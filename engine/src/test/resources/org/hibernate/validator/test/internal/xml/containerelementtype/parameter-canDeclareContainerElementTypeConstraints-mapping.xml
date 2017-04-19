@@ -9,16 +9,16 @@
     <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForParameterXmlMappingTest$IFishTank" ignore-annotations="false">
         <method name="test1">
             <parameter type="java.util.Optional">
-                <containerElementType>
+                <container-element-type>
                     <constraint annotation="javax.validation.constraints.Size">
                         <element name="max">
                             <value>5</value>
                         </element>
                     </constraint>
-                </containerElementType>
+                </container-element-type>
             </parameter>
             <parameter type="java.util.Map">
-                <containerElementType typeArgumentIndex="0">
+                <container-element-type type-argument-index="0">
                     <constraint annotation="javax.validation.constraints.Size">
                         <element name="min">
                             <value>3</value>
@@ -27,14 +27,14 @@
                             <value>10</value>
                         </element>
                     </constraint>
-                </containerElementType>
-                <containerElementType typeArgumentIndex="1">
+                </container-element-type>
+                <container-element-type type-argument-index="1">
                     <constraint annotation="javax.validation.constraints.Min">
                         <element name="value">
                             <value>1</value>
                         </element>
                     </constraint>
-                </containerElementType>
+                </container-element-type>
             </parameter>
         </method>
     </bean>

@@ -11,7 +11,7 @@
             <parameter type="java.util.Optional">
             </parameter>
             <parameter type="java.util.Map">
-                <containerElementType />
+                <container-element-type />
             </parameter>
         </method>
     </bean>

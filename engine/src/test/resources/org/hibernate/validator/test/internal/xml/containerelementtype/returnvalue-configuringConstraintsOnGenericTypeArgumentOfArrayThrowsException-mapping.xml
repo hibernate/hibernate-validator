@@ -10,13 +10,13 @@
         <method name="test9">
             <parameter type="[Ljava.lang.Object;" />
             <return-value>
-                <containerElementType typeArgumentIndex="0">
+                <container-element-type type-argument-index="0">
                     <constraint annotation="javax.validation.constraints.Size">
                         <element name="max">
                             <value>5</value>
                         </element>
                     </constraint>
-                </containerElementType>
+                </container-element-type>
             </return-value>
         </method>
     </bean>

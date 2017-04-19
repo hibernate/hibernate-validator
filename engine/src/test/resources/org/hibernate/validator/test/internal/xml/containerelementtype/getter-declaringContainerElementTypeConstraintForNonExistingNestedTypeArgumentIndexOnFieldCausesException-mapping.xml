@@ -8,10 +8,10 @@
 
     <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForGetterXmlMappingTest$FishTank" ignore-annotations="false">
         <getter name="fishOfTheMonth">
-            <containerElementType typeArgumentIndex="1">
-                <containerElementType typeArgumentIndex="2">
-                </containerElementType>
-            </containerElementType>
+            <container-element-type type-argument-index="1">
+                <container-element-type type-argument-index="2">
+                </container-element-type>
+            </container-element-type>
         </getter>
     </bean>
 </constraint-mappings>
