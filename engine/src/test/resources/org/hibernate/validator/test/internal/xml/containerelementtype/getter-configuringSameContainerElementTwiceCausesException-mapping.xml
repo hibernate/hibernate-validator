@@ -8,19 +8,19 @@
 
     <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForGetterXmlMappingTest$FishTank" ignore-annotations="false">
         <getter name="tagsOfFishOfTheMonth">
-            <containerElementType typeArgumentIndex="0">
-                <containerElementType typeArgumentIndex="1">
-                    <containerElementType typeArgumentIndex="0">
+            <container-element-type type-argument-index="0">
+                <container-element-type type-argument-index="1">
+                    <container-element-type type-argument-index="0">
                         <constraint annotation="javax.validation.constraints.NotNull" />
-                    </containerElementType>
-                </containerElementType>
-            </containerElementType>
-            <containerElementType typeArgumentIndex="0">
-                <containerElementType typeArgumentIndex="1">
-                    <containerElementType typeArgumentIndex="0">
-                    </containerElementType>
-                </containerElementType>
-            </containerElementType>
+                    </container-element-type>
+                </container-element-type>
+            </container-element-type>
+            <container-element-type type-argument-index="0">
+                <container-element-type type-argument-index="1">
+                    <container-element-type type-argument-index="0">
+                    </container-element-type>
+                </container-element-type>
+            </container-element-type>
         </getter>
     </bean>
 </constraint-mappings>

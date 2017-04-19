@@ -9,13 +9,13 @@
     <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForParameterXmlMappingTest$IFishTank" ignore-annotations="false">
         <method name="test5">
             <parameter type="[Ljava.lang.String;">
-                <containerElementType>
+                <container-element-type>
                     <constraint annotation="javax.validation.constraints.Size">
                         <element name="max">
                             <value>5</value>
                         </element>
                     </constraint>
-                </containerElementType>
+                </container-element-type>
             </parameter>
         </method>
     </bean>

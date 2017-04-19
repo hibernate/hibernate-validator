@@ -9,11 +9,11 @@
     <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForReturnValueXmlMappingTest$IFishTank" ignore-annotations="false">
         <method name="test2">
             <return-value>
-                <containerElementType typeArgumentIndex="1">
-                    <containerElementType typeArgumentIndex="0">
+                <container-element-type type-argument-index="1">
+                    <container-element-type type-argument-index="0">
                         <constraint annotation="javax.validation.constraints.NotNull" />
-                    </containerElementType>
-                </containerElementType>
+                    </container-element-type>
+                </container-element-type>
             </return-value>
         </method>
     </bean>

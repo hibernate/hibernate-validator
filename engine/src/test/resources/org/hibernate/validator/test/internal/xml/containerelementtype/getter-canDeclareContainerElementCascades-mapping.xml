@@ -8,9 +8,9 @@
 
     <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForGetterXmlMappingTest$FishTank" ignore-annotations="false">
         <getter name="boss">
-            <containerElementType>
+            <container-element-type>
                 <valid />
-            </containerElementType>
+            </container-element-type>
         </getter>
     </bean>
 
