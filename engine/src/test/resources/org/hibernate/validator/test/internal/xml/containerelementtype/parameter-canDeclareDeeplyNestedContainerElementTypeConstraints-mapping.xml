@@ -9,13 +9,13 @@
     <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForParameterXmlMappingTest$IFishTank" ignore-annotations="false">
         <method name="test3">
             <parameter type="java.util.List">
-                <containerElementType typeArgumentIndex="0">
-                    <containerElementType typeArgumentIndex="1">
-                        <containerElementType typeArgumentIndex="0">
+                <container-element-type type-argument-index="0">
+                    <container-element-type type-argument-index="1">
+                        <container-element-type type-argument-index="0">
                             <constraint annotation="javax.validation.constraints.NotNull" />
-                        </containerElementType>
-                    </containerElementType>
-                </containerElementType>
+                        </container-element-type>
+                    </container-element-type>
+                </container-element-type>
             </parameter>
         </method>
     </bean>

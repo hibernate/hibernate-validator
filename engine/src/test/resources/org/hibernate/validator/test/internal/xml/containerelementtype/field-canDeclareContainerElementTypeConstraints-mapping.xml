@@ -8,16 +8,16 @@
 
     <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForFieldXmlMappingTest$FishTank" ignore-annotations="false">
         <field name="model">
-            <containerElementType>
+            <container-element-type>
                 <constraint annotation="javax.validation.constraints.Size">
                     <element name="max">
                         <value>5</value>
                     </element>
                 </constraint>
-            </containerElementType>
+            </container-element-type>
         </field>
         <field name="fishCountByType">
-            <containerElementType typeArgumentIndex="0">
+            <container-element-type type-argument-index="0">
                 <constraint annotation="javax.validation.constraints.Size">
                     <element name="min">
                         <value>3</value>
@@ -26,14 +26,14 @@
                         <value>10</value>
                     </element>
                 </constraint>
-            </containerElementType>
-            <containerElementType typeArgumentIndex="1">
+            </container-element-type>
+            <container-element-type type-argument-index="1">
                 <constraint annotation="javax.validation.constraints.Min">
                     <element name="value">
                         <value>1</value>
                     </element>
                 </constraint>
-            </containerElementType>
+            </container-element-type>
         </field>
     </bean>
 </constraint-mappings>
