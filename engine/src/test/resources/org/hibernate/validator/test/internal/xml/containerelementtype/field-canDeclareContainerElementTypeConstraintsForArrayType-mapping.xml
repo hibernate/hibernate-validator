@@ -8,13 +8,13 @@
 
     <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForFieldXmlMappingTest$FishTank" ignore-annotations="false">
         <field name="fishNames">
-            <containerElementType>
+            <container-element-type>
                 <constraint annotation="javax.validation.constraints.Size">
                     <element name="max">
                         <value>5</value>
                     </element>
                 </constraint>
-            </containerElementType>
+            </container-element-type>
         </field>
     </bean>
 </constraint-mappings>

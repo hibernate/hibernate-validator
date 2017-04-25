@@ -9,7 +9,7 @@
     <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForReturnValueXmlMappingTest$IFishTank" ignore-annotations="false">
         <method name="test1">
             <return-value>
-                <containerElementType />
+                <container-element-type />
             </return-value>
         </method>
     </bean>

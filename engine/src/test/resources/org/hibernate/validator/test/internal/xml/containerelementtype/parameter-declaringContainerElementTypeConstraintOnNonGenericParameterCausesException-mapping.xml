@@ -9,8 +9,8 @@
     <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForParameterXmlMappingTest$IFishTank" ignore-annotations="false">
         <method name="setSize">
             <parameter type="int">
-                <containerElementType typeArgumentIndex="1">
-                </containerElementType>
+                <container-element-type type-argument-index="1">
+                </container-element-type>
             </parameter>
         </method>
     </bean>

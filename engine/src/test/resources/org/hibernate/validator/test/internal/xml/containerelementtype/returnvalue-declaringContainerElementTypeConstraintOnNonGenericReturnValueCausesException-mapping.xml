@@ -9,8 +9,8 @@
     <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForReturnValueXmlMappingTest$IFishTank" ignore-annotations="false">
         <method name="getSize">
             <return-value>
-                <containerElementType typeArgumentIndex="1">
-                </containerElementType>
+                <container-element-type type-argument-index="1">
+                </container-element-type>
             </return-value>
         </method>
     </bean>

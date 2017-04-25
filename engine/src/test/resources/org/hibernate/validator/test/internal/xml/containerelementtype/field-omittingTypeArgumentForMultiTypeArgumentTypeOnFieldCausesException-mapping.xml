@@ -8,7 +8,7 @@
 
     <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForFieldXmlMappingTest$FishTank" ignore-annotations="false">
         <field name="fishCountByType">
-            <containerElementType />
+            <container-element-type />
         </field>
     </bean>
 </constraint-mappings>

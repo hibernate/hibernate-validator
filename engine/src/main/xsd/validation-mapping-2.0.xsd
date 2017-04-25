@@ -112,16 +112,20 @@
     <xs:complexType name="containerElementTypeType">
         <xs:sequence>
             <xs:element type="xs:string" name="valid" minOccurs="0" fixed=""/>
+            <xs:element type="map:groupConversionType"
+                        name="convert-group"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
             <xs:element type="map:constraintType"
                         name="constraint"
                         maxOccurs="unbounded"
                         minOccurs="0"/>
             <xs:element type="map:containerElementTypeType"
-                        name="containerElementType"
+                        name="container-element-type"
                         maxOccurs="unbounded"
                         minOccurs="0"/>
         </xs:sequence>
-        <xs:attribute name="typeArgumentIndex" use="optional">
+        <xs:attribute name="type-argument-index" use="optional">
             <xs:simpleType>
                 <xs:restriction base="xs:int">
                     <xs:minInclusive value="0" />
@@ -183,7 +187,7 @@
                         minOccurs="0"
                         maxOccurs="unbounded"/>
             <xs:element type="map:containerElementTypeType"
-                        name="containerElementType"
+                        name="container-element-type"
                         minOccurs="0"
                         maxOccurs="unbounded"/>
             <xs:element type="map:constraintType"
@@ -237,7 +241,7 @@
                         minOccurs="0"
                         maxOccurs="unbounded"/>
             <xs:element type="map:containerElementTypeType"
-                        name="containerElementType"
+                        name="container-element-type"
                         minOccurs="0"
                         maxOccurs="unbounded"/>
             <xs:element type="map:constraintType"
@@ -256,7 +260,7 @@
                         minOccurs="0"
                         maxOccurs="unbounded"/>
             <xs:element type="map:containerElementTypeType"
-                        name="containerElementType"
+                        name="container-element-type"
                         minOccurs="0"
                         maxOccurs="unbounded"/>
             <xs:element type="map:constraintType"
@@ -290,7 +294,7 @@
                         minOccurs="0"
                         maxOccurs="unbounded"/>
             <xs:element type="map:containerElementTypeType"
-                        name="containerElementType"
+                        name="container-element-type"
                         minOccurs="0"
                         maxOccurs="unbounded"/>
             <xs:element type="map:constraintType"
