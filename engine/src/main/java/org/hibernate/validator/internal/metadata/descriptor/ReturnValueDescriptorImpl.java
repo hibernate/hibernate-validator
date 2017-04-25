@@ -10,6 +10,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 
+import javax.validation.metadata.ContainerElementTypeDescriptor;
 import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 
@@ -45,6 +46,11 @@ public class ReturnValueDescriptorImpl extends ElementDescriptorImpl
 	@Override
 	public boolean isCascaded() {
 		return cascaded;
+	}
+
+	@Override
+	public List<ContainerElementTypeDescriptor> getContainerElementTypes() {
+		throw new UnsupportedOperationException( "Not supported for now" );
 	}
 
 	@Override
