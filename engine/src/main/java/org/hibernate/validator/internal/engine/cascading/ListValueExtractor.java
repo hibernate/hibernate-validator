@@ -23,7 +23,7 @@ class ListValueExtractor implements ValueExtractor<List<@ExtractedValue ?>> {
 	@Override
 	public void extractValues(List<?> originalValue, ValueReceiver receiver) {
 		for ( int i = 0; i < originalValue.size(); i++ ) {
-			receiver.indexedValue( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, i, originalValue.get( i ) );
+			receiver.indexedValue( NodeImpl.LIST_ELEMENT_NODE_NAME, i, originalValue.get( i ) );
 		}
 	}
 }
