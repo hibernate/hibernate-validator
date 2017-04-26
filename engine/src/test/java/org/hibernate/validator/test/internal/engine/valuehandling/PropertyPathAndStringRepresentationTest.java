@@ -187,12 +187,12 @@ public class PropertyPathAndStringRepresentationTest {
 
 		Set<ConstraintViolation<Block>> constraintViolations = validator.validate( block );
 
-		assertCorrectPropertyPaths( constraintViolations, "addresses[0].<iterable element>" );
+		assertCorrectPropertyPaths( constraintViolations, "addresses[0].<list element>" );
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "addresses" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
 		);
 	}
 

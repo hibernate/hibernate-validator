@@ -82,7 +82,7 @@ public class NestedCascadedConstraintsTest {
 				constraintViolations,
 				"map[Optional[Cinema<cinema2>]].<map value>[1].email",
 				"map[Optional[Cinema<cinema2>]].<map value>[2].email",
-				"map[Optional[Cinema<cinema3>]].<map value>[0].<iterable element>"
+				"map[Optional[Cinema<cinema3>]].<map value>[0].<list element>"
 		);
 		assertCorrectConstraintTypes( constraintViolations, Email.class, Email.class, NotNull.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
@@ -97,7 +97,7 @@ public class NestedCascadedConstraintsTest {
 				pathWith()
 						.property( "map" )
 						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, invalidCinemaEmailAddresses.map.keySet().toArray()[2], null, Map.class, 1 )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
 		);
 
 		CinemaEmailAddresses invalidKeyCinemaEmailAddresses = CinemaEmailAddresses.invalidKey();
@@ -133,7 +133,7 @@ public class NestedCascadedConstraintsTest {
 
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"array[0].<iterable element>[0].<iterable element>",
+				"array[0].<iterable element>[0].<list element>",
 				"array[0].<iterable element>[1].visitor.name"
 		);
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotNull.class );
@@ -141,7 +141,7 @@ public class NestedCascadedConstraintsTest {
 				pathWith()
 						.property( "array" )
 						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 ),
+						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 ),
 				pathWith()
 						.property( "array" )
 						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )

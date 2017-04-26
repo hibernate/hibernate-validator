@@ -24,7 +24,6 @@ import javax.validation.constraints.Size;
 import javax.validation.valueextraction.Unwrapping;
 import javax.validation.valueextraction.ValueExtractor;
 
-import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -89,7 +88,7 @@ public class JavaFXValueExtractorsTest {
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
 
 		constraintViolations = validator.validate( ListPropertyEntity.invalidListElement() );
-		assertCorrectPropertyPaths( constraintViolations, "listProperty[0]." + NodeImpl.ITERABLE_ELEMENT_NODE_NAME );
+		assertCorrectPropertyPaths( constraintViolations, "listProperty[0].<list element>" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
 	}
 
@@ -103,7 +102,7 @@ public class JavaFXValueExtractorsTest {
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
 
 		constraintViolations = validator.validate( SetPropertyEntity.invalidSetElement() );
-		assertCorrectPropertyPaths( constraintViolations, "setProperty[]." + NodeImpl.ITERABLE_ELEMENT_NODE_NAME );
+		assertCorrectPropertyPaths( constraintViolations, "setProperty[].<iterable element>" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
 	}
 
@@ -117,11 +116,11 @@ public class JavaFXValueExtractorsTest {
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
 
 		constraintViolations = validator.validate( MapPropertyEntity.invalidMapKey() );
-		assertCorrectPropertyPaths( constraintViolations, "mapProperty<K>[app]." + NodeImpl.MAP_KEY_NODE_NAME );
+		assertCorrectPropertyPaths( constraintViolations, "mapProperty<K>[app].<map key>" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
 
 		constraintViolations = validator.validate( MapPropertyEntity.invalidMapValue() );
-		assertCorrectPropertyPaths( constraintViolations, "mapProperty[pear]." + NodeImpl.MAP_VALUE_NODE_NAME );
+		assertCorrectPropertyPaths( constraintViolations, "mapProperty[pear].<map value>" );
 		assertCorrectConstraintTypes( constraintViolations, Email.class );
 	}
 

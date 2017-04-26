@@ -78,7 +78,7 @@ public class TypeAnnotationConstraintTest {
 
 		Set<ConstraintViolation<TypeWithList1>> constraintViolations = validator.validate( l );
 
-		assertCorrectPropertyPaths( constraintViolations, "names[1].<iterable element>", "names[2].<iterable element>", "names[2].<iterable element>" );
+		assertCorrectPropertyPaths( constraintViolations, "names[1].<list element>", "names[2].<list element>", "names[2].<list element>" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
 				NotBlank.class,
@@ -93,7 +93,7 @@ public class TypeAnnotationConstraintTest {
 		l.bars = Arrays.asList( new Bar( 2 ), null );
 		Set<ConstraintViolation<TypeWithList3>> constraintViolations = validator.validate( l );
 		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "bars[1].<iterable element>", "bars[0].number" );
+		assertCorrectPropertyPaths( constraintViolations, "bars[1].<list element>", "bars[0].number" );
 		assertCorrectConstraintTypes( constraintViolations, Min.class, NotNull.class );
 	}
 
@@ -104,7 +104,7 @@ public class TypeAnnotationConstraintTest {
 		l.names = Arrays.asList( "First", "", null );
 		Set<ConstraintViolation<TypeWithList4>> constraintViolations = validator.validate( l );
 		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "names[1].<iterable element>", "names[2].<iterable element>" );
+		assertCorrectPropertyPaths( constraintViolations, "names[1].<list element>", "names[2].<list element>" );
 		assertCorrectConstraintTypes( constraintViolations, NotBlank.class, NotBlank.class );
 
 		l = new TypeWithList4();
@@ -123,7 +123,7 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<TypeWithList5>> constraintViolations = validator.validate( l );
 
 		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "strings[0].<iterable element>", "strings[2].<iterable element>", "strings[2].<iterable element>" );
+		assertCorrectPropertyPaths( constraintViolations, "strings[0].<list element>", "strings[2].<list element>", "strings[2].<list element>" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
 				NotBlank.class,
@@ -143,9 +143,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"returnStrings.<return value>[1].<iterable element>",
-				"returnStrings.<return value>[2].<iterable element>",
-				"returnStrings.<return value>[2].<iterable element>"
+				"returnStrings.<return value>[1].<list element>",
+				"returnStrings.<return value>[2].<list element>",
+				"returnStrings.<return value>[2].<list element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -168,7 +168,7 @@ public class TypeAnnotationConstraintTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "names" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
 		);
 	}
 
@@ -185,9 +185,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"setValues.listParameter[0].<iterable element>",
-				"setValues.listParameter[2].<iterable element>",
-				"setValues.listParameter[2].<iterable element>"
+				"setValues.listParameter[0].<list element>",
+				"setValues.listParameter[2].<list element>",
+				"setValues.listParameter[2].<list element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -209,9 +209,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"TypeWithList8.listParameter[0].<iterable element>",
-				"TypeWithList8.listParameter[2].<iterable element>",
-				"TypeWithList8.listParameter[2].<iterable element>"
+				"TypeWithList8.listParameter[0].<list element>",
+				"TypeWithList8.listParameter[2].<list element>",
+				"TypeWithList8.listParameter[2].<list element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
