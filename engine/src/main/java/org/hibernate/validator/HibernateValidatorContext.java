@@ -7,11 +7,13 @@
 
 package org.hibernate.validator;
 
+import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidatorContext;
+import javax.validation.valueextraction.ValueExtractor;
 
 /**
  * Represents a Hibernate Validator specific context that is used to create
@@ -39,6 +41,18 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 */
 	@Override
 	HibernateValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider);
+
+	/**
+	 * @since 6.0
+	 */
+	@Override
+	HibernateValidatorContext clockProvider(ClockProvider clockProvider);
+
+	/**
+	 * @since 6.0
+	 */
+	@Override
+	HibernateValidatorContext addValueExtractor(ValueExtractor<?> extractor);
 
 	/**
 	 * En- or disables the fail fast mode. When fail fast is enabled the validation
