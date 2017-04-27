@@ -293,7 +293,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 37 )
+				new DiagnosticExpectation( Kind.ERROR, 32 )
 		);
 	}
 

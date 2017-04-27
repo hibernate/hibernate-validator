@@ -29,7 +29,7 @@ import org.hibernate.validator.constraints.Length;
  */
 
 @Length(min = 5)
-@Length.List(@Length(min = 45))
+@Length.List({ @Length(min = 45) })
 @Target({ ANNOTATION_TYPE, METHOD, CONSTRUCTOR })
 @Retention(RUNTIME)
 @Constraint(validatedBy = MixDirectAnnotationAndListContainerAnnotation.MixDirectAnnotationAndListContainerAnnotationValidator.class)
