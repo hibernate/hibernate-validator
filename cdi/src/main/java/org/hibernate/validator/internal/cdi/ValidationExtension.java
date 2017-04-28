@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.cdi;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
@@ -53,8 +55,6 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * A CDI portable extension which integrates Bean Validation with CDI. It registers the following objects:
@@ -105,8 +105,14 @@ public class ValidationExtension implements Extension {
 	private Bean<?> defaultValidatorBean;
 	private Bean<?> hibernateValidatorBean;
 
+	private final SimpleValidationProviderResolver validationProviderResolver;
+
 	public ValidationExtension() {
-		Configuration<?> config = Validation.byDefaultProvider().configure();
+		validationProviderResolver = new SimpleValidationProviderResolver();
+
+		Configuration<?> config = Validation.byDefaultProvider()
+				.providerResolver( validationProviderResolver )
+				.configure();
 		BootstrapConfiguration bootstrap = config.getBootstrapConfiguration();
 		globalExecutableTypes = bootstrap.getDefaultValidatedExecutableTypes();
 		isExecutableValidationEnabled = bootstrap.isExecutableValidationEnabled();
@@ -147,7 +153,7 @@ public class ValidationExtension implements Extension {
 
 		// register default VF if none has been provided by the application or another PE
 		if ( defaultValidatorFactoryBean == null ) {
-			defaultValidatorFactoryBean = new ValidatorFactoryBean( beanManager, defaultProviderHelper );
+			defaultValidatorFactoryBean = new ValidatorFactoryBean( beanManager, defaultProviderHelper, validationProviderResolver );
 			if ( hibernateValidatorFactoryBean == null && defaultProviderHelper.isHibernateValidator() ) {
 				hibernateValidatorFactoryBean = defaultValidatorFactoryBean;
 			}
@@ -157,7 +163,7 @@ public class ValidationExtension implements Extension {
 		// register VF with @HibernateValidator qualifier in case it hasn't been contributed by the application and the
 		// default VF registered by ourselves isn't for Hibernate Validator
 		if ( hibernateValidatorFactoryBean == null ) {
-			hibernateValidatorFactoryBean = new ValidatorFactoryBean( beanManager, hvProviderHelper );
+			hibernateValidatorFactoryBean = new ValidatorFactoryBean( beanManager, hvProviderHelper, validationProviderResolver );
 			afterBeanDiscoveryEvent.addBean( hibernateValidatorFactoryBean );
 		}
 
