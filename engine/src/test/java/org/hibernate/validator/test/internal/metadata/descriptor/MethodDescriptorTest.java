@@ -6,6 +6,13 @@
  */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.hibernate.validator.testutils.ValidatorUtil.getMethodDescriptor;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
@@ -24,13 +31,6 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerExtension;
 import org.hibernate.validator.test.internal.metadata.IllegalCustomerRepositoryExt;
 import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.hibernate.validator.testutils.ValidatorUtil.getMethodDescriptor;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 /**
  * @author Gunnar Morling

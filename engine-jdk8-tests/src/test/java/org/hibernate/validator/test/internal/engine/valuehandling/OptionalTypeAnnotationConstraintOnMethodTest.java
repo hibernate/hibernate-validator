@@ -6,6 +6,20 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE_USE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -20,7 +34,6 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
-import org.fest.assertions.Assertions;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -31,19 +44,6 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.constraints.NotBlankTypeUse;
 import org.hibernate.validator.testutils.constraints.NotNullTypeUse;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
-
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.TYPE_USE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 /**
  * Test combination of {@link Optional} and {@link UnwrapValidatedValue} on methods.
@@ -95,7 +95,7 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 
 		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectPropertyPaths( constraintViolations, "method.arg0", "method.arg0" );
-		Assertions.assertThat( constraintViolations ).onProperty( "message" ).containsOnly( "container", "type" );
+		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotNullTypeUse.class );
 	}
 
@@ -136,7 +136,7 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateParameters( new ModelD(), method, values );
 
-		Assertions.assertThat( constraintViolations ).isEmpty();
+		assertThat( constraintViolations ).isEmpty();
 	}
 
 	@Test
@@ -149,7 +149,7 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 
 		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectPropertyPaths( constraintViolations, "method.arg0", "method.arg0" );
-		Assertions.assertThat( constraintViolations ).onProperty( "message" ).containsOnly( "container", "type" );
+		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
 		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class, NotNull.class );
 	}
 
@@ -200,7 +200,7 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateParameters( new ModelE(), method, values );
 
-		Assertions.assertThat( constraintViolations ).isEmpty();
+		assertThat( constraintViolations ).isEmpty();
 	}
 
 	@Test

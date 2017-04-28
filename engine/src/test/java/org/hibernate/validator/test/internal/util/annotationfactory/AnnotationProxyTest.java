@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.util.annotationfactory;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;

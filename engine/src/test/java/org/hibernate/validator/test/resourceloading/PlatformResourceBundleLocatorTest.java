@@ -6,6 +6,11 @@
  */
 package org.hibernate.validator.test.resourceloading;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.testng.Assert.assertEquals;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -22,11 +27,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.testng.Assert.assertEquals;
 
 
 /**

@@ -6,6 +6,14 @@
  */
 package org.hibernate.validator.testutil;
 
+import static org.assertj.core.api.Fail.fail;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.IterableAssert;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,15 +28,6 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
-
-import org.fest.assertions.Assertions;
-import org.fest.assertions.CollectionAssert;
-
-import static org.fest.assertions.Formatting.format;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.PathImpl.createNewPath;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 /**
  * This class provides useful functions to assert correctness of constraint violations raised
@@ -69,7 +68,7 @@ public final class ConstraintViolationAssert {
 			actualMessages.add( violation.getMessage() );
 		}
 
-		Assertions.assertThat( actualMessages ).containsOnly( (Object[]) expectedMessages );
+		Assertions.assertThat( actualMessages ).containsOnly( expectedMessages );
 	}
 
 	public static void assertCorrectConstraintViolationMessages(ConstraintViolationException e,
@@ -140,7 +139,7 @@ public final class ConstraintViolationAssert {
 	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage,
 			Class<?> rootBeanClass, Object invalidValue, String propertyPath) {
 		assertTrue(
-				pathsAreEqual( violation.getPropertyPath(), createNewPath( propertyPath ) ),
+				pathsAreEqual( violation.getPropertyPath(), PathImpl.createNewPath(propertyPath) ),
 				"Wrong propertyPath"
 		);
 		assertConstraintViolation( violation, errorMessage, rootBeanClass, invalidValue );
@@ -340,7 +339,7 @@ public final class ConstraintViolationAssert {
 		return new PathExpectation();
 	}
 
-	public static class ConstraintViolationSetAssert extends CollectionAssert {
+	public static class ConstraintViolationSetAssert extends IterableAssert {
 
 		private final Set<? extends ConstraintViolation<?>> actualViolations;
 
@@ -363,14 +362,14 @@ public final class ConstraintViolationAssert {
 			actualPathsTmp.removeAll( expectedPaths );
 
 			if ( !actualPathsTmp.isEmpty() ) {
-				fail( format( "Found unexpected path(s): <%s>. Expected: <%s>", actualPathsTmp, expectedPaths ) );
+				fail( String.format( "Found unexpected path(s): <%s>. Expected: <%s>", actualPathsTmp, expectedPaths ) );
 			}
 
 			List<PathExpectation> expectedPathsTmp = new ArrayList<PathExpectation>( expectedPaths );
 			expectedPathsTmp.removeAll( actualPaths );
 
 			if ( !expectedPathsTmp.isEmpty() ) {
-				fail( format( "Missing expected path(s) <%s>. Actual paths: <%s>", expectedPathsTmp, actualPaths ) );
+				fail( String.format( "Missing expected path(s) <%s>. Actual paths: <%s>", expectedPathsTmp, actualPaths ) );
 			}
 		}
 
@@ -386,7 +385,7 @@ public final class ConstraintViolationAssert {
 				actualPaths.add( actual );
 			}
 
-			fail( format( "Didn't find path <%s> in actual paths <%s>.", expectedPath, actualPaths ) );
+			fail( String.format( "Didn't find path <%s> in actual paths <%s>.", expectedPath, actualPaths ) );
 		}
 
 		public void containsPaths(PathExpectation... expectedPaths) {
