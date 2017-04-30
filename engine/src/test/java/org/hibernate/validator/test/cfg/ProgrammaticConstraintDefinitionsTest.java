@@ -75,12 +75,16 @@ public class ProgrammaticConstraintDefinitionsTest {
 		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 				.additionalTagsWithAttributes( AnnotationFactory.create( tagDescriptor ) ), "<td class='class' id='tableId'>1234qwer</td>", 0 );
 
-		AnnotationDescriptor<SafeHtml.Tag> protocolDescriptor = new AnnotationDescriptor( SafeHtml.Tag.class );
-		protocolDescriptor.setValue( "name", "img" );
-		protocolDescriptor.setValue( "attributes", new String[]{ "src" } );
-		protocolDescriptor.setValue( "protocols", new String[]{ "data" } );
+		AnnotationDescriptor<SafeHtml.Tag.Attribute> attributeDescriptor = new AnnotationDescriptor( SafeHtml.Tag.Attribute.class );
+		attributeDescriptor.setValue( "name",  "src"  );
+		attributeDescriptor.setValue( "protocols", new String[]{ "data" } );
+
+		tagDescriptor = new AnnotationDescriptor( SafeHtml.Tag.class );
+		tagDescriptor.setValue( "name", "img" );
+		tagDescriptor.setValue( "additionalAttributesWithProtocols", new SafeHtml.Tag.Attribute[]{ AnnotationFactory.create( attributeDescriptor ) } );
+
 		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-				.additionalTagsWithAttributes( AnnotationFactory.create( protocolDescriptor ) ), "<img src='data:image/png;base64,100101' />", 0 );
+				.additionalTagsWithAttributes( AnnotationFactory.create( tagDescriptor ) ), "<img src='data:image/png;base64,100101' />", 0 );
 	}
 
 	@Test
