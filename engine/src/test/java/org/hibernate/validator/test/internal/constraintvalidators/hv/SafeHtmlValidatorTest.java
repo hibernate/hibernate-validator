@@ -166,12 +166,13 @@ public class SafeHtmlValidatorTest {
 		assertNumberOfViolations( validator.validate( new Bar( "<div src='data:image/png;base64,100101' />" ) ), 1 );
 		assertNumberOfViolations( validator.validate( new Bar(
 				"<custom>" +
-						"  <img src='data:image/png;base64,100101' />" +
-						"  <custom attr1='strange_protocol:some_text' />" +
-						"  <custom><img /></custom>" +
-						"  <section id='sec1' attr='val'></section>" +
-						"  <custom attr1='dataprotocol:some_text' attr2='strange_protocol:some_text' />" +
-						"</custom>" ) ), 0 );
+				"  <img src='data:image/png;base64,100101' />" +
+				"  <custom attr1='strange_protocol:some_text' />" +
+				"  <custom attr3='some_protocol:some_text' />" +
+				"  <custom><img /></custom>" +
+				"  <section id='sec1' attr='val'></section>" +
+				"  <custom attr1='dataprotocol:some_text' attr2='strange_protocol:some_text' />" +
+				"</custom>" ) ), 0 );
 	}
 
 	@Test
@@ -211,8 +212,12 @@ public class SafeHtmlValidatorTest {
 		@SafeHtml(
 				whitelistType = WhiteListType.BASIC,
 				additionalTagsWithAttributes = {
-						@SafeHtml.Tag(name = "img", attributes = "src", protocols = { "data" }),
-						@SafeHtml.Tag(name = "custom", attributes = { "attr1", "attr2" }, protocols = { "dataprotocol", "strange_protocol" }),
+						@SafeHtml.Tag(name = "img", additionalAttributesWithProtocols = @SafeHtml.Tag.Attribute(name = "src", protocols = { "data" })),
+						@SafeHtml.Tag(name = "custom", additionalAttributesWithProtocols = {
+								@SafeHtml.Tag.Attribute(name = "attr1", protocols = { "dataprotocol", "strange_protocol" }),
+								@SafeHtml.Tag.Attribute(name = "attr2", protocols = { "dataprotocol", "strange_protocol" }),
+								@SafeHtml.Tag.Attribute(name = "attr3", protocols = "some_protocol")
+						}),
 						@SafeHtml.Tag(name = "section", attributes = { "attr", "id" })
 				}
 		)
