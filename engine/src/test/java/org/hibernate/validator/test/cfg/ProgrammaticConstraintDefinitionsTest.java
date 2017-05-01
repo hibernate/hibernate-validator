@@ -85,6 +85,16 @@ public class ProgrammaticConstraintDefinitionsTest {
 
 		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 				.additionalTagsWithAttributes( AnnotationFactory.create( tagDescriptor ) ), "<img src='data:image/png;base64,100101' />", 0 );
+		doProgrammaticTest(
+				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
+						.additionalTag( "img" ).attribute( "src" ).protocols( "data" ),
+				"<img src='data:image/png;base64,100101' />", 0
+		);
+		doProgrammaticTest(
+				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
+						.additionalTag( "td" ).attributes( "class", "id" ),
+				"<td class='class' id='tableId'>1234qwer</td>", 0
+		);
 	}
 
 	@Test
