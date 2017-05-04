@@ -14,15 +14,10 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.Map;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Represents a programmatically configured constraint and meta-data
@@ -31,8 +26,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  */
 class ConfiguredConstraint<A extends Annotation> {
-
-	private static final Log log = LoggerFactory.make();
 
 	private final ConstraintDefAccessor<A> constraint;
 	private final ConstraintLocation location;
@@ -99,27 +92,8 @@ class ConfiguredConstraint<A extends Annotation> {
 		return location;
 	}
 
-	public Class<A> getConstraintType() {
-		return constraint.getConstraintType();
-	}
-
-	public Map<String, Object> getParameters() {
-		return constraint.getParameters();
-	}
-
 	public A createAnnotationProxy() {
-
-		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<>( getConstraintType() );
-		for ( Map.Entry<String, Object> parameter : getParameters().entrySet() ) {
-			annotationDescriptor.setValue( parameter.getKey(), parameter.getValue() );
-		}
-
-		try {
-			return AnnotationFactory.create( annotationDescriptor );
-		}
-		catch (RuntimeException e) {
-			throw log.getUnableToCreateAnnotationForConfiguredConstraintException( e );
-		}
+		return constraint.createAnnotationProxy();
 	}
 
 	@Override
@@ -137,12 +111,9 @@ class ConfiguredConstraint<A extends Annotation> {
 			super( original );
 		}
 
-		private Class<A> getConstraintType() {
-			return constraintType;
-		}
-
-		private Map<String, Object> getParameters() {
-			return parameters;
+		@Override
+		protected A createAnnotationProxy() {
+			return super.createAnnotationProxy();
 		}
 	}
 
