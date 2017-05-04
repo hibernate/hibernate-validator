@@ -166,13 +166,20 @@ public class SafeHtmlValidatorTest {
 		assertNumberOfViolations( validator.validate( new Bar( "<div src='data:image/png;base64,100101' />" ) ), 1 );
 		assertNumberOfViolations( validator.validate( new Bar(
 				"<custom>" +
-				"  <img src='data:image/png;base64,100101' />" +
-				"  <custom attr1='strange_protocol:some_text' />" +
-				"  <custom attr3='some_protocol:some_text' />" +
-				"  <custom><img /></custom>" +
-				"  <section id='sec1' attr='val'></section>" +
-				"  <custom attr1='dataprotocol:some_text' attr2='strange_protocol:some_text' />" +
-				"</custom>" ) ), 0 );
+						"  <img src='data:image/png;base64,100101' />" +
+						"  <custom attr1='strange_protocol:some_text' />" +
+						"  <custom attr3='some_protocol:some_text' />" +
+						"  <custom><img /></custom>" +
+						"  <section id='sec1' attr='val'></section>" +
+						"  <custom attr1='dataprotocol:some_text' attr2='strange_protocol:some_text' />" +
+						"</custom>" ) ), 0 );
+		assertNumberOfViolations( validator.validate( new Bar(
+				"<div>" +
+						"<img src='not_data:image/png;base64,100101' />" +
+						"<custom attr1='strange_protocol:some_text' />" +
+						"/<div>"
+
+		) ), 1 );
 	}
 
 	@Test
