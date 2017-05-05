@@ -150,6 +150,26 @@ public class NestedCascadedConstraintsTest {
 		);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1326")
+	public void testNestedNullValue() {
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.addValueExtractor( new ReferenceValueExtractor() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		Set<ConstraintViolation<NestedCascadingListWithValidAllAlongTheWay>> constraintViolations = validator
+				.validate( NestedCascadingListWithValidAllAlongTheWay.valid() );
+
+		assertNumberOfViolations( constraintViolations, 0 );
+
+		constraintViolations = validator.validate( NestedCascadingListWithValidAllAlongTheWay.withNullList() );
+
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertCorrectPropertyPaths( constraintViolations, "list[0].<list element>" );
+	}
+
 	private static class EmailAddressMap {
 
 		private final Map<String, List<@Valid EmailAddress>> map = new LinkedHashMap<>();
@@ -237,4 +257,25 @@ public class NestedCascadedConstraintsTest {
 		}
 	}
 
+	@SuppressWarnings({ "unused" })
+	private static class NestedCascadingListWithValidAllAlongTheWay {
+
+		private List<@NotNull List<@NotNull @Valid Cinema>> list;
+
+		private static NestedCascadingListWithValidAllAlongTheWay valid() {
+			NestedCascadingListWithValidAllAlongTheWay valid = new NestedCascadingListWithValidAllAlongTheWay();
+
+			valid.list = Arrays.asList( Arrays.asList( new Cinema( "cinema1", new SomeReference<>( new Visitor( "Name 1" ) ) ) ) );
+
+			return valid;
+		}
+
+		private static NestedCascadingListWithValidAllAlongTheWay withNullList() {
+			NestedCascadingListWithValidAllAlongTheWay valid = new NestedCascadingListWithValidAllAlongTheWay();
+
+			valid.list = Arrays.asList( (List<Cinema>) null );
+
+			return valid;
+		}
+	}
 }
