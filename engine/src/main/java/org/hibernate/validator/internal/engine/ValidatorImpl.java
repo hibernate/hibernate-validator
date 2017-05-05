@@ -688,7 +688,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		private void doValidate(Object value, String nodeName) {
-			if ( context.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath() ) || shouldFailFast( context ) ) {
+			if ( value == null ||
+					context.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath() ) ||
+					shouldFailFast( context ) ) {
 				return;
 			}
 
