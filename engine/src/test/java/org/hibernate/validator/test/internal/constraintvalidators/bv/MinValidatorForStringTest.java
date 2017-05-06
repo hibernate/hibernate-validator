@@ -13,7 +13,7 @@ import javax.validation.constraints.Min;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForCharSequence;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;

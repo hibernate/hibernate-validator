@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.constraintvalidators.bv.money;
 
 import javax.money.MonetaryAmount;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.BaseNegativeValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.BaseNegativeValidator;
 
 /**
  * Check that the number being validated positive.
