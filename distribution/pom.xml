@@ -174,7 +174,7 @@
                 <jdk>9</jdk>
             </activation>
             <properties>
-                <javadoc.additional.param>--add-modules=${maven-javadoc-plugin.jigsaw.modules}</javadoc.additional.param>
+                <javadoc.additional.param>-html5 --add-modules=${maven-javadoc-plugin.jigsaw.modules}</javadoc.additional.param>
             </properties>
         </profile>
     </profiles>
