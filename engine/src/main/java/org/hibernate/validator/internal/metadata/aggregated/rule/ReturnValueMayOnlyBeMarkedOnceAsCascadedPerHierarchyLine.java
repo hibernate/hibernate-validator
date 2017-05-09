@@ -18,7 +18,8 @@ public class ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine extends Me
 
 	@Override
 	public void apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
-		if ( method.isCascading() && otherMethod.isCascading() &&
+		if ( method.getCascadingMetaData().isMarkedForCascadingOnElementOrContainerElements() &&
+				otherMethod.getCascadingMetaData().isMarkedForCascadingOnElementOrContainerElements() &&
 				( isDefinedOnSubType( method, otherMethod ) || isDefinedOnSubType( otherMethod, method ) ) ) {
 			throw log.getMethodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidationException(
 					method.getExecutable(),

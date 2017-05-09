@@ -87,7 +87,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence,
 				// TODO which one to use ???
-				cascadables.isEmpty() ? Collections.emptySet() : cascadables.iterator().next().getGroupConversionDescriptors()
+				cascadables.isEmpty() ? Collections.emptySet() : cascadables.iterator().next().getCascadingMetaData().getGroupConversionDescriptors()
 		);
 	}
 
@@ -188,30 +188,31 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		public final void add(ConstrainedElement constrainedElement) {
 			super.add( constrainedElement );
 
-			if ( constrainedElement.isCascading() || !constrainedElement.getGroupConversions().isEmpty() ) {
+			if ( constrainedElement.getCascadingMetaData().isMarkedForCascadingOnElementOrContainerElements() ||
+					constrainedElement.getCascadingMetaData().hasGroupConversionsOnElementOrContainerElements() ) {
 				if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
 					Field field = ( (ConstrainedField) constrainedElement ).getField();
 					Cascadable.Builder builder = cascadableBuilders.get( field );
 
 					if ( builder == null ) {
-						builder = new FieldCascadable.Builder( field );
+						builder = new FieldCascadable.Builder( field, constrainedElement.getCascadingMetaData() );
 						cascadableBuilders.put( field, builder );
 					}
-
-					builder.addGroupConversions( constrainedElement.getGroupConversions() );
-					builder.addCascadingTypeParameters( constrainedElement.getCascadingTypeParameters() );
+					else {
+						builder.mergeCascadingMetaData( constrainedElement.getCascadingMetaData() );
+					}
 				}
 				else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
 					Method method = (Method) ( (ConstrainedExecutable) constrainedElement ).getExecutable();
 					Cascadable.Builder builder = cascadableBuilders.get( method );
 
 					if ( builder == null ) {
-						builder = new GetterCascadable.Builder( method );
+						builder = new GetterCascadable.Builder( method, constrainedElement.getCascadingMetaData() );
 						cascadableBuilders.put( method, builder );
 					}
-
-					builder.addGroupConversions( constrainedElement.getGroupConversions() );
-					builder.addCascadingTypeParameters( constrainedElement.getCascadingTypeParameters() );
+					else {
+						builder.mergeCascadingMetaData( constrainedElement.getCascadingMetaData() );
+					}
 				}
 			}
 		}

@@ -11,15 +11,12 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ElementKind;
-import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
@@ -40,42 +37,30 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 
 	@Immutable
 	private final List<Cascadable> cascadables;
-	private final GroupConversionHelper groupConversionHelper;
-	@Immutable
-	private final List<CascadingTypeParameter> cascadingTypeParameters;
+
+	private final CascadingMetaData cascadingMetaData;
 
 	public ReturnValueMetaData(Type type,
 							   Set<MetaConstraint<?>> constraints,
-							   List<CascadingTypeParameter> cascadingTypeParameters,
-							   Map<Class<?>, Class<?>> groupConversions) {
+							   CascadingMetaData cascadingMetaData) {
 		super(
 				RETURN_VALUE_NODE_NAME,
 				type,
 				constraints,
 				ElementKind.RETURN_VALUE,
-				!cascadingTypeParameters.isEmpty(),
-				!constraints.isEmpty() || !cascadingTypeParameters.isEmpty()
+				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
+				!constraints.isEmpty() || cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements()
 		);
 
-		this.cascadingTypeParameters = CollectionHelper.toImmutableList( cascadingTypeParameters );
+
 		this.cascadables = CollectionHelper.toImmutableList( isCascading() ? Arrays.<Cascadable>asList( this ) : Collections.<Cascadable>emptyList() );
-		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
-		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
+		this.cascadingMetaData = cascadingMetaData;
+		this.cascadingMetaData.validateGroupConversions( this.toString() );
 	}
 
 	@Override
 	public Iterable<Cascadable> getCascadables() {
 		return cascadables;
-	}
-
-	@Override
-	public Class<?> convertGroup(Class<?> originalGroup) {
-		return groupConversionHelper.convertGroup( originalGroup );
-	}
-
-	@Override
-	public Set<GroupConversionDescriptor> getGroupConversionDescriptors() {
-		return groupConversionHelper.asDescriptors();
 	}
 
 	@Override
@@ -91,7 +76,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 				isCascading(),
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence,
-				groupConversionHelper.asDescriptors()
+				cascadingMetaData.getGroupConversionDescriptors()
 		);
 	}
 
@@ -111,7 +96,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	}
 
 	@Override
-	public List<CascadingTypeParameter> getCascadingTypeParameters() {
-		return cascadingTypeParameters;
+	public CascadingMetaData getCascadingMetaData() {
+		return cascadingMetaData;
 	}
 }

@@ -431,7 +431,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 124, value = "Found multiple group conversions for source group %s: %s.")
 	ConstraintDeclarationException getMultipleGroupConversionsForSameSourceException(@FormatWith(ClassObjectFormatter.class) Class<?> from,
-			@FormatWith(CollectionOfClassesObjectFormatter.class) Set<Class<?>> tos);
+			@FormatWith(CollectionOfClassesObjectFormatter.class) Collection<Class<?>> tos);
 
 	@Message(id = 125, value = "Found group conversions for non-cascading element: %s.")
 	ConstraintDeclarationException getGroupConversionOnNonCascadingElementException(String location);
@@ -522,7 +522,7 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidator<?, ?>> validatorClass2);
 
 	@Message(id = 151,
-			value = "A method overriding another method must not alter the parameter constraint configuration, but method %2$s changes the configuration of %1$s.")
+			value = "A method overriding another method must not redefine the parameter constraint configuration, but method %2$s redefines the configuration of %1$s.")
 	ConstraintDeclarationException getParameterConfigurationAlteredInSubTypeException(@FormatWith(ExecutableFormatter.class) Executable superMethod, @FormatWith(ExecutableFormatter.class) Executable subMethod);
 
 	@Message(id = 152,

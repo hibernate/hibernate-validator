@@ -6,16 +6,12 @@
  */
 package org.hibernate.validator.internal.metadata.raw;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
@@ -44,8 +40,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				index,
 				Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<MetaConstraint<?>>emptySet(),
-				Collections.<Class<?>, Class<?>>emptyMap(),
-				Collections.<CascadingTypeParameter>emptyList()
+				CascadingTypeParameter.nonCascading( type )
 		);
 	}
 
@@ -59,8 +54,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * @param constraints The constraints of the represented method parameter, if
 	 * any.
 	 * @param typeArgumentConstraints Type arguments constraints, if any.
-	 * @param groupConversions The group conversions of the represented method parameter, if any.
-	 * @param cascadingTypeParameters The type parameters marked for cascaded validation, if any.
+	 * @param cascadingMetaData The cascaded validation metadata for this element and its container elements.
 	 */
 	public ConstrainedParameter(ConfigurationSource source,
 								Executable executable,
@@ -68,15 +62,13 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 								int index,
 								Set<MetaConstraint<?>> constraints,
 								Set<MetaConstraint<?>> typeArgumentConstraints,
-								Map<Class<?>, Class<?>> groupConversions,
-								List<CascadingTypeParameter> cascadingTypeParameters) {
+								CascadingTypeParameter cascadingMetaData) {
 		super(
 				source,
 				ConstrainedElementKind.PARAMETER,
 				constraints,
 				typeArgumentConstraints,
-				groupConversions,
-				cascadingTypeParameters
+				cascadingMetaData
 		);
 
 		this.executable = executable;
@@ -113,11 +105,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		Set<MetaConstraint<?>> mergedTypeArgumentConstraints = new HashSet<>( typeArgumentConstraints );
 		mergedTypeArgumentConstraints.addAll( other.typeArgumentConstraints );
 
-		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
-		mergedGroupConversions.putAll( other.groupConversions );
-
-		List<CascadingTypeParameter> mergedCascadingTypeParameters = new ArrayList<>( cascadingTypeParameters );
-		mergedCascadingTypeParameters.addAll( other.cascadingTypeParameters );
+		CascadingTypeParameter mergedCascadingMetaData = cascadingMetaData.merge( other.cascadingMetaData );
 
 		return new ConstrainedParameter(
 				mergedSource,
@@ -126,8 +114,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				index,
 				mergedConstraints,
 				mergedTypeArgumentConstraints,
-				mergedGroupConversions,
-				mergedCascadingTypeParameters
+				mergedCascadingMetaData
 		);
 	}
 
@@ -143,8 +130,8 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 		String constraintsAsString = sb.length() > 0 ? sb.substring( 0, sb.length() - 2 ) : sb.toString();
 
-		return "ParameterMetaData [executable=" + executable + "], index=" + index + "], constraints=["
-				+ constraintsAsString + "], isCascading=" + isCascading() + "]";
+		return "ParameterMetaData [executable=" + executable + ", index=" + index + "], constraints=["
+				+ constraintsAsString + "]";
 	}
 
 	@Override
