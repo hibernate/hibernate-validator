@@ -6,11 +6,10 @@
  */
 package org.hibernate.validator.internal.metadata.raw;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.validation.Valid;
+import javax.validation.groups.ConvertGroup;
 
 import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -73,29 +72,10 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	Set<MetaConstraint<?>> getTypeArgumentConstraints();
 
 	/**
-	 * Returns a map with the group conversions for this constrained element, as
-	 * e.g. given using the {@code @ConvertGroup} annotation.
-	 *
-	 * @return A map with this constrained element's group conversions. May be
-	 *         empty, but never {@code null}.
+	 * Returns the cascading metadata (e.g. {@link Valid} and {@link ConvertGroup}) for the element and the potential
+	 * container elements.
 	 */
-	Map<Class<?>, Class<?>> getGroupConversions();
-
-	/**
-	 * Whether cascading validation for the represented element shall be
-	 * performed or not.
-	 *
-	 * @return <code>True</code>, if cascading validation for the represented
-	 *         element shall be performed, <code>false</code> otherwise.
-	 */
-	boolean isCascading();
-
-	/**
-	 * The type variables of the represented element that are marked for cascaded validation. An empty list will be
-	 * returned in case this element is not cascading. {@code null} will be contained in the returned list if the
-	 * element itself has been marked for cascaded validation (i.e. classic usage of {@link Valid}.
-	 */
-	List<CascadingTypeParameter> getCascadingTypeParameters();
+	CascadingTypeParameter getCascadingMetaData();
 
 	/**
 	 * Whether this element is constrained or not. This is the case, if this

@@ -73,7 +73,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 
 		assertThat( constructor.getKind() ).isEqualTo( ConstrainedElementKind.CONSTRUCTOR );
 		assertThat( constructor.isConstrained() ).isTrue();
-		assertThat( constructor.isCascading() ).isFalse();
+		assertThat( constructor.getCascadingMetaData().isCascading() ).isFalse();
 		assertThat( constructor.getConstraints() ).hasSize( 1 );
 
 		MetaConstraint<?> constraint = constructor.getConstraints().iterator().next();
@@ -96,7 +96,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 
 		//then
 		assertThat( createEvent.isConstrained() ).isTrue();
-		assertThat( createEvent.isCascading() ).isFalse();
+		assertThat( createEvent.getCascadingMetaData().isCascading() ).isFalse();
 		assertThat( createEvent.getKind() ).isEqualTo( ConstrainedElementKind.METHOD );
 		assertThat( createEvent.getConstraints() ).as( "No return value constraints expected" ).isEmpty();
 		assertThat( createEvent.getCrossParameterConstraints() ).hasSize( 1 );
@@ -132,7 +132,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		ConstrainedField field = findConstrainedField( beanConfiguration, User.class, "mail" );
 
 		//then
-		assertThat( field.getGroupConversions() ).isEmpty();
+		assertThat( field.getCascadingMetaData().getGroupConversions() ).isEmpty();
 	}
 
 	@Test
@@ -145,7 +145,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		Map<Class<?>, Class<?>> expected = newHashMap();
 		expected.put( Default.class, BasicNumber.class );
 
-		assertThat( field.getGroupConversions() ).isEqualTo( expected );
+		assertThat( field.getCascadingMetaData().getGroupConversions() ).isEqualTo( expected );
 	}
 
 	@Test
@@ -159,7 +159,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		expected.put( Default.class, BasicPostal.class );
 		expected.put( Complete.class, FullPostal.class );
 
-		assertThat( field.getGroupConversions() ).isEqualTo( expected );
+		assertThat( field.getCascadingMetaData().getGroupConversions() ).isEqualTo( expected );
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
@@ -174,7 +174,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		ConstrainedExecutable method = findConstrainedMethod( beanConfiguration, User.class, "getMail1" );
 
 		//then
-		assertThat( method.getGroupConversions() ).isEmpty();
+		assertThat( method.getCascadingMetaData().getGroupConversions() ).isEmpty();
 	}
 
 	@Test
@@ -187,7 +187,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		Map<Class<?>, Class<?>> expected = newHashMap();
 		expected.put( Default.class, BasicNumber.class );
 
-		assertThat( method.getGroupConversions() ).isEqualTo( expected );
+		assertThat( method.getCascadingMetaData().getGroupConversions() ).isEqualTo( expected );
 	}
 
 	@Test
@@ -201,7 +201,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		expected.put( Default.class, BasicPostal.class );
 		expected.put( Complete.class, FullPostal.class );
 
-		assertThat( method.getGroupConversions() ).isEqualTo( expected );
+		assertThat( method.getCascadingMetaData().getGroupConversions() ).isEqualTo( expected );
 	}
 
 	@Test
@@ -216,7 +216,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		);
 
 		//then
-		assertThat( method.getParameterMetaData( 0 ).getGroupConversions() ).isEmpty();
+		assertThat( method.getParameterMetaData( 0 ).getCascadingMetaData().getGroupConversions() ).isEmpty();
 	}
 
 	@Test
@@ -234,7 +234,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		Map<Class<?>, Class<?>> expected = newHashMap();
 		expected.put( Default.class, BasicNumber.class );
 
-		assertThat( method.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo( expected );
+		assertThat( method.getParameterMetaData( 0 ).getCascadingMetaData().getGroupConversions() ).isEqualTo( expected );
 	}
 
 	@Test
@@ -253,7 +253,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		expected.put( Default.class, BasicPostal.class );
 		expected.put( Complete.class, FullPostal.class );
 
-		assertThat( method.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo( expected );
+		assertThat( method.getParameterMetaData( 0 ).getCascadingMetaData().getGroupConversions() ).isEqualTo( expected );
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
@@ -271,7 +271,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		Map<Class<?>, Class<?>> expected = newHashMap();
 		expected.put( Default.class, BasicNumber.class );
 
-		assertThat( constructor.getGroupConversions() ).isEqualTo( expected );
+		assertThat( constructor.getCascadingMetaData().getGroupConversions() ).isEqualTo( expected );
 	}
 
 	@Test
@@ -285,7 +285,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		expected.put( Default.class, BasicPostal.class );
 		expected.put( Complete.class, FullPostal.class );
 
-		assertThat( constructor.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo( expected );
+		assertThat( constructor.getParameterMetaData( 0 ).getCascadingMetaData().getGroupConversions() ).isEqualTo( expected );
 	}
 
 	@Test

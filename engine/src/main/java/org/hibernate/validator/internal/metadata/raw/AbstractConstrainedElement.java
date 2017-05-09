@@ -8,8 +8,6 @@ package org.hibernate.validator.internal.metadata.raw;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
@@ -28,10 +26,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	protected final ConfigurationSource source;
 	@Immutable
 	protected final Set<MetaConstraint<?>> constraints;
-	@Immutable
-	protected final Map<Class<?>, Class<?>> groupConversions;
-	@Immutable
-	protected final List<CascadingTypeParameter> cascadingTypeParameters;
+	protected final CascadingTypeParameter cascadingMetaData;
 	@Immutable
 	protected final Set<MetaConstraint<?>> typeArgumentConstraints;
 
@@ -39,14 +34,12 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 									  ConstrainedElementKind kind,
 									  Set<MetaConstraint<?>> constraints,
 									  Set<MetaConstraint<?>> typeArgumentConstraints,
-									  Map<Class<?>, Class<?>> groupConversions,
-									  List<CascadingTypeParameter> cascadingTypeParameters) {
+									  CascadingTypeParameter cascadingMetaData) {
 		this.kind = kind;
 		this.source = source;
 		this.constraints = constraints != null ? CollectionHelper.toImmutableSet( constraints ) : Collections.<MetaConstraint<?>>emptySet();
 		this.typeArgumentConstraints = typeArgumentConstraints != null ? CollectionHelper.toImmutableSet( typeArgumentConstraints ) : Collections.<MetaConstraint<?>>emptySet();
-		this.groupConversions = CollectionHelper.toImmutableMap( groupConversions );
-		this.cascadingTypeParameters = CollectionHelper.toImmutableList( cascadingTypeParameters );
+		this.cascadingMetaData = cascadingMetaData;
 	}
 
 	@Override
@@ -70,23 +63,13 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	}
 
 	@Override
-	public Map<Class<?>, Class<?>> getGroupConversions() {
-		return groupConversions;
-	}
-
-	@Override
-	public boolean isCascading() {
-		return !cascadingTypeParameters.isEmpty();
-	}
-
-	@Override
-	public List<CascadingTypeParameter> getCascadingTypeParameters() {
-		return cascadingTypeParameters;
+	public CascadingTypeParameter getCascadingMetaData() {
+		return cascadingMetaData;
 	}
 
 	@Override
 	public boolean isConstrained() {
-		return isCascading() || !constraints.isEmpty() || !typeArgumentConstraints.isEmpty();
+		return cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements() || !constraints.isEmpty() || !typeArgumentConstraints.isEmpty();
 	}
 
 	@Override
@@ -98,8 +81,8 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	public String toString() {
 		return "AbstractConstrainedElement [kind=" + kind + ", source="
 				+ source + ", constraints="
-				+ constraints + ", groupConversions=" + groupConversions
-				+ ", cascadingTypeParameters=" + cascadingTypeParameters + "]";
+				+ constraints + ", cascadingMetaData="
+				+ cascadingMetaData + "]";
 	}
 
 	@Override

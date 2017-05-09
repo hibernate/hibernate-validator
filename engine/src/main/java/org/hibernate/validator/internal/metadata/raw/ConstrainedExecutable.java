@@ -7,16 +7,13 @@
 package org.hibernate.validator.internal.metadata.raw;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.validation.metadata.ConstraintDescriptor;
@@ -65,16 +62,14 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * @param returnValueConstraints Type arguments constraints, if any.
 	 * @param typeArgumentConstraints The type argument constraints on the return value of the represented executable,
 	 * if any.
-	 * @param groupConversions The group conversions of the represented executable, if any.
-	 * @param cascadingTypeParameters The type parameters marked for cascaded validation, if any.
+	 * @param cascadingMetaData The cascaded validation metadata for this element and its container elements.
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
 			Executable executable,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Set<MetaConstraint<?>> typeArgumentConstraints,
-			Map<Class<?>, Class<?>> groupConversions,
-			List<CascadingTypeParameter> cascadingTypeParameters) {
+			CascadingTypeParameter cascadingMetaData) {
 		this(
 				source,
 				executable,
@@ -82,8 +77,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
 				typeArgumentConstraints,
-				groupConversions,
-				cascadingTypeParameters
+				cascadingMetaData
 		);
 	}
 
@@ -99,8 +93,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * @param returnValueConstraints The return value constraints of the represented executable, if any.
 	 * @param typeArgumentConstraints The type argument constraints on the return value of the represented executable,
 	 * if any.
-	 * @param groupConversions The group conversions of the represented executable, if any.
-	 * @param cascadingTypeParameters The type parameters marked for cascaded validation, if any.
+	 * @param cascadingMetaData The cascaded validation metadata for this element and its container elements.
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
@@ -109,15 +102,13 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Set<MetaConstraint<?>> typeArgumentConstraints,
-			Map<Class<?>, Class<?>> groupConversions,
-			List<CascadingTypeParameter> cascadingTypeParameters) {
+			CascadingTypeParameter cascadingMetaData) {
 		super(
 				source,
 				( executable instanceof Constructor ) ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
 				returnValueConstraints,
 				typeArgumentConstraints,
-				groupConversions,
-				cascadingTypeParameters
+				cascadingMetaData
 		);
 
 		this.executable = executable;
@@ -249,7 +240,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		int i = 0;
 		for ( ConstrainedParameter parameter : parameterMetaData ) {
 			ConstrainedParameter otherParameter = other.getParameterMetaData( i );
-			if ( parameter.isCascading() != otherParameter.isCascading()
+			// FIXME: how to deal with method overriding with type overloading of one of the parameters?
+			if ( !parameter.getCascadingMetaData().equals( otherParameter.getCascadingMetaData() )
 				|| !getDescriptors( parameter.getConstraints() ).equals( getDescriptors( otherParameter.getConstraints() ) ) ) {
 				return false;
 			}
@@ -287,11 +279,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		Set<MetaConstraint<?>> mergedTypeArgumentConstraints = new HashSet<>( typeArgumentConstraints );
 		mergedTypeArgumentConstraints.addAll( other.typeArgumentConstraints );
 
-		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
-		mergedGroupConversions.putAll( other.groupConversions );
-
-		List<CascadingTypeParameter> mergedCascadingTypeParameters = new ArrayList<>( cascadingTypeParameters );
-		mergedCascadingTypeParameters.addAll( other.cascadingTypeParameters );
+		CascadingTypeParameter mergedCascadingMetaData = cascadingMetaData.merge( other.cascadingMetaData );
 
 		return new ConstrainedExecutable(
 				mergedSource,
@@ -300,8 +288,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				mergedCrossParameterConstraints,
 				mergedReturnValueConstraints,
 				mergedTypeArgumentConstraints,
-				mergedGroupConversions,
-				mergedCascadingTypeParameters
+				mergedCascadingMetaData
 		);
 	}
 

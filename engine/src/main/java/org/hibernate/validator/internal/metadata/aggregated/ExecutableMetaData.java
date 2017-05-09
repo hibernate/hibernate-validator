@@ -14,7 +14,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -87,8 +86,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Set<MetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
-			Map<Class<?>, Class<?>> returnValueGroupConversions,
-			List<CascadingTypeParameter> cascadingTypeParameters,
+			CascadingMetaData cascadingMetaData,
 			boolean isConstrained,
 			boolean isGetter) {
 		super(
@@ -96,7 +94,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				returnType,
 				returnValueConstraints,
 				kind,
-				!cascadingTypeParameters.isEmpty(),
+				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
 				isConstrained
 		);
 
@@ -107,8 +105,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		this.returnValueMetaData = new ReturnValueMetaData(
 				returnType,
 				returnValueConstraints,
-				cascadingTypeParameters,
-				returnValueGroupConversions
+				cascadingMetaData
 		);
 		this.isGetter = isGetter;
 	}
@@ -253,9 +250,9 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private Executable executable;
 		private final boolean isGetterMethod;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
-		private final List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
 		private final Set<MethodConfigurationRule> rules;
 		private boolean isConstrained = false;
+		private CascadingTypeParameter cascadingMetaData;
 
 		/**
 		 * Holds a merged representation of the configurations for one method
@@ -323,7 +320,12 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			constrainedExecutables.add( constrainedExecutable );
 			isConstrained = isConstrained || constrainedExecutable.isConstrained();
 			crossParameterConstraints.addAll( constrainedExecutable.getCrossParameterConstraints() );
-			cascadingTypeParameters.addAll( constrainedExecutable.getCascadingTypeParameters() );
+			if ( cascadingMetaData == null ) {
+				cascadingMetaData = constrainedExecutable.getCascadingMetaData();
+			}
+			else {
+				cascadingMetaData = cascadingMetaData.merge( constrainedExecutable.getCascadingMetaData() );
+			}
 
 			addToExecutablesByDeclaringType( constrainedExecutable );
 
@@ -370,8 +372,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
-					getGroupConversions(),
-					cascadingTypeParameters,
+					new CascadingMetaData( cascadingMetaData ),
 					isConstrained,
 					isGetterMethod
 			);

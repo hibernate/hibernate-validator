@@ -7,6 +7,8 @@
 package org.hibernate.validator.internal.xml;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -71,26 +73,16 @@ class ConstrainedFieldBuilder {
 			}
 
 			ContainerElementTypeConfigurationBuilder containerElementTypeConfigurationBuilder = new ContainerElementTypeConfigurationBuilder(
-					metaConstraintBuilder, constraintLocation, defaultPackage );
+					metaConstraintBuilder, groupConversionBuilder, constraintLocation, defaultPackage );
 			ContainerElementTypeConfiguration containerElementTypeConfiguration = containerElementTypeConfigurationBuilder
 					.build( fieldType.getContainerElementType(), ReflectionHelper.typeOf( field ) );
-
-			List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>( containerElementTypeConfiguration.getCascadingTypeParameters().size() + 1 );
-			cascadingTypeParameters.addAll( containerElementTypeConfiguration.getCascadingTypeParameters() );
-			addCascadedTypeParameterForField( cascadingTypeParameters, field, fieldType.getValid() != null );
-
-			Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
-					fieldType.getConvertGroup(),
-					defaultPackage
-			);
 
 			ConstrainedField constrainedField = new ConstrainedField(
 					ConfigurationSource.XML,
 					field,
 					metaConstraints,
 					containerElementTypeConfiguration.getMetaConstraints(),
-					groupConversions,
-					cascadingTypeParameters
+					getCascadingMetaDataForField( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), field, fieldType, defaultPackage )
 			);
 			constrainedFields.add( constrainedField );
 
@@ -106,12 +98,19 @@ class ConstrainedFieldBuilder {
 		return constrainedFields;
 	}
 
-	private void addCascadedTypeParameterForField(List<CascadingTypeParameter> cascadingTypeParameters, Field field, boolean isCascaded) {
-		if ( isCascaded ) {
-			cascadingTypeParameters.add( field.getType().isArray()
-					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( field ) )
-					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( field ) ) );
-		}
+	private CascadingTypeParameter getCascadingMetaDataForField(Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Field field,
+			FieldType fieldType, String defaultPackage) {
+		boolean isArray = field.getType().isArray();
+		Type type = ReflectionHelper.typeOf( field );
+		boolean isCascaded = fieldType.getValid() != null;
+		Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
+				fieldType.getConvertGroup(),
+				defaultPackage
+		);
+
+		return isArray
+				? CascadingTypeParameter.arrayElement( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions )
+				: CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
 	private static Field findField(Class<?> beanClass, String fieldName, List<String> alreadyProcessedFieldNames) {

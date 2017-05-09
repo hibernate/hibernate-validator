@@ -51,11 +51,11 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.resolver.CachingTraversableResolverForSingleValidation;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ReturnValueMetaData;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
@@ -559,48 +559,51 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @param validationContext The execution context
 	 * @param valueContext Collected information for single validation
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void validateCascadedConstraints(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		Validatable validatable = valueContext.getCurrentValidatable();
 		PathImpl originalPath = valueContext.getPropertyPath();
-		Class<?> originalGroup = valueContext.getCurrentGroup();
 
 		for ( Cascadable cascadable : validatable.getCascadables() ) {
 			valueContext.appendNode( cascadable );
-			Class<?> group = cascadable.convertGroup( originalGroup );
-			valueContext.setCurrentGroup( group );
 
 			ElementType elementType = cascadable.getElementType();
 			if ( isCascadeRequired( validationContext, valueContext.getCurrentBean(), valueContext.getPropertyPath(), elementType ) ) {
-
 				Object value = getCascadableValue( validationContext, valueContext.getCurrentBean(), cascadable );
+				CascadingMetaData cascadingMetaData = cascadable.getCascadingMetaData();
 
-				if ( value != null ) {
-					// expand the group only if was created by group conversion;
-					// otherwise we're looping through the right validation order
-					// already and need only to pass the current element
-					ValidationOrder validationOrder = validationOrderGenerator.getValidationOrder(
-							group,
-							group != originalGroup
-							);
+				if ( value != null && cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements() ) {
+					if ( cascadingMetaData.isCascading() ) {
+						ValueExtractorDescriptor extractor = valueExtractorManager.getValueExtractor(
+								value.getClass(),
+								cascadable.getCascadingMetaData().getTypeParameter() );
 
-					validateCascadedValues( value, validationContext, valueContext, cascadable.getCascadingTypeParameters(), validationOrder );
+						CascadingValueReceiver receiver = new CascadingValueReceiver( validationContext, valueContext, cascadingMetaData, true );
+						( (ValueExtractor) extractor.getValueExtractor() ).extractValues( value, receiver );
+					}
+
+					validateCascadedContainerElementsForCurrentGroup( value, validationContext, valueContext,
+							cascadable.getCascadingMetaData().getContainerElementTypesCascadingMetaData() );
 				}
 			}
 
 			// reset the path
 			valueContext.setPropertyPath( originalPath );
-			valueContext.setCurrentGroup( originalGroup );
 		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void validateCascadedValues(Object value, ValidationContext<?> context, ValueContext<?, ?> valueContext,
-			List<CascadingTypeParameter> cascadingTypeParameters, ValidationOrder validationOrder) {
-		for ( CascadingTypeParameter cascadingTypeParameter : cascadingTypeParameters ) {
+	private void validateCascadedContainerElementsForCurrentGroup(Object value, ValidationContext<?> validationContext, ValueContext<?, ?> valueContext,
+			List<CascadingMetaData> containerElementTypesCascadingMetaData) {
+		for ( CascadingMetaData cascadingMetaData : containerElementTypesCascadingMetaData ) {
+			if ( !cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements() ) {
+				continue;
+			}
+
 			List<TypeVariable<?>> cascadingTypeParametersOfValueType = getCorrespondingTypeParametersInSubType(
 					value.getClass(),
-					TypeHelper.getErasedReferenceType( cascadingTypeParameter.getEnclosingType() ),
-					cascadingTypeParameter.getTypeParameter()
+					TypeHelper.getErasedReferenceType( cascadingMetaData.getEnclosingType() ),
+					cascadingMetaData.getTypeParameter()
 			);
 
 			for ( TypeVariable<?> cascadingTypeParameterOfValueType : cascadingTypeParametersOfValueType ) {
@@ -613,8 +616,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					throw log.getNoValueExtractorFoundForTypeException( value.getClass(), cascadingTypeParameterOfValueType );
 				}
 
-				CascadingValueReceiver receiver = new CascadingValueReceiver( context, valueContext, validationOrder, cascadingTypeParameter );
-
+				CascadingValueReceiver receiver = new CascadingValueReceiver( validationContext, valueContext, cascadingMetaData, false );
 				( (ValueExtractor) extractor.getValueExtractor() ).extractValues( value, receiver );
 			}
 		}
@@ -649,17 +651,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private class CascadingValueReceiver implements ValueExtractor.ValueReceiver {
 
-		private final ValidationContext<?> context;
+		private final ValidationContext<?> validationContext;
 		private final ValueContext<?, ?> valueContext;
-		private final ValidationOrder validationOrder;
-		private final CascadingTypeParameter cascadingTypeParameter;
+		private final CascadingMetaData cascadingMetaData;
+		private final boolean annotatedObject;
 
-		public CascadingValueReceiver(ValidationContext<?> context, ValueContext<?, ?> valueContext, ValidationOrder validationOrder,
-				CascadingTypeParameter cascadingTypeParameter) {
-			this.context = context;
+		public CascadingValueReceiver(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext, CascadingMetaData cascadingMetaData,
+				boolean annotatedObject) {
+			this.validationContext = validationContext;
 			this.valueContext = valueContext;
-			this.validationOrder = validationOrder;
-			this.cascadingTypeParameter = cascadingTypeParameter;
+			this.cascadingMetaData = cascadingMetaData;
+			this.annotatedObject = annotatedObject;
 		}
 
 		@Override
@@ -689,35 +691,77 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		private void doValidate(Object value, String nodeName) {
 			if ( value == null ||
-					context.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath() ) ||
-					shouldFailFast( context ) ) {
+					validationContext.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath() ) ||
+					shouldFailFast( validationContext ) ) {
 				return;
 			}
 
+			Class<?> originalGroup = valueContext.getCurrentGroup();
+			Class<?> currentGroup = cascadingMetaData.convertGroup( originalGroup );
+
+			// expand the group only if was created by group conversion;
+			// otherwise we're looping through the right validation order
+			// already and need only to pass the current element
+			ValidationOrder validationOrder = validationOrderGenerator.getValidationOrder( currentGroup, currentGroup != originalGroup );
+
 			ValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
 
-			if ( cascadingTypeParameter.getTypeParameter() != null ) {
-				cascadedValueContext.setTypeParameter( cascadingTypeParameter.getTypeParameter() );
+			if ( cascadingMetaData.getTypeParameter() != null ) {
+				cascadedValueContext.setTypeParameter( cascadingMetaData.getTypeParameter() );
 			}
 
 			// Cascade validation
-			if ( cascadingTypeParameter.isCascading() ) {
-				validateInContext( context, cascadedValueContext, validationOrder );
+			if ( cascadingMetaData.isCascading() ) {
+				validateInContext( validationContext, cascadedValueContext, validationOrder );
 			}
 
-			// Cascade validation to nested types arguments
-			if ( !cascadingTypeParameter.getNestedCascadingTypeParameters().isEmpty() ) {
+			// Cascade validation to container elements if we are dealing with a container element
+			if ( !annotatedObject && cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements() ) {
 				ValueContext<?, Object> cascadedTypeArgumentValueContext = buildNewLocalExecutionContext( valueContext, value );
-				if ( cascadingTypeParameter.getTypeParameter() != null && !TypeVariables.isInternal( cascadingTypeParameter.getTypeParameter() ) ) {
-					cascadedValueContext.setTypeParameter( cascadingTypeParameter.getTypeParameter() );
+				if ( cascadingMetaData.getTypeParameter() != null ) {
+					cascadedValueContext.setTypeParameter( cascadingMetaData.getTypeParameter() );
 				}
 
 				if ( nodeName != null ) {
 					cascadedTypeArgumentValueContext.appendTypeParameterNode( nodeName );
 				}
 
-				validateCascadedValues( value, context, cascadedTypeArgumentValueContext, cascadingTypeParameter.getNestedCascadingTypeParameters(),
-						validationOrder );
+				validateCascadedContainerElementsInContext( value, validationContext, cascadedTypeArgumentValueContext, cascadingMetaData, validationOrder );
+			}
+		}
+	}
+
+	private void validateCascadedContainerElementsInContext(Object value, ValidationContext<?> validationContext, ValueContext<?, ?> valueContext,
+			CascadingMetaData cascadingMetaData, ValidationOrder validationOrder) {
+		Iterator<Group> groupIterator = validationOrder.getGroupIterator();
+		while ( groupIterator.hasNext() ) {
+			Group group = groupIterator.next();
+			valueContext.setCurrentGroup( group.getDefiningClass() );
+			validateCascadedContainerElementsForCurrentGroup( value, validationContext, valueContext,
+					cascadingMetaData.getContainerElementTypesCascadingMetaData() );
+			if ( shouldFailFast( validationContext ) ) {
+				return;
+			}
+		}
+
+		Iterator<Sequence> sequenceIterator = validationOrder.getSequenceIterator();
+		while ( sequenceIterator.hasNext() ) {
+			Sequence sequence = sequenceIterator.next();
+			for ( GroupWithInheritance groupOfGroups : sequence ) {
+				int numberOfViolations = validationContext.getFailingConstraints().size();
+
+				for ( Group group : groupOfGroups ) {
+					valueContext.setCurrentGroup( group.getDefiningClass() );
+
+					validateCascadedContainerElementsForCurrentGroup( value, validationContext, valueContext,
+							cascadingMetaData.getContainerElementTypesCascadingMetaData() );
+					if ( shouldFailFast( validationContext ) ) {
+						return;
+					}
+				}
+				if ( validationContext.getFailingConstraints().size() > numberOfViolations ) {
+					break;
+				}
 			}
 		}
 	}

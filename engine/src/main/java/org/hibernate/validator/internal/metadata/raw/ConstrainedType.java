@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.raw;
 import java.util.Collections;
 import java.util.Set;
 
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
 /**
@@ -36,8 +37,7 @@ public class ConstrainedType extends AbstractConstrainedElement {
 				ConstrainedElementKind.TYPE,
 				constraints,
 				Collections.emptySet(),
-				Collections.<Class<?>, Class<?>>emptyMap(),
-				Collections.emptyList()
+				CascadingTypeParameter.nonCascading( beanClass )
 		);
 
 		this.beanClass = beanClass;

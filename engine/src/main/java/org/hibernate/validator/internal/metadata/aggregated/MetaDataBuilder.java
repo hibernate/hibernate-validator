@@ -11,7 +11,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
@@ -22,10 +21,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
-import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Builds {@link ConstraintMetaData} instances for the
@@ -35,8 +31,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  */
 public abstract class MetaDataBuilder {
-
-	private static final Log log = LoggerFactory.make();
 
 	protected final ConstraintHelper constraintHelper;
 	protected final TypeResolutionHelper typeResolutionHelper;
@@ -76,9 +70,7 @@ public abstract class MetaDataBuilder {
 	public void add(ConstrainedElement constrainedElement) {
 		constraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getConstraints() ) );
 		constraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getTypeArgumentConstraints() ) );
-		isCascading = isCascading || constrainedElement.isCascading();
-
-		addGroupConversions( constrainedElement.getGroupConversions() );
+		isCascading = isCascading || constrainedElement.getCascadingMetaData().isMarkedForCascadingOnElementOrContainerElements();
 	}
 
 	/**
@@ -89,23 +81,6 @@ public abstract class MetaDataBuilder {
 	 * @return A {@link ConstraintMetaData} object.
 	 */
 	public abstract ConstraintMetaData build();
-
-	private void addGroupConversions(Map<Class<?>, Class<?>> groupConversions) {
-		for ( Entry<Class<?>, Class<?>> oneConversion : groupConversions.entrySet() ) {
-			if ( this.groupConversions.containsKey( oneConversion.getKey() ) ) {
-				throw log.getMultipleGroupConversionsForSameSourceException(
-						oneConversion.getKey(),
-						CollectionHelper.<Class<?>>asSet(
-								groupConversions.get( oneConversion.getKey() ),
-								oneConversion.getValue()
-						)
-				);
-			}
-			else {
-				this.groupConversions.put( oneConversion.getKey(), oneConversion.getValue() );
-			}
-		}
-	}
 
 	protected Map<Class<?>, Class<?>> getGroupConversions() {
 		return groupConversions;

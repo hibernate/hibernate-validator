@@ -11,6 +11,9 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.xml.binding.GroupConversionType;
 
 /**
@@ -19,6 +22,8 @@ import org.hibernate.validator.internal.xml.binding.GroupConversionType;
  * @author Hardy Ferentschik
  */
 class GroupConversionBuilder {
+
+	private static final Log LOG = LoggerFactory.make();
 
 	private final ClassLoadingHelper classLoadingHelper;
 
@@ -32,6 +37,13 @@ class GroupConversionBuilder {
 		for ( GroupConversionType groupConversionType : groupConversionTypes ) {
 			Class<?> fromClass = classLoadingHelper.loadClass( groupConversionType.getFrom(), defaultPackage );
 			Class<?> toClass = classLoadingHelper.loadClass( groupConversionType.getTo(), defaultPackage );
+
+			if ( groupConversionMap.containsKey( fromClass ) ) {
+				throw LOG.getMultipleGroupConversionsForSameSourceException(
+						fromClass,
+						CollectionHelper.<Class<?>>asSet( groupConversionMap.get( fromClass ), toClass ) );
+			}
+
 			groupConversionMap.put( fromClass, toClass );
 		}
 

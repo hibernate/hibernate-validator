@@ -10,11 +10,10 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -138,10 +137,6 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 		return isCascading;
 	}
 
-	public Map<Class<?>, Class<?>> getGroupConversions() {
-		return groupConversions;
-	}
-
 	protected Set<MetaConstraint<?>> getTypeArgumentConstraints(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
 		return containerElementContexts.values()
 			.stream()
@@ -150,24 +145,22 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 			.collect( Collectors.toSet() );
 	}
 
-	protected List<CascadingTypeParameter> getCascadedTypeParameters() {
-		List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
+	protected CascadingTypeParameter getCascadingMetaData() {
+		Map<TypeVariable<?>, CascadingTypeParameter> typeParametersCascadingMetaData = new HashMap<>();
 
 		for ( ContainerElementConstraintMappingContextImpl typeArgumentContext : containerElementContexts.values() ) {
 			CascadingTypeParameter cascadingTypeParameter = typeArgumentContext.getCascadingTypeParameter();
 			if ( cascadingTypeParameter != null ) {
-				cascadingTypeParameters.add( cascadingTypeParameter );
+				typeParametersCascadingMetaData.put( cascadingTypeParameter.getTypeParameter(), cascadingTypeParameter );
 			}
 		}
 
-		if ( isCascading ) {
-			boolean isArray = TypeHelper.isArray( configuredType );
-			cascadingTypeParameters.add( isArray
-					? CascadingTypeParameter.arrayElement( configuredType )
-					: CascadingTypeParameter.annotatedObject( configuredType ) );
-		}
+		boolean isArray = TypeHelper.isArray( configuredType );
+		CascadingTypeParameter cascadingMetaData = isArray
+				? CascadingTypeParameter.arrayElement( configuredType, isCascading, typeParametersCascadingMetaData, groupConversions )
+				: CascadingTypeParameter.annotatedObject( configuredType, isCascading, typeParametersCascadingMetaData, groupConversions );
 
-		return cascadingTypeParameters;
+		return cascadingMetaData;
 	}
 
 	private static class ContainerElementPathKey {
