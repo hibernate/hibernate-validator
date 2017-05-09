@@ -11,6 +11,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -300,6 +301,9 @@ public final class ReflectionHelper {
 		}
 		if ( type instanceof ParameterizedType ) {
 			return getClassFromType( ( (ParameterizedType) type ).getRawType() );
+		}
+		if ( type instanceof GenericArrayType ) {
+			return Object[].class;
 		}
 		throw log.getUnableToConvertTypeToClassException( type );
 	}
