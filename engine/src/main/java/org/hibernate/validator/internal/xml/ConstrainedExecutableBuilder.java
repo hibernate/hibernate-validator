@@ -17,7 +17,6 @@ import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -212,14 +211,12 @@ class ConstrainedExecutableBuilder {
 		Set<MetaConstraint<?>> returnValueConstraints = new HashSet<>();
 		Set<MetaConstraint<?>> returnValueTypeArgumentConstraints = new HashSet<>();
 		List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
-		Map<Class<?>, Class<?>> groupConversions = new HashMap<>();
 		CascadingTypeParameter cascadingMetaData = parseReturnValueType(
 				returnValueType,
 				executable,
 				returnValueConstraints,
 				returnValueTypeArgumentConstraints,
 				cascadingTypeParameters,
-				groupConversions,
 				defaultPackage
 		);
 
@@ -272,7 +269,6 @@ class ConstrainedExecutableBuilder {
 												Set<MetaConstraint<?>> returnValueConstraints,
 												Set<MetaConstraint<?>> returnValueTypeArgumentConstraints,
 												List<CascadingTypeParameter> cascadingTypeParameters,
-												Map<Class<?>, Class<?>> groupConversions,
 												String defaultPackage) {
 		if ( returnValueType == null ) {
 			return CascadingTypeParameter.nonCascading( ReflectionHelper.typeOf( executable ) );
@@ -296,13 +292,6 @@ class ConstrainedExecutableBuilder {
 				.build( returnValueType.getContainerElementType(), ReflectionHelper.typeOf( executable ) );
 
 		returnValueTypeArgumentConstraints.addAll( containerElementTypeConfiguration.getMetaConstraints() );
-
-		groupConversions.putAll(
-				groupConversionBuilder.buildGroupConversionMap(
-						returnValueType.getConvertGroup(),
-						defaultPackage
-				)
-		);
 
 		// ignore annotations
 		if ( returnValueType.getIgnoreAnnotations() != null ) {
