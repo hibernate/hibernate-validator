@@ -10,9 +10,10 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -76,18 +77,9 @@ class ConstrainedGetterBuilder {
 			}
 
 			ContainerElementTypeConfigurationBuilder containerElementTypeConfigurationBuilder = new ContainerElementTypeConfigurationBuilder(
-					metaConstraintBuilder, constraintLocation, defaultPackage );
+					metaConstraintBuilder, groupConversionBuilder, constraintLocation, defaultPackage );
 			ContainerElementTypeConfiguration containerElementTypeConfiguration = containerElementTypeConfigurationBuilder
 					.build( getterType.getContainerElementType(), ReflectionHelper.typeOf( getter ) );
-
-			List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>( containerElementTypeConfiguration.getCascadingTypeParameters().size() + 1 );
-			cascadingTypeParameters.addAll( containerElementTypeConfiguration.getCascadingTypeParameters() );
-			addCascadedTypeParameterForGetter( cascadingTypeParameters, getter, getterType.getValid() != null );
-
-			Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
-					getterType.getConvertGroup(),
-					defaultPackage
-			);
 
 			ConstrainedExecutable constrainedGetter = new ConstrainedExecutable(
 					ConfigurationSource.XML,
@@ -96,8 +88,7 @@ class ConstrainedGetterBuilder {
 					Collections.<MetaConstraint<?>>emptySet(),
 					metaConstraints,
 					containerElementTypeConfiguration.getMetaConstraints(),
-					groupConversions,
-					cascadingTypeParameters
+					getCascadingMetaDataForGetter( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), getter, getterType, defaultPackage )
 			);
 			constrainedExecutables.add( constrainedGetter );
 
@@ -113,12 +104,19 @@ class ConstrainedGetterBuilder {
 		return constrainedExecutables;
 	}
 
-	private void addCascadedTypeParameterForGetter(List<CascadingTypeParameter> cascadingTypeParameters, Method method, boolean isCascaded) {
-		if ( isCascaded ) {
-			cascadingTypeParameters.add( method.getReturnType().isArray()
-					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( method ) )
-					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( method ) ) );
-		}
+	private CascadingTypeParameter getCascadingMetaDataForGetter(Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Method method,
+			GetterType getterType, String defaultPackage) {
+		boolean isArray = method.getReturnType().isArray();
+		Type type = ReflectionHelper.typeOf( method );
+		boolean isCascaded = getterType.getValid() != null;
+		Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
+				getterType.getConvertGroup(),
+				defaultPackage
+		);
+
+		return isArray
+				? CascadingTypeParameter.arrayElement( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions )
+				: CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
 	private static Method findGetter(Class<?> beanClass, String getterName, List<String> alreadyProcessedGetterNames) {

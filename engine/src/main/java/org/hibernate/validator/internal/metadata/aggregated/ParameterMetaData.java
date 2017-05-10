@@ -9,13 +9,10 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ElementKind;
-import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
@@ -28,10 +25,8 @@ import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * An aggregated view of the constraint related meta data for a single method
@@ -42,45 +37,33 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  */
 public class ParameterMetaData extends AbstractConstraintMetaData implements Cascadable {
 
-	private final GroupConversionHelper groupConversionHelper;
 	private final int index;
-	@Immutable
-	private final List<CascadingTypeParameter> cascadingTypeParameters;
+	private final CascadingMetaData cascadingMetaData;
 
 	private ParameterMetaData(int index,
 							  String name,
 							  Type type,
 							  Set<MetaConstraint<?>> constraints,
-							  List<CascadingTypeParameter> cascadingTypeParameters,
-							  Map<Class<?>, Class<?>> groupConversions) {
+							  Set<MetaConstraint<?>> containerElementsConstraints,
+							  CascadingMetaData cascadingMetaData) {
 		super(
 				name,
 				type,
 				constraints,
+				containerElementsConstraints,
 				ElementKind.PARAMETER,
-				!cascadingTypeParameters.isEmpty(),
-				!constraints.isEmpty() || !cascadingTypeParameters.isEmpty()
+				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
+				!constraints.isEmpty() || cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements()
 		);
 
 		this.index = index;
 
-		this.cascadingTypeParameters = CollectionHelper.toImmutableList( cascadingTypeParameters );
-		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
-		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
+		this.cascadingMetaData = cascadingMetaData;
+		this.cascadingMetaData.validateGroupConversions( this.toString() );
 	}
 
 	public int getIndex() {
 		return index;
-	}
-
-	@Override
-	public Class<?> convertGroup(Class<?> originalGroup) {
-		return groupConversionHelper.convertGroup( originalGroup );
-	}
-
-	@Override
-	public Set<GroupConversionDescriptor> getGroupConversionDescriptors() {
-		return groupConversionHelper.asDescriptors();
 	}
 
 	@Override
@@ -94,11 +77,12 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				getType(),
 				index,
 				getName(),
-				asDescriptors( getConstraints() ),
-				isCascading(),
+				asDescriptors( getDirectConstraints() ),
+				asContainerElementTypeDescriptors( getContainerElementsConstraints(), cascadingMetaData, defaultGroupSequenceRedefined, defaultGroupSequence ),
+				cascadingMetaData.isCascading(),
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence,
-				getGroupConversionDescriptors()
+				cascadingMetaData.getGroupConversionDescriptors()
 		);
 	}
 
@@ -118,16 +102,16 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	}
 
 	@Override
-	public List<CascadingTypeParameter> getCascadingTypeParameters() {
-		return cascadingTypeParameters;
+	public CascadingMetaData getCascadingMetaData() {
+		return cascadingMetaData;
 	}
 
 	public static class Builder extends MetaDataBuilder {
 		private final ExecutableParameterNameProvider parameterNameProvider;
 		private final Type parameterType;
 		private final int parameterIndex;
-		private final List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
 		private Executable executableForNameRetrieval;
+		private CascadingTypeParameter cascadingMetaData;
 
 		public Builder(Class<?> beanClass,
 				ConstrainedParameter constrainedParameter,
@@ -159,7 +143,12 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 
 			ConstrainedParameter newConstrainedParameter = (ConstrainedParameter) constrainedElement;
 
-			cascadingTypeParameters.addAll( newConstrainedParameter.getCascadingTypeParameters() );
+			if ( cascadingMetaData == null ) {
+				cascadingMetaData = newConstrainedParameter.getCascadingMetaData();
+			}
+			else {
+				cascadingMetaData = cascadingMetaData.merge( newConstrainedParameter.getCascadingMetaData() );
+			}
 
 			// If the current parameter is from a method hosted on a parent class,
 			// use this parent class parameter name instead of the more specific one.
@@ -178,8 +167,8 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 					parameterNameProvider.getParameterNames( executableForNameRetrieval ).get( parameterIndex ),
 					parameterType,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
-					cascadingTypeParameters,
-					getGroupConversions()
+					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
+					new CascadingMetaData( cascadingMetaData )
 			);
 		}
 	}

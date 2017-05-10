@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -204,9 +205,10 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 			typeParameter,
 			isCascading,
 			nestedContainerElementContexts.values()
-				.stream()
-				.map( ContainerElementConstraintMappingContextImpl::getCascadingTypeParameter )
-				.collect( Collectors.toList() )
+					.stream()
+					.map( ContainerElementConstraintMappingContextImpl::getCascadingTypeParameter )
+					.collect( Collectors.toMap( CascadingTypeParameter::getTypeParameter, Function.identity() ) ),
+			groupConversions
 		);
 	}
 

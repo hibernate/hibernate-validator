@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.engine.cascading;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedArrayType;
 import java.lang.reflect.AnnotatedType;
-import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
@@ -57,17 +56,12 @@ public class ArrayElement implements TypeVariable<Class<?>> {
 	}
 
 	public ArrayElement(Type arrayType) {
-		if ( arrayType instanceof GenericArrayType ) {
-			this.containerClass = Object[].class;
+		Class<?> arrayClass = ReflectionHelper.getClassFromType( arrayType );
+		if ( arrayClass.getComponentType().isPrimitive() ) {
+			this.containerClass = arrayClass;
 		}
 		else {
-			Class<?> arrayClass = ReflectionHelper.getClassFromType( arrayType );
-			if ( arrayClass.getComponentType().isPrimitive() ) {
-				this.containerClass = arrayClass;
-			}
-			else {
-				this.containerClass = Object[].class;
-			}
+			this.containerClass = Object[].class;
 		}
 	}
 

@@ -22,24 +22,44 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 public class PropertyDescriptorImpl extends ElementDescriptorImpl implements PropertyDescriptor {
+
+	private final String propertyName;
+
+	@Immutable
+	private final List<ContainerElementTypeDescriptor> containerElementTypes;
+
 	private final boolean cascaded;
-	private final String property;
+
 	@Immutable
 	private final Set<GroupConversionDescriptor> groupConversions;
 
 	public PropertyDescriptorImpl(Type returnType,
 								  String propertyName,
 								  Set<ConstraintDescriptorImpl<?>> constraints,
+								  List<ContainerElementTypeDescriptor> containerElementTypes,
 								  boolean cascaded,
 								  boolean defaultGroupSequenceRedefined,
-								  List<Class<?>> defaultGroupSequence, Set<GroupConversionDescriptor> groupConversions) {
+								  List<Class<?>> defaultGroupSequence,
+								  Set<GroupConversionDescriptor> groupConversions) {
 		super( returnType, constraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 
-		this.property = propertyName;
+		this.propertyName = propertyName;
+		this.containerElementTypes = containerElementTypes;
 		this.cascaded = cascaded;
 		this.groupConversions = CollectionHelper.toImmutableSet( groupConversions );
+	}
+
+	@Override
+	public String getPropertyName() {
+		return propertyName;
+	}
+
+	@Override
+	public List<ContainerElementTypeDescriptor> getContainerElementTypes() {
+		return CollectionHelper.toImmutableList( containerElementTypes );
 	}
 
 	@Override
@@ -48,26 +68,16 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 	}
 
 	@Override
-	public List<ContainerElementTypeDescriptor> getContainerElementTypes() {
-		throw new UnsupportedOperationException( "Not supported for now" );
-	}
-
-	@Override
 	public Set<GroupConversionDescriptor> getGroupConversions() {
 		return groupConversions;
-	}
-
-	@Override
-	public String getPropertyName() {
-		return property;
 	}
 
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "PropertyDescriptorImpl" );
-		sb.append( "{property=" ).append( property );
-		sb.append( ", cascaded='" ).append( cascaded ).append( '\'' );
+		sb.append( "{propertyName=" ).append( propertyName );
+		sb.append( ", cascaded=" ).append( cascaded );
 		sb.append( '}' );
 		return sb.toString();
 	}

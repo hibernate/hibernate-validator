@@ -11,7 +11,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.lang.reflect.TypeVariable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -70,18 +70,9 @@ class ConstrainedParameterBuilder {
 			}
 
 			ContainerElementTypeConfigurationBuilder containerElementTypeConfigurationBuilder = new ContainerElementTypeConfigurationBuilder(
-					metaConstraintBuilder, constraintLocation, defaultPackage );
+					metaConstraintBuilder, groupConversionBuilder, constraintLocation, defaultPackage );
 			ContainerElementTypeConfiguration containerElementTypeConfiguration = containerElementTypeConfigurationBuilder
 					.build( parameterType.getContainerElementType(), type );
-
-			List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>( containerElementTypeConfiguration.getCascadingTypeParameters().size() + 1 );
-			cascadingTypeParameters.addAll( containerElementTypeConfiguration.getCascadingTypeParameters() );
-			addCascadedTypeParameterForParameter( cascadingTypeParameters, type, parameterType.getValid() != null );
-
-			Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
-					parameterType.getConvertGroup(),
-					defaultPackage
-			);
 
 			// ignore annotations
 			if ( parameterType.getIgnoreAnnotations() != null ) {
@@ -99,8 +90,7 @@ class ConstrainedParameterBuilder {
 					i,
 					metaConstraints,
 					containerElementTypeConfiguration.getMetaConstraints(),
-					groupConversions,
-					cascadingTypeParameters
+					getCascadingMetaDataForParameter( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), type, parameterType, defaultPackage )
 			);
 			constrainedParameters.add( constrainedParameter );
 			i++;
@@ -109,11 +99,18 @@ class ConstrainedParameterBuilder {
 		return constrainedParameters;
 	}
 
-	private void addCascadedTypeParameterForParameter(List<CascadingTypeParameter> cascadingTypeParameters, Type parameterType, boolean isCascaded) {
-		if ( isCascaded ) {
-			cascadingTypeParameters.add( ReflectionHelper.getClassFromType( parameterType ).isArray()
-					? CascadingTypeParameter.arrayElement( parameterType )
-					: CascadingTypeParameter.annotatedObject( parameterType ) );
-		}
+
+	private CascadingTypeParameter getCascadingMetaDataForParameter(Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Type type,
+			ParameterType parameterType, String defaultPackage) {
+		boolean isArray = ReflectionHelper.getClassFromType( type ).isArray();
+		boolean isCascaded = parameterType.getValid() != null;
+		Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
+				parameterType.getConvertGroup(),
+				defaultPackage
+		);
+
+		return isArray
+				? CascadingTypeParameter.arrayElement( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions )
+				: CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
 	}
 }

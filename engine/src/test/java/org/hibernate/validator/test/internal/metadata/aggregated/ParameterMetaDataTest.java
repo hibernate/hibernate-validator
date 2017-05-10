@@ -117,7 +117,7 @@ public class ParameterMetaDataTest {
 
 		assertThat(
 				methodMetaData.getParameterMetaData( 0 )
-						.convertGroup( Default.class )
+						.getCascadingMetaData().convertGroup( Default.class )
 		).isEqualTo( ValidationGroup.class );
 	}
 

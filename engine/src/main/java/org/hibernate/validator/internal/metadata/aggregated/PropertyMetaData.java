@@ -64,11 +64,14 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 	private PropertyMetaData(String propertyName,
 							 Type type,
 							 Set<MetaConstraint<?>> constraints,
-							 Set<Cascadable> cascadables) {
+							 Set<MetaConstraint<?>> containerElementsConstraints,
+							 Set<Cascadable> cascadables,
+							 boolean cascadingProperty) {
 		super(
 				propertyName,
 				type,
 				constraints,
+				containerElementsConstraints,
 				ElementKind.PROPERTY,
 				!cascadables.isEmpty(),
 				!cascadables.isEmpty() || !constraints.isEmpty()
@@ -79,15 +82,19 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 	@Override
 	public PropertyDescriptorImpl asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		// TODO we have one CascadingMetaData per Cascadable but we need only one to provide a view to the
+		// Bean Validation metadata API so we pick the first one...
+		CascadingMetaData firstCascadingMetaData = cascadables.isEmpty() ? null : cascadables.iterator().next().getCascadingMetaData();
+
 		return new PropertyDescriptorImpl(
 				getType(),
 				getName(),
-				asDescriptors( getConstraints() ),
-				isCascading(),
+				asDescriptors( getDirectConstraints() ),
+				asContainerElementTypeDescriptors( getContainerElementsConstraints(), firstCascadingMetaData, defaultGroupSequenceRedefined, defaultGroupSequence ),
+				firstCascadingMetaData != null ? firstCascadingMetaData.isCascading() : false,
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence,
-				// TODO which one to use ???
-				cascadables.isEmpty() ? Collections.emptySet() : cascadables.iterator().next().getGroupConversionDescriptors()
+				firstCascadingMetaData != null ? firstCascadingMetaData.getGroupConversionDescriptors() : Collections.emptySet()
 		);
 	}
 
@@ -142,6 +149,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		private final String propertyName;
 		private final Map<Member, Cascadable.Builder> cascadableBuilders = new HashMap<>();
 		private final Type propertyType;
+		private boolean cascadingProperty = false;
 
 		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
 				ValueExtractorManager valueExtractorManager) {
@@ -188,30 +196,33 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		public final void add(ConstrainedElement constrainedElement) {
 			super.add( constrainedElement );
 
-			if ( constrainedElement.isCascading() || !constrainedElement.getGroupConversions().isEmpty() ) {
+			cascadingProperty = cascadingProperty || constrainedElement.getCascadingMetaData().isCascading();
+
+			if ( constrainedElement.getCascadingMetaData().isMarkedForCascadingOnElementOrContainerElements() ||
+					constrainedElement.getCascadingMetaData().hasGroupConversionsOnElementOrContainerElements() ) {
 				if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
 					Field field = ( (ConstrainedField) constrainedElement ).getField();
 					Cascadable.Builder builder = cascadableBuilders.get( field );
 
 					if ( builder == null ) {
-						builder = new FieldCascadable.Builder( field );
+						builder = new FieldCascadable.Builder( field, constrainedElement.getCascadingMetaData() );
 						cascadableBuilders.put( field, builder );
 					}
-
-					builder.addGroupConversions( constrainedElement.getGroupConversions() );
-					builder.addCascadingTypeParameters( constrainedElement.getCascadingTypeParameters() );
+					else {
+						builder.mergeCascadingMetaData( constrainedElement.getCascadingMetaData() );
+					}
 				}
 				else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
 					Method method = (Method) ( (ConstrainedExecutable) constrainedElement ).getExecutable();
 					Cascadable.Builder builder = cascadableBuilders.get( method );
 
 					if ( builder == null ) {
-						builder = new GetterCascadable.Builder( method );
+						builder = new GetterCascadable.Builder( method, constrainedElement.getCascadingMetaData() );
 						cascadableBuilders.put( method, builder );
 					}
-
-					builder.addGroupConversions( constrainedElement.getGroupConversions() );
-					builder.addCascadingTypeParameters( constrainedElement.getCascadingTypeParameters() );
+					else {
+						builder.mergeCascadingMetaData( constrainedElement.getCascadingMetaData() );
+					}
 				}
 			}
 		}
@@ -291,7 +302,9 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					propertyName,
 					propertyType,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
-					cascadables
+					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
+					cascadables,
+					cascadingProperty
 			);
 		}
 	}
