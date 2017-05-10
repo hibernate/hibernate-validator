@@ -146,7 +146,9 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 	}
 
 	protected CascadingTypeParameter getCascadingMetaData() {
-		Map<TypeVariable<?>, CascadingTypeParameter> typeParametersCascadingMetaData = new HashMap<>();
+		Map<TypeVariable<?>, CascadingTypeParameter> typeParametersCascadingMetaData = containerElementContexts.values().stream()
+				.filter( c -> c.getCascadingTypeParameter() != null )
+				.collect( Collectors.toMap( c -> c.getCascadingTypeParameter().getTypeParameter(), c -> c.getCascadingTypeParameter() ) );
 
 		for ( ContainerElementConstraintMappingContextImpl typeArgumentContext : containerElementContexts.values() ) {
 			CascadingTypeParameter cascadingTypeParameter = typeArgumentContext.getCascadingTypeParameter();
@@ -154,6 +156,7 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 				typeParametersCascadingMetaData.put( cascadingTypeParameter.getTypeParameter(), cascadingTypeParameter );
 			}
 		}
+
 
 		boolean isArray = TypeHelper.isArray( configuredType );
 		CascadingTypeParameter cascadingMetaData = isArray
