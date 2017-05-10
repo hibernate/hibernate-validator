@@ -93,6 +93,7 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 			elementTypes.add( ElementType.METHOD );
 			elementTypes.add( ElementType.CONSTRUCTOR );
 			elementTypes.add( ElementType.FIELD );
+			elementTypes.add( ElementType.TYPE_USE );
 
 			//for a bean descriptor there will be no parameter constraints, so we can safely add this element type here
 			elementTypes.add( ElementType.PARAMETER );

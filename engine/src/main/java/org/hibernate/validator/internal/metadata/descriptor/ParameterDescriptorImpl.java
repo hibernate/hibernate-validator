@@ -22,11 +22,19 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  *
  * @author Gunnar Morling
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 public class ParameterDescriptorImpl extends ElementDescriptorImpl implements ParameterDescriptor {
+
 	private final int index;
+
 	private final String name;
+
+	@Immutable
+	private final List<ContainerElementTypeDescriptor> containerElementTypes;
+
 	private final boolean cascaded;
+
 	@Immutable
 	private final Set<GroupConversionDescriptor> groupConversions;
 
@@ -34,6 +42,7 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 								   int index,
 								   String name,
 								   Set<ConstraintDescriptorImpl<?>> constraints,
+								   List<ContainerElementTypeDescriptor> containerElementTypes,
 								   boolean isCascaded,
 								   boolean defaultGroupSequenceRedefined,
 								   List<Class<?>> defaultGroupSequence,
@@ -41,23 +50,9 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 		super( type, constraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 		this.index = index;
 		this.name = name;
+		this.containerElementTypes = containerElementTypes;
 		this.cascaded = isCascaded;
 		this.groupConversions = CollectionHelper.toImmutableSet( groupConversions );
-	}
-
-	@Override
-	public boolean isCascaded() {
-		return cascaded;
-	}
-
-	@Override
-	public List<ContainerElementTypeDescriptor> getContainerElementTypes() {
-		throw new UnsupportedOperationException( "Not supported for now" );
-	}
-
-	@Override
-	public Set<GroupConversionDescriptor> getGroupConversions() {
-		return groupConversions;
 	}
 
 	@Override
@@ -66,8 +61,23 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 	}
 
 	@Override
+	public List<ContainerElementTypeDescriptor> getContainerElementTypes() {
+		return CollectionHelper.toImmutableList( containerElementTypes );
+	}
+
+	@Override
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public boolean isCascaded() {
+		return cascaded;
+	}
+
+	@Override
+	public Set<GroupConversionDescriptor> getGroupConversions() {
+		return groupConversions;
 	}
 
 	@Override
