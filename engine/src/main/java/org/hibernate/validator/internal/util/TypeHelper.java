@@ -174,6 +174,13 @@ public final class TypeHelper {
 			return getErasedType( bounds[0] );
 		}
 
+		// the erasure of a wildcard type is the erasure of its leftmost upper bound
+		if ( type instanceof WildcardType ) {
+			Type[] upperBounds = ( (WildcardType) type ).getUpperBounds();
+
+			return getErasedType( upperBounds[0] );
+		}
+
 		// the erasure of every other type is the type itself
 		return type;
 	}
