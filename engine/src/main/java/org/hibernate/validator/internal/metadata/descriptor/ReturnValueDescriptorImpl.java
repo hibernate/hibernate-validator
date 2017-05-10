@@ -19,15 +19,22 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 public class ReturnValueDescriptorImpl extends ElementDescriptorImpl
 		implements ReturnValueDescriptor {
+
+	@Immutable
+	private final List<ContainerElementTypeDescriptor> containerElementTypes;
+
 	private final boolean cascaded;
+
 	@Immutable
 	private final Set<GroupConversionDescriptor> groupConversions;
 
 	public ReturnValueDescriptorImpl(Type returnType,
 									 Set<ConstraintDescriptorImpl<?>> returnValueConstraints,
+									 List<ContainerElementTypeDescriptor> containerElementTypes,
 									 boolean cascaded,
 									 boolean defaultGroupSequenceRedefined,
 									 List<Class<?>> defaultGroupSequence,
@@ -39,18 +46,19 @@ public class ReturnValueDescriptorImpl extends ElementDescriptorImpl
 				defaultGroupSequence
 		);
 
+		this.containerElementTypes = containerElementTypes;
 		this.cascaded = cascaded;
 		this.groupConversions = CollectionHelper.toImmutableSet( groupConversions );
 	}
 
 	@Override
-	public boolean isCascaded() {
-		return cascaded;
+	public List<ContainerElementTypeDescriptor> getContainerElementTypes() {
+		return CollectionHelper.toImmutableList( containerElementTypes );
 	}
 
 	@Override
-	public List<ContainerElementTypeDescriptor> getContainerElementTypes() {
-		throw new UnsupportedOperationException( "Not supported for now" );
+	public boolean isCascaded() {
+		return cascaded;
 	}
 
 	@Override

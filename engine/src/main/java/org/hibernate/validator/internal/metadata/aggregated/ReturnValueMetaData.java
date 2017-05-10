@@ -42,14 +42,16 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 
 	public ReturnValueMetaData(Type type,
 							   Set<MetaConstraint<?>> constraints,
+							   Set<MetaConstraint<?>> containerElementsConstraints,
 							   CascadingMetaData cascadingMetaData) {
 		super(
 				RETURN_VALUE_NODE_NAME,
 				type,
 				constraints,
+				containerElementsConstraints,
 				ElementKind.RETURN_VALUE,
 				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
-				!constraints.isEmpty() || cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements()
+				!constraints.isEmpty() || containerElementsConstraints.isEmpty() || cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements()
 		);
 
 
@@ -72,8 +74,9 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	public ReturnValueDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		return new ReturnValueDescriptorImpl(
 				getType(),
-				asDescriptors( getConstraints() ),
-				isCascading(),
+				asDescriptors( getDirectConstraints() ),
+				asContainerElementTypeDescriptors( getContainerElementsConstraints(), cascadingMetaData, defaultGroupSequenceRedefined, defaultGroupSequence ),
+				cascadingMetaData.isCascading(),
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence,
 				cascadingMetaData.getGroupConversionDescriptors()

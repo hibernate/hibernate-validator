@@ -37,7 +37,8 @@ public abstract class MetaDataBuilder {
 	protected final ValueExtractorManager valueExtractorManager;
 
 	private final Class<?> beanClass;
-	private final Set<MetaConstraint<?>> constraints = newHashSet();
+	private final Set<MetaConstraint<?>> directConstraints = newHashSet();
+	private final Set<MetaConstraint<?>> containerElementsConstraints = newHashSet();
 	private final Map<Class<?>, Class<?>> groupConversions = newHashMap();
 	private boolean isCascading = false;
 
@@ -68,8 +69,8 @@ public abstract class MetaDataBuilder {
 	 * @param constrainedElement The element to add.
 	 */
 	public void add(ConstrainedElement constrainedElement) {
-		constraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getConstraints() ) );
-		constraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getTypeArgumentConstraints() ) );
+		directConstraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getConstraints() ) );
+		containerElementsConstraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getTypeArgumentConstraints() ) );
 		isCascading = isCascading || constrainedElement.getCascadingMetaData().isMarkedForCascadingOnElementOrContainerElements();
 	}
 
@@ -86,8 +87,12 @@ public abstract class MetaDataBuilder {
 		return groupConversions;
 	}
 
-	protected Set<MetaConstraint<?>> getConstraints() {
-		return constraints;
+	protected Set<MetaConstraint<?>> getDirectConstraints() {
+		return directConstraints;
+	}
+
+	public Set<MetaConstraint<?>> getContainerElementConstraints() {
+		return containerElementsConstraints;
 	}
 
 	protected boolean isCascading() {
