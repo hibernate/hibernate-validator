@@ -44,14 +44,16 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 							  String name,
 							  Type type,
 							  Set<MetaConstraint<?>> constraints,
+							  Set<MetaConstraint<?>> containerElementsConstraints,
 							  CascadingMetaData cascadingMetaData) {
 		super(
 				name,
 				type,
 				constraints,
+				containerElementsConstraints,
 				ElementKind.PARAMETER,
 				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
-				!constraints.isEmpty() || cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements()
+				!constraints.isEmpty() || !containerElementsConstraints.isEmpty() || cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements()
 		);
 
 		this.index = index;
@@ -75,8 +77,9 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				getType(),
 				index,
 				getName(),
-				asDescriptors( getConstraints() ),
-				isCascading(),
+				asDescriptors( getDirectConstraints() ),
+				asContainerElementTypeDescriptors( getContainerElementsConstraints(), cascadingMetaData, defaultGroupSequenceRedefined, defaultGroupSequence ),
+				cascadingMetaData.isCascading(),
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence,
 				cascadingMetaData.getGroupConversionDescriptors()
@@ -163,7 +166,8 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 					parameterIndex,
 					parameterNameProvider.getParameterNames( executableForNameRetrieval ).get( parameterIndex ),
 					parameterType,
-					adaptOriginsAndImplicitGroups( getConstraints() ),
+					adaptOriginsAndImplicitGroups( getDirectConstraints() ),
+					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
 					new CascadingMetaData( cascadingMetaData )
 			);
 		}

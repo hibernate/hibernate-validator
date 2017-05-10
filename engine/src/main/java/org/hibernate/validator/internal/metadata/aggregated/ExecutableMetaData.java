@@ -84,6 +84,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			ElementKind kind,
 			Set<String> signatures,
 			Set<MetaConstraint<?>> returnValueConstraints,
+			Set<MetaConstraint<?>> returnValueContainerElementConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			CascadingMetaData cascadingMetaData,
@@ -93,6 +94,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				name,
 				returnType,
 				returnValueConstraints,
+				returnValueContainerElementConstraints,
 				kind,
 				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
 				isConstrained
@@ -105,6 +107,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		this.returnValueMetaData = new ReturnValueMetaData(
 				returnType,
 				returnValueConstraints,
+				returnValueContainerElementConstraints,
 				cascadingMetaData
 		);
 		this.isGetter = isGetter;
@@ -369,7 +372,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					executable.getParameterTypes(),
 					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
 					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? Collections.singleton( ExecutableHelper.getSignature( executable ) ) : signatures,
-					adaptOriginsAndImplicitGroups( getConstraints() ),
+					adaptOriginsAndImplicitGroups( getDirectConstraints() ),
+					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
 					new CascadingMetaData( cascadingMetaData ),
