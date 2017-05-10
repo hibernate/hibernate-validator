@@ -211,6 +211,11 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <extensions>
+                        <extension>
+                            <className>org.hibernate.infra.asciidoctor.extensions.customnumbering.CustomNumberingProcessor</className>
+                        </extension>
+                    </extensions>
                     <sourceDocumentName>index.asciidoc</sourceDocumentName>
                     <attributes>
                         <docinfodir>${asciidoctor.aggregated-resources-dir}/docinfo/noorm-documentation</docinfodir>
