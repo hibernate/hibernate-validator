@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
 
+import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityNumberComparatorHelper;
+
 /**
  * Check that the number being validated is positive.
  *
@@ -18,6 +20,6 @@ public class PositiveValidatorForDouble extends BasePositiveValidator<Double> {
 
 	@Override
 	protected int compare(Double number) {
-		return NumberSignumHelper.signum( number, -1 );
+		return NumberSignHelper.signum( number, InfinityNumberComparatorHelper.LESS_THAN );
 	}
 }

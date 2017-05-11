@@ -8,16 +8,16 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Optional;
+import java.util.OptionalInt;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.InfinityNumberComparatorHelper;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityNumberComparatorHelper;
 
 /**
  * @author Marko Bekhta
  */
-public final class NumberSignumHelper {
+final class NumberSignHelper {
 
-	private NumberSignumHelper() {
+	private NumberSignHelper() {
 	}
 
 	private static final short SHORT_ZERO = (short) 0;
@@ -52,18 +52,18 @@ public final class NumberSignumHelper {
 		return Double.compare( value.doubleValue(), 0D );
 	}
 
-	static int signum(Float number, int treatNanAs) {
-		Optional<Integer> infinity = InfinityNumberComparatorHelper.infinityCheck( number, treatNanAs );
+	static int signum(Float number, OptionalInt treatNanAs) {
+		OptionalInt infinity = InfinityNumberComparatorHelper.infinityCheck( number, treatNanAs );
 		if ( infinity.isPresent() ) {
-			return infinity.get();
+			return infinity.getAsInt();
 		}
 		return number.compareTo( 0F );
 	}
 
-	static int signum(Double number, int treatNanAs) {
-		Optional<Integer> infinity = InfinityNumberComparatorHelper.infinityCheck( number, treatNanAs );
+	static int signum(Double number, OptionalInt treatNanAs) {
+		OptionalInt infinity = InfinityNumberComparatorHelper.infinityCheck( number, treatNanAs );
 		if ( infinity.isPresent() ) {
-			return infinity.get();
+			return infinity.getAsInt();
 		}
 		return number.compareTo( 0D );
 	}

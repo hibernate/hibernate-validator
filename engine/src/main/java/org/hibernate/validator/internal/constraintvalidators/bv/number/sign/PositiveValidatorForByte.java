@@ -18,6 +18,6 @@ public class PositiveValidatorForByte extends BasePositiveValidator<Byte> {
 
 	@Override
 	protected int compare(Byte number) {
-		return NumberSignumHelper.signum( number );
+		return NumberSignHelper.signum( number );
 	}
 }

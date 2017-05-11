@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal;
 
+import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityNumberComparatorHelper;
+
 /**
  * Check that the number being validated is less than or equal to the maximum
  * value specified.
@@ -15,6 +17,6 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.bound.de
 public class DecimalMaxValidatorForDouble extends BaseDecimalMaxValidator<Double> {
 
 	@Override protected int compare(Double number) {
-		return DecimalNumberComparatorHelper.compare( number, maxValue, 1 );
+		return DecimalNumberComparatorHelper.compare( number, maxValue, InfinityNumberComparatorHelper.GREATER_THAN );
 	}
 }

@@ -18,6 +18,6 @@ public class NegativeValidatorForNumber extends BaseNegativeValidator<Number> {
 
 	@Override
 	protected int compare(Number value) {
-		return NumberSignumHelper.signum( value );
+		return NumberSignHelper.signum( value );
 	}
 }

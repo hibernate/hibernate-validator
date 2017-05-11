@@ -20,6 +20,6 @@ public class NegativeValidatorForBigDecimal extends BaseNegativeValidator<BigDec
 
 	@Override
 	protected int compare(BigDecimal number) {
-		return NumberSignumHelper.signum( number );
+		return NumberSignHelper.signum( number );
 	}
 }

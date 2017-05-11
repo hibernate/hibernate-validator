@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal;
 
+import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityNumberComparatorHelper;
+
 /**
  * Check that the number being validated is greater than or equal to the minimum
  * value specified.
@@ -15,6 +17,6 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.bound.de
 public class DecimalMinValidatorForFloat extends BaseDecimalMinValidator<Float> {
 
 	@Override protected int compare(Float number) {
-		return DecimalNumberComparatorHelper.compare( number, minValue, -1 );
+		return DecimalNumberComparatorHelper.compare( number, minValue, InfinityNumberComparatorHelper.LESS_THAN );
 	}
 }

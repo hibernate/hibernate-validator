@@ -18,6 +18,6 @@ public class PositiveValidatorForShort extends BasePositiveValidator<Short> {
 
 	@Override
 	protected int compare(Short number) {
-		return NumberSignumHelper.signum( number );
+		return NumberSignHelper.signum( number );
 	}
 }

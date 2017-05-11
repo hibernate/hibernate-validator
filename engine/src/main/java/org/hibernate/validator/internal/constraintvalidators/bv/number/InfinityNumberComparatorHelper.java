@@ -4,44 +4,47 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.constraintvalidators.bv.number.bound;
+package org.hibernate.validator.internal.constraintvalidators.bv.number;
 
-import java.util.Optional;
+import java.util.OptionalInt;
 
 /**
  * @author Marko Bekhta
  */
 public final class InfinityNumberComparatorHelper {
 
+	public static final OptionalInt LESS_THAN = OptionalInt.of( -1 );
+	public static final OptionalInt FINITE_VALUE = OptionalInt.empty();
+	public static final OptionalInt GREATER_THAN = OptionalInt.of( 1 );
+
 	private InfinityNumberComparatorHelper() {
 	}
 
-	public static Optional<Integer> infinityCheck(Double number, int treatNanAs) {
-		Integer result = null;
+	public static OptionalInt infinityCheck(Double number, OptionalInt treatNanAs) {
+		OptionalInt result = FINITE_VALUE;
 		if ( number == Double.NEGATIVE_INFINITY ) {
-			result = -1;
+			result = LESS_THAN;
 		}
 		else if ( number.isNaN() ) {
 			result = treatNanAs;
 		}
 		else if ( number == Double.POSITIVE_INFINITY ) {
-			result = 1;
+			result = GREATER_THAN;
 		}
-		return Optional.ofNullable( result );
+		return result;
 	}
 
-	public static Optional<Integer> infinityCheck(Float number, int treatNanAs) {
-		Integer result = null;
+	public static OptionalInt infinityCheck(Float number, OptionalInt treatNanAs) {
+		OptionalInt result = FINITE_VALUE;
 		if ( number == Float.NEGATIVE_INFINITY ) {
-			result = -1;
+			result = LESS_THAN;
 		}
 		else if ( number.isNaN() ) {
 			result = treatNanAs;
 		}
 		else if ( number == Float.POSITIVE_INFINITY ) {
-			result = 1;
+			result = GREATER_THAN;
 		}
-		return Optional.ofNullable( result );
+		return result;
 	}
-
 }

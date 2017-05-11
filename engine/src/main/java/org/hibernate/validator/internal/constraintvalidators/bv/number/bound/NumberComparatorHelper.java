@@ -8,12 +8,14 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.bound;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Optional;
+import java.util.OptionalInt;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityNumberComparatorHelper;
 
 /**
  * @author Marko Bekhta
  */
-public final class NumberComparatorHelper {
+final class NumberComparatorHelper {
 
 	private NumberComparatorHelper() {
 	}
@@ -34,20 +36,19 @@ public final class NumberComparatorHelper {
 		return Long.compare( number.longValue(), value );
 	}
 
-	public static int compare(Double number, long value, int treatNanAs) {
-		Optional<Integer> infinity = InfinityNumberComparatorHelper.infinityCheck( number, treatNanAs );
+	public static int compare(Double number, long value, OptionalInt treatNanAs) {
+		OptionalInt infinity = InfinityNumberComparatorHelper.infinityCheck( number, treatNanAs );
 		if ( infinity.isPresent() ) {
-			return infinity.get();
+			return infinity.getAsInt();
 		}
 		return Long.compare( number.longValue(), value );
 	}
 
-	public static int compare(Float number, long value, int treatNanAs) {
-		Optional<Integer> infinity = InfinityNumberComparatorHelper.infinityCheck( number, treatNanAs );
+	public static int compare(Float number, long value, OptionalInt treatNanAs) {
+		OptionalInt infinity = InfinityNumberComparatorHelper.infinityCheck( number, treatNanAs );
 		if ( infinity.isPresent() ) {
-			return infinity.get();
+			return infinity.getAsInt();
 		}
 		return Long.compare( number.longValue(), value );
 	}
-
 }

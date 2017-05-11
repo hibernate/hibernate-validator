@@ -18,6 +18,6 @@ public class PositiveValidatorForLong extends BasePositiveValidator<Long> {
 
 	@Override
 	protected int compare(Long number) {
-		return NumberSignumHelper.signum( number );
+		return NumberSignHelper.signum( number );
 	}
 }
