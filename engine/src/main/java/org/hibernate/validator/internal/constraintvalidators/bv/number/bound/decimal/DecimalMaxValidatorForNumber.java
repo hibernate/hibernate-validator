@@ -12,7 +12,7 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.bound.de
  *
  * @author Marko Bekhta
  */
-public class DecimalMaxValidatorForNumber extends BaseDecimalMaxValidator<Number> {
+public class DecimalMaxValidatorForNumber extends AbstractDecimalMaxValidator<Number> {
 
 	@Override protected int compare(Number number) {
 		return DecimalNumberComparatorHelper.compare( number, maxValue );

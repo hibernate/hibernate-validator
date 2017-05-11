@@ -14,7 +14,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityN
  *
  * @author Marko Bekhta
  */
-public class MinValidatorForFloat extends BaseMinValidator<Float> {
+public class MinValidatorForFloat extends AbstractMinValidator<Float> {
 
 	@Override
 	protected int compare(Float number) {

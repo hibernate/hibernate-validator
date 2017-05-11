@@ -12,7 +12,7 @@ import javax.validation.Validator;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.BaseMaxValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.AbstractMaxValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForNumber;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
@@ -22,7 +22,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 
 /**
  * Check correct behavior of {@link MinValidatorForNumber} and
- * {@link BaseMaxValidator} on boundary values.
+ * {@link AbstractMaxValidator} on boundary values.
  * <p/>
  * The chosen numbers: 9223372036854775806l and 9223372036854775807l cast to
  * the same double value.

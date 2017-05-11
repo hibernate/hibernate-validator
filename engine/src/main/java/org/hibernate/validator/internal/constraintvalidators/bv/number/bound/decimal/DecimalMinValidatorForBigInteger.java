@@ -14,7 +14,7 @@ import java.math.BigInteger;
  *
  * @author Marko Bekhta
  */
-public class DecimalMinValidatorForBigInteger extends BaseDecimalMinValidator<BigInteger> {
+public class DecimalMinValidatorForBigInteger extends AbstractDecimalMinValidator<BigInteger> {
 
 	@Override protected int compare(BigInteger number) {
 		return DecimalNumberComparatorHelper.compare( number, minValue );

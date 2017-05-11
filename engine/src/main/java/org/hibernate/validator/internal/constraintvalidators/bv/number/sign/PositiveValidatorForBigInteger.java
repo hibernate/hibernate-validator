@@ -16,7 +16,7 @@ import java.math.BigInteger;
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class PositiveValidatorForBigInteger extends BasePositiveValidator<BigInteger> {
+public class PositiveValidatorForBigInteger extends AbstractPositiveValidator<BigInteger> {
 
 	@Override
 	protected int compare(BigInteger number) {

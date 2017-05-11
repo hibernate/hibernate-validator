@@ -9,14 +9,14 @@ package org.hibernate.validator.test.internal.constraintvalidators.bv;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.BaseMinValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.AbstractMinValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForBigInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForDouble;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForFloat;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForLong;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForNumber;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.BaseDecimalMinValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.AbstractDecimalMinValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForBigInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForDouble;
@@ -82,7 +82,7 @@ public class MinValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 	}
 
 	private void testDecimalMin(DecimalMin m, boolean inclusive) {
-		BaseDecimalMinValidator constraint = new DecimalMinValidatorForNumber();
+		AbstractDecimalMinValidator constraint = new DecimalMinValidatorForNumber();
 		constraint.initialize( m );
 		testNumberValidator( constraint, inclusive, false );
 
@@ -108,7 +108,7 @@ public class MinValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 	}
 
 	private void testMin(Min m, boolean inclusive) {
-		BaseMinValidator constraint = new MinValidatorForNumber();
+		AbstractMinValidator constraint = new MinValidatorForNumber();
 		constraint.initialize( m );
 		testNumberValidator( constraint, inclusive, false );
 

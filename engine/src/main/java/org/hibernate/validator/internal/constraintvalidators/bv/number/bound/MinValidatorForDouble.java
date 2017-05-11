@@ -14,7 +14,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityN
  *
  * @author Marko Bekhta
  */
-public class MinValidatorForDouble extends BaseMinValidator<Double> {
+public class MinValidatorForDouble extends AbstractMinValidator<Double> {
 
 	@Override
 	protected int compare(Double number) {

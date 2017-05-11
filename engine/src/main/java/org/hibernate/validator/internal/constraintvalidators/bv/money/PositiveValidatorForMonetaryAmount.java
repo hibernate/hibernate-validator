@@ -8,14 +8,14 @@ package org.hibernate.validator.internal.constraintvalidators.bv.money;
 
 import javax.money.MonetaryAmount;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.BasePositiveValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.AbstractPositiveValidator;
 
 /**
  * Check that the number being validated positive.
  *
  * @author Marko Bekhta
  */
-public class PositiveValidatorForMonetaryAmount extends BasePositiveValidator<MonetaryAmount> {
+public class PositiveValidatorForMonetaryAmount extends AbstractPositiveValidator<MonetaryAmount> {
 
 	@Override
 	protected int compare(MonetaryAmount amount) {

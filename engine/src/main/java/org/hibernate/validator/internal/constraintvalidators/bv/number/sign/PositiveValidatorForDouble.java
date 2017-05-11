@@ -16,7 +16,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityN
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class PositiveValidatorForDouble extends BasePositiveValidator<Double> {
+public class PositiveValidatorForDouble extends AbstractPositiveValidator<Double> {
 
 	@Override
 	protected int compare(Double number) {

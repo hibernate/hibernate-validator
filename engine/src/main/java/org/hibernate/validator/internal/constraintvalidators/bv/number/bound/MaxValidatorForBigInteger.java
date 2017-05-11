@@ -14,7 +14,7 @@ import java.math.BigInteger;
  *
  * @author Marko Bekhta
  */
-public class MaxValidatorForBigInteger extends BaseMaxValidator<BigInteger> {
+public class MaxValidatorForBigInteger extends AbstractMaxValidator<BigInteger> {
 
 	@Override
 	protected int compare(BigInteger number) {

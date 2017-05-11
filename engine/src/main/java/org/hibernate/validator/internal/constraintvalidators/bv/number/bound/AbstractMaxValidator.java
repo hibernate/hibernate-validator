@@ -8,10 +8,10 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.bound;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Max;
 
 /**
- * Check that the number being validated is greater than or equal to the minimum
+ * Check that the number being validated is less than or equal to the maximum
  * value specified.
  *
  * @author Alaa Nassef
@@ -19,13 +19,13 @@ import javax.validation.constraints.Min;
  * @author Xavier Sosnovsky
  * @author Marko Bekhta
  */
-public abstract class BaseMinValidator<T> implements ConstraintValidator<Min, T> {
+public abstract class AbstractMaxValidator<T> implements ConstraintValidator<Max, T> {
 
-	protected long minValue;
+	protected long maxValue;
 
 	@Override
-	public void initialize(Min maxValue) {
-		this.minValue = maxValue.value();
+	public void initialize(Max maxValue) {
+		this.maxValue = maxValue.value();
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public abstract class BaseMinValidator<T> implements ConstraintValidator<Min, T>
 			return true;
 		}
 
-		return compare( value ) >= 0;
+		return compare( value ) <= 0;
 	}
 
 	protected abstract int compare(T number);

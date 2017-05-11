@@ -12,7 +12,7 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.bound.de
  *
  * @author Marko Bekhta
  */
-public class DecimalMinValidatorForNumber extends BaseDecimalMinValidator<Number> {
+public class DecimalMinValidatorForNumber extends AbstractDecimalMinValidator<Number> {
 
 	@Override protected int compare(Number number) {
 		return DecimalNumberComparatorHelper.compare( number, minValue );

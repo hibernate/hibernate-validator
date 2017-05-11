@@ -14,7 +14,7 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class PositiveValidatorForInteger extends BasePositiveValidator<Integer> {
+public class PositiveValidatorForInteger extends AbstractPositiveValidator<Integer> {
 
 	@Override
 	protected int compare(Integer number) {

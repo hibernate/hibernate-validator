@@ -16,7 +16,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityN
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class NegativeValidatorForFloat extends BaseNegativeValidator<Float> {
+public class NegativeValidatorForFloat extends AbstractNegativeValidator<Float> {
 
 	@Override
 	protected int compare(Float number) {

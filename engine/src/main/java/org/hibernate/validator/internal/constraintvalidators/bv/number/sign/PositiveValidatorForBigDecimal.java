@@ -16,7 +16,7 @@ import java.math.BigDecimal;
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class PositiveValidatorForBigDecimal extends BasePositiveValidator<BigDecimal> {
+public class PositiveValidatorForBigDecimal extends AbstractPositiveValidator<BigDecimal> {
 
 	@Override
 	protected int compare(BigDecimal number) {

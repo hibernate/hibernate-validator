@@ -12,7 +12,7 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.bound;
  *
  * @author Marko Bekhta
  */
-public class MaxValidatorForLong extends BaseMaxValidator<Long> {
+public class MaxValidatorForLong extends AbstractMaxValidator<Long> {
 
 	@Override
 	protected int compare(Long number) {

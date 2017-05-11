@@ -22,7 +22,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Xavier Sosnovsky
  * @author Marko Bekhta
  */
-public abstract class BaseDecimalMaxValidator<T> implements ConstraintValidator<DecimalMax, T> {
+public abstract class AbstractDecimalMaxValidator<T> implements ConstraintValidator<DecimalMax, T> {
 
 	private static final Log LOG = LoggerFactory.make();
 

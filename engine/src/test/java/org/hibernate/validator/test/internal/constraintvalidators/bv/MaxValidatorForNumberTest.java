@@ -9,14 +9,14 @@ package org.hibernate.validator.test.internal.constraintvalidators.bv;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Max;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.BaseMaxValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.AbstractMaxValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForBigInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForDouble;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForFloat;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForLong;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForNumber;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.BaseDecimalMaxValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.AbstractDecimalMaxValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForBigInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForDouble;
@@ -82,7 +82,7 @@ public class MaxValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 	}
 
 	private void testDecimalMax(DecimalMax m, boolean inclusive) {
-		BaseDecimalMaxValidator constraint = new DecimalMaxValidatorForNumber();
+		AbstractDecimalMaxValidator constraint = new DecimalMaxValidatorForNumber();
 		constraint.initialize( m );
 		testNumberValidator( constraint, inclusive, true );
 
@@ -108,7 +108,7 @@ public class MaxValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 	}
 
 	private void testMax(Max m, boolean inclusive) {
-		BaseMaxValidator constraint = new MaxValidatorForNumber();
+		AbstractMaxValidator constraint = new MaxValidatorForNumber();
 		constraint.initialize( m );
 		testNumberValidator( constraint, inclusive, true );
 

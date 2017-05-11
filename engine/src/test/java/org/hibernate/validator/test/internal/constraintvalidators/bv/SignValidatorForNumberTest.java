@@ -16,8 +16,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.constraints.Negative;
 import javax.validation.constraints.Positive;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.BaseNegativeValidator;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.BasePositiveValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.AbstractNegativeValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.AbstractPositiveValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForBigInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForByte;
@@ -67,7 +67,7 @@ public class SignValidatorForNumberTest {
 	}
 
 	private void testNegative(Negative m, boolean strict) {
-		BaseNegativeValidator constraint = new NegativeValidatorForNumber();
+		AbstractNegativeValidator constraint = new NegativeValidatorForNumber();
 		constraint.initialize( m );
 		testSignNumber( constraint, strict, false );
 
@@ -105,7 +105,7 @@ public class SignValidatorForNumberTest {
 	}
 
 	private void testPositive(Positive m, boolean strict) {
-		BasePositiveValidator constraint = new PositiveValidatorForNumber();
+		AbstractPositiveValidator constraint = new PositiveValidatorForNumber();
 		constraint.initialize( m );
 		testSignNumber( constraint, strict, true );
 

@@ -14,7 +14,7 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class NegativeValidatorForByte extends BaseNegativeValidator<Byte> {
+public class NegativeValidatorForByte extends AbstractNegativeValidator<Byte> {
 
 	@Override
 	protected int compare(Byte number) {

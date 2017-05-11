@@ -14,7 +14,7 @@ import java.math.BigInteger;
  *
  * @author Marko Bekhta
  */
-public class MinValidatorForBigInteger extends BaseMinValidator<BigInteger> {
+public class MinValidatorForBigInteger extends AbstractMinValidator<BigInteger> {
 
 	@Override
 	protected int compare(BigInteger number) {

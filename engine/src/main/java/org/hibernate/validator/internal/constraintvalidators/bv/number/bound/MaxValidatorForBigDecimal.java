@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  *
  * @author Marko Bekhta
  */
-public class MaxValidatorForBigDecimal extends BaseMaxValidator<BigDecimal> {
+public class MaxValidatorForBigDecimal extends AbstractMaxValidator<BigDecimal> {
 
 	@Override
 	protected int compare(BigDecimal number) {

@@ -8,19 +8,19 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.Negative;
 
 /**
- * Base validator to be used in implementations for {@link Positive} constraint.
+ * Base validator to be used in implementations for {@link Negative} constraint.
  *
  * @author Marko Bekhta
  */
-public abstract class BasePositiveValidator<T> implements ConstraintValidator<Positive, T> {
+public abstract class AbstractNegativeValidator<T> implements ConstraintValidator<Negative, T> {
 
 	private boolean strict;
 
 	@Override
-	public void initialize(Positive positive) {
+	public void initialize(Negative positive) {
 		this.strict = positive.strict();
 	}
 
@@ -31,7 +31,7 @@ public abstract class BasePositiveValidator<T> implements ConstraintValidator<Po
 			return true;
 		}
 		int comparisonResult = compare( value );
-		return strict ? comparisonResult > 0 : comparisonResult >= 0;
+		return strict ? comparisonResult < 0 : comparisonResult <= 0;
 	}
 
 	protected abstract int compare(T element);
