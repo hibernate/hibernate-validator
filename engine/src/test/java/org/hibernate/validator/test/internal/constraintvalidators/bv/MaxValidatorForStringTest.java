@@ -13,7 +13,7 @@ import javax.validation.constraints.Max;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMaxValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMaxValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForCharSequence;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
