@@ -265,9 +265,7 @@ public abstract class AbstractMethodValidationTest {
 		}
 	}
 
-	// FIXME HV-1330: we have transient failures with this test
-	// sometimes the exception is not thrown
-	@Test(enabled = false)
+	@Test
 	public void cascadingArrayParameter() {
 		Customer customer = new Customer( null );
 

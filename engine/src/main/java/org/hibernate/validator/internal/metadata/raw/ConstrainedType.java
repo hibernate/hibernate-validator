@@ -37,7 +37,7 @@ public class ConstrainedType extends AbstractConstrainedElement {
 				ConstrainedElementKind.TYPE,
 				constraints,
 				Collections.emptySet(),
-				CascadingTypeParameter.nonCascading( beanClass )
+				CascadingTypeParameter.nonCascading()
 		);
 
 		this.beanClass = beanClass;

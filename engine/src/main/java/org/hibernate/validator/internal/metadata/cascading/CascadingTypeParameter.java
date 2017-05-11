@@ -33,6 +33,9 @@ public class CascadingTypeParameter {
 
 	private static final Log LOG = LoggerFactory.make();
 
+	private static final CascadingTypeParameter NON_CASCADING =
+			new CascadingTypeParameter( null, null, false, Collections.emptyMap(), Collections.emptyMap() );
+
 	/**
 	 * The enclosing type that defines this type parameter.
 	 */
@@ -90,9 +93,8 @@ public class CascadingTypeParameter {
 		hasGroupConversionsOnElementOrContainerElements = tmpHasGroupConversionsOnElementOrContainerElements;
 	}
 
-	public static CascadingTypeParameter nonCascading(Type cascadableType) {
-		// as it's non cascading anyway, we can also treat the arrays as annotated object
-		return annotatedObject( cascadableType, false, Collections.emptyMap(), Collections.emptyMap() );
+	public static CascadingTypeParameter nonCascading() {
+		return NON_CASCADING;
 	}
 
 	public static CascadingTypeParameter annotatedObject(Type cascadableType, boolean cascading,
@@ -135,6 +137,13 @@ public class CascadingTypeParameter {
 	}
 
 	public CascadingTypeParameter merge(CascadingTypeParameter otherCascadingTypeParameter) {
+		if ( this == NON_CASCADING ) {
+			return otherCascadingTypeParameter;
+		}
+		if ( otherCascadingTypeParameter == NON_CASCADING ) {
+			return this;
+		}
+
 		boolean cascading = this.cascading || otherCascadingTypeParameter.cascading;
 
 		Map<Class<?>, Class<?>> groupConversions = mergeGroupConversion( this.groupConversions, otherCascadingTypeParameter.groupConversions );

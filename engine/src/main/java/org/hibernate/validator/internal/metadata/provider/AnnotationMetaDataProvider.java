@@ -327,7 +327,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( executable ) ) {
 			returnValueConstraints = Collections.emptySet();
 			typeArgumentsConstraints = Collections.emptySet();
-			cascadingMetaData = CascadingTypeParameter.nonCascading( ReflectionHelper.typeOf( executable ) );
+			cascadingMetaData = CascadingTypeParameter.nonCascading();
 		}
 		else {
 			typeArgumentsConstraints = findTypeAnnotationConstraints( executable );
@@ -401,7 +401,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 								i,
 								parameterConstraints,
 								Collections.emptySet(),
-								CascadingTypeParameter.nonCascading( type )
+								CascadingTypeParameter.nonCascading()
 						)
 				);
 				i++;
@@ -607,7 +607,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 		catch (ArrayIndexOutOfBoundsException ex) {
 			log.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
-			return CascadingTypeParameter.nonCascading( ReflectionHelper.typeOf( parameter.getDeclaringExecutable(), i ) );
+			return CascadingTypeParameter.nonCascading();
 		}
 	}
 

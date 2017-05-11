@@ -40,7 +40,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				index,
 				Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<MetaConstraint<?>>emptySet(),
-				CascadingTypeParameter.nonCascading( type )
+				CascadingTypeParameter.nonCascading()
 		);
 	}
 

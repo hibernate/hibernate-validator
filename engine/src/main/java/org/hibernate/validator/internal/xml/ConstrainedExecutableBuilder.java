@@ -16,7 +16,6 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -210,13 +209,11 @@ class ConstrainedExecutableBuilder {
 		// parse the return value
 		Set<MetaConstraint<?>> returnValueConstraints = new HashSet<>();
 		Set<MetaConstraint<?>> returnValueTypeArgumentConstraints = new HashSet<>();
-		List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
 		CascadingTypeParameter cascadingMetaData = parseReturnValueType(
 				returnValueType,
 				executable,
 				returnValueConstraints,
 				returnValueTypeArgumentConstraints,
-				cascadingTypeParameters,
 				defaultPackage
 		);
 
@@ -268,10 +265,9 @@ class ConstrainedExecutableBuilder {
 												Executable executable,
 												Set<MetaConstraint<?>> returnValueConstraints,
 												Set<MetaConstraint<?>> returnValueTypeArgumentConstraints,
-												List<CascadingTypeParameter> cascadingTypeParameters,
 												String defaultPackage) {
 		if ( returnValueType == null ) {
-			return CascadingTypeParameter.nonCascading( ReflectionHelper.typeOf( executable ) );
+			return CascadingTypeParameter.nonCascading();
 		}
 
 		ConstraintLocation constraintLocation = ConstraintLocation.forReturnValue( executable );

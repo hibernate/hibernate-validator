@@ -112,7 +112,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ) : Collections.<MetaConstraint<?>>emptySet(),
-				returnValueContext != null ? returnValueContext.getCascadingMetaData() : CascadingTypeParameter.nonCascading( ReflectionHelper.typeOf( executable ) )
+				returnValueContext != null ? returnValueContext.getCascadingMetaData() : CascadingTypeParameter.nonCascading()
 		);
 	}
 
