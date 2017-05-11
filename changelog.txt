@@ -1,6 +1,42 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.0.Beta1 (11-05-2017)
+-------------------------
+
+** Bug
+    * HV-1330 - engine               - Transient failure of XmlBasedMethodValidationTest#cascadingArrayParameter
+    * HV-1326 - engine               - NPE when null value is encountered during nested cascaded validation
+    * HV-1311 - engine               - Some jdk.internal annotations are not ignored in constraints discovery
+
+** Improvement
+    * HV-1321 - engine               - Add missing method re-definitions to HibernateValidatorContext
+    * HV-1309 - engine               - @Deprecated should be ignored as a potential composing constraint annotation
+    * HV-1308 - build                - Use license-maven-plugin instead of checkstyle to check the licenses
+    * HV-1305 - build                - Use HTML5 doclet when generating JavaDoc with Java 9
+    * HV-1303 - validators           - @SafeHtml should support relative URLs
+
+** New Feature
+    * HV-1313 - engine               - Support group conversion for container element types
+    * HV-1312 - engine, tests        - In XML, containerElementType should be renamed container-element-type for consistency
+    * HV-1310 - engine               - Support container element constraints for nested arrays
+    * HV-1304 - engine               - Explore extension of meta-model to cover container element constraints
+    * HV-1298 - validators           - Support @Positive/@Negative for monetary amount
+    * HV-1297 - annotation-processor - Annotation processor support for @NotEmpty, @NotBlank, @Email, @Positive, @Negative
+
+** Sub-task
+    * HV-1306 - engine               - Throw an exception if several value extractors are defined in parallel hierarchies
+
+** Task
+    * HV-1332 - tck-runner           - Upgrade the TCK to 2.0.0.Beta1
+    * HV-1329 - engine               - Add validation messages for new built-in constraints
+    * HV-1324 - tests                - Fix annotation processor test issue with latest JDK 9
+    * HV-1320 - engine               - Replace <iterable element> by <list element> in the node path of Lists
+    * HV-1319 - build                - Update HV to use Bean Validation 2.0.0.Beta1
+    * HV-1318 - engine               - Take into account the move of ValidateUnwrappedValue to javax.validation.metadata
+    * HV-1296 - engine               - Follow-up to-dos around value extractor implementation
+    * HV-1288 - build                - Don't use org.testng.AssertJUnit
+
 6.0.0.Alpha2 (30-03-2017)
 -------------------------
 
