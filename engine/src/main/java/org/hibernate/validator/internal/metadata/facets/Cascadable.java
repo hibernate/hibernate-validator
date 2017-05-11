@@ -7,15 +7,10 @@
 package org.hibernate.validator.internal.metadata.facets;
 
 import java.lang.annotation.ElementType;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
 import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 
 /**
@@ -27,27 +22,6 @@ import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParamete
  * @author Gunnar Morling
  */
 public interface Cascadable {
-
-	/**
-	 * Converts the given validation group as per the group conversion
-	 * configuration for this element (as e.g. specified via
-	 * {@code @ConvertGroup}.
-	 *
-	 * @param originalGroup The group to convert.
-	 *
-	 * @return The converted group. Will be the original group itself in case no
-	 * conversion is to be performed.
-	 */
-	Class<?> convertGroup(Class<?> originalGroup);
-
-	/**
-	 * Returns a set with {@link GroupConversionDescriptor}s representing the
-	 * group conversions of this cascadable.
-	 *
-	 * @return A set with group conversion descriptors. May be empty, but never
-	 * {@code null}.
-	 */
-	Set<GroupConversionDescriptor> getGroupConversionDescriptors();
 
 	/**
 	 * Returns the element type of the cascadable.
@@ -75,16 +49,14 @@ public interface Cascadable {
 	void appendTo(PathImpl path);
 
 	/**
-	 * Returns the type parameters of the represented element that are marked for cascaded validation, if any. The
-	 * returned list will contain the special {@link AnnotatedElement} marker in case the element itself has been
-	 * marked.
+	 * Returns cascading metadata of this cascadable element. Also contains the cascading metadata of the potential
+	 * container element types.
 	 */
-	List<CascadingTypeParameter> getCascadingTypeParameters();
+	CascadingMetaData getCascadingMetaData();
 
 	public interface Builder {
 
-		void addGroupConversions(Map<Class<?>, Class<?>> groupConversions);
-		void addCascadingTypeParameters(List<CascadingTypeParameter> cascadingTypeParameters);
+		void mergeCascadingMetaData(CascadingTypeParameter cascadingMetaData);
 		Cascadable build();
 	}
 }

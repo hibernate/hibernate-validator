@@ -11,25 +11,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
-import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
-import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * A {@link Cascadable} backed by a property getter of a Java bean.
@@ -41,27 +29,14 @@ public class GetterCascadable implements Cascadable {
 	private final Method method;
 	private final String propertyName;
 	private final Type cascadableType;
-	@Immutable
-	private final List<CascadingTypeParameter> cascadingTypeParameters;
-	private final GroupConversionHelper groupConversionHelper;
+	private final CascadingMetaData cascadingMetaData;
 
-	GetterCascadable(Method method, List<CascadingTypeParameter> cascadingTypeParameters, Map<Class<?>, Class<?>> groupConversions) {
+	GetterCascadable(Method method, CascadingMetaData cascadingMetaData) {
 		this.method = method;
 		this.propertyName = ReflectionHelper.getPropertyName( method );
 		this.cascadableType = ReflectionHelper.typeOf( method );
-		this.cascadingTypeParameters = CollectionHelper.toImmutableList( cascadingTypeParameters );
-		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
-		this.groupConversionHelper.validateGroupConversions( !cascadingTypeParameters.isEmpty(), method.toString() );
-	}
-
-	@Override
-	public Class<?> convertGroup(Class<?> originalGroup) {
-		return groupConversionHelper.convertGroup( originalGroup );
-	}
-
-	@Override
-	public Set<GroupConversionDescriptor> getGroupConversionDescriptors() {
-		return groupConversionHelper.asDescriptors();
+		this.cascadingMetaData = cascadingMetaData;
+		this.cascadingMetaData.validateGroupConversions( method.toString() );
 	}
 
 	@Override
@@ -85,48 +60,28 @@ public class GetterCascadable implements Cascadable {
 	}
 
 	@Override
-	public List<CascadingTypeParameter> getCascadingTypeParameters() {
-		return cascadingTypeParameters;
+	public CascadingMetaData getCascadingMetaData() {
+		return cascadingMetaData;
 	}
 
 	public static class Builder implements Cascadable.Builder {
 
-		private static final Log LOG = LoggerFactory.make();
-
 		private final Method method;
-		private final List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
-		private final Map<Class<?>, Class<?>> groupConversions = new HashMap<>();
+		private CascadingTypeParameter cascadingMetaData;
 
-		public Builder(Method method) {
+		public Builder(Method method, CascadingTypeParameter cascadingMetaData) {
 			this.method = method;
+			this.cascadingMetaData = cascadingMetaData;
 		}
 
 		@Override
-		public void addCascadingTypeParameters(List<CascadingTypeParameter> cascadingTypeParameters) {
-			this.cascadingTypeParameters.addAll( cascadingTypeParameters );
-		}
-
-		@Override
-		public void addGroupConversions(Map<Class<?>, Class<?>> groupConversions) {
-			for ( Entry<Class<?>, Class<?>> oneConversion : groupConversions.entrySet() ) {
-				if ( this.groupConversions.containsKey( oneConversion.getKey() ) ) {
-					throw LOG.getMultipleGroupConversionsForSameSourceException(
-							oneConversion.getKey(),
-							CollectionHelper.<Class<?>>asSet(
-									groupConversions.get( oneConversion.getKey() ),
-									oneConversion.getValue()
-							)
-					);
-				}
-				else {
-					this.groupConversions.put( oneConversion.getKey(), oneConversion.getValue() );
-				}
-			}
+		public void mergeCascadingMetaData(CascadingTypeParameter cascadingMetaData) {
+			this.cascadingMetaData = this.cascadingMetaData.merge( cascadingMetaData );
 		}
 
 		@Override
 		public GetterCascadable build() {
-			return new GetterCascadable( getAccessible( method ), cascadingTypeParameters, groupConversions );
+			return new GetterCascadable( getAccessible( method ), new CascadingMetaData( cascadingMetaData ) );
 		}
 
 		/**

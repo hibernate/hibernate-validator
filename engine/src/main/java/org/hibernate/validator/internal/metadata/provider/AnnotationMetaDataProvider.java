@@ -16,6 +16,7 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedArrayType;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Constructor;
@@ -30,7 +31,6 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -239,12 +239,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				field
 		);
 
-		Map<Class<?>, Class<?>> groupConversions = getGroupConversions(
-				field.getAnnotation( ConvertGroup.class ),
-				field.getAnnotation( ConvertGroup.List.class )
-		);
-
-		List<CascadingTypeParameter> cascadingTypeParameters = findCascadingTypeParameters( field );
+		CascadingTypeParameter cascadingMetaData = findCascadingMetaData( field );
 		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraints( field );
 
 		return new ConstrainedField(
@@ -252,8 +247,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				field,
 				constraints,
 				typeArgumentsConstraints,
-				groupConversions,
-				cascadingTypeParameters
+				cascadingMetaData
 		);
 	}
 
@@ -328,14 +322,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		Set<MetaConstraint<?>> returnValueConstraints;
 		Set<MetaConstraint<?>> typeArgumentsConstraints;
-		Map<Class<?>, Class<?>> groupConversions;
-		List<CascadingTypeParameter> cascadingTypeParameters;
+		CascadingTypeParameter cascadingMetaData;
 
 		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( executable ) ) {
 			returnValueConstraints = Collections.emptySet();
 			typeArgumentsConstraints = Collections.emptySet();
-			groupConversions = Collections.emptyMap();
-			cascadingTypeParameters = Collections.emptyList();
+			cascadingMetaData = CascadingTypeParameter.nonCascading( ReflectionHelper.typeOf( executable ) );
 		}
 		else {
 			typeArgumentsConstraints = findTypeAnnotationConstraints( executable );
@@ -343,11 +335,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 					executableConstraints.get( ConstraintType.GENERIC ),
 					executable
 			);
-			groupConversions = getGroupConversions(
-					executable.getAnnotation( ConvertGroup.class ),
-					executable.getAnnotation( ConvertGroup.List.class )
-			);
-			cascadingTypeParameters = findCascadingTypeParameters( executable );
+			cascadingMetaData = findCascadingMetaData( executable );
 		}
 
 		return new ConstrainedExecutable(
@@ -357,8 +345,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				crossParameterConstraints,
 				returnValueConstraints,
 				typeArgumentsConstraints,
-				groupConversions,
-				cascadingTypeParameters
+				cascadingMetaData
 		);
 	}
 
@@ -403,20 +390,18 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			}
 
 			Set<MetaConstraint<?>> parameterConstraints = newHashSet();
-			ConvertGroup groupConversion = null;
-			ConvertGroup.List groupConversionList = null;
 
 			if ( annotationProcessingOptions.areParameterConstraintsIgnoredFor( executable, i ) ) {
+				Type type = ReflectionHelper.typeOf( executable, i );
 				metaData.add(
 						new ConstrainedParameter(
 								ConfigurationSource.ANNOTATION,
 								executable,
-								ReflectionHelper.typeOf( executable, i ),
+								type,
 								i,
 								parameterConstraints,
 								Collections.emptySet(),
-								getGroupConversions( groupConversion, groupConversionList ),
-								Collections.emptyList()
+								CascadingTypeParameter.nonCascading( type )
 						)
 				);
 				i++;
@@ -426,14 +411,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			ConstraintLocation location = ConstraintLocation.forParameter( executable, i );
 
 			for ( Annotation parameterAnnotation : parameterAnnotations ) {
-				// determine group conversions
-				if ( parameterAnnotation.annotationType().equals( ConvertGroup.class ) ) {
-					groupConversion = (ConvertGroup) parameterAnnotation;
-				}
-				else if ( parameterAnnotation.annotationType().equals( ConvertGroup.List.class ) ) {
-					groupConversionList = (ConvertGroup.List) parameterAnnotation;
-				}
-
 				// collect constraints if this annotation is a constraint annotation
 				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
 						executable, parameterAnnotation, ElementType.PARAMETER
@@ -446,7 +423,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			}
 
 			Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable, i );
-			List<CascadingTypeParameter> cascadingTypeParameters = findCascadingTypeParameters( executable, i );
+			CascadingTypeParameter cascadingMetaData = findCascadingMetaData( executable, i );
 
 			metaData.add(
 					new ConstrainedParameter(
@@ -456,8 +433,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 							i,
 							parameterConstraints,
 							typeArgumentsConstraints,
-							getGroupConversions( groupConversion, groupConversionList ),
-							cascadingTypeParameters
+							cascadingMetaData
 					)
 			);
 			i++;
@@ -542,6 +518,13 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return constraintDescriptors;
 	}
 
+	private Map<Class<?>, Class<?>> getGroupConversions(AnnotatedElement annotatedElement) {
+		return getGroupConversions(
+				annotatedElement.getAnnotation( ConvertGroup.class ),
+				annotatedElement.getAnnotation( ConvertGroup.List.class )
+		);
+	}
+
 	private Map<Class<?>, Class<?>> getGroupConversions(ConvertGroup groupConversion, ConvertGroup.List groupConversionList) {
 		Map<Class<?>, Class<?>> groupConversions = newHashMap();
 
@@ -611,43 +594,33 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 	}
 
-	private List<CascadingTypeParameter> findCascadingTypeParameters(Executable executable, int i) {
+	private CascadingTypeParameter findCascadingMetaData(Executable executable, int i) {
 		Parameter parameter = executable.getParameters()[i];
 		TypeVariable<?>[] typeParameters = parameter.getType().getTypeParameters();
 		AnnotatedType annotatedType = parameter.getAnnotatedType();
 
-		List<CascadingTypeParameter> cascadingTypeParameters = getCascadingTypeParameters( typeParameters, annotatedType );
+		Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( typeParameters, annotatedType );
 
 		try {
-			if ( parameter.isAnnotationPresent( Valid.class ) ) {
-				cascadingTypeParameters.add( parameter.getType().isArray()
-						? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( parameter.getDeclaringExecutable(), i ) )
-						: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( parameter.getDeclaringExecutable(), i ) ) );
-			}
+			return getCascadingMetaData( parameter.getType().isArray(), ReflectionHelper.typeOf( parameter.getDeclaringExecutable(), i ),
+					parameter, containerElementTypesCascadingMetaData );
 		}
 		catch (ArrayIndexOutOfBoundsException ex) {
 			log.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
+			return CascadingTypeParameter.nonCascading( ReflectionHelper.typeOf( parameter.getDeclaringExecutable(), i ) );
 		}
-
-		return cascadingTypeParameters.isEmpty() ? Collections.emptyList() : cascadingTypeParameters;
 	}
 
-	private List<CascadingTypeParameter> findCascadingTypeParameters(Field field) {
+	private CascadingTypeParameter findCascadingMetaData(Field field) {
 		TypeVariable<?>[] typeParameters = field.getType().getTypeParameters();
 		AnnotatedType annotatedType = field.getAnnotatedType();
 
-		List<CascadingTypeParameter> cascadingTypeParameters = getCascadingTypeParameters( typeParameters, annotatedType );
+		Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( typeParameters, annotatedType );
 
-		if ( field.isAnnotationPresent( Valid.class ) ) {
-			cascadingTypeParameters.add( field.getType().isArray()
-					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( field ) )
-					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( field ) ) );
-		}
-
-		return cascadingTypeParameters.isEmpty() ? Collections.emptyList() : cascadingTypeParameters;
+		return getCascadingMetaData( field.getType().isArray(), ReflectionHelper.typeOf( field ), field, containerElementTypesCascadingMetaData );
 	}
 
-	private List<CascadingTypeParameter> findCascadingTypeParameters(Executable executable) {
+	private CascadingTypeParameter findCascadingMetaData(Executable executable) {
 		boolean isArray;
 		TypeVariable<?>[] typeParameters;
 
@@ -661,31 +634,25 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 		AnnotatedType annotatedType = executable.getAnnotatedReturnType();
 
-		List<CascadingTypeParameter> cascadingTypeParameters = getCascadingTypeParameters( typeParameters, annotatedType );
+		Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( typeParameters, annotatedType );
 
-		if ( executable.isAnnotationPresent( Valid.class ) ) {
-			cascadingTypeParameters.add( isArray
-					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( executable ) )
-					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( executable ) ) );
-		}
-
-		return cascadingTypeParameters.isEmpty() ? Collections.emptyList() : cascadingTypeParameters;
+		return getCascadingMetaData( isArray, ReflectionHelper.typeOf( executable ), executable, containerElementTypesCascadingMetaData );
 	}
 
-	private List<CascadingTypeParameter> getCascadingTypeParameters(TypeVariable<?>[] typeParameters, AnnotatedType annotatedType) {
-		List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
+	private Map<TypeVariable<?>, CascadingTypeParameter> getTypeParametersCascadingMetadata(TypeVariable<?>[] typeParameters, AnnotatedType annotatedType) {
+		Map<TypeVariable<?>, CascadingTypeParameter> typeParametersCascadingMetadata = CollectionHelper.newHashMap( typeParameters.length );
 
 		if ( annotatedType instanceof AnnotatedArrayType ) {
-			addCascadingTypeParametersForArrayType( cascadingTypeParameters, (AnnotatedArrayType) annotatedType );
+			addCascadingMetaDataForArrayType( typeParametersCascadingMetadata, (AnnotatedArrayType) annotatedType );
 		}
 		else if ( annotatedType instanceof AnnotatedParameterizedType ) {
-			addCascadingTypeParametersForParameterizedType( cascadingTypeParameters, (AnnotatedParameterizedType) annotatedType, typeParameters );
+			addCascadingMetaDataForParameterizedType( typeParametersCascadingMetadata, (AnnotatedParameterizedType) annotatedType, typeParameters );
 		}
 
-		return cascadingTypeParameters;
+		return typeParametersCascadingMetadata;
 	}
 
-	private void addCascadingTypeParametersForParameterizedType(List<CascadingTypeParameter> cascadingTypeParameters,
+	private void addCascadingMetaDataForParameterizedType(Map<TypeVariable<?>, CascadingTypeParameter> typeParametersCascadingMetadata,
 			AnnotatedParameterizedType annotatedParameterizedType, TypeVariable<?>[] typeParameters) {
 		AnnotatedType[] annotatedTypeArguments = annotatedParameterizedType.getAnnotatedActualTypeArguments();
 
@@ -693,48 +660,38 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		for ( AnnotatedType annotatedTypeArgument : annotatedTypeArguments ) {
 			Type validatedType = annotatedTypeArgument.getType();
-			List<CascadingTypeParameter> nestedCascadingTypeParameters;
+			Map<TypeVariable<?>, CascadingTypeParameter> nestedTypeParametersCascadingMetadata;
 			if ( validatedType instanceof ParameterizedType ) {
-				nestedCascadingTypeParameters = getCascadingTypeParameters(
+				nestedTypeParametersCascadingMetadata = getTypeParametersCascadingMetadata(
 						ReflectionHelper.getClassFromType( validatedType ).getTypeParameters(), annotatedTypeArgument );
 			}
 			else {
-				nestedCascadingTypeParameters = Collections.emptyList();
+				nestedTypeParametersCascadingMetadata = Collections.emptyMap();
 			}
 
-			boolean isCascading = annotatedTypeArgument.isAnnotationPresent( Valid.class );
-
-			if ( isCascading || !nestedCascadingTypeParameters.isEmpty() ) {
-				CascadingTypeParameter cascadingTypeParameter = new CascadingTypeParameter( annotatedParameterizedType.getType(), typeParameters[i],
-						isCascading, nestedCascadingTypeParameters );
-
-				cascadingTypeParameters.add( cascadingTypeParameter );
-			}
+			typeParametersCascadingMetadata.put( typeParameters[i], new CascadingTypeParameter( annotatedParameterizedType.getType(), typeParameters[i],
+					annotatedTypeArgument.isAnnotationPresent( Valid.class ), nestedTypeParametersCascadingMetadata, getGroupConversions( annotatedTypeArgument ) ) );
 			i++;
 		}
 	}
 
-	private void addCascadingTypeParametersForArrayType(List<CascadingTypeParameter> cascadingTypeParameters, AnnotatedArrayType annotatedArrayType) {
+	private void addCascadingMetaDataForArrayType(Map<TypeVariable<?>, CascadingTypeParameter> typeParametersCascadingMetadata,
+			AnnotatedArrayType annotatedArrayType) {
 		Type validatedType = annotatedArrayType.getAnnotatedGenericComponentType().getType();
 
-		List<CascadingTypeParameter> nestedCascadingTypeParameters;
+		Map<TypeVariable<?>, CascadingTypeParameter> nestedTypeParametersCascadingMetadata;
 		if ( validatedType instanceof ParameterizedType ) {
-			nestedCascadingTypeParameters = getCascadingTypeParameters( ReflectionHelper.getClassFromType( validatedType ).getTypeParameters(),
-					annotatedArrayType.getAnnotatedGenericComponentType() );
+			nestedTypeParametersCascadingMetadata = getTypeParametersCascadingMetadata(
+					ReflectionHelper.getClassFromType( validatedType ).getTypeParameters(), annotatedArrayType.getAnnotatedGenericComponentType() );
 		}
 		else {
-			nestedCascadingTypeParameters = Collections.emptyList();
+			nestedTypeParametersCascadingMetadata = Collections.emptyMap();
 		}
 
-		boolean isCascading = annotatedArrayType.isAnnotationPresent( Valid.class );
-
-		CascadingTypeParameter cascadingTypeParameter = new CascadingTypeParameter( validatedType,
-				new ArrayElement( annotatedArrayType ),
-				isCascading, nestedCascadingTypeParameters );
-
-		if ( isCascading || !nestedCascadingTypeParameters.isEmpty() ) {
-			cascadingTypeParameters.add( cascadingTypeParameter );
-		}
+		TypeVariable<?> arrayElement = new ArrayElement( annotatedArrayType );
+		typeParametersCascadingMetadata.put( arrayElement, new CascadingTypeParameter( validatedType,
+				arrayElement,
+				annotatedArrayType.isAnnotationPresent( Valid.class ), nestedTypeParametersCascadingMetadata, getGroupConversions( annotatedArrayType ) ) );
 	}
 
 	/**
@@ -829,6 +786,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, descriptor, constraintLocation );
 	}
 
+	private CascadingTypeParameter getCascadingMetaData(boolean isArray, Type type, AnnotatedElement annotatedElement,
+			Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData) {
+		return isArray
+				? CascadingTypeParameter.arrayElement( type, annotatedElement.isAnnotationPresent( Valid.class ), containerElementTypesCascadingMetaData,
+						getGroupConversions( annotatedElement ) )
+				: CascadingTypeParameter.annotatedObject( type, annotatedElement.isAnnotationPresent( Valid.class ), containerElementTypesCascadingMetaData,
+						getGroupConversions( annotatedElement ) );
+	}
+
 	/**
 	 * The location of a type argument before it is really considered a constraint location.
 	 * <p>
@@ -899,4 +865,5 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 	}
+
 }

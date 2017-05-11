@@ -336,6 +336,7 @@ public class ExecutableMetaDataTest {
 						.getCascadables()
 						.iterator()
 						.next()
+						.getCascadingMetaData()
 						.convertGroup( Default.class )
 		).isEqualTo( ValidationGroup.class );
 	}
