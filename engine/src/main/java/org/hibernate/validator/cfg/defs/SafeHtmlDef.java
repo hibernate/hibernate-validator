@@ -51,7 +51,7 @@ public class SafeHtmlDef extends ConstraintDef<SafeHtmlDef, SafeHtml> {
 		return new SafeHtmlTagDef( tag, this );
 	}
 
-	public class SafeHtmlTagDef extends SafeHtmlDef {
+	public static class SafeHtmlTagDef extends SafeHtmlDef {
 
 		private final TagWithAttributes tag;
 
@@ -75,43 +75,34 @@ public class SafeHtmlDef extends ConstraintDef<SafeHtmlDef, SafeHtml> {
 			tag.addAttributes( attributes );
 			return this;
 		}
+	}
 
-		public class SafeHtmlTagWithAttributeDef extends SafeHtmlTagDef {
+	public static class SafeHtmlTagWithAttributeDef extends SafeHtmlTagDef {
 
-			private final Attribute attribute;
+		private final Attribute attribute;
 
-			public SafeHtmlTagWithAttributeDef(TagWithAttributes tag, String attribute, SafeHtmlDef safeHtmlDef) {
-				super( tag, safeHtmlDef );
-				this.attribute = new Attribute( attribute );
-				tag.addAdditionalAttributesWithProtocols( this.attribute );
-			}
+		public SafeHtmlTagWithAttributeDef(TagWithAttributes tag, String attribute, SafeHtmlDef safeHtmlDef) {
+			super( tag, safeHtmlDef );
+			this.attribute = new Attribute( attribute );
+			tag.addAdditionalAttributesWithProtocols( this.attribute );
+		}
 
-			public SafeHtmlTagWithAttributeDef protocol(String protocol) {
-				attribute.addProtocol( protocol );
-				return this;
-			}
+		public SafeHtmlTagWithAttributeDef protocol(String protocol) {
+			attribute.addProtocol( protocol );
+			return this;
+		}
 
-			public SafeHtmlTagWithAttributeDef protocols(String... protocols) {
-				attribute.addProtocols( protocols );
-				return this;
-			}
-
+		public SafeHtmlTagWithAttributeDef protocols(String... protocols) {
+			attribute.addProtocols( protocols );
+			return this;
 		}
 	}
 
 	private static class TagWithAttributes extends AnnotationDef<TagWithAttributes, SafeHtml.Tag> {
 
-		private final String name;
-
 		public TagWithAttributes(String name) {
 			super( SafeHtml.Tag.class );
-			this.name = name;
 			addParameter( "name", name );
-
-		}
-
-		public String getName() {
-			return name;
 		}
 
 		public TagWithAttributes addAttributes(String... attributes) {
@@ -123,7 +114,6 @@ public class SafeHtmlDef extends ConstraintDef<SafeHtmlDef, SafeHtml> {
 			addAnnotationAsParameter( "additionalAttributesWithProtocols", attribute );
 			return this;
 		}
-
 	}
 
 	private static class Attribute extends AnnotationDef<Attribute, SafeHtml.Tag.Attribute> {
