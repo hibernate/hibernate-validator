@@ -132,10 +132,12 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T> T[] toAnnotationParameterArray(List<AnnotationDef<?, ?>> list, Class<T> aClass) {
 		return list.stream().map( AnnotationDef::createAnnotationProxy ).toArray( n -> (T[]) Array.newInstance( aClass, n ) );
 	}
 
+	@SuppressWarnings("unchecked")
 	protected <T> T toAnnotationParameter(AnnotationDef<?, ?> annotationDef, Class<T> aClass) {
 		return (T) annotationDef.createAnnotationProxy();
 	}

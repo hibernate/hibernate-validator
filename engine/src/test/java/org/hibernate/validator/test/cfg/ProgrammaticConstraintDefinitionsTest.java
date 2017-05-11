@@ -69,6 +69,33 @@ public class ProgrammaticConstraintDefinitionsTest {
 				"<img src='/some/relative/url/image.png' />", 0
 		);
 
+		doProgrammaticTest(
+				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
+						.additionalTag( "img" ).attribute( "src" ),
+				"<img src='data:image/png;base64,100101' />", 1
+		);
+		doProgrammaticTest(
+				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
+						.additionalTag( "img" ).attribute( "src" ).protocols( "data" ),
+				"<img src='data:image/png;base64,100101' />", 0
+		);
+		doProgrammaticTest(
+				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
+						.additionalTag( "img" ).attribute( "src" ).protocols( "data" ),
+				"<img src='not_data:image/png;base64,100101' />", 1
+		);
+		doProgrammaticTest(
+				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
+						.additionalTag( "td" ).attributes( "class", "id" ),
+				"<td class='class' id='tableId'>1234qwer</td>", 0
+		);
+		doProgrammaticTest(
+				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
+						.additionalTag( "td" ).attributes( "class", "id" ),
+				"<td class='class' id='tableId' otherAttribute='value'>1234qwer</td>", 1
+		);
+
+		// Deprecated, kept to ensure backwards compatibility (or at least ensure we are aware we break something if we decide to do so)
 		AnnotationDescriptor<SafeHtml.Tag> tagDescriptor = new AnnotationDescriptor( SafeHtml.Tag.class );
 		tagDescriptor.setValue( "name", "td" );
 		tagDescriptor.setValue( "attributes", new String[]{ "class", "id" } );
@@ -85,16 +112,6 @@ public class ProgrammaticConstraintDefinitionsTest {
 
 		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 				.additionalTagsWithAttributes( AnnotationFactory.create( tagDescriptor ) ), "<img src='data:image/png;base64,100101' />", 0 );
-		doProgrammaticTest(
-				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTag( "img" ).attribute( "src" ).protocols( "data" ),
-				"<img src='data:image/png;base64,100101' />", 0
-		);
-		doProgrammaticTest(
-				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTag( "td" ).attributes( "class", "id" ),
-				"<td class='class' id='tableId'>1234qwer</td>", 0
-		);
 	}
 
 	@Test
