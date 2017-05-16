@@ -26,6 +26,8 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.LuhnCheckDef;
 import org.hibernate.validator.cfg.defs.ParameterScriptAssertDef;
 import org.hibernate.validator.cfg.defs.SafeHtmlDef;
+import org.hibernate.validator.cfg.defs.SafeHtmlDef.AttributeDef;
+import org.hibernate.validator.cfg.defs.SafeHtmlDef.TagDef;
 import org.hibernate.validator.cfg.defs.br.CNPJDef;
 import org.hibernate.validator.cfg.defs.br.CPFDef;
 import org.hibernate.validator.cfg.defs.br.TituloEleitoralDef;
@@ -36,7 +38,6 @@ import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
-
 import org.testng.annotations.Test;
 
 /**
@@ -69,29 +70,75 @@ public class ProgrammaticConstraintDefinitionsTest {
 				"<img src='/some/relative/url/image.png' />", 0
 		);
 
+		// disallowed attribute
 		doProgrammaticTest(
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTag( "img" ).attribute( "src" ),
-				"<img src='data:image/png;base64,100101' />", 1
+						.additionalTags( new TagDef( "img" )
+								.attributes( "src" )
+						),
+				"<img href='snafu' />", 1
 		);
+
+		// allowed attribute, no restrictions on protocols
 		doProgrammaticTest(
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTag( "img" ).attribute( "src" ).protocols( "data" ),
+						.additionalTags( new TagDef( "img" )
+								.attributes( "src" )
+						),
 				"<img src='data:image/png;base64,100101' />", 0
 		);
+
+		// allowed attribute, no restrictions on protocols
 		doProgrammaticTest(
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTag( "img" ).attribute( "src" ).protocols( "data" ),
+						.additionalTags( new TagDef( "img" )
+								.attributes( new AttributeDef( "src" ) )
+						),
+				"<img src='data:image/png;base64,100101' />", 0
+		);
+
+		// allowed attribute, allowed protocol
+		doProgrammaticTest(
+				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
+						.additionalTags( new TagDef( "img" )
+								.attributes( new AttributeDef( "src" )
+										.protocols( "data" )
+								)
+						),
+				"<img src='data:image/png;base64,100101' />", 0
+		);
+
+		// allowed attribute, disallowed protocol
+		doProgrammaticTest(
+				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
+						.additionalTags( new TagDef( "img" )
+								.attributes( new AttributeDef( "src" )
+										.protocols( "data" )
+								)
+						),
 				"<img src='not_data:image/png;base64,100101' />", 1
 		);
+
+		// multiple allowed attributes and protocols
 		doProgrammaticTest(
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTag( "td" ).attributes( "class", "id" ),
+						.additionalTags( new TagDef( "img" )
+								.attributes(
+										new AttributeDef( "src" ).protocols( "data", "data2" ),
+										new AttributeDef( "href" ).protocols( "http", "http2" )
+								)
+						),
+				"<img src='data:image/png;base64,100101' href='http://foo'/>", 0
+		);
+
+		doProgrammaticTest(
+				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
+						.additionalTags( new TagDef( "td" ).attributes( "class", "id" ) ),
 				"<td class='class' id='tableId'>1234qwer</td>", 0
 		);
 		doProgrammaticTest(
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTag( "td" ).attributes( "class", "id" ),
+						.additionalTags( new TagDef( "td" ).attributes( "class", "id" ) ),
 				"<td class='class' id='tableId' otherAttribute='value'>1234qwer</td>", 1
 		);
 
@@ -206,7 +253,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 	@SuppressWarnings("unused")
 	private static class OtherPerson {
 
-		private String number;
+		private final String number;
 
 		public OtherPerson(String number) {
 			this.number = number;

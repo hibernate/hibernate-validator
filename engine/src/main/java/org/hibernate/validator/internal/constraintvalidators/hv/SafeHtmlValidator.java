@@ -7,17 +7,17 @@
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
 import java.util.Iterator;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import org.hibernate.validator.constraints.SafeHtml;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
-
-import org.hibernate.validator.constraints.SafeHtml;
 
 /**
  * Validate that the string does not contain malicious code.
@@ -60,9 +60,11 @@ public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequ
 			if ( tag.attributes().length > 0 ) {
 				whitelist.addAttributes( tag.name(), tag.attributes() );
 			}
-			if ( tag.additionalAttributesWithProtocols().length > 0 ) {
-				for ( SafeHtml.Tag.Attribute attribute : tag.additionalAttributesWithProtocols() ) {
-					whitelist.addAttributes( tag.name(), attribute.name() );
+
+			for ( SafeHtml.Tag.Attribute attribute : tag.additionalAttributesWithProtocols() ) {
+				whitelist.addAttributes( tag.name(), attribute.name() );
+
+				if ( attribute.protocols().length > 0 ) {
 					whitelist.addProtocols( tag.name(), attribute.name(), attribute.protocols() );
 				}
 			}

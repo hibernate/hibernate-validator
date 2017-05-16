@@ -34,11 +34,22 @@ public class SafeHtmlDef extends ConstraintDef<SafeHtmlDef, SafeHtml> {
 	}
 
 	/**
-	 * @deprecated Use {@link SafeHtmlDef#additionalTag(String)} instead.
+	 * @deprecated Use {@link SafeHtmlDef#additionalTags(TagDef, TagDef...)} instead.
 	 */
 	@Deprecated
 	public SafeHtmlDef additionalTagsWithAttributes(SafeHtml.Tag... additionalTagsWithAttributes) {
 		addParameter( "additionalTagsWithAttributes", additionalTagsWithAttributes );
+		return this;
+	}
+
+	public SafeHtmlDef additionalTags(TagDef tag, TagDef... furtherTags) {
+		addAnnotationAsParameter( "additionalTagsWithAttributes", tag );
+
+		if ( furtherTags != null && furtherTags.length > 0 ) {
+			for ( TagDef tagDef : furtherTags ) {
+				addAnnotationAsParameter( "additionalTagsWithAttributes", tagDef );
+			}
+		}
 		return this;
 	}
 
@@ -47,89 +58,61 @@ public class SafeHtmlDef extends ConstraintDef<SafeHtmlDef, SafeHtml> {
 		return this;
 	}
 
-	public SafeHtmlTagDef additionalTag(String tag) {
-		return new SafeHtmlTagDef( tag, this );
-	}
+	public static class TagDef extends AnnotationDef<TagDef, SafeHtml.Tag> {
 
-	public static class SafeHtmlTagDef extends SafeHtmlDef {
-
-		private final TagWithAttributes tag;
-
-		public SafeHtmlTagDef(String tag, SafeHtmlDef safeHtmlDef) {
-			super( safeHtmlDef );
-			this.tag = new TagWithAttributes( tag );
-			addAnnotationAsParameter( "additionalTagsWithAttributes", this.tag );
-		}
-
-		public SafeHtmlTagDef(TagWithAttributes tag, SafeHtmlDef safeHtmlDef) {
-			super( safeHtmlDef );
-			this.tag = tag;
-		}
-
-		public SafeHtmlTagWithAttributeDef attribute(String attribute) {
-			tag.addAttributes( attribute );
-			return new SafeHtmlTagWithAttributeDef( tag, attribute, this );
-		}
-
-		public SafeHtmlTagDef attributes(String... attributes) {
-			tag.addAttributes( attributes );
-			return this;
-		}
-	}
-
-	public static class SafeHtmlTagWithAttributeDef extends SafeHtmlTagDef {
-
-		private final Attribute attribute;
-
-		public SafeHtmlTagWithAttributeDef(TagWithAttributes tag, String attribute, SafeHtmlDef safeHtmlDef) {
-			super( tag, safeHtmlDef );
-			this.attribute = new Attribute( attribute );
-			tag.addAdditionalAttributesWithProtocols( this.attribute );
-		}
-
-		public SafeHtmlTagWithAttributeDef protocol(String protocol) {
-			attribute.addProtocol( protocol );
-			return this;
-		}
-
-		public SafeHtmlTagWithAttributeDef protocols(String... protocols) {
-			attribute.addProtocols( protocols );
-			return this;
-		}
-	}
-
-	private static class TagWithAttributes extends AnnotationDef<TagWithAttributes, SafeHtml.Tag> {
-
-		public TagWithAttributes(String name) {
+		public TagDef(String name) {
 			super( SafeHtml.Tag.class );
 			addParameter( "name", name );
 		}
 
-		public TagWithAttributes addAttributes(String... attributes) {
+		public TagDef attributes(String attribute, String... furtherAttributes) {
+			String[] attributes;
+
+			if ( furtherAttributes != null && furtherAttributes.length > 0 ) {
+				attributes = new String[furtherAttributes.length + 1];
+				System.arraycopy( furtherAttributes, 0, attributes, 1, furtherAttributes.length );
+				attributes[0] = attribute;
+			}
+			else {
+				attributes = new String[] { attribute };
+			}
+
 			addParameter( "attributes", attributes );
 			return this;
 		}
 
-		public TagWithAttributes addAdditionalAttributesWithProtocols(Attribute attribute) {
+		public TagDef attributes(AttributeDef attribute, AttributeDef... furtherAttributes) {
 			addAnnotationAsParameter( "additionalAttributesWithProtocols", attribute );
+
+			if ( furtherAttributes != null && furtherAttributes.length > 0 ) {
+				for ( AttributeDef attributeDef : furtherAttributes ) {
+					addAnnotationAsParameter( "additionalAttributesWithProtocols", attributeDef );
+				}
+			}
+
 			return this;
 		}
 	}
 
-	private static class Attribute extends AnnotationDef<Attribute, SafeHtml.Tag.Attribute> {
+	public static class AttributeDef extends AnnotationDef<AttributeDef, SafeHtml.Tag.Attribute> {
 
-		public Attribute(String name, String... protocols) {
+		public AttributeDef(String name) {
 			super( SafeHtml.Tag.Attribute.class );
 			addParameter( "name", name );
-			addParameter( "protocols", protocols );
 		}
 
-		public Attribute addProtocol(String protocol) {
-			addParameter( "protocols", protocol );
-			return this;
-		}
+		public AttributeDef protocols(String protocol, String... furtherProtocols) {
+			String[] protocols;
 
-		public Attribute addProtocols(String... protocols) {
+			if ( furtherProtocols != null ) {
+				protocols = new String[furtherProtocols.length + 1];
+				System.arraycopy( furtherProtocols, 0, protocols, 1, furtherProtocols.length );
+				protocols[0] = protocol;
+			}
+			else {
+				protocols = new String[] { protocol };
+			}
+
 			addParameter( "protocols", protocols );
 			return this;
 		}
