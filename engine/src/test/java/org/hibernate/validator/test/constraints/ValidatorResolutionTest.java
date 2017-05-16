@@ -6,19 +6,21 @@
  */
 package org.hibernate.validator.test.constraints;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-
-import org.testng.annotations.Test;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -43,7 +45,7 @@ public class ValidatorResolutionTest {
 		constraintViolations = validator.validate( suburb );
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertConstraintViolation(
-				constraintViolations.iterator().next(), "size must be between 5 and 10", Suburb.class, "", "name"
+				constraintViolations.iterator().next(), Size.class, "size must be between 5 and 10", Suburb.class, "", pathWith().property( "name" )
 		);
 
 		suburb.setName( "Hoegsbo" );
@@ -55,10 +57,11 @@ public class ValidatorResolutionTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertConstraintViolation(
 				constraintViolations.iterator().next(),
+				Size.class,
 				"size must be between 2 and 2",
 				Suburb.class,
 				suburb.getFacilities(),
-				"facilities"
+				pathWith().property( "facilities" )
 		);
 
 		suburb.addFacility( Suburb.Facility.BUS_TERMINAL, true );
@@ -70,10 +73,11 @@ public class ValidatorResolutionTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertConstraintViolation(
 				constraintViolations.iterator().next(),
+				Size.class,
 				"size must be between 2 and 2147483647",
 				Suburb.class,
 				suburb.getStreetNames(),
-				"streetNames"
+				pathWith().property( "streetNames" )
 		);
 
 		suburb.addStreetName( "Marklandsgatan" );
@@ -89,10 +93,11 @@ public class ValidatorResolutionTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertConstraintViolation(
 				constraintViolations.iterator().next(),
+				Size.class,
 				"size must be between 4 and 1000",
 				Suburb.class,
 				suburb.getBoundingBox(),
-				"boundingBox"
+				pathWith().property( "boundingBox" )
 		);
 
 		boundingBox = new Coordinate[4];

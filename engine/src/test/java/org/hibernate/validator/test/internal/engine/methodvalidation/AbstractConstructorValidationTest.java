@@ -7,17 +7,15 @@
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeKinds;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeNames;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.ElementKind;
-import javax.validation.Path;
+import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
 
-import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl.ValidB2BRepository;
@@ -45,16 +43,12 @@ public abstract class AbstractConstructorValidationTest {
 
 		ConstraintViolation<CustomerRepositoryImpl> constraintViolation = violations.iterator()
 				.next();
-		assertThat( constraintViolation.getMessage() ).isEqualTo( messagePrefix() + "may not be null" );
-		assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
-		assertThat( constraintViolation.getInvalidValue() ).isNull();
 
-		assertNodeKinds(
-				constraintViolation.getPropertyPath(),
-				ElementKind.CONSTRUCTOR,
-				ElementKind.PARAMETER
+		assertConstraintViolation( constraintViolation, NotNull.class, messagePrefix() + "may not be null", CustomerRepositoryImpl.class, null,
+				pathWith()
+						.constructor( CustomerRepositoryImpl.class )
+						.parameter( "id", 0 )
 		);
-		assertNodeNames( constraintViolation.getPropertyPath(), "CustomerRepositoryImpl", "id" );
 	}
 
 	@Test
@@ -67,13 +61,11 @@ public abstract class AbstractConstructorValidationTest {
 		assertThat( violations ).hasSize( 1 );
 
 		ConstraintViolation<CustomerRepositoryImpl> constraintViolation = violations.iterator().next();
-		assertThat( constraintViolation.getMessage() ).isEqualTo( messagePrefix() + "may not be null" );
-		assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
-		assertThat( constraintViolation.getInvalidValue() ).isNull();
-
-		Path path = constraintViolation.getPropertyPath();
-		assertNodeKinds( path, ElementKind.CONSTRUCTOR, ElementKind.PARAMETER, ElementKind.PROPERTY );
-		assertNodeNames( path, "CustomerRepositoryImpl", "customer", "name" );
+		assertConstraintViolation( constraintViolation, NotNull.class, messagePrefix() + "may not be null", CustomerRepositoryImpl.class, null,
+				pathWith()
+						.constructor( CustomerRepositoryImpl.class )
+						.parameter( "customer", 0 )
+						.property( "name" ) );
 	}
 
 	@Test
@@ -87,20 +79,13 @@ public abstract class AbstractConstructorValidationTest {
 		assertThat( violations ).hasSize( 1 );
 
 		ConstraintViolation<CustomerRepositoryImpl> constraintViolation = violations.iterator().next();
-		assertThat( constraintViolation.getMessage() ).isEqualTo( messagePrefix() + "{ValidB2BRepository.message}" );
-		assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
-		assertThat( constraintViolation.getInvalidValue() ).isSameAs( customerRepository );
-		assertThat( constraintViolation.getConstraintDescriptor().getAnnotation().annotationType() )
-				.isSameAs(
-						ValidB2BRepository.class
-				);
 
-		assertNodeKinds(
-				constraintViolation.getPropertyPath(),
-				ElementKind.CONSTRUCTOR,
-				ElementKind.RETURN_VALUE
+		assertConstraintViolation( constraintViolation, ValidB2BRepository.class, messagePrefix() + "{ValidB2BRepository.message}", CustomerRepositoryImpl.class,
+				customerRepository,
+				pathWith()
+						.constructor( CustomerRepositoryImpl.class )
+						.returnValue()
 		);
-		assertNodeNames( constraintViolation.getPropertyPath(), "CustomerRepositoryImpl", NodeImpl.RETURN_VALUE_NODE_NAME );
 	}
 
 	@Test
@@ -114,13 +99,13 @@ public abstract class AbstractConstructorValidationTest {
 		assertThat( violations ).hasSize( 1 );
 
 		ConstraintViolation<CustomerRepositoryImpl> constraintViolation = violations.iterator().next();
-		assertThat( constraintViolation.getMessage() ).isEqualTo( messagePrefix() + "may not be null" );
-		assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
-		assertThat( constraintViolation.getInvalidValue() ).isNull();
 
-		Path path = constraintViolation.getPropertyPath();
-		assertNodeKinds( path, ElementKind.CONSTRUCTOR, ElementKind.RETURN_VALUE, ElementKind.PROPERTY );
-		assertNodeNames( path, "CustomerRepositoryImpl", NodeImpl.RETURN_VALUE_NODE_NAME, "customer" );
+		assertConstraintViolation( constraintViolation, NotNull.class, messagePrefix() + "may not be null", CustomerRepositoryImpl.class, null,
+				pathWith()
+						.constructor( CustomerRepositoryImpl.class )
+						.returnValue()
+						.property( "customer" )
+		);
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)

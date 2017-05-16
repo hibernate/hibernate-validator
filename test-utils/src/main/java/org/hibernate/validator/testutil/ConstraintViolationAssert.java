@@ -7,8 +7,6 @@
 package org.hibernate.validator.testutil;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.lang.annotation.Annotation;
@@ -116,20 +114,25 @@ public final class ConstraintViolationAssert {
 		assertCorrectPropertyPaths( e.getConstraintViolations(), expectedPropertyPaths );
 	}
 
+	public static void assertCorrectPropertyPath(ConstraintViolation<?> violation, PathExpectation path) {
+		Assertions.assertThat( new PathExpectation( violation.getPropertyPath() ) ).isEqualTo( path );
+	}
+
 	/**
 	 * Asserts that the error message, root bean class, invalid value and property path of the given violation are equal
 	 * to the expected message, root bean class, invalid value and propertyPath.
 	 *
 	 * @param violation The violation to verify.
-	 * @param errorMessage The expected violation error message.
+	 * @param constraint The violated constraint.
+	 * @param errorMessage The expected error message.
 	 * @param rootBeanClass The expected root bean class.
 	 * @param invalidValue The expected invalid value.
 	 * @param propertyPath The expected property path.
 	 */
-	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage,
-			Class<?> rootBeanClass, Object invalidValue, String propertyPath) {
-		assertEquals( violation.getPropertyPath().toString(), propertyPath );
-		assertConstraintViolation( violation, errorMessage, rootBeanClass, invalidValue );
+	public static void assertConstraintViolation(ConstraintViolation<?> violation, Class<? extends Annotation> constraint, String errorMessage,
+			Class<?> rootBeanClass, Object invalidValue, PathExpectation propertyPath) {
+		Assertions.assertThat( new PathExpectation( violation.getPropertyPath() ) ).isEqualTo( propertyPath );
+		assertConstraintViolation( violation, constraint, errorMessage, rootBeanClass, invalidValue );
 	}
 
 	/**
@@ -137,14 +140,15 @@ public final class ConstraintViolationAssert {
 	 * expected message, root bean class and invalid value.
 	 *
 	 * @param violation The violation to verify.
+	 * @param constraint The violated constraint.
 	 * @param errorMessage The expected error message.
 	 * @param rootBeanClass The expected root bean class.
 	 * @param invalidValue The expected invalid value.
 	 */
-	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage,
+	public static void assertConstraintViolation(ConstraintViolation<?> violation, Class<? extends Annotation> constraint, String errorMessage,
 			Class<?> rootBeanClass, Object invalidValue) {
 		assertEquals( violation.getInvalidValue(), invalidValue, "Wrong invalid value" );
-		assertConstraintViolation( violation, errorMessage, rootBeanClass );
+		assertConstraintViolation( violation, constraint, errorMessage, rootBeanClass );
 	}
 
 	/**
@@ -152,22 +156,25 @@ public final class ConstraintViolationAssert {
 	 * and root bean class.
 	 *
 	 * @param violation The violation to verify.
+	 * @param constraint The violated constraint.
 	 * @param errorMessage The expected error message.
 	 * @param rootBeanClass The expected root bean class.
 	 */
-	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage,
+	public static void assertConstraintViolation(ConstraintViolation<?> violation, Class<? extends Annotation> constraint, String errorMessage,
 			Class<?> rootBeanClass) {
-		assertEquals( violation.getRootBean().getClass(), rootBeanClass, "Wrong root bean type" );
-		assertConstraintViolation( violation, errorMessage );
+		assertEquals( violation.getRootBeanClass(), rootBeanClass, "Wrong root bean type" );
+		assertConstraintViolation( violation, constraint, errorMessage );
 	}
 
 	/**
 	 * Asserts that the error message of the given violation is equal to the expected message.
 	 *
 	 * @param violation The violation to verify.
+	 * @param constraint The violated constraint.
 	 * @param errorMessage The expected error message.
 	 */
-	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage) {
+	public static void assertConstraintViolation(ConstraintViolation<?> violation, Class<? extends Annotation> constraint, String errorMessage) {
+		assertEquals( violation.getConstraintDescriptor().getAnnotation().annotationType(), constraint, "Wrong constraint type" );
 		assertEquals( violation.getMessage(), errorMessage, "Wrong expectedMessage" );
 	}
 
@@ -195,40 +202,6 @@ public final class ConstraintViolationAssert {
 		}
 
 		assertCorrectConstraintTypes( actualConstraintTypes, expectedConstraintTypes );
-	}
-
-	/**
-	 * Asserts that the nodes in the path have the specified kinds.
-	 *
-	 * @param path The path under test
-	 * @param kinds The node kinds
-	 */
-	public static void assertNodeKinds(Path path, ElementKind... kinds) {
-		Iterator<Path.Node> pathIterator = path.iterator();
-
-		for ( ElementKind kind : kinds ) {
-			assertTrue( pathIterator.hasNext() );
-			assertEquals( pathIterator.next().getKind(), kind );
-		}
-
-		assertFalse( pathIterator.hasNext() );
-	}
-
-	/**
-	 * Asserts that the nodes in the path have the specified names.
-	 *
-	 * @param path The path under test
-	 * @param names The node names
-	 */
-	public static void assertNodeNames(Path path, String... names) {
-		Iterator<Path.Node> pathIterator = path.iterator();
-
-		for ( String name : names ) {
-			assertTrue( pathIterator.hasNext() );
-			assertEquals( pathIterator.next().getName(), name );
-		}
-
-		assertFalse( pathIterator.hasNext() );
 	}
 
 	/**
@@ -477,6 +450,11 @@ public final class ConstraintViolationAssert {
 
 		public PathExpectation bean(boolean inIterable, Object key, Integer index, Class<?> containerClass, Integer typeArgumentIndex) {
 			nodes.add( new NodeExpectation( null, ElementKind.BEAN, inIterable, key, index, null, containerClass, typeArgumentIndex ) );
+			return this;
+		}
+
+		public PathExpectation constructor(Class<?> clazz) {
+			nodes.add( new NodeExpectation( clazz.getSimpleName(), ElementKind.CONSTRUCTOR ) );
 			return this;
 		}
 

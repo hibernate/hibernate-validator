@@ -28,6 +28,8 @@ import javax.validation.GroupSequence;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -44,6 +46,8 @@ import org.hibernate.validator.cfg.defs.NotEmptyDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.RangeDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
@@ -145,7 +149,7 @@ public class ConstraintMappingTest {
 
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( new Marathon() );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), "may not be null" );
+		assertConstraintViolation( violations.iterator().next(), NotNull.class, "may not be null" );
 	}
 
 	@Test
@@ -162,7 +166,7 @@ public class ConstraintMappingTest {
 		marathon.setName( "NY" );
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), "too short" );
+		assertConstraintViolation( violations.iterator().next(), Size.class, "too short" );
 	}
 
 	@Test(description = "HV-404: Introducing ConstraintsForType#genericConstraint(Class) allows to set specific parameters on following specific constraints.")
@@ -181,7 +185,7 @@ public class ConstraintMappingTest {
 		marathon.addRunner( new Runner() );
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), "name too short" );
+		assertConstraintViolation( violations.iterator().next(), Size.class, "name too short" );
 	}
 
 	@Test
@@ -203,7 +207,7 @@ public class ConstraintMappingTest {
 
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), "must be in the future" );
+		assertConstraintViolation( violations.iterator().next(), Future.class, "must be in the future" );
 	}
 
 	@Test
@@ -226,7 +230,7 @@ public class ConstraintMappingTest {
 		marathon.addRunner( new Runner() );
 		violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), "must be true" );
+		assertConstraintViolation( violations.iterator().next(), AssertTrue.class, "must be true" );
 	}
 
 	@Test
@@ -247,7 +251,7 @@ public class ConstraintMappingTest {
 		marathon.addRunner( new Runner() );
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), "must be true" );
+		assertConstraintViolation( violations.iterator().next(), AssertTrue.class, "must be true" );
 	}
 
 	@Test
@@ -298,12 +302,12 @@ public class ConstraintMappingTest {
 
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), "may not be null" );
+		assertConstraintViolation( violations.iterator().next(), NotNull.class, "may not be null" );
 
 		marathon.setName( "Stockholm Marathon" );
 		violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), "may not be empty" );
+		assertConstraintViolation( violations.iterator().next(), NotEmpty.class, "may not be empty" );
 	}
 
 	@Test
@@ -321,12 +325,12 @@ public class ConstraintMappingTest {
 
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), "may not be null" );
+		assertConstraintViolation( violations.iterator().next(), NotNull.class, "may not be null" );
 
 		marathon.setName( "Stockholm Marathon" );
 		violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), "may not be empty" );
+		assertConstraintViolation( violations.iterator().next(), NotEmpty.class, "may not be empty" );
 	}
 
 	@Test(
@@ -453,7 +457,7 @@ public class ConstraintMappingTest {
 		Validator validator = config.buildValidatorFactory().getValidator();
 		Set<ConstraintViolation<Runner>> violations = validator.validate( new Runner() );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), "must be between 12 and 99" );
+		assertConstraintViolation( violations.iterator().next(), Range.class, "must be between 12 and 99" );
 	}
 
 	@Test(description = "HV-444")
@@ -472,12 +476,12 @@ public class ConstraintMappingTest {
 
 		Set<ConstraintViolation<ExtendedMarathon>> violations = validator.validate( extendedMarathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), "may not be null" );
+		assertConstraintViolation( violations.iterator().next(), NotNull.class, "may not be null" );
 
 		extendedMarathon.setName( "Stockholm Marathon" );
 		violations = validator.validate( extendedMarathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), "may not be empty" );
+		assertConstraintViolation( violations.iterator().next(), NotEmpty.class, "may not be empty" );
 	}
 
 	@Test
