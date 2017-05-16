@@ -10,9 +10,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeKinds;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeNames;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPath;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -33,7 +33,6 @@ import javax.validation.Path.ParameterNode;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Address;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
@@ -84,6 +83,7 @@ public abstract class AbstractMethodValidationTest {
 
 			assertConstraintViolation(
 					constraintViolation,
+					NotNull.class,
 					messagePrefix() + "may not be null",
 					CustomerRepositoryImpl.class,
 					null
@@ -607,12 +607,11 @@ public abstract class AbstractMethodValidationTest {
 					DateMidnight.class
 			);
 
-			assertNodeNames(
-					constraintViolation.getPropertyPath(),
-					"methodWithCrossParameterConstraint",
-					NodeImpl.CROSS_PARAMETER_NODE_NAME
+			assertCorrectPropertyPath( constraintViolation,
+					pathWith()
+							.method( "methodWithCrossParameterConstraint" )
+							.crossParameter()
 			);
-			assertNodeKinds( constraintViolation.getPropertyPath(), ElementKind.METHOD, ElementKind.CROSS_PARAMETER );
 		}
 	}
 

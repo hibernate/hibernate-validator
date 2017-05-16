@@ -6,15 +6,17 @@
  */
 package org.hibernate.validator.test.constraints;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
+import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
-
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * @author Hardy Ferentschik
@@ -30,7 +32,7 @@ public class ConstraintTest {
 		Set<ConstraintViolation<Elevator>> constraintViolations = validator.validate( elevator );
 
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertConstraintViolation( constraintViolations.iterator().next(), "Invalid floor" );
+		assertConstraintViolation( constraintViolations.iterator().next(), Range.class, "Invalid floor" );
 
 		elevator.setCurrentFloor( -2 );
 		constraintViolations = validator.validate( elevator );
@@ -51,6 +53,6 @@ public class ConstraintTest {
 		constraintViolations = validator.validate( elevator );
 
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertConstraintViolation( constraintViolations.iterator().next(), "Invalid floor" );
+		assertConstraintViolation( constraintViolations.iterator().next(), Range.class, "Invalid floor" );
 	}
 }

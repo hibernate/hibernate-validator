@@ -6,24 +6,25 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup;
-import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup1;
-import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup2;
-import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationSequence;
-import org.hibernate.validator.testutils.ValidatorUtil;
-import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroupImpl;
-
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup1;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup2;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationSequence;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroupImpl;
+import org.hibernate.validator.testutils.ValidatorUtil;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Integration test for the group sequence processing during method-level validation.
@@ -64,7 +65,7 @@ public class MethodLevelValidationGroupSequenceTest {
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertConstraintViolation(
-					constraintViolation, "may not be null", CustomerRepositoryWithRedefinedDefaultGroupImpl.class, null
+					constraintViolation, NotNull.class, "may not be null", CustomerRepositoryWithRedefinedDefaultGroupImpl.class, null
 			);
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
@@ -90,6 +91,7 @@ public class MethodLevelValidationGroupSequenceTest {
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertConstraintViolation(
 					constraintViolation,
+					Min.class,
 					"must be greater than or equal to 5",
 					CustomerRepositoryWithRedefinedDefaultGroupImpl.class,
 					1
@@ -141,6 +143,7 @@ public class MethodLevelValidationGroupSequenceTest {
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertConstraintViolation(
 					constraintViolation,
+					Min.class,
 					"must be greater than or equal to 5",
 					CustomerRepositoryWithRedefinedDefaultGroupImpl.class,
 					1
@@ -195,7 +198,7 @@ public class MethodLevelValidationGroupSequenceTest {
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertConstraintViolation(
-					constraintViolation, "may not be null", CustomerRepositoryWithRedefinedDefaultGroupImpl.class, null
+					constraintViolation, NotNull.class, "may not be null", CustomerRepositoryWithRedefinedDefaultGroupImpl.class, null
 			);
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
@@ -221,6 +224,7 @@ public class MethodLevelValidationGroupSequenceTest {
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertConstraintViolation(
 					constraintViolation,
+					Min.class,
 					"must be greater than or equal to 5",
 					CustomerRepositoryWithRedefinedDefaultGroupImpl.class,
 					1
@@ -251,6 +255,7 @@ public class MethodLevelValidationGroupSequenceTest {
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertConstraintViolation(
 					constraintViolation,
+					Min.class,
 					"must be greater than or equal to 5",
 					CustomerRepositoryWithRedefinedDefaultGroupImpl.class,
 					1
