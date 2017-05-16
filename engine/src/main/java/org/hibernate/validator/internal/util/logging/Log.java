@@ -757,4 +757,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 219, value = "Unable to get the most specific value extractor for type %1$s as several value extractors are defined in this type's parallel hierarchies: %2$s.")
 	ConstraintDeclarationException unableToGetMostSpecificValueExtractorDueToSeveralValueExtractorsDefinedForParallelHierarchies(@FormatWith(ClassObjectFormatter.class) Class<?> valueType,
 			@FormatWith(CollectionOfClassesObjectFormatter.class) Collection<Class<? extends ValueExtractor>> valueExtractors);
+
+	@SuppressWarnings("rawtypes")
+	@Message(id = 220, value = "When @ExtractedValue is defined on a type parameter of a container type, the type attribute may not be set: %1$s.")
+	ValueExtractorDefinitionException extractedValueOnTypeParameterOfContainerTypeMayNotDefineTypeAttribute(
+			@FormatWith(ClassObjectFormatter.class) Class<? extends ValueExtractor> extractorImplementationType);
 }

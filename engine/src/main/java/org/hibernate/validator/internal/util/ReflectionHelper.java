@@ -433,7 +433,7 @@ public final class ReflectionHelper {
 	 * @throws IllegalArgumentException in case the parameter {@code primitiveType} does not
 	 * represent a primitive type.
 	 */
-	public static Class<?> boxedType(Class<?> primitiveType) {
+	private static Class<?> internalBoxedType(Class<?> primitiveType) {
 		Class<?> wrapperType = PRIMITIVE_TO_WRAPPER_TYPES.get( primitiveType );
 
 		if ( wrapperType == null ) {
@@ -448,7 +448,19 @@ public final class ReflectionHelper {
 	 */
 	public static Type boxedType(Type type) {
 		if ( type instanceof Class && ( (Class<?>) type ).isPrimitive() ) {
-			return boxedType( (Class<?>) type );
+			return internalBoxedType( (Class<?>) type );
+		}
+		else {
+			return type;
+		}
+	}
+
+	/**
+	 * Returns the corresponding auto-boxed type if given a primitive type. Returns the given type itself otherwise.
+	 */
+	public static Class<?> boxedType(Class<?> type) {
+		if ( type.isPrimitive() ) {
+			return internalBoxedType( (Class<?>) type );
 		}
 		else {
 			return type;

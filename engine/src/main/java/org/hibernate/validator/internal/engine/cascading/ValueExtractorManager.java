@@ -79,6 +79,9 @@ public class ValueExtractorManager {
 		specDefinedExtractors.add( IterableValueExtractor.DESCRIPTOR );
 
 		specDefinedExtractors.add( OptionalValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( OptionalIntValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( OptionalDoubleValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( OptionalLongValueExtractor.DESCRIPTOR );
 
 		specDefinedExtractors.add( ObjectValueExtractor.DESCRIPTOR );
 

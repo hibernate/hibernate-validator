@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.UnwrapByDefault;
@@ -37,6 +38,7 @@ public class ValueExtractorDescriptor {
 	private final Key key;
 	private final ValueExtractor<?> valueExtractor;
 	private final boolean unwrapByDefault;
+	private final Optional<Class<?>> extractedType;
 
 	public ValueExtractorDescriptor(ValueExtractor<?> valueExtractor) {
 		AnnotatedParameterizedType valueExtractorDefinition = getValueExtractorDefinition( valueExtractor.getClass() );
@@ -47,6 +49,7 @@ public class ValueExtractorDescriptor {
 		);
 		this.valueExtractor = valueExtractor;
 		this.unwrapByDefault = hasUnwrapByDefaultAnnotation( valueExtractor.getClass() );
+		this.extractedType = getExtractedType( valueExtractorDefinition );
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -74,6 +77,9 @@ public class ValueExtractorDescriptor {
 					if ( extractedTypeParameter != null ) {
 						throw LOG.getValueExtractorDeclaresExtractedValueMultipleTimesException( extractorImplementationType );
 					}
+					if ( !Void.class.equals( typeArgument.getAnnotation( ExtractedValue.class ).type() ) ) {
+						throw LOG.extractedValueOnTypeParameterOfContainerTypeMayNotDefineTypeAttribute( extractorImplementationType );
+					}
 
 					extractedTypeParameter = containerTypeRaw.getTypeParameters()[i];
 				}
@@ -86,6 +92,19 @@ public class ValueExtractorDescriptor {
 		}
 
 		return extractedTypeParameter;
+	}
+
+	private static Optional<Class<?>> getExtractedType(AnnotatedParameterizedType valueExtractorDefinition) {
+		AnnotatedType containerType = valueExtractorDefinition.getAnnotatedActualTypeArguments()[0];
+
+		if ( containerType.isAnnotationPresent( ExtractedValue.class ) ) {
+			Class<?> extractedType = containerType.getAnnotation( ExtractedValue.class ).type();
+			if ( !Void.class.equals( extractedType ) ) {
+				return Optional.of( ReflectionHelper.boxedType( extractedType ) );
+			}
+		}
+
+		return Optional.empty();
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -145,6 +164,10 @@ public class ValueExtractorDescriptor {
 
 	public TypeVariable<?> getExtractedTypeParameter() {
 		return key.extractedTypeParameter;
+	}
+
+	public Optional<Class<?>> getExtractedType() {
+		return extractedType;
 	}
 
 	public ValueExtractor<?> getValueExtractor() {
