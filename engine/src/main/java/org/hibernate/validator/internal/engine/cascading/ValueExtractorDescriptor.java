@@ -39,17 +39,19 @@ public class ValueExtractorDescriptor {
 	private final boolean unwrapByDefault;
 
 	public ValueExtractorDescriptor(ValueExtractor<?> valueExtractor) {
+		AnnotatedParameterizedType valueExtractorDefinition = getValueExtractorDefinition( valueExtractor.getClass() );
+
 		this.key = new Key(
-				getContainerType( valueExtractor.getClass() ),
-				getExtractedTypeParameter( valueExtractor.getClass() )
+				getContainerType( valueExtractorDefinition, valueExtractor.getClass() ),
+				getExtractedTypeParameter( valueExtractorDefinition, valueExtractor.getClass() )
 		);
 		this.valueExtractor = valueExtractor;
 		this.unwrapByDefault = hasUnwrapByDefaultAnnotation( valueExtractor.getClass() );
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static TypeVariable<?> getExtractedTypeParameter(Class<? extends ValueExtractor> extractorImplementationType) {
-		AnnotatedParameterizedType valueExtractorDefinition = getValueExtractorDefinition( extractorImplementationType );
+	private static TypeVariable<?> getExtractedTypeParameter(AnnotatedParameterizedType valueExtractorDefinition,
+			Class<? extends ValueExtractor> extractorImplementationType) {
 		AnnotatedType containerType = valueExtractorDefinition.getAnnotatedActualTypeArguments()[0];
 		Class<?> containerTypeRaw = (Class<?>) TypeHelper.getErasedType( containerType.getType() );
 
@@ -87,9 +89,8 @@ public class ValueExtractorDescriptor {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static Class<?> getContainerType(Class<? extends ValueExtractor> extractorImplementationType) {
-		AnnotatedParameterizedType genericInterface = getValueExtractorDefinition( extractorImplementationType );
-		AnnotatedType containerType = genericInterface.getAnnotatedActualTypeArguments()[0];
+	private static Class<?> getContainerType(AnnotatedParameterizedType valueExtractorDefinition, Class<? extends ValueExtractor> extractorImplementationType) {
+		AnnotatedType containerType = valueExtractorDefinition.getAnnotatedActualTypeArguments()[0];
 		return TypeHelper.getErasedReferenceType( containerType.getType() );
 	}
 
