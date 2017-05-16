@@ -88,7 +88,7 @@ public class MetaConstraints {
 
 			return getSingleTypeParameterBind( typeResolutionHelper,
 					location.getTypeForValidatorResolution(),
-					valueExtractorDescriptorCandidate.getExtractedType() );
+					valueExtractorDescriptorCandidate.getContainerType() );
 		}
 	}
 

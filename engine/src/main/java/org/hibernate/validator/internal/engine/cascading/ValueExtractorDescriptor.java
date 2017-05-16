@@ -40,7 +40,7 @@ public class ValueExtractorDescriptor {
 
 	public ValueExtractorDescriptor(ValueExtractor<?> valueExtractor) {
 		this.key = new Key(
-				getExtractedType( valueExtractor.getClass() ),
+				getContainerType( valueExtractor.getClass() ),
 				getExtractedTypeParameter( valueExtractor.getClass() )
 		);
 		this.valueExtractor = valueExtractor;
@@ -50,22 +50,22 @@ public class ValueExtractorDescriptor {
 	@SuppressWarnings("rawtypes")
 	private static TypeVariable<?> getExtractedTypeParameter(Class<? extends ValueExtractor> extractorImplementationType) {
 		AnnotatedParameterizedType valueExtractorDefinition = getValueExtractorDefinition( extractorImplementationType );
-		AnnotatedType extractedType = valueExtractorDefinition.getAnnotatedActualTypeArguments()[0];
-		Class<?> extractedTypeRaw = (Class<?>) TypeHelper.getErasedType( extractedType.getType() );
+		AnnotatedType containerType = valueExtractorDefinition.getAnnotatedActualTypeArguments()[0];
+		Class<?> containerTypeRaw = (Class<?>) TypeHelper.getErasedType( containerType.getType() );
 
 		TypeVariable<?> extractedTypeParameter = null;
 
-		if ( extractedType.isAnnotationPresent( ExtractedValue.class ) ) {
-			if ( extractedType instanceof AnnotatedArrayType ) {
-				extractedTypeParameter = new ArrayElement( (AnnotatedArrayType) extractedType );
+		if ( containerType.isAnnotationPresent( ExtractedValue.class ) ) {
+			if ( containerType instanceof AnnotatedArrayType ) {
+				extractedTypeParameter = new ArrayElement( (AnnotatedArrayType) containerType );
 			}
 			else {
 				extractedTypeParameter = AnnotatedObject.INSTANCE;
 			}
 		}
 
-		if ( extractedType instanceof AnnotatedParameterizedType ) {
-			AnnotatedParameterizedType parameterizedExtractedType = (AnnotatedParameterizedType) extractedType;
+		if ( containerType instanceof AnnotatedParameterizedType ) {
+			AnnotatedParameterizedType parameterizedExtractedType = (AnnotatedParameterizedType) containerType;
 			int i = 0;
 			for ( AnnotatedType typeArgument : parameterizedExtractedType.getAnnotatedActualTypeArguments() ) {
 				if ( typeArgument.isAnnotationPresent( ExtractedValue.class ) ) {
@@ -73,7 +73,7 @@ public class ValueExtractorDescriptor {
 						throw LOG.getValueExtractorDeclaresExtractedValueMultipleTimesException( extractorImplementationType );
 					}
 
-					extractedTypeParameter = extractedTypeRaw.getTypeParameters()[i];
+					extractedTypeParameter = containerTypeRaw.getTypeParameters()[i];
 				}
 				i++;
 			}
@@ -87,10 +87,10 @@ public class ValueExtractorDescriptor {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static Class<?> getExtractedType(Class<? extends ValueExtractor> extractorImplementationType) {
+	private static Class<?> getContainerType(Class<? extends ValueExtractor> extractorImplementationType) {
 		AnnotatedParameterizedType genericInterface = getValueExtractorDefinition( extractorImplementationType );
-		AnnotatedType extractedType = genericInterface.getAnnotatedActualTypeArguments()[0];
-		return TypeHelper.getErasedReferenceType( extractedType.getType() );
+		AnnotatedType containerType = genericInterface.getAnnotatedActualTypeArguments()[0];
+		return TypeHelper.getErasedReferenceType( containerType.getType() );
 	}
 
 	private static AnnotatedParameterizedType getValueExtractorDefinition(Class<?> extractorImplementationType) {
@@ -138,8 +138,8 @@ public class ValueExtractorDescriptor {
 		return key;
 	}
 
-	public Class<?> getExtractedType() {
-		return key.extractedType;
+	public Class<?> getContainerType() {
+		return key.containerType;
 	}
 
 	public TypeVariable<?> getExtractedTypeParameter() {
@@ -161,20 +161,20 @@ public class ValueExtractorDescriptor {
 
 	public static class Key {
 
-		private final Class<?> extractedType;
+		private final Class<?> containerType;
 		private final TypeVariable<?> extractedTypeParameter;
 		private final int hashCode;
 
-		public Key(Class<?> extractedType, TypeVariable<?> extractedTypeParameter) {
-			this.extractedType = extractedType;
+		public Key(Class<?> containerType, TypeVariable<?> extractedTypeParameter) {
+			this.containerType = containerType;
 			this.extractedTypeParameter = extractedTypeParameter;
-			this.hashCode = buildHashCode( extractedType, extractedTypeParameter );
+			this.hashCode = buildHashCode( containerType, extractedTypeParameter );
 		}
 
-		private static int buildHashCode(Type extractedType, TypeVariable<?> extractedTypeParameter) {
+		private static int buildHashCode(Type containerType, TypeVariable<?> extractedTypeParameter) {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + extractedType.hashCode();
+			result = prime * result + containerType.hashCode();
 			result = prime * result + extractedTypeParameter.hashCode();
 			return result;
 		}
@@ -197,13 +197,13 @@ public class ValueExtractorDescriptor {
 			}
 			Key other = (Key) obj;
 
-			return extractedType.equals( other.extractedType ) &&
+			return containerType.equals( other.containerType ) &&
 					extractedTypeParameter.equals( other.extractedTypeParameter );
 		}
 
 		@Override
 		public String toString() {
-			return "Key [extractedType=" + StringHelper.toShortString( extractedType ) + ", extractedTypeParameter=" + extractedTypeParameter + "]";
+			return "Key [containerType=" + StringHelper.toShortString( containerType ) + ", extractedTypeParameter=" + extractedTypeParameter + "]";
 		}
 	}
 }

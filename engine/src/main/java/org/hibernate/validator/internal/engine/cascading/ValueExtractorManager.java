@@ -126,7 +126,7 @@ public class ValueExtractorManager {
 	public ValueExtractorDescriptor getValueExtractor(Class<?> valueType) {
 		List<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
 				.stream()
-				.filter( e -> TypeHelper.isAssignable( TypeHelper.getErasedReferenceType( e.getExtractedType() ), valueType ) )
+				.filter( e -> TypeHelper.isAssignable( TypeHelper.getErasedReferenceType( e.getContainerType() ), valueType ) )
 				.collect( Collectors.toList() );
 
 		return getMostSpecific( valueType, typeCompatibleExtractors );
@@ -142,7 +142,7 @@ public class ValueExtractorManager {
 
 		List<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
 				.stream()
-				.filter( e -> TypeHelper.isAssignable( e.getExtractedType(), valueType ) )
+				.filter( e -> TypeHelper.isAssignable( e.getContainerType(), valueType ) )
 				.collect( Collectors.toList() );
 
 		List<ValueExtractorDescriptor> typeParameterCompatibleExtractors = new ArrayList<>();
@@ -151,7 +151,7 @@ public class ValueExtractorManager {
 			TypeVariable<?> typeParameterBoundToExtractorType;
 
 			if ( !isInternal ) {
-				Map<TypeVariable<?>, TypeVariable<?>> bindingsForExtractorType = allBindings.get( extractorDescriptor.getExtractedType() );
+				Map<TypeVariable<?>, TypeVariable<?>> bindingsForExtractorType = allBindings.get( extractorDescriptor.getContainerType() );
 				typeParameterBoundToExtractorType = bind( typeParameter, bindingsForExtractorType );
 			}
 			else {
@@ -178,10 +178,10 @@ public class ValueExtractorManager {
 			boolean isNewRoot = true;
 			while ( candidatesIterator.hasNext() ) {
 				ValueExtractorDescriptor candidate = candidatesIterator.next();
-				if ( TypeHelper.isAssignable( candidate.getExtractedType(), descriptor.getExtractedType() ) ) {
+				if ( TypeHelper.isAssignable( candidate.getContainerType(), descriptor.getContainerType() ) ) {
 					candidatesIterator.remove();
 				}
-				else if ( TypeHelper.isAssignable( descriptor.getExtractedType(), candidate.getExtractedType() ) ) {
+				else if ( TypeHelper.isAssignable( descriptor.getContainerType(), candidate.getContainerType() ) ) {
 					isNewRoot = false;
 				}
 			}

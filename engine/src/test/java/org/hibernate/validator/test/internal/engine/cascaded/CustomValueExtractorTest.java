@@ -191,7 +191,7 @@ public class CustomValueExtractorTest {
 
 		Set<TypeVariable<?>> mapExtractors = defaultExtractors.stream()
 			.filter( e -> {
-				return TypeHelper.getErasedReferenceType( new ValueExtractorDescriptor( e ).getExtractedType() ) == Map.class;
+				return TypeHelper.getErasedReferenceType( new ValueExtractorDescriptor( e ).getContainerType() ) == Map.class;
 			} )
 			.map( e ->  new ValueExtractorDescriptor( e ).getExtractedTypeParameter() )
 			.collect( Collectors.toSet() );
@@ -201,7 +201,7 @@ public class CustomValueExtractorTest {
 
 		Set<TypeVariable<?>> optionalExtractors = defaultExtractors.stream()
 			.filter( e -> {
-				return TypeHelper.getErasedReferenceType( new ValueExtractorDescriptor( e ).getExtractedType() ) == java.util.Optional.class;
+				return TypeHelper.getErasedReferenceType( new ValueExtractorDescriptor( e ).getContainerType() ) == java.util.Optional.class;
 			} )
 			.map( e ->  new ValueExtractorDescriptor( e ).getExtractedTypeParameter() )
 			.collect( Collectors.toSet() );
@@ -212,7 +212,7 @@ public class CustomValueExtractorTest {
 
 		Set<TypeVariable<?>> guavaOptionalExtractors = defaultExtractors.stream()
 			.filter( e -> {
-				return TypeHelper.getErasedReferenceType( new ValueExtractorDescriptor( e ).getExtractedType() ) == Optional.class;
+				return TypeHelper.getErasedReferenceType( new ValueExtractorDescriptor( e ).getContainerType() ) == Optional.class;
 			} )
 			.map( e ->  new ValueExtractorDescriptor( e ).getExtractedTypeParameter() )
 			.collect( Collectors.toSet() );
