@@ -46,16 +46,12 @@ public class OptionalPrimitivesValueExtractorTest {
 		assertNumberOfViolations( constraintViolations, 0 );
 
 		constraintViolations = validator.validate( Foo.invalid() );
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectConstraintTypes( constraintViolations, Min.class, DecimalMin.class, Min.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "optionalInt" ),
-				pathWith()
-						.property( "optionalDouble" ),
-				pathWith()
-						.property( "optionalLong" )
+				pathWith().property( "optionalInt" ),
+				pathWith().property( "optionalDouble" ),
+				pathWith().property( "optionalLong" )
 		);
+		assertCorrectConstraintTypes( constraintViolations, Min.class, DecimalMin.class, Min.class );
 	}
 
 	private static class Foo {

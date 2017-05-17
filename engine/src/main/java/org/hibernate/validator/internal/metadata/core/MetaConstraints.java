@@ -86,14 +86,13 @@ public class MetaConstraints {
 
 			valueExtractionPath.add( TypeParameterAndExtractor.of( valueExtractorDescriptorCandidate ) );
 
-			if ( valueExtractorDescriptorCandidate.getExtractedType().isPresent() ) {
-				return valueExtractorDescriptorCandidate.getExtractedType().get();
-			}
-			else {
-				return getSingleTypeParameterBind( typeResolutionHelper,
-						location.getTypeForValidatorResolution(),
-						valueExtractorDescriptorCandidate.getContainerType() );
-			}
+			return valueExtractorDescriptorCandidate.getExtractedType()
+					.orElseGet( () ->
+						getSingleTypeParameterBind( typeResolutionHelper,
+								location.getTypeForValidatorResolution(),
+								valueExtractorDescriptorCandidate.getContainerType()
+						)
+					);
 		}
 	}
 
