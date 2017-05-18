@@ -12,6 +12,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
@@ -21,7 +22,6 @@ import org.hibernate.validator.internal.constraintvalidators.hv.SafeHtmlValidato
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.TestForIssue;
-
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -38,7 +38,7 @@ public class SafeHtmlValidatorTest {
 
 	@BeforeMethod
 	public void setUp() {
-		descriptor = new AnnotationDescriptor<SafeHtml>( SafeHtml.class );
+		descriptor = new AnnotationDescriptor<>( SafeHtml.class );
 	}
 
 	@Test
@@ -98,7 +98,7 @@ public class SafeHtmlValidatorTest {
 	public void testDivWithWhiteListedClassAttribute() throws Exception {
 		descriptor.setValue( "whitelistType", WhiteListType.RELAXED );
 
-		AnnotationDescriptor<SafeHtml.Tag> tagDescriptor = new AnnotationDescriptor<SafeHtml.Tag>( SafeHtml.Tag.class );
+		AnnotationDescriptor<SafeHtml.Tag> tagDescriptor = new AnnotationDescriptor<>( SafeHtml.Tag.class );
 		tagDescriptor.setValue( "name", "div" );
 		tagDescriptor.setValue( "attributes", new String[] { "class" } );
 		SafeHtml.Tag tag = AnnotationFactory.create( tagDescriptor );
@@ -219,11 +219,11 @@ public class SafeHtmlValidatorTest {
 		@SafeHtml(
 				whitelistType = WhiteListType.BASIC,
 				additionalTagsWithAttributes = {
-						@SafeHtml.Tag(name = "img", additionalAttributesWithProtocols = @SafeHtml.Tag.Attribute(name = "src", protocols = { "data" })),
+						@SafeHtml.Tag(name = "img", additionalAttributesWithProtocols = @SafeHtml.Attribute(name = "src", protocols = { "data" })),
 						@SafeHtml.Tag(name = "custom", additionalAttributesWithProtocols = {
-								@SafeHtml.Tag.Attribute(name = "attr1", protocols = { "dataprotocol", "strange_protocol" }),
-								@SafeHtml.Tag.Attribute(name = "attr2", protocols = { "dataprotocol", "strange_protocol" }),
-								@SafeHtml.Tag.Attribute(name = "attr3", protocols = "some_protocol")
+								@SafeHtml.Attribute(name = "attr1", protocols = { "dataprotocol", "strange_protocol" }),
+								@SafeHtml.Attribute(name = "attr2", protocols = { "dataprotocol", "strange_protocol" }),
+								@SafeHtml.Attribute(name = "attr3", protocols = "some_protocol")
 						}),
 						@SafeHtml.Tag(name = "section", attributes = { "attr", "id" })
 				}
