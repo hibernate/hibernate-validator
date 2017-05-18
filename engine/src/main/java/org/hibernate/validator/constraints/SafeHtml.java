@@ -95,7 +95,7 @@ public @interface SafeHtml {
 		 * @return list of tag attributes with corresponding allowed protocols which are whitelisted.
 		 * @since 6.0
 		 */
-		Attribute[] additionalAttributesWithProtocols() default { };
+		Attribute[] attributesWithProtocols() default { };
 	}
 
 	/**

@@ -95,11 +95,11 @@ public class SafeHtmlDef extends ConstraintDef<SafeHtmlDef, SafeHtml> {
 		}
 
 		public TagDef attributes(AttributeDef attribute, AttributeDef... furtherAttributes) {
-			addAnnotationAsParameter( "additionalAttributesWithProtocols", attribute );
+			addAnnotationAsParameter( "attributesWithProtocols", attribute );
 
 			if ( furtherAttributes != null && furtherAttributes.length > 0 ) {
 				for ( AttributeDef attributeDef : furtherAttributes ) {
-					addAnnotationAsParameter( "additionalAttributesWithProtocols", attributeDef );
+					addAnnotationAsParameter( "attributesWithProtocols", attributeDef );
 				}
 			}
 

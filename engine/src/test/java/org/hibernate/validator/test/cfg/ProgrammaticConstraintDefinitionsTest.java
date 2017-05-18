@@ -155,7 +155,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 
 		tagDescriptor = new AnnotationDescriptor( SafeHtml.Tag.class );
 		tagDescriptor.setValue( "name", "img" );
-		tagDescriptor.setValue( "additionalAttributesWithProtocols", new SafeHtml.Attribute[]{ AnnotationFactory.create( attributeDescriptor ) } );
+		tagDescriptor.setValue( "attributesWithProtocols", new SafeHtml.Attribute[]{ AnnotationFactory.create( attributeDescriptor ) } );
 
 		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 				.additionalTagsWithAttributes( AnnotationFactory.create( tagDescriptor ) ), "<img src='data:image/png;base64,100101' />", 0 );
