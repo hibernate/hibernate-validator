@@ -80,6 +80,7 @@ public @interface SafeHtml {
 	@Retention(RUNTIME)
 	@Documented
 	public @interface Tag {
+
 		/**
 		 * @return the tag name to whitelist.
 		 */
@@ -95,25 +96,26 @@ public @interface SafeHtml {
 		 * @since 6.0
 		 */
 		Attribute[] additionalAttributesWithProtocols() default { };
+	}
+
+	/**
+	 * Allows to specify whitelisted attributes with whitelisted protocols.
+	 *
+	 * @since 6.0
+	 */
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+	@Retention(RUNTIME)
+	@Documented @interface Attribute {
 
 		/**
-		 * Allows to specify attribute with whitelisted protocols.
-		 * @since 6.0
+		 * @return the attribute name to whitelist.
 		 */
-		@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
-		@Retention(RUNTIME)
-		@Documented @interface Attribute {
-			/**
-			 * @return the attribute name to whitelist.
-			 */
-			String name();
+		String name();
 
-			/**
-			 * @return list of attribute protocols which are whitelisted.
-			 */
-			String[] protocols() default { };
-
-		}
+		/**
+		 * @return list of attribute protocols which are whitelisted.
+		 */
+		String[] protocols() default { };
 	}
 
 	/**

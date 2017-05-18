@@ -42,6 +42,11 @@ public class SafeHtmlDef extends ConstraintDef<SafeHtmlDef, SafeHtml> {
 		return this;
 	}
 
+	/**
+	 * Whitelists additional tags.
+	 *
+	 * @since 6.0
+	 */
 	public SafeHtmlDef additionalTags(TagDef tag, TagDef... furtherTags) {
 		addAnnotationAsParameter( "additionalTagsWithAttributes", tag );
 
@@ -53,11 +58,19 @@ public class SafeHtmlDef extends ConstraintDef<SafeHtmlDef, SafeHtml> {
 		return this;
 	}
 
+	/**
+	 * @since 6.0
+	 */
 	public SafeHtmlDef baseURI(String baseURI) {
 		addParameter( "baseURI", baseURI );
 		return this;
 	}
 
+	/**
+	 * Represents a {@link SafeHtml.Tag}.
+	 *
+	 * @since 6.0
+	 */
 	public static class TagDef extends AnnotationDef<TagDef, SafeHtml.Tag> {
 
 		public TagDef(String name) {
@@ -94,10 +107,15 @@ public class SafeHtmlDef extends ConstraintDef<SafeHtmlDef, SafeHtml> {
 		}
 	}
 
-	public static class AttributeDef extends AnnotationDef<AttributeDef, SafeHtml.Tag.Attribute> {
+	/**
+	 * Represents a {@link SafeHtml.Attribute}.
+	 *
+	 * @since 6.0
+	 */
+	public static class AttributeDef extends AnnotationDef<AttributeDef, SafeHtml.Attribute> {
 
 		public AttributeDef(String name) {
-			super( SafeHtml.Tag.Attribute.class );
+			super( SafeHtml.Attribute.class );
 			addParameter( "name", name );
 		}
 
