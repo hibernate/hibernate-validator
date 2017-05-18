@@ -14,6 +14,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
@@ -30,6 +31,7 @@ import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
@@ -116,6 +118,10 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		config.traversableResolver( createTraversableResolver( config ) );
 		config.parameterNameProvider( createParameterNameProvider( config ) );
 		config.clockProvider( createClockProvider( config ) );
+
+		for ( ValueExtractor<?> valueExtractor : createValueExtractors( config ) ) {
+			config.addValueExtractor( valueExtractor );
+		}
 
 		return config.buildValidatorFactory();
 	}
@@ -222,6 +228,18 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		);
 
 		return createInstance( constraintValidatorFactoryClass );
+	}
+
+	private Set<ValueExtractor<?>> createValueExtractors(Configuration<?> config) {
+		BootstrapConfiguration bootstrapConfiguration = config.getBootstrapConfiguration();
+		Set<String> valueExtractorFqcns = bootstrapConfiguration.getValueExtractorClassNames();
+
+		@SuppressWarnings("unchecked")
+		Set<ValueExtractor<?>> valueExtractors = valueExtractorFqcns.stream()
+				.map( fqcn -> createInstance( (Class<? extends ValueExtractor<?>>) run( LoadClass.action( fqcn, null ) ) ) )
+				.collect( Collectors.toSet() );
+
+		return valueExtractors;
 	}
 
 	private <T> T createInstance(Class<T> type) {
