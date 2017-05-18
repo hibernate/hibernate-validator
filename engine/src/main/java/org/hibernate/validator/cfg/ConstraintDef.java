@@ -7,8 +7,6 @@
 package org.hibernate.validator.cfg;
 
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.validation.Payload;
 
@@ -28,42 +26,19 @@ import org.hibernate.validator.internal.util.StringHelper;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Annotation> {
-
-	// Note on visibility of members: These members are intentionally made
-	// protected and published by a sub-class for internal use. There aren't
-	// public getters as they would pollute the fluent definition API.
-
-	/**
-	 * The constraint annotation type of this definition.
-	 */
-	protected final Class<A> constraintType;
-
-	/**
-	 * A map with the annotation parameters of this definition. Keys are
-	 * property names of this definition's annotation type, values are
-	 * annotation parameter values of the appropriate types.
-	 */
-	protected final Map<String, Object> parameters;
+public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Annotation> extends AnnotationDef<C, A> {
 
 	protected ConstraintDef(Class<A> constraintType) {
-		this.constraintType = constraintType;
-		this.parameters = new HashMap<>();
+		super( constraintType );
 	}
 
 	protected ConstraintDef(ConstraintDef<?, A> original) {
-		this.constraintType = original.constraintType;
-		this.parameters = original.parameters;
+		super( original );
 	}
 
 	@SuppressWarnings("unchecked")
 	private C getThis() {
 		return (C) this;
-	}
-
-	protected C addParameter(String key, Object value) {
-		parameters.put( key, value );
-		return getThis();
 	}
 
 	public C message(String message) {
@@ -86,7 +61,7 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( this.getClass().getName() );
-		sb.append( ", constraintType=" ).append( StringHelper.toShortString( constraintType ) );
+		sb.append( ", constraintType=" ).append( StringHelper.toShortString( annotationType ) );
 		sb.append( ", parameters=" ).append( parameters );
 		sb.append( '}' );
 		return sb.toString();
