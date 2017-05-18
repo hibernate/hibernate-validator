@@ -114,12 +114,13 @@ public class SafeHtmlDef extends ConstraintDef<SafeHtmlDef, SafeHtml> {
 	 */
 	public static class AttributeDef extends AnnotationDef<AttributeDef, SafeHtml.Attribute> {
 
-		public AttributeDef(String name) {
+		public AttributeDef(String name, String protocol, String... furtherProtocols) {
 			super( SafeHtml.Attribute.class );
 			addParameter( "name", name );
+			addProtocols( protocol, furtherProtocols );
 		}
 
-		public AttributeDef protocols(String protocol, String... furtherProtocols) {
+		private void addProtocols(String protocol, String... furtherProtocols) {
 			String[] protocols;
 
 			if ( furtherProtocols != null ) {
@@ -132,7 +133,6 @@ public class SafeHtmlDef extends ConstraintDef<SafeHtmlDef, SafeHtml> {
 			}
 
 			addParameter( "protocols", protocols );
-			return this;
 		}
 	}
 }

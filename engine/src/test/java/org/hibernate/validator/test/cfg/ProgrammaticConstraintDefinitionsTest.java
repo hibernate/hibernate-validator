@@ -88,22 +88,11 @@ public class ProgrammaticConstraintDefinitionsTest {
 				"<img src='data:image/png;base64,100101' />", 0
 		);
 
-		// allowed attribute, no restrictions on protocols
-		doProgrammaticTest(
-				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTags( new TagDef( "img" )
-								.attributes( new AttributeDef( "src" ) )
-						),
-				"<img src='data:image/png;base64,100101' />", 0
-		);
-
 		// allowed attribute, allowed protocol
 		doProgrammaticTest(
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 						.additionalTags( new TagDef( "img" )
-								.attributes( new AttributeDef( "src" )
-										.protocols( "data" )
-								)
+								.attributes( new AttributeDef( "src", "data" ) )
 						),
 				"<img src='data:image/png;base64,100101' />", 0
 		);
@@ -112,9 +101,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 		doProgrammaticTest(
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 						.additionalTags( new TagDef( "img" )
-								.attributes( new AttributeDef( "src" )
-										.protocols( "data" )
-								)
+								.attributes( new AttributeDef( "src", "data" ) )
 						),
 				"<img src='not_data:image/png;base64,100101' />", 1
 		);
@@ -124,8 +111,8 @@ public class ProgrammaticConstraintDefinitionsTest {
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 						.additionalTags( new TagDef( "img" )
 								.attributes(
-										new AttributeDef( "src" ).protocols( "data", "data2" ),
-										new AttributeDef( "href" ).protocols( "http", "http2" )
+										new AttributeDef( "src", "data", "data2" ),
+										new AttributeDef( "href", "http", "http2" )
 								)
 						),
 				"<img src='data:image/png;base64,100101' href='http://foo'/>", 0

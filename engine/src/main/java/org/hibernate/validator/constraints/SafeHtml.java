@@ -115,7 +115,7 @@ public @interface SafeHtml {
 		/**
 		 * @return list of attribute protocols which are whitelisted.
 		 */
-		String[] protocols() default { };
+		String[] protocols();
 	}
 
 	/**
