@@ -219,8 +219,8 @@ public class SafeHtmlValidatorTest {
 		@SafeHtml(
 				whitelistType = WhiteListType.BASIC,
 				additionalTagsWithAttributes = {
-						@SafeHtml.Tag(name = "img", additionalAttributesWithProtocols = @SafeHtml.Attribute(name = "src", protocols = { "data" })),
-						@SafeHtml.Tag(name = "custom", additionalAttributesWithProtocols = {
+						@SafeHtml.Tag(name = "img", attributesWithProtocols = @SafeHtml.Attribute(name = "src", protocols = { "data" })),
+						@SafeHtml.Tag(name = "custom", attributesWithProtocols = {
 								@SafeHtml.Attribute(name = "attr1", protocols = { "dataprotocol", "strange_protocol" }),
 								@SafeHtml.Attribute(name = "attr2", protocols = { "dataprotocol", "strange_protocol" }),
 								@SafeHtml.Attribute(name = "attr3", protocols = "some_protocol")

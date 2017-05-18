@@ -61,7 +61,7 @@ public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequ
 				whitelist.addAttributes( tag.name(), tag.attributes() );
 			}
 
-			for ( SafeHtml.Attribute attribute : tag.additionalAttributesWithProtocols() ) {
+			for ( SafeHtml.Attribute attribute : tag.attributesWithProtocols() ) {
 				whitelist.addAttributes( tag.name(), attribute.name() );
 
 				if ( attribute.protocols().length > 0 ) {
