@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.ContainerElementNodeBuilderCustomizableContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderDefinedContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeContextBuilder;
@@ -226,6 +227,11 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 				propertyPath = propertyPath.getPathWithoutLeafNode();
 			}
 		}
+
+		@Override
+		public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
+			throw new UnsupportedOperationException( "HV-1340 - Not implemented yet" );
+		}
 	}
 
 	private class NodeBuilder extends NodeBuilderBase
@@ -249,6 +255,11 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
 			return new DeferredNodeBuilder( messageTemplate, propertyPath, null );
+		}
+
+		@Override
+		public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
+			throw new UnsupportedOperationException( "HV-1340 - Not implemented yet" );
 		}
 	}
 
@@ -317,6 +328,16 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 			else {
 				propertyPath.addPropertyNode( leafNodeName );
 			}
+		}
+
+		@Override
+		public DeferredNodeBuilder inContainer(Class<?> containerClass, Integer typeArgumentIndex) {
+			throw new UnsupportedOperationException( "HV-1340 - Not implemented yet" );
+		}
+
+		@Override
+		public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
+			throw new UnsupportedOperationException( "HV-1340 - Not implemented yet" );
 		}
 	}
 }
