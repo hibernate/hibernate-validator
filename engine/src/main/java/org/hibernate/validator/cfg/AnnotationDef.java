@@ -22,6 +22,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Base class for all annotation definition types.
+ * <p>
+ * Note that any protected member in this type and its subtypes are not part of the public API and are only meant for internal use.
  *
  * @param <C> The type of a concrete sub type. Following to the
  * "self referencing generic type" pattern each sub type has to be
@@ -134,7 +136,9 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 
 	@SuppressWarnings("unchecked")
 	private <T> T[] toAnnotationParameterArray(List<AnnotationDef<?, ?>> list, Class<T> aClass) {
-		return list.stream().map( AnnotationDef::createAnnotationProxy ).toArray( n -> (T[]) Array.newInstance( aClass, n ) );
+		return list.stream()
+				.map( AnnotationDef::createAnnotationProxy )
+				.toArray( n -> (T[]) Array.newInstance( aClass, n ) );
 	}
 
 	@SuppressWarnings("unchecked")
