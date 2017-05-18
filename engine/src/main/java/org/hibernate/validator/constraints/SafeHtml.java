@@ -60,7 +60,7 @@ public @interface SafeHtml {
 	String[] additionalTags() default { };
 
 	/**
-	 * @return Allows to specify additional whitelist tags with optional attributes.
+	 * @return Allows to specify additional whitelist tags with optional attributes and protocols.
 	 */
 	Tag[] additionalTagsWithAttributes() default { };
 
@@ -89,6 +89,31 @@ public @interface SafeHtml {
 		 * @return list of tag attributes which are whitelisted.
 		 */
 		String[] attributes() default { };
+
+		/**
+		 * @return list of tag attributes with corresponding allowed protocols which are whitelisted.
+		 * @since 6.0
+		 */
+		Attribute[] additionalAttributesWithProtocols() default { };
+
+		/**
+		 * Allows to specify attribute with whitelisted protocols.
+		 * @since 6.0
+		 */
+		@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+		@Retention(RUNTIME)
+		@Documented @interface Attribute {
+			/**
+			 * @return the attribute name to whitelist.
+			 */
+			String name();
+
+			/**
+			 * @return list of attribute protocols which are whitelisted.
+			 */
+			String[] protocols() default { };
+
+		}
 	}
 
 	/**
