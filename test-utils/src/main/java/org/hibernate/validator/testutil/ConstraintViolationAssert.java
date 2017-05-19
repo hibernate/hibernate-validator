@@ -232,6 +232,16 @@ public final class ConstraintViolationAssert {
 	}
 
 	/**
+	 * Asserts that the path matches the expected path.
+	 *
+	 * @param path The path under test
+	 * @param expectedPath The expected path
+	 */
+	public static void assertPathEquals(Path path, PathExpectation expectedPath) {
+		assertEquals( new PathExpectation( path ), expectedPath, "Path does not match" );
+	}
+
+	/**
 	 * Checks that two property paths are equal.
 	 *
 	 * @param p1 The first property path.

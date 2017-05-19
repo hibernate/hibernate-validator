@@ -17,6 +17,8 @@ import java.util.Map;
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.ContainerElementNodeBuilderCustomizableContext;
+import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.ContainerElementNodeBuilderDefinedContext;
+import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.ContainerElementNodeContextBuilder;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderDefinedContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeContextBuilder;
@@ -196,12 +198,12 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		public NodeBuilderCustomizableContext addPropertyNode(String name) {
 			dropLeafNodeIfRequired();
 
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, name );
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, name, ElementKind.PROPERTY );
 		}
 
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, null );
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, null, ElementKind.BEAN );
 		}
 
 		@Override
@@ -216,6 +218,13 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 			return new NodeBuilder( messageTemplate, propertyPath );
 		}
 
+		@Override
+		public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
+			dropLeafNodeIfRequired();
+
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, name, containerType, typeArgumentIndex );
+		}
+
 		/**
 		 * In case nodes are added from within a class-level or cross-parameter
 		 * constraint, the node representing the constraint element will be
@@ -227,15 +236,10 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 				propertyPath = propertyPath.getPathWithoutLeafNode();
 			}
 		}
-
-		@Override
-		public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
-			throw new UnsupportedOperationException( "HV-1340 - Not implemented yet" );
-		}
 	}
 
 	private class NodeBuilder extends NodeBuilderBase
-			implements NodeBuilderDefinedContext, LeafNodeBuilderDefinedContext {
+			implements NodeBuilderDefinedContext, LeafNodeBuilderDefinedContext, ContainerElementNodeBuilderDefinedContext {
 
 		private NodeBuilder(String template, PathImpl path) {
 			super( template, path );
@@ -249,33 +253,57 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		@Override
 		public NodeBuilderCustomizableContext addPropertyNode(String name) {
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, name );
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, name, ElementKind.PROPERTY );
 		}
 
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, null );
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, null, ElementKind.BEAN );
 		}
 
 		@Override
 		public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
-			throw new UnsupportedOperationException( "HV-1340 - Not implemented yet" );
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, name, containerType, typeArgumentIndex );
 		}
 	}
 
 	private class DeferredNodeBuilder extends NodeBuilderBase
-			implements NodeBuilderCustomizableContext, LeafNodeBuilderCustomizableContext, NodeContextBuilder, LeafNodeContextBuilder {
+			implements NodeBuilderCustomizableContext, LeafNodeBuilderCustomizableContext, NodeContextBuilder, LeafNodeContextBuilder,
+			ContainerElementNodeBuilderCustomizableContext, ContainerElementNodeContextBuilder {
 
 		private final String leafNodeName;
 
-		private DeferredNodeBuilder(String template, PathImpl path, String nodeName) {
+		private final ElementKind leafNodeKind;
+
+		private final Class<?> leafNodeContainerType;
+
+		private final Integer leafNodeTypeArgumentIndex;
+
+		private DeferredNodeBuilder(String template, PathImpl path, String nodeName, ElementKind leafNodeKind) {
 			super( template, path );
 			this.leafNodeName = nodeName;
+			this.leafNodeKind = leafNodeKind;
+			this.leafNodeContainerType = null;
+			this.leafNodeTypeArgumentIndex = null;
+		}
+
+		private DeferredNodeBuilder(String template, PathImpl path, String nodeName, Class<?> leafNodeContainerType, Integer leafNodeTypeArgumentIndex) {
+			super( template, path );
+			this.leafNodeName = nodeName;
+			this.leafNodeKind = ElementKind.CONTAINER_ELEMENT;
+			this.leafNodeContainerType = leafNodeContainerType;
+			this.leafNodeTypeArgumentIndex = leafNodeTypeArgumentIndex;
 		}
 
 		@Override
 		public DeferredNodeBuilder inIterable() {
 			propertyPath.makeLeafNodeIterable();
+			return this;
+		}
+
+		@Override
+		public DeferredNodeBuilder inContainer(Class<?> containerClass, Integer typeArgumentIndex) {
+			propertyPath.setLeafNodeTypeParameter( containerClass, typeArgumentIndex );
 			return this;
 		}
 
@@ -302,13 +330,19 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		@Override
 		public NodeBuilderCustomizableContext addPropertyNode(String name) {
 			addLeafNode();
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, name );
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, name, ElementKind.PROPERTY );
+		}
+
+		@Override
+		public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
+			addLeafNode();
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, name, containerType, typeArgumentIndex );
 		}
 
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
 			addLeafNode();
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, null );
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, null, ElementKind.BEAN );
 		}
 
 		@Override
@@ -322,22 +356,20 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		 * property node.
 		 */
 		private void addLeafNode() {
-			if ( leafNodeName == null ) {
-				propertyPath.addBeanNode();
+			switch ( leafNodeKind ) {
+				case BEAN:
+					propertyPath.addBeanNode();
+					break;
+				case PROPERTY:
+					propertyPath.addPropertyNode( leafNodeName );
+					break;
+				case CONTAINER_ELEMENT:
+					propertyPath.setLeafNodeTypeParameter( leafNodeContainerType, leafNodeTypeArgumentIndex );
+					propertyPath.addContainerElementNode( leafNodeName );
+					break;
+				default:
+					throw new IllegalStateException( "Unsupported node kind: " + leafNodeKind );
 			}
-			else {
-				propertyPath.addPropertyNode( leafNodeName );
-			}
-		}
-
-		@Override
-		public DeferredNodeBuilder inContainer(Class<?> containerClass, Integer typeArgumentIndex) {
-			throw new UnsupportedOperationException( "HV-1340 - Not implemented yet" );
-		}
-
-		@Override
-		public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
-			throw new UnsupportedOperationException( "HV-1340 - Not implemented yet" );
 		}
 	}
 }
