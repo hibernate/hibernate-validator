@@ -107,6 +107,10 @@ public class ValidationExtension implements Extension {
 
 	public ValidationExtension() {
 		Configuration<?> config = Validation.byDefaultProvider().configure();
+		// we use the default ParameterNameProvider here as we cannot use the injected one
+		// as it hasn't been turned into a managed bean yet and might not be able to
+		// return a parameter name. At this stage, we don't care about the parameter names.
+		config.parameterNameProvider( config.getDefaultParameterNameProvider() );
 		BootstrapConfiguration bootstrap = config.getBootstrapConfiguration();
 		globalExecutableTypes = bootstrap.getDefaultValidatedExecutableTypes();
 		isExecutableValidationEnabled = bootstrap.isExecutableValidationEnabled();
