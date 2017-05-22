@@ -6,6 +6,13 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE_USE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
@@ -14,6 +21,9 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,12 +31,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;
 import javax.validation.GroupSequence;
+import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.executable.ExecutableValidator;
@@ -263,6 +278,15 @@ public class ValidatorTest {
 		validator.validateProperty( someM, "foo.baz" );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1341")
+	public void testValidatePropertyInPresenceOfClassLevelConstraint() {
+		Validator validator = getValidator();
+
+		Set<ConstraintViolation<WithClassLevelConstraint>> violations = validator.validateValue( WithClassLevelConstraint.class, "someProperty", Integer.valueOf( -1 ) );
+		assertCorrectPropertyPaths( violations, "someProperty" );
+	}
+
 	class A {
 		@NotNull
 		String b;
@@ -426,5 +450,37 @@ public class ValidatorTest {
 	class Z {
 		@NotNull
 		String foo;
+	}
+
+	@ClassLevelConstraint
+	class WithClassLevelConstraint {
+
+		@Min(1)
+		Integer someProperty;
+	}
+
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
+	@Retention(RUNTIME)
+	@Repeatable(ClassLevelConstraint.List.class)
+	@Constraint( validatedBy = ClassLevelConstraint.Validator.class )
+	public @interface ClassLevelConstraint {
+
+		String message() default "Invalid order shipment date must be after order date";
+		Class<?>[] groups() default {};
+		Class<? extends Payload>[] payload() default {};
+
+		@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
+		@Retention(RUNTIME)
+		@interface List {
+			ClassLevelConstraint[] value();
+		}
+
+		class Validator implements ConstraintValidator<ClassLevelConstraint, WithClassLevelConstraint> {
+
+			@Override
+			public boolean isValid(WithClassLevelConstraint value, ConstraintValidatorContext context) {
+				return false;
+			}
+		}
 	}
 }

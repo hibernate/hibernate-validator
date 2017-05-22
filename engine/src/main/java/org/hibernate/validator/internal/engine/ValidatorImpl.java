@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.validation.ClockProvider;
@@ -1301,11 +1302,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ValueContext<?, ?> valueContext,
 			MetaConstraint<?> metaConstraint) {
 		// validateProperty()/validateValue() call, but this constraint is for another property
-		if ( validationContext.getValidatedProperty() != null ) {
-			String propertyName = getPropertyName( metaConstraint.getLocation() );
-			if ( propertyName != null && !propertyName.equals( validationContext.getValidatedProperty() ) ) {
+		if ( validationContext.getValidatedProperty() != null &&
+				!Objects.equals( validationContext.getValidatedProperty(), getPropertyName( metaConstraint.getLocation() ) ) ) {
 				return false;
-			}
 		}
 		if ( validationContext.hasMetaConstraintBeenProcessed(
 				valueContext.getCurrentBean(),
