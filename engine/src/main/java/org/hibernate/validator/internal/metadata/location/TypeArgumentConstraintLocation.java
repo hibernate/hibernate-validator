@@ -29,6 +29,7 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 	private final Type typeForValidatorResolution;
 	private final Type containerType;
 	private final ConstraintLocation outerDelegate;
+	private final int hashCode;
 
 	TypeArgumentConstraintLocation(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type typeOfAnnotatedElement) {
 		this.delegate = delegate;
@@ -41,6 +42,7 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 			outerDelegate = ( (TypeArgumentConstraintLocation) outerDelegate ).delegate;
 		}
 		this.outerDelegate = outerDelegate;
+		this.hashCode = buildHashCode( delegate, typeParameter );
 	}
 
 	@Override
@@ -101,10 +103,10 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 
 		TypeArgumentConstraintLocation that = (TypeArgumentConstraintLocation) o;
 
-		if ( delegate != null ? !delegate.equals( that.delegate ) : that.delegate != null ) {
+		if ( !typeParameter.equals( that.typeParameter ) ) {
 			return false;
 		}
-		if ( !typeForValidatorResolution.equals( that.typeForValidatorResolution ) ) {
+		if ( !delegate.equals( that.delegate ) ) {
 			return false;
 		}
 
@@ -113,8 +115,12 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public int hashCode() {
-		int result = delegate != null ? delegate.hashCode() : 0;
-		result = 31 * result + typeForValidatorResolution.hashCode();
+		return hashCode;
+	}
+
+	private static int buildHashCode(ConstraintLocation delegate, TypeVariable<?> typeParameter) {
+		int result = delegate.hashCode();
+		result = 31 * result + typeParameter.hashCode();
 		return result;
 	}
 }

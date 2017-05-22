@@ -7,6 +7,8 @@
 package org.hibernate.validator.test.internal.engine.cascaded;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +18,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.HibernateValidator;
@@ -83,6 +86,25 @@ public class MapExtractorTest {
 		assertCorrectPropertyPaths( violations, "addressByType<K>[too short].<map key>", "addressByType<K>[too small].<map key>", "addressByType[long enough].<map value>" );
 	}
 
+	@Test
+	public void testSameConstraintTypesForKeyAndValue() {
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.buildValidatorFactory()
+				.getValidator();
+
+		Set<ConstraintViolation<Foo>> violations = validator.validate( Foo.invalid() );
+
+		assertThat( violations ).containsOnlyPaths(
+				pathWith()
+						.property( "property" )
+						.containerElement( "<map key>", true, null, null, Map.class, 0 ),
+				pathWith()
+						.property( "property" )
+						.containerElement( "<map value>", true, null, null, Map.class, 1 )
+		);
+	}
+
 	private static class CustomerWithCascadingKeys {
 
 		Map<@Valid AddressType, String> addressByType;
@@ -128,6 +150,17 @@ public class MapExtractorTest {
 			addressByType.put( new AddressType( "too short" ), new EmailAddress( "work@bob.de" ) );
 			addressByType.put( new AddressType( "too small" ), new EmailAddress( "invalid" ) );
 			addressByType.put( new AddressType( "long enough" ), new EmailAddress( "alsoinvalid" ) );
+		}
+	}
+
+	private static class Foo {
+
+		private final Map<@NotNull String, @NotNull String> property = new HashMap<>();
+
+		private static Foo invalid() {
+			Foo foo = new Foo();
+			foo.property.put( null, null );
+			return foo;
 		}
 	}
 }
