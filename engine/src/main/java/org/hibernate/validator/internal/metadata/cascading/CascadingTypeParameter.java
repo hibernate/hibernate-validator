@@ -10,15 +10,20 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
+import org.hibernate.validator.internal.util.TypeVariableBindings;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
@@ -99,7 +104,16 @@ public class CascadingTypeParameter {
 
 	public static CascadingTypeParameter annotatedObject(Type cascadableType, boolean cascading,
 			Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
-		return new CascadingTypeParameter( cascadableType, AnnotatedObject.INSTANCE, cascading, containerElementTypesCascadingMetaData, groupConversions );
+		Map<TypeVariable<?>, CascadingTypeParameter> amendedContainerElementsCascadingMetaData;
+		if ( cascading ) {
+			amendedContainerElementsCascadingMetaData = addPotentialLegacyCascadingMetaData( cascadableType, containerElementTypesCascadingMetaData,
+					groupConversions );
+		}
+		else {
+			amendedContainerElementsCascadingMetaData = containerElementTypesCascadingMetaData;
+		}
+
+		return new CascadingTypeParameter( cascadableType, AnnotatedObject.INSTANCE, cascading, amendedContainerElementsCascadingMetaData, groupConversions );
 	}
 
 	public static CascadingTypeParameter arrayElement(Type cascadableType, boolean cascading,
@@ -235,5 +249,70 @@ public class CascadingTypeParameter {
 		mergedGroupConversions.putAll( otherGroupConversions );
 
 		return mergedGroupConversions;
+	}
+
+	private static Map<TypeVariable<?>, CascadingTypeParameter> addPotentialLegacyCascadingMetaData(Type cascadableType,
+			Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
+		Class<?> cascadableClass = ReflectionHelper.getClassFromType( cascadableType );
+
+		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> map = TypeVariableBindings.getTypeVariableBindings( cascadableClass );
+		map.get( List.class );
+
+		if ( Map.class.isAssignableFrom( cascadableClass ) ) {
+			return addLegacyCascadingMetaData( cascadableClass, Map.class, 1, containerElementTypesCascadingMetaData, groupConversions );
+		}
+		else if ( List.class.isAssignableFrom( cascadableClass ) ) {
+			return addLegacyCascadingMetaData( cascadableClass, List.class, 0, containerElementTypesCascadingMetaData, groupConversions );
+		}
+		else if ( Iterable.class.isAssignableFrom( cascadableClass ) ) {
+			return addLegacyCascadingMetaData( cascadableClass, Iterable.class, 0, containerElementTypesCascadingMetaData, groupConversions );
+		}
+		else if ( Optional.class.isAssignableFrom( cascadableClass ) ) {
+			return addLegacyCascadingMetaData( cascadableClass, Optional.class, 0, containerElementTypesCascadingMetaData, groupConversions );
+		}
+		else {
+			return containerElementTypesCascadingMetaData;
+		}
+	}
+
+	private static Map<TypeVariable<?>, CascadingTypeParameter> addLegacyCascadingMetaData(final Class<?> enclosingType, Class<?> referenceType,
+			int typeParameterIndex, Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData,
+			Map<Class<?>, Class<?>> groupConversions) {
+		// we try to find a corresponding type parameter in the current cascadable type
+		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> typeVariableBindings = TypeVariableBindings.getTypeVariableBindings( enclosingType );
+		TypeVariable<?> cascadableTypeParameter = typeVariableBindings.get( referenceType ).entrySet().stream()
+				.filter( e -> Objects.equals( e.getKey().getGenericDeclaration(), enclosingType ) )
+				.collect( Collectors.toMap( Map.Entry::getValue, Map.Entry::getKey ) )
+				.get( referenceType.getTypeParameters()[typeParameterIndex] );
+
+		Class<?> cascadableClass;
+		if ( cascadableTypeParameter != null ) {
+			cascadableClass = enclosingType;
+		}
+		else {
+			// if we can't find one, we default to the reference type (e.g. List.class for instance)
+			cascadableClass = referenceType;
+			cascadableTypeParameter = referenceType.getTypeParameters()[typeParameterIndex];
+		}
+
+		Map<TypeVariable<?>, CascadingTypeParameter> amendedCascadingMetadata = CollectionHelper.newHashMap( containerElementTypesCascadingMetaData.size() + 1 );
+		amendedCascadingMetadata.putAll( containerElementTypesCascadingMetaData );
+
+		if ( containerElementTypesCascadingMetaData.containsKey( cascadableTypeParameter ) ) {
+			amendedCascadingMetadata.put( cascadableTypeParameter,
+					makeCascading( containerElementTypesCascadingMetaData.get( cascadableTypeParameter ), groupConversions ) );
+		}
+		else {
+			amendedCascadingMetadata.put( cascadableTypeParameter,
+					new CascadingTypeParameter( cascadableClass, cascadableTypeParameter, true, Collections.emptyMap(), groupConversions ) );
+		}
+
+		return amendedCascadingMetadata;
+	}
+
+	private static CascadingTypeParameter makeCascading(CascadingTypeParameter cascadingTypeParameter, Map<Class<?>, Class<?>> groupConversions) {
+		return new CascadingTypeParameter( cascadingTypeParameter.enclosingType, cascadingTypeParameter.typeParameter, true,
+				cascadingTypeParameter.containerElementTypesCascadingMetaData,
+				cascadingTypeParameter.groupConversions.isEmpty() ? groupConversions : cascadingTypeParameter.groupConversions );
 	}
 }
