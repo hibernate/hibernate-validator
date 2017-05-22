@@ -237,7 +237,7 @@ public class ValidatorTest {
 		assertCorrectPropertyPaths( constraintViolationsI, "map[bar].foo" );
 
 		K someK = new K();
-		someK.foo = new L<String>();
+		someK.foo = new L<>();
 		Set<ConstraintViolation<K>> constraintViolationsK = validator.validateProperty( someK, "foo.bar" );
 		assertNumberOfViolations( constraintViolationsK, 1 );
 		assertCorrectPropertyPaths( constraintViolationsK, "foo.bar" );
@@ -356,7 +356,7 @@ public class ValidatorTest {
 		private final Collection<Bar> bar;
 
 		public Foo() {
-			bar = new ArrayList<Bar>();
+			bar = new ArrayList<>();
 			bar.add( new Bar() );
 		}
 	}
@@ -377,7 +377,7 @@ public class ValidatorTest {
 
 	class I {
 		@Valid
-		Map<String, J> map = new HashMap<String, J>();
+		Map<String, J> map = new HashMap<>();
 
 		public void putJ(String key, J j) {
 			map.put( key, j );
@@ -416,7 +416,7 @@ public class ValidatorTest {
 
 	class X {
 		@Valid
-		List<Z> list = new ArrayList<Z>();
+		List<Z> list = new ArrayList<>();
 
 		public void addZ(Z z) {
 			list.add( z );
