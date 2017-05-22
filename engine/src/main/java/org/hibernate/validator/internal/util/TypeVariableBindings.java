@@ -63,14 +63,19 @@ public class TypeVariableBindings {
 			Type[] typeArguments = ( (ParameterizedType) genericSuperType ).getActualTypeArguments();
 			TypeVariable<?>[] typeParameters = ( (Class<?>) ( (ParameterizedType) genericSuperType ).getRawType() ).getTypeParameters();
 
-			for ( Entry<TypeVariable<?>, TypeVariable<?>> subTypeParameter : bindings.entrySet() ) {
-				for ( int i = 0; i < typeArguments.length; i++ ) {
-					Type typeArgument = typeArguments[i];
-					TypeVariable<?> typeParameter = typeParameters[i];
+			for ( int i = 0; i < typeArguments.length; i++ ) {
+				Type typeArgument = typeArguments[i];
+				TypeVariable<?> typeParameter = typeParameters[i];
 
+				boolean typeParameterFoundInSubType = false;
+				for ( Entry<TypeVariable<?>, TypeVariable<?>> subTypeParameter : bindings.entrySet() ) {
 					if ( typeArgument.equals( subTypeParameter.getValue() ) ) {
 						newBindings.put( subTypeParameter.getKey(), typeParameter );
+						typeParameterFoundInSubType = true;
 					}
+				}
+				if ( !typeParameterFoundInSubType ) {
+					newBindings.put( typeParameter, typeParameter );
 				}
 			}
 
