@@ -24,3 +24,5 @@ org.assertj.core.api.Assertions#fail()
 ################################################################################################################
 # Nobody should be using StringBuffer anymore
 java.lang.StringBuffer
+
+org.jboss.logging.processor.util.Objects
