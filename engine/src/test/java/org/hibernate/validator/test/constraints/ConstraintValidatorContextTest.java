@@ -131,10 +131,10 @@ public class ConstraintValidatorContextTest {
 		Set<ConstraintViolation<FooContainer>> constraintViolations = validator.validate( new FooContainer() );
 
 		assertThat( constraintViolations ).containsPaths(
-				pathWith().property( "fooList" ).property( "myNode1", true, null, 1 ),
+				pathWith().property( "fooList" ).property( "myNode1", true, null, 1, List.class, 0 ),
 				pathWith().property( "fooArray" ).property( "myNode1", true, null, 1, java.lang.Object[].class, null ),
-				pathWith().property( "fooSet" ).property( "myNode1", true, null, null ),
-				pathWith().property( "fooMap" ).property( "myNode1", true, "MapKey", null )
+				pathWith().property( "fooSet" ).property( "myNode1", true, null, null, Set.class, 0 ),
+				pathWith().property( "fooMap" ).property( "myNode1", true, "MapKey", null, Map.class, 1 )
 		);
 	}
 
