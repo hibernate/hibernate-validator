@@ -68,14 +68,11 @@ public class ValueExtractorManager {
 		specDefinedExtractors.add( BooleanArrayValueExtractor.DESCRIPTOR );
 		specDefinedExtractors.add( ObjectArrayValueExtractor.DESCRIPTOR );
 
-		specDefinedExtractors.add( LegacyListValueExtractor.DESCRIPTOR );
 		specDefinedExtractors.add( ListValueExtractor.DESCRIPTOR );
 
-		specDefinedExtractors.add( LegacyMapValueExtractor.DESCRIPTOR );
 		specDefinedExtractors.add( MapValueExtractor.DESCRIPTOR );
 		specDefinedExtractors.add( MapKeyExtractor.DESCRIPTOR );
 
-		specDefinedExtractors.add( LegacyIterableValueExtractor.DESCRIPTOR );
 		specDefinedExtractors.add( IterableValueExtractor.DESCRIPTOR );
 
 		specDefinedExtractors.add( OptionalValueExtractor.DESCRIPTOR );
@@ -98,8 +95,6 @@ public class ValueExtractorManager {
 		for ( ValueExtractorDescriptor descriptor : SPEC_DEFINED_EXTRACTORS ) {
 			tmpValueExtractors.put( descriptor.getKey(), descriptor );
 		}
-
-		tmpValueExtractors.put( LegacyOptionalValueExtractor.DESCRIPTOR.getKey(), LegacyOptionalValueExtractor.DESCRIPTOR );
 
 		// then any custom ones, overriding the built-in ones
 		for ( ValueExtractor<?> valueExtractor : externalExtractors ) {

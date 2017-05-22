@@ -29,7 +29,6 @@ import javax.validation.valueextraction.ValueExtractorDeclarationException;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -197,7 +196,7 @@ public class CustomValueExtractorTest {
 			.collect( Collectors.toSet() );
 
 		assertThat( mapExtractors ).containsOnly(
-				Map.class.getTypeParameters()[0], Map.class.getTypeParameters()[1], AnnotatedObject.INSTANCE  );
+				Map.class.getTypeParameters()[0], Map.class.getTypeParameters()[1] );
 
 		Set<TypeVariable<?>> optionalExtractors = defaultExtractors.stream()
 			.filter( e -> {
@@ -206,9 +205,7 @@ public class CustomValueExtractorTest {
 			.map( e ->  new ValueExtractorDescriptor( e ).getExtractedTypeParameter() )
 			.collect( Collectors.toSet() );
 
-		assertThat( optionalExtractors ).describedAs( "Expecting extractor for <T>, but not the legacy extractor for java.util.Optional" )
-			. containsOnly( java.util.Optional.class.getTypeParameters()
-		);
+		assertThat( optionalExtractors ).containsOnly( java.util.Optional.class.getTypeParameters() );
 
 		Set<TypeVariable<?>> guavaOptionalExtractors = defaultExtractors.stream()
 			.filter( e -> {
