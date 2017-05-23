@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,6 +24,7 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
+import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
@@ -39,7 +40,7 @@ public class CascadingTypeParameter {
 	private static final Log LOG = LoggerFactory.make();
 
 	private static final CascadingTypeParameter NON_CASCADING =
-			new CascadingTypeParameter( null, null, false, Collections.emptyMap(), Collections.emptyMap() );
+			new CascadingTypeParameter( null, null, null, null, false, Collections.emptyMap(), Collections.emptyMap() );
 
 	/**
 	 * The enclosing type that defines this type parameter.
@@ -50,6 +51,16 @@ public class CascadingTypeParameter {
 	 * The type parameter.
 	 */
 	private final TypeVariable<?> typeParameter;
+
+	/**
+	 * The declared container class: it is the one used in the node of the property path.
+	 */
+	private final Class<?> declaredContainerClass;
+
+	/**
+	 * The declared type parameter: it is the one used in the node of the property path.
+	 */
+	private final TypeVariable<?> declaredTypeParameter;
 
 	/**
 	 * Possibly the cascading type parameters corresponding to this type parameter if it is a parameterized type.
@@ -80,8 +91,18 @@ public class CascadingTypeParameter {
 
 	public CascadingTypeParameter(Type enclosingType, TypeVariable<?> typeParameter, boolean cascading,
 			Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
+		this( enclosingType, typeParameter,
+				TypeVariables.getContainerClass( typeParameter ), TypeVariables.getActualTypeParameter( typeParameter ),
+				cascading, containerElementTypesCascadingMetaData, groupConversions );
+	}
+
+	private CascadingTypeParameter(Type enclosingType, TypeVariable<?> typeParameter, Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter,
+			boolean cascading, Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData,
+			Map<Class<?>, Class<?>> groupConversions) {
 		this.enclosingType = enclosingType;
 		this.typeParameter = typeParameter;
+		this.declaredContainerClass = declaredContainerClass;
+		this.declaredTypeParameter = declaredTypeParameter;
 		this.cascading = cascading;
 		this.groupConversions = CollectionHelper.toImmutableMap( groupConversions );
 		this.containerElementTypesCascadingMetaData = CollectionHelper.toImmutableMap( containerElementTypesCascadingMetaData );
@@ -128,6 +149,14 @@ public class CascadingTypeParameter {
 
 	public Type getEnclosingType() {
 		return enclosingType;
+	}
+
+	public Class<?> getDeclaredContainerClass() {
+		return declaredContainerClass;
+	}
+
+	public TypeVariable<?> getDeclaredTypeParameter() {
+		return declaredTypeParameter;
 	}
 
 	public boolean isCascading() {
@@ -280,14 +309,16 @@ public class CascadingTypeParameter {
 			Map<Class<?>, Class<?>> groupConversions) {
 		// we try to find a corresponding type parameter in the current cascadable type
 		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> typeVariableBindings = TypeVariableBindings.getTypeVariableBindings( enclosingType );
-		TypeVariable<?> cascadableTypeParameter = typeVariableBindings.get( referenceType ).entrySet().stream()
+		final TypeVariable<?> correspondingTypeParameter = typeVariableBindings.get( referenceType ).entrySet().stream()
 				.filter( e -> Objects.equals( e.getKey().getGenericDeclaration(), enclosingType ) )
 				.collect( Collectors.toMap( Map.Entry::getValue, Map.Entry::getKey ) )
 				.get( referenceType.getTypeParameters()[typeParameterIndex] );
 
 		Class<?> cascadableClass;
-		if ( cascadableTypeParameter != null ) {
+		TypeVariable<?> cascadableTypeParameter;
+		if ( correspondingTypeParameter != null ) {
 			cascadableClass = enclosingType;
+			cascadableTypeParameter = correspondingTypeParameter;
 		}
 		else {
 			// if we can't find one, we default to the reference type (e.g. List.class for instance)
@@ -304,7 +335,8 @@ public class CascadingTypeParameter {
 		}
 		else {
 			amendedCascadingMetadata.put( cascadableTypeParameter,
-					new CascadingTypeParameter( cascadableClass, cascadableTypeParameter, true, Collections.emptyMap(), groupConversions ) );
+					new CascadingTypeParameter( cascadableClass, cascadableTypeParameter, enclosingType, correspondingTypeParameter, true,
+							Collections.emptyMap(), groupConversions ) );
 		}
 
 		return amendedCascadingMetadata;

@@ -708,7 +708,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
 
 			if ( cascadingMetaData.getTypeParameter() != null ) {
-				cascadedValueContext.setTypeParameter( cascadingMetaData.getTypeParameter() );
+				cascadedValueContext.setTypeParameter( cascadingMetaData.getDeclaredContainerClass(), cascadingMetaData.getDeclaredTypeParameter() );
 			}
 
 			// Cascade validation
@@ -720,7 +720,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			if ( !annotatedObject && cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements() ) {
 				ValueContext<?, Object> cascadedTypeArgumentValueContext = buildNewLocalExecutionContext( valueContext, value );
 				if ( cascadingMetaData.getTypeParameter() != null ) {
-					cascadedValueContext.setTypeParameter( cascadingMetaData.getTypeParameter() );
+					cascadedValueContext.setTypeParameter( cascadingMetaData.getDeclaredContainerClass(), cascadingMetaData.getDeclaredTypeParameter() );
 				}
 
 				if ( nodeName != null ) {

@@ -11,6 +11,7 @@ import java.lang.reflect.TypeVariable;
 
 import javax.validation.groups.Default;
 
+import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -170,16 +171,24 @@ public class ValueContext<T, V> {
 		propertyPath.setLeafNodeIndex( index );
 	}
 
-	public final void setTypeParameter(TypeVariable<?> typeParameter) {
-		if ( TypeVariables.isAnnotatedObject( typeParameter ) ) {
+	/**
+	 * Sets the container element information.
+	 *
+	 * @param containerClass the class of the container
+	 * @param typeParameter the actual type parameter (i.e. not one of our internal type parameters)
+	 *
+	 * @see TypeVariables#getContainerClass(TypeVariable)
+	 * @see TypeVariables#getActualTypeParameter(TypeVariable)
+	 * @see AnnotatedObject
+	 * @see ArrayElement
+	 */
+	public final void setTypeParameter(Class<?> containerClass, TypeVariable<?> typeParameter) {
+		if ( containerClass == null ) {
 			return;
 		}
-		else if ( TypeVariables.isArrayElement( typeParameter ) ) {
-			propertyPath.setLeafNodeTypeParameter( ( (ArrayElement) typeParameter ).getContainerClass(), null );
-		}
-		else {
-			propertyPath.setLeafNodeTypeParameter( TypeVariables.getDeclaringClass( typeParameter ), TypeVariables.getTypeParameterIndex( typeParameter ) );
-		}
+
+		propertyPath.setLeafNodeTypeParameter( containerClass,
+				typeParameter != null ? TypeVariables.getTypeParameterIndex( typeParameter ) : null );
 	}
 
 	public final void setCurrentGroup(Class<?> currentGroup) {
