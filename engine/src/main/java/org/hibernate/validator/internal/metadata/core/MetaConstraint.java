@@ -24,6 +24,7 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.StringHelper;
+import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -213,7 +214,7 @@ public class MetaConstraint<A extends Annotation> {
 
 			TypeVariable<?> typeParameter = currentValueExtractionPathNode.getTypeParameter();
 			if ( typeParameter != null ) {
-				valueContext.setTypeParameter( typeParameter );
+				valueContext.setTypeParameter( TypeVariables.getContainerClass( typeParameter ), TypeVariables.getActualTypeParameter( typeParameter ) );
 			}
 
 			if ( nodeName != null ) {

@@ -40,6 +40,16 @@ public class CascadingMetaData {
 	private final TypeVariable<?> typeParameter;
 
 	/**
+	 * The declared container class: it is the one used in the node of the property path.
+	 */
+	private final Class<?> declaredContainerClass;
+
+	/**
+	 * The declared type parameter: it is the one used in the node of the property path.
+	 */
+	private final TypeVariable<?> declaredTypeParameter;
+
+	/**
 	 * Possibly the cascading type parameters corresponding to this type parameter if it is a parameterized type.
 	 */
 	@Immutable
@@ -68,6 +78,8 @@ public class CascadingMetaData {
 	public CascadingMetaData(CascadingTypeParameter cascadingMetaData) {
 		this.enclosingType = cascadingMetaData.getEnclosingType();
 		this.typeParameter = cascadingMetaData.getTypeParameter();
+		this.declaredContainerClass = cascadingMetaData.getDeclaredContainerClass();
+		this.declaredTypeParameter = cascadingMetaData.getDeclaredTypeParameter();
 		this.containerElementTypesCascadingMetaData = cascadingMetaData.getContainerElementTypesCascadingMetaData().entrySet().stream()
 				.map( entry -> new CascadingMetaData( entry.getValue() ) )
 				.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) );
@@ -83,6 +95,14 @@ public class CascadingMetaData {
 
 	public Type getEnclosingType() {
 		return enclosingType;
+	}
+
+	public Class<?> getDeclaredContainerClass() {
+		return declaredContainerClass;
+	}
+
+	public TypeVariable<?> getDeclaredTypeParameter() {
+		return declaredTypeParameter;
 	}
 
 	public boolean isCascading() {

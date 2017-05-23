@@ -25,6 +25,27 @@ public class TypeVariables {
 	private TypeVariables() {
 	}
 
+	public static Class<?> getContainerClass(TypeVariable<?> typeParameter) {
+		if ( isAnnotatedObject( typeParameter ) ) {
+			return null;
+		}
+		else if ( isArrayElement( typeParameter ) ) {
+			return ( (ArrayElement) typeParameter ).getContainerClass();
+		}
+		else {
+			return getDeclaringClass( typeParameter );
+		}
+	}
+
+	public static TypeVariable<?> getActualTypeParameter(TypeVariable<?> typeParameter) {
+		if ( isInternal( typeParameter ) ) {
+			return null;
+		}
+		else {
+			return typeParameter;
+		}
+	}
+
 	public static boolean isInternal(TypeVariable<?> typeParameter) {
 		return isAnnotatedObject( typeParameter ) || isArrayElement( typeParameter );
 	}
@@ -54,7 +75,7 @@ public class TypeVariables {
 		throw LOG.getUnableToFindTypeParameterInClass( (Class<?>) typeParameter.getGenericDeclaration(), typeParameter.getName() );
 	}
 
-	public static Class<?> getDeclaringClass(TypeVariable<?> typeParameter) {
+	private static Class<?> getDeclaringClass(TypeVariable<?> typeParameter) {
 		return (Class<?>) typeParameter.getGenericDeclaration();
 	}
 }

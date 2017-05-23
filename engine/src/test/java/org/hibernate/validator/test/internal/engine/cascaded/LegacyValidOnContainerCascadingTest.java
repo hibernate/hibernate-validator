@@ -61,6 +61,21 @@ public class LegacyValidOnContainerCascadingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1344")
+	public void testValidOnListWithoutTypeArgument() {
+		Validator validator = getValidator();
+		Set<ConstraintViolation<ValidOnListWithoutTypeArgument>> constraintViolations = validator.validate( ValidOnListWithoutTypeArgument.invalid() );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "visitors" )
+						.property( "listName" ),
+				pathWith()
+						.property( "visitors" )
+						.property( "name", true, null, 0, MyListWithoutTypeArgument.class, null )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1344")
 	public void testValidOnListAndOnTypeArgumentWithGroupConversions() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<ValidOnListAndOnTypeArgumentWithGroupConversions>> constraintViolations =
@@ -164,6 +179,31 @@ public class LegacyValidOnContainerCascadingTest {
 		private final String listName;
 
 		private MyList(String listName, List<E> elements) {
+			this.listName = listName;
+			addAll( elements );
+		}
+	}
+
+	private static class ValidOnListWithoutTypeArgument {
+
+		@Valid
+		private final MyListWithoutTypeArgument visitors;
+
+		private ValidOnListWithoutTypeArgument(MyListWithoutTypeArgument visitors) {
+			this.visitors = visitors;
+		}
+
+		private static ValidOnListWithoutTypeArgument invalid() {
+			return new ValidOnListWithoutTypeArgument( new MyListWithoutTypeArgument( null, Arrays.asList( new Visitor( null ) ) ) );
+		}
+	}
+
+	private static class MyListWithoutTypeArgument extends ArrayList<Visitor> {
+
+		@NotNull
+		private final String listName;
+
+		private MyListWithoutTypeArgument(String listName, List<Visitor> elements) {
 			this.listName = listName;
 			addAll( elements );
 		}
