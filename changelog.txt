@@ -1,6 +1,31 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.0.Beta2 (24-05-2017)
+-------------------------
+
+** Bug
+    * HV-1343 - engine        - TypeArgumentConstraintLocation equals/hashCode implementation is broken 
+    * HV-1342 - integration   - Use the default ParameterNameProvider in the startup stage of a CDI environment
+    * HV-1341 - engine        - Validator#validateValue on a class with constraints leads to a ClassCastException
+
+** Improvement
+    * HV-1344 - engine        - Change the way legacy @Valid on containers are handled
+    * HV-1339 - engine        - Add support for non parameterized type in value extraction
+    * HV-1335 - build         - Upgrade assertj-core to 3.7.0
+    * HV-1327 - documentation - Use hibernate-asciidoctor-extension for example numbering in documentation
+    * HV-1307 - validators    - SafeHtmlDef programmatic API should not use annotation proxies
+    * HV-1302 - validators    - @SafeHtml should support adding additional protocols
+    * HV-1300 - validators    - Split *ForNumber validators in an implementation per type
+
+** New Feature
+    * HV-1333 - integration   - ValueExtractors should be CDI-enabled
+
+** Task
+    * HV-1346 - build         - Upgrade Bean Validation API to 2.0.0.Beta2
+    * HV-1345 - tck-runner    - Upgrade TCK to 2.0.0.Beta2
+    * HV-1340 - engine        - Addition of container element nodes via the node builder API
+
 6.0.0.Beta1 (11-05-2017)
 -------------------------
 
