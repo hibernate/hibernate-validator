@@ -86,6 +86,16 @@ public class GroupConversionHelper {
 		}
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append( getClass().getSimpleName() );
+		sb.append( " [" );
+		sb.append( "groupConversions=" ).append( groupConversions );
+		sb.append( "]" );
+		return sb.toString();
+	}
+
 	private boolean isGroupSequence(Class<?> oneGroup) {
 		return oneGroup.isAnnotationPresent( GroupSequence.class );
 	}
