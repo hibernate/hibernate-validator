@@ -10,7 +10,6 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 
@@ -38,7 +37,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class PropertyPathAndStringRepresentationTest {
+public class ContainerElementPropertyPathTest {
 
 	private Validator validator;
 
@@ -54,7 +53,6 @@ public class PropertyPathAndStringRepresentationTest {
 
 		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statictics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[].<map key>" ); // the key is null, thus the '[]'
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -71,7 +69,6 @@ public class PropertyPathAndStringRepresentationTest {
 
 		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statictics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[null, Lyon].street" );
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -85,7 +82,6 @@ public class PropertyPathAndStringRepresentationTest {
 
 		constraintViolations = validator.validate( statictics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[rue Garibaldi, L].city.name" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -103,7 +99,6 @@ public class PropertyPathAndStringRepresentationTest {
 
 		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statictics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[rue Garibaldi, Lyon]" );
 		assertCorrectConstraintTypes( constraintViolations, ValidLyonZipCode.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -120,7 +115,6 @@ public class PropertyPathAndStringRepresentationTest {
 
 		Set<ConstraintViolation<State>> constraintViolations = validator.validate( state );
 
-		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[Lyon].<map value>" );
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -138,7 +132,6 @@ public class PropertyPathAndStringRepresentationTest {
 
 		Set<ConstraintViolation<State>> constraintViolations = validator.validate( state );
 
-		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[Lyon].street" );
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -152,7 +145,6 @@ public class PropertyPathAndStringRepresentationTest {
 
 		constraintViolations = validator.validate( state );
 
-		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[Lyon].city.name" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -171,7 +163,6 @@ public class PropertyPathAndStringRepresentationTest {
 
 		Set<ConstraintViolation<State>> constraintViolations = validator.validate( state );
 
-		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[Lyon]" );
 		assertCorrectConstraintTypes( constraintViolations, ValidLyonZipCode.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -187,7 +178,6 @@ public class PropertyPathAndStringRepresentationTest {
 
 		Set<ConstraintViolation<Block>> constraintViolations = validator.validate( block );
 
-		assertCorrectPropertyPaths( constraintViolations, "addresses[0].<list element>" );
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -203,7 +193,6 @@ public class PropertyPathAndStringRepresentationTest {
 
 		Set<ConstraintViolation<Block>> constraintViolations = validator.validate( block );
 
-		assertCorrectPropertyPaths( constraintViolations, "addresses[0].street" );
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -216,7 +205,6 @@ public class PropertyPathAndStringRepresentationTest {
 
 		constraintViolations = validator.validate( block );
 
-		assertCorrectPropertyPaths( constraintViolations, "addresses[0].city.name" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -233,7 +221,6 @@ public class PropertyPathAndStringRepresentationTest {
 
 		Set<ConstraintViolation<Block>> constraintViolations = validator.validate( block );
 
-		assertCorrectPropertyPaths( constraintViolations, "addresses[0]" );
 		assertCorrectConstraintTypes( constraintViolations, ValidLyonZipCode.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
