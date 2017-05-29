@@ -546,7 +546,7 @@ message, groups and payload. This is a requirement of the Bean Validation specif
 In addition to the constraints defined by the Bean Validation API Hibernate Validator provides several useful custom constraints which are listed below.
 With one exception also these constraints apply to the field/property level, only `@ScriptAssert` is a class-level constraint.
 
-`@CreditCardNumber(ignoreNonDigitCharacters=)`:: Checks that the annotated character sequence passes the Luhn checksum test. Note, this validation aims to check for user mistakes, not credit card validity! See also http://www.merriampark.com/anatomycc.htm[Anatomy of Credit Card Numbers]. `ignoreNonDigitCharacters` allows to ignore non digit characters. The default is `false`.
+`@CreditCardNumber(ignoreNonDigitCharacters=)`:: Checks that the annotated character sequence passes the Luhn checksum test. Note, this validation aims to check for user mistakes, not credit card validity! See also http://www.dirigodev.com/blog/ecommerce/anatomy-of-a-credit-card-number/[Anatomy of a credit card number]. `ignoreNonDigitCharacters` allows to ignore non digit characters. The default is `false`.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
