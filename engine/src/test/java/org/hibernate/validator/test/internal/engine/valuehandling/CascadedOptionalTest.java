@@ -21,6 +21,7 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -30,6 +31,7 @@ import org.testng.annotations.Test;
  * @author Gunnar Morling
  */
 @TestForIssue(jiraKey = "HV-1080")
+@CandidateForTck
 public class CascadedOptionalTest {
 
 	private Validator validator;

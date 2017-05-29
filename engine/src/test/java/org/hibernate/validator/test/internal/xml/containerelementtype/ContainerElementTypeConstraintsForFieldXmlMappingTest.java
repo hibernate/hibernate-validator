@@ -24,6 +24,7 @@ import javax.validation.Validator;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
 
@@ -31,6 +32,7 @@ import org.testng.annotations.Test;
  * @author Gunnar Morling
  * @author Guillaume Smet
  */
+@CandidateForTck
 public class ContainerElementTypeConstraintsForFieldXmlMappingTest {
 
 	@Test

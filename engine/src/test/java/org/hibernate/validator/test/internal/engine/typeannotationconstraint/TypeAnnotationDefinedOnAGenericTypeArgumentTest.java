@@ -17,6 +17,7 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -25,6 +26,7 @@ import org.testng.annotations.Test;
  * @author Guillaume Smet
  */
 @TestForIssue(jiraKey = "HV-1279")
+@CandidateForTck
 public class TypeAnnotationDefinedOnAGenericTypeArgumentTest {
 
 	private Validator validator;

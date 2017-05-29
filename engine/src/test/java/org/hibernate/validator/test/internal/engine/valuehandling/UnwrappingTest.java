@@ -39,6 +39,7 @@ import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -51,6 +52,7 @@ import org.testng.annotations.Test;
  */
 @TestForIssue(jiraKey = "HV-925")
 @SuppressWarnings("unused")
+@CandidateForTck
 public class UnwrappingTest {
 	private Validator validatorWithValueExtractor;
 	private Validator validatorWithoutValueExtractor;

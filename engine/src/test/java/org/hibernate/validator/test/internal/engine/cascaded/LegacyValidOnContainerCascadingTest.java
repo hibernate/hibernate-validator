@@ -25,8 +25,10 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.Test;
 
+@CandidateForTck
 public class LegacyValidOnContainerCascadingTest {
 
 	@Test

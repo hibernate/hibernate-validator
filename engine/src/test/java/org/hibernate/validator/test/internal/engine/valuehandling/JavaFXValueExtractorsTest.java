@@ -24,6 +24,7 @@ import javax.validation.constraints.Size;
 import javax.validation.valueextraction.Unwrapping;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -53,6 +54,7 @@ import javafx.collections.ObservableSet;
  * @author Guillaume Smet
  */
 @SuppressWarnings("restriction")
+@CandidateForTck
 public class JavaFXValueExtractorsTest {
 
 	private Validator validator;

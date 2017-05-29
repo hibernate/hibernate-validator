@@ -23,11 +23,13 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.Test;
 
 /**
  * @author Gunnar Morling
  */
+@CandidateForTck
 public class MapExtractorTest {
 
 	@Test

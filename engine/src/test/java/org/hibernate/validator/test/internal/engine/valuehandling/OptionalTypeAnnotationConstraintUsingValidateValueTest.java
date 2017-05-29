@@ -25,6 +25,7 @@ import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
@@ -44,6 +45,7 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
  *
  * @author George Gastaldi
  */
+@CandidateForTck
 public class OptionalTypeAnnotationConstraintUsingValidateValueTest {
 	private Validator validator;
 

@@ -20,6 +20,7 @@ import javax.validation.constraints.NotNull;
 
 import org.testng.annotations.Test;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
@@ -31,6 +32,7 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
  * @author Khalid Alqinyah
  * @author Gunnar Morling
  */
+@CandidateForTck
 public class CascadedIterableMapPropertiesTest {
 
 	@Test

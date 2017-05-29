@@ -29,6 +29,7 @@ import javax.validation.valueextraction.Unwrapping;
 
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -37,6 +38,7 @@ import javafx.beans.property.StringProperty;
 
 @TestForIssue(jiraKey = "HV-1237")
 @SuppressWarnings("restriction")
+@CandidateForTck
 public class NestedTypeArgumentsValueExtractorTest {
 
 	private Validator validator;
