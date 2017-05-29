@@ -6,11 +6,9 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.Annotation;
-import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
@@ -39,7 +37,6 @@ public abstract class MetaDataBuilder {
 	private final Class<?> beanClass;
 	private final Set<MetaConstraint<?>> directConstraints = newHashSet();
 	private final Set<MetaConstraint<?>> containerElementsConstraints = newHashSet();
-	private final Map<Class<?>, Class<?>> groupConversions = newHashMap();
 	private boolean isCascading = false;
 
 	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
@@ -82,10 +79,6 @@ public abstract class MetaDataBuilder {
 	 * @return A {@link ConstraintMetaData} object.
 	 */
 	public abstract ConstraintMetaData build();
-
-	protected Map<Class<?>, Class<?>> getGroupConversions() {
-		return groupConversions;
-	}
 
 	protected Set<MetaConstraint<?>> getDirectConstraints() {
 		return directConstraints;
