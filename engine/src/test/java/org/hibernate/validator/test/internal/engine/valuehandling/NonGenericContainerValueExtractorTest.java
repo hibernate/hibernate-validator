@@ -30,12 +30,14 @@ import javax.validation.valueextraction.UnwrapByDefault;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
  * @author Guillaume Smet
  */
+@CandidateForTck
 public class NonGenericContainerValueExtractorTest {
 
 	private Validator validator;

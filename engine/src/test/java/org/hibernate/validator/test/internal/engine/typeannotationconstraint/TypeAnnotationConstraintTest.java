@@ -39,6 +39,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.MessageLoggedAssertionLogger;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -49,6 +50,7 @@ import org.testng.annotations.Test;
  * @author Hardy Ferentschik
  * @author Guillaume Smet
  */
+@CandidateForTck
 public class TypeAnnotationConstraintTest {
 
 	private Validator validator;

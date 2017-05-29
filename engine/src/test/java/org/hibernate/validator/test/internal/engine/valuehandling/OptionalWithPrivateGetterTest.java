@@ -15,6 +15,7 @@ import javax.validation.constraints.AssertTrue;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
@@ -25,6 +26,7 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HV-975")
+@CandidateForTck
 public class OptionalWithPrivateGetterTest {
 
 	@Test
@@ -53,5 +55,3 @@ public class OptionalWithPrivateGetterTest {
 		}
 	}
 }
-
-

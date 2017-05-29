@@ -22,6 +22,7 @@ import javax.validation.Validator;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -29,6 +30,7 @@ import org.testng.annotations.Test;
  * @author Gunnar Morling
  */
 @TestForIssue(jiraKey = "HV-1031")
+@CandidateForTck
 public class SameElementContainedSeveralTimesInCollectionTest {
 
 	private Validator validator;

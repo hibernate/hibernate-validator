@@ -30,9 +30,11 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.Test;
 
 @TestForIssue(jiraKey = "HV-1237")
+@CandidateForTck
 public class NestedCascadedConstraintsTest {
 
 	@Test

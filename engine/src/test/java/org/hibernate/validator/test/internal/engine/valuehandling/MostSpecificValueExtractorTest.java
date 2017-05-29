@@ -31,11 +31,13 @@ import org.hibernate.validator.test.internal.engine.valuehandling.model.IWrapper
 import org.hibernate.validator.test.internal.engine.valuehandling.model.IWrapper221;
 import org.hibernate.validator.test.internal.engine.valuehandling.model.Wrapper2;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.Test;
 
 /**
  * @author Guillaume Smet
  */
+@CandidateForTck
 public class MostSpecificValueExtractorTest {
 
 	@Test

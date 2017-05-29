@@ -34,9 +34,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.internal.engine.path.NodeImpl;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+@CandidateForTck
 public class ContainerElementPropertyPathTest {
 
 	private Validator validator;

@@ -22,12 +22,14 @@ import javax.validation.Validator;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
  * @author Guillaume Smet
  */
+@CandidateForTck
 public class OptionalPrimitivesValueExtractorTest {
 
 	private Validator validator;

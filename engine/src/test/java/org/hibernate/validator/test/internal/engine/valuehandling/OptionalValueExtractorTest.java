@@ -25,6 +25,7 @@ import javax.validation.constraints.Min;
 import javax.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -34,6 +35,7 @@ import org.testng.annotations.Test;
  * @author Khalid Alqinyah
  * @author Hardy Ferentschik
  */
+@CandidateForTck
 public class OptionalValueExtractorTest {
 
 	private Validator validator;

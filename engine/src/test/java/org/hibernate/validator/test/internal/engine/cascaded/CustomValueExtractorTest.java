@@ -33,6 +33,7 @@ import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescripto
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -44,6 +45,7 @@ import com.google.common.collect.Multimap;
 /**
  * @author Gunnar Morling
  */
+@CandidateForTck
 public class CustomValueExtractorTest {
 
 	private ValidationXmlTestHelper validationXmlTestHelper;

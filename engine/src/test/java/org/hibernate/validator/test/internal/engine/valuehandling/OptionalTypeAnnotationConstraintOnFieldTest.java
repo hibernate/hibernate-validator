@@ -39,6 +39,7 @@ import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -48,6 +49,7 @@ import org.testng.annotations.Test;
  * @author Davide D'Alto
  */
 @TestForIssue(jiraKey = "HV-976")
+@CandidateForTck
 public class OptionalTypeAnnotationConstraintOnFieldTest {
 
 	private Validator validator;

@@ -32,6 +32,7 @@ import org.hibernate.validator.test.internal.engine.valuehandling.model.Property
 import org.hibernate.validator.test.internal.engine.valuehandling.model.StringProperty;
 import org.hibernate.validator.test.internal.engine.valuehandling.model.UiInputValueExtractor;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -42,6 +43,7 @@ import org.testng.annotations.Test;
  * @author Gunnar Morling
  */
 @TestForIssue(jiraKey = "HV-819")
+@CandidateForTck
 public class UnwrapValidatedValueTest {
 
 	private Validator validator;
