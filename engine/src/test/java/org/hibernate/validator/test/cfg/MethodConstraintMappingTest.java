@@ -630,6 +630,7 @@ public class MethodConstraintMappingTest {
 		}
 		catch (ConstraintViolationException cve) {
 			assertThat( cve.getConstraintViolations() ).containsOnlyPaths(
+					pathWith().method( "greet" ).returnValue(),
 					pathWith().method( "greet" ).returnValue()
 			);
 		}
