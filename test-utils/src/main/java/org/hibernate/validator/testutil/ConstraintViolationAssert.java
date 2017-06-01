@@ -11,7 +11,7 @@ import static org.testng.Assert.fail;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -65,7 +65,7 @@ public final class ConstraintViolationAssert {
 			actualMessages.add( violation.getMessage() );
 		}
 
-		Assertions.assertThat( actualMessages ).containsOnly( expectedMessages );
+		Assertions.assertThat( actualMessages ).containsExactlyInAnyOrder( expectedMessages );
 	}
 
 	public static void assertCorrectConstraintViolationMessages(ConstraintViolationException e,
@@ -321,24 +321,10 @@ public final class ConstraintViolationAssert {
 	 */
 	private static <T> void assertCorrectConstraintTypes(Iterable<Class<? extends Annotation>> actualConstraintTypes,
 			Class<?>... expectedConstraintTypes) {
-		List<String> expectedConstraintTypeNames = new ArrayList<>();
-		for ( Class<?> expectedConstraintType : expectedConstraintTypes ) {
-			expectedConstraintTypeNames.add( expectedConstraintType.getName() );
-		}
 
-		List<String> actualConstraintTypeNames = new ArrayList<>();
-		for ( Class<?> actualConstraintType : actualConstraintTypes ) {
-			actualConstraintTypeNames.add( actualConstraintType.getName() );
-		}
-
-		Collections.sort( expectedConstraintTypeNames );
-		Collections.sort( actualConstraintTypeNames );
-
-		assertEquals(
-				actualConstraintTypeNames,
-				expectedConstraintTypeNames,
-				String.format( "Expected %s, but got %s", expectedConstraintTypeNames, actualConstraintTypeNames )
-		);
+		Assertions.assertThat( actualConstraintTypes )
+				.extracting( Class::getName )
+				.containsExactlyInAnyOrder( Arrays.stream( expectedConstraintTypes ).map( c -> c.getName() ).toArray( size -> new String[size] ) );
 	}
 
 	public static PathExpectation pathWith() {
@@ -360,7 +346,7 @@ public final class ConstraintViolationAssert {
 				actualPaths.add( new PathExpectation( violation.getPropertyPath() ) );
 			}
 
-			Assertions.assertThat( actualPaths ).containsOnly( paths );
+			Assertions.assertThat( actualPaths ).containsExactlyInAnyOrder( paths );
 		}
 
 		public void containsPath(PathExpectation expectedPath) {
