@@ -29,6 +29,7 @@ processFileInplace( hvModuleXml ) { text ->
     text.replaceAll( /hibernate-validator.*jar/, hvArtifactName )
 }
 appendDependency( hvModuleXml, "javax.money.api", true )
+appendDependency( hvModuleXml, "javafx.api", true )
 
 new File( project.properties['wildflyPatchedTargetDir'], 'modules/system/layers/base/org/hibernate/validator/main/hibernate-validator-5.2.4.Final.jar' ).delete()
 
