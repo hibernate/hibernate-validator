@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<module xmlns="urn:jboss:module:1.3" name="javafx.api">
+    <dependencies>
+        <system export="true">
+            <paths>
+                <path name="javafx/animation"/>
+                <path name="javafx/application"/>
+                <path name="javafx/beans"/>
+                <path name="javafx/beans/binding"/>
+                <path name="javafx/beans/property"/>
+                <path name="javafx/beans/property/adapter"/>
+                <path name="javafx/beans/value"/>
+                <path name="javafx/collections"/>
+                <path name="javafx/collections/transformation"/>
+                <path name="javafx/concurrent"/>
+                <path name="javafx/css"/>
+                <path name="javafx/embed/swing"/>
+                <path name="javafx/embed/swt"/>
+                <path name="javafx/event"/>
+                <path name="javafx/fxml"/>
+                <path name="javafx/geometry"/>
+                <path name="javafx/print"/>
+                <path name="javafx/scene"/>
+                <path name="javafx/scene/canvas"/>
+                <path name="javafx/scene/chart"/>
+                <path name="javafx/scene/control"/>
+                <path name="javafx/scene/control/cell"/>
+                <path name="javafx/scene/effect"/>
+                <path name="javafx/scene/image"/>
+                <path name="javafx/scene/input"/>
+                <path name="javafx/scene/layout"/>
+                <path name="javafx/scene/media"/>
+                <path name="javafx/scene/paint"/>
+                <path name="javafx/scene/shape"/>
+                <path name="javafx/scene/text"/>
+                <path name="javafx/scene/transform"/>
+                <path name="javafx/scene/web"/>
+                <path name="javafx/stage"/>
+                <path name="javafx/util"/>
+                <path name="javafx/util/converter"/>
+                <path name="netscape/javascript"/>
+            </paths>
+        </system>
+    </dependencies>
+</module>

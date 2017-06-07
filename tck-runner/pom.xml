@@ -316,8 +316,49 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <jbossHome>${project.build.directory}/wildfly-${wildfly.version}/</jbossHome>
+                            <jbossHome>${wildflyTargetDir}</jbossHome>
                         </configuration>
+                    </plugin>
+                    <!-- Copy additional modules -->
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-resources</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${wildflyTargetDir}/modules/system/layers/base/</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/test/modules</directory>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Update standalone.xml -->
+                    <plugin>
+                        <groupId>org.codehaus.gmavenplus</groupId>
+                        <artifactId>gmavenplus-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>update-standalone-xml</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <scripts>
+                                        <script>file:///${pom.basedir}/src/script/updateStandaloneXml.groovy</script>
+                                    </scripts>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
