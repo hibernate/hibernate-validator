@@ -37,7 +37,7 @@ Hibernate Validator requires an implementation of the Unified Expression Languag
 violation messages (see <<section-message-interpolation>>). When your application runs in a Java EE
 container such as JBoss AS, an EL implementation is already provided by the container. In a Java SE
 environment, however, you have to add an implementation as dependency to your POM file. For instance
-you can add the following two dependencies to use the JSR 341 http://uel.java.net/[reference
+you can add the following dependency to use the JSR 341 https://javaee.github.io/uel-ri/[reference
 implementation]:
 
 .Maven dependencies for Unified EL reference implementation
