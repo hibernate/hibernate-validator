@@ -202,6 +202,11 @@
                             <backend>html5</backend>
                             <outputDirectory>${asciidoctor.base-output-dir}/html_single</outputDirectory>
                             <sourceHighlighter>prettify</sourceHighlighter>
+                            <extensions>
+                                <extension>
+                                    <className>org.hibernate.infra.asciidoctor.extensions.customnumbering.CustomNumberingProcessor</className>
+                                </extension>
+                            </extensions>
                             <attributes>
                                 <stylesdir>css</stylesdir>
                                 <iconfont-remote>false</iconfont-remote>
@@ -252,6 +257,11 @@
                                     <backend>pdf</backend>
                                     <outputDirectory>${asciidoctor.base-output-dir}/pdf</outputDirectory>
                                     <sourceHighlighter>coderay</sourceHighlighter>
+                                    <extensions>
+                                        <extension>
+                                            <className>org.hibernate.infra.asciidoctor.extensions.customnumbering.CustomNumberingProcessor</className>
+                                        </extension>
+                                    </extensions>
                                     <attributes>
                                         <imagesDir>${asciidoctor.aggregated-resources-dir}/images/</imagesDir>
                                         <pdf-stylesdir>${asciidoctor.aggregated-resources-dir}/theme</pdf-stylesdir>
