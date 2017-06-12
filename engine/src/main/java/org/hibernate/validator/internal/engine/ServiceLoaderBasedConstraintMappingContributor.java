@@ -18,7 +18,7 @@ import javax.validation.ConstraintValidator;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.internal.util.privilegedactions.GetConstraintValidatorList;
+import org.hibernate.validator.internal.util.privilegedactions.GetConstraintValidatorsFromServiceLoader;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 
 import com.fasterxml.classmate.ResolvedType;
@@ -45,8 +45,7 @@ public class ServiceLoaderBasedConstraintMappingContributor implements Constrain
 		Map<Class<?>, List<Class<?>>> customValidators = newHashMap();
 
 		// find additional constraint validators via the Java ServiceLoader mechanism
-		GetConstraintValidatorList constraintValidatorListAction = new GetConstraintValidatorList();
-		List<ConstraintValidator<?, ?>> discoveredConstraintValidators = run( constraintValidatorListAction );
+		List<ConstraintValidator<?, ?>> discoveredConstraintValidators = run( GetConstraintValidatorsFromServiceLoader.action() );
 
 		for ( ConstraintValidator<?, ?> constraintValidator : discoveredConstraintValidators ) {
 			Class<?> constraintValidatorClass = constraintValidator.getClass();
