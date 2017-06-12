@@ -162,7 +162,7 @@ public class ContainerElementTypeConstraintsForFieldXmlMappingTest {
 
 	private Validator getValidator(String mappingFile) {
 		Configuration<?> config = ValidatorUtil.getConfiguration();
-		config.addMapping( ContainerElementTypeConstraintsForFieldXmlMappingTest.class.getResourceAsStream( mappingFile ) );
+		config.addMapping( getClass().getResourceAsStream( mappingFile ) );
 		return config.buildValidatorFactory().getValidator();
 	}
 
