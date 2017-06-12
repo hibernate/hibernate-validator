@@ -15,10 +15,8 @@ import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,6 +46,7 @@ import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.internal.util.privilegedactions.GetInstancesFromServiceLoader;
 import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
@@ -305,6 +304,11 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public final ValidatorFactory buildValidatorFactory() {
 		loadValueExtractorsFromServiceLoader();
 		parseValidationXml();
+
+		for ( ValueExtractorDescriptor valueExtractorDescriptor : valueExtractorDescriptors.values() ) {
+			validationBootstrapParameters.addValueExtractorDescriptor( valueExtractorDescriptor );
+		}
+
 		ValidatorFactory factory = null;
 		try {
 			if ( isSpecificProvider() ) {
@@ -494,23 +498,17 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			);
 			applyXmlSettings( xmlParameters );
 		}
-
-		for ( ValueExtractorDescriptor valueExtractorDescriptor : valueExtractorDescriptors.values() ) {
-			validationBootstrapParameters.addValueExtractorDescriptor( valueExtractorDescriptor );
-		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void loadValueExtractorsFromServiceLoader() {
-		@SuppressWarnings("rawtypes")
-		ServiceLoader<ValueExtractor> loader = ServiceLoader.load(
-				ValueExtractor.class,
-				externalClassLoader != null ? externalClassLoader : getClass().getClassLoader()
-		);
+		List<ValueExtractor> valueExtractors = run( GetInstancesFromServiceLoader.action(
+				externalClassLoader != null ? externalClassLoader : run( GetClassLoader.fromContext() ),
+				ValueExtractor.class
+		) );
 
-		@SuppressWarnings("rawtypes")
-		Iterator<ValueExtractor> extractors = loader.iterator();
-		while ( extractors.hasNext() ) {
-			validationBootstrapParameters.addValueExtractorDescriptor( new ValueExtractorDescriptor( extractors.next() ) );
+		for ( ValueExtractor<?> valueExtractor : valueExtractors ) {
+			validationBootstrapParameters.addValueExtractorDescriptor( new ValueExtractorDescriptor( valueExtractor ) );
 		}
 	}
 
