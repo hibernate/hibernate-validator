@@ -39,7 +39,7 @@ public class ContainerElementTypeConstraintsForParameterXmlMappingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementTypeConstraintsForParameterProgrammatically() {
+	public void canDeclareContainerElementTypeConstraintsForParameterWithXmlMapping() {
 		Validator validator = getValidator( "parameter-canDeclareContainerElementTypeConstraints-mapping.xml" );
 
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
@@ -67,7 +67,7 @@ public class ContainerElementTypeConstraintsForParameterXmlMappingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareNestedContainerElementTypeConstraintsForParameterProgrammatically() {
+	public void canDeclareNestedContainerElementTypeConstraintsForParameterWithXmlMapping() {
 		Validator validator = getValidator( "parameter-canDeclareNestedContainerElementTypeConstraints-mapping.xml" );
 
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
@@ -91,7 +91,7 @@ public class ContainerElementTypeConstraintsForParameterXmlMappingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareDeeplyNestedContainerElementTypeConstraintsForParameterProgrammatically() {
+	public void canDeclareDeeplyNestedContainerElementTypeConstraintsForParameterWithXmlMapping() {
 		Validator validator = getValidator( "parameter-canDeclareDeeplyNestedContainerElementTypeConstraints-mapping.xml" );
 
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
@@ -117,7 +117,7 @@ public class ContainerElementTypeConstraintsForParameterXmlMappingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementCascadesForParameterProgrammatically() {
+	public void canDeclareContainerElementCascadesForParameterWithXmlMapping() {
 		Validator validator = getValidator( "parameter-canDeclareContainerElementCascades-mapping.xml" );
 
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
@@ -137,7 +137,7 @@ public class ContainerElementTypeConstraintsForParameterXmlMappingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementTypeConstraintsForArrayTypeParameterProgrammatically() {
+	public void canDeclareContainerElementTypeConstraintsForArrayTypeParameterWithXmlMapping() {
 		Validator validator = getValidator( "parameter-canDeclareContainerElementTypeConstraintsForArrayType-mapping.xml" );
 
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
@@ -157,7 +157,7 @@ public class ContainerElementTypeConstraintsForParameterXmlMappingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementTypeConstraintsForListContainingArrayTypeParameterProgrammatically() {
+	public void canDeclareContainerElementTypeConstraintsForListContainingArrayTypeParameterWithXmlMapping() {
 		Validator validator = getValidator( "parameter-canDeclareContainerElementTypeConstraintsForListContainingArrayType-mapping.xml" );
 
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
@@ -180,7 +180,7 @@ public class ContainerElementTypeConstraintsForParameterXmlMappingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementTypeConstraintsForMultiDimensionalArrayTypeParameterProgrammatically() {
+	public void canDeclareContainerElementTypeConstraintsForMultiDimensionalArrayTypeParameterWithXmlMapping() {
 		Validator validator = getValidator( "parameter-canDeclareContainerElementTypeConstraintsForMultiDimensionalArrayType-mapping.xml" );
 
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
@@ -250,7 +250,7 @@ public class ContainerElementTypeConstraintsForParameterXmlMappingTest {
 
 	private Validator getValidator(String mappingFile) {
 		Configuration<?> config = ValidatorUtil.getConfiguration();
-		config.addMapping( ContainerElementTypeConstraintsForFieldXmlMappingTest.class.getResourceAsStream( mappingFile ) );
+		config.addMapping( getClass().getResourceAsStream( mappingFile ) );
 		return config.buildValidatorFactory().getValidator();
 	}
 

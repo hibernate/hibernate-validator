@@ -33,7 +33,7 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementTypeConstraintsForGetterProgrammatically() {
+	public void canDeclareContainerElementTypeConstraintsForGetterWithXmlMapping() {
 		Validator validator = getValidator( "getter-canDeclareContainerElementTypeConstraints-mapping.xml" );
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
@@ -50,7 +50,7 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareNestedContainerElementTypeConstraintsForGetterProgrammatically() {
+	public void canDeclareNestedContainerElementTypeConstraintsForGetterWithXmlMapping() {
 		Validator validator = getValidator( "getter-canDeclareNestedContainerElementTypeConstraints-mapping.xml" );
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
@@ -63,7 +63,7 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareDeeplyNestedContainerElementTypeConstraintsForGetterProgrammatically() {
+	public void canDeclareDeeplyNestedContainerElementTypeConstraintsForGetterWithXmlMapping() {
 		Validator validator = getValidator( "getter-canDeclareDeeplyNestedContainerElementTypeConstraints-mapping.xml" );
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
@@ -76,7 +76,7 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementCascadesForGetterProgrammatically() {
+	public void canDeclareContainerElementCascadesForGetterWithXmlMapping() {
 		Validator validator = getValidator( "getter-canDeclareContainerElementCascades-mapping.xml" );
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
@@ -89,7 +89,7 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementTypeConstraintsForArrayTypeGetterProgrammatically() {
+	public void canDeclareContainerElementTypeConstraintsForArrayTypeGetterWithXmlMapping() {
 		Validator validator = getValidator( "getter-canDeclareContainerElementTypeConstraintsForArrayType-mapping.xml" );
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
@@ -102,7 +102,7 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementTypeConstraintsForListContainingArrayTypeGetterProgrammatically() {
+	public void canDeclareContainerElementTypeConstraintsForListContainingArrayTypeGetterWithXmlMapping() {
 		Validator validator = getValidator( "getter-canDeclareContainerElementTypeConstraintsForListContainingArrayType-mapping.xml" );
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
@@ -115,7 +115,7 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementTypeConstraintsForMultiDimensionalArrayTypeGetterProgrammatically() {
+	public void canDeclareContainerElementTypeConstraintsForMultiDimensionalArrayTypeGetterWithXmlMapping() {
 		Validator validator = getValidator( "getter-canDeclareContainerElementTypeConstraintsForMultiDimensionalArrayType-mapping.xml" );
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
@@ -158,7 +158,7 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 	private Validator getValidator(String mappingFile) {
 		Configuration<?> config = ValidatorUtil.getConfiguration();
-		config.addMapping( ContainerElementTypeConstraintsForFieldXmlMappingTest.class.getResourceAsStream( mappingFile ) );
+		config.addMapping( getClass().getResourceAsStream( mappingFile ) );
 		return config.buildValidatorFactory().getValidator();
 	}
 
