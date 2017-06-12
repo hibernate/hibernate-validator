@@ -6,28 +6,27 @@
  */
 package org.hibernate.validator.internal.util.privilegedactions;
 
-import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
+
 import javax.validation.ConstraintValidator;
 
 /**
  * @author Hardy Ferentschik
  */
-public class GetConstraintValidatorList implements PrivilegedAction<List<ConstraintValidator<?, ?>>> {
+public class GetConstraintValidatorsFromServiceLoader implements PrivilegedAction<List<ConstraintValidator<?, ?>>> {
 
-	public static List<ConstraintValidator<?, ?>> getConstraintValidatorList() {
-		final GetConstraintValidatorList action = new GetConstraintValidatorList();
-		if ( System.getSecurityManager() != null ) {
-			return AccessController.doPrivileged( action );
-		}
-		else {
-			return action.run();
-		}
+	private static final GetConstraintValidatorsFromServiceLoader INSTANCE = new GetConstraintValidatorsFromServiceLoader();
+
+	private GetConstraintValidatorsFromServiceLoader() {
+	}
+
+	public static GetConstraintValidatorsFromServiceLoader action() {
+		return INSTANCE;
 	}
 
 	@Override
@@ -38,13 +37,14 @@ public class GetConstraintValidatorList implements PrivilegedAction<List<Constra
 
 		// Option #2: if we cannot find any service files with the context class loader use the current class loader
 		if ( constraintValidatorList.isEmpty() ) {
-			classloader = GetConstraintValidatorList.class.getClassLoader();
+			classloader = GetConstraintValidatorsFromServiceLoader.class.getClassLoader();
 			constraintValidatorList = loadConstraintValidators( classloader );
 		}
 
 		return constraintValidatorList;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private List<ConstraintValidator<?, ?>> loadConstraintValidators(ClassLoader classloader) {
 		ServiceLoader<ConstraintValidator> loader = ServiceLoader.load( ConstraintValidator.class, classloader );
 		Iterator<ConstraintValidator> constraintValidatorIterator = loader.iterator();
@@ -62,5 +62,3 @@ public class GetConstraintValidatorList implements PrivilegedAction<List<Constra
 		return constraintValidators;
 	}
 }
-
-
