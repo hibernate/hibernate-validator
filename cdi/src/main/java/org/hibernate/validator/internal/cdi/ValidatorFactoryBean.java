@@ -13,7 +13,11 @@ import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -33,8 +37,11 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.internal.util.privilegedactions.GetInstancesFromServiceLoader;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 
 /**
@@ -119,11 +126,24 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		config.parameterNameProvider( createParameterNameProvider( config ) );
 		config.clockProvider( createClockProvider( config ) );
 
-		for ( ValueExtractor<?> valueExtractor : createValueExtractors( config ) ) {
-			config.addValueExtractor( valueExtractor );
-		}
+		addValueExtractorBeans( config );
 
 		return config.buildValidatorFactory();
+	}
+
+	private void addValueExtractorBeans(Configuration<?> config) {
+		Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = createValidationXmlValueExtractors( config ).stream()
+				.collect( Collectors.toMap( ValueExtractorDescriptor::getKey, Function.identity() ) );
+
+		// We only add the service loader value extractors if we don't already have a value extractor defined in the XML configuration
+		// as the XML configuration has precedence over the service loader value extractors.
+		for ( ValueExtractorDescriptor serviceLoaderValueExtractorDescriptor : createServiceLoaderValueExtractors() ) {
+			valueExtractorDescriptors.putIfAbsent( serviceLoaderValueExtractorDescriptor.getKey(), serviceLoaderValueExtractorDescriptor );
+		}
+
+		for ( ValueExtractorDescriptor valueExtractorDescriptor : valueExtractorDescriptors.values() ) {
+			config.addValueExtractor( valueExtractorDescriptor.getValueExtractor() );
+		}
 	}
 
 	@Override
@@ -230,20 +250,43 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		return createInstance( constraintValidatorFactoryClass );
 	}
 
-	private Set<ValueExtractor<?>> createValueExtractors(Configuration<?> config) {
+	private Set<ValueExtractorDescriptor> createValidationXmlValueExtractors(Configuration<?> config) {
 		BootstrapConfiguration bootstrapConfiguration = config.getBootstrapConfiguration();
 		Set<String> valueExtractorFqcns = bootstrapConfiguration.getValueExtractorClassNames();
 
 		@SuppressWarnings("unchecked")
-		Set<ValueExtractor<?>> valueExtractors = valueExtractorFqcns.stream()
+		Set<ValueExtractorDescriptor> valueExtractorDescriptors = valueExtractorFqcns.stream()
 				.map( fqcn -> createInstance( (Class<? extends ValueExtractor<?>>) run( LoadClass.action( fqcn, null ) ) ) )
+				.map( ve -> new ValueExtractorDescriptor( ve ) )
 				.collect( Collectors.toSet() );
 
-		return valueExtractors;
+		return valueExtractorDescriptors;
+	}
+
+	@SuppressWarnings("rawtypes")
+	private Set<ValueExtractorDescriptor> createServiceLoaderValueExtractors() {
+		Set<ValueExtractorDescriptor> valueExtractorDescriptors = new HashSet<>();
+
+		List<ValueExtractor> valueExtractors = run( GetInstancesFromServiceLoader.action(
+				run( GetClassLoader.fromContext() ),
+				ValueExtractor.class
+		) );
+
+		for ( ValueExtractor<?> valueExtractor : valueExtractors ) {
+			valueExtractorDescriptors.add( new ValueExtractorDescriptor( injectInstance( valueExtractor ) ) );
+		}
+
+		return valueExtractorDescriptors;
 	}
 
 	private <T> T createInstance(Class<T> type) {
 		DestructibleBeanInstance<T> destructibleInstance = new DestructibleBeanInstance<T>( beanManager, type );
+		destructibleResources.add( destructibleInstance );
+		return destructibleInstance.getInstance();
+	}
+
+	private <T> T injectInstance(T instance) {
+		DestructibleBeanInstance<T> destructibleInstance = new DestructibleBeanInstance<T>( beanManager, instance );
 		destructibleResources.add( destructibleInstance );
 		return destructibleInstance.getInstance();
 	}

@@ -23,6 +23,13 @@ public class DestructibleBeanInstance<T> {
 		this.instance = createAndInjectBeans( beanManager, injectionTarget );
 	}
 
+	@SuppressWarnings("unchecked")
+	public DestructibleBeanInstance(BeanManager beanManager, T instance) {
+		this.injectionTarget = createInjectionTarget( beanManager, (Class<T>) instance.getClass() );
+		injectBeans( beanManager, beanManager.createCreationalContext( null ), injectionTarget, instance );
+		this.instance = instance;
+	}
+
 	public T getInstance() {
 		return instance;
 	}
@@ -37,13 +44,17 @@ public class DestructibleBeanInstance<T> {
 		return beanManager.createInjectionTarget( annotatedType );
 	}
 
-	private T createAndInjectBeans(BeanManager beanManager, InjectionTarget<T> injectionTarget) {
+	private static <T> T createAndInjectBeans(BeanManager beanManager, InjectionTarget<T> injectionTarget) {
 		CreationalContext<T> creationalContext = beanManager.createCreationalContext( null );
 
 		T instance = injectionTarget.produce( creationalContext );
-		injectionTarget.inject( instance, creationalContext );
-		injectionTarget.postConstruct( instance );
+		injectBeans( beanManager, creationalContext, injectionTarget, instance );
 
 		return instance;
+	}
+
+	private static <T> void injectBeans(BeanManager beanManager, CreationalContext<T> creationalContext, InjectionTarget<T> injectionTarget, T instance) {
+		injectionTarget.inject( instance, creationalContext );
+		injectionTarget.postConstruct( instance );
 	}
 }
