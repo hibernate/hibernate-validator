@@ -331,10 +331,40 @@ public final class ConstraintViolationAssert {
 		return new PathExpectation();
 	}
 
+	public static ViolationExpectation violationOf(Class<? extends Annotation> constraintType) {
+		return new ViolationExpectation( constraintType );
+	}
+
 	public static class ConstraintViolationSetAssert extends IterableAssert<ConstraintViolation<?>> {
 
 		protected ConstraintViolationSetAssert(Set<? extends ConstraintViolation<?>> actualViolations) {
 			super( actualViolations );
+		}
+
+		public void containsOnlyViolations(ViolationExpectation... expectedViolations) {
+			isNotNull();
+
+			List<ViolationExpectation> actualViolations = new ArrayList<>();
+
+			ViolationExpectationPropertiesToTest referencePropertiesToTest;
+			if ( expectedViolations.length == 0 ) {
+				referencePropertiesToTest = ViolationExpectationPropertiesToTest.all();
+			}
+			else {
+				referencePropertiesToTest = expectedViolations[0].propertiesToTest;
+				for ( ViolationExpectation expectedViolation : expectedViolations ) {
+					if ( !referencePropertiesToTest.equals( expectedViolation.propertiesToTest ) ) {
+						throw new IllegalArgumentException( String.format( "Expected violations passed in parameter must test the exact same properties but do not: %1$s != %2$s",
+								expectedViolations[0], expectedViolation ) );
+					}
+				}
+			}
+
+			for ( ConstraintViolation<?> violation : actual ) {
+				actualViolations.add( new ViolationExpectation( violation, referencePropertiesToTest ) );
+			}
+
+			Assertions.assertThat( actualViolations ).containsExactlyInAnyOrder( expectedViolations );
 		}
 
 		public void containsOnlyPaths(PathExpectation... paths) {
@@ -368,6 +398,254 @@ public final class ConstraintViolationAssert {
 			for ( PathExpectation pathExpectation : expectedPaths ) {
 				containsPath( pathExpectation );
 			}
+		}
+	}
+
+	public static class ViolationExpectation {
+
+		private final ViolationExpectationPropertiesToTest propertiesToTest = new ViolationExpectationPropertiesToTest();
+
+		private final Class<? extends Annotation> constraintType;
+
+		private Class<?> rootBeanClass;
+
+		private String message;
+
+		private Object invalidValue;
+
+		private PathExpectation propertyPath;
+
+		public ViolationExpectation(Class<? extends Annotation> constraintType) {
+			this.constraintType = constraintType;
+		}
+
+		public ViolationExpectation(ConstraintViolation<?> violation, ViolationExpectationPropertiesToTest propertiesToTest) {
+			this.constraintType = violation.getConstraintDescriptor().getAnnotation().annotationType();
+
+			if ( propertiesToTest.testRootBeanClass ) {
+				withRootBeanClass( violation.getRootBeanClass() );
+			}
+			if ( propertiesToTest.testMessage ) {
+				withMessage( violation.getMessage() );
+			}
+			if ( propertiesToTest.testInvalidValue ) {
+				withInvalidValue( violation.getInvalidValue() );
+			}
+			if ( propertiesToTest.testPropertyPath ) {
+				withPropertyPath( new PathExpectation( violation.getPropertyPath() ) );
+			}
+		}
+
+		public ViolationExpectation withRootBeanClass(Class<?> rootBeanClass) {
+			propertiesToTest.testRootBeanClass();
+			this.rootBeanClass = rootBeanClass;
+			return this;
+		}
+
+		public ViolationExpectation withMessage(String message) {
+			propertiesToTest.testMessage();
+			this.message = message;
+			return this;
+		}
+
+		public ViolationExpectation withInvalidValue(Object invalidValue) {
+			propertiesToTest.testInvalidValue();
+			this.invalidValue = invalidValue;
+			return this;
+		}
+
+		public ViolationExpectation withPropertyPath(PathExpectation propertyPath) {
+			propertiesToTest.testPropertyPath();
+			this.propertyPath = propertyPath;
+			return this;
+		}
+
+		public ViolationExpectation withProperty(String property) {
+			return withPropertyPath( new PathExpectation().property( property ) );
+		}
+
+		@Override
+		public String toString() {
+			String lineBreak = System.getProperty( "line.separator" );
+			StringBuilder asString = new StringBuilder( lineBreak + "ViolationExpectation(" + lineBreak );
+			asString.append( "  constraintType: " ).append( constraintType ).append( lineBreak );
+			if ( propertiesToTest.testRootBeanClass ) {
+				asString.append( "  rootBeanClass: " ).append( rootBeanClass ).append( lineBreak );
+			}
+			if ( propertiesToTest.testMessage ) {
+				asString.append( "  message: " ).append( message ).append( lineBreak );
+			}
+			if ( propertiesToTest.testInvalidValue ) {
+				asString.append( "  invalidValue: " ).append( invalidValue ).append( lineBreak );
+			}
+			if ( propertiesToTest.testPropertyPath ) {
+				asString.append( "  propertyPath: " ).append( propertyPath.toStringInViolation() ).append( lineBreak );
+			}
+
+			return asString.append( ")" ).toString();
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ( constraintType == null ? 0 : constraintType.hashCode() );
+			if ( propertiesToTest.testRootBeanClass ) {
+				result = prime * result + ( rootBeanClass == null ? 0 : rootBeanClass.hashCode() );
+			}
+			if ( propertiesToTest.testMessage ) {
+				result = prime * result + ( message == null ? 0 : message.hashCode() );
+			}
+			if ( propertiesToTest.testInvalidValue ) {
+				result = prime * result + ( invalidValue == null ? 0 : invalidValue.hashCode() );
+			}
+			if ( propertiesToTest.testPropertyPath ) {
+				result = prime * result + ( propertyPath == null ? 0 : propertyPath.hashCode() );
+			}
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) {
+				return true;
+			}
+			if ( obj == null ) {
+				return false;
+			}
+			if ( getClass() != obj.getClass() ) {
+				return false;
+			}
+			ViolationExpectation other = (ViolationExpectation) obj;
+			if ( constraintType == null ) {
+				if ( other.constraintType != null ) {
+					return false;
+				}
+			}
+			else if ( !constraintType.equals( other.constraintType ) ) {
+				return false;
+			}
+			if ( propertiesToTest.testRootBeanClass ) {
+				if ( rootBeanClass == null ) {
+					if ( other.rootBeanClass != null ) {
+						return false;
+					}
+				}
+				else if ( !rootBeanClass.equals( other.rootBeanClass ) ) {
+					return false;
+				}
+			}
+			if ( propertiesToTest.testMessage ) {
+				if ( message == null ) {
+					if ( other.message != null ) {
+						return false;
+					}
+				}
+				else if ( !message.equals( other.message ) ) {
+					return false;
+				}
+			}
+			if ( propertiesToTest.testInvalidValue ) {
+				if ( invalidValue == null ) {
+					if ( other.invalidValue != null ) {
+						return false;
+					}
+				}
+				else if ( !invalidValue.equals( other.invalidValue ) ) {
+					return false;
+				}
+			}
+			if ( propertiesToTest.testPropertyPath ) {
+				if ( propertyPath == null ) {
+					if ( other.propertyPath != null ) {
+						return false;
+					}
+				}
+				else if ( !propertyPath.equals( other.propertyPath ) ) {
+					return false;
+				}
+			}
+			return true;
+		}
+	}
+
+	private static class ViolationExpectationPropertiesToTest {
+
+		private boolean testRootBeanClass = false;
+
+		private boolean testMessage = false;
+
+		private boolean testInvalidValue = false;
+
+		private boolean testPropertyPath = false;
+
+		private static ViolationExpectationPropertiesToTest all() {
+			ViolationExpectationPropertiesToTest propertiesToTest = new ViolationExpectationPropertiesToTest()
+					.testRootBeanClass()
+					.testMessage()
+					.testInvalidValue()
+					.testPropertyPath();
+			return propertiesToTest;
+		}
+
+		private ViolationExpectationPropertiesToTest testRootBeanClass() {
+			testRootBeanClass = true;
+			return this;
+		}
+
+		private ViolationExpectationPropertiesToTest testMessage() {
+			testMessage = true;
+			return this;
+		}
+
+		private ViolationExpectationPropertiesToTest testInvalidValue() {
+			testInvalidValue = true;
+			return this;
+		}
+
+		private ViolationExpectationPropertiesToTest testPropertyPath() {
+			testPropertyPath = true;
+			return this;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ( testRootBeanClass ? 1 : 0 );
+			result = prime * result + ( testMessage ? 1 : 0 );
+			result = prime * result + ( testInvalidValue ? 1 : 0 );
+			result = prime * result + ( testPropertyPath ? 1 : 0 );
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) {
+				return true;
+			}
+			if ( obj == null ) {
+				return false;
+			}
+			if ( getClass() != obj.getClass() ) {
+				return false;
+			}
+
+			ViolationExpectationPropertiesToTest other = (ViolationExpectationPropertiesToTest) obj;
+			if ( testRootBeanClass != other.testRootBeanClass ) {
+				return false;
+			}
+			if ( testMessage != other.testMessage ) {
+				return false;
+			}
+			if ( testInvalidValue != other.testInvalidValue ) {
+				return false;
+			}
+			if ( testPropertyPath != other.testPropertyPath ) {
+				return false;
+			}
+
+			return true;
 		}
 	}
 
@@ -478,6 +756,16 @@ public final class ConstraintViolationAssert {
 			}
 
 			return asString.append( ")" ).toString();
+		}
+
+		public String toStringInViolation() {
+			String lineBreak = System.getProperty( "line.separator" );
+			StringBuilder asString = new StringBuilder( "PathExpectation(" + lineBreak );
+			for ( NodeExpectation node : nodes ) {
+				asString.append( "    " ).append( node ).append( lineBreak );
+			}
+
+			return asString.append( "  )" ).toString();
 		}
 
 		@Override
