@@ -627,7 +627,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private void addOverrideAttributes(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, Method m, OverridesAttribute... attributes) {
 		Object value = run( GetAnnotationParameter.action( annotation, m.getName(), Object.class ) );
 		for ( OverridesAttribute overridesAttribute : attributes ) {
-			ensureAttributeIsOverridable( m, overridesAttribute );
+			String overridesAttributeName = overridesAttribute.name().length() > 0 ? overridesAttribute.name() : m.getName();
+
+			ensureAttributeIsOverridable( m, overridesAttribute, overridesAttributeName );
 
 			ClassIndexWrapper wrapper = new ClassIndexWrapper(
 					overridesAttribute.constraint(), overridesAttribute.constraintIndex()
@@ -637,14 +639,14 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				map = newHashMap();
 				overrideParameters.put( wrapper, map );
 			}
-			map.put( overridesAttribute.name(), value );
+			map.put( overridesAttributeName, value );
 		}
 	}
 
-	private void ensureAttributeIsOverridable(Method m, OverridesAttribute overridesAttribute) {
-		final Method method = run( GetMethod.action( overridesAttribute.constraint(), overridesAttribute.name() ) );
+	private void ensureAttributeIsOverridable(Method m, OverridesAttribute overridesAttribute, String overridesAttributeName) {
+		final Method method = run( GetMethod.action( overridesAttribute.constraint(), overridesAttributeName ) );
 		if ( method == null ) {
-			throw LOG.getOverriddenConstraintAttributeNotFoundException( overridesAttribute.name() );
+			throw LOG.getOverriddenConstraintAttributeNotFoundException( overridesAttributeName );
 		}
 		Class<?> returnTypeOfOverriddenConstraint = method.getReturnType();
 		if ( !returnTypeOfOverriddenConstraint.equals( m.getReturnType() ) ) {
