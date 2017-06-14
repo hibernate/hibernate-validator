@@ -419,7 +419,7 @@ public final class ConstraintViolationAssert {
 			this.constraintType = constraintType;
 		}
 
-		public ViolationExpectation(ConstraintViolation<?> violation, ViolationExpectationPropertiesToTest propertiesToTest) {
+		private ViolationExpectation(ConstraintViolation<?> violation, ViolationExpectationPropertiesToTest propertiesToTest) {
 			this.constraintType = violation.getConstraintDescriptor().getAnnotation().annotationType();
 
 			if ( propertiesToTest.testRootBeanClass ) {
@@ -436,7 +436,7 @@ public final class ConstraintViolationAssert {
 			}
 		}
 
-		public ViolationExpectation withRootBeanClass(Class<?> rootBeanClass) {
+		private ViolationExpectation withRootBeanClass(Class<?> rootBeanClass) {
 			propertiesToTest.testRootBeanClass();
 			this.rootBeanClass = rootBeanClass;
 			return this;
