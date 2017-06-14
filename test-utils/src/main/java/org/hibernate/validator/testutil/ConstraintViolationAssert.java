@@ -415,7 +415,7 @@ public final class ConstraintViolationAssert {
 
 		private PathExpectation propertyPath;
 
-		public ViolationExpectation(Class<? extends Annotation> constraintType) {
+		private ViolationExpectation(Class<? extends Annotation> constraintType) {
 			this.constraintType = constraintType;
 		}
 
@@ -436,7 +436,7 @@ public final class ConstraintViolationAssert {
 			}
 		}
 
-		private ViolationExpectation withRootBeanClass(Class<?> rootBeanClass) {
+		public ViolationExpectation withRootBeanClass(Class<?> rootBeanClass) {
 			propertiesToTest.testRootBeanClass();
 			this.rootBeanClass = rootBeanClass;
 			return this;
