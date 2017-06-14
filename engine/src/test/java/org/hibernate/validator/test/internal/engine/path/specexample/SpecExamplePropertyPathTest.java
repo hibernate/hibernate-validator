@@ -39,6 +39,48 @@ import org.testng.annotations.Test;
 public class SpecExamplePropertyPathTest {
 
 	/**
+	 * 5.) book.author.lastname
+	 */
+	@Test
+	public void cascadedValidationWithPropertyConstraintLegacyStyle() throws Exception {
+		Validator validator = getValidator();
+
+		Book book = new Book();
+		book.setTitle( "A book" );
+		book.setAuthors( Arrays.asList( new Author( "West" ), new Author( "Wayne" ), new Author( "Hood" ), new Author( "" ) ) );
+
+		Set<ConstraintViolation<Book>> constraintViolations = validator.validate( book );
+		assertThat( constraintViolations ).containsOnlyViolations( violationOf( NotEmpty.class ) );
+
+		Path path = constraintViolations.iterator().next().getPropertyPath();
+
+		for ( Path.Node node : path ) {
+			printNode( node );
+		}
+	}
+
+	/**
+	 * 6.) book.author.company
+	 */
+	@Test
+	public void cascadedValidationWithPropertyConstraintLegacyStyle2() throws Exception {
+		Validator validator = getValidator();
+
+		Book book = new Book();
+		book.setTitle( "A book" );
+		book.setAuthors( Arrays.asList( new Author( "West", "A Company Name That Is Way Too Long" ) ) );
+
+		Set<ConstraintViolation<Book>> constraintViolations = validator.validate( book );
+		assertThat( constraintViolations ).containsOnlyViolations( violationOf( Size.class ) );
+
+		Path path = constraintViolations.iterator().next().getPropertyPath();
+
+		for ( Path.Node node : path ) {
+			printNode( node );
+		}
+	}
+
+	/**
 	 * 9.) book.tags
 	 */
 	@Test

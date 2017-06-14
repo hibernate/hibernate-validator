@@ -31,6 +31,11 @@ public class Author {
 		this.lastName = lastName;
 	}
 
+	public Author(String lastName, String company) {
+		this.lastName = lastName;
+		this.company = company;
+	}
+
 	public String getFirstName() {
 		return firstName;
 	}
