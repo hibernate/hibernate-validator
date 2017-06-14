@@ -534,15 +534,6 @@
                         <suppressAnnotations>
                             <annotation>**.IgnoreForbiddenApisErrors</annotation>
                         </suppressAnnotations>
-                        <bundledSignatures>
-                            <!--
-                              this will automatically choose the right
-                              signatures based on 'maven.compiler.target'
-                            -->
-                            <bundledSignature>jdk-deprecated</bundledSignature>
-                            <!-- disallow printing to System.out or System.err -->
-                            <bundledSignature>jdk-system-out</bundledSignature>
-                        </bundledSignatures>
                         <signaturesArtifacts>
                             <signaturesArtifact>
                                 <groupId>org.hibernate.validator</groupId>
@@ -562,11 +553,38 @@
                     </configuration>
                     <executions>
                         <execution>
+                            <id>check-main</id>
                             <goals>
                                 <goal>check</goal>
+                            </goals>
+                            <phase>verify</phase>
+                            <configuration>
+                                <bundledSignatures>
+                                    <!--
+                                      this will automatically choose the right
+                                      signatures based on 'maven.compiler.target'
+                                    -->
+                                    <bundledSignature>jdk-deprecated</bundledSignature>
+                                    <!-- disallow printing to System.out or System.err -->
+                                    <bundledSignature>jdk-system-out</bundledSignature>
+                                </bundledSignatures>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>check-test</id>
+                            <goals>
                                 <goal>testCheck</goal>
                             </goals>
                             <phase>verify</phase>
+                            <configuration>
+                                <bundledSignatures>
+                                    <!--
+                                      this will automatically choose the right
+                                      signatures based on 'maven.compiler.target'
+                                    -->
+                                    <bundledSignature>jdk-deprecated</bundledSignature>
+                                </bundledSignatures>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
