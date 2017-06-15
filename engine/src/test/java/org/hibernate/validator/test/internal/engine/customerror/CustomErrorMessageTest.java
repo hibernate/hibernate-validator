@@ -6,14 +6,18 @@
  */
 package org.hibernate.validator.test.internal.engine.customerror;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
-import org.testng.annotations.Test;
+import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -25,11 +29,14 @@ public class CustomErrorMessageTest {
 	 * @throws Exception in case the test fails.
 	 */
 	@Test
+	@TestForIssue( jiraKey = "HV-297" )
 	public void testReportAsSingleViolationDoesNotInfluenceCustomError() throws Exception {
 		Validator validator = getValidator();
 		DummyTestClass dummyTestClass = new DummyTestClass();
 
 		Set<ConstraintViolation<DummyTestClass>> constraintViolations = validator.validate( dummyTestClass );
-		assertCorrectConstraintViolationMessages( constraintViolations, IsValidValidator.message );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( IsValid.class ).withMessage( IsValidValidator.message )
+		);
 	}
 }

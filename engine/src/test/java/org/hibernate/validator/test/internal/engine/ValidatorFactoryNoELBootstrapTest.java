@@ -7,7 +7,7 @@
 package org.hibernate.validator.test.internal.engine;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -30,6 +30,7 @@ import javax.validation.constraints.Min;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
+import org.hibernate.validator.testutil.ConstraintViolationAssert;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
 
@@ -84,7 +85,9 @@ public class ValidatorFactoryNoELBootstrapTest {
 			assertNotNull( validator );
 
 			Set<ConstraintViolation<SomeBean>> violations = validator.validate( new SomeBean() );
-			assertCorrectConstraintViolationMessages( violations, "must be greater than or equal to 42" );
+			ConstraintViolationAssert.assertThat( violations ).containsOnlyViolations(
+					violationOf( Min.class ).withMessage( "must be greater than or equal to 42" )
+			);
 		}
 	}
 

@@ -7,7 +7,8 @@
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -114,11 +115,9 @@ public class MethodLevelValidationGroupSequenceTest {
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages(
-					e.getConstraintViolations(),
-					"must be greater than or equal to 5",
-					"must be greater than or equal to 7"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Min.class ).withMessage( "must be greater than or equal to 5" ),
+					violationOf( Min.class ).withMessage( "must be greater than or equal to 7" )
 			);
 		}
 	}
@@ -169,10 +168,9 @@ public class MethodLevelValidationGroupSequenceTest {
 		}
 		catch (ConstraintViolationException e) {
 
-			assertCorrectConstraintViolationMessages(
-					e.getConstraintViolations(),
-					"must be greater than or equal to 5",
-					"must be greater than or equal to 7"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Min.class ).withMessage( "must be greater than or equal to 5" ),
+					violationOf( Min.class ).withMessage( "must be greater than or equal to 7" )
 			);
 		}
 	}

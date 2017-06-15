@@ -54,27 +54,6 @@ public final class ConstraintViolationAssert {
 	}
 
 	/**
-	 * Asserts that the messages in the violation list matches exactly the expected messages list.
-	 *
-	 * @param violations The violation list to verify.
-	 * @param expectedMessages The expected constraint violation messages.
-	 */
-	public static void assertCorrectConstraintViolationMessages(Set<? extends ConstraintViolation<?>> violations,
-			String... expectedMessages) {
-		List<String> actualMessages = new ArrayList<>();
-		for ( ConstraintViolation<?> violation : violations ) {
-			actualMessages.add( violation.getMessage() );
-		}
-
-		Assertions.assertThat( actualMessages ).containsExactlyInAnyOrder( expectedMessages );
-	}
-
-	public static void assertCorrectConstraintViolationMessages(ConstraintViolationException e,
-			String... expectedMessages) {
-		assertCorrectConstraintViolationMessages( e.getConstraintViolations(), expectedMessages );
-	}
-
-	/**
 	 * Asserts that the violated constraint type in the violation list matches exactly the expected constraint types
 	 * list.
 	 *

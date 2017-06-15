@@ -97,7 +97,7 @@ public class FailFastTest {
 		final Validator validator = factory.getValidator();
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
 		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withProperty( "c" )
+				violationOf( NotNull.class )
 		);
 	}
 
@@ -135,7 +135,7 @@ public class FailFastTest {
 						.getValidator();
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
 		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withProperty( "c" )
+				violationOf( NotNull.class )
 		);
 	}
 
