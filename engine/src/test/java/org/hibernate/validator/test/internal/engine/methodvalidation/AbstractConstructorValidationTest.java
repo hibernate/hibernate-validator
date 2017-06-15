@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.Set;
 
@@ -19,6 +19,7 @@ import javax.validation.executable.ExecutableValidator;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl.ValidB2BRepository;
+
 import org.testng.annotations.Test;
 
 /**
@@ -26,6 +27,7 @@ import org.testng.annotations.Test;
  * @author Hardy Ferentschik
  */
 public abstract class AbstractConstructorValidationTest {
+
 	protected ExecutableValidator executableValidator;
 
 	public abstract void setUp();
@@ -39,15 +41,15 @@ public abstract class AbstractConstructorValidationTest {
 				new String[] { null }
 		);
 
-		assertThat( violations ).hasSize( 1 );
-
-		ConstraintViolation<CustomerRepositoryImpl> constraintViolation = violations.iterator()
-				.next();
-
-		assertConstraintViolation( constraintViolation, NotNull.class, messagePrefix() + "may not be null", CustomerRepositoryImpl.class, null,
-				pathWith()
-						.constructor( CustomerRepositoryImpl.class )
-						.parameter( "id", 0 )
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( messagePrefix() + "may not be null" )
+						.withInvalidValue( null )
+						.withRootBeanClass( CustomerRepositoryImpl.class )
+						.withPropertyPath( pathWith()
+								.constructor( CustomerRepositoryImpl.class )
+								.parameter( "id", 0 )
+						)
 		);
 	}
 
@@ -58,14 +60,17 @@ public abstract class AbstractConstructorValidationTest {
 				new Customer[] { new Customer( null ) }
 		);
 
-		assertThat( violations ).hasSize( 1 );
-
-		ConstraintViolation<CustomerRepositoryImpl> constraintViolation = violations.iterator().next();
-		assertConstraintViolation( constraintViolation, NotNull.class, messagePrefix() + "may not be null", CustomerRepositoryImpl.class, null,
-				pathWith()
-						.constructor( CustomerRepositoryImpl.class )
-						.parameter( "customer", 0 )
-						.property( "name" ) );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( messagePrefix() + "may not be null" )
+						.withInvalidValue( null )
+						.withRootBeanClass( CustomerRepositoryImpl.class )
+						.withPropertyPath( pathWith()
+								.constructor( CustomerRepositoryImpl.class )
+								.parameter( "customer", 0 )
+								.property( "name" )
+						)
+		);
 	}
 
 	@Test
@@ -76,15 +81,15 @@ public abstract class AbstractConstructorValidationTest {
 				customerRepository
 		);
 
-		assertThat( violations ).hasSize( 1 );
-
-		ConstraintViolation<CustomerRepositoryImpl> constraintViolation = violations.iterator().next();
-
-		assertConstraintViolation( constraintViolation, ValidB2BRepository.class, messagePrefix() + "{ValidB2BRepository.message}", CustomerRepositoryImpl.class,
-				customerRepository,
-				pathWith()
-						.constructor( CustomerRepositoryImpl.class )
-						.returnValue()
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ValidB2BRepository.class )
+						.withMessage( messagePrefix() + "{ValidB2BRepository.message}" )
+						.withInvalidValue( customerRepository )
+						.withRootBeanClass( CustomerRepositoryImpl.class )
+						.withPropertyPath( pathWith()
+								.constructor( CustomerRepositoryImpl.class )
+								.returnValue()
+						)
 		);
 	}
 
@@ -96,15 +101,16 @@ public abstract class AbstractConstructorValidationTest {
 				customerRepository
 		);
 
-		assertThat( violations ).hasSize( 1 );
-
-		ConstraintViolation<CustomerRepositoryImpl> constraintViolation = violations.iterator().next();
-
-		assertConstraintViolation( constraintViolation, NotNull.class, messagePrefix() + "may not be null", CustomerRepositoryImpl.class, null,
-				pathWith()
-						.constructor( CustomerRepositoryImpl.class )
-						.returnValue()
-						.property( "customer" )
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( messagePrefix() + "may not be null" )
+						.withInvalidValue( null )
+						.withRootBeanClass( CustomerRepositoryImpl.class )
+						.withPropertyPath( pathWith()
+								.constructor( CustomerRepositoryImpl.class )
+								.returnValue()
+								.property( "customer" )
+						)
 		);
 	}
 
