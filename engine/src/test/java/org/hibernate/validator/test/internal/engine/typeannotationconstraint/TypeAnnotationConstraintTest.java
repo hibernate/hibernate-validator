@@ -7,12 +7,9 @@
 package org.hibernate.validator.test.internal.engine.typeannotationconstraint;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.lang.reflect.Constructor;
@@ -33,13 +30,14 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.apache.log4j.Logger;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.MessageLoggedAssertionLogger;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
+
+import org.apache.log4j.Logger;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -66,9 +64,11 @@ public class TypeAnnotationConstraintTest {
 	public void value_extractor_not_called_on_null_values() {
 		Set<ConstraintViolation<ModelWithNullValue>> constraintViolations = validator.validate( new ModelWithNullValue() );
 
-		assertCorrectPropertyPaths( constraintViolations, "nullValue" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "container" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withProperty( "nullValue" )
+						.withMessage( "container" )
+		);
 	}
 
 	// List
@@ -80,13 +80,24 @@ public class TypeAnnotationConstraintTest {
 
 		Set<ConstraintViolation<TypeWithList1>> constraintViolations = validator.validate( l );
 
-		assertCorrectPropertyPaths( constraintViolations, "names[1].<list element>", "names[2].<list element>", "names[2].<list element>" );
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 2, List.class, 0 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 2, List.class, 0 )
+						)
 		);
+
 	}
 
 	@Test
@@ -94,9 +105,18 @@ public class TypeAnnotationConstraintTest {
 		TypeWithList3 l = new TypeWithList3();
 		l.bars = Arrays.asList( new Bar( 2 ), null );
 		Set<ConstraintViolation<TypeWithList3>> constraintViolations = validator.validate( l );
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "bars[1].<list element>", "bars[0].number" );
-		assertCorrectConstraintTypes( constraintViolations, Min.class, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "bars" )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+						),
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.property( "bars" )
+								.property( "number", true, null, 0, List.class, 0 )
+						)
+		);
 	}
 
 	@Test
@@ -105,16 +125,25 @@ public class TypeAnnotationConstraintTest {
 		TypeWithList4 l = new TypeWithList4();
 		l.names = Arrays.asList( "First", "", null );
 		Set<ConstraintViolation<TypeWithList4>> constraintViolations = validator.validate( l );
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "names[1].<list element>", "names[2].<list element>" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlank.class, NotBlank.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 2, List.class, 0 )
+						)
+		);
 
 		l = new TypeWithList4();
 		l.names = new ArrayList<>();
 		constraintViolations = validator.validate( l );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "names" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class ).withProperty( "names" )
+		);
 	}
 
 	@Test
@@ -124,13 +153,22 @@ public class TypeAnnotationConstraintTest {
 
 		Set<ConstraintViolation<TypeWithList5>> constraintViolations = validator.validate( l );
 
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "strings[0].<list element>", "strings[2].<list element>", "strings[2].<list element>" );
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "strings" )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "strings" )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 2, List.class, 0 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "strings" )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 2, List.class, 0 )
+						)
 		);
 	}
 
@@ -142,18 +180,25 @@ public class TypeAnnotationConstraintTest {
 				method,
 				Arrays.asList( "First", "", null )
 		);
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"returnStrings.<return value>[1].<list element>",
-				"returnStrings.<return value>[2].<list element>",
-				"returnStrings.<return value>[2].<list element>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "returnStrings" )
+								.returnValue()
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "returnStrings" )
+								.returnValue()
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 2, List.class, 0 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.method( "returnStrings" )
+								.returnValue()
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 2, List.class, 0 )
+						)
 		);
 	}
 
@@ -165,12 +210,12 @@ public class TypeAnnotationConstraintTest {
 
 		Set<ConstraintViolation<TypeWithList1>> constraintViolations = validator.validate( l );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "names" )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						)
 		);
 	}
 
@@ -184,23 +229,31 @@ public class TypeAnnotationConstraintTest {
 				method,
 				values
 		);
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"setValues.listParameter[0].<list element>",
-				"setValues.listParameter[2].<list element>",
-				"setValues.listParameter[2].<list element>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "setValues" )
+								.parameter( "listParameter", 0 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "setValues" )
+								.parameter( "listParameter", 0 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 2, List.class, 0 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.method( "setValues" )
+								.parameter( "listParameter", 0 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 2, List.class, 0 )
+						)
 		);
 	}
 
 	@Test
-	public void constructor_parameter_constraint_provided_on_type_parameter_of_a_list_gets_validated() throws Exception {
+	public void constructor_parameter_constraint_provided_on_type_parameter_of_a_list_gets_validated()
+			throws Exception {
 		Constructor<TypeWithList8> constructor = TypeWithList8.class.getDeclaredConstructor( List.class );
 		Object[] values = new Object[] { Arrays.asList( "", "First", null ) };
 
@@ -208,18 +261,25 @@ public class TypeAnnotationConstraintTest {
 				constructor,
 				values
 		);
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"TypeWithList8.listParameter[0].<list element>",
-				"TypeWithList8.listParameter[2].<list element>",
-				"TypeWithList8.listParameter[2].<list element>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.constructor( TypeWithList8.class )
+								.parameter( "listParameter", 0 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.constructor( TypeWithList8.class )
+								.parameter( "listParameter", 0 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 2, List.class, 0 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.constructor( TypeWithList8.class )
+								.parameter( "listParameter", 0 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 2, List.class, 0 )
+						)
 		);
 	}
 
@@ -233,13 +293,22 @@ public class TypeAnnotationConstraintTest {
 
 		Set<ConstraintViolation<TypeWithSet1>> constraintViolations = validator.validate( s );
 
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "names[].<iterable element>", "names[].<iterable element>", "names[].<iterable element>" );
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						)
 		);
 	}
 
@@ -249,8 +318,18 @@ public class TypeAnnotationConstraintTest {
 		TypeWithSet3 s = new TypeWithSet3();
 		s.bars = CollectionHelper.asSet( new Bar( 2 ), null );
 		Set<ConstraintViolation<TypeWithSet3>> constraintViolations = validator.validate( s );
-		assertCorrectPropertyPaths( constraintViolations, "bars[].<iterable element>", "bars[].number" );
-		assertCorrectConstraintTypes( constraintViolations, Min.class, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "bars" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						),
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.property( "bars" )
+								.property( "number", true, null, null, Set.class, 0 )
+						)
+		);
 	}
 
 	@Test
@@ -259,16 +338,25 @@ public class TypeAnnotationConstraintTest {
 		TypeWithSet4 s = new TypeWithSet4();
 		s.names = CollectionHelper.asSet( "First", "", null );
 		Set<ConstraintViolation<TypeWithSet4>> constraintViolations = validator.validate( s );
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "names[].<iterable element>", "names[].<iterable element>" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlank.class, NotBlank.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						)
+		);
 
 		s = new TypeWithSet4();
 		s.names = new HashSet<>();
 		constraintViolations = validator.validate( s );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "names" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class ).withProperty( "names" )
+		);
 	}
 
 	@Test
@@ -282,13 +370,22 @@ public class TypeAnnotationConstraintTest {
 
 		Set<ConstraintViolation<TypeWithSet5>> constraintViolations = validator.validate( s );
 
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "strings[].<iterable element>", "strings[].<iterable element>", "strings[].<iterable element>" );
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "strings" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "strings" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "strings" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						)
 		);
 	}
 
@@ -301,18 +398,25 @@ public class TypeAnnotationConstraintTest {
 				method,
 				CollectionHelper.asSet( "First", "", null )
 		);
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"returnStrings.<return value>[].<iterable element>",
-				"returnStrings.<return value>[].<iterable element>",
-				"returnStrings.<return value>[].<iterable element>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "returnStrings" )
+								.returnValue()
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "returnStrings" )
+								.returnValue()
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.method( "returnStrings" )
+								.returnValue()
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						)
 		);
 	}
 
@@ -326,18 +430,25 @@ public class TypeAnnotationConstraintTest {
 				method,
 				values
 		);
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"setValues.setParameter[].<iterable element>",
-				"setValues.setParameter[].<iterable element>",
-				"setValues.setParameter[].<iterable element>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "setValues" )
+								.parameter( "setParameter", 0 )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "setValues" )
+								.parameter( "setParameter", 0 )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.method( "setValues" )
+								.parameter( "setParameter", 0 )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						)
 		);
 	}
 
@@ -350,18 +461,25 @@ public class TypeAnnotationConstraintTest {
 				constructor,
 				values
 		);
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"TypeWithSet8.setParameter[].<iterable element>",
-				"TypeWithSet8.setParameter[].<iterable element>",
-				"TypeWithSet8.setParameter[].<iterable element>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.constructor( TypeWithSet8.class )
+								.parameter( "setParameter", 0 )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.constructor( TypeWithSet8.class )
+								.parameter( "setParameter", 0 )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.constructor( TypeWithSet8.class )
+								.parameter( "setParameter", 0 )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, Set.class, 0 )
+						)
 		);
 	}
 
@@ -375,9 +493,13 @@ public class TypeAnnotationConstraintTest {
 		m.nameMap.put( "second", "" );
 		m.nameMap.put( "third", "Name 3" );
 		Set<ConstraintViolation<TypeWithMap1>> constraintViolations = validator.validate( m );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "nameMap[second].<map value>" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlank.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "nameMap" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "second", null, Map.class, 1 )
+						)
+		);
 	}
 
 	@Test
@@ -387,9 +509,18 @@ public class TypeAnnotationConstraintTest {
 		m.barMap.put( "bar", new Bar( 2 ) );
 		m.barMap.put( "foo", null );
 		Set<ConstraintViolation<TypeWithMap3>> constraintViolations = validator.validate( m );
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "barMap[foo].<map value>", "barMap[bar].number" );
-		assertCorrectConstraintTypes( constraintViolations, Min.class, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "barMap" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "foo", null, Map.class, 1 )
+						),
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.property( "barMap" )
+								.property( "number", true, "bar", null, Map.class, 1 )
+						)
+		);
 	}
 
 	@Test
@@ -401,15 +532,19 @@ public class TypeAnnotationConstraintTest {
 		m.nameMap.put( "second", "" );
 		m.nameMap.put( "third", "Name 3" );
 		Set<ConstraintViolation<TypeWithMap4>> constraintViolations = validator.validate( m );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "nameMap[second].<map value>" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlank.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "nameMap" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "second", null, Map.class, 1 )
+						)
+		);
 
 		m = new TypeWithMap4();
 		constraintViolations = validator.validate( m );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "nameMap" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "nameMap" )
+		);
 	}
 
 	@Test
@@ -422,14 +557,22 @@ public class TypeAnnotationConstraintTest {
 
 		Set<ConstraintViolation<TypeWithMap5>> constraintViolations = validator.validate( m );
 
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "stringMap[first].<map value>", "stringMap[third].<map value>",
-				 "stringMap[third].<map value>" );
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "stringMap" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "first", null, Map.class, 1 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "stringMap" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "third", null, Map.class, 1 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "stringMap" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "third", null, Map.class, 1 )
+						)
 		);
 	}
 
@@ -447,18 +590,25 @@ public class TypeAnnotationConstraintTest {
 				method,
 				parameter
 		);
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"returnStringMap.<return value>[second].<map value>",
-				"returnStringMap.<return value>[third].<map value>",
-				"returnStringMap.<return value>[third].<map value>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "returnStringMap" )
+								.returnValue()
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "second", null, Map.class, 1 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "returnStringMap" )
+								.returnValue()
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "third", null, Map.class, 1 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.method( "returnStringMap" )
+								.returnValue()
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "third", null, Map.class, 1 )
+						)
 		);
 	}
 
@@ -492,18 +642,25 @@ public class TypeAnnotationConstraintTest {
 				method,
 				values
 		);
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"setValues.mapParameter[second].<map value>",
-				"setValues.mapParameter[third].<map value>",
-				"setValues.mapParameter[third].<map value>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "setValues" )
+								.parameter( "mapParameter", 0 )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "second", null, Map.class, 1 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "setValues" )
+								.parameter( "mapParameter", 0 )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "third", null, Map.class, 1 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.method( "setValues" )
+								.parameter( "mapParameter", 0 )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "third", null, Map.class, 1 )
+						)
 		);
 	}
 
@@ -521,18 +678,25 @@ public class TypeAnnotationConstraintTest {
 				constructor,
 				values
 		);
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"TypeWithMap8.mapParameter[second].<map value>",
-				"TypeWithMap8.mapParameter[third].<map value>",
-				"TypeWithMap8.mapParameter[third].<map value>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.constructor( TypeWithMap8.class )
+								.parameter( "mapParameter", 0 )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "second", null, Map.class, 1 )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.constructor( TypeWithMap8.class )
+								.parameter( "mapParameter", 0 )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "third", null, Map.class, 1 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.constructor( TypeWithMap8.class )
+								.parameter( "mapParameter", 0 )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "third", null, Map.class, 1 )
+						)
 		);
 	}
 
@@ -542,17 +706,26 @@ public class TypeAnnotationConstraintTest {
 	@TestForIssue(jiraKey = "HV-1175")
 	public void field_constraint_provided_on_type_parameter_of_an_array_gets_validated() {
 		TypeWithArray1 a = new TypeWithArray1();
-		a.names = new String[]{ "First", "", null };
+		a.names = new String[] { "First", "", null };
 
 		Set<ConstraintViolation<TypeWithArray1>> constraintViolations = validator.validate( a );
 
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "names[1].<iterable element>", "names[2].<iterable element>", "names[2].<iterable element>" );
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+						)
 		);
 	}
 
@@ -560,45 +733,74 @@ public class TypeAnnotationConstraintTest {
 	@TestForIssue(jiraKey = "HV-1175")
 	public void constraint_provided_on_custom_bean_used_as_array_parameter_gets_validated() {
 		TypeWithArray3 a = new TypeWithArray3();
-		a.bars = new Bar[]{ new Bar( 2 ), null };
+		a.bars = new Bar[] { new Bar( 2 ), null };
 		Set<ConstraintViolation<TypeWithArray3>> constraintViolations = validator.validate( a );
-		assertCorrectPropertyPaths( constraintViolations, "bars[1].<iterable element>", "bars[0].number" );
-		assertCorrectConstraintTypes( constraintViolations, Min.class, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "bars" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+						),
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.property( "bars" )
+								.property( "number", true, null, 0, Object[].class, null )
+						)
+		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1175")
 	public void constraints_specified_on_array_and_on_type_parameter_of_array_get_validated() {
 		TypeWithArray4 a = new TypeWithArray4();
-		a.names = new String[]{ "First", "", null };
+		a.names = new String[] { "First", "", null };
 		Set<ConstraintViolation<TypeWithArray4>> constraintViolations = validator.validate( a );
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "names[1].<iterable element>", "names[2].<iterable element>" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlank.class, NotBlank.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+						)
+		);
 
 		a = new TypeWithArray4();
 		a.names = new String[0];
 		constraintViolations = validator.validate( a );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "names" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class ).withProperty( "names" )
+		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1175")
 	public void getter_constraint_provided_on_type_parameter_of_an_array_gets_validated() {
 		TypeWithArray5 a = new TypeWithArray5();
-		a.strings = new String[]{ "", "First", null };
+		a.strings = new String[] { "", "First", null };
 
 		Set<ConstraintViolation<TypeWithArray5>> constraintViolations = validator.validate( a );
 
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "strings[0].<iterable element>", "strings[2].<iterable element>", "strings[2].<iterable element>" );
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "strings" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "strings" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+						)
+				,
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "strings" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+						)
 		);
 	}
 
@@ -609,20 +811,28 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<TypeWithArray6>> constraintViolations = validator.forExecutables().validateReturnValue(
 				new TypeWithArray6(),
 				method,
-				new String[]{ "First", "", null }
+				new String[] { "First", "", null }
 		);
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"returnStrings.<return value>[1].<iterable element>",
-				"returnStrings.<return value>[2].<iterable element>",
-				"returnStrings.<return value>[2].<iterable element>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "returnStrings" )
+								.returnValue()
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "returnStrings" )
+								.returnValue()
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+						)
+				,
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.method( "returnStrings" )
+								.returnValue()
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+						)
 		);
 	}
 
@@ -630,14 +840,16 @@ public class TypeAnnotationConstraintTest {
 	@TestForIssue(jiraKey = "HV-1175")
 	public void property_path_contains_index_information_for_array() {
 		TypeWithArray1 a = new TypeWithArray1();
-		a.names = new String[]{ "" };
+		a.names = new String[] { "" };
 
 		Set<ConstraintViolation<TypeWithArray1>> constraintViolations = validator.validate( a );
 
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "names" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "names" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+						)
 		);
 	}
 
@@ -645,50 +857,67 @@ public class TypeAnnotationConstraintTest {
 	@TestForIssue(jiraKey = "HV-1175")
 	public void method_parameter_constraint_provided_as_type_parameter_of_an_array_gets_validated() throws Exception {
 		Method method = TypeWithArray7.class.getDeclaredMethod( "setValues", String[].class );
-		Object[] values = new Object[] { new String[]{ "", "First", null } };
+		Object[] values = new Object[] { new String[] { "", "First", null } };
 
 		Set<ConstraintViolation<TypeWithArray7>> constraintViolations = validator.forExecutables().validateParameters(
 				new TypeWithArray7(),
 				method,
 				values
 		);
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"setValues.arrayParameter[0].<iterable element>",
-				"setValues.arrayParameter[2].<iterable element>",
-				"setValues.arrayParameter[2].<iterable element>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "setValues" )
+								.parameter( "arrayParameter", 0 )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "setValues" )
+								.parameter( "arrayParameter", 0 )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+						)
+				,
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.method( "setValues" )
+								.parameter( "arrayParameter", 0 )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+						)
 		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1175")
-	public void constructor_parameter_constraint_provided_on_type_parameter_of_an_array_gets_validated() throws Exception {
+	public void constructor_parameter_constraint_provided_on_type_parameter_of_an_array_gets_validated()
+			throws Exception {
 		Constructor<TypeWithArray8> constructor = TypeWithArray8.class.getDeclaredConstructor( String[].class );
-		Object[] values = new Object[] { new String[]{ "", "First", null } };
+		Object[] values = new Object[] { new String[] { "", "First", null } };
 
 		Set<ConstraintViolation<TypeWithArray8>> constraintViolations = validator.forExecutables().validateConstructorParameters(
 				constructor,
 				values
 		);
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"TypeWithArray8.arrayParameter[0].<iterable element>",
-				"TypeWithArray8.arrayParameter[2].<iterable element>",
-				"TypeWithArray8.arrayParameter[2].<iterable element>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class,
-				NotBlank.class,
-				NotNull.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.constructor( TypeWithArray8.class )
+								.parameter( "arrayParameter", 0 )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+						),
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.constructor( TypeWithArray8.class )
+								.parameter( "arrayParameter", 0 )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+						)
+				,
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.constructor( TypeWithArray8.class )
+								.parameter( "arrayParameter", 0 )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+						)
 		);
 	}
 
@@ -698,15 +927,16 @@ public class TypeAnnotationConstraintTest {
 	@TestForIssue(jiraKey = "HV-1175")
 	public void field_constraint_provided_on_type_parameter_of_an_array_of_primitives_gets_validated() {
 		TypeWithArrayOfPrimitives1 a = new TypeWithArrayOfPrimitives1();
-		a.ints = new int[]{ 6, 1 };
+		a.ints = new int[] { 6, 1 };
 
 		Set<ConstraintViolation<TypeWithArrayOfPrimitives1>> constraintViolations = validator.validate( a );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ints[1].<iterable element>" );
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				Min.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.property( "ints" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
+						)
 		);
 	}
 
@@ -716,53 +946,58 @@ public class TypeAnnotationConstraintTest {
 	@TestForIssue(jiraKey = "HV-1175")
 	public void constraints_specified_on_array_and_on_type_parameter_of_array_of_primitives_get_validated() {
 		TypeWithArrayOfPrimitives4 a = new TypeWithArrayOfPrimitives4();
-		a.ints = new int[]{ 6, 1 };
+		a.ints = new int[] { 6, 1 };
 		Set<ConstraintViolation<TypeWithArrayOfPrimitives4>> constraintViolations = validator.validate( a );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ints[1].<iterable element>" );
-		assertCorrectConstraintTypes( constraintViolations, Min.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.property( "ints" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
+						)
+		);
 
 		a = new TypeWithArrayOfPrimitives4();
 		a.ints = new int[0];
 		constraintViolations = validator.validate( a );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ints" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class ).withProperty( "ints" )
+		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1175")
 	public void getter_constraint_provided_on_type_parameter_of_an_array_of_primitives_gets_validated() {
 		TypeWithArrayOfPrimitives5 a = new TypeWithArrayOfPrimitives5();
-		a.ints = new int[]{ 6, 1 };
+		a.ints = new int[] { 6, 1 };
 
 		Set<ConstraintViolation<TypeWithArrayOfPrimitives5>> constraintViolations = validator.validate( a );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ints[1].<iterable element>" );
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				Min.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.property( "ints" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
+						)
 		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1175")
-	public void return_value_constraint_provided_on_type_parameter_of_an_array_of_primitives_gets_validated() throws Exception {
+	public void return_value_constraint_provided_on_type_parameter_of_an_array_of_primitives_gets_validated()
+			throws Exception {
 		Method method = TypeWithArrayOfPrimitives6.class.getDeclaredMethod( "returnInts" );
 		Set<ConstraintViolation<TypeWithArrayOfPrimitives6>> constraintViolations = validator.forExecutables().validateReturnValue(
 				new TypeWithArrayOfPrimitives6(),
 				method,
-				new int[]{ 6, 1 }
+				new int[] { 6, 1 }
 		);
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"returnInts.<return value>[1].<iterable element>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				Min.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.method( "returnInts" )
+								.returnValue()
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
+						)
 		);
 	}
 
@@ -770,57 +1005,58 @@ public class TypeAnnotationConstraintTest {
 	@TestForIssue(jiraKey = "HV-1175")
 	public void property_path_contains_index_information_for_array_of_primitives() {
 		TypeWithArrayOfPrimitives1 a = new TypeWithArrayOfPrimitives1();
-		a.ints = new int[]{ 1 };
+		a.ints = new int[] { 1 };
 
 		Set<ConstraintViolation<TypeWithArrayOfPrimitives1>> constraintViolations = validator.validate( a );
 
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class ).withPropertyPath( pathWith()
 						.property( "ints" )
 						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, int[].class, null )
+				)
 		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1175")
-	public void method_parameter_constraint_provided_as_type_parameter_of_an_array_of_primitives_gets_validated() throws Exception {
+	public void method_parameter_constraint_provided_as_type_parameter_of_an_array_of_primitives_gets_validated()
+			throws Exception {
 		Method method = TypeWithArrayOfPrimitives7.class.getDeclaredMethod( "setValues", int[].class );
-		Object[] values = new Object[] { new int[]{ 6, 1 } };
+		Object[] values = new Object[] { new int[] { 6, 1 } };
 
 		Set<ConstraintViolation<TypeWithArrayOfPrimitives7>> constraintViolations = validator.forExecutables().validateParameters(
 				new TypeWithArrayOfPrimitives7(),
 				method,
 				values
 		);
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"setValues.arrayParameter[1].<iterable element>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				Min.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.method( "setValues" )
+								.parameter( "arrayParameter", 0 )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
+						)
 		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1175")
-	public void constructor_parameter_constraint_provided_on_type_parameter_of_an_array_of_primitives_gets_validated() throws Exception {
+	public void constructor_parameter_constraint_provided_on_type_parameter_of_an_array_of_primitives_gets_validated()
+			throws Exception {
 		Constructor<TypeWithArrayOfPrimitives8> constructor = TypeWithArrayOfPrimitives8.class.getDeclaredConstructor( int[].class );
-		Object[] values = new Object[] { new int[]{ 6, 1 } };
+		Object[] values = new Object[] { new int[] { 6, 1 } };
 
 		Set<ConstraintViolation<TypeWithArrayOfPrimitives8>> constraintViolations = validator.forExecutables().validateConstructorParameters(
 				constructor,
 				values
 		);
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"TypeWithArrayOfPrimitives8.arrayParameter[1].<iterable element>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				Min.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.constructor( TypeWithArrayOfPrimitives8.class )
+								.parameter( "arrayParameter", 0 )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
+						)
 		);
 	}
 
@@ -833,9 +1069,9 @@ public class TypeAnnotationConstraintTest {
 
 		Set<ConstraintViolation<TypeWithOptional1>> constraintViolations = validator.validate( o );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "stringOptional" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlank.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class ).withProperty( "stringOptional" )
+		);
 	}
 
 	// Case 2 does not make sense here so we skip it
@@ -845,9 +1081,9 @@ public class TypeAnnotationConstraintTest {
 		TypeWithOptional3 o = new TypeWithOptional3();
 		o.bar = Optional.empty();
 		Set<ConstraintViolation<TypeWithOptional3>> constraintViolations = validator.validate( o );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "bar" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "bar" )
+		);
 	}
 
 	@Test
@@ -855,16 +1091,16 @@ public class TypeAnnotationConstraintTest {
 		TypeWithOptional4 o = new TypeWithOptional4();
 		o.stringOptional = Optional.of( "" );
 		Set<ConstraintViolation<TypeWithOptional4>> constraintViolations = validator.validate( o );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "stringOptional" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlank.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class ).withProperty( "stringOptional" )
+		);
 
 		o = new TypeWithOptional4();
 		o.stringOptional = null;
 		constraintViolations = validator.validate( o );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "stringOptional" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "stringOptional" )
+		);
 	}
 
 	@Test
@@ -874,11 +1110,8 @@ public class TypeAnnotationConstraintTest {
 
 		Set<ConstraintViolation<TypeWithOptional5>> constraintViolations = validator.validate( o );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "stringOptional" );
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class ).withProperty( "stringOptional" )
 		);
 	}
 
@@ -890,14 +1123,13 @@ public class TypeAnnotationConstraintTest {
 				method,
 				Optional.of( "" )
 		);
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"returnStringOptional.<return value>"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "returnStringOptional" )
+								.returnValue()
+
+						)
 		);
 	}
 
@@ -912,14 +1144,13 @@ public class TypeAnnotationConstraintTest {
 				method,
 				values
 		);
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"setValues.optionalParameter"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.method( "setValues" )
+								.parameter( "optionalParameter", 0 )
+
+						)
 		);
 	}
 
@@ -933,14 +1164,13 @@ public class TypeAnnotationConstraintTest {
 				constructor,
 				values
 		);
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"TypeWithOptional8.optionalParameter"
-		);
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				NotBlank.class
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.constructor( TypeWithOptional8.class )
+								.parameter( "optionalParameter", 0 )
+
+						)
 		);
 	}
 

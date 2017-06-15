@@ -6,7 +6,14 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
@@ -16,13 +23,8 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.EANDef;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.testng.annotations.Test;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -63,7 +65,7 @@ public class EAN8Test {
 
 		Validator validator = getValidator();
 		Set<ConstraintViolation<Product>> constraintViolations = validator.validate( product );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -82,7 +84,7 @@ public class EAN8Test {
 
 		product = new Product( "40123455" );
 		constraintViolations = validator.validate( product );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	private static class Product {

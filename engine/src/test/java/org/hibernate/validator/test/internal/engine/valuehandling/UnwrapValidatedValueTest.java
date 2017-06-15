@@ -6,7 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertEquals;
 
 import java.lang.annotation.ElementType;
@@ -17,6 +18,7 @@ import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
+import javax.validation.constraints.Max;
 import javax.validation.valueextraction.Unwrapping;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -137,7 +139,9 @@ public class UnwrapValidatedValueTest {
 				.getValidator();
 
 		Set<ConstraintViolation<OrderLine>> violations = validator.validate( new OrderLine( 7L ) );
-		assertNumberOfViolations( violations, 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Max.class )
+		);
 	}
 
 	@SuppressWarnings("unchecked")

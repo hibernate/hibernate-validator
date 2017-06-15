@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.lang.reflect.Method;
@@ -26,6 +26,7 @@ import javax.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -48,12 +49,13 @@ public class OptionalValueExtractorTest {
 	@Test
 	public void testOptionalCascadedValidation() {
 		Set<ConstraintViolation<Snafu>> constraintViolations = validator.validate( new Snafu() );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"barOptional.number"
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.property( "barOptional" )
+								.property( "number", false, null, null, Optional.class, 0 )
+						)
 		);
-		assertCorrectConstraintTypes( constraintViolations, Min.class );
 	}
 
 	@Test
@@ -65,9 +67,14 @@ public class OptionalValueExtractorTest {
 				method,
 				Optional.of( new Bar() )
 		);
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "getBar.<return value>.number" );
-		assertCorrectConstraintTypes( constraintViolations, Min.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.method( "getBar" )
+								.returnValue()
+								.property( "number", false, null, null, Optional.class, 0 )
+						)
+		);
 	}
 
 	@Test
@@ -80,9 +87,14 @@ public class OptionalValueExtractorTest {
 				method,
 				values
 		);
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "setBar.optionalBarPara.number" );
-		assertCorrectConstraintTypes( constraintViolations, Min.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.method( "setBar" )
+								.parameter( "optionalBarPara", 0 )
+								.property( "number", false, null, null, Optional.class, 0 )
+						)
+		);
 	}
 
 	@Test(enabled = false)
@@ -90,13 +102,23 @@ public class OptionalValueExtractorTest {
 	@TestForIssue(jiraKey = "HV-895")
 	public void cascaded_validation_applies_for_elements_of_list_wrapped_in_optional() {
 		Set<ConstraintViolation<Quux>> constraintViolations = validator.validate( new Quux() );
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"bar[0].number",
-				"bar[1].number"
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.property( "bar" )
+								.property( "number", true, null, 0, Optional.class, 0 )
+						),
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.property( "bar" )
+								.property( "number", true, null, 1, Optional.class, 0 )
+						)
 		);
-		assertCorrectConstraintTypes( constraintViolations, Min.class, Min.class );
+		//		assertCorrectPropertyPaths(
+		//				constraintViolations,
+		//				"bar[0].number",
+		//				"bar[1].number"
+		//		);
 	}
 
 	private class Foo {

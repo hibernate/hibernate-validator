@@ -6,21 +6,23 @@
  */
 package org.hibernate.validator.test.constraints;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * HV-250
@@ -39,9 +41,9 @@ public class ClassValidatorWithTypeVariableTest {
 		Batch batch = new Batch( null );
 
 		Set<ConstraintViolation<Batch>> violations = validator.validate( batch );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectPropertyPaths( violations, "offers" );
-		assertCorrectConstraintTypes( violations, NotNull.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith().property( "offers" ) )
+		);
 	}
 
 	@Test
@@ -52,9 +54,13 @@ public class ClassValidatorWithTypeVariableTest {
 		Batch batch = new Batch( offers );
 
 		Set<ConstraintViolation<Batch>> violations = validator.validate( batch );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectPropertyPaths( violations, "offers[].item" );
-		assertCorrectConstraintTypes( violations, NotNull.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "offers" )
+								.property( "item", true, null, null, Set.class, 0 )
+						)
+		);
 	}
 
 	@Test
@@ -66,9 +72,14 @@ public class ClassValidatorWithTypeVariableTest {
 		Batch batch = new Batch( offers );
 
 		Set<ConstraintViolation<Batch>> violations = validator.validate( batch );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectPropertyPaths( violations, "offers[].item.date" );
-		assertCorrectConstraintTypes( violations, NotNull.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "offers" )
+								.property( "item", true, null, null, Set.class, 0 )
+								.property( "date" )
+						)
+		);
 	}
 
 	@SuppressWarnings("unused")

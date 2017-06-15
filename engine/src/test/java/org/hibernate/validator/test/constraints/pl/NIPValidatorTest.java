@@ -6,7 +6,9 @@
  */
 package org.hibernate.validator.test.constraints.pl;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import javax.validation.Validator;
@@ -32,33 +34,62 @@ public class NIPValidatorTest {
 
 	@Test
 	public void testCorrectNipNumber() {
-		assertNumberOfViolations( validator.validate( new Person( "123-456-78-19" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "123-45-67-819" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "123-456-32-18" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "5931423811" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "2596048500" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "4163450312" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "1786052059" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "6660057854" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "4219220786" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "3497264632" ) ), 0 );
+		assertNoViolations( validator.validate( new Person( "123-456-78-19" ) ) );
+		assertNoViolations( validator.validate( new Person( "123-45-67-819" ) ) );
+		assertNoViolations( validator.validate( new Person( "123-456-32-18" ) ) );
+		assertNoViolations( validator.validate( new Person( "5931423811" ) ) );
+		assertNoViolations( validator.validate( new Person( "2596048500" ) ) );
+		assertNoViolations( validator.validate( new Person( "4163450312" ) ) );
+		assertNoViolations( validator.validate( new Person( "1786052059" ) ) );
+		assertNoViolations( validator.validate( new Person( "6660057854" ) ) );
+		assertNoViolations( validator.validate( new Person( "4219220786" ) ) );
+		assertNoViolations( validator.validate( new Person( "3497264632" ) ) );
 
 	}
 
 	@Test
 	public void testIncorrectNipNumber() {
-		assertNumberOfViolations( validator.validate( new Person( "123-456-78-14" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "123-45-67-812" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "123-456-32-12" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "5931423812" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "2596048505" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "4163450311" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "1786052053" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "6660057852" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "4219220785" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "3497264639" ) ), 1 );
+		assertThat( validator.validate( new Person( "123-456-78-14" ) ) )
+				.containsOnlyViolations(
+						violationOf( NIP.class ).withProperty( "nip" )
+				);
+		assertThat( validator.validate( new Person( "123-45-67-812" ) ) )
+				.containsOnlyViolations(
+						violationOf( NIP.class ).withProperty( "nip" )
+				);
+		assertThat( validator.validate( new Person( "123-456-32-12" ) ) )
+				.containsOnlyViolations(
+						violationOf( NIP.class ).withProperty( "nip" )
+				);
+		assertThat( validator.validate( new Person( "5931423812" ) ) )
+				.containsOnlyViolations(
+						violationOf( NIP.class ).withProperty( "nip" )
+				);
+		assertThat( validator.validate( new Person( "2596048505" ) ) )
+				.containsOnlyViolations(
+						violationOf( NIP.class ).withProperty( "nip" )
+				);
+		assertThat( validator.validate( new Person( "4163450311" ) ) )
+				.containsOnlyViolations(
+						violationOf( NIP.class ).withProperty( "nip" )
+				);
+		assertThat( validator.validate( new Person( "1786052053" ) ) )
+				.containsOnlyViolations(
+						violationOf( NIP.class ).withProperty( "nip" )
+				);
+		assertThat( validator.validate( new Person( "6660057852" ) ) )
+				.containsOnlyViolations(
+						violationOf( NIP.class ).withProperty( "nip" )
+				);
+		assertThat( validator.validate( new Person( "4219220785" ) ) )
+				.containsOnlyViolations(
+						violationOf( NIP.class ).withProperty( "nip" )
+				);
+		assertThat( validator.validate( new Person( "3497264639" ) ) )
+				.containsOnlyViolations(
+						violationOf( NIP.class ).withProperty( "nip" )
+				);
 	}
-
 
 	public static class Person {
 

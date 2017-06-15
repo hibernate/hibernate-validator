@@ -7,17 +7,19 @@
 
 package org.hibernate.validator.test.constraints.boolcomposition.localconstrval;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
-import org.testng.annotations.Test;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import org.testng.annotations.Test;
 
 /**
  * @author Federico Mancini
@@ -38,7 +40,7 @@ public class LocalConstrValTest {
 				new Person( "6chars", "WWWW" )
 		);
 
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		//nickname is too long
 		constraintViolations = currentValidator.validate(
@@ -46,9 +48,9 @@ public class LocalConstrValTest {
 						"12characters", "loongstring"
 				)
 		);
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintTypes( constraintViolations, SmallString.class );
-		assertCorrectPropertyPaths( constraintViolations, "nickName" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( SmallString.class ).withProperty( "nickName" )
+		);
 
 		//nickName fails for violating @Size, but is reported as SingleViolation
 		//name fails for violating both Pattern and the test in LongStringValidator. In a way it is reported
@@ -58,8 +60,10 @@ public class LocalConstrValTest {
 						"exactlyTEN", "tinystr"
 				)
 		);
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectConstraintTypes( constraintViolations, SmallString.class, Pattern.class, PatternOrLong.class );
-		assertCorrectPropertyPaths( constraintViolations, "nickName", "name", "name" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( SmallString.class ).withProperty( "nickName" ),
+				violationOf( Pattern.class ).withProperty( "name" ),
+				violationOf( PatternOrLong.class ).withProperty( "name" )
+		);
 	}
 }

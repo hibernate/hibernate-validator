@@ -49,7 +49,7 @@ public class RelaxedMethodParameterConstraintsTest {
 				new Object[] { "foo" }
 		);
 
-		ConstraintViolationAssert.assertNumberOfViolations( violations, 0 );
+		ConstraintViolationAssert.assertNoViolations( violations );
 
 		configuration.allowOverridingMethodAlterParameterConstraint( false );
 	}
@@ -86,7 +86,7 @@ public class RelaxedMethodParameterConstraintsTest {
 						new Object[] { "foo" }
 				);
 
-		ConstraintViolationAssert.assertNumberOfViolations( violations, 0 );
+		ConstraintViolationAssert.assertNoViolations( violations );
 
 		configuration.allowOverridingMethodAlterParameterConstraint( false );
 	}

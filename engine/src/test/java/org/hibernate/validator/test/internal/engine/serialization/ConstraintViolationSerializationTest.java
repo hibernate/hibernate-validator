@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.serialization;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.NotSerializableException;
@@ -13,15 +16,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-
-import org.testng.annotations.Test;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -37,7 +40,9 @@ public class ConstraintViolationSerializationTest {
 
 		byte[] bytes = serialize( constraintViolations );
 		Set<ConstraintViolation<?>> deserializedViolations = deserialize( bytes );
-		assertNumberOfViolations( deserializedViolations, 1 );
+		assertThat( deserializedViolations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "foo" )
+		);
 	}
 
 	@TestForIssue(jiraKey = "HV-245")

@@ -7,6 +7,7 @@
 package org.hibernate.validator.testutil;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.lang.annotation.Annotation;
@@ -179,18 +180,12 @@ public final class ConstraintViolationAssert {
 	}
 
 	/**
-	 * Asserts that the given violation list has the expected number of violations.
+	 * Asserts that the given violation list has no violations (is empty).
 	 *
 	 * @param violations The violation list to verify.
-	 * @param numberOfViolations The expected number of violation.
 	 */
-	public static void assertNumberOfViolations(Set<? extends ConstraintViolation<?>> violations,
-			int numberOfViolations) {
-		assertEquals(
-				violations.size(),
-				numberOfViolations,
-				"Wrong number of constraint violations"
-		);
+	public static void assertNoViolations(Set<? extends ConstraintViolation<?>> violations) {
+		assertTrue( violations.isEmpty(), "Should not have constraint violations" );
 	}
 
 	public static void assertConstraintTypes(Set<? extends ConstraintDescriptor<?>> descriptors,

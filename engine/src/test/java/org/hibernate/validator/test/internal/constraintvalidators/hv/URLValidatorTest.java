@@ -6,17 +6,24 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static java.lang.annotation.ElementType.METHOD;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.io.InputStream;
 import java.util.Set;
+
 import javax.validation.Configuration;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.Pattern.Flag;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -31,13 +38,8 @@ import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Tests the {@code URL} constraint.
@@ -249,7 +251,7 @@ public class URLValidatorTest {
 		Validator validator = config.buildValidatorFactory().getValidator();
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo() );
 
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 		assertEquals(
 				constraintValidatorFactory.requestedConstraintValidators.size(),
 				2, // @URL is a composing constraint, a @Pattern validator impl will also be requested
@@ -264,27 +266,33 @@ public class URLValidatorTest {
 	private void runUrlContainerValidation(Validator validator, URLContainer container, boolean caseSensitive) {
 		container.setUrl( "http://my.domain.com/index.html" );
 		Set<ConstraintViolation<URLContainer>> violations = validator.validate( container );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 
 		container.setUrl( "http://my.domain.com/index.htm" );
 		violations = validator.validate( container );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 
 		container.setUrl( "http://my.domain.com/index" );
 		violations = validator.validate( container );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "must be a valid URL" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( URL.class ).withMessage( "must be a valid URL" )
+		);
 
 		container.setUrl( "http://my.domain.com/index.asp" );
 		violations = validator.validate( container );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "must be a valid URL" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( URL.class ).withMessage( "must be a valid URL" )
+		);
 
 		container.setUrl( "http://my.domain.com/index.HTML" );
 		violations = validator.validate( container );
-		assertNumberOfViolations( violations, caseSensitive ? 1 : 0 );
 		if ( caseSensitive ) {
-			assertCorrectConstraintViolationMessages( violations, "must be a valid URL" );
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( URL.class ).withMessage( "must be a valid URL" )
+			);
+		}
+		else {
+			assertNoViolations( violations );
 		}
 
 	}
