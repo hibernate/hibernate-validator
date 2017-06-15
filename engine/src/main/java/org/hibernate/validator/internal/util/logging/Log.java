@@ -712,7 +712,7 @@ public interface Log extends BasicLogger {
 	ConstraintDefinitionException getInvalidUnwrappingConfigurationForConstraintException(Member member, @FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint);
 
 	@Message(id = 206, value = "Unable to instantiate value extractor class %s.")
-	ValidationException getUnableToInstantiateValueExtractorClassException(String valueExtractorClassName, @Cause ValidationException e);
+	ValueExtractorDeclarationException getUnableToInstantiateValueExtractorClassException(String valueExtractorClassName, @Cause ValidationException e);
 
 	@LogMessage(level = INFO)
 	@Message(id = 207, value = "Adding value extractor %s.")
