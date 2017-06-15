@@ -6,10 +6,9 @@
  */
 package org.hibernate.validator.test.cfg;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertNull;
@@ -34,6 +33,7 @@ import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -73,8 +73,15 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "greet.<return value>.message" );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "may not be null" )
+					.withPropertyPath( pathWith()
+							.method( "greet" )
+							.returnValue()
+							.property( "message" )
+					)
+			);
 		}
 	}
 
@@ -103,8 +110,15 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages( e, "message must not be null" );
-			assertCorrectPropertyPaths( e, "greet.<return value>.message" );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "message must not be null" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.returnValue()
+									.property( "message" )
+							)
+			);
 		}
 	}
 
@@ -124,8 +138,15 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "greet.user.name" );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "may not be null" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.parameter( "user", 0 )
+									.property( "name" )
+							)
+			);
 		}
 	}
 
@@ -176,8 +197,14 @@ public class MethodConstraintMappingTest {
 			service.greet( "Hi" );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages( e, "size must be between 5 and 10" );
-			assertCorrectPropertyPaths( e, "greet.string" );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Size.class )
+							.withMessage( "size must be between 5 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.parameter( "string", 0 )
+							)
+			);
 		}
 	}
 
@@ -200,8 +227,15 @@ public class MethodConstraintMappingTest {
 			service.greet( new User( null ) );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "greet.user.name" );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "may not be null" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.parameter( "user", 0 )
+									.property( "name" )
+							)
+			);
 		}
 	}
 
@@ -238,9 +272,14 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "greet.user" );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "may not be null" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.parameter( "user", 0 )
+							)
+			);
 		}
 	}
 
@@ -263,11 +302,14 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages(
-					e, "size must be between 1 and 10"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Size.class )
+							.withMessage( "size must be between 1 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.parameter( "string", 0 )
+							)
 			);
-			assertCorrectPropertyPaths( e, "greet.string" );
 		}
 	}
 
@@ -291,11 +333,20 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages(
-					e, "size must be between 1 and 10", "size must be between 2 and 10"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Size.class )
+							.withMessage( "size must be between 1 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.parameter( "string", 0 )
+							),
+					violationOf( Size.class )
+							.withMessage( "size must be between 2 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.parameter( "string", 0 )
+							)
 			);
-			assertCorrectPropertyPaths( e, "greet.string", "greet.string" );
 		}
 	}
 
@@ -320,11 +371,20 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages(
-					e, "size must be between 1 and 10", "size must be between 1 and 10"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Size.class )
+							.withMessage( "size must be between 1 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.parameter( "string1", 0 )
+							),
+					violationOf( Size.class )
+							.withMessage( "size must be between 1 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.parameter( "string2", 1 )
+							)
 			);
-			assertCorrectPropertyPaths( e, "greet.string1", "greet.string2" );
 		}
 	}
 
@@ -347,11 +407,20 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages(
-					e, "size must be between 1 and 10", "size must be between 2 and 10"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Size.class )
+							.withMessage( "size must be between 1 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "sayHello" )
+									.parameter( "name", 0 )
+							),
+					violationOf( Size.class )
+							.withMessage( "size must be between 2 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "sayHello" )
+									.parameter( "name", 0 )
+							)
 			);
-			assertCorrectPropertyPaths( e, "sayHello.name", "sayHello.name" );
 		}
 	}
 
@@ -373,9 +442,14 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "greet.user" );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "may not be null" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.parameter( "user", 0 )
+							)
+			);
 		}
 
 		try {
@@ -384,9 +458,15 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "greet.user.name" );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "may not be null" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.parameter( "user", 0 )
+									.property( "name" )
+							)
+			);
 		}
 	}
 
@@ -409,9 +489,14 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages( e, "size must be between 1 and 10" );
-			assertCorrectPropertyPaths( e, "greet.<return value>" );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Size.class )
+							.withMessage( "size must be between 1 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.returnValue()
+							)
+			);
 		}
 	}
 
@@ -435,11 +520,20 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages(
-					e, "size must be between 1 and 10", "size must be between 2 and 10"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Size.class )
+							.withMessage( "size must be between 1 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.returnValue()
+							),
+					violationOf( Size.class )
+							.withMessage( "size must be between 2 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.returnValue()
+							)
 			);
-			assertCorrectPropertyPaths( e, "greet.<return value>", "greet.<return value>" );
 		}
 	}
 
@@ -462,11 +556,14 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages(
-					e, "size must be between 1 and 10"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Size.class )
+							.withMessage( "size must be between 1 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.returnValue()
+							)
 			);
-			assertCorrectPropertyPaths( e, "greet.<return value>" );
 		}
 	}
 
@@ -489,11 +586,20 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages(
-					e, "size must be between 1 and 10", "size must be between 2 and 10"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Size.class )
+							.withMessage( "size must be between 1 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.returnValue()
+							),
+					violationOf( Size.class )
+							.withMessage( "size must be between 2 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.returnValue()
+							)
 			);
-			assertCorrectPropertyPaths( e, "greet.<return value>", "greet.<return value>" );
 		}
 	}
 
@@ -515,11 +621,14 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages(
-					e, "may not be null"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "may not be null" )
+							.withPropertyPath( pathWith()
+									.method( "getHello" )
+									.returnValue()
+							)
 			);
-			assertCorrectPropertyPaths( e, "getHello.<return value>" );
 		}
 	}
 
@@ -541,11 +650,15 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages(
-					e, "may not be null"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "may not be null" )
+							.withPropertyPath( pathWith()
+									.method( "getUser" )
+									.returnValue()
+									.property( "name" )
+							)
 			);
-			assertCorrectPropertyPaths( e, "getUser.<return value>.name" );
 		}
 	}
 
@@ -586,9 +699,13 @@ public class MethodConstraintMappingTest {
 		Set<ConstraintViolation<GreetingServiceImpl>> violations = validator.validateProperty(
 				new GreetingServiceImpl(), "hello"
 		);
-
-		assertCorrectConstraintViolationMessages( violations, "may not be null" );
-		assertCorrectPropertyPaths( violations, "hello" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "may not be null" )
+						.withPropertyPath( pathWith()
+								.property( "hello" )
+						)
+		);
 	}
 
 	@Test
@@ -603,8 +720,14 @@ public class MethodConstraintMappingTest {
 		Validator validator = config.buildValidatorFactory().getValidator();
 		Set<ConstraintViolation<GreetingServiceImpl>> violations = validator.validate( new GreetingServiceImpl() );
 
-		assertCorrectConstraintViolationMessages( violations, "may not be null" );
-		assertCorrectPropertyPaths( violations, "user.name" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "may not be null" )
+						.withPropertyPath( pathWith()
+								.property( "user" )
+								.property( "name" )
+						)
+		);
 	}
 
 	@Test
@@ -628,10 +751,20 @@ public class MethodConstraintMappingTest {
 			service.greet( null, null );
 			fail( "Expected exception wasn't thrown" );
 		}
-		catch (ConstraintViolationException cve) {
-			assertThat( cve.getConstraintViolations() ).containsOnlyPaths(
-					pathWith().method( "greet" ).returnValue(),
-					pathWith().method( "greet" ).returnValue()
+		catch (ConstraintViolationException e) {
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( GenericAndCrossParameterConstraint.class )
+							.withMessage( "default message" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.returnValue()
+							),
+					violationOf( Size.class )
+							.withMessage( "size must be between 1 and 10" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.returnValue()
+							)
 			);
 		}
 	}
@@ -660,11 +793,14 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages(
-					e, "default message"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( GenericAndCrossParameterConstraint.class )
+							.withMessage( "default message" )
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.crossParameter()
+							)
 			);
-			assertCorrectPropertyPaths( e, "greet.<cross-parameter>" );
 		}
 	}
 
@@ -692,11 +828,14 @@ public class MethodConstraintMappingTest {
 			fail( "Expected exception wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages(
-					e, "default message"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( GenericAndCrossParameterConstraint.class )
+							.withMessage( "default message" )
+							.withPropertyPath( pathWith()
+									.method( "sayNothing" )
+									.crossParameter()
+							)
 			);
-			assertCorrectPropertyPaths( e, "sayNothing.<cross-parameter>" );
 		}
 	}
 

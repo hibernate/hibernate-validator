@@ -8,7 +8,8 @@ package org.hibernate.validator.test.internal.xml;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertEquals;
 
 import java.io.InputStream;
@@ -24,6 +25,7 @@ import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.validation.executable.ExecutableType;
 import javax.validation.groups.Default;
 import javax.validation.metadata.MethodDescriptor;
@@ -152,10 +154,9 @@ public class XmlMappingTest {
 				);
 
 		//then
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"size must be between 1 and 10",
-				"size must be between 2 and 10"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "size must be between 1 and 10" ),
+				violationOf( Size.class ).withMessage( "size must be between 2 and 10" )
 		);
 	}
 

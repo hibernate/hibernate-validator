@@ -6,8 +6,9 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -27,6 +28,7 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescrip
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.Test;
 
 /**
@@ -139,8 +141,13 @@ public class ScriptAssertValidatorTest {
 				)
 		);
 
-		assertCorrectPropertyPaths( fieldViolations, "startDate" );
-		assertCorrectConstraintViolationMessages( fieldViolations, "script expression \"_this.startDate.before(_this.endDate)\" didn't evaluate to true" );
+		assertThat( fieldViolations ).containsOnlyViolations(
+				violationOf( ScriptAssert.class )
+						.withMessage( "script expression \"_this.startDate.before(_this.endDate)\" didn't evaluate to true" )
+						.withPropertyPath( pathWith()
+								.property( "startDate" )
+						)
+		);
 
 		Set<ConstraintViolation<AnnotatedWithoutReportCalendarEvent>> beanViolations = validator.validate(
 				new AnnotatedWithoutReportCalendarEvent(
@@ -149,8 +156,13 @@ public class ScriptAssertValidatorTest {
 				)
 		);
 
-		assertCorrectPropertyPaths( beanViolations, "" );
-		assertCorrectConstraintViolationMessages( fieldViolations, "script expression \"_this.startDate.before(_this.endDate)\" didn't evaluate to true" );
+		assertThat( beanViolations ).containsOnlyViolations(
+				violationOf( ScriptAssert.class )
+						.withMessage( "script expression \"_this.startDate.before(_this.endDate)\" didn't evaluate to true" )
+						.withPropertyPath( pathWith()
+								.bean()
+						)
+		);
 	}
 
 	/**
