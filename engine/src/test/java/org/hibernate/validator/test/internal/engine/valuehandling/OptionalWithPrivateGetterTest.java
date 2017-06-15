@@ -6,21 +6,22 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
 import java.time.LocalDate;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.AssertTrue;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -36,7 +37,7 @@ public class OptionalWithPrivateGetterTest {
 		Set<ConstraintViolation<Project>> constraintViolations = validator.validate(
 				new Project( LocalDate.MIN, LocalDate.MAX )
 		);
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -49,9 +50,9 @@ public class OptionalWithPrivateGetterTest {
 			Set<ConstraintViolation<Project>> constraintViolations = validator.validate(
 					new Project( dates[0], dates[1] )
 			);
-			assertNumberOfViolations( constraintViolations, 1 );
-			assertCorrectConstraintTypes( constraintViolations, AssertTrue.class );
-			assertCorrectPropertyPaths( constraintViolations, "startBeforeEnd" );
+			assertThat( constraintViolations ).containsOnlyViolations(
+					violationOf( AssertTrue.class ).withProperty( "startBeforeEnd" )
+			);
 		}
 	}
 }

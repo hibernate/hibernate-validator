@@ -6,6 +6,16 @@
  */
 package org.hibernate.validator.test.internal.engine.path;
 
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertSame;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
@@ -31,17 +41,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.path.PropertyNode;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertSame;
 
 /**
  * @author Hardy Ferentschik
@@ -103,8 +105,9 @@ public class NodeImplTest {
 		C c = new C();
 
 		Set<ConstraintViolation<C>> constraintViolations = validator.validate( c );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( CustomConstraint.class ).withPropertyPath( pathWith().bean() )
+		);
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();
 		Iterator<Path.Node> nodeIterator = path.iterator();
@@ -118,8 +121,13 @@ public class NodeImplTest {
 		D d = new D();
 
 		Set<ConstraintViolation<D>> constraintViolations = validator.validate( d );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "c" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( CustomConstraint.class )
+						.withPropertyPath( pathWith()
+								.property( "c" )
+								.bean()
+						)
+		);
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();
 		Iterator<Path.Node> nodeIterator = path.iterator();
@@ -138,8 +146,13 @@ public class NodeImplTest {
 
 		Set<ConstraintViolation<AWithListOfB>> constraintViolations = validator.validate( a );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "bs[0].b" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "bs" )
+								.property( "b", true, null, 0, Collection.class, 0 )
+						)
+		);
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();
 		Iterator<Path.Node> nodeIterator = path.iterator();
@@ -157,8 +170,13 @@ public class NodeImplTest {
 
 		Set<ConstraintViolation<AWithArrayOfB>> constraintViolations = validator.validate( a );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "bs[0].b" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "bs" )
+								.property( "b", true, null, 0, Object[].class, null )
+						)
+		);
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();
 		Iterator<Path.Node> nodeIterator = path.iterator();
@@ -176,8 +194,13 @@ public class NodeImplTest {
 
 		Set<ConstraintViolation<AWithMapOfB>> constraintViolations = validator.validate( a );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "bs[b].b" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "bs" )
+								.property( "b", true, "b", null, Map.class, 1 )
+						)
+		);
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();
 		Iterator<Path.Node> nodeIterator = path.iterator();
@@ -197,8 +220,14 @@ public class NodeImplTest {
 
 		Set<ConstraintViolation<Building>> constraintViolations = validator.validate( building );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "apartments[].resident.name" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "apartments" )
+								.property( "resident", true, null, null, Set.class, 0 )
+								.property( "name" )
+						)
+		);
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();
 		Iterator<Path.Node> nodeIterator = path.iterator();
@@ -230,8 +259,13 @@ public class NodeImplTest {
 
 		Set<ConstraintViolation<Building>> constraintViolations = validator.validate( building );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "floors[2].number" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Max.class )
+						.withPropertyPath( pathWith()
+								.property( "floors" )
+								.property( "number", true, null, 2, List.class, 0 )
+						)
+		);
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();
 		Iterator<Path.Node> nodeIterator = path.iterator();
@@ -258,8 +292,13 @@ public class NodeImplTest {
 
 		Set<ConstraintViolation<Building>> constraintViolations = validator.validate( building );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "managers[main].name" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "managers" )
+								.property( "name", true, "main", null, Map.class, 1 )
+						)
+		);
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();
 		Iterator<Path.Node> nodeIterator = path.iterator();
@@ -279,8 +318,13 @@ public class NodeImplTest {
 	}
 
 	private void assertConstraintViolationToOneValidation(Set<ConstraintViolation<AWithB>> constraintViolations) {
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "b.b" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "b" )
+								.property( "b" )
+						)
+		);
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();
 		Iterator<Path.Node> nodeIterator = path.iterator();
@@ -293,8 +337,9 @@ public class NodeImplTest {
 	}
 
 	private void assertConstraintViolationPropertyValidation(Set<ConstraintViolation<A>> constraintViolations) {
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "a" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "a" )
+		);
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();
 		Iterator<Path.Node> nodeIterator = path.iterator();

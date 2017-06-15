@@ -6,19 +6,22 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -36,7 +39,9 @@ public class CreditCardNumberValidatorTest {
 		CreditCard card = new CreditCard();
 		card.setCreditCardNumber( "1234567890123456" );
 		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( CreditCardNumber.class )
+		);
 	}
 
 	@Test
@@ -45,7 +50,9 @@ public class CreditCardNumberValidatorTest {
 		CreditCard card = new CreditCard();
 		card.setCreditCardNumberAsCharSequence( new MyCustomStringImpl( "1234567890123456" ) );
 		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( CreditCardNumber.class )
+		);
 	}
 
 	@Test
@@ -53,7 +60,7 @@ public class CreditCardNumberValidatorTest {
 		CreditCard card = new CreditCard();
 		card.setCreditCardNumber( "541234567890125" );
 		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -62,7 +69,7 @@ public class CreditCardNumberValidatorTest {
 		CreditCard card = new CreditCard();
 		card.setCreditCardNumberAsCharSequence( new MyCustomStringImpl( "541234567890125" ) );
 		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -71,13 +78,13 @@ public class CreditCardNumberValidatorTest {
 		CreditCard card = new CreditCard();
 		card.setCreditCardNumber( "5105105105105100" );
 		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
 	public void testNullValue() throws Exception {
 		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( new CreditCard() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -86,7 +93,9 @@ public class CreditCardNumberValidatorTest {
 		CreditCard card = new CreditCard();
 		card.setCreditCardNumber( "text not numbers" );
 		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( CreditCardNumber.class )
+		);
 	}
 
 	@Test
@@ -95,7 +104,7 @@ public class CreditCardNumberValidatorTest {
 		CreditCard card = new CreditCard();
 		card.setCreditCardNumberWithNonDigits( "5412 3456 7890 125" );
 		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -104,7 +113,7 @@ public class CreditCardNumberValidatorTest {
 		CreditCard card = new CreditCard();
 		card.setCreditCardNumberWithNonDigits( "5412-3456-7890-125" );
 		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	public static class CreditCard {

@@ -6,7 +6,9 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -22,6 +24,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.SafeHtmlValidato
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -119,14 +122,16 @@ public class SafeHtmlValidatorTest {
 	public void testDivWithWhiteListedStyleAttribute() throws Exception {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( "<div style='foo'>test</div>" ) );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		// the attributes are optional - allowing <div class> also allows just <div>
 		constraintViolations = validator.validate( new Foo( "<div>test</div>" ) );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( new Foo( "<div class='foo'>test</div>" ) );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( SafeHtml.class )
+		);
 	}
 
 	@Test
@@ -158,13 +163,25 @@ public class SafeHtmlValidatorTest {
 	public void testAdditionalProtocols() {
 		Validator validator = getValidator();
 
-		assertNumberOfViolations( validator.validate( new Bar( "<img src='data:image/png;base64,100101' />" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Bar( "<img/>" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Bar( "<img src='not_data:image/png;base64,100101' />" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Bar( "<img not_src='data:image/png;base64,100101' />" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Bar( "<div src='data:image/png;base64,100101' />" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Bar( "<div src='data:image/png;base64,100101' />" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Bar(
+		assertNoViolations( validator.validate( new Bar( "<img src='data:image/png;base64,100101' />" ) ) );
+		assertNoViolations( validator.validate( new Bar( "<img/>" ) ) );
+		assertThat( validator.validate( new Bar( "<img src='not_data:image/png;base64,100101' />" ) ) )
+				.containsOnlyViolations(
+						violationOf( SafeHtml.class )
+				);
+		assertThat( validator.validate( new Bar( "<img not_src='data:image/png;base64,100101' />" ) ) )
+				.containsOnlyViolations(
+						violationOf( SafeHtml.class )
+				);
+		assertThat( validator.validate( new Bar( "<div src='data:image/png;base64,100101' />" ) ) )
+				.containsOnlyViolations(
+						violationOf( SafeHtml.class )
+				);
+		assertThat( validator.validate( new Bar( "<div src='data:image/png;base64,100101' />" ) ) )
+				.containsOnlyViolations(
+						violationOf( SafeHtml.class )
+				);
+		assertNoViolations( validator.validate( new Bar(
 				"<custom>" +
 						"  <img src='data:image/png;base64,100101' />" +
 						"  <custom attr1='strange_protocol:some_text' />" +
@@ -172,14 +189,15 @@ public class SafeHtmlValidatorTest {
 						"  <custom><img /></custom>" +
 						"  <section id='sec1' attr='val'></section>" +
 						"  <custom attr1='dataprotocol:some_text' attr2='strange_protocol:some_text' />" +
-						"</custom>" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Bar(
+						"</custom>" ) ) );
+		assertThat( validator.validate( new Bar(
 				"<div>" +
 						"<img src='not_data:image/png;base64,100101' />" +
 						"<custom attr1='strange_protocol:some_text' />" +
 						"/<div>"
-
-		) ), 1 );
+		) ) ).containsOnlyViolations(
+				violationOf( SafeHtml.class )
+		);
 	}
 
 	@Test

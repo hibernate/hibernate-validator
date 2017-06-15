@@ -7,7 +7,7 @@
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
@@ -23,6 +23,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 
 import org.hibernate.validator.testutils.CandidateForTck;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -42,10 +43,10 @@ public class OptionalPrimitivesValueExtractorTest {
 	@Test
 	public void testOptionalInt() {
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( Foo.valid() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( Foo.empty() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( Foo.invalid() );
 		assertThat( constraintViolations ).containsOnlyPaths(
@@ -57,6 +58,7 @@ public class OptionalPrimitivesValueExtractorTest {
 	}
 
 	private static class Foo {
+
 		@Min(value = 5)
 		private final OptionalInt optionalInt;
 

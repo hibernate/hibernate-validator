@@ -6,13 +6,10 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPath;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -31,6 +28,7 @@ import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.Path.ParameterNode;
 import javax.validation.Validator;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Address;
@@ -42,6 +40,7 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.service.Cus
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithConstrainedVoidMethodImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.RepositoryBase;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.joda.time.DateMidnight;
 import org.testng.annotations.Test;
 
@@ -77,20 +76,19 @@ public abstract class AbstractMethodValidationTest {
 		catch (ConstraintViolationException e) {
 
 			Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
-			assertNumberOfViolations( constraintViolations, 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "findCustomerByName" )
+									.parameter( "name", 0 )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( null )
+			);
 
 			ConstraintViolation<?> constraintViolation = constraintViolations.iterator().next();
 
-			assertConstraintViolation(
-					constraintViolation,
-					NotNull.class,
-					messagePrefix() + "may not be null",
-					CustomerRepositoryImpl.class,
-					null
-			);
-			assertEquals(
-					constraintViolation.getConstraintDescriptor().getAnnotation().annotationType(), NotNull.class
-			);
 			assertMethod( constraintViolation, "findCustomerByName", String.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -114,7 +112,16 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "findCustomerByAgeAndName" )
+									.parameter( "name", 1 )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( null )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
@@ -138,11 +145,23 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 2 );
-			assertCorrectConstraintViolationMessages(
-					e.getConstraintViolations(),
-					messagePrefix() + "may not be null",
-					messagePrefix() + "must be greater than or equal to 5"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "findCustomerByAgeAndName" )
+									.parameter( "name", 1 )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( null ),
+					violationOf( Min.class )
+							.withPropertyPath( pathWith()
+									.method( "findCustomerByAgeAndName" )
+									.parameter( "age", 0 )
+							)
+							.withMessage( messagePrefix() + "must be greater than or equal to 5" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( 1 )
 			);
 		}
 	}
@@ -155,7 +174,17 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "persistCustomer" )
+									.parameter( "customer", 0 )
+									.property( "name" )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( null )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
@@ -184,7 +213,18 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "persistCustomer" )
+									.parameter( "customer", 0 )
+									.property( "address" )
+									.property( "city" )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( null )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
@@ -215,7 +255,17 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "cascadingMapParameter" )
+									.parameter( "customer", 0 )
+									.property( "name", true, "Bob", null, Map.class, 1 )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( null )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
@@ -245,7 +295,17 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "cascadingIterableParameter" )
+									.parameter( "customer", 0 )
+									.property( "name", true, null, 1, List.class, 0 )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( null )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
@@ -274,7 +334,17 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "cascadingArrayParameter" )
+									.parameter( "customer", 0 )
+									.property( "name", true, null, 1, Object[].class, null )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( null )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
@@ -304,7 +374,16 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "findById" )
+									.parameter( "id", 0 )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( null )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
@@ -322,7 +401,16 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "foo" )
+									.parameter( "id", 0 )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( null )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
@@ -340,7 +428,17 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "bar" )
+									.parameter( "customer", 0 )
+									.property( "name" )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( null )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
@@ -364,7 +462,16 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertNumberOfViolations( e.getConstraintViolations(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Min.class )
+							.withPropertyPath( pathWith()
+									.method( "baz" )
+									.returnValue()
+							)
+							.withMessage( messagePrefix() + "must be greater than or equal to 10" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( 9 )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must be greater than or equal to 10" );
@@ -387,7 +494,16 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertNumberOfViolations( e.getConstraintViolations(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "cascadingReturnValue" )
+									.returnValue()
+									.property( "name" )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
@@ -413,7 +529,16 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertNumberOfViolations( e.getConstraintViolations(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "overriddenMethodWithCascadingReturnValue" )
+									.returnValue()
+									.property( "name" )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
@@ -440,7 +565,17 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "cascadingIterableReturnValue" )
+									.returnValue()
+									.property( "name", true, null, 1, List.class, 0 )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( null )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
@@ -470,7 +605,17 @@ public abstract class AbstractMethodValidationTest {
 			Map<String, Customer> expectedReturnValue = newHashMap();
 			expectedReturnValue.put( "Bob", customer );
 
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "cascadingMapReturnValue" )
+									.returnValue()
+									.property( "name", true, "Bob", null, Map.class, 1 )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( null )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
@@ -496,7 +641,17 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withPropertyPath( pathWith()
+									.method( "cascadingArrayReturnValue" )
+									.returnValue()
+									.property( "name", true, null, 1, Object[].class, null )
+							)
+							.withMessage( messagePrefix() + "may not be null" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( null )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
@@ -522,10 +677,23 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages(
-					e.getConstraintViolations(),
-					messagePrefix() + "must be greater than or equal to 5",
-					messagePrefix() + "must be greater than or equal to 10"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Min.class )
+							.withPropertyPath( pathWith()
+									.method( "overriddenMethodWithReturnValueConstraint" )
+									.returnValue()
+							)
+							.withMessage( messagePrefix() + "must be greater than or equal to 5" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( 3 ),
+					violationOf( Min.class )
+							.withPropertyPath( pathWith()
+									.method( "overriddenMethodWithReturnValueConstraint" )
+									.returnValue()
+							)
+							.withMessage( messagePrefix() + "must be greater than or equal to 10" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( 3 )
 			);
 		}
 	}
@@ -537,10 +705,23 @@ public abstract class AbstractMethodValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages(
-					e.getConstraintViolations(),
-					messagePrefix() + "must be greater than or equal to 5",
-					messagePrefix() + "must be greater than or equal to 10"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Min.class )
+							.withPropertyPath( pathWith()
+									.method( "overriddenMethodWithReturnValueConstraint" )
+									.returnValue()
+							)
+							.withMessage( messagePrefix() + "must be greater than or equal to 5" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( 3 ),
+					violationOf( Min.class )
+							.withPropertyPath( pathWith()
+									.method( "overriddenMethodWithReturnValueConstraint" )
+									.returnValue()
+							)
+							.withMessage( messagePrefix() + "must be greater than or equal to 10" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+							.withInvalidValue( 3 )
 			);
 		}
 	}
@@ -584,19 +765,21 @@ public abstract class AbstractMethodValidationTest {
 		}
 		catch (ConstraintViolationException e) {
 			//then
-			assertThat( e.getConstraintViolations() ).hasSize( 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( ConsistentDateParameters.class )
+							.withPropertyPath( pathWith()
+									.method( "methodWithCrossParameterConstraint" )
+									.crossParameter()
+							)
+							.withMessage( messagePrefix() + "{ConsistentDateParameters.message}" )
+							.withRootBeanClass( CustomerRepositoryImpl.class )
+			);
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertCorrectConstraintViolationMessages(
-					e.getConstraintViolations(),
-					messagePrefix() + "{ConsistentDateParameters.message}"
-			);
-			assertThat( constraintViolation.getConstraintDescriptor().getAnnotation().annotationType() ).isEqualTo(
-					ConsistentDateParameters.class
-			);
-			assertThat( constraintViolation.getInvalidValue() ).isEqualTo( new Object[] { startDate, endDate } );
+			assertEquals( constraintViolation.getConstraintDescriptor().getAnnotation().annotationType(), ConsistentDateParameters.class );
+			assertEquals( constraintViolation.getInvalidValue(), new Object[] { startDate, endDate } );
 			assertEquals( constraintViolation.getLeafBean(), customerRepository );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
-			assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
+			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { startDate, endDate } );
 			assertEquals( constraintViolation.getExecutableReturnValue(), null );
 
@@ -605,12 +788,6 @@ public abstract class AbstractMethodValidationTest {
 					"methodWithCrossParameterConstraint",
 					DateMidnight.class,
 					DateMidnight.class
-			);
-
-			assertCorrectPropertyPath( constraintViolation,
-					pathWith()
-							.method( "methodWithCrossParameterConstraint" )
-							.crossParameter()
 			);
 		}
 	}

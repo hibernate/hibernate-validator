@@ -6,19 +6,22 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -42,27 +45,37 @@ public class BlankValidatorTest {
 		Foo foo = new Foo();
 
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( foo );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+		);
 
 		foo.name = "";
 		constraintViolations = validator.validate( foo );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+		);
 
 		foo.name = " ";
 		constraintViolations = validator.validate( foo );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+		);
 
 		foo.name = "\t";
 		constraintViolations = validator.validate( foo );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+		);
 
 		foo.name = "\n";
 		constraintViolations = validator.validate( foo );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+		);
 
 		foo.name = "john doe";
 		constraintViolations = validator.validate( foo );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	class Foo {

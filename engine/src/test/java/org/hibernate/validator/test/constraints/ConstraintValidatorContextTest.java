@@ -9,10 +9,9 @@ package org.hibernate.validator.test.constraints;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.lang.annotation.Retention;
 import java.util.Arrays;
@@ -37,6 +36,7 @@ import javax.validation.executable.ExecutableValidator;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -65,8 +65,13 @@ public class ConstraintValidatorContextTest {
 		item.interval.end = 5;
 
 		Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "interval.start" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( StartLessThanEnd.class )
+						.withPropertyPath( pathWith()
+								.property( "interval" )
+								.property( "start" )
+						)
+		);
 	}
 
 	@Test
@@ -79,16 +84,25 @@ public class ConstraintValidatorContextTest {
 		item.interval.end = 5;
 
 		Set<ConstraintViolation<Interval>> constraintViolations = validator.validate( interval );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "start" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( StartLessThanEnd.class ).withPropertyPath( pathWith().property( "start" ) )
+		);
 	}
 
 	@Test
 	public void testLegacyAddNode() {
 		Set<ConstraintViolation<MyObject>> constraintViolations = validator.validate( new MyObject() );
 
-		assertNumberOfViolations( constraintViolations, 4 );
-		assertCorrectPropertyPaths( constraintViolations, "field1", "field2", "myNode1", "myNode2[key].myNode3" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith().property( "field1" ) ),
+				violationOf( NotNull.class ).withPropertyPath( pathWith().property( "field2" ) ),
+				violationOf( MyClassLevelValidation.class ).withPropertyPath( pathWith().property( "myNode1" ) ),
+				violationOf( MyClassLevelValidation.class )
+						.withPropertyPath( pathWith()
+								.property( "myNode2" )
+								.property( "myNode3", true, "key", null, null, null )
+						)
+		);
 	}
 
 	@Test

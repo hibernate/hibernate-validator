@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.test.internal.engine.cascaded;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.Arrays;
@@ -31,6 +31,7 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
+
 import org.testng.annotations.Test;
 
 @TestForIssue(jiraKey = "HV-1237")
@@ -43,7 +44,7 @@ public class NestedCascadedConstraintsTest {
 
 		Set<ConstraintViolation<EmailAddressMap>> constraintViolations = validator.validate( EmailAddressMap.validEmailAddressMap() );
 
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( EmailAddressMap.invalidEmailAddressMap() );
 
@@ -52,16 +53,19 @@ public class NestedCascadedConstraintsTest {
 				"map[invalid].<map value>[1].email",
 				"map[invalid].<map value>[2].email"
 		);
-		assertCorrectConstraintTypes( constraintViolations, Email.class, Email.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "invalid", null, Map.class, 1 )
-						.property( "email", true, null, 1, List.class, 0 ),
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "invalid", null, Map.class, 1 )
-						.property( "email", true, null, 2, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Email.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "invalid", null, Map.class, 1 )
+								.property( "email", true, null, 1, List.class, 0 )
+						),
+				violationOf( Email.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "invalid", null, Map.class, 1 )
+								.property( "email", true, null, 2, List.class, 0 )
+						)
 		);
 	}
 
@@ -75,7 +79,7 @@ public class NestedCascadedConstraintsTest {
 
 		Set<ConstraintViolation<CinemaEmailAddresses>> constraintViolations = validator.validate( CinemaEmailAddresses.validCinemaEmailAddresses() );
 
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		CinemaEmailAddresses invalidCinemaEmailAddresses = CinemaEmailAddresses.invalidCinemaEmailAddresses();
 		constraintViolations = validator.validate( invalidCinemaEmailAddresses );
@@ -86,20 +90,31 @@ public class NestedCascadedConstraintsTest {
 				"map[Optional[Cinema<cinema2>]].<map value>[2].email",
 				"map[Optional[Cinema<cinema3>]].<map value>[0].<list element>"
 		);
-		assertCorrectConstraintTypes( constraintViolations, Email.class, Email.class, NotNull.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, invalidCinemaEmailAddresses.map.keySet().toArray()[1], null, Map.class, 1 )
-						.property( "email", true, null, 1, List.class, 0 ),
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, invalidCinemaEmailAddresses.map.keySet().toArray()[1], null, Map.class, 1 )
-						.property( "email", true, null, 2, List.class, 0 ),
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, invalidCinemaEmailAddresses.map.keySet().toArray()[2], null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Email.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, invalidCinemaEmailAddresses.map.keySet().toArray()[1], null, Map.class,
+										1
+								)
+								.property( "email", true, null, 1, List.class, 0 )
+						),
+				violationOf( Email.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, invalidCinemaEmailAddresses.map.keySet().toArray()[1], null, Map.class,
+										1
+								)
+								.property( "email", true, null, 2, List.class, 0 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, invalidCinemaEmailAddresses.map.keySet().toArray()[2], null, Map.class,
+										1
+								)
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						)
 		);
 
 		CinemaEmailAddresses invalidKeyCinemaEmailAddresses = CinemaEmailAddresses.invalidKey();
@@ -109,13 +124,16 @@ public class NestedCascadedConstraintsTest {
 				constraintViolations,
 				"map<K>[Optional[Cinema<cinema4>]].<map key>.visitor.name"
 		);
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, invalidKeyCinemaEmailAddresses.map.keySet().toArray()[1], null, Map.class, 0 )
-						.property( "visitor", Optional.class, 0 )
-						.property( "name", Reference.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, invalidKeyCinemaEmailAddresses.map.keySet().toArray()[1], null, Map.class,
+										0
+								)
+								.property( "visitor", Optional.class, 0 )
+								.property( "name", Reference.class, 0 )
+						)
 		);
 	}
 
@@ -129,7 +147,7 @@ public class NestedCascadedConstraintsTest {
 
 		Set<ConstraintViolation<CinemaArray>> constraintViolations = validator.validate( CinemaArray.validCinemaArray() );
 
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( CinemaArray.invalidCinemaArray() );
 
@@ -138,17 +156,20 @@ public class NestedCascadedConstraintsTest {
 				"array[0].<iterable element>[0].<list element>",
 				"array[0].<iterable element>[1].visitor.name"
 		);
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotNull.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "array" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 ),
-				pathWith()
-						.property( "array" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
-						.property( "visitor", true, null, 1, List.class, 0 )
-						.property( "name", Reference.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "array" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						),
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "array" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+								.property( "visitor", true, null, 1, List.class, 0 )
+								.property( "name", Reference.class, 0 )
+						)
 		);
 	}
 
@@ -164,12 +185,18 @@ public class NestedCascadedConstraintsTest {
 		Set<ConstraintViolation<NestedCascadingListWithValidAllAlongTheWay>> constraintViolations = validator
 				.validate( NestedCascadingListWithValidAllAlongTheWay.valid() );
 
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( NestedCascadingListWithValidAllAlongTheWay.withNullList() );
 
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 		assertCorrectPropertyPaths( constraintViolations, "list[0].<list element>" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "list" )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						)
+		);
 	}
 
 	private static class EmailAddressMap {
@@ -177,7 +204,9 @@ public class NestedCascadedConstraintsTest {
 		private final Map<String, List<@Valid EmailAddress>> map = new LinkedHashMap<>();
 
 		private static EmailAddressMap validEmailAddressMap() {
-			List<EmailAddress> validEmailAddresses = Arrays.asList( new EmailAddress( "valid-email-1@example.com" ), new EmailAddress( "valid-email-2@example.com" ) );
+			List<EmailAddress> validEmailAddresses = Arrays.asList( new EmailAddress( "valid-email-1@example.com" ),
+					new EmailAddress( "valid-email-2@example.com" )
+			);
 
 			EmailAddressMap emailAddressMap = new EmailAddressMap();
 			emailAddressMap.map.put( "valid", validEmailAddresses );
@@ -186,9 +215,12 @@ public class NestedCascadedConstraintsTest {
 		}
 
 		private static EmailAddressMap invalidEmailAddressMap() {
-			List<EmailAddress> validEmailAddresses = Arrays.asList( new EmailAddress( "valid-email-1@example.com" ), new EmailAddress( "valid-email-2@example.com" ) );
+			List<EmailAddress> validEmailAddresses = Arrays.asList( new EmailAddress( "valid-email-1@example.com" ),
+					new EmailAddress( "valid-email-2@example.com" )
+			);
 			List<EmailAddress> emailAddressesContainingInvalidEmails = Arrays.asList( new EmailAddress( "valid-email-3@example.com" ),
-					new EmailAddress( "invalid-1" ), new EmailAddress( "invalid-2" ) );
+					new EmailAddress( "invalid-1" ), new EmailAddress( "invalid-2" )
+			);
 
 			EmailAddressMap emailAddressMap = new EmailAddressMap();
 			emailAddressMap.map.put( "valid", validEmailAddresses );
@@ -245,7 +277,7 @@ public class NestedCascadedConstraintsTest {
 		private static CinemaArray validCinemaArray() {
 			CinemaArray cinemaArray = new CinemaArray();
 
-			cinemaArray.array = new List[] { Arrays.asList( new Cinema( "cinema1", new SomeReference<>( new Visitor( "Name 1" ) ) ) ) };
+			cinemaArray.array = new List[]{ Arrays.asList( new Cinema( "cinema1", new SomeReference<>( new Visitor( "Name 1" ) ) ) ) };
 
 			return cinemaArray;
 		}
@@ -253,7 +285,7 @@ public class NestedCascadedConstraintsTest {
 		private static CinemaArray invalidCinemaArray() {
 			CinemaArray cinemaArray = new CinemaArray();
 
-			cinemaArray.array = new List[] { Arrays.asList( null, new Cinema( "cinema2", new SomeReference<>( new Visitor() ) ) ) };
+			cinemaArray.array = new List[]{ Arrays.asList( null, new Cinema( "cinema2", new SomeReference<>( new Visitor() ) ) ) };
 
 			return cinemaArray;
 		}

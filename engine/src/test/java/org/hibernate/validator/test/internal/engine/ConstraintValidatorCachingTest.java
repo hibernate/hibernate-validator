@@ -6,6 +6,20 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -13,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.Configuration;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -25,26 +40,13 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCollection;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -67,12 +69,12 @@ public class ConstraintValidatorCachingTest {
 
 		constraintValidatorFactory.assertSize( 0 );
 		Set<ConstraintViolation<Person>> violations = validator.validate( john );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 		constraintValidatorFactory.assertSize( 3 );
 
 		// need to call validate twice to let the cache kick in
 		violations = validator.validate( john );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 		constraintValidatorFactory.assertSize( 3 );
 
 		constraintValidatorFactory.assertKeyExists( SizeValidatorForCollection.class );
@@ -84,7 +86,7 @@ public class ConstraintValidatorCachingTest {
 		constraintValidatorFactory.assertSize( 3 );
 
 		violations = validator.validate( john );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 		constraintValidatorFactory.assertSize( 3 );
 
 		factory.close();
@@ -108,14 +110,14 @@ public class ConstraintValidatorCachingTest {
 
 		constraintValidatorFactory1.assertSize( 0 );
 		Set<ConstraintViolation<Person>> violations = validator.validate( john );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 		constraintValidatorFactory1.assertSize( 3 );
 
 		// getting a new validator with a new constraint factory
 		validator = factory.usingContext().constraintValidatorFactory( constraintValidatorFactory2 ).getValidator();
 		constraintValidatorFactory2.assertSize( 0 );
 		violations = validator.validate( john );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 		constraintValidatorFactory2.assertSize( 3 );
 		constraintValidatorFactory1.assertConstraintValidatorInstancesAreNotShared( constraintValidatorFactory2 );
 
@@ -129,8 +131,10 @@ public class ConstraintValidatorCachingTest {
 	public void testConstraintValidatorInstancesAreCachedPerConstraint() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<Foo>> violations = validator.validate( new Foo() );
-		assertNumberOfViolations( violations, 2 );
-		assertCorrectConstraintViolationMessages( violations, "size 10", "size 20" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "size 10" ),
+				violationOf( Size.class ).withMessage( "size 20" )
+		);
 	}
 
 	public class OnceInstanceOnlyConstraintValidatorFactory implements ConstraintValidatorFactory {

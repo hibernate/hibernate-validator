@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -20,6 +20,7 @@ import javax.validation.Validator;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 /**
@@ -56,7 +57,7 @@ public class ParameterlessMethodValidationTest {
 
 		Bar bar = new Bar();
 
-		assertNumberOfViolations( validator.forExecutables().validateParameters( bar, bar.getClass().getMethod( "getString" ), new Object[]{} ), 0 );
+		assertNoViolations( validator.forExecutables().validateParameters( bar, bar.getClass().getMethod( "getString" ), new Object[]{} ) );
 	}
 
 	private static class Bar {

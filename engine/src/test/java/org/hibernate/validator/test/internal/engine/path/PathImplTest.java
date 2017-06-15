@@ -6,11 +6,13 @@
  */
 package org.hibernate.validator.test.internal.engine.path;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -37,6 +39,7 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.Test;
 
 /**
@@ -166,7 +169,13 @@ public class PathImplTest {
 		Key id = new Key();
 		container.addItem( id, new Item( null ) );
 		Set<ConstraintViolation<Container>> constraintViolations = validator.validate( container );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "store" )
+								.property( "id", true, id, null, Map.class, 1 )
+						)
+		);
 		ConstraintViolation<Container> violation = constraintViolations.iterator().next();
 		Path path = violation.getPropertyPath();
 		Iterator<Path.Node> iter = path.iterator();

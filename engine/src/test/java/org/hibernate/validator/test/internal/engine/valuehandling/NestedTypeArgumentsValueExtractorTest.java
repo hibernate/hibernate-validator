@@ -8,7 +8,7 @@ package org.hibernate.validator.test.internal.engine.valuehandling;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.Email;
@@ -30,11 +29,11 @@ import javax.validation.valueextraction.Unwrapping;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 @TestForIssue(jiraKey = "HV-1237")
 @SuppressWarnings("restriction")
@@ -51,7 +50,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 	@Test
 	public void validation_of_nested_type_arguments_works_with_map_of_list_of_optional() {
 		Set<ConstraintViolation<MapOfLists>> constraintViolations = validator.validate( MapOfLists.valid() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( MapOfLists.invalidKey() );
 		assertCorrectPropertyPaths(
@@ -116,7 +115,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 	@Test
 	public void validation_of_nested_type_arguments_works_with_map_of_list_of_stringproperty() {
 		Set<ConstraintViolation<MapOfListsWithAutomaticUnwrapping>> constraintViolations = validator.validate( MapOfListsWithAutomaticUnwrapping.valid() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( MapOfListsWithAutomaticUnwrapping.invalidStringProperty() );
 		assertCorrectPropertyPaths(
@@ -144,7 +143,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 	@Test
 	public void validation_of_nested_type_arguments_works_with_array_of_optional_of_stringproperty() {
 		Set<ConstraintViolation<ArrayOfOptionalsWithAutomaticUnwrapping>> constraintViolations = validator.validate( ArrayOfOptionalsWithAutomaticUnwrapping.valid() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( ArrayOfOptionalsWithAutomaticUnwrapping.invalidArray() );
 		assertCorrectPropertyPaths(
@@ -184,7 +183,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 	@Test
 	public void validation_of_nested_type_arguments_works_on_nested_arrays() {
 		Set<ConstraintViolation<NestedArray>> constraintViolations = validator.validate( NestedArray.valid() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( NestedArray.invalidArrayFirstDimension() );
 		assertCorrectPropertyPaths(

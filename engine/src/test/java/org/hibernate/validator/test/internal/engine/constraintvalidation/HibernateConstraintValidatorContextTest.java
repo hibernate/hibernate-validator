@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.constraintvalidation;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.lang.annotation.ElementType;
@@ -30,6 +30,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.engine.HibernateConstraintViolation;
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
@@ -55,8 +56,9 @@ public class HibernateConstraintValidatorContextTest {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<MessageParameterFoo>> constraintViolations = validator.validate( new MessageParameterFoo( QUESTION_1 ) );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintViolationMessages( constraintViolations, "the answer is: 42" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( MessageParameterOracleConstraint.class ).withMessage( "the answer is: 42" )
+		);
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000028.*")
@@ -72,8 +74,10 @@ public class HibernateConstraintValidatorContextTest {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<MessageParameterFoo>> constraintViolations = validator.validate( new MessageParameterFoo( QUESTION_2 ) );
 
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectConstraintViolationMessages( constraintViolations, "answer 1: 2", "answer 2: 42" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( MessageParameterOracleConstraint.class ).withMessage( "answer 1: 2" ),
+				violationOf( MessageParameterOracleConstraint.class ).withMessage( "answer 2: 42" )
+		);
 	}
 
 	@Test
@@ -82,8 +86,9 @@ public class HibernateConstraintValidatorContextTest {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<MessageParameterFoo>> constraintViolations = validator.validate( new MessageParameterFoo( QUESTION_3 ) );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintViolationMessages( constraintViolations, "the answer is: {foo}" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( MessageParameterOracleConstraint.class ).withMessage( "the answer is: {foo}" )
+		);
 	}
 
 	@Test
@@ -92,7 +97,9 @@ public class HibernateConstraintValidatorContextTest {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<MessageParameterFoo>> constraintViolations = validator.validate( new MessageParameterFoo( QUESTION_1 ) );
 
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( MessageParameterOracleConstraint.class ).withMessage( "the answer is: 42" )
+		);
 
 		ConstraintViolationImpl<MessageParameterFoo> constraintViolation = (ConstraintViolationImpl<MessageParameterFoo>) constraintViolations.iterator()
 				.next();
@@ -109,8 +116,9 @@ public class HibernateConstraintValidatorContextTest {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<ExpressionVariableFoo>> constraintViolations = validator.validate( new ExpressionVariableFoo( QUESTION_1 ) );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintViolationMessages( constraintViolations, "the answer is: 42" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ExpressionVariableOracleConstraint.class ).withMessage( "the answer is: 42" )
+		);
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000028.*")
@@ -126,8 +134,10 @@ public class HibernateConstraintValidatorContextTest {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<ExpressionVariableFoo>> constraintViolations = validator.validate( new ExpressionVariableFoo( QUESTION_2 ) );
 
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectConstraintViolationMessages( constraintViolations, "answer 1: 2", "answer 2: 42" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ExpressionVariableOracleConstraint.class ).withMessage( "answer 1: 2" ),
+				violationOf( ExpressionVariableOracleConstraint.class ).withMessage( "answer 2: 42" )
+		);
 	}
 
 	@Test
@@ -136,8 +146,9 @@ public class HibernateConstraintValidatorContextTest {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<ExpressionVariableFoo>> constraintViolations = validator.validate( new ExpressionVariableFoo( QUESTION_3 ) );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintViolationMessages( constraintViolations, "the answer is: ${foo}" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ExpressionVariableOracleConstraint.class ).withMessage( "the answer is: ${foo}" )
+		);
 	}
 
 	@Test
@@ -146,7 +157,9 @@ public class HibernateConstraintValidatorContextTest {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<ExpressionVariableFoo>> constraintViolations = validator.validate( new ExpressionVariableFoo( QUESTION_1 ) );
 
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ExpressionVariableOracleConstraint.class ).withMessage( "the answer is: 42" )
+		);
 
 		ConstraintViolationImpl<ExpressionVariableFoo> constraintViolation = (ConstraintViolationImpl<ExpressionVariableFoo>) constraintViolations.iterator()
 				.next();
@@ -163,7 +176,9 @@ public class HibernateConstraintValidatorContextTest {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<ExpressionVariableFoo>> constraintViolations = validator.validate( new ExpressionVariableFoo( QUESTION_4 ) );
 
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ExpressionVariableOracleConstraint.class )
+		);
 
 		ConstraintViolation<ExpressionVariableFoo> constraintViolation = constraintViolations.iterator().next();
 		@SuppressWarnings("unchecked")
@@ -180,7 +195,9 @@ public class HibernateConstraintValidatorContextTest {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<ExpressionVariableFoo>> constraintViolations = validator.validate( new ExpressionVariableFoo( QUESTION_4 ) );
 
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ExpressionVariableOracleConstraint.class )
+		);
 
 		ConstraintViolation<ExpressionVariableFoo> constraintViolation = constraintViolations.iterator().next();
 		@SuppressWarnings("unchecked")
@@ -195,7 +212,9 @@ public class HibernateConstraintValidatorContextTest {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<ExpressionVariableFoo>> constraintViolations = validator.validate( new ExpressionVariableFoo( QUESTION_1 ) );
 
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ExpressionVariableOracleConstraint.class )
+		);
 
 		ConstraintViolation<ExpressionVariableFoo> constraintViolation = constraintViolations.iterator().next();
 		@SuppressWarnings("unchecked")
