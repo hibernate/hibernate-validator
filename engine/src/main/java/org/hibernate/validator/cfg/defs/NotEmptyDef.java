@@ -6,8 +6,9 @@
  */
 package org.hibernate.validator.cfg.defs;
 
+import javax.validation.constraints.NotEmpty;
+
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * @author Hardy Ferentschik

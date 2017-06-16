@@ -31,6 +31,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.groups.Default;
@@ -46,7 +47,6 @@ import org.hibernate.validator.cfg.defs.NotEmptyDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.RangeDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
@@ -307,7 +307,7 @@ public class ConstraintMappingTest {
 		marathon.setName( "Stockholm Marathon" );
 		violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), NotEmpty.class, "may not be empty" );
+		assertConstraintViolation( violations.iterator().next(), NotEmpty.class, "must not be empty" );
 	}
 
 	@Test
@@ -330,7 +330,7 @@ public class ConstraintMappingTest {
 		marathon.setName( "Stockholm Marathon" );
 		violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), NotEmpty.class, "may not be empty" );
+		assertConstraintViolation( violations.iterator().next(), NotEmpty.class, "must not be empty" );
 	}
 
 	@Test(
@@ -481,7 +481,7 @@ public class ConstraintMappingTest {
 		extendedMarathon.setName( "Stockholm Marathon" );
 		violations = validator.validate( extendedMarathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), NotEmpty.class, "may not be empty" );
+		assertConstraintViolation( violations.iterator().next(), NotEmpty.class, "must not be empty" );
 	}
 
 	@Test

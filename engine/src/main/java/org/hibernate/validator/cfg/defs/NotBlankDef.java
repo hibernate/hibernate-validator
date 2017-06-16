@@ -6,13 +6,15 @@
  */
 package org.hibernate.validator.cfg.defs;
 
+import javax.validation.constraints.NotBlank;
+
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * @author Hardy Ferentschik
  */
 public class NotBlankDef extends ConstraintDef<NotBlankDef, NotBlank> {
+
 	public NotBlankDef() {
 		super( NotBlank.class );
 	}
