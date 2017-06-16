@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
 
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.constraints.Negative;
+
 /**
  * Check that the number being validated is negative.
  *
@@ -14,10 +18,15 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class NegativeValidatorForLong extends AbstractNegativeValidator<Long> {
+public class NegativeValidatorForLong implements ConstraintValidator<Negative, Long> {
 
 	@Override
-	protected int compare(Long number) {
-		return NumberSignHelper.signum( number );
+	public boolean isValid(Long value, ConstraintValidatorContext context) {
+		// null values are valid
+		if ( value == null ) {
+			return true;
+		}
+
+		return NumberSignHelper.signum( value ) < 0;
 	}
 }

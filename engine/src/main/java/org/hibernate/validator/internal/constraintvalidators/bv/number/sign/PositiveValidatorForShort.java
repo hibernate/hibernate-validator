@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
 
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.constraints.Positive;
+
 /**
  * Check that the number being validated is positive.
  *
@@ -14,10 +18,15 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class PositiveValidatorForShort extends AbstractPositiveValidator<Short> {
+public class PositiveValidatorForShort implements ConstraintValidator<Positive, Short> {
 
 	@Override
-	protected int compare(Short number) {
-		return NumberSignHelper.signum( number );
+	public boolean isValid(Short value, ConstraintValidatorContext context) {
+		// null values are valid
+		if ( value == null ) {
+			return true;
+		}
+
+		return NumberSignHelper.signum( value ) > 0;
 	}
 }

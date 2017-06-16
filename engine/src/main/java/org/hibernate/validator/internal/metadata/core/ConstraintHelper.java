@@ -38,6 +38,7 @@ import javax.validation.constraints.Future;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Negative;
+import javax.validation.constraints.NegativeOrZero;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -45,6 +46,7 @@ import javax.validation.constraints.Null;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import javax.validation.constraintvalidation.ValidationTarget;
 
@@ -70,36 +72,12 @@ import org.hibernate.validator.constraints.time.DurationMin;
 import org.hibernate.validator.internal.constraintvalidators.bv.AssertFalseValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.AssertTrueValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMaxValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForBigDecimal;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForBigInteger;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForDouble;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForFloat;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForLong;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForNumber;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForBigDecimal;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForBigInteger;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForDouble;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForFloat;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForLong;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForBigDecimal;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForBigInteger;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForDouble;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForFloat;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForLong;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForBigDecimal;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForBigInteger;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForDouble;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForFloat;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForLong;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotBlankValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.NullValidator;
@@ -109,7 +87,9 @@ import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMax
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMinValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MaxValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MinValidatorForMonetaryAmount;
+import org.hibernate.validator.internal.constraintvalidators.bv.money.NegativeOrZeroValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.NegativeValidatorForMonetaryAmount;
+import org.hibernate.validator.internal.constraintvalidators.bv.money.PositiveOrZeroValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.PositiveValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArray;
 import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArraysOfBoolean;
@@ -123,6 +103,39 @@ import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmpt
 import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForCollection;
 import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForMap;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForBigDecimal;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForDouble;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForFloat;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForLong;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForBigDecimal;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForDouble;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForFloat;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForLong;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForBigDecimal;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForDouble;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForFloat;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForLong;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForBigDecimal;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForDouble;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForFloat;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForLong;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForBigDecimal;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForByte;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForDouble;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForFloat;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForInteger;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForLong;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForShort;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForBigInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForByte;
@@ -132,6 +145,15 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.Nega
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForLong;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForShort;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForBigDecimal;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForByte;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForDouble;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForFloat;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForInteger;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForLong;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForShort;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForBigInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForByte;
@@ -375,6 +397,18 @@ public class ConstraintHelper {
 					NegativeValidatorForByte.class,
 					NegativeValidatorForNumber.class,
 					NegativeValidatorForMonetaryAmount.class ) );
+
+			putConstraints( tmpConstraints, NegativeOrZero.class, Arrays.asList(
+					NegativeOrZeroValidatorForBigDecimal.class,
+					NegativeOrZeroValidatorForBigInteger.class,
+					NegativeOrZeroValidatorForDouble.class,
+					NegativeOrZeroValidatorForFloat.class,
+					NegativeOrZeroValidatorForLong.class,
+					NegativeOrZeroValidatorForInteger.class,
+					NegativeOrZeroValidatorForShort.class,
+					NegativeOrZeroValidatorForByte.class,
+					NegativeOrZeroValidatorForNumber.class,
+					NegativeOrZeroValidatorForMonetaryAmount.class ) );
 		}
 		else {
 			putConstraints( tmpConstraints, Negative.class, Arrays.asList(
@@ -387,6 +421,18 @@ public class ConstraintHelper {
 					NegativeValidatorForShort.class,
 					NegativeValidatorForByte.class,
 					NegativeValidatorForNumber.class
+			) );
+
+			putConstraints( tmpConstraints, NegativeOrZero.class, Arrays.asList(
+					NegativeOrZeroValidatorForBigDecimal.class,
+					NegativeOrZeroValidatorForBigInteger.class,
+					NegativeOrZeroValidatorForDouble.class,
+					NegativeOrZeroValidatorForFloat.class,
+					NegativeOrZeroValidatorForLong.class,
+					NegativeOrZeroValidatorForInteger.class,
+					NegativeOrZeroValidatorForShort.class,
+					NegativeOrZeroValidatorForByte.class,
+					NegativeOrZeroValidatorForNumber.class
 			) );
 		}
 		putConstraint( tmpConstraints, NotBlank.class, NotBlankValidator.class );
@@ -447,6 +493,18 @@ public class ConstraintHelper {
 					PositiveValidatorForByte.class,
 					PositiveValidatorForNumber.class,
 					PositiveValidatorForMonetaryAmount.class ) );
+
+			putConstraints( tmpConstraints, PositiveOrZero.class, Arrays.asList(
+					PositiveOrZeroValidatorForBigDecimal.class,
+					PositiveOrZeroValidatorForBigInteger.class,
+					PositiveOrZeroValidatorForDouble.class,
+					PositiveOrZeroValidatorForFloat.class,
+					PositiveOrZeroValidatorForLong.class,
+					PositiveOrZeroValidatorForInteger.class,
+					PositiveOrZeroValidatorForShort.class,
+					PositiveOrZeroValidatorForByte.class,
+					PositiveOrZeroValidatorForNumber.class,
+					PositiveOrZeroValidatorForMonetaryAmount.class ) );
 		}
 		else {
 			putConstraints( tmpConstraints, Positive.class, Arrays.asList(
@@ -459,6 +517,18 @@ public class ConstraintHelper {
 					PositiveValidatorForShort.class,
 					PositiveValidatorForByte.class,
 					PositiveValidatorForNumber.class
+			) );
+
+			putConstraints( tmpConstraints, PositiveOrZero.class, Arrays.asList(
+					PositiveOrZeroValidatorForBigDecimal.class,
+					PositiveOrZeroValidatorForBigInteger.class,
+					PositiveOrZeroValidatorForDouble.class,
+					PositiveOrZeroValidatorForFloat.class,
+					PositiveOrZeroValidatorForLong.class,
+					PositiveOrZeroValidatorForInteger.class,
+					PositiveOrZeroValidatorForShort.class,
+					PositiveOrZeroValidatorForByte.class,
+					PositiveOrZeroValidatorForNumber.class
 			) );
 		}
 

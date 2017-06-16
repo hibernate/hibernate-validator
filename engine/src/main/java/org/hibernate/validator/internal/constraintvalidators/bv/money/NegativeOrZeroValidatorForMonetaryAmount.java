@@ -4,29 +4,27 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
+package org.hibernate.validator.internal.constraintvalidators.bv.money;
 
+import javax.money.MonetaryAmount;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.NegativeOrZero;
 
 /**
  * Check that the number being validated positive.
  *
- * @author Hardy Ferentschik
- * @author Xavier Sosnovsky
- * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class PositiveValidatorForInteger implements ConstraintValidator<Positive, Integer> {
+public class NegativeOrZeroValidatorForMonetaryAmount implements ConstraintValidator<NegativeOrZero, MonetaryAmount> {
 
 	@Override
-	public boolean isValid(Integer value, ConstraintValidatorContext context) {
+	public boolean isValid(MonetaryAmount value, ConstraintValidatorContext context) {
 		// null values are valid
 		if ( value == null ) {
 			return true;
 		}
 
-		return NumberSignHelper.signum( value ) > 0;
+		return value.signum() <= 0;
 	}
 }

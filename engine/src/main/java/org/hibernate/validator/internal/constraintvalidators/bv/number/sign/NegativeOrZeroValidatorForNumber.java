@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Negative;
+import javax.validation.constraints.NegativeOrZero;
 
 /**
  * Check that the number being validated is negative.
@@ -18,7 +18,7 @@ import javax.validation.constraints.Negative;
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class NegativeValidatorForNumber implements ConstraintValidator<Negative, Number> {
+public class NegativeOrZeroValidatorForNumber implements ConstraintValidator<NegativeOrZero, Number> {
 
 	@Override
 	public boolean isValid(Number value, ConstraintValidatorContext context) {
@@ -27,6 +27,6 @@ public class NegativeValidatorForNumber implements ConstraintValidator<Negative,
 			return true;
 		}
 
-		return NumberSignHelper.signum( value ) < 0;
+		return NumberSignHelper.signum( value ) <= 0;
 	}
 }

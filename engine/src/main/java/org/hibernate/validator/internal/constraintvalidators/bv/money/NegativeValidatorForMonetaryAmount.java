@@ -7,18 +7,24 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.money;
 
 import javax.money.MonetaryAmount;
-
-import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.AbstractNegativeValidator;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.constraints.Negative;
 
 /**
  * Check that the number being validated positive.
  *
  * @author Marko Bekhta
  */
-public class NegativeValidatorForMonetaryAmount extends AbstractNegativeValidator<MonetaryAmount> {
+public class NegativeValidatorForMonetaryAmount implements ConstraintValidator<Negative, MonetaryAmount> {
 
 	@Override
-	protected int compare(MonetaryAmount amount) {
-		return amount.signum();
+	public boolean isValid(MonetaryAmount value, ConstraintValidatorContext context) {
+		// null values are valid
+		if ( value == null ) {
+			return true;
+		}
+
+		return value.signum() < 0;
 	}
 }

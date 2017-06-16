@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
 
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.constraints.Negative;
+
 import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityNumberComparatorHelper;
 
 /**
@@ -16,10 +20,15 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityN
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class NegativeValidatorForDouble extends AbstractNegativeValidator<Double> {
+public class NegativeValidatorForDouble implements ConstraintValidator<Negative, Double> {
 
 	@Override
-	protected int compare(Double number) {
-		return NumberSignHelper.signum( number, InfinityNumberComparatorHelper.GREATER_THAN );
+	public boolean isValid(Double value, ConstraintValidatorContext context) {
+		// null values are valid
+		if ( value == null ) {
+			return true;
+		}
+
+		return NumberSignHelper.signum( value, InfinityNumberComparatorHelper.GREATER_THAN ) < 0;
 	}
 }
