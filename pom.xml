@@ -86,6 +86,7 @@
         <module>annotation-processor</module>
         <module>integration</module>
         <module>performance</module>
+        <module>osgi</module>
     </modules>
 
     <properties>
@@ -148,9 +149,9 @@
         <easymock.version>3.4</easymock.version>
 
         <!-- OSGi dependencies -->
-        <pax.exam.version>4.10.0</pax.exam.version>
+        <pax.exam.version>4.11.0</pax.exam.version>
         <pax.url.version>2.5.2</pax.url.version>
-        <apache.karaf.version>4.0.8</apache.karaf.version>
+        <apache.karaf.version>4.1.1</apache.karaf.version>
         <osgi-core.version>6.0.0</osgi-core.version>
 
         <puppycrawl.checkstyle.version>7.6</puppycrawl.checkstyle.version>
@@ -1035,15 +1036,6 @@
     </distributionManagement>
 
     <profiles>
-        <profile>
-            <id>pre-jdk9</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <modules>
-                <module>osgi</module>
-            </modules>
-        </profile>
         <profile>
             <id>docs</id>
             <activation>
