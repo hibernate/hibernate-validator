@@ -19,7 +19,7 @@ import org.hibernate.validator.constraints.Currency;
 public class ModelWithJavaMoneyTypes {
 
 	@Currency("EUR")
-	@Negative(strict = true)
+	@Negative
 	public MonetaryAmount monetaryAmountEuro;
 
 	@DecimalMax("1000.00")

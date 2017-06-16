@@ -8,25 +8,27 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Negative;
+import javax.validation.constraints.PositiveOrZero;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityNumberComparatorHelper;
 
 /**
- * Check that the number being validated is negative.
+ * Check that the number being validated is positive.
  *
  * @author Hardy Ferentschik
  * @author Xavier Sosnovsky
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class NegativeValidatorForNumber implements ConstraintValidator<Negative, Number> {
+public class PositiveOrZeroValidatorForFloat implements ConstraintValidator<PositiveOrZero, Float> {
 
 	@Override
-	public boolean isValid(Number value, ConstraintValidatorContext context) {
+	public boolean isValid(Float value, ConstraintValidatorContext context) {
 		// null values are valid
 		if ( value == null ) {
 			return true;
 		}
 
-		return NumberSignHelper.signum( value ) < 0;
+		return NumberSignHelper.signum( value, InfinityNumberComparatorHelper.LESS_THAN ) >= 0;
 	}
 }

@@ -11,9 +11,9 @@ import static org.testng.Assert.assertTrue;
 
 import javax.money.MonetaryAmount;
 import javax.validation.ConstraintValidator;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.money.PositiveValidatorForMonetaryAmount;
+import org.hibernate.validator.internal.constraintvalidators.bv.money.PositiveOrZeroValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.javamoney.moneta.Money;
@@ -23,40 +23,40 @@ import org.testng.annotations.Test;
  * @author Marko Bekhta
  * @author Guillaume Smet
  */
-public class PositiveValidatorForMonetaryAmountTest {
+public class PositiveOrZeroValidatorForMonetaryAmountTest {
 
-	private final ConstraintValidator<Positive, MonetaryAmount> constraintValidator = new PositiveValidatorForMonetaryAmount();
+	private final ConstraintValidator<PositiveOrZero, MonetaryAmount> constraintValidator = new PositiveOrZeroValidatorForMonetaryAmount();
 
 	@Test
 	public void nullIsValid() {
-		constraintValidator.initialize( positive( true ) );
+		constraintValidator.initialize( positiveOrZero() );
 
 		assertTrue( constraintValidator.isValid( null, null ) );
 	}
 
 	@Test
 	public void invalidIfNegative() {
-		constraintValidator.initialize( positive( false ) );
+		constraintValidator.initialize( positiveOrZero() );
 
 		assertFalse( constraintValidator.isValid( Money.of( -1, "EUR" ), null ) );
 	}
 
 	@Test
 	public void validIfPositive() {
-		constraintValidator.initialize( positive( false ) );
+		constraintValidator.initialize( positiveOrZero() );
 
 		assertTrue( constraintValidator.isValid( Money.of( 1, "EUR" ), null ) );
 	}
 
 	@Test
-	public void invalidIfZero() {
-		constraintValidator.initialize( positive( true ) );
+	public void validIfZero() {
+		constraintValidator.initialize( positiveOrZero() );
 
-		assertFalse( constraintValidator.isValid( Money.of( 0, "EUR" ), null ) );
+		assertTrue( constraintValidator.isValid( Money.of( 0, "EUR" ), null ) );
 	}
 
-	private Positive positive(final boolean strict) {
-		AnnotationDescriptor<Positive> descriptor = new AnnotationDescriptor<>( Positive.class );
+	private PositiveOrZero positiveOrZero() {
+		AnnotationDescriptor<PositiveOrZero> descriptor = new AnnotationDescriptor<>( PositiveOrZero.class );
 		return AnnotationFactory.create( descriptor );
 	}
 }

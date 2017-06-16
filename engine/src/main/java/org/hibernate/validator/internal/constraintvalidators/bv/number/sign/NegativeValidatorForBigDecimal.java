@@ -8,6 +8,10 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
 
 import java.math.BigDecimal;
 
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.constraints.Negative;
+
 /**
  * Check that the number being validated is negative.
  *
@@ -16,10 +20,15 @@ import java.math.BigDecimal;
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class NegativeValidatorForBigDecimal extends AbstractNegativeValidator<BigDecimal> {
+public class NegativeValidatorForBigDecimal implements ConstraintValidator<Negative, BigDecimal> {
 
 	@Override
-	protected int compare(BigDecimal number) {
-		return NumberSignHelper.signum( number );
+	public boolean isValid(BigDecimal value, ConstraintValidatorContext context) {
+		// null values are valid
+		if ( value == null ) {
+			return true;
+		}
+
+		return NumberSignHelper.signum( value ) < 0;
 	}
 }

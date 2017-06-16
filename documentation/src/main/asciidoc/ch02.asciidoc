@@ -506,7 +506,11 @@ impact portability of your application between Bean Validation providers.
 	Supported data types::: Any type
 	Hibernate metadata impact::: Column(s) are not nullable
 
-`@Negative(strict=)`:: Checks if the element is negative. If `strict=true` zero values are considered invalid, otherwise they are valid.
+`@Negative`:: Checks if the element is strictly negative. Zero values are considered invalid.
+	Supported data types::: `BigDecimal`, `BigInteger`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `CharSequence` (the numeric value represented by the character sequence is evaluated), any sub-type of `Number` and `javax.money.MonetaryAmount`
+	Hibernate metadata impact::: None
+
+`@NegativeOrZero`:: Checks if the element is negative or zero.
 	Supported data types::: `BigDecimal`, `BigInteger`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `CharSequence` (the numeric value represented by the character sequence is evaluated), any sub-type of `Number` and `javax.money.MonetaryAmount`
 	Hibernate metadata impact::: None
 
@@ -522,7 +526,11 @@ impact portability of your application between Bean Validation providers.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
-`@Positive(strict=)`:: Checks if the element is positive. If `strict=true` zero values are considered invalid, otherwise they are valid.
+`@Positive`:: Checks if the element is strictly positive. Zero values are considered invalid.
+	Supported data types::: `BigDecimal`, `BigInteger`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `CharSequence` (the numeric value represented by the character sequence is evaluated), any sub-type of `Number` and `javax.money.MonetaryAmount`
+	Hibernate metadata impact::: None
+
+`@PositiveOrZero`:: Checks if the element is positive or zero.
 	Supported data types::: `BigDecimal`, `BigInteger`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `CharSequence` (the numeric value represented by the character sequence is evaluated), any sub-type of `Number` and `javax.money.MonetaryAmount`
 	Hibernate metadata impact::: None
 
