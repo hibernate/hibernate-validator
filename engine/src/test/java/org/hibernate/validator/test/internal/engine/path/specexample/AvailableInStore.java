@@ -19,8 +19,6 @@ import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.test.internal.engine.customerror.IsValid;
-
 /**
  * @author Gunnar Morling
  */
@@ -37,7 +35,7 @@ public @interface AvailableInStore {
 
 	Class<? extends Payload>[] payload() default { };
 
-	class Validator implements ConstraintValidator<IsValid, Author> {
+	class Validator implements ConstraintValidator<AvailableInStore, Author> {
 
 		@Override
 		public boolean isValid(Author value, ConstraintValidatorContext constraintValidatorContext) {
