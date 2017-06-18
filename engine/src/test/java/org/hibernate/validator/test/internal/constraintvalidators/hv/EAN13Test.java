@@ -7,8 +7,9 @@
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
 import static java.lang.annotation.ElementType.FIELD;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
@@ -38,7 +39,9 @@ public class EAN13Test {
 
 		Validator validator = getValidator();
 		Set<ConstraintViolation<Product>> constraintViolations = validator.validate( product );
-		assertCorrectConstraintTypes( constraintViolations, EAN.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( EAN.class )
+		);
 	}
 
 	@Test
@@ -47,7 +50,9 @@ public class EAN13Test {
 
 		Validator validator = getValidator();
 		Set<ConstraintViolation<Product>> constraintViolations = validator.validate( product );
-		assertCorrectConstraintTypes( constraintViolations, EAN.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( EAN.class )
+		);
 	}
 
 	@Test
@@ -56,7 +61,9 @@ public class EAN13Test {
 
 		Validator validator = getValidator();
 		Set<ConstraintViolation<Product>> constraintViolations = validator.validate( product );
-		assertCorrectConstraintTypes( constraintViolations, EAN.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( EAN.class )
+		);
 	}
 
 	@Test
@@ -80,7 +87,9 @@ public class EAN13Test {
 
 		Product product = new Product( "1234567891011" );
 		Set<ConstraintViolation<Product>> constraintViolations = validator.validate( product );
-		assertCorrectConstraintTypes( constraintViolations, EAN.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( EAN.class )
+		);
 
 		product = new Product( "4006381333931" );
 		constraintViolations = validator.validate( product );

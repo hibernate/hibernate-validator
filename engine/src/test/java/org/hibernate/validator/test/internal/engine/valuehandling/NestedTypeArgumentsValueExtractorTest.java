@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.Arrays;
@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.Email;
@@ -56,22 +57,24 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map<K>[k].<map key>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, "k", null, Map.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, "k", null, Map.class, 0 )
+						)
 		);
 
 		constraintViolations = validator.validate( MapOfLists.invalidList() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key1].<map value>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+						)
 		);
 
 		constraintViolations = validator.validate( MapOfLists.invalidString() );
@@ -79,16 +82,19 @@ public class NestedTypeArgumentsValueExtractorTest {
 				constraintViolations,
 				"map[key1].<map value>[0].<list element>",
 				"map[key1].<map value>[1].<list element>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 ),
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						),
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+						)
 		);
 
 		constraintViolations = validator.validate( MapOfLists.reallyInvalid() );
@@ -97,18 +103,23 @@ public class NestedTypeArgumentsValueExtractorTest {
 				"map<K>[k].<map key>",
 				"map[k].<map value>",
 				"map[k].<map value>[0].<list element>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class, Size.class, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, "k", null, Map.class, 0 ),
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "k", null, Map.class, 1 ),
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "k", null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, "k", null, Map.class, 0 )
+						),
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "k", null, Map.class, 1 )
+						),
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "k", null, Map.class, 1 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						)
 		);
 	}
 
@@ -121,22 +132,26 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key].<map value>[1].<list element>" );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key", null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key", null, Map.class, 1 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+						)
 		);
 
 		constraintViolations = validator.validate( MapOfListsWithAutomaticUnwrapping.invalidListElement() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key].<map value>[0].<list element>" );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key", null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key", null, Map.class, 1 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						)
 		);
 	}
 
@@ -150,13 +165,17 @@ public class NestedTypeArgumentsValueExtractorTest {
 				constraintViolations,
 				"array[0].<iterable element>",
 				"array[1].<iterable element>" );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "array" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null ),
-				pathWith()
-						.property( "array" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "array" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+						),
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "array" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+						)
 		);
 	}
 
@@ -166,17 +185,21 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key1].<map value>[0].<list element>",
-				"map[key1].<map value>[1].<list element>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 ),
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+				"map[key1].<map value>[1].<list element>"
+		);
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						),
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+						)
 		);
 	}
 
@@ -189,23 +212,25 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"array[0].<iterable element>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "array" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "array" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+						)
 		);
 
 		constraintViolations = validator.validate( NestedArray.invalidArraySecondDimension() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"array[1].<iterable element>[1].<iterable element>" );
-		assertCorrectConstraintTypes( constraintViolations, Email.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "array" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Email.class )
+						.withPropertyPath( pathWith()
+								.property( "array" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+						)
 		);
 	}
 

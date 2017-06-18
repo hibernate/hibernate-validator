@@ -620,10 +620,12 @@ public class TypeAnnotationConstraintTest {
 
 		Set<ConstraintViolation<TypeWithMap1>> constraintViolations = validator.validate( m );
 
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "nameMap" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "first", null, Map.class, 1 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "nameMap" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "first", null, Map.class, 1 )
+						)
 		);
 	}
 

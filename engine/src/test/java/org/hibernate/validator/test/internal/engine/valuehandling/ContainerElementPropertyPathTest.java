@@ -9,9 +9,9 @@ package org.hibernate.validator.test.internal.engine.valuehandling;
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -35,6 +35,7 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.testutils.CandidateForTck;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -55,11 +56,12 @@ public class ContainerElementPropertyPathTest {
 
 		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statictics );
 
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "inhabitantsPerAddress" )
-						.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, null, null, Map.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "inhabitantsPerAddress" )
+								.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, null, null, Map.class, 0 )
+						)
 		);
 	}
 
@@ -71,11 +73,12 @@ public class ContainerElementPropertyPathTest {
 
 		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statictics );
 
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "inhabitantsPerAddress" )
-						.property( "street", true, invalidAddress, null, Map.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "inhabitantsPerAddress" )
+								.property( "street", true, invalidAddress, null, Map.class, 0 )
+						)
 		);
 
 		invalidAddress = new Address( "rue Garibaldi", new City( "L" ) );
@@ -84,12 +87,13 @@ public class ContainerElementPropertyPathTest {
 
 		constraintViolations = validator.validate( statictics );
 
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "inhabitantsPerAddress" )
-						.property( "city", true, invalidAddress, null, Map.class, 0 )
-						.property( "name" )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "inhabitantsPerAddress" )
+								.property( "city", true, invalidAddress, null, Map.class, 0 )
+								.property( "name" )
+						)
 		);
 	}
 
@@ -101,11 +105,12 @@ public class ContainerElementPropertyPathTest {
 
 		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statictics );
 
-		assertCorrectConstraintTypes( constraintViolations, ValidLyonZipCode.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "inhabitantsPerAddress" )
-						.bean( true, invalidAddress, null, Map.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ValidLyonZipCode.class )
+						.withPropertyPath( pathWith()
+								.property( "inhabitantsPerAddress" )
+								.bean( true, invalidAddress, null, Map.class, 0 )
+						)
 		);
 	}
 
@@ -117,11 +122,12 @@ public class ContainerElementPropertyPathTest {
 
 		Set<ConstraintViolation<State>> constraintViolations = validator.validate( state );
 
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "addressesPerCity" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, city, null, Map.class, 1 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "addressesPerCity" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, city, null, Map.class, 1 )
+						)
 		);
 	}
 
@@ -134,11 +140,12 @@ public class ContainerElementPropertyPathTest {
 
 		Set<ConstraintViolation<State>> constraintViolations = validator.validate( state );
 
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "addressesPerCity" )
-						.property( "street", true, city, null, Map.class, 1 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "addressesPerCity" )
+								.property( "street", true, city, null, Map.class, 1 )
+						)
 		);
 
 		invalidAddress = new Address( "rue Garibaldi", new City( "L" ) );
@@ -147,12 +154,13 @@ public class ContainerElementPropertyPathTest {
 
 		constraintViolations = validator.validate( state );
 
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "addressesPerCity" )
-						.property( "city", true, city, null, Map.class, 1 )
-						.property( "name" )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "addressesPerCity" )
+								.property( "city", true, city, null, Map.class, 1 )
+								.property( "name" )
+						)
 		);
 	}
 
@@ -165,11 +173,12 @@ public class ContainerElementPropertyPathTest {
 
 		Set<ConstraintViolation<State>> constraintViolations = validator.validate( state );
 
-		assertCorrectConstraintTypes( constraintViolations, ValidLyonZipCode.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "addressesPerCity" )
-						.bean( true, city, null, Map.class, 1 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ValidLyonZipCode.class )
+						.withPropertyPath( pathWith()
+								.property( "addressesPerCity" )
+								.bean( true, city, null, Map.class, 1 )
+						)
 		);
 	}
 
@@ -180,11 +189,12 @@ public class ContainerElementPropertyPathTest {
 
 		Set<ConstraintViolation<Block>> constraintViolations = validator.validate( block );
 
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "addresses" )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "addresses" )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						)
 		);
 	}
 
@@ -195,11 +205,12 @@ public class ContainerElementPropertyPathTest {
 
 		Set<ConstraintViolation<Block>> constraintViolations = validator.validate( block );
 
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "addresses" )
-						.property( "street", true, null, 0, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "addresses" )
+								.property( "street", true, null, 0, List.class, 0 )
+						)
 		);
 
 		block = new Block();
@@ -207,12 +218,13 @@ public class ContainerElementPropertyPathTest {
 
 		constraintViolations = validator.validate( block );
 
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "addresses" )
-						.property( "city", true, null, 0, List.class, 0 )
-						.property( "name" )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "addresses" )
+								.property( "city", true, null, 0, List.class, 0 )
+								.property( "name" )
+						)
 		);
 	}
 
@@ -223,11 +235,12 @@ public class ContainerElementPropertyPathTest {
 
 		Set<ConstraintViolation<Block>> constraintViolations = validator.validate( block );
 
-		assertCorrectConstraintTypes( constraintViolations, ValidLyonZipCode.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "addresses" )
-						.bean( true, null, 0, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ValidLyonZipCode.class )
+						.withPropertyPath( pathWith()
+								.property( "addresses" )
+								.bean( true, null, 0, List.class, 0 )
+						)
 		);
 	}
 

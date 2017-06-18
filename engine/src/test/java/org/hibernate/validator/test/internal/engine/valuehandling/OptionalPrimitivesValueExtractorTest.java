@@ -6,10 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.OptionalDouble;
@@ -49,12 +48,11 @@ public class OptionalPrimitivesValueExtractorTest {
 		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( Foo.invalid() );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith().property( "optionalInt" ),
-				pathWith().property( "optionalDouble" ),
-				pathWith().property( "optionalLong" )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class ).withProperty( "optionalInt" ),
+				violationOf( DecimalMin.class ).withProperty( "optionalDouble" ),
+				violationOf( Min.class ).withProperty( "optionalLong" )
 		);
-		assertCorrectConstraintTypes( constraintViolations, Min.class, DecimalMin.class, Min.class );
 	}
 
 	private static class Foo {

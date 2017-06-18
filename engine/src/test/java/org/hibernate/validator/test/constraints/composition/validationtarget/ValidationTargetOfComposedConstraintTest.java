@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.test.constraints.composition.validationtarget;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+
 import java.lang.reflect.Method;
 import java.util.Set;
 
@@ -14,9 +18,8 @@ import javax.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-import org.testng.annotations.Test;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import org.testng.annotations.Test;
 
 /**
  *
@@ -38,7 +41,12 @@ public class ValidationTargetOfComposedConstraintTest {
 				method,
 				returnValue
 		);
-
-		assertCorrectConstraintTypes( constraintViolations, ValidInvoiceAmount.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ValidInvoiceAmount.class )
+						.withPropertyPath( pathWith()
+								.method( "getInvoiceAmount" )
+								.returnValue()
+						)
+		);
 	}
 }

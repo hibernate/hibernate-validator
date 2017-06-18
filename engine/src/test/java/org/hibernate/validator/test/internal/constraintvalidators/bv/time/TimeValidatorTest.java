@@ -6,13 +6,17 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.time;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-
-import static org.testng.Assert.assertEquals;
+import javax.validation.constraints.Past;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.Test;
 
 /**
@@ -28,6 +32,8 @@ public class TimeValidatorTest {
 		Validator validator = ValidatorUtil.getValidator();
 		DateHolder dateHolder = new DateHolder();
 		Set<ConstraintViolation<DateHolder>> constraintViolations = validator.validate( dateHolder );
-		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Past.class )
+		);
 	}
 }

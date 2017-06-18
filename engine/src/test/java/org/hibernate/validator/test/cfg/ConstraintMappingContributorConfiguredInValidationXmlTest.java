@@ -8,7 +8,8 @@ package org.hibernate.validator.test.cfg;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.Set;
 
@@ -44,10 +45,15 @@ public class ConstraintMappingContributorConfiguredInValidationXmlTest {
 				Validator validator = ValidatorUtil.getValidator();
 
 				Set<? extends ConstraintViolation<?>> violations = validator.validate( new Marathon() );
-				assertCorrectConstraintTypes( violations, NotNull.class, Min.class );
+				assertThat( violations ).containsOnlyViolations(
+						violationOf( NotNull.class ).withProperty( "name" ),
+						violationOf( Min.class ).withProperty( "numberOfHelpers" )
+				);
 
 				violations = validator.validate( new Runner() );
-				assertCorrectConstraintTypes( violations, AssertTrue.class );
+				assertThat( violations ).containsOnlyViolations(
+						violationOf( AssertTrue.class ).withProperty( "paidEntryFee" )
+				);
 			}
 		} );
 

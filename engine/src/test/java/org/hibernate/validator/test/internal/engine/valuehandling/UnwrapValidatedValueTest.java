@@ -8,7 +8,6 @@ package org.hibernate.validator.test.internal.engine.valuehandling;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertEquals;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
@@ -19,6 +18,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.constraints.Max;
+import javax.validation.constraints.Size;
 import javax.validation.valueextraction.Unwrapping;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -35,6 +35,7 @@ import org.hibernate.validator.test.internal.engine.valuehandling.model.UiInputV
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -61,13 +62,21 @@ public class UnwrapValidatedValueTest {
 	@Test
 	public void shouldUnwrapPropertyValuesDuringValidation() {
 		Set<ConstraintViolation<Customer>> violations = validator.validate( new Customer() );
-		assertEquals( violations.size(), 3 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ),
+				violationOf( Size.class ),
+				violationOf( Size.class )
+		);
 	}
 
 	@Test
 	public void shouldUnwrapPropertyValuesDuringCascadedValidation() {
 		Set<ConstraintViolation<Account>> violations = validator.validate( new Account() );
-		assertEquals( violations.size(), 3 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ),
+				violationOf( Size.class ),
+				violationOf( Size.class )
+		);
 	}
 
 	@Test
@@ -79,7 +88,9 @@ public class UnwrapValidatedValueTest {
 		Set<ConstraintViolation<Customer>> violations = validator.forExecutables()
 				.validateParameters( customer, method, parameterValues );
 
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class )
+		);
 	}
 
 	@Test
@@ -91,13 +102,17 @@ public class UnwrapValidatedValueTest {
 		Set<ConstraintViolation<Customer>> violations = validator.forExecutables()
 				.validateReturnValue( customer, method, returnValue );
 
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class )
+		);
 	}
 
 	@Test
 	public void shouldUnwrapPropertyValuesDuringPropertyValidation() {
 		Set<ConstraintViolation<Customer>> violations = validator.validateProperty( new Customer(), "name" );
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class )
+		);
 	}
 
 	@Test
@@ -107,7 +122,9 @@ public class UnwrapValidatedValueTest {
 				"middleName",
 				Customer.CustomValidationGroup.class
 		);
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class )
+		);
 	}
 
 	@Test
@@ -117,7 +134,9 @@ public class UnwrapValidatedValueTest {
 				"name",
 				new StringProperty( "Bob" )
 		);
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class )
+		);
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000198.*")
