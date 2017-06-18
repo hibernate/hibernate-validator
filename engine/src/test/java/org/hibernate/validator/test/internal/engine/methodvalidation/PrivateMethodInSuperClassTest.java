@@ -6,7 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.Set;
 
@@ -20,6 +21,7 @@ import javax.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -28,7 +30,6 @@ import org.testng.annotations.Test;
  * the same signature, as this is no case of method overriding.
  *
  * @author Gunnar Morling
- *
  */
 public class PrivateMethodInSuperClassTest {
 
@@ -51,7 +52,9 @@ public class PrivateMethodInSuperClassTest {
 				new Object[] { null }
 		);
 
-		assertCorrectConstraintTypes( violations, NotNull.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 
 		// Public method in the sub-class; same signature but *not* overriding
 		violations = executableValidator.validateParameters(
@@ -60,21 +63,27 @@ public class PrivateMethodInSuperClassTest {
 				new Object[] { "fo" }
 		);
 
-		assertCorrectConstraintTypes( violations, Size.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class )
+		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1018")
 	public void canValidateConstraintOnPrivateSuperTypeProperty() {
 		Set<ConstraintViolation<GiantPanda>> violations = validator.validate( new GiantPanda() );
-		assertCorrectConstraintTypes( violations, Min.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Min.class )
+		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1018")
 	public void canValidateConstraintOnPrivateSuperTypePropertyReachedThroughCascadedValidation() {
 		Set<ConstraintViolation<FavoriteAnimalCollection>> violations = validator.validate( new FavoriteAnimalCollection() );
-		assertCorrectConstraintTypes( violations, Min.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Min.class )
+		);
 	}
 
 	public static class Mammal {

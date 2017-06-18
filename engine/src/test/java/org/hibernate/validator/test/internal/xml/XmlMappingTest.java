@@ -7,7 +7,7 @@
 package org.hibernate.validator.test.internal.xml;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertEquals;
@@ -64,7 +64,9 @@ public class XmlMappingTest {
 
 		final Set<ConstraintViolation<Customer>> violations = validator.validate( new Customer(), Default.class );
 
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 	}
 
 	@Test
@@ -85,7 +87,7 @@ public class XmlMappingTest {
 				Properties.class, "listOfString", listOfString
 		);
 
-		assertEquals( violations.size(), 0 );
+		assertNoViolations( violations );
 	}
 
 	@Test
@@ -98,7 +100,9 @@ public class XmlMappingTest {
 		final Validator validator = validatorFactory.getValidator();
 		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 	}
 
 	@Test
@@ -111,7 +115,9 @@ public class XmlMappingTest {
 		final Validator validator = validatorFactory.getValidator();
 		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 	}
 
 	@Test
@@ -124,7 +130,7 @@ public class XmlMappingTest {
 		final Validator validator = validatorFactory.getValidator();
 		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
-		assertEquals( violations.size(), 0 );
+		assertNoViolations( violations );
 	}
 
 	@Test
@@ -169,7 +175,9 @@ public class XmlMappingTest {
 		final Validator validator = validatorFactory.getValidator();
 		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 	}
 
 	@Test(
@@ -188,7 +196,9 @@ public class XmlMappingTest {
 		final Validator validator = validatorFactory.getValidator();
 		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 	}
 
 	@Test
@@ -324,7 +334,8 @@ public class XmlMappingTest {
 		system.addPart( new Part() );
 		Set<ConstraintViolation<System>> violations = validator.validate( system );
 
-		assertEquals( violations.size(), 1 );
-		assertCorrectConstraintTypes( violations, NotNull.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 	}
 }

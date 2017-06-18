@@ -6,19 +6,20 @@
  */
 package org.hibernate.validator.test.internal.xml.constrainttarget;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
+import static org.testng.Assert.fail;
+
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
-import static org.testng.Assert.fail;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Test for automatic determination of constraints with generic and cross-parameter validator when
@@ -48,8 +49,12 @@ public class ConstraintTargetDeterminationTest {
 			fail( "Expected exception wasn't thrown" );
 		}
 		catch (ConstraintViolationException cve) {
-			assertThat( cve.getConstraintViolations() ).containsOnlyPaths(
-					pathWith().method( "getNumberOfOrders" ).returnValue()
+			assertThat( cve.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( GenericAndCrossParameterConstraint.class )
+							.withPropertyPath( pathWith()
+									.method( "getNumberOfOrders" )
+									.returnValue()
+							)
 			);
 		}
 	}
@@ -62,9 +67,12 @@ public class ConstraintTargetDeterminationTest {
 			fail( "Expected exception wasn't thrown" );
 		}
 		catch (ConstraintViolationException cve) {
-			assertThat( cve.getConstraintViolations() ).containsOnlyPaths(
-					pathWith().method( "placeOrder" )
-							.crossParameter()
+			assertThat( cve.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( GenericAndCrossParameterConstraint.class )
+							.withPropertyPath( pathWith()
+									.method( "placeOrder" )
+									.crossParameter()
+							)
 			);
 		}
 	}
@@ -77,9 +85,17 @@ public class ConstraintTargetDeterminationTest {
 			fail( "Expected exception wasn't thrown" );
 		}
 		catch (ConstraintViolationException cve) {
-			assertThat( cve.getConstraintViolations() ).containsOnlyPaths(
-					pathWith().method( "cancelOrder" ).crossParameter(),
-					pathWith().method( "cancelOrder" ).crossParameter()
+			assertThat( cve.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( GenericAndCrossParameterConstraint.class )
+							.withPropertyPath( pathWith()
+									.method( "cancelOrder" )
+									.crossParameter()
+							),
+					violationOf( ComposedGenericAndCrossParameterConstraint.class )
+							.withPropertyPath( pathWith()
+									.method( "cancelOrder" )
+									.crossParameter()
+							)
 			);
 		}
 	}
