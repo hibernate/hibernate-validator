@@ -14,7 +14,6 @@ import java.lang.reflect.Method;
 import java.util.Set;
 
 import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
@@ -159,7 +158,7 @@ public class UnwrapValidatedValueTest {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Test(expectedExceptions = ConstraintDefinitionException.class, expectedExceptionsMessageRegExp = "HV000205.*")
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000205.*")
 	public void shouldThrowAnExceptionInCaseOfInvalidUnwrappingConfiguration() {
 		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
 		ConstraintMapping mapping = configuration.createConstraintMapping();
