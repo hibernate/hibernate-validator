@@ -11,6 +11,7 @@ import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
@@ -33,6 +34,8 @@ import org.hibernate.validator.ap.util.MessagerAdapter;
  */
 public class ClassVisitor extends AbstractElementVisitor<Void, Void> {
 
+	private final Set<Name> processedTypes;
+
 	private final ClassCheckFactory factory;
 
 	private final Elements elementUtils;
@@ -54,6 +57,8 @@ public class ClassVisitor extends AbstractElementVisitor<Void, Void> {
 						)
 				)
 		);
+
+		this.processedTypes = CollectionHelper.newHashSet();
 	}
 
 	/**
@@ -101,8 +106,12 @@ public class ClassVisitor extends AbstractElementVisitor<Void, Void> {
 	 * @param typeElement inner elements of which you want to visit
 	 */
 	private void visitAllMyElements(TypeElement typeElement) {
-		for ( Element element : elementUtils.getAllMembers( typeElement ) ) {
-			visit( element );
+		Name qualifiedName = typeElement.getQualifiedName();
+		if ( !processedTypes.contains( qualifiedName ) ) {
+			processedTypes.add( qualifiedName );
+			for ( Element element : elementUtils.getAllMembers( typeElement ) ) {
+				visit( element );
+			}
 		}
 	}
 
