@@ -762,4 +762,10 @@ public interface Log extends BasicLogger {
 	@Message(id = 220, value = "When @ExtractedValue is defined on a type parameter of a container type, the type attribute may not be set: %1$s.")
 	ValueExtractorDefinitionException extractedValueOnTypeParameterOfContainerTypeMayNotDefineTypeAttribute(
 			@FormatWith(ClassObjectFormatter.class) Class<? extends ValueExtractor> extractorImplementationType);
+
+	@SuppressWarnings("rawtypes")
+	@Message(id = 221, value = "An error occurred while extracting values in value extractor %1$s.")
+	ValidationException getErrorWhileExtractingValuesInValueExtractorException(
+			@FormatWith(ClassObjectFormatter.class) Class<? extends ValueExtractor> extractorImplementationType,
+			@Cause Exception e);
 }
