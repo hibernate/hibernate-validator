@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import javax.validation.ValidationException;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.ValidationContext;
@@ -25,6 +26,8 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeVariables;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -36,6 +39,8 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Guillaume Smet
  */
 public class MetaConstraint<A extends Annotation> {
+
+	private static final Log LOG = LoggerFactory.make();
 
 	/**
 	 * The constraint tree created from the constraint annotation.
@@ -94,7 +99,7 @@ public class MetaConstraint<A extends Annotation> {
 		return constraintTree.getDescriptor().getElementType();
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes" })
 	public boolean validateConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		boolean success = true;
 		// constraint requiring value extraction to get the value to validate
@@ -102,7 +107,7 @@ public class MetaConstraint<A extends Annotation> {
 			Object valueToValidate = valueContext.getCurrentValidatedValue();
 			if ( valueToValidate != null ) {
 				TypeParameterValueReceiver receiver = new TypeParameterValueReceiver( validationContext, valueContext, valueExtractionPath );
-				( (ValueExtractor) valueExtractionPath.getValueExtractorDescriptor().getValueExtractor() ).extractValues( valueToValidate, receiver );
+				extractValues( (ValueExtractor) valueExtractionPath.getValueExtractorDescriptor().getValueExtractor(), valueToValidate, receiver );
 				success = receiver.isSuccess();
 			}
 		}
@@ -170,6 +175,19 @@ public class MetaConstraint<A extends Annotation> {
 		return sb.toString();
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void extractValues(ValueExtractor valueExtractor, Object containerValue, ValueExtractor.ValueReceiver valueReceiver) {
+		try {
+			valueExtractor.extractValues( containerValue, valueReceiver );
+		}
+		catch (ValidationException e) {
+			throw e;
+		}
+		catch (Exception e) {
+			throw LOG.getErrorWhileExtractingValuesInValueExtractorException( valueExtractor.getClass(), e );
+		}
+	}
+
 	private final class TypeParameterValueReceiver implements ValueExtractor.ValueReceiver {
 
 		private final ValidationContext<?> validationContext;
@@ -208,7 +226,7 @@ public class MetaConstraint<A extends Annotation> {
 			doValidate( value, nodeName );
 		}
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings({ "rawtypes" })
 		private void doValidate(Object value, String nodeName) {
 			PathImpl before = valueContext.getPropertyPath();
 
@@ -226,7 +244,7 @@ public class MetaConstraint<A extends Annotation> {
 					currentValueExtractionPathNode = currentValueExtractionPathNode.getNext();
 
 					ValueExtractorDescriptor valueExtractorDescriptor = currentValueExtractionPathNode.getValueExtractorDescriptor();
-					( (ValueExtractor) valueExtractorDescriptor.getValueExtractor() ).extractValues( value, this );
+					extractValues( (ValueExtractor) valueExtractorDescriptor.getValueExtractor(), value, this );
 
 					currentValueExtractionPathNode = currentValueExtractionPathNode.getPrevious();
 				}

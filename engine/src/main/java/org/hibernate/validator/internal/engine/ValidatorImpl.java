@@ -32,6 +32,7 @@ import javax.validation.ElementKind;
 import javax.validation.MessageInterpolator;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.executable.ExecutableValidator;
 import javax.validation.groups.Default;
@@ -560,7 +561,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @param validationContext The execution context
 	 * @param valueContext Collected information for single validation
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	private void validateCascadedConstraints(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		Validatable validatable = valueContext.getCurrentValidatable();
 		PathImpl originalPath = valueContext.getPropertyPath();
@@ -580,7 +581,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 								cascadable.getCascadingMetaData().getTypeParameter() );
 
 						CascadingValueReceiver receiver = new CascadingValueReceiver( validationContext, valueContext, cascadingMetaData, true );
-						( (ValueExtractor) extractor.getValueExtractor() ).extractValues( value, receiver );
+						extractValues( (ValueExtractor) extractor.getValueExtractor(), value, receiver );
 					}
 
 					validateCascadedContainerElementsForCurrentGroup( value, validationContext, valueContext,
@@ -593,7 +594,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	private void validateCascadedContainerElementsForCurrentGroup(Object value, ValidationContext<?> validationContext, ValueContext<?, ?> valueContext,
 			List<CascadingMetaData> containerElementTypesCascadingMetaData) {
 		for ( CascadingMetaData cascadingMetaData : containerElementTypesCascadingMetaData ) {
@@ -618,8 +619,21 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				}
 
 				CascadingValueReceiver receiver = new CascadingValueReceiver( validationContext, valueContext, cascadingMetaData, false );
-				( (ValueExtractor) extractor.getValueExtractor() ).extractValues( value, receiver );
+				extractValues( (ValueExtractor) extractor.getValueExtractor(), value, receiver );
 			}
+		}
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void extractValues(ValueExtractor valueExtractor, Object containerValue, ValueExtractor.ValueReceiver valueReceiver) {
+		try {
+			valueExtractor.extractValues( containerValue, valueReceiver );
+		}
+		catch (ValidationException e) {
+			throw e;
+		}
+		catch (Exception e) {
+			throw log.getErrorWhileExtractingValuesInValueExtractorException( valueExtractor.getClass(), e );
 		}
 	}
 
