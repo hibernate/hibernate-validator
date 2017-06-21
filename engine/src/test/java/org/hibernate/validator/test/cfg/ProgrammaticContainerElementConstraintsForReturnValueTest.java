@@ -110,7 +110,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 		}
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class ).withMessage( "may not be null" )
+					violationOf( NotNull.class ).withMessage( "must not be null" )
 			);
 		}
 	}
@@ -138,7 +138,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 		}
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class ).withMessage( "may not be null" )
+					violationOf( NotNull.class ).withMessage( "must not be null" )
 			);
 		}
 	}
@@ -169,7 +169,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 		}
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class ).withMessage( "may not be null" )
+					violationOf( NotNull.class ).withMessage( "must not be null" )
 			);
 		}
 	}

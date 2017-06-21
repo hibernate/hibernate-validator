@@ -76,7 +76,7 @@ public class ConstructorConstraintMappingTest {
 
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( NotNull.class )
-						.withMessage( "may not be null" )
+						.withMessage( "must not be null" )
 						.withPropertyPath( pathWith()
 								.constructor( GreetingService.class )
 								.returnValue()
@@ -106,7 +106,7 @@ public class ConstructorConstraintMappingTest {
 		);
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( NotNull.class )
-						.withMessage( "may not be null" )
+						.withMessage( "must not be null" )
 						.withPropertyPath( pathWith()
 								.constructor( GreetingService.class )
 								.parameter( "user", 0 )
@@ -190,7 +190,7 @@ public class ConstructorConstraintMappingTest {
 		);
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( NotNull.class )
-						.withMessage( "may not be null" )
+						.withMessage( "must not be null" )
 						.withPropertyPath( pathWith()
 								.constructor( GreetingService.class )
 								.parameter( "user", 0 )

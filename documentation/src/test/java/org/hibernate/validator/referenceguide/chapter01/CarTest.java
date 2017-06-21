@@ -29,7 +29,7 @@ public class CarTest {
 				validator.validate( car );
 
 		assertEquals( 1, constraintViolations.size() );
-		assertEquals( "may not be null", constraintViolations.iterator().next().getMessage() );
+		assertEquals( "must not be null", constraintViolations.iterator().next().getMessage() );
 	}
 
 	@Test

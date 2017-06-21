@@ -59,7 +59,7 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withMessage( "may not be null" )
+				violationOf( NotNull.class ).withMessage( "must not be null" )
 		);
 	}
 
@@ -71,7 +71,7 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withMessage( "may not be null" )
+				violationOf( NotNull.class ).withMessage( "must not be null" )
 		);
 	}
 
@@ -83,7 +83,7 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withMessage( "may not be null" )
+				violationOf( NotNull.class ).withMessage( "must not be null" )
 		);
 	}
 

@@ -63,7 +63,7 @@ public class MethodLevelValidationGroupSequenceTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withInvalidValue( null )
 							.withRootBeanClass( CustomerRepositoryWithRedefinedDefaultGroupImpl.class )
 			);
@@ -188,7 +188,7 @@ public class MethodLevelValidationGroupSequenceTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withInvalidValue( null )
 							.withRootBeanClass( CustomerRepositoryWithRedefinedDefaultGroupImpl.class )
 			);

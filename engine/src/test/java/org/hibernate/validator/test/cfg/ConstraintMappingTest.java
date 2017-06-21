@@ -149,7 +149,7 @@ public class ConstraintMappingTest {
 
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( new Marathon() );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withMessage( "may not be null" )
+				violationOf( NotNull.class ).withMessage( "must not be null" )
 		);
 	}
 
@@ -310,7 +310,7 @@ public class ConstraintMappingTest {
 
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withMessage( "may not be null" )
+				violationOf( NotNull.class ).withMessage( "must not be null" )
 		);
 
 		marathon.setName( "Stockholm Marathon" );
@@ -335,7 +335,7 @@ public class ConstraintMappingTest {
 
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withMessage( "may not be null" )
+				violationOf( NotNull.class ).withMessage( "must not be null" )
 		);
 
 		marathon.setName( "Stockholm Marathon" );
@@ -495,7 +495,7 @@ public class ConstraintMappingTest {
 
 		Set<ConstraintViolation<ExtendedMarathon>> violations = validator.validate( extendedMarathon );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withMessage( "may not be null" )
+				violationOf( NotNull.class ).withMessage( "must not be null" )
 		);
 
 		extendedMarathon.setName( "Stockholm Marathon" );

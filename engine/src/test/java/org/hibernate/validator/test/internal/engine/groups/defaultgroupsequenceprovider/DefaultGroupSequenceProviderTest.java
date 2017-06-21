@@ -119,7 +119,7 @@ public class DefaultGroupSequenceProviderTest {
 				c, fooMethod, c.foo( null )
 		);
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withMessage( "may not be null" )
+				violationOf( NotNull.class ).withMessage( "must not be null" )
 		);
 
 		violations = validator.forExecutables().validateReturnValue( c, fooMethod, c.foo( "foo" ) );
@@ -143,7 +143,7 @@ public class DefaultGroupSequenceProviderTest {
 
 	private interface C {
 
-		@NotNull(message = "may not be null")
+		@NotNull(message = "must not be null")
 		@Length(min = 10, max = 20, groups = TestGroup.class, message = "length must be between {min} and {max}")
 		String foo(String param);
 	}

@@ -75,7 +75,7 @@ public class MethodConstraintMappingTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 					.withPropertyPath( pathWith()
 							.method( "greet" )
 							.returnValue()
@@ -140,7 +140,7 @@ public class MethodConstraintMappingTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withPropertyPath( pathWith()
 									.method( "greet" )
 									.parameter( "user", 0 )
@@ -229,7 +229,7 @@ public class MethodConstraintMappingTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withPropertyPath( pathWith()
 									.method( "greet" )
 									.parameter( "user", 0 )
@@ -274,7 +274,7 @@ public class MethodConstraintMappingTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withPropertyPath( pathWith()
 									.method( "greet" )
 									.parameter( "user", 0 )
@@ -444,7 +444,7 @@ public class MethodConstraintMappingTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withPropertyPath( pathWith()
 									.method( "greet" )
 									.parameter( "user", 0 )
@@ -460,7 +460,7 @@ public class MethodConstraintMappingTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withPropertyPath( pathWith()
 									.method( "greet" )
 									.parameter( "user", 0 )
@@ -623,7 +623,7 @@ public class MethodConstraintMappingTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withPropertyPath( pathWith()
 									.method( "getHello" )
 									.returnValue()
@@ -652,7 +652,7 @@ public class MethodConstraintMappingTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withPropertyPath( pathWith()
 									.method( "getUser" )
 									.returnValue()
@@ -701,7 +701,7 @@ public class MethodConstraintMappingTest {
 		);
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( NotNull.class )
-						.withMessage( "may not be null" )
+						.withMessage( "must not be null" )
 						.withPropertyPath( pathWith()
 								.property( "hello" )
 						)
@@ -722,7 +722,7 @@ public class MethodConstraintMappingTest {
 
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( NotNull.class )
-						.withMessage( "may not be null" )
+						.withMessage( "must not be null" )
 						.withPropertyPath( pathWith()
 								.property( "user" )
 								.property( "name" )

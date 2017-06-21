@@ -47,7 +47,7 @@ public class CascadedMethodLevelValidationGroupSequenceTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withInvalidValue( null )
 							.withRootBeanClass( CompoundEntityRepositoryImpl.class )
 			);
@@ -72,7 +72,7 @@ public class CascadedMethodLevelValidationGroupSequenceTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withInvalidValue( null )
 							.withRootBeanClass( CompoundEntityRepositoryImpl.class )
 			);
@@ -98,7 +98,7 @@ public class CascadedMethodLevelValidationGroupSequenceTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withInvalidValue( null )
 							.withRootBeanClass( CompoundEntityRepositoryImpl.class )
 			);
@@ -123,7 +123,7 @@ public class CascadedMethodLevelValidationGroupSequenceTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withInvalidValue( null )
 							.withRootBeanClass( CompoundEntityRepositoryImpl.class )
 			);
@@ -147,7 +147,7 @@ public class CascadedMethodLevelValidationGroupSequenceTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withInvalidValue( null )
 							.withRootBeanClass( CompoundEntityRepositoryImpl.class )
 			);
@@ -173,7 +173,7 @@ public class CascadedMethodLevelValidationGroupSequenceTest {
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
-							.withMessage( "may not be null" )
+							.withMessage( "must not be null" )
 							.withInvalidValue( null )
 							.withRootBeanClass( CompoundEntityRepositoryImpl.class )
 			);

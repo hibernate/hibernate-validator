@@ -58,7 +58,7 @@ public class CascadingWithConstraintMappingTest {
 		Set<ConstraintViolation<B>> violations = validator.validate( b );
 
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withMessage( "may not be null" )
+				violationOf( NotNull.class ).withMessage( "must not be null" )
 		);
 	}
 
@@ -82,7 +82,7 @@ public class CascadingWithConstraintMappingTest {
 		Set<ConstraintViolation<B>> violations = validator.validate( b );
 
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withMessage( "may not be null" )
+				violationOf( NotNull.class ).withMessage( "must not be null" )
 		);
 	}
 
@@ -109,7 +109,7 @@ public class CascadingWithConstraintMappingTest {
 		);
 
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withMessage( "may not be null" )
+				violationOf( NotNull.class ).withMessage( "must not be null" )
 		);
 	}
 
