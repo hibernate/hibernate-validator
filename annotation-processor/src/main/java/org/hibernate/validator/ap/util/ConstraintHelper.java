@@ -175,7 +175,7 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * {@code java.time} types supported by {@code @Past} and {@Future} annotations.
+	 * {@code java.time} types supported by {@code @Past}, {@code @Future}, {@code @PastOrPresent} and {@code FutureOrPresent} annotations.
 	 */
 	private static final Class<?>[] JAVA_TIME_TYPES_SUPPORTED_BY_FUTURE_AND_PAST_ANNOTATIONS = new Class<?>[] {
 		HijrahDate.class,
@@ -195,7 +195,7 @@ public class ConstraintHelper {
 	};
 
 	/**
-	 * Types supported by {@code @Size} and {@NotEmpty} annotations.
+	 * Types supported by {@code @Size} and {@code @NotEmpty} annotations.
 	 */
 	private static final Class<?>[] TYPES_SUPPORTED_BY_SIZE_AND_NOT_EMPTY_ANNOTATIONS = new Class<?>[] {
 		Object[].class,
@@ -253,6 +253,9 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE, Calendar.class, Date.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE, JodaTypes.READABLE_PARTIAL, JodaTypes.READABLE_INSTANT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE, JAVA_TIME_TYPES_SUPPORTED_BY_FUTURE_AND_PAST_ANNOTATIONS );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE_OR_PRESENT, Calendar.class, Date.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE_OR_PRESENT, JodaTypes.READABLE_PARTIAL, JodaTypes.READABLE_INSTANT );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE_OR_PRESENT, JAVA_TIME_TYPES_SUPPORTED_BY_FUTURE_AND_PAST_ANNOTATIONS );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, Number.class, String.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, Number.class, String.class );
@@ -266,6 +269,9 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PAST, Calendar.class, Date.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PAST, JodaTypes.READABLE_PARTIAL, JodaTypes.READABLE_INSTANT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PAST, JAVA_TIME_TYPES_SUPPORTED_BY_FUTURE_AND_PAST_ANNOTATIONS );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PAST_OR_PRESENT, Calendar.class, Date.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PAST_OR_PRESENT, JodaTypes.READABLE_PARTIAL, JodaTypes.READABLE_INSTANT );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PAST_OR_PRESENT, JAVA_TIME_TYPES_SUPPORTED_BY_FUTURE_AND_PAST_ANNOTATIONS );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PATTERN, String.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.POSITIVE, Number.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.POSITIVE, JavaMoneyTypes.MONETARY_AMOUNT );

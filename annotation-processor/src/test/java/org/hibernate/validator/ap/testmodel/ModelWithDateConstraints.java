@@ -7,6 +7,7 @@
 package org.hibernate.validator.ap.testmodel;
 
 import java.util.Date;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Past;
 
 public class ModelWithDateConstraints {
@@ -15,8 +16,10 @@ public class ModelWithDateConstraints {
 	 * Not allowed.
 	 */
 	@Past
+	@FutureOrPresent
 	public String string;
 
 	@Past
+	@FutureOrPresent
 	public Date date;
 }
