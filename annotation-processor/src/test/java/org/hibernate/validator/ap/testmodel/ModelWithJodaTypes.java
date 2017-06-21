@@ -10,7 +10,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Past;
+import javax.validation.constraints.PastOrPresent;
 
 import org.joda.time.DateMidnight;
 import org.joda.time.LocalDate;
@@ -22,26 +24,38 @@ public class ModelWithJodaTypes {
 
 	@Past
 	@Future
+	@PastOrPresent
+	@FutureOrPresent
 	public Date jdkDate;
 
 	@Past
 	@Future
+	@PastOrPresent
+	@FutureOrPresent
 	public GregorianCalendar jdkCalendar;
 
 	@Past
 	@Future
+	@PastOrPresent
+	@FutureOrPresent
 	public ReadableInstant jodaInstant;
 
 	@Past
 	@Future
+	@PastOrPresent
+	@FutureOrPresent
 	public DateMidnight jodaDateMidnight;
 
 	@Past
 	@Future
+	@PastOrPresent
+	@FutureOrPresent
 	public ReadablePartial jodaPartial;
 
 	@Past
 	@Future
+	@PastOrPresent
+	@FutureOrPresent
 	public LocalDate jodaLocalDate;
 
 	/**
@@ -49,6 +63,8 @@ public class ModelWithJodaTypes {
 	 */
 	@Future
 	@Past
+	@PastOrPresent
+	@FutureOrPresent
 	public String string;
 
 }
