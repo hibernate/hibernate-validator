@@ -38,6 +38,7 @@ public class TypeNames {
 		public static final String MAX = JAVAX_VALIDATION_CONSTRAINTS + ".Max";
 		public static final String MIN = JAVAX_VALIDATION_CONSTRAINTS + ".Min";
 		public static final String NEGATIVE = JAVAX_VALIDATION_CONSTRAINTS + ".Negative";
+		public static final String NEGATIVE_OR_ZERO = JAVAX_VALIDATION_CONSTRAINTS + ".NegativeOrZero";
 		public static final String NOT_BLANK = JAVAX_VALIDATION_CONSTRAINTS + ".NotBlank";
 		public static final String NOT_EMPTY = JAVAX_VALIDATION_CONSTRAINTS + ".NotEmpty";
 		public static final String NOT_NULL = JAVAX_VALIDATION_CONSTRAINTS + ".NotNull";
@@ -45,6 +46,7 @@ public class TypeNames {
 		public static final String PAST = JAVAX_VALIDATION_CONSTRAINTS + ".Past";
 		public static final String PATTERN = JAVAX_VALIDATION_CONSTRAINTS + ".Pattern";
 		public static final String POSITIVE = JAVAX_VALIDATION_CONSTRAINTS + ".Positive";
+		public static final String POSITIVE_OR_ZERO = JAVAX_VALIDATION_CONSTRAINTS + ".PositiveOrZero";
 		public static final String SIZE = JAVAX_VALIDATION_CONSTRAINTS + ".Size";
 
 		public static final String CONSTRAINTVALIDATION = "javax.validation.constraintvalidation";
