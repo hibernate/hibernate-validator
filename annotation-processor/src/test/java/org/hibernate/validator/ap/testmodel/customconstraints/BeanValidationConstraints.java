@@ -10,9 +10,11 @@ import java.util.Collection;
 import java.util.List;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Negative;
+import javax.validation.constraints.NegativeOrZero;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 public class BeanValidationConstraints {
 
@@ -25,9 +27,11 @@ public class BeanValidationConstraints {
 	public String string;
 
 	@Positive
+	@PositiveOrZero
 	public int number;
 
 	@Negative
+	@NegativeOrZero
 	public Double otherNumber;
 
 	@NotEmpty
@@ -38,6 +42,7 @@ public class BeanValidationConstraints {
 	 */
 	@Email
 	@Negative
+	@NegativeOrZero
 	@NotEmpty
 	@NotBlank
 	public Object property;
@@ -48,5 +53,6 @@ public class BeanValidationConstraints {
 	public int badInt;
 
 	@Positive
+	@PositiveOrZero
 	public Collection collection;
 }

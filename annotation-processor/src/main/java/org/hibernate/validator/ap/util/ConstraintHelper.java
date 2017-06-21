@@ -262,6 +262,8 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NEGATIVE, Number.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NEGATIVE, JavaMoneyTypes.MONETARY_AMOUNT );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NEGATIVE_OR_ZERO, Number.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NEGATIVE_OR_ZERO, JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NOT_BLANK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NOT_EMPTY, TYPES_SUPPORTED_BY_SIZE_AND_NOT_EMPTY_ANNOTATIONS );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NOT_NULL, Object.class );
@@ -275,6 +277,8 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PATTERN, String.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.POSITIVE, Number.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.POSITIVE, JavaMoneyTypes.MONETARY_AMOUNT );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.POSITIVE_OR_ZERO, Number.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.POSITIVE_OR_ZERO, JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.SIZE, TYPES_SUPPORTED_BY_SIZE_AND_NOT_EMPTY_ANNOTATIONS );
 
 		//register HV-specific constraints
