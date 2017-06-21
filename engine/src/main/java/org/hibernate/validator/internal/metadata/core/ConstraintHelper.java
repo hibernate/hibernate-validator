@@ -35,6 +35,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Negative;
@@ -44,6 +45,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Past;
+import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -193,6 +195,24 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.future.Futu
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForYear;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForYearMonth;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForZonedDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForCalendar;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForHijrahDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForInstant;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForJapaneseDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForLocalDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForLocalDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForLocalTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForMinguoDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForMonthDay;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForOffsetDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForOffsetTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForReadableInstant;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForReadablePartial;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForThaiBuddhistDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForYear;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForYearMonth;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForCalendar;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForHijrahDate;
@@ -211,6 +231,24 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastVa
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForYear;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForYearMonth;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForZonedDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForCalendar;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForHijrahDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForInstant;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForJapaneseDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForLocalDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForLocalDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForLocalTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForMinguoDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForMonthDay;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForOffsetDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForOffsetTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForReadableInstant;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForReadablePartial;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForThaiBuddhistDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForYear;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForYearMonth;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
@@ -341,6 +379,31 @@ public class ConstraintHelper {
 		futureValidators.add( FutureValidatorForZonedDateTime.class );
 
 		putConstraints( tmpConstraints, Future.class, futureValidators );
+
+		List<Class<? extends ConstraintValidator<FutureOrPresent, ?>>> futureOrPresentValidators = new ArrayList<>( 18 );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForCalendar.class );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForDate.class );
+		if ( isJodaTimeInClasspath() ) {
+			futureOrPresentValidators.add( FutureOrPresentValidatorForReadableInstant.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForReadablePartial.class );
+		}
+		// Java 8 date/time API validators
+		futureOrPresentValidators.add( FutureOrPresentValidatorForHijrahDate.class );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForInstant.class );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForJapaneseDate.class );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForLocalDate.class );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForLocalDateTime.class );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForLocalTime.class );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForMinguoDate.class );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForMonthDay.class );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForOffsetDateTime.class );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForOffsetTime.class );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForThaiBuddhistDate.class );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForYear.class );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForYearMonth.class );
+		futureOrPresentValidators.add( FutureOrPresentValidatorForZonedDateTime.class );
+
+		putConstraints( tmpConstraints, FutureOrPresent.class, futureOrPresentValidators );
 
 		if ( isJavaMoneyInClasspath() ) {
 			putConstraints( tmpConstraints, Max.class, Arrays.asList(
@@ -479,6 +542,31 @@ public class ConstraintHelper {
 		pastValidators.add( PastValidatorForZonedDateTime.class );
 
 		putConstraints( tmpConstraints, Past.class, pastValidators );
+
+		List<Class<? extends ConstraintValidator<PastOrPresent, ?>>> pastOrPresentValidators = new ArrayList<>( 18 );
+		pastOrPresentValidators.add( PastOrPresentValidatorForCalendar.class );
+		pastOrPresentValidators.add( PastOrPresentValidatorForDate.class );
+		if ( isJodaTimeInClasspath() ) {
+			pastOrPresentValidators.add( PastOrPresentValidatorForReadableInstant.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForReadablePartial.class );
+		}
+		// Java 8 date/time API validators
+		pastOrPresentValidators.add( PastOrPresentValidatorForHijrahDate.class );
+		pastOrPresentValidators.add( PastOrPresentValidatorForInstant.class );
+		pastOrPresentValidators.add( PastOrPresentValidatorForJapaneseDate.class );
+		pastOrPresentValidators.add( PastOrPresentValidatorForLocalDate.class );
+		pastOrPresentValidators.add( PastOrPresentValidatorForLocalDateTime.class );
+		pastOrPresentValidators.add( PastOrPresentValidatorForLocalTime.class );
+		pastOrPresentValidators.add( PastOrPresentValidatorForMinguoDate.class );
+		pastOrPresentValidators.add( PastOrPresentValidatorForMonthDay.class );
+		pastOrPresentValidators.add( PastOrPresentValidatorForOffsetDateTime.class );
+		pastOrPresentValidators.add( PastOrPresentValidatorForOffsetTime.class );
+		pastOrPresentValidators.add( PastOrPresentValidatorForThaiBuddhistDate.class );
+		pastOrPresentValidators.add( PastOrPresentValidatorForYear.class );
+		pastOrPresentValidators.add( PastOrPresentValidatorForYearMonth.class );
+		pastOrPresentValidators.add( PastOrPresentValidatorForZonedDateTime.class );
+
+		putConstraints( tmpConstraints, PastOrPresent.class, pastOrPresentValidators );
 
 		putConstraint( tmpConstraints, Pattern.class, PatternValidator.class );
 		if ( isJavaMoneyInClasspath() ) {

@@ -35,6 +35,7 @@ public class TypeNames {
 		public static final String DIGITS = JAVAX_VALIDATION_CONSTRAINTS + ".Digits";
 		public static final String EMAIL = JAVAX_VALIDATION_CONSTRAINTS + ".Email";
 		public static final String FUTURE = JAVAX_VALIDATION_CONSTRAINTS + ".Future";
+		public static final String FUTURE_OR_PRESENT = JAVAX_VALIDATION_CONSTRAINTS + ".FutureOrPresent";
 		public static final String MAX = JAVAX_VALIDATION_CONSTRAINTS + ".Max";
 		public static final String MIN = JAVAX_VALIDATION_CONSTRAINTS + ".Min";
 		public static final String NEGATIVE = JAVAX_VALIDATION_CONSTRAINTS + ".Negative";
@@ -43,6 +44,7 @@ public class TypeNames {
 		public static final String NOT_NULL = JAVAX_VALIDATION_CONSTRAINTS + ".NotNull";
 		public static final String NULL = JAVAX_VALIDATION_CONSTRAINTS + ".Null";
 		public static final String PAST = JAVAX_VALIDATION_CONSTRAINTS + ".Past";
+		public static final String PAST_OR_PRESENT = JAVAX_VALIDATION_CONSTRAINTS + ".PastOrPresent";
 		public static final String PATTERN = JAVAX_VALIDATION_CONSTRAINTS + ".Pattern";
 		public static final String POSITIVE = JAVAX_VALIDATION_CONSTRAINTS + ".Positive";
 		public static final String SIZE = JAVAX_VALIDATION_CONSTRAINTS + ".Size";

@@ -18,16 +18,9 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractEpo
  */
 public abstract class AbstractPastEpochBasedValidator<T> extends AbstractEpochBasedTimeValidator<Past, T> {
 
-	private boolean isPresentValid;
-
-	@Override
-	public void initialize(Past constraintAnnotation) {
-		isPresentValid = constraintAnnotation.orPresent();
-	}
-
 	@Override
 	protected boolean isValid(int result) {
-		return isPresentValid ? ( result <= 0 ) : ( result < 0 );
+		return result < 0;
 	}
 
 }

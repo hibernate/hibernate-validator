@@ -236,7 +236,8 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 17 )
+				new DiagnosticExpectation( Kind.ERROR, 18 ),
+				new DiagnosticExpectation( Kind.ERROR, 19 )
 		);
 	}
 
@@ -262,8 +263,11 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		assertThatDiagnosticsMatch(
 				diagnostics,
 				new DiagnosticExpectation( Kind.ERROR, 10 ),
-				new DiagnosticExpectation( Kind.ERROR, 17 ),
-				new DiagnosticExpectation( Kind.ERROR, 20 )
+				new DiagnosticExpectation( Kind.ERROR, 11 ),
+				new DiagnosticExpectation( Kind.ERROR, 18 ),
+				new DiagnosticExpectation( Kind.ERROR, 19 ),
+				new DiagnosticExpectation( Kind.ERROR, 22 ),
+				new DiagnosticExpectation( Kind.ERROR, 23 )
 		);
 	}
 
@@ -598,8 +602,10 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 50 ),
-				new DiagnosticExpectation( Kind.ERROR, 51 )
+				new DiagnosticExpectation( Kind.ERROR, 64 ),
+				new DiagnosticExpectation( Kind.ERROR, 65 ),
+				new DiagnosticExpectation( Kind.ERROR, 66 ),
+				new DiagnosticExpectation( Kind.ERROR, 67 )
 		);
 	}
 
@@ -612,7 +618,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new ConstraintValidationProcessor(), diagnostics, sourceFile
 		);
 
-		assertTrue( compilationResult, "Java 8 date/time API types fails at @Future/@Past." );
+		assertTrue( compilationResult, "Java 8 date/time API types fails at @Future/@Past/@FutureOrPresent/@PastOrPresent." );
 	}
 
 	@Test

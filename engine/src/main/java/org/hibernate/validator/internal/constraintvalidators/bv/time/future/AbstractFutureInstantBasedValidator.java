@@ -20,16 +20,9 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractIns
  */
 public abstract class AbstractFutureInstantBasedValidator<T> extends AbstractInstantBasedTimeValidator<Future, T> {
 
-	private boolean isPresentValid;
-
-	@Override
-	public void initialize(Future constraintAnnotation) {
-		isPresentValid = constraintAnnotation.orPresent();
-	}
-
 	@Override
 	protected boolean isValid(int result) {
-		return isPresentValid ? ( result >= 0 ) : ( result > 0 );
+		return result > 0;
 	}
 
 }
