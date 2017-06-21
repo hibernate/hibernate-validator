@@ -68,7 +68,7 @@ public class CompositeConstraintTest {
 			);
 
 			assertThat( constraintViolations ).containsOnlyViolations(
-					violationOf( NotNull.class ).withMessage( "may not be null" )
+					violationOf( NotNull.class ).withMessage( "must not be null" )
 			);
 
 			constraintViolations = currentValidator.validate(

@@ -29,7 +29,7 @@ public class CarTest {
 				.iterator()
 				.next()
 				.getMessage();
-		assertEquals( "may not be null", message );
+		assertEquals( "must not be null", message );
 
 		message = validator.validateProperty( car, "licensePlate" )
 				.iterator()

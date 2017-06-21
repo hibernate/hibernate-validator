@@ -53,7 +53,7 @@ public class AnnotationBasedMethodValidationTest extends AbstractMethodValidatio
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "iterableParameterWithCascadingTypeParameter", List.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );

@@ -43,7 +43,7 @@ public abstract class AbstractConstructorValidationTest {
 
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( NotNull.class )
-						.withMessage( messagePrefix() + "may not be null" )
+						.withMessage( messagePrefix() + "must not be null" )
 						.withInvalidValue( null )
 						.withRootBeanClass( CustomerRepositoryImpl.class )
 						.withPropertyPath( pathWith()
@@ -62,7 +62,7 @@ public abstract class AbstractConstructorValidationTest {
 
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( NotNull.class )
-						.withMessage( messagePrefix() + "may not be null" )
+						.withMessage( messagePrefix() + "must not be null" )
 						.withInvalidValue( null )
 						.withRootBeanClass( CustomerRepositoryImpl.class )
 						.withPropertyPath( pathWith()
@@ -103,7 +103,7 @@ public abstract class AbstractConstructorValidationTest {
 
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( NotNull.class )
-						.withMessage( messagePrefix() + "may not be null" )
+						.withMessage( messagePrefix() + "must not be null" )
 						.withInvalidValue( null )
 						.withRootBeanClass( CustomerRepositoryImpl.class )
 						.withPropertyPath( pathWith()

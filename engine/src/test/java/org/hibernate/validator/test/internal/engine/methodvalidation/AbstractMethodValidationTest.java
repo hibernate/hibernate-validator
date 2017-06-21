@@ -82,7 +82,7 @@ public abstract class AbstractMethodValidationTest {
 									.method( "findCustomerByName" )
 									.parameter( "name", 0 )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 							.withInvalidValue( null )
 			);
@@ -118,13 +118,13 @@ public abstract class AbstractMethodValidationTest {
 									.method( "findCustomerByAgeAndName" )
 									.parameter( "name", 1 )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 							.withInvalidValue( null )
 			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "findCustomerByAgeAndName", Integer.class, String.class );
 			assertParameterIndex( constraintViolation, 1 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -151,7 +151,7 @@ public abstract class AbstractMethodValidationTest {
 									.method( "findCustomerByAgeAndName" )
 									.parameter( "name", 1 )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 							.withInvalidValue( null ),
 					violationOf( Min.class )
@@ -181,13 +181,13 @@ public abstract class AbstractMethodValidationTest {
 									.parameter( "customer", 0 )
 									.property( "name" )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 							.withInvalidValue( null )
 			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "persistCustomer", Customer.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -221,13 +221,13 @@ public abstract class AbstractMethodValidationTest {
 									.property( "address" )
 									.property( "city" )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 							.withInvalidValue( null )
 			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "persistCustomer", Customer.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -262,13 +262,13 @@ public abstract class AbstractMethodValidationTest {
 									.parameter( "customer", 0 )
 									.property( "name", true, "Bob", null, Map.class, 1 )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 							.withInvalidValue( null )
 			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "cascadingMapParameter", Map.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -302,13 +302,13 @@ public abstract class AbstractMethodValidationTest {
 									.parameter( "customer", 0 )
 									.property( "name", true, null, 1, List.class, 0 )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 							.withInvalidValue( null )
 			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "cascadingIterableParameter", List.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -341,13 +341,13 @@ public abstract class AbstractMethodValidationTest {
 									.parameter( "customer", 0 )
 									.property( "name", true, null, 1, Object[].class, null )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 							.withInvalidValue( null )
 			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "cascadingArrayParameter", Customer[].class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -380,13 +380,13 @@ public abstract class AbstractMethodValidationTest {
 									.method( "findById" )
 									.parameter( "id", 0 )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 							.withInvalidValue( null )
 			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "findById", Long.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -407,13 +407,13 @@ public abstract class AbstractMethodValidationTest {
 									.method( "foo" )
 									.parameter( "id", 0 )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 							.withInvalidValue( null )
 			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "foo", Long.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -435,13 +435,13 @@ public abstract class AbstractMethodValidationTest {
 									.parameter( "customer", 0 )
 									.property( "name" )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 							.withInvalidValue( null )
 			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "bar", Customer.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -501,12 +501,12 @@ public abstract class AbstractMethodValidationTest {
 									.returnValue()
 									.property( "name" )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "cascadingReturnValue" );
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -536,12 +536,12 @@ public abstract class AbstractMethodValidationTest {
 									.returnValue()
 									.property( "name" )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "overriddenMethodWithCascadingReturnValue" );
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 
@@ -572,13 +572,13 @@ public abstract class AbstractMethodValidationTest {
 									.returnValue()
 									.property( "name", true, null, 1, List.class, 0 )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 							.withInvalidValue( null )
 			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "cascadingIterableReturnValue" );
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 			assertEquals(
@@ -612,13 +612,13 @@ public abstract class AbstractMethodValidationTest {
 									.returnValue()
 									.property( "name", true, "Bob", null, Map.class, 1 )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 							.withInvalidValue( null )
 			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "cascadingMapReturnValue" );
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 			assertEquals(
@@ -648,13 +648,13 @@ public abstract class AbstractMethodValidationTest {
 									.returnValue()
 									.property( "name", true, null, 1, Object[].class, null )
 							)
-							.withMessage( messagePrefix() + "may not be null" )
+							.withMessage( messagePrefix() + "must not be null" )
 							.withRootBeanClass( CustomerRepositoryImpl.class )
 							.withInvalidValue( null )
 			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "cascadingArrayReturnValue" );
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 			assertEquals(

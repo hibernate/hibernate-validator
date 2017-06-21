@@ -418,7 +418,7 @@ The following gives an overview of these methods.
 The values under "Example" column refer to <<example-validator-validate>>.
 
 `getMessage()`:: The interpolated error message
-	Example::: "may not be null"
+	Example::: "must not be null"
 `getMessageTemplate()`:: The non-interpolated error message
 	Example::: "{... NotNull.message}"
 `getRootBean()`:: The root bean being validated
