@@ -6,11 +6,18 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
+import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
+import static org.hibernate.validator.constraints.CompositionType.AND;
+import static org.hibernate.validator.constraints.CompositionType.OR;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintViolation;
 
@@ -22,12 +29,6 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
-
-import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
-import static org.hibernate.validator.constraints.CompositionType.AND;
-import static org.hibernate.validator.constraints.CompositionType.OR;
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Due to constraint composition a single constraint annotation can lead to a whole constraint tree being validated.
@@ -104,6 +105,9 @@ public class ConstraintTree<A extends Annotation> {
 		// After all children are validated the actual ConstraintValidator of the constraint itself is executed
 		if ( mainConstraintNeedsEvaluation( validationContext, constraintViolations ) ) {
 
+			// find the right constraint validator
+			ConstraintValidator<A, V> validator = getInitializedConstraintValidator( validationContext, valueContext );
+
 			if ( log.isTraceEnabled() ) {
 				log.tracef(
 						"Validating value %s against constraint defined by %s.",
@@ -111,9 +115,6 @@ public class ConstraintTree<A extends Annotation> {
 						descriptor
 				);
 			}
-
-			// find the right constraint validator
-			ConstraintValidator<A, V> validator = getInitializedConstraintValidator( validationContext, valueContext );
 
 			// create a constraint validator context
 			ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
