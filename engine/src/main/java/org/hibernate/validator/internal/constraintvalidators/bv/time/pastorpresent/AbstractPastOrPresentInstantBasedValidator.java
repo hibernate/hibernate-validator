@@ -22,7 +22,7 @@ public abstract class AbstractPastOrPresentInstantBasedValidator<T> extends Abst
 
 	@Override
 	protected boolean isValid(int result) {
-		return result < 0;
+		return result <= 0;
 	}
 
 }
