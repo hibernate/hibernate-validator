@@ -582,6 +582,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		// reset the unwrapping mode
 		valueContext.setUnwrapMode( UnwrapMode.AUTOMATIC );
+		// reset ValidatedValueHandler to prevent HV-1352
+		valueContext.setValidatedValueHandler( null );
 		return validationSuccessful;
 	}
 
