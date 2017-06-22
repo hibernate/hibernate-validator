@@ -77,7 +77,7 @@ public class ValueExtractorDescriptor {
 					if ( extractedTypeParameter != null ) {
 						throw LOG.getValueExtractorDeclaresExtractedValueMultipleTimesException( extractorImplementationType );
 					}
-					if ( !Void.class.equals( typeArgument.getAnnotation( ExtractedValue.class ).type() ) ) {
+					if ( !void.class.equals( typeArgument.getAnnotation( ExtractedValue.class ).type() ) ) {
 						throw LOG.extractedValueOnTypeParameterOfContainerTypeMayNotDefineTypeAttribute( extractorImplementationType );
 					}
 
@@ -99,7 +99,7 @@ public class ValueExtractorDescriptor {
 
 		if ( containerType.isAnnotationPresent( ExtractedValue.class ) ) {
 			Class<?> extractedType = containerType.getAnnotation( ExtractedValue.class ).type();
-			if ( !Void.class.equals( extractedType ) ) {
+			if ( !void.class.equals( extractedType ) ) {
 				return Optional.of( ReflectionHelper.boxedType( extractedType ) );
 			}
 		}
