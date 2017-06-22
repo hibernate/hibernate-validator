@@ -31,7 +31,7 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 	private final String name;
 
 	@Immutable
-	private final List<ContainerElementTypeDescriptor> containerElementTypes;
+	private final Set<ContainerElementTypeDescriptor> constrainedContainerElementTypes;
 
 	private final boolean cascaded;
 
@@ -42,7 +42,7 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 								   int index,
 								   String name,
 								   Set<ConstraintDescriptorImpl<?>> constraints,
-								   List<ContainerElementTypeDescriptor> containerElementTypes,
+								   Set<ContainerElementTypeDescriptor> constrainedContainerElementTypes,
 								   boolean isCascaded,
 								   boolean defaultGroupSequenceRedefined,
 								   List<Class<?>> defaultGroupSequence,
@@ -50,7 +50,7 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 		super( type, constraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 		this.index = index;
 		this.name = name;
-		this.containerElementTypes = containerElementTypes;
+		this.constrainedContainerElementTypes = CollectionHelper.toImmutableSet( constrainedContainerElementTypes );
 		this.cascaded = isCascaded;
 		this.groupConversions = CollectionHelper.toImmutableSet( groupConversions );
 	}
@@ -61,8 +61,8 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 	}
 
 	@Override
-	public List<ContainerElementTypeDescriptor> getContainerElementTypes() {
-		return CollectionHelper.toImmutableList( containerElementTypes );
+	public Set<ContainerElementTypeDescriptor> getConstrainedContainerElementTypes() {
+		return constrainedContainerElementTypes;
 	}
 
 	@Override
