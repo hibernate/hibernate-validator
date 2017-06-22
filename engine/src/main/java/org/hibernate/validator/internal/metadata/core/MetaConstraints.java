@@ -98,7 +98,7 @@ public class MetaConstraints {
 
 	private static void addValueExtractorDescriptorForTypeArgumentLocation( ValueExtractorManager valueExtractorManager,
 			List<TypeParameterAndExtractor> valueExtractionPath, TypeArgumentConstraintLocation typeArgumentConstraintLocation ) {
-		Class<?> declaredType = TypeHelper.getErasedReferenceType( typeArgumentConstraintLocation.getContainerType() );
+		Class<?> declaredType = typeArgumentConstraintLocation.getContainerClass();
 		TypeVariable<?> typeParameter = typeArgumentConstraintLocation.getTypeParameter();
 
 		ValueExtractorDescriptor valueExtractorDescriptor = valueExtractorManager.getValueExtractor( declaredType, typeParameter );

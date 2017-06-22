@@ -25,7 +25,7 @@ public class ReturnValueDescriptorImpl extends ElementDescriptorImpl
 		implements ReturnValueDescriptor {
 
 	@Immutable
-	private final List<ContainerElementTypeDescriptor> containerElementTypes;
+	private final Set<ContainerElementTypeDescriptor> constrainedContainerElementTypes;
 
 	private final boolean cascaded;
 
@@ -34,7 +34,7 @@ public class ReturnValueDescriptorImpl extends ElementDescriptorImpl
 
 	public ReturnValueDescriptorImpl(Type returnType,
 									 Set<ConstraintDescriptorImpl<?>> returnValueConstraints,
-									 List<ContainerElementTypeDescriptor> containerElementTypes,
+									 Set<ContainerElementTypeDescriptor> constrainedContainerElementTypes,
 									 boolean cascaded,
 									 boolean defaultGroupSequenceRedefined,
 									 List<Class<?>> defaultGroupSequence,
@@ -46,14 +46,14 @@ public class ReturnValueDescriptorImpl extends ElementDescriptorImpl
 				defaultGroupSequence
 		);
 
-		this.containerElementTypes = containerElementTypes;
+		this.constrainedContainerElementTypes = CollectionHelper.toImmutableSet( constrainedContainerElementTypes );
 		this.cascaded = cascaded;
 		this.groupConversions = CollectionHelper.toImmutableSet( groupConversions );
 	}
 
 	@Override
-	public List<ContainerElementTypeDescriptor> getContainerElementTypes() {
-		return CollectionHelper.toImmutableList( containerElementTypes );
+	public Set<ContainerElementTypeDescriptor> getConstrainedContainerElementTypes() {
+		return constrainedContainerElementTypes;
 	}
 
 	@Override

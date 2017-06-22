@@ -29,7 +29,7 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 	private final String propertyName;
 
 	@Immutable
-	private final List<ContainerElementTypeDescriptor> containerElementTypes;
+	private final Set<ContainerElementTypeDescriptor> constrainedContainerElementTypes;
 
 	private final boolean cascaded;
 
@@ -39,7 +39,7 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 	public PropertyDescriptorImpl(Type returnType,
 								  String propertyName,
 								  Set<ConstraintDescriptorImpl<?>> constraints,
-								  List<ContainerElementTypeDescriptor> containerElementTypes,
+								  Set<ContainerElementTypeDescriptor> constrainedContainerElementTypes,
 								  boolean cascaded,
 								  boolean defaultGroupSequenceRedefined,
 								  List<Class<?>> defaultGroupSequence,
@@ -47,7 +47,7 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 		super( returnType, constraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 		this.propertyName = propertyName;
-		this.containerElementTypes = containerElementTypes;
+		this.constrainedContainerElementTypes = CollectionHelper.toImmutableSet( constrainedContainerElementTypes );
 		this.cascaded = cascaded;
 		this.groupConversions = CollectionHelper.toImmutableSet( groupConversions );
 	}
@@ -58,8 +58,8 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 	}
 
 	@Override
-	public List<ContainerElementTypeDescriptor> getContainerElementTypes() {
-		return CollectionHelper.toImmutableList( containerElementTypes );
+	public Set<ContainerElementTypeDescriptor> getConstrainedContainerElementTypes() {
+		return constrainedContainerElementTypes;
 	}
 
 	@Override

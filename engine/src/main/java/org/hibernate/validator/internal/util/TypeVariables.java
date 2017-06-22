@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.internal.util;
 
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
@@ -65,7 +68,11 @@ public class TypeVariables {
 		return clazz.getTypeParameters()[typeParameterIndex].getName();
 	}
 
-	public static int getTypeParameterIndex(TypeVariable<?> typeParameter) {
+	public static Integer getTypeParameterIndex(TypeVariable<?> typeParameter) {
+		if ( isArrayElement( typeParameter ) ) {
+			return null;
+		}
+
 		TypeVariable<?>[] typeParameters = typeParameter.getGenericDeclaration().getTypeParameters();
 		for ( int i = 0; i < typeParameters.length; i++ ) {
 			if ( typeParameter.getName().equals( typeParameters[i].getName() ) ) {
@@ -73,6 +80,20 @@ public class TypeVariables {
 			}
 		}
 		throw LOG.getUnableToFindTypeParameterInClass( (Class<?>) typeParameter.getGenericDeclaration(), typeParameter.getName() );
+	}
+
+	public static Type getContainerElementType(Type type, TypeVariable<?> typeParameter) {
+		if ( type instanceof ParameterizedType ) {
+			Type[] typeArguments = ( (ParameterizedType) type ).getActualTypeArguments();
+
+			return typeArguments[getTypeParameterIndex( typeParameter )];
+		}
+		else if ( type instanceof GenericArrayType ) {
+			return ( (GenericArrayType) type ).getGenericComponentType();
+		}
+		else {
+			return null;
+		}
 	}
 
 	private static Class<?> getDeclaringClass(TypeVariable<?> typeParameter) {

@@ -8,8 +8,6 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
@@ -19,6 +17,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,7 +32,6 @@ import org.hibernate.validator.internal.metadata.descriptor.ContainerElementType
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
@@ -168,79 +166,64 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 		return theValue;
 	}
 
-	protected List<ContainerElementTypeDescriptor> asContainerElementTypeDescriptors(
+	protected Set<ContainerElementTypeDescriptor> asContainerElementTypeDescriptors(
 			Set<MetaConstraint<?>> containerElementsConstraints, CascadingMetaData cascadingMetaData,
 			boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 
-		return asContainerElementTypeDescriptors( type, ContainerElementMetaConstraintTree.of( containerElementsConstraints ),
-				cascadingMetaData, defaultGroupSequenceRedefined, defaultGroupSequence );
+		return asContainerElementTypeDescriptors( type,
+				ContainerElementMetaDataTree.of( cascadingMetaData, containerElementsConstraints ),
+				defaultGroupSequenceRedefined, defaultGroupSequence );
 	}
 
-	private List<ContainerElementTypeDescriptor> asContainerElementTypeDescriptors(Type type,
-			ContainerElementMetaConstraintTree containerElementMetaConstraintTree, CascadingMetaData cascadingMetaData,
+	private Set<ContainerElementTypeDescriptor> asContainerElementTypeDescriptors(Type type, ContainerElementMetaDataTree containerElementMetaDataTree,
 			boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-		if ( type instanceof ParameterizedType ) {
-			List<ContainerElementTypeDescriptor> containerElementTypeDescriptors = new ArrayList<>();
+		Set<ContainerElementTypeDescriptor> containerElementTypeDescriptors = new HashSet<>();
 
-			Type[] typeArguments = ( (ParameterizedType) type ).getActualTypeArguments();
-			TypeVariable<?>[] typeParameters = ReflectionHelper.getClassFromType( type ).getTypeParameters();
+		for ( Entry<TypeVariable<?>, ContainerElementMetaDataTree> entry : containerElementMetaDataTree.nodes.entrySet() ) {
+			TypeVariable<?> childTypeParameter = entry.getKey();
+			ContainerElementMetaDataTree childContainerElementMetaDataTree = entry.getValue();
 
-			for ( int i = 0; i < typeArguments.length; i++ ) {
-				Type typeArgument = typeArguments[i];
-				TypeVariable<?> typeParameter = typeParameters[i];
+			Set<ContainerElementTypeDescriptor> childrenDescriptors =
+					asContainerElementTypeDescriptors( childContainerElementMetaDataTree.elementType, childContainerElementMetaDataTree,
+					defaultGroupSequenceRedefined, defaultGroupSequence );
 
-				Set<MetaConstraint<?>> constraints = Collections.emptySet();
-				ContainerElementMetaConstraintTree currentContainerElementMetaConstraintTree = null;
-
-				if ( containerElementMetaConstraintTree != null && containerElementMetaConstraintTree.nodes.containsKey( typeParameter ) ) {
-					currentContainerElementMetaConstraintTree = containerElementMetaConstraintTree.nodes.get( typeParameter );
-					constraints = containerElementMetaConstraintTree.nodes.get( typeParameter ).constraints;
-				}
-
-				CascadingMetaData currentCascadingMetaData = null;
-				boolean cascading = false;
-				Set<GroupConversionDescriptor> groupConversionDescriptors = Collections.emptySet();
-
-				if ( cascadingMetaData != null ) {
-					for ( CascadingMetaData candidateCascadingMetaData : cascadingMetaData.getContainerElementTypesCascadingMetaData() ) {
-						if ( candidateCascadingMetaData.getTypeParameter().equals( typeParameter ) ) {
-							currentCascadingMetaData = candidateCascadingMetaData;
-							cascading = currentCascadingMetaData.isCascading();
-							groupConversionDescriptors = currentCascadingMetaData.getGroupConversionDescriptors();
-						}
-					}
-				}
-
-				containerElementTypeDescriptors.add( new ContainerElementTypeDescriptorImpl(
-						typeArgument, TypeVariables.getTypeParameterIndex( typeParameter ),
-						asDescriptors( constraints ),
-						asContainerElementTypeDescriptors( typeArgument, currentContainerElementMetaConstraintTree, currentCascadingMetaData,
-								defaultGroupSequenceRedefined, defaultGroupSequence ),
-						cascading,
-						defaultGroupSequenceRedefined, defaultGroupSequence,
-						groupConversionDescriptors ) );
-			}
-
-			return containerElementTypeDescriptors;
+			containerElementTypeDescriptors.add( new ContainerElementTypeDescriptorImpl(
+					childContainerElementMetaDataTree.elementType,
+					childContainerElementMetaDataTree.containerClass, TypeVariables.getTypeParameterIndex( childTypeParameter ),
+					asDescriptors( childContainerElementMetaDataTree.constraints ),
+					childrenDescriptors,
+					childContainerElementMetaDataTree.cascading,
+					defaultGroupSequenceRedefined, defaultGroupSequence,
+					childContainerElementMetaDataTree.groupConversionDescriptors ) );
 		}
-		else if ( type instanceof GenericArrayType ) {
-			// TODO Container element constraints are not supported for arrays in the Bean Validation specification.
-			// Let's ignore them for now.
-			return Collections.emptyList();
-		}
-		else {
-			return Collections.emptyList();
-		}
+
+		return containerElementTypeDescriptors;
 	}
 
-	private static class ContainerElementMetaConstraintTree {
+	/**
+	 * This data structure is used to join the cascading metadata information with the constraint violations. It is a
+	 * temporary data structure and it should be kept that way.
+	 * <p>
+	 * We might consider in the future having a common tree structure for the cascading metadata and the constraint
+	 * violations that would be built earlier and shared. This class shouldn't be taken as a model as this data
+	 * structure should be made immutable.
+	 */
+	private static class ContainerElementMetaDataTree {
 
-		private Map<TypeVariable<?>, ContainerElementMetaConstraintTree> nodes = new HashMap<>();
+		private Map<TypeVariable<?>, ContainerElementMetaDataTree> nodes = new HashMap<>();
+
+		private Type elementType = null;
+
+		private Class<?> containerClass;
 
 		private Set<MetaConstraint<?>> constraints = new HashSet<>();
 
-		private static ContainerElementMetaConstraintTree of(Set<MetaConstraint<?>> containerElementsConstraints) {
-			ContainerElementMetaConstraintTree containerElementMetaConstraintTree = new ContainerElementMetaConstraintTree();
+		private boolean cascading = false;
+
+		private Set<GroupConversionDescriptor> groupConversionDescriptors = new HashSet<>();
+
+		private static ContainerElementMetaDataTree of(CascadingMetaData cascadingMetaData, Set<MetaConstraint<?>> containerElementsConstraints) {
+			ContainerElementMetaDataTree containerElementMetaConstraintTree = new ContainerElementMetaDataTree();
 
 			for ( MetaConstraint<?> constraint : containerElementsConstraints ) {
 				ConstraintLocation currentLocation = constraint.getLocation();
@@ -255,15 +238,45 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 				containerElementMetaConstraintTree.addConstraint( constraintPath, constraint );
 			}
 
+			if ( cascadingMetaData != null && cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements() ) {
+				containerElementMetaConstraintTree.addCascadingMetaData( new ArrayList<>(), cascadingMetaData );
+			}
+
 			return containerElementMetaConstraintTree;
 		}
 
 		private void addConstraint(List<TypeVariable<?>> path, MetaConstraint<?> constraint) {
-			ContainerElementMetaConstraintTree tree = this;
-			for ( TypeVariable<?> typeParameter : path ) {
-				tree = tree.nodes.computeIfAbsent( typeParameter, tp -> new ContainerElementMetaConstraintTree() );
+			ContainerElementMetaDataTree tree = this;
+			for ( TypeVariable<?> typeArgument : path ) {
+				tree = tree.nodes.computeIfAbsent( typeArgument, ta -> new ContainerElementMetaDataTree() );
 			}
+
+			TypeArgumentConstraintLocation constraintLocation = (TypeArgumentConstraintLocation) constraint.getLocation();
+
+			tree.elementType = constraintLocation.getTypeForValidatorResolution();
+			tree.containerClass = ( (TypeArgumentConstraintLocation) constraint.getLocation() ).getContainerClass();
 			tree.constraints.add( constraint );
+		}
+
+		private void addCascadingMetaData(List<TypeVariable<?>> path, CascadingMetaData cascadingMetaData) {
+			for ( CascadingMetaData nestedCascadingMetaData : cascadingMetaData.getContainerElementTypesCascadingMetaData() ) {
+				List<TypeVariable<?>> nestedPath = new ArrayList<>( path );
+				nestedPath.add( nestedCascadingMetaData.getTypeParameter() );
+
+				ContainerElementMetaDataTree tree = this;
+				for ( TypeVariable<?> typeArgument : nestedPath ) {
+					tree = tree.nodes.computeIfAbsent( typeArgument, ta -> new ContainerElementMetaDataTree() );
+				}
+
+				tree.elementType = TypeVariables.getContainerElementType( nestedCascadingMetaData.getEnclosingType(), nestedCascadingMetaData.getTypeParameter() );
+				tree.containerClass = nestedCascadingMetaData.getDeclaredContainerClass();
+				tree.cascading = nestedCascadingMetaData.isCascading();
+				tree.groupConversionDescriptors = nestedCascadingMetaData.getGroupConversionDescriptors();
+
+				if ( nestedCascadingMetaData.isMarkedForCascadingOnElementOrContainerElements() ) {
+					addCascadingMetaData( nestedPath, nestedCascadingMetaData );
+				}
+			}
 		}
 	}
 }

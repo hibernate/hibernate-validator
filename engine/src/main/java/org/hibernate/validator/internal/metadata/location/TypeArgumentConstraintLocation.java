@@ -14,6 +14,7 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
+import org.hibernate.validator.internal.util.TypeHelper;
 
 /**
  * Type argument constraint location.
@@ -27,7 +28,7 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 	private final ConstraintLocation delegate;
 	private final TypeVariable<?> typeParameter;
 	private final Type typeForValidatorResolution;
-	private final Type containerType;
+	private final Class<?> containerClass;
 	private final ConstraintLocation outerDelegate;
 	private final int hashCode;
 
@@ -35,7 +36,7 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 		this.delegate = delegate;
 		this.typeParameter = typeParameter;
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( typeOfAnnotatedElement );
-		this.containerType = delegate.getTypeForValidatorResolution();
+		this.containerClass = TypeHelper.getErasedReferenceType( delegate.getTypeForValidatorResolution() );
 
 		ConstraintLocation outerDelegate = delegate;
 		while ( outerDelegate instanceof TypeArgumentConstraintLocation ) {
@@ -64,8 +65,8 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 		return typeForValidatorResolution;
 	}
 
-	public Type getContainerType() {
-		return containerType;
+	public Class<?> getContainerClass() {
+		return containerClass;
 	}
 
 	@Override
