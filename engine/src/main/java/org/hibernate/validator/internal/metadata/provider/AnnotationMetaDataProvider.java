@@ -599,7 +599,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		TypeVariable<?>[] typeParameters = parameter.getType().getTypeParameters();
 		AnnotatedType annotatedType = parameter.getAnnotatedType();
 
-		Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( typeParameters, annotatedType );
+		Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( annotatedType, typeParameters );
 
 		try {
 			return getCascadingMetaData( parameter.getType().isArray(), ReflectionHelper.typeOf( parameter.getDeclaringExecutable(), i ),
@@ -615,7 +615,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		TypeVariable<?>[] typeParameters = field.getType().getTypeParameters();
 		AnnotatedType annotatedType = field.getAnnotatedType();
 
-		Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( typeParameters, annotatedType );
+		Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( annotatedType, typeParameters );
 
 		return getCascadingMetaData( field.getType().isArray(), ReflectionHelper.typeOf( field ), field, containerElementTypesCascadingMetaData );
 	}
@@ -634,64 +634,72 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 		AnnotatedType annotatedType = executable.getAnnotatedReturnType();
 
-		Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( typeParameters, annotatedType );
+		Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( annotatedType, typeParameters );
 
 		return getCascadingMetaData( isArray, ReflectionHelper.typeOf( executable ), executable, containerElementTypesCascadingMetaData );
 	}
 
-	private Map<TypeVariable<?>, CascadingTypeParameter> getTypeParametersCascadingMetadata(TypeVariable<?>[] typeParameters, AnnotatedType annotatedType) {
-		Map<TypeVariable<?>, CascadingTypeParameter> typeParametersCascadingMetadata = CollectionHelper.newHashMap( typeParameters.length );
-
+	private Map<TypeVariable<?>, CascadingTypeParameter> getTypeParametersCascadingMetadata(AnnotatedType annotatedType,
+			TypeVariable<?>[] typeParameters) {
 		if ( annotatedType instanceof AnnotatedArrayType ) {
-			addCascadingMetaDataForArrayType( typeParametersCascadingMetadata, (AnnotatedArrayType) annotatedType );
+			return getTypeParametersCascadingMetaDataForArrayType( (AnnotatedArrayType) annotatedType );
 		}
 		else if ( annotatedType instanceof AnnotatedParameterizedType ) {
-			addCascadingMetaDataForParameterizedType( typeParametersCascadingMetadata, (AnnotatedParameterizedType) annotatedType, typeParameters );
+			return getTypeParametersCascadingMetaDataForParameterizedType( (AnnotatedParameterizedType) annotatedType, typeParameters );
+		}
+		else {
+			return Collections.emptyMap();
+		}
+	}
+
+	private Map<TypeVariable<?>, CascadingTypeParameter> getTypeParametersCascadingMetaDataForParameterizedType(
+			AnnotatedParameterizedType annotatedParameterizedType, TypeVariable<?>[] typeParameters) {
+		Map<TypeVariable<?>, CascadingTypeParameter> typeParametersCascadingMetadata = CollectionHelper.newHashMap( typeParameters.length );
+
+		AnnotatedType[] annotatedTypeArguments = annotatedParameterizedType.getAnnotatedActualTypeArguments();
+		int i = 0;
+
+		for ( AnnotatedType annotatedTypeArgument : annotatedTypeArguments ) {
+			Map<TypeVariable<?>, CascadingTypeParameter> nestedTypeParametersCascadingMetadata = getTypeParametersCascadingMetaDataForAnnotatedType(
+					annotatedTypeArgument );
+
+			typeParametersCascadingMetadata.put( typeParameters[i], new CascadingTypeParameter( annotatedParameterizedType.getType(), typeParameters[i],
+					annotatedTypeArgument.isAnnotationPresent( Valid.class ), nestedTypeParametersCascadingMetadata,
+					getGroupConversions( annotatedTypeArgument ) ) );
+			i++;
 		}
 
 		return typeParametersCascadingMetadata;
 	}
 
-	private void addCascadingMetaDataForParameterizedType(Map<TypeVariable<?>, CascadingTypeParameter> typeParametersCascadingMetadata,
-			AnnotatedParameterizedType annotatedParameterizedType, TypeVariable<?>[] typeParameters) {
-		AnnotatedType[] annotatedTypeArguments = annotatedParameterizedType.getAnnotatedActualTypeArguments();
+	private Map<TypeVariable<?>, CascadingTypeParameter> getTypeParametersCascadingMetaDataForArrayType(AnnotatedArrayType annotatedArrayType) {
+		Map<TypeVariable<?>, CascadingTypeParameter> typeParametersCascadingMetadata = CollectionHelper.newHashMap( 1 );
+		AnnotatedType containerElementAnnotatedType = annotatedArrayType.getAnnotatedGenericComponentType();
 
-		int i = 0;
-
-		for ( AnnotatedType annotatedTypeArgument : annotatedTypeArguments ) {
-			Type validatedType = annotatedTypeArgument.getType();
-			Map<TypeVariable<?>, CascadingTypeParameter> nestedTypeParametersCascadingMetadata;
-			if ( validatedType instanceof ParameterizedType ) {
-				nestedTypeParametersCascadingMetadata = getTypeParametersCascadingMetadata(
-						ReflectionHelper.getClassFromType( validatedType ).getTypeParameters(), annotatedTypeArgument );
-			}
-			else {
-				nestedTypeParametersCascadingMetadata = Collections.emptyMap();
-			}
-
-			typeParametersCascadingMetadata.put( typeParameters[i], new CascadingTypeParameter( annotatedParameterizedType.getType(), typeParameters[i],
-					annotatedTypeArgument.isAnnotationPresent( Valid.class ), nestedTypeParametersCascadingMetadata, getGroupConversions( annotatedTypeArgument ) ) );
-			i++;
-		}
-	}
-
-	private void addCascadingMetaDataForArrayType(Map<TypeVariable<?>, CascadingTypeParameter> typeParametersCascadingMetadata,
-			AnnotatedArrayType annotatedArrayType) {
-		Type validatedType = annotatedArrayType.getAnnotatedGenericComponentType().getType();
-
-		Map<TypeVariable<?>, CascadingTypeParameter> nestedTypeParametersCascadingMetadata;
-		if ( validatedType instanceof ParameterizedType ) {
-			nestedTypeParametersCascadingMetadata = getTypeParametersCascadingMetadata(
-					ReflectionHelper.getClassFromType( validatedType ).getTypeParameters(), annotatedArrayType.getAnnotatedGenericComponentType() );
-		}
-		else {
-			nestedTypeParametersCascadingMetadata = Collections.emptyMap();
-		}
+		Map<TypeVariable<?>, CascadingTypeParameter> nestedTypeParametersCascadingMetadata = getTypeParametersCascadingMetaDataForAnnotatedType(
+				containerElementAnnotatedType );
 
 		TypeVariable<?> arrayElement = new ArrayElement( annotatedArrayType );
-		typeParametersCascadingMetadata.put( arrayElement, new CascadingTypeParameter( validatedType,
+		typeParametersCascadingMetadata.put( arrayElement, new CascadingTypeParameter( annotatedArrayType.getType(),
 				arrayElement,
-				annotatedArrayType.isAnnotationPresent( Valid.class ), nestedTypeParametersCascadingMetadata, getGroupConversions( annotatedArrayType ) ) );
+				annotatedArrayType.isAnnotationPresent( Valid.class ),
+				nestedTypeParametersCascadingMetadata,
+				getGroupConversions( annotatedArrayType ) ) );
+
+		return typeParametersCascadingMetadata;
+	}
+
+	private Map<TypeVariable<?>, CascadingTypeParameter> getTypeParametersCascadingMetaDataForAnnotatedType(AnnotatedType annotatedType) {
+		if ( annotatedType instanceof AnnotatedArrayType ) {
+			return getTypeParametersCascadingMetaDataForArrayType( (AnnotatedArrayType) annotatedType );
+		}
+		else if ( annotatedType instanceof AnnotatedParameterizedType ) {
+			return getTypeParametersCascadingMetaDataForParameterizedType( (AnnotatedParameterizedType) annotatedType,
+					ReflectionHelper.getClassFromType( annotatedType.getType() ).getTypeParameters() );
+		}
+		else {
+			return Collections.emptyMap();
+		}
 	}
 
 	/**
