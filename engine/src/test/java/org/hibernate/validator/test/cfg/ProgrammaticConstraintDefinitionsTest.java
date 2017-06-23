@@ -6,11 +6,13 @@
  */
 package org.hibernate.validator.test.cfg;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.fail;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.util.Set;
 
@@ -34,10 +36,18 @@ import org.hibernate.validator.cfg.defs.br.TituloEleitoralDef;
 import org.hibernate.validator.cfg.defs.pl.NIPDef;
 import org.hibernate.validator.cfg.defs.pl.PESELDef;
 import org.hibernate.validator.cfg.defs.pl.REGONDef;
+import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.br.CNPJ;
+import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.constraints.br.TituloEleitoral;
+import org.hibernate.validator.constraints.pl.NIP;
+import org.hibernate.validator.constraints.pl.PESEL;
+import org.hibernate.validator.constraints.pl.REGON;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
+
 import org.testng.annotations.Test;
 
 /**
@@ -47,31 +57,34 @@ public class ProgrammaticConstraintDefinitionsTest {
 
 	@Test
 	public void countrySpecificProgrammaticDefinition() {
-		doProgrammaticTest( new TituloEleitoralDef(), "038763000914", "48255-77", "invalid Brazilian Voter ID card number" );
-		doProgrammaticTest( new CPFDef(), "134.241.313-00", "48255-77", "invalid Brazilian individual taxpayer registry number (CPF)" );
-		doProgrammaticTest( new CNPJDef(), "91.509.901/0001-69", "91.509.901/0001-60", "invalid Brazilian corporate taxpayer registry number (CNPJ)" );
+		doProgrammaticTest( TituloEleitoral.class, new TituloEleitoralDef(), "038763000914", "48255-77", "invalid Brazilian Voter ID card number" );
+		doProgrammaticTest( CPF.class, new CPFDef(), "134.241.313-00", "48255-77", "invalid Brazilian individual taxpayer registry number (CPF)" );
+		doProgrammaticTest( CNPJ.class, new CNPJDef(), "91.509.901/0001-69", "91.509.901/0001-60",
+				"invalid Brazilian corporate taxpayer registry number (CNPJ)"
+		);
 
-		doProgrammaticTest( new REGONDef(), "49905531368510", "49905531368512", "Invalid Polish Taxpayer Identification Number (REGON)" );
-		doProgrammaticTest( new REGONDef(), "858336997", "691657185", "Invalid Polish Taxpayer Identification Number (REGON)" );
-		doProgrammaticTest( new PESELDef(), "12252918020", "44051401358", "Invalid Polish National Identification Number (PESEL)" );
-		doProgrammaticTest( new NIPDef(), "1786052059", "2596048505", "Invalid VAT Identification Number (NIP)" );
+		doProgrammaticTest( REGON.class, new REGONDef(), "49905531368510", "49905531368512", "Invalid Polish Taxpayer Identification Number (REGON)" );
+		doProgrammaticTest( REGON.class, new REGONDef(), "858336997", "691657185", "Invalid Polish Taxpayer Identification Number (REGON)" );
+		doProgrammaticTest( PESEL.class, new PESELDef(), "12252918020", "44051401358", "Invalid Polish National Identification Number (PESEL)" );
+		doProgrammaticTest( NIP.class, new NIPDef(), "1786052059", "2596048505", "Invalid VAT Identification Number (NIP)" );
 
 	}
 
 	@Test
 	public void safeHtmlProgrammaticDefinition() {
-		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.BASIC ), "<td>1234qwertd>", 1 );
-		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE ), "test", 0 );
-		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ), "<td>1234qwer</td>", 0 );
-		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE ).additionalTags( "td" ), "<td>1234qwer</td>", 0 );
+		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.BASIC ), "<td>1234qwertd>", 1 );
+		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE ), "test", 0 );
+		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ), "<td>1234qwer</td>", 0 );
+		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE ).additionalTags( "td" ), "<td>1234qwer</td>", 0 );
 
-		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ), "<img src='/some/relative/url/image.png' />", 1 );
-		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ).baseURI( "http://localhost" ),
+		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ), "<img src='/some/relative/url/image.png' />", 1 );
+		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ).baseURI( "http://localhost" ),
 				"<img src='/some/relative/url/image.png' />", 0
 		);
 
 		// disallowed attribute
 		doProgrammaticTest(
+				SafeHtml.class,
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 						.additionalTags( new TagDef( "img" )
 								.attributes( "src" )
@@ -81,6 +94,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 
 		// allowed attribute, no restrictions on protocols
 		doProgrammaticTest(
+				SafeHtml.class,
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 						.additionalTags( new TagDef( "img" )
 								.attributes( "src" )
@@ -90,6 +104,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 
 		// allowed attribute, allowed protocol
 		doProgrammaticTest(
+				SafeHtml.class,
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 						.additionalTags( new TagDef( "img" )
 								.attributes( new AttributeDef( "src", "data" ) )
@@ -99,6 +114,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 
 		// allowed attribute, disallowed protocol
 		doProgrammaticTest(
+				SafeHtml.class,
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 						.additionalTags( new TagDef( "img" )
 								.attributes( new AttributeDef( "src", "data" ) )
@@ -108,6 +124,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 
 		// multiple allowed attributes and protocols
 		doProgrammaticTest(
+				SafeHtml.class,
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 						.additionalTags( new TagDef( "img" )
 								.attributes(
@@ -119,11 +136,13 @@ public class ProgrammaticConstraintDefinitionsTest {
 		);
 
 		doProgrammaticTest(
+				SafeHtml.class,
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 						.additionalTags( new TagDef( "td" ).attributes( "class", "id" ) ),
 				"<td class='class' id='tableId'>1234qwer</td>", 0
 		);
 		doProgrammaticTest(
+				SafeHtml.class,
 				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 						.additionalTags( new TagDef( "td" ).attributes( "class", "id" ) ),
 				"<td class='class' id='tableId' otherAttribute='value'>1234qwer</td>", 1
@@ -133,34 +152,34 @@ public class ProgrammaticConstraintDefinitionsTest {
 		AnnotationDescriptor<SafeHtml.Tag> tagDescriptor = new AnnotationDescriptor( SafeHtml.Tag.class );
 		tagDescriptor.setValue( "name", "td" );
 		tagDescriptor.setValue( "attributes", new String[]{ "class", "id" } );
-		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
+		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 				.additionalTagsWithAttributes( AnnotationFactory.create( tagDescriptor ) ), "<td class='class' id='tableId'>1234qwer</td>", 0 );
 
 		AnnotationDescriptor<SafeHtml.Attribute> attributeDescriptor = new AnnotationDescriptor( SafeHtml.Attribute.class );
-		attributeDescriptor.setValue( "name",  "src"  );
+		attributeDescriptor.setValue( "name", "src" );
 		attributeDescriptor.setValue( "protocols", new String[]{ "data" } );
 
 		tagDescriptor = new AnnotationDescriptor( SafeHtml.Tag.class );
 		tagDescriptor.setValue( "name", "img" );
 		tagDescriptor.setValue( "attributesWithProtocols", new SafeHtml.Attribute[]{ AnnotationFactory.create( attributeDescriptor ) } );
 
-		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
+		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 				.additionalTagsWithAttributes( AnnotationFactory.create( tagDescriptor ) ), "<img src='data:image/png;base64,100101' />", 0 );
 	}
 
 	@Test
 	public void luhnCheckDefProgrammaticDefinition() {
-		doProgrammaticTest( new LuhnCheckDef().startIndex( 0 )
-									.endIndex( Integer.MAX_VALUE )
-									.checkDigitIndex( -1 )
-									.ignoreNonDigitCharacters( false ),
-							"A79927398713", 1
+		doProgrammaticTest( LuhnCheck.class, new LuhnCheckDef().startIndex( 0 )
+						.endIndex( Integer.MAX_VALUE )
+						.checkDigitIndex( -1 )
+						.ignoreNonDigitCharacters( false ),
+				"A79927398713", 1
 		);
-		doProgrammaticTest( new LuhnCheckDef().startIndex( 0 )
-									.endIndex( Integer.MAX_VALUE )
-									.checkDigitIndex( -1 )
-									.ignoreNonDigitCharacters( true ),
-							"A79927398713", 0
+		doProgrammaticTest( LuhnCheck.class, new LuhnCheckDef().startIndex( 0 )
+						.endIndex( Integer.MAX_VALUE )
+						.checkDigitIndex( -1 )
+						.ignoreNonDigitCharacters( true ),
+				"A79927398713", 0
 		);
 	}
 
@@ -203,7 +222,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 		}
 	}
 
-	private void doProgrammaticTest(ConstraintDef<?, ?> def, String content, int numOfViolations) {
+	private void doProgrammaticTest(Class<? extends Annotation> constraint, ConstraintDef<?, ?> def, String content, int numOfViolations) {
 		HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Bar.class )
@@ -216,10 +235,17 @@ public class ProgrammaticConstraintDefinitionsTest {
 				.getValidator();
 
 		Set<ConstraintViolation<Bar>> violations = validator.validate( new Bar( content ) );
-		assertNumberOfViolations( violations, numOfViolations );
+		if ( numOfViolations > 0 ) {
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( constraint )
+			);
+		}
+		else {
+			assertNoViolations( violations );
+		}
 	}
 
-	private void doProgrammaticTest(ConstraintDef<?, ?> def, String validNum, String invalidNum, String message) {
+	private void doProgrammaticTest(Class<? extends Annotation> constraint, ConstraintDef<?, ?> def, String validNum, String invalidNum, String message) {
 		HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( OtherPerson.class )
@@ -232,9 +258,10 @@ public class ProgrammaticConstraintDefinitionsTest {
 				.getValidator();
 
 		Set<ConstraintViolation<OtherPerson>> violations = validator.validate( new OtherPerson( invalidNum ) );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, message );
-		assertNumberOfViolations( validator.validate( new OtherPerson( validNum ) ), 0 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( constraint ).withMessage( message )
+		);
+		assertNoViolations( validator.validate( new OtherPerson( validNum ) ) );
 	}
 
 	@SuppressWarnings("unused")
@@ -253,6 +280,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 	}
 
 	public interface Foo {
+
 		String getSource();
 
 		void setSource(String source);

@@ -6,11 +6,21 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.validation;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import static org.testng.Assert.fail;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -18,19 +28,10 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Payload;
 import javax.validation.Validator;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.fail;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -49,8 +50,9 @@ public class GroupValidationTest {
 		A a = new A();
 
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( a, First.class, Second.class );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintTypes( constraintViolations, FailOnSecondValidationCall.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( FailOnSecondValidationCall.class )
+		);
 	}
 
 	public static class A {

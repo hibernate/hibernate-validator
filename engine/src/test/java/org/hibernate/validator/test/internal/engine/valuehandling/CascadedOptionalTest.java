@@ -6,8 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -22,6 +23,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -48,8 +50,13 @@ public class CascadedOptionalTest {
 
 		Set<ConstraintViolation<PondWithCascadedField>> constraintViolations = validator.validate( pond );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "masterFish.name" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "masterFish" )
+								.property( "name" )
+						)
+		);
 		assertFalse( pond.getMasterFishInvoked );
 	}
 
@@ -60,8 +67,13 @@ public class CascadedOptionalTest {
 
 		Set<ConstraintViolation<PondWithCascadedGetter>> constraintViolations = validator.validate( pond );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "masterFish.name" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "masterFish" )
+								.property( "name", false, null, null, Optional.class, 0 )
+						)
+		);
 		assertTrue( pond.getMasterFishInvoked );
 	}
 

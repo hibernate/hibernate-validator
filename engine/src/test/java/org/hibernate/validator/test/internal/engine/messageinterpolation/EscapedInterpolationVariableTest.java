@@ -6,10 +6,15 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.testng.Assert.fail;
+
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
 import javax.validation.Validator;
@@ -21,11 +26,9 @@ import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpo
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.testng.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -81,25 +84,33 @@ public class EscapedInterpolationVariableTest {
 	@Test
 	public void testEscapedOpeningAndClosingBrace() throws Exception {
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( new A() );
-		assertCorrectConstraintViolationMessages( constraintViolations, "{escapedParameterKey}" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Max.class ).withMessage( "{escapedParameterKey}" )
+		);
 	}
 
 	@Test
 	public void testEscapedClosingBrace() throws Exception {
 		Set<ConstraintViolation<B>> constraintViolations = validator.validate( new B() );
-		assertCorrectConstraintViolationMessages( constraintViolations, "{key-2}" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Max.class ).withMessage( "{key-2}" )
+		);
 	}
 
 	@Test
 	public void testEscapedOpenBrace() throws Exception {
 		Set<ConstraintViolation<C>> constraintViolations = validator.validate( new C() );
-		assertCorrectConstraintViolationMessages( constraintViolations, "{key-3}" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Max.class ).withMessage( "{key-3}" )
+		);
 	}
 
 	@Test
 	public void testMessageStaysUnchangedDueToSingleCurlyBrace() throws Exception {
 		Set<ConstraintViolation<D>> constraintViolations = validator.validate( new D() );
-		assertCorrectConstraintViolationMessages( constraintViolations, "{key-4} {" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Max.class ).withMessage( "{key-4} {" )
+		);
 	}
 
 	private class A {

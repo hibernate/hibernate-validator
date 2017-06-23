@@ -6,8 +6,9 @@
  */
 package org.hibernate.validator.test.constraints;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.Set;
 
@@ -16,6 +17,7 @@ import javax.validation.Validator;
 
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.Test;
 
 /**
@@ -31,28 +33,30 @@ public class ConstraintTest {
 		elevator.setCurrentFloor( -3 );
 		Set<ConstraintViolation<Elevator>> constraintViolations = validator.validate( elevator );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertConstraintViolation( constraintViolations.iterator().next(), Range.class, "Invalid floor" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Range.class ).withMessage( "Invalid floor" )
+		);
 
 		elevator.setCurrentFloor( -2 );
 		constraintViolations = validator.validate( elevator );
 
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		elevator.setCurrentFloor( 45 );
 		constraintViolations = validator.validate( elevator );
 
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		elevator.setCurrentFloor( 50 );
 		constraintViolations = validator.validate( elevator );
 
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		elevator.setCurrentFloor( 51 );
 		constraintViolations = validator.validate( elevator );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertConstraintViolation( constraintViolations.iterator().next(), Range.class, "Invalid floor" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Range.class ).withMessage( "Invalid floor" )
+		);
 	}
 }

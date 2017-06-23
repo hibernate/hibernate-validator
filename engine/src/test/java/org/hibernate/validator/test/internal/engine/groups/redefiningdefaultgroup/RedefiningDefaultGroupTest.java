@@ -6,21 +6,23 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.redefiningdefaultgroup;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.GroupSequence;
 import javax.validation.Validator;
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.groups.Default;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 /**
  * @author Hardy Ferentschik
@@ -40,40 +42,38 @@ public class RedefiningDefaultGroupTest {
 		// create a car and check that everything is ok with it.
 		Car car = new Car( "Morris", "DD-AB-123", 2 );
 		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		// but has it passed the vehicle inspection?
 		constraintViolations = validator.validate( car, CarChecks.class );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintViolationMessages(
-				constraintViolations,
-				"The car has to pass the vehicle inspection first"
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( AssertTrue.class )
+						.withProperty( "passedVehicleInspection" )
+						.withMessage( "The car has to pass the vehicle inspection first" )
 		);
 
 		// let's go to the vehicle inspection
 		car.setPassedVehicleInspection( true );
 		constraintViolations = validator.validate( car );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		// now let's add a driver. He is 18, but has not passed the driving test yet
 		Driver john = new Driver( "John Doe" );
 		john.setAge( 18 );
 		car.setDriver( john );
 		constraintViolations = validator.validate( car, DriverChecks.class );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintViolationMessages(
-				constraintViolations,
-				"You first have to pass the driving test"
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( AssertTrue.class ).withMessage( "You first have to pass the driving test" )
 		);
 
 		// ok, John passes the test
 		john.passedDrivingTest( true );
 		constraintViolations = validator.validate( car, DriverChecks.class );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		// just checking that everything is in order now
 		constraintViolations = validator.validate( car, Default.class, CarChecks.class, DriverChecks.class );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -81,26 +81,26 @@ public class RedefiningDefaultGroupTest {
 		// create a car and check that everything is ok with it.
 		Car car = new Car( "Morris", "DD-AB-123", 2 );
 		Set<ConstraintViolation<Car>> constraintViolations = validator.validateProperty( car, "manufacturer" );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validateProperty( car, "licensePlate" );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validateProperty( car, "seatCount" );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		// but has it passed the vehicle inspection?
 		constraintViolations = validator.validateProperty( car, "passedVehicleInspection", CarChecks.class );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintViolationMessages(
-				constraintViolations,
-				"The car has to pass the vehicle inspection first"
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( AssertTrue.class )
+						.withProperty( "passedVehicleInspection" )
+						.withMessage( "The car has to pass the vehicle inspection first" )
 		);
 
 		// let's go to the vehicle inspection
 		car.setPassedVehicleInspection( true );
 		constraintViolations = validator.validateProperty( car, "passedVehicleInspection", CarChecks.class );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		// now let's add a driver. He is 18, but has not passed the driving test yet
 		Driver john = new Driver( "John Doe" );
@@ -108,22 +108,20 @@ public class RedefiningDefaultGroupTest {
 		car.setDriver( john );
 
 		constraintViolations = validator.validateProperty( car, "driver.name", CarChecks.class );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validateProperty( car, "driver.age", CarChecks.class );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validateProperty( car, "driver.hasDrivingLicense", DriverChecks.class );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintViolationMessages(
-				constraintViolations,
-				"You first have to pass the driving test"
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( AssertTrue.class ).withMessage( "You first have to pass the driving test" )
 		);
 
 		// ok, John passes the test
 		john.passedDrivingTest( true );
 		constraintViolations = validator.validateProperty( car, "driver.hasDrivingLicense", DriverChecks.class );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -136,7 +134,7 @@ public class RedefiningDefaultGroupTest {
 		john.passedDrivingTest( true );
 		car.setDriver( john );
 
-		assertNumberOfViolations( validator.validate( car, OrderedChecks.class ), 0 );
+		assertNoViolations( validator.validate( car, OrderedChecks.class ) );
 	}
 
 	@Test
@@ -149,16 +147,16 @@ public class RedefiningDefaultGroupTest {
 		john.passedDrivingTest( true );
 		car.setDriver( john );
 
-		assertNumberOfViolations( validator.validateProperty( car, "manufacturer", OrderedChecks.class ), 0 );
-		assertNumberOfViolations( validator.validateProperty( car, "licensePlate", OrderedChecks.class ), 0 );
-		assertNumberOfViolations(
-				validator.validateProperty( car, "passedVehicleInspection", OrderedChecks.class ), 0
+		assertNoViolations( validator.validateProperty( car, "manufacturer", OrderedChecks.class ) );
+		assertNoViolations( validator.validateProperty( car, "licensePlate", OrderedChecks.class ) );
+		assertNoViolations(
+				validator.validateProperty( car, "passedVehicleInspection", OrderedChecks.class )
 		);
-		assertNumberOfViolations( validator.validateProperty( car, "seatCount", OrderedChecks.class ), 0 );
-		assertNumberOfViolations( validator.validateProperty( car, "driver.name", OrderedChecks.class ), 0 );
-		assertNumberOfViolations( validator.validateProperty( car, "driver.age", OrderedChecks.class ), 0 );
-		assertNumberOfViolations(
-				validator.validateProperty( car, "driver.hasDrivingLicense", OrderedChecks.class ), 0
+		assertNoViolations( validator.validateProperty( car, "seatCount", OrderedChecks.class ) );
+		assertNoViolations( validator.validateProperty( car, "driver.name", OrderedChecks.class ) );
+		assertNoViolations( validator.validateProperty( car, "driver.age", OrderedChecks.class ) );
+		assertNoViolations(
+				validator.validateProperty( car, "driver.hasDrivingLicense", OrderedChecks.class )
 		);
 	}
 
@@ -172,7 +170,7 @@ public class RedefiningDefaultGroupTest {
 		john.passedDrivingTest( true );
 		rentalCar.setDriver( john );
 
-		assertNumberOfViolations( validator.validate( rentalCar, Default.class, DriverChecks.class ), 0 );
+		assertNoViolations( validator.validate( rentalCar, Default.class, DriverChecks.class ) );
 	}
 
 	@Test
@@ -185,40 +183,40 @@ public class RedefiningDefaultGroupTest {
 		john.passedDrivingTest( true );
 		rentalCar.setDriver( john );
 
-		assertNumberOfViolations(
+		assertNoViolations(
 				validator.validateProperty(
 						rentalCar, "manufacturer", Default.class, DriverChecks.class
-				), 0
+				)
 		);
-		assertNumberOfViolations(
+		assertNoViolations(
 				validator.validateProperty(
 						rentalCar, "licensePlate", Default.class, DriverChecks.class
-				), 0
+				)
 		);
-		assertNumberOfViolations(
+		assertNoViolations(
 				validator.validateProperty(
 						rentalCar, "passedVehicleInspection", Default.class, DriverChecks.class
-				), 0
+				)
 		);
-		assertNumberOfViolations(
+		assertNoViolations(
 				validator.validateProperty(
 						rentalCar, "seatCount", Default.class, DriverChecks.class
-				), 0
+				)
 		);
-		assertNumberOfViolations(
+		assertNoViolations(
 				validator.validateProperty(
 						rentalCar, "driver.name", Default.class, DriverChecks.class
-				), 0
+				)
 		);
-		assertNumberOfViolations(
+		assertNoViolations(
 				validator.validateProperty(
 						rentalCar, "driver.age", Default.class, DriverChecks.class
-				), 0
+				)
 		);
-		assertNumberOfViolations(
+		assertNoViolations(
 				validator.validateProperty(
 						rentalCar, "driver.hasDrivingLicense", Default.class, DriverChecks.class
-				), 0
+				)
 		);
 	}
 
@@ -235,13 +233,19 @@ public class RedefiningDefaultGroupTest {
 		rentalCar.setDriver( john );
 
 		Set<ConstraintViolation<RentalCar>> constraintViolations = validator.validate( rentalCar );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "seatCount" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withProperty( "seatCount" )
+						.withMessage( "must be greater than or equal to 2" )
+		);
 
 		rentalCar.setSeatCount( 4 );
 		constraintViolations = validator.validate( rentalCar );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "passedVehicleInspection" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( AssertTrue.class )
+						.withProperty( "passedVehicleInspection" )
+						.withMessage( "The car has to pass the vehicle inspection first" )
+		);
 	}
 
 	@Test
@@ -253,9 +257,11 @@ public class RedefiningDefaultGroupTest {
 				bigRentalCar, "seatCount"
 		);
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "seatCount" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "must be greater than or equal to 2" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withProperty( "seatCount" )
+						.withMessage( "must be greater than or equal to 2" )
+		);
 	}
 
 	@Test
@@ -274,13 +280,19 @@ public class RedefiningDefaultGroupTest {
 		miniRentalCar.setDriver( john );
 
 		Set<ConstraintViolation<MiniRentalCar>> constraintViolations = validator.validate( miniRentalCar );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "seatCount" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withProperty( "seatCount" )
+						.withMessage( "must be greater than or equal to 2" )
+		);
 
 		miniRentalCar.setSeatCount( 4 );
 		constraintViolations = validator.validate( miniRentalCar );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "passedVehicleInspection" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( AssertTrue.class )
+						.withProperty( "passedVehicleInspection" )
+						.withMessage( "The car has to pass the vehicle inspection first" )
+		);
 	}
 
 	@Test
@@ -292,8 +304,11 @@ public class RedefiningDefaultGroupTest {
 		Set<ConstraintViolation<MiniRentalCar>> constraintViolations = validator.validateProperty(
 				miniRentalCar, "passedVehicleInspection"
 		);
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "passedVehicleInspection" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( AssertTrue.class )
+						.withProperty( "passedVehicleInspection" )
+						.withMessage( "The car has to pass the vehicle inspection first" )
+		);
 	}
 
 	@Test
@@ -311,13 +326,19 @@ public class RedefiningDefaultGroupTest {
 		anotherMiniRentalCar.setDriver( john );
 
 		Set<ConstraintViolation<AnotherMiniRentalCar>> constraintViolations = validator.validate( anotherMiniRentalCar );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "seatCount" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withProperty( "seatCount" )
+						.withMessage( "must be greater than or equal to 2" )
+		);
 
 		anotherMiniRentalCar.setSeatCount( 6 );
 		constraintViolations = validator.validateProperty( anotherMiniRentalCar, "seatCount" );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "seatCount" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Max.class )
+						.withProperty( "seatCount" )
+						.withMessage( "must be less than or equal to 4" )
+		);
 	}
 
 	@Test
@@ -326,12 +347,18 @@ public class RedefiningDefaultGroupTest {
 
 		// this should cause only one constraint violation due to the default group sequence redefined on the AnotherMiniRentalCar class.
 		Set<ConstraintViolation<AnotherMiniRentalCar>> constraintViolations = validator.validate( anotherMiniRentalCar );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "seatCount" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withProperty( "seatCount" )
+						.withMessage( "must be greater than or equal to 2" )
+		);
 
 		constraintViolations = validator.validateProperty( anotherMiniRentalCar, "seatCount" );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "seatCount" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+						.withProperty( "seatCount" )
+						.withMessage( "must be greater than or equal to 2" )
+		);
 	}
 
 	private class MiniRentalCar extends RentalCar {

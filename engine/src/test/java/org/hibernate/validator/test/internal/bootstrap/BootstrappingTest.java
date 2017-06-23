@@ -6,15 +6,14 @@
  */
 package org.hibernate.validator.test.internal.bootstrap;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.testng.Assert.assertEquals;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 import java.lang.reflect.Method;
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.validation.Configuration;
@@ -22,10 +21,10 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
-import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.HibernateValidator;
@@ -37,6 +36,7 @@ import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 /**
@@ -71,9 +71,9 @@ public class BootstrappingTest {
 		customer.setFirstName( "John" );
 
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintTypes( constraintViolations, NotEmpty.class );
-		assertCorrectPropertyPaths( constraintViolations, "lastName" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotEmpty.class ).withProperty( "lastName" )
+		);
 
 		// get a new factory using a custom configuration
 		configuration = Validation.byDefaultProvider().configure();
@@ -95,7 +95,7 @@ public class BootstrappingTest {
 		factory = configuration.buildValidatorFactory();
 		validator = factory.getValidator();
 		constraintViolations = validator.validate( customer );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
@@ -121,18 +121,11 @@ public class BootstrappingTest {
 				addOrderMethod,
 				new Object[] { null }
 		);
-		assertNumberOfViolations( constraintViolations, 1 );
-
-		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
-		Iterator<Path.Node> pathIterator = constraintViolation.getPropertyPath().iterator();
-		Path.Node leafNode = pathIterator.next();
-		while ( pathIterator.hasNext() ) {
-			leafNode = pathIterator.next();
-		}
-		assertEquals(
-				leafNode.getName(),
-				"foo0",
-				"The name should be provided from the dummy provider and be foo0"
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.method( "addOrder" )
+								.parameter( "foo0", 0 ) )
 		);
 	}
 

@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.money;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -28,6 +28,7 @@ import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.CurrencyValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+
 import org.javamoney.moneta.Money;
 import org.testng.annotations.Test;
 
@@ -64,8 +65,9 @@ public class CurrencyValidatorForMonetaryAmountTest {
 		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
 		Set<ConstraintViolation<Order>> violations = validator.validate( new Order( Money.of( 100, "GBP" ) ) );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "invalid currency (must be one of [EUR, USD])" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Currency.class ).withMessage( "invalid currency (must be one of [EUR, USD])" )
+		);
 	}
 
 	@Test
@@ -82,8 +84,9 @@ public class CurrencyValidatorForMonetaryAmountTest {
 			.getValidator();
 
 		Set<ConstraintViolation<Order>> violations = validator.validate( new Order( Money.of( 100, "GBP" ) ) );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "invalid currency (must be one of [EUR, USD])" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Currency.class ).withMessage( "invalid currency (must be one of [EUR, USD])" )
+		);
 	}
 
 	private Currency currency(String... acceptedCurrencies) {

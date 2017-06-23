@@ -8,8 +8,9 @@ package org.hibernate.validator.test.cfg;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
 import java.lang.annotation.Documented;
@@ -73,8 +74,15 @@ public class ConstructorConstraintMappingTest {
 				createdObject
 		);
 
-		assertCorrectPropertyPaths( violations, "GreetingService.<return value>.hello" );
-		assertCorrectConstraintViolationMessages( violations, "may not be null" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "may not be null" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.returnValue()
+								.property( "hello" )
+						)
+		);
 	}
 
 	@Test
@@ -96,8 +104,15 @@ public class ConstructorConstraintMappingTest {
 				constructor,
 				parameterValues
 		);
-		assertCorrectConstraintViolationMessages( violations, "may not be null" );
-		assertCorrectPropertyPaths( violations, "GreetingService.user.name" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "may not be null" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.parameter( "user", 0 )
+								.property( "name" )
+						)
+		);
 	}
 
 	@Test
@@ -123,8 +138,15 @@ public class ConstructorConstraintMappingTest {
 				constructor,
 				parameterValues
 		);
-		assertCorrectConstraintViolationMessages( violations, "name must not be null" );
-		assertCorrectPropertyPaths( violations, "GreetingService.user.name" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "name must not be null" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.parameter( "user", 0 )
+								.property( "name" )
+						)
+		);
 	}
 
 	@Test(
@@ -166,8 +188,14 @@ public class ConstructorConstraintMappingTest {
 				constructor,
 				parameterValues
 		);
-		assertCorrectConstraintViolationMessages( violations, "may not be null" );
-		assertCorrectPropertyPaths( violations, "GreetingService.user" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "may not be null" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.parameter( "user", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -189,8 +217,14 @@ public class ConstructorConstraintMappingTest {
 				parameterValues
 		);
 
-		assertCorrectConstraintViolationMessages( violations, "size must be between 1 and 10" );
-		assertCorrectPropertyPaths( violations, "GreetingService.message" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withMessage( "size must be between 1 and 10" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.parameter( "message", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -213,12 +247,20 @@ public class ConstructorConstraintMappingTest {
 				parameterValues
 		);
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"size must be between 1 and 10",
-				"size must be between 2 and 10"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withMessage( "size must be between 1 and 10" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.parameter( "message", 0 )
+						),
+				violationOf( Size.class )
+						.withMessage( "size must be between 2 and 10" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.parameter( "message", 0 )
+						)
 		);
-		assertCorrectPropertyPaths( violations, "GreetingService.message", "GreetingService.message" );
 	}
 
 	@Test
@@ -242,12 +284,20 @@ public class ConstructorConstraintMappingTest {
 				parameterValues
 		);
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"size must be between 1 and 10",
-				"size must be between 1 and 10"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withMessage( "size must be between 1 and 10" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.parameter( "message", 0 )
+						),
+				violationOf( Size.class )
+						.withMessage( "size must be between 1 and 10" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.parameter( "anotherMessage", 1 )
+						)
 		);
-		assertCorrectPropertyPaths( violations, "GreetingService.message", "GreetingService.anotherMessage" );
 	}
 
 	@Test
@@ -269,12 +319,20 @@ public class ConstructorConstraintMappingTest {
 				parameterValues
 		);
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"size must be between 1 and 10",
-				"size must be between 2 and 10"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withMessage( "size must be between 1 and 10" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.parameter( "message", 0 )
+						),
+				violationOf( Size.class )
+						.withMessage( "size must be between 2 and 10" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.parameter( "message", 0 )
+						)
 		);
-		assertCorrectPropertyPaths( violations, "GreetingService.message", "GreetingService.message" );
 	}
 
 	@Test
@@ -299,8 +357,14 @@ public class ConstructorConstraintMappingTest {
 				new GreetingService( "" )
 		);
 
-		assertCorrectConstraintViolationMessages( violations, "invalid" );
-		assertCorrectPropertyPaths( violations, "GreetingService.<return value>" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ValidGreetingService.class )
+						.withMessage( "invalid" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.returnValue()
+						)
+		);
 	}
 
 	@Test
@@ -330,8 +394,21 @@ public class ConstructorConstraintMappingTest {
 				new GreetingService( "" )
 		);
 
-		assertCorrectConstraintViolationMessages( violations, "invalid 1", "invalid 2" );
-		assertCorrectPropertyPaths( violations, "GreetingService.<return value>", "GreetingService.<return value>" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ValidGreetingService.class )
+						.withMessage( "invalid 1" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.returnValue()
+						),
+				violationOf( ValidGreetingService.class )
+						.withMessage( "invalid 2" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.returnValue()
+						)
+		);
+
 	}
 
 	@Test
@@ -356,8 +433,20 @@ public class ConstructorConstraintMappingTest {
 				new GreetingService( "" )
 		);
 
-		assertCorrectConstraintViolationMessages( violations, "invalid 1", "invalid 2" );
-		assertCorrectPropertyPaths( violations, "GreetingService.<return value>", "GreetingService.<return value>" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ValidGreetingService.class )
+						.withMessage( "invalid 1" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.returnValue()
+						),
+				violationOf( ValidGreetingService.class )
+						.withMessage( "invalid 2" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.returnValue()
+						)
+		);
 	}
 
 	@Test
@@ -382,8 +471,14 @@ public class ConstructorConstraintMappingTest {
 				new GreetingService( "", "" )
 		);
 
-		assertCorrectConstraintViolationMessages( violations, "default message" );
-		assertCorrectPropertyPaths( violations, "GreetingService.<return value>" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( GenericAndCrossParameterConstraint.class )
+						.withMessage( "default message" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.returnValue()
+						)
+		);
 	}
 
 	@Test
@@ -408,9 +503,14 @@ public class ConstructorConstraintMappingTest {
 				constructor,
 				parameterValues
 		);
-
-		assertCorrectConstraintViolationMessages( violations, "default message" );
-		assertCorrectPropertyPaths( violations, "GreetingService.<cross-parameter>" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( GenericAndCrossParameterConstraint.class )
+						.withMessage( "default message" )
+						.withPropertyPath( pathWith()
+								.constructor( GreetingService.class )
+								.crossParameter()
+						)
+		);
 	}
 
 	private ExecutableValidator getConfiguredExecutableValidator() {

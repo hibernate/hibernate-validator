@@ -8,7 +8,8 @@
 package org.hibernate.validator.test.cfg;
 
 import static java.lang.annotation.ElementType.FIELD;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
 import java.util.ArrayList;
@@ -22,6 +23,9 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -66,13 +70,12 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"size must be between 0 and 5",
-				"size must be between 3 and 10",
-				"size must be between 3 and 10",
-				"must be greater than or equal to 1",
-				"must be greater than or equal to 1"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "size must be between 0 and 5" ),
+				violationOf( Size.class ).withMessage( "size must be between 3 and 10" ),
+				violationOf( Size.class ).withMessage( "size must be between 3 and 10" ),
+				violationOf( Min.class ).withMessage( "must be greater than or equal to 1" ),
+				violationOf( Min.class ).withMessage( "must be greater than or equal to 1" )
 		);
 	}
 
@@ -91,9 +94,8 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"may not be null"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( "may not be null" )
 		);
 	}
 
@@ -112,9 +114,8 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"may not be null"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( "may not be null" )
 		);
 	}
 
@@ -136,9 +137,8 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"may not be null"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( "may not be null" )
 		);
 	}
 
@@ -157,9 +157,8 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"size must be between 0 and 5"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
 		);
 	}
 
@@ -178,9 +177,8 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"size must be between 0 and 5"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
 		);
 	}
 
@@ -199,9 +197,8 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"size must be between 0 and 5"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
 		);
 	}
 

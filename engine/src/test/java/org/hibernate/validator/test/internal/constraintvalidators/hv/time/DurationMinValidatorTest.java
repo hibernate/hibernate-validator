@@ -7,9 +7,9 @@
 package org.hibernate.validator.test.internal.constraintvalidators.hv.time;
 
 import static java.lang.annotation.ElementType.FIELD;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
@@ -29,6 +29,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMin
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -63,10 +64,12 @@ public class DurationMinValidatorTest {
 	public void testWithValidator() {
 		Validator validator = getValidator();
 
-		assertNumberOfViolations( validator.validate( new Task( null ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Task( Duration.ofSeconds( 9 ) ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Task( Duration.ofSeconds( 11 ) ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Task( Duration.ofSeconds( 11 ) ) ), 0 );
+		assertNoViolations( validator.validate( new Task( null ) ) );
+		assertNoViolations( validator.validate( new Task( Duration.ofSeconds( 11 ) ) ) );
+		assertThat( validator.validate( new Task( Duration.ofSeconds( 9 ) ) ) )
+				.containsOnlyViolations(
+						violationOf( DurationMin.class )
+				);
 	}
 
 	@Test
@@ -86,11 +89,13 @@ public class DurationMinValidatorTest {
 
 		AnotherTask task = new AnotherTask( Duration.ofDays( 1 ) );
 		Set<ConstraintViolation<AnotherTask>> constraintViolations = validator.validate( task );
-		assertCorrectConstraintTypes( constraintViolations, DurationMin.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( DurationMin.class )
+		);
 
 		task = new AnotherTask( Duration.ofDays( 2 ) );
 		constraintViolations = validator.validate( task );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -111,7 +116,9 @@ public class DurationMinValidatorTest {
 
 		AnotherTask task = new AnotherTask( Duration.ofDays( 2 ) );
 		Set<ConstraintViolation<AnotherTask>> constraintViolations = validator.validate( task );
-		assertCorrectConstraintViolationMessages( constraintViolations, "must be longer than 30 days 12 hours 50 minutes" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( DurationMin.class ).withMessage( "must be longer than 30 days 12 hours 50 minutes" )
+		);
 	}
 
 	private void doTesting(boolean inclusive) {

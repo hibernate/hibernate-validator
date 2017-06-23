@@ -10,8 +10,9 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -41,6 +42,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NullDef;
 import org.hibernate.validator.test.constraints.Object;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -115,7 +117,9 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 	public void testConvertNotNullToNull() {
 		Validator validator = ValidatorUtil.getValidator();
 		Set<ConstraintViolation<Bar>> violations = validator.validate( new Bar() );
-		assertCorrectConstraintTypes( violations, NotNull.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "property" )
+		);
 
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Bar.class )
@@ -126,7 +130,7 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		validator = config.buildValidatorFactory().getValidator();
 		violations = validator.validate( new Bar() );
 
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 	}
 
 	@Test

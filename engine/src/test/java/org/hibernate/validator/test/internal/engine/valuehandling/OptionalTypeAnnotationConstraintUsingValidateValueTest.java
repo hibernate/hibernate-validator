@@ -6,27 +6,6 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.util.Optional;
-import java.util.Set;
-import javax.validation.Constraint;
-import javax.validation.ConstraintViolation;
-import javax.validation.Payload;
-import javax.validation.ReportAsSingleViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.Null;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.constraints.CompositionType;
-import org.hibernate.validator.constraints.ConstraintComposition;
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.CandidateForTck;
-
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
@@ -34,11 +13,31 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.validation.Constraint;
+import javax.validation.ConstraintViolation;
+import javax.validation.Payload;
+import javax.validation.ReportAsSingleViolation;
+import javax.validation.Validator;
+import javax.validation.constraints.Null;
+
+import org.hibernate.validator.constraints.CompositionType;
+import org.hibernate.validator.constraints.ConstraintComposition;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.CandidateForTck;
+
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Test usage of {@link Optional} on fields using validate value.
@@ -65,10 +64,11 @@ public class OptionalTypeAnnotationConstraintUsingValidateValueTest {
 				"valueWithNullOrNotBlank",
 				model.valueWithNullOrNotBlank
 		);
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "valueWithNullOrNotBlank" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "type" );
-		assertCorrectConstraintTypes( constraintViolations, NullOrNotBlank.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NullOrNotBlank.class )
+						.withProperty( "valueWithNullOrNotBlank" )
+						.withMessage( "type" )
+		);
 	}
 
 	@ConstraintComposition(CompositionType.OR)

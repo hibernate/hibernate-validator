@@ -6,7 +6,9 @@
  */
 package org.hibernate.validator.test.constraints.pl;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import javax.validation.Validator;
@@ -23,6 +25,7 @@ import org.testng.annotations.Test;
  * @author Marko Bekhta
  */
 public class REGONValidatorTest {
+
 	private Validator validator;
 
 	@BeforeMethod
@@ -32,62 +35,128 @@ public class REGONValidatorTest {
 
 	@Test
 	public void testCorrectRegon9Number() {
-		assertNumberOfViolations( validator.validate( new Company( "123456785" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "691657182" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "180204898" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "180000960" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "180159761" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "180175352" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "180204898" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "558505989" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "858336997" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "737024234" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "074635672" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "593908869" ) ), 0 );
+		assertNoViolations( validator.validate( new Company( "123456785" ) ) );
+		assertNoViolations( validator.validate( new Company( "691657182" ) ) );
+		assertNoViolations( validator.validate( new Company( "180204898" ) ) );
+		assertNoViolations( validator.validate( new Company( "180000960" ) ) );
+		assertNoViolations( validator.validate( new Company( "180159761" ) ) );
+		assertNoViolations( validator.validate( new Company( "180175352" ) ) );
+		assertNoViolations( validator.validate( new Company( "180204898" ) ) );
+		assertNoViolations( validator.validate( new Company( "558505989" ) ) );
+		assertNoViolations( validator.validate( new Company( "858336997" ) ) );
+		assertNoViolations( validator.validate( new Company( "737024234" ) ) );
+		assertNoViolations( validator.validate( new Company( "074635672" ) ) );
+		assertNoViolations( validator.validate( new Company( "593908869" ) ) );
 	}
 
 	@Test
 	public void testCorrectRegon14Number() {
-		assertNumberOfViolations( validator.validate( new Company( "12345678512347" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "59418566359965" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "65485163947915" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "89385161104781" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "95697475666436" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "57435387084379" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "39289346827756" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "35543437342533" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "45257314860534" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Company( "49905531368510" ) ), 0 );
+		assertNoViolations( validator.validate( new Company( "12345678512347" ) ) );
+		assertNoViolations( validator.validate( new Company( "59418566359965" ) ) );
+		assertNoViolations( validator.validate( new Company( "65485163947915" ) ) );
+		assertNoViolations( validator.validate( new Company( "89385161104781" ) ) );
+		assertNoViolations( validator.validate( new Company( "95697475666436" ) ) );
+		assertNoViolations( validator.validate( new Company( "57435387084379" ) ) );
+		assertNoViolations( validator.validate( new Company( "39289346827756" ) ) );
+		assertNoViolations( validator.validate( new Company( "35543437342533" ) ) );
+		assertNoViolations( validator.validate( new Company( "45257314860534" ) ) );
+		assertNoViolations( validator.validate( new Company( "49905531368510" ) ) );
 	}
 
 	@Test
 	public void testIncorrectRegon9Number() {
-		assertNumberOfViolations( validator.validate( new Company( "123456784" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "691657185" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "180204896" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "180000967" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "180159768" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "180175359" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "180204891" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "558505982" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "858336993" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "737024237" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "074635675" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "593908866" ) ), 1 );
+		assertThat( validator.validate( new Company( "123456784" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "691657185" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "180204896" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "180000967" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "180159768" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "180175359" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "180204891" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "558505982" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "858336993" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "737024237" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "074635675" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "593908866" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
 	}
 
 	@Test
 	public void testIncorrectRegon14Number() {
-		assertNumberOfViolations( validator.validate( new Company( "12345678512341" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "59418566359962" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "65485163947913" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "89385161104784" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "95697475666435" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "57435387084376" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "39289346827757" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "35543437342538" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "45257314860539" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Company( "49905531368512" ) ), 1 );
+		assertThat( validator.validate( new Company( "12345678512341" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "59418566359962" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "65485163947913" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "89385161104784" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "95697475666435" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "57435387084376" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "39289346827757" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "35543437342538" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "45257314860539" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "49905531368512" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
 	}
 
 	public static class Company {

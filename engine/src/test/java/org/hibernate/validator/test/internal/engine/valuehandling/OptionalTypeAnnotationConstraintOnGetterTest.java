@@ -13,11 +13,9 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.lang.annotation.Documented;
@@ -40,6 +38,7 @@ import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -65,10 +64,11 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 		model.setValueWithoutTypeAnnotation( null );
 
 		Set<ConstraintViolation<ModelA>> constraintViolations = validator.validate( model );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "valueWithoutTypeAnnotation" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "container" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "container" )
+						.withProperty( "valueWithoutTypeAnnotation" )
+		);
 	}
 
 	@Test
@@ -77,7 +77,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 		model.setValueWithoutTypeAnnotation( Optional.empty() );
 
 		Set<ConstraintViolation<ModelA>> constraintViolations = validator.validate( model );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -86,10 +86,11 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 		model.setValueWithNotNull( null );
 
 		Set<ConstraintViolation<ModelB>> constraintViolations = validator.validate( model );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "valueWithNotNull" );
-		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "container" )
+						.withProperty( "valueWithNotNull" )
+		);
 	}
 
 	@Test
@@ -98,10 +99,11 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 		model.setValueWithNotNull( Optional.empty() );
 
 		Set<ConstraintViolation<ModelB>> constraintViolations = validator.validate( model );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "valueWithNotNull" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "type" )
+						.withProperty( "valueWithNotNull" )
+		);
 	}
 
 	@Test
@@ -110,10 +112,11 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 		model.setValueWithNullOrNotBlank( null );
 
 		Set<ConstraintViolation<ModelD>> constraintViolations = validator.validate( model );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "valueWithNullOrNotBlank" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "container" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "container" )
+						.withProperty( "valueWithNullOrNotBlank" )
+		);
 	}
 
 	@Test
@@ -122,7 +125,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 		model.setValueWithNullOrNotBlank( Optional.empty() );
 
 		Set<ConstraintViolation<ModelD>> constraintViolations = validator.validate( model );
-		assertThat( constraintViolations ).isEmpty();
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -131,10 +134,14 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 		model.setValueWithNotNullUnwrapped( Optional.empty() );
 
 		Set<ConstraintViolation<ModelC>> constraintViolations = validator.validate( model );
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "valueWithNotNullUnwrapped", "valueWithNotNullUnwrapped" );
-		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlank.class, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "container" )
+						.withProperty( "valueWithNotNullUnwrapped" ),
+				violationOf( NotBlank.class )
+						.withMessage( "type" )
+						.withProperty( "valueWithNotNullUnwrapped" )
+		);
 	}
 
 	@Test
@@ -143,10 +150,11 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 		model.setValueWithNullOrNotBlank( Optional.of( "" ) );
 
 		Set<ConstraintViolation<ModelD>> constraintViolations = validator.validate( model );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "valueWithNullOrNotBlank" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "type" );
-		assertCorrectConstraintTypes( constraintViolations, NullOrNotBlank.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NullOrNotBlank.class )
+						.withMessage( "type" )
+						.withProperty( "valueWithNullOrNotBlank" )
+		);
 	}
 
 	@Test
@@ -155,7 +163,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 		model.setValueReference( null );
 
 		Set<ConstraintViolation<ModelE>> constraintViolations = validator.validate( model );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -164,10 +172,11 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 		model.setValueReference( "" );
 
 		Set<ConstraintViolation<ModelE>> constraintViolations = validator.validate( model );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "valueReference" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "reference" );
-		assertCorrectConstraintTypes( constraintViolations, NullOrNotBlank.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NullOrNotBlank.class )
+						.withMessage( "reference" )
+						.withProperty( "valueReference" )
+		);
 	}
 
 	@Test
@@ -176,7 +185,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 		model.setValueReference( "1" );
 
 		Set<ConstraintViolation<ModelE>> constraintViolations = validator.validate( model );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@ConstraintComposition(CompositionType.OR)

@@ -13,11 +13,10 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.lang.annotation.Documented;
@@ -41,6 +40,7 @@ import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -68,10 +68,14 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.forExecutables()
 				.validateConstructorParameters( constructor, values );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelA.valueWithoutTypeAnnotation" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "container" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "container" )
+						.withPropertyPath( pathWith()
+								.constructor( ModelA.class )
+								.parameter( "valueWithoutTypeAnnotation", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -82,7 +86,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.forExecutables()
 				.validateConstructorParameters( constructor, values );
 
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -93,11 +97,14 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.forExecutables()
 				.validateConstructorParameters( constructor, values );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelB.valueWithNotNull" );
-
-		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "container" )
+						.withPropertyPath( pathWith()
+								.constructor( ModelB.class )
+								.parameter( "valueWithNotNull", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -108,10 +115,14 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.forExecutables()
 				.validateConstructorParameters( constructor, values );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelB.valueWithNotNull" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "type" )
+						.withPropertyPath( pathWith()
+								.constructor( ModelB.class )
+								.parameter( "valueWithNotNull", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -122,11 +133,14 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.forExecutables()
 				.validateConstructorParameters( constructor, values );
 
-
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelD.valueWithNullOrNotBlank" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "container" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "container" )
+						.withPropertyPath( pathWith()
+								.constructor( ModelD.class )
+								.parameter( "valueWithNullOrNotBlank", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -137,7 +151,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.forExecutables()
 				.validateConstructorParameters( constructor, values );
 
-		assertThat( constraintViolations ).isEmpty();
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -148,10 +162,20 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.forExecutables()
 				.validateConstructorParameters( constructor, values );
 
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelC.valueWithNotNullUnwrapped", "ModelC.valueWithNotNullUnwrapped" );
-		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlank.class, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "container" )
+						.withPropertyPath( pathWith()
+								.constructor( ModelC.class )
+								.parameter( "valueWithNotNullUnwrapped", 0 )
+						),
+				violationOf( NotBlank.class )
+						.withMessage( "type" )
+						.withPropertyPath( pathWith()
+								.constructor( ModelC.class )
+								.parameter( "valueWithNotNullUnwrapped", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -162,10 +186,14 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.forExecutables()
 				.validateConstructorParameters( constructor, values );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelD.valueWithNullOrNotBlank" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "type" );
-		assertCorrectConstraintTypes( constraintViolations, NullOrNotBlank.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NullOrNotBlank.class )
+						.withMessage( "type" )
+						.withPropertyPath( pathWith()
+								.constructor( ModelD.class )
+								.parameter( "valueWithNullOrNotBlank", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -176,7 +204,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.forExecutables()
 				.validateConstructorParameters( constructor, values );
 
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -187,10 +215,14 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.forExecutables()
 				.validateConstructorParameters( constructor, values );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelE.valueReference" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "reference" );
-		assertCorrectConstraintTypes( constraintViolations, NullOrNotBlank.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NullOrNotBlank.class )
+						.withMessage( "reference" )
+						.withPropertyPath( pathWith()
+								.constructor( ModelE.class )
+								.parameter( "valueReference", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -201,7 +233,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.forExecutables()
 				.validateConstructorParameters( constructor, values );
 
-		assertThat( constraintViolations ).isEmpty();
+		assertNoViolations( constraintViolations );
 	}
 
 	@ConstraintComposition(CompositionType.OR)

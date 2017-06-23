@@ -6,20 +6,24 @@
  */
 package org.hibernate.validator.test.internal.engine.proxy;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.testng.Assert.assertEquals;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-
-import org.testng.annotations.Test;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.testng.Assert.assertEquals;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -35,7 +39,10 @@ public class ProxyTest {
 
 		Validator validator = ValidatorUtil.getValidator();
 		Set<ConstraintViolation<A>> violations = validator.validate( a );
-		assertNumberOfViolations( violations, 2 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withProperty( "string" ),
+				violationOf( Min.class ).withProperty( "integer" )
+		);
 	}
 
 	@Test
@@ -47,7 +54,10 @@ public class ProxyTest {
 
 		Validator validator = ValidatorUtil.getValidator();
 		Set<ConstraintViolation<B>> violations = validator.validate( b );
-		assertNumberOfViolations( violations, 2 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withProperty( "string" ),
+				violationOf( Min.class ).withProperty( "integer" )
+		);
 	}
 
 	private class CustomInvocationHandler implements InvocationHandler {

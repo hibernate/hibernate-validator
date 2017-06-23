@@ -6,16 +6,18 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.inheritance;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
-import org.testng.annotations.Test;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -32,7 +34,14 @@ public class GroupInheritanceTest {
 		tryMe.field3 = "bar";
 
 		Set<ConstraintViolation<Try>> violations = validator.validate( tryMe, Try.GlobalCheck.class );
-		assertCorrectConstraintViolationMessages( violations, "field1", "field2" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withProperty( "field1" )
+						.withMessage( "field1" ),
+				violationOf( NotNull.class )
+						.withProperty( "field2" )
+						.withMessage( "field2" )
+		);
 	}
 
 	/**
@@ -45,7 +54,13 @@ public class GroupInheritanceTest {
 		tryMe.field3 = "foo";
 
 		Set<ConstraintViolation<Try>> violations = validator.validate( tryMe, Try.Component.class );
-		assertNumberOfViolations( violations, 2 );
-		assertCorrectConstraintViolationMessages( violations, "field1", "field2" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withProperty( "field1" )
+						.withMessage( "field1" ),
+				violationOf( NotNull.class )
+						.withProperty( "field2" )
+						.withMessage( "field2" )
+		);
 	}
 }

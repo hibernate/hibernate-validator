@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.test.constraints;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +20,7 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.Test;
 
 /**
@@ -39,50 +40,49 @@ public class ValidatorResolutionTest {
 
 		// all values are null and should pass
 		Set<ConstraintViolation<Suburb>> constraintViolations = validator.validate( suburb );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		suburb.setName( "" );
 		constraintViolations = validator.validate( suburb );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertConstraintViolation(
-				constraintViolations.iterator().next(), Size.class, "size must be between 5 and 10", Suburb.class, "", pathWith().property( "name" )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withMessage( "size must be between 5 and 10" )
+						.withProperty( "name" )
+						.withRootBeanClass( Suburb.class )
+						.withInvalidValue( "" )
 		);
 
 		suburb.setName( "Hoegsbo" );
 		constraintViolations = validator.validate( suburb );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		suburb.addFacility( Suburb.Facility.SHOPPING_MALL, false );
 		constraintViolations = validator.validate( suburb );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertConstraintViolation(
-				constraintViolations.iterator().next(),
-				Size.class,
-				"size must be between 2 and 2",
-				Suburb.class,
-				suburb.getFacilities(),
-				pathWith().property( "facilities" )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withMessage( "size must be between 2 and 2" )
+						.withProperty( "facilities" )
+						.withRootBeanClass( Suburb.class )
+						.withInvalidValue( suburb.getFacilities() )
 		);
 
 		suburb.addFacility( Suburb.Facility.BUS_TERMINAL, true );
 		constraintViolations = validator.validate( suburb );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		suburb.addStreetName( "Sikelsgatan" );
 		constraintViolations = validator.validate( suburb );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertConstraintViolation(
-				constraintViolations.iterator().next(),
-				Size.class,
-				"size must be between 2 and 2147483647",
-				Suburb.class,
-				suburb.getStreetNames(),
-				pathWith().property( "streetNames" )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withMessage( "size must be between 2 and 2147483647" )
+						.withProperty( "streetNames" )
+						.withRootBeanClass( Suburb.class )
+						.withInvalidValue( suburb.getStreetNames() )
 		);
 
 		suburb.addStreetName( "Marklandsgatan" );
 		constraintViolations = validator.validate( suburb );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		Coordinate[] boundingBox = new Coordinate[3];
 		boundingBox[0] = new Coordinate( 0L, 0L );
@@ -90,14 +90,12 @@ public class ValidatorResolutionTest {
 		boundingBox[2] = new Coordinate( 1L, 0L );
 		suburb.setBoundingBox( boundingBox );
 		constraintViolations = validator.validate( suburb );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertConstraintViolation(
-				constraintViolations.iterator().next(),
-				Size.class,
-				"size must be between 4 and 1000",
-				Suburb.class,
-				suburb.getBoundingBox(),
-				pathWith().property( "boundingBox" )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withMessage( "size must be between 4 and 1000" )
+						.withProperty( "boundingBox" )
+						.withRootBeanClass( Suburb.class )
+						.withInvalidValue( suburb.getBoundingBox() )
 		);
 
 		boundingBox = new Coordinate[4];
@@ -107,7 +105,7 @@ public class ValidatorResolutionTest {
 		boundingBox[3] = new Coordinate( 1L, 1L );
 		suburb.setBoundingBox( boundingBox );
 		constraintViolations = validator.validate( suburb );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -117,7 +115,7 @@ public class ValidatorResolutionTest {
 
 		Foo testEntity = new Foo( new org.hibernate.validator.test.constraints.Object[] { }, new int[] { } );
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( testEntity );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -127,7 +125,7 @@ public class ValidatorResolutionTest {
 
 		Bar testEntity = new Bar( new org.hibernate.validator.test.constraints.Object[] { }, new int[] { } );
 		Set<ConstraintViolation<Bar>> constraintViolations = validator.validate( testEntity );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -137,7 +135,7 @@ public class ValidatorResolutionTest {
 
 		Fubar testEntity = new Fubar( new org.hibernate.validator.test.constraints.Object[] { }, new int[] { } );
 		Set<ConstraintViolation<Fubar>> constraintViolations = validator.validate( testEntity );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -147,7 +145,7 @@ public class ValidatorResolutionTest {
 
 		SubTypeEntity testEntity = new SubTypeEntity( new SubType[] { } );
 		Set<ConstraintViolation<SubTypeEntity>> constraintViolations = validator.validate( testEntity );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@SuppressWarnings("unused")

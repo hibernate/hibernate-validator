@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -23,6 +23,7 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.service.Cus
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationSequence;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroupImpl;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -60,13 +61,14 @@ public class MethodLevelValidationGroupSequenceTest {
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "may not be null" )
+							.withInvalidValue( null )
+							.withRootBeanClass( CustomerRepositoryWithRedefinedDefaultGroupImpl.class )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertConstraintViolation(
-					constraintViolation, NotNull.class, "may not be null", CustomerRepositoryWithRedefinedDefaultGroupImpl.class, null
-			);
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
 			);
@@ -85,17 +87,14 @@ public class MethodLevelValidationGroupSequenceTest {
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Min.class )
+							.withMessage( "must be greater than or equal to 5" )
+							.withInvalidValue( 1 )
+							.withRootBeanClass( CustomerRepositoryWithRedefinedDefaultGroupImpl.class )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertConstraintViolation(
-					constraintViolation,
-					Min.class,
-					"must be greater than or equal to 5",
-					CustomerRepositoryWithRedefinedDefaultGroupImpl.class,
-					1
-			);
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
 			);
@@ -114,11 +113,9 @@ public class MethodLevelValidationGroupSequenceTest {
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertCorrectConstraintViolationMessages(
-					e.getConstraintViolations(),
-					"must be greater than or equal to 5",
-					"must be greater than or equal to 7"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Min.class ).withMessage( "must be greater than or equal to 5" ),
+					violationOf( Min.class ).withMessage( "must be greater than or equal to 7" )
 			);
 		}
 	}
@@ -137,17 +134,14 @@ public class MethodLevelValidationGroupSequenceTest {
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Min.class )
+							.withMessage( "must be greater than or equal to 5" )
+							.withInvalidValue( 1 )
+							.withRootBeanClass( CustomerRepositoryWithRedefinedDefaultGroupImpl.class )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertConstraintViolation(
-					constraintViolation,
-					Min.class,
-					"must be greater than or equal to 5",
-					CustomerRepositoryWithRedefinedDefaultGroupImpl.class,
-					1
-			);
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup2.class
 			);
@@ -169,10 +163,9 @@ public class MethodLevelValidationGroupSequenceTest {
 		}
 		catch (ConstraintViolationException e) {
 
-			assertCorrectConstraintViolationMessages(
-					e.getConstraintViolations(),
-					"must be greater than or equal to 5",
-					"must be greater than or equal to 7"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Min.class ).withMessage( "must be greater than or equal to 5" ),
+					violationOf( Min.class ).withMessage( "must be greater than or equal to 7" )
 			);
 		}
 	}
@@ -193,13 +186,14 @@ public class MethodLevelValidationGroupSequenceTest {
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "may not be null" )
+							.withInvalidValue( null )
+							.withRootBeanClass( CustomerRepositoryWithRedefinedDefaultGroupImpl.class )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertConstraintViolation(
-					constraintViolation, NotNull.class, "may not be null", CustomerRepositoryWithRedefinedDefaultGroupImpl.class, null
-			);
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
 			);
@@ -218,17 +212,13 @@ public class MethodLevelValidationGroupSequenceTest {
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
-
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertConstraintViolation(
-					constraintViolation,
-					Min.class,
-					"must be greater than or equal to 5",
-					CustomerRepositoryWithRedefinedDefaultGroupImpl.class,
-					1
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Min.class )
+							.withMessage( "must be greater than or equal to 5" )
+							.withInvalidValue( 1 )
+							.withRootBeanClass( CustomerRepositoryWithRedefinedDefaultGroupImpl.class )
 			);
+			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
 			);
@@ -249,17 +239,14 @@ public class MethodLevelValidationGroupSequenceTest {
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Min.class )
+							.withMessage( "must be greater than or equal to 5" )
+							.withInvalidValue( 1 )
+							.withRootBeanClass( CustomerRepositoryWithRedefinedDefaultGroupImpl.class )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertConstraintViolation(
-					constraintViolation,
-					Min.class,
-					"must be greater than or equal to 5",
-					CustomerRepositoryWithRedefinedDefaultGroupImpl.class,
-					1
-			);
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup2.class
 			);

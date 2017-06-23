@@ -9,10 +9,10 @@ package org.hibernate.validator.test.internal.engine.valuehandling;
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -48,10 +48,10 @@ public class ContainerElementStringRepresentationTest {
 
 	@Test
 	public void testMapInvalidKeyTypeArgument() {
-		DemographicStatistics statictics = new DemographicStatistics();
-		statictics.put( null, 2 );
+		DemographicStatistics statistics = new DemographicStatistics();
+		statistics.put( null, 2 );
 
-		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statictics );
+		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statistics );
 
 		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[].<map key>" ); // the key is null, thus the '[]'
 	}
@@ -59,18 +59,18 @@ public class ContainerElementStringRepresentationTest {
 	@Test
 	public void testMapInvalidKeyCascadedValidation() {
 		Address invalidAddress = new Address( null, new City( "Lyon" ) );
-		DemographicStatistics statictics = new DemographicStatistics();
-		statictics.put( invalidAddress, 2 );
+		DemographicStatistics statistics = new DemographicStatistics();
+		statistics.put( invalidAddress, 2 );
 
-		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statictics );
+		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statistics );
 
 		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[null, Lyon].street" );
 
 		invalidAddress = new Address( "rue Garibaldi", new City( "L" ) );
-		statictics = new DemographicStatistics();
-		statictics.put( invalidAddress, 2 );
+		statistics = new DemographicStatistics();
+		statistics.put( invalidAddress, 2 );
 
-		constraintViolations = validator.validate( statictics );
+		constraintViolations = validator.validate( statistics );
 
 		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[rue Garibaldi, L].city.name" );
 	}
@@ -78,10 +78,10 @@ public class ContainerElementStringRepresentationTest {
 	@Test
 	public void testMapInvalidKeyClassLevelConstraint() {
 		Address invalidAddress = new Address( "rue Garibaldi", new City( "Lyon" ), "75003" );
-		DemographicStatistics statictics = new DemographicStatistics();
-		statictics.put( invalidAddress, 2 );
+		DemographicStatistics statistics = new DemographicStatistics();
+		statistics.put( invalidAddress, 2 );
 
-		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statictics );
+		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statistics );
 
 		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[rue Garibaldi, Lyon]" );
 	}
@@ -107,11 +107,12 @@ public class ContainerElementStringRepresentationTest {
 		Set<ConstraintViolation<State>> constraintViolations = validator.validate( state );
 
 		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[Lyon].street" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "addressesPerCity" )
-						.property( "street", true, city, null, Map.class, 1 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "addressesPerCity" )
+								.property( "street", true, city, null, Map.class, 1 )
+						)
 		);
 
 		invalidAddress = new Address( "rue Garibaldi", new City( "L" ) );
@@ -153,11 +154,12 @@ public class ContainerElementStringRepresentationTest {
 		Set<ConstraintViolation<Block>> constraintViolations = validator.validate( block );
 
 		assertCorrectPropertyPaths( constraintViolations, "addresses[0].street" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "addresses" )
-						.property( "street", true, null, 0, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "addresses" )
+								.property( "street", true, null, 0, List.class, 0 )
+						)
 		);
 
 		block = new Block();

@@ -6,7 +6,8 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
@@ -46,7 +47,9 @@ public class ParameterScriptAssertValidatorTest {
 			fail( "Expected exception wasn't raised" );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages( e, "script expression \"start < end\" didn't evaluate to true" );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( ParameterScriptAssert.class ).withMessage( "script expression \"start < end\" didn't evaluate to true" )
+			);
 		}
 	}
 
@@ -67,9 +70,8 @@ public class ParameterScriptAssertValidatorTest {
 			fail( "Expected exception wasn't raised" );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages(
-					e,
-					"script expression \"param0 < param1\" didn't evaluate to true"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( ParameterScriptAssert.class ).withMessage( "script expression \"param0 < param1\" didn't evaluate to true" )
 			);
 		}
 	}
@@ -85,9 +87,8 @@ public class ParameterScriptAssertValidatorTest {
 				constructor,
 				parameterValues
 		);
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"script expression \"name.size() > 3\" didn't evaluate to true"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ParameterScriptAssert.class ).withMessage( "script expression \"name.size() > 3\" didn't evaluate to true" )
 		);
 	}
 

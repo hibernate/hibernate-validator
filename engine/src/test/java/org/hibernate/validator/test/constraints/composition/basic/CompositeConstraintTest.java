@@ -6,20 +6,20 @@
  */
 package org.hibernate.validator.test.constraints.composition.basic;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import org.testng.annotations.Test;
 
 /**
  * @author Gerhard Petracek
@@ -39,18 +39,18 @@ public class CompositeConstraintTest {
 					)
 			);
 
-			assertNumberOfViolations( constraintViolations, 1 );
-			assertCorrectConstraintTypes( constraintViolations, ValidNameSingleViolation.class );
-			assertCorrectConstraintViolationMessages( constraintViolations, "invalid name" );
+			assertThat( constraintViolations ).containsOnlyViolations(
+					violationOf( ValidNameSingleViolation.class ).withMessage( "invalid name" )
+			);
 
 			constraintViolations = currentValidator.validate(
 					new Person(
 							"G", "Gerhard"
 					)
 			);
-			assertNumberOfViolations( constraintViolations, 1 );
-			assertCorrectConstraintTypes( constraintViolations, ValidNameSingleViolation.class );
-			assertCorrectConstraintViolationMessages( constraintViolations, "invalid name" );
+			assertThat( constraintViolations ).containsOnlyViolations(
+					violationOf( ValidNameSingleViolation.class ).withMessage( "invalid name" )
+			);
 		}
 	}
 
@@ -67,18 +67,18 @@ public class CompositeConstraintTest {
 					)
 			);
 
-			assertNumberOfViolations( constraintViolations, 1 );
-			assertCorrectConstraintTypes( constraintViolations, NotNull.class );
-			assertCorrectConstraintViolationMessages( constraintViolations, "may not be null" );
+			assertThat( constraintViolations ).containsOnlyViolations(
+					violationOf( NotNull.class ).withMessage( "may not be null" )
+			);
 
 			constraintViolations = currentValidator.validate(
 					new Person(
 							"Gerd", "G"
 					)
 			);
-			assertNumberOfViolations( constraintViolations, 1 );
-			assertCorrectConstraintTypes( constraintViolations, Size.class );
-			assertCorrectConstraintViolationMessages( constraintViolations, "size must be between 2 and 10" );
+			assertThat( constraintViolations ).containsOnlyViolations(
+					violationOf( Size.class ).withMessage( "size must be between 2 and 10" )
+			);
 		}
 	}
 }

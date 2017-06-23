@@ -6,7 +6,14 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
@@ -21,13 +28,8 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescrip
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.testng.annotations.Test;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * Tests for the {@code Mod11CheckValidator}.
@@ -281,7 +283,7 @@ public class Mod11CheckValidatorTest {
 		Product product = new Product( "123-456-789-P" );
 
 		Set<ConstraintViolation<Product>> constraintViolations = validator.validate( product );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	private Mod11Check createMod11CheckAnnotation(
