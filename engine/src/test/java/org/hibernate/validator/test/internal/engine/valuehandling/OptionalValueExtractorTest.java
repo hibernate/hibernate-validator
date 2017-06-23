@@ -114,11 +114,6 @@ public class OptionalValueExtractorTest {
 								.property( "number", true, null, 1, Optional.class, 0 )
 						)
 		);
-		//		assertCorrectPropertyPaths(
-		//				constraintViolations,
-		//				"bar[0].number",
-		//				"bar[1].number"
-		//		);
 	}
 
 	private class Foo {

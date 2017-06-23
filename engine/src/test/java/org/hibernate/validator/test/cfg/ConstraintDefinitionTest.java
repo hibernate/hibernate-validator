@@ -83,7 +83,7 @@ public class ConstraintDefinitionTest {
 
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedLongFieldBean() );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( NonDefaultLongValidator.class ) )
+				violationOf( ConstraintAnnotation.class ).withMessage( getValidatorIdentifyingMessage( NonDefaultLongValidator.class ) )
 		);
 	}
 
@@ -100,7 +100,7 @@ public class ConstraintDefinitionTest {
 		 */
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedStringFieldBean() );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( DefaultStringValidator.class ) )
+				violationOf( ConstraintAnnotation.class ).withMessage( getValidatorIdentifyingMessage( DefaultStringValidator.class ) )
 		);
 	}
 
@@ -118,7 +118,7 @@ public class ConstraintDefinitionTest {
 		 */
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedStringFieldBean() );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( DefaultStringValidator.class ) )
+				violationOf( ConstraintAnnotation.class ).withMessage( getValidatorIdentifyingMessage( DefaultStringValidator.class ) )
 		);
 	}
 
@@ -133,7 +133,7 @@ public class ConstraintDefinitionTest {
 
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedIntegerFieldBean() );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( NonDefaultIntegerValidator.class ) )
+				violationOf( ConstraintAnnotation.class ).withMessage( getValidatorIdentifyingMessage( NonDefaultIntegerValidator.class ) )
 		);
 	}
 
@@ -150,12 +150,12 @@ public class ConstraintDefinitionTest {
 
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedLongFieldBean() );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( NonDefaultLongValidator.class ) )
+				violationOf( ConstraintAnnotation.class ).withMessage( getValidatorIdentifyingMessage( NonDefaultLongValidator.class ) )
 		);
 
 		violations = validator.validate( new ConstrainedIntegerFieldBean() );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( NonDefaultIntegerValidator.class ) )
+				violationOf( ConstraintAnnotation.class ).withMessage( getValidatorIdentifyingMessage( NonDefaultIntegerValidator.class ) )
 		);
 	}
 
@@ -208,19 +208,19 @@ public class ConstraintDefinitionTest {
 		// Defaults are untouched
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedStringFieldBean() );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( DefaultStringValidator.class ) )
+				violationOf( ConstraintAnnotation.class ).withMessage( getValidatorIdentifyingMessage( DefaultStringValidator.class ) )
 		);
 
 		// XML configuration is taken into account
 		violations = validator.validate( new ConstrainedLongFieldBean() );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( NonDefaultLongValidator.class ) )
+				violationOf( ConstraintAnnotation.class ).withMessage( getValidatorIdentifyingMessage( NonDefaultLongValidator.class ) )
 		);
 
 		// Programmatic configuration is also taken into account
 		violations = validator.validate( new ConstrainedShortFieldBean() );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( NonDefaultShortValidator.class ) )
+				violationOf( ConstraintAnnotation.class ).withMessage( getValidatorIdentifyingMessage( NonDefaultShortValidator.class ) )
 		);
 	}
 
@@ -243,13 +243,13 @@ public class ConstraintDefinitionTest {
 		// Defaults are overridden
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedIntegerFieldBean() );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( NonDefaultIntegerValidator.class ) )
+				violationOf( ConstraintAnnotation.class ).withMessage( getValidatorIdentifyingMessage( NonDefaultIntegerValidator.class ) )
 		);
 
 		// XML configuration is overridden by programmatic configuration
 		violations = validator.validate( new ConstrainedLongFieldBean() );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( OtherNonDefaultLongValidator.class ) )
+				violationOf( ConstraintAnnotation.class ).withMessage( getValidatorIdentifyingMessage( OtherNonDefaultLongValidator.class ) )
 		);
 	}
 
@@ -290,7 +290,7 @@ public class ConstraintDefinitionTest {
 
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new MyBean() );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( Directory.class ).withMessage( "" )
+				violationOf( Directory.class )
 		);
 	}
 
@@ -304,7 +304,7 @@ public class ConstraintDefinitionTest {
 
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new MyBean() );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( Directory.class ).withMessage( "" )
+				violationOf( Directory.class )
 		);
 	}
 
@@ -326,7 +326,7 @@ public class ConstraintDefinitionTest {
 		Class<? extends Payload>[] payload() default { };
 	}
 
-	private static String getCorrectValidationMessage(Class<? extends StubValidator> validatorClass) {
+	private static String getValidatorIdentifyingMessage(Class<? extends StubValidator<?>> validatorClass) {
 		return StubValidator.getIdentifyingMessage( validatorClass );
 	}
 

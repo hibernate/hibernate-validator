@@ -85,7 +85,7 @@ public class ConstraintValidatorContextTest {
 
 		Set<ConstraintViolation<Interval>> constraintViolations = validator.validate( interval );
 		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( StartLessThanEnd.class ).withPropertyPath( pathWith().property( "start" ) )
+				violationOf( StartLessThanEnd.class ).withProperty( "start" )
 		);
 	}
 
@@ -94,9 +94,9 @@ public class ConstraintValidatorContextTest {
 		Set<ConstraintViolation<MyObject>> constraintViolations = validator.validate( new MyObject() );
 
 		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withPropertyPath( pathWith().property( "field1" ) ),
-				violationOf( NotNull.class ).withPropertyPath( pathWith().property( "field2" ) ),
-				violationOf( MyClassLevelValidation.class ).withPropertyPath( pathWith().property( "myNode1" ) ),
+				violationOf( NotNull.class ).withProperty( "field1" ),
+				violationOf( NotNull.class ).withProperty( "field2" ),
+				violationOf( MyClassLevelValidation.class ).withProperty( "myNode1" ),
 				violationOf( MyClassLevelValidation.class )
 						.withPropertyPath( pathWith()
 								.property( "myNode2" )

@@ -171,12 +171,12 @@ public class JavaFXValueExtractorsTest {
 
 	public static class ListPropertyEntity {
 
+		@Size(min = 3)
+		private ListProperty<@Size(min = 4) String> listProperty;
+
 		private ListPropertyEntity(ObservableList<String> innerList) {
 			this.listProperty = new ReadOnlyListWrapper<String>( innerList );
 		}
-
-		@Size(min = 3)
-		private ListProperty<@Size(min = 4) String> listProperty;
 
 		public static ListPropertyEntity valid() {
 			return new ListPropertyEntity( FXCollections.observableArrayList( "apple", "pear", "cherry" ) );

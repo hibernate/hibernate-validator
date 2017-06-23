@@ -83,7 +83,9 @@ public class FailFastTest {
 		}
 		catch (ConstraintViolationException e) {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Min.class ), violationOf( NotBlank.class ), violationOf( NotNull.class )
+					violationOf( Min.class ),
+					violationOf( NotBlank.class ),
+					violationOf( NotNull.class )
 			);
 		}
 	}

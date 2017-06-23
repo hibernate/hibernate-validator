@@ -42,7 +42,7 @@ public class ClassValidatorWithTypeVariableTest {
 
 		Set<ConstraintViolation<Batch>> violations = validator.validate( batch );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withPropertyPath( pathWith().property( "offers" ) )
+				violationOf( NotNull.class ).withProperty( "offers" )
 		);
 	}
 
