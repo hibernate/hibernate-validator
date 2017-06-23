@@ -243,6 +243,13 @@ public class CustomValueExtractorTest {
 			() -> Validation.buildDefaultValidatorFactory() );
 	}
 
+	@Test(expectedExceptions = ValueExtractorDeclarationException.class, expectedExceptionsMessageRegExp = "HV000222.*")
+	public void configuringMultipleExtractorsOfSameTypeInValidationXmlCausesException() throws Exception {
+		validationXmlTestHelper.runWithCustomValidationXml(
+				"value-extractor-duplicated-validation.xml",
+				() -> Validation.buildDefaultValidatorFactory() );
+	}
+
 	private static class CustomerWithMultimap {
 
 		ListMultimap<String, @Valid EmailAddress> addressByType;

@@ -16,6 +16,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.validation.BootstrapConfiguration;
 import javax.validation.executable.ExecutableType;
@@ -39,6 +40,7 @@ import org.hibernate.validator.internal.xml.binding.DefaultValidatedExecutableTy
 import org.hibernate.validator.internal.xml.binding.ExecutableValidationType;
 import org.hibernate.validator.internal.xml.binding.PropertyType;
 import org.hibernate.validator.internal.xml.binding.ValidationConfigType;
+
 import org.xml.sax.SAXException;
 
 /**
@@ -194,6 +196,13 @@ public class ValidationXmlParser {
 				: getValidatedExecutableTypes( executableValidationType.getDefaultValidatedExecutableTypes() );
 		boolean executableValidationEnabled = executableValidationType == null || executableValidationType.getEnabled();
 
+		Set<String> valueExtractorClassNames = new HashSet<>();
+		for ( String className : config.getValueExtractor() ) {
+			if ( !valueExtractorClassNames.add( className ) ) {
+				throw log.getDuplicateDefinitionsOfValueExtractorException( className );
+			}
+		}
+
 		return new BootstrapConfigurationImpl(
 				config.getDefaultProvider(),
 				config.getConstraintValidatorFactory(),
@@ -201,7 +210,7 @@ public class ValidationXmlParser {
 				config.getTraversableResolver(),
 				config.getParameterNameProvider(),
 				config.getClockProvider(),
-				new HashSet<>( config.getValueExtractor() ),
+				valueExtractorClassNames,
 				defaultValidatedExecutableTypes,
 				executableValidationEnabled,
 				new HashSet<>( config.getConstraintMapping() ),
