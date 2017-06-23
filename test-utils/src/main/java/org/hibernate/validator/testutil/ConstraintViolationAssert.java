@@ -7,7 +7,6 @@
 package org.hibernate.validator.testutil;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.lang.annotation.Annotation;
@@ -19,7 +18,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
@@ -90,17 +88,13 @@ public final class ConstraintViolationAssert {
 		return new ConstraintViolationSetAssert( actualViolations );
 	}
 
-	public static void assertCorrectPropertyPaths(ConstraintViolationException e, String... expectedPropertyPaths) {
-		assertCorrectPropertyPaths( e.getConstraintViolations(), expectedPropertyPaths );
-	}
-
 	/**
 	 * Asserts that the given violation list has no violations (is empty).
 	 *
 	 * @param violations The violation list to verify.
 	 */
 	public static void assertNoViolations(Set<? extends ConstraintViolation<?>> violations) {
-		assertTrue( violations.isEmpty(), "Should not have constraint violations" );
+		Assertions.assertThat( violations ).isEmpty();
 	}
 
 	public static void assertConstraintTypes(Set<? extends ConstraintDescriptor<?>> descriptors,
