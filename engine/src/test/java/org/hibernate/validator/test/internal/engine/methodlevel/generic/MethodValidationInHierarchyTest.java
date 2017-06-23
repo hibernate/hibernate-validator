@@ -38,7 +38,7 @@ public class MethodValidationInHierarchyTest {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), "must not be null" );
 		}
 	}
 
@@ -58,7 +58,7 @@ public class MethodValidationInHierarchyTest {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), "must not be null" );
 		}
 	}
 }

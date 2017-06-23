@@ -6,13 +6,18 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -21,10 +26,8 @@ import org.hibernate.validator.cfg.defs.DecimalMaxDef;
 import org.hibernate.validator.cfg.defs.DecimalMinDef;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -50,8 +53,9 @@ public class DecimalMinMaxValidatorBoundaryTest {
 		this.d = 0.1;
 
 		Set<ConstraintViolation<DecimalMinMaxValidatorBoundaryTest>> constraintViolations = validator.validate( this );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintTypes( constraintViolations, DecimalMin.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( DecimalMin.class )
+		);
 	}
 
 	@Test
@@ -66,7 +70,7 @@ public class DecimalMinMaxValidatorBoundaryTest {
 		this.d = 0.1;
 
 		Set<ConstraintViolation<DecimalMinMaxValidatorBoundaryTest>> constraintViolations = validator.validate( this );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 
@@ -83,34 +87,42 @@ public class DecimalMinMaxValidatorBoundaryTest {
 
 		this.d = 1.0;
 		Set<ConstraintViolation<DecimalMinMaxValidatorBoundaryTest>> constraintViolations = validator.validate( this );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		this.d = 1.1;
 		constraintViolations = validator.validate( this );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		this.d = 1.19;
 		constraintViolations = validator.validate( this );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		this.d = 1.20;
 		constraintViolations = validator.validate( this );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		this.d = 1.3;
 		constraintViolations = validator.validate( this );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( DecimalMax.class )
+		);
 
 		this.d = 1.51;
 		constraintViolations = validator.validate( this );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( DecimalMax.class )
+		);
 
 		this.d = 1.9;
 		constraintViolations = validator.validate( this );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( DecimalMax.class )
+		);
 
 		this.d = 2.000000001;
 		constraintViolations = validator.validate( this );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( DecimalMax.class )
+		);
 	}
 }

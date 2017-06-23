@@ -6,10 +6,19 @@
  */
 package org.hibernate.validator.test.internal.engine.failfast;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
+import static org.testng.Assert.fail;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -25,8 +34,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorFactory;
@@ -37,13 +44,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
-import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
 
 /**
  * Tests for fail fast mode
@@ -65,7 +66,10 @@ public class FailFastTest {
 		final Validator validator = factory.getValidator();
 
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
-		assertNumberOfViolations( constraintViolations, 2 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "b" ),
+				violationOf( NotNull.class ).withProperty( "c" )
+		);
 	}
 
 	@Test
@@ -78,7 +82,9 @@ public class FailFastTest {
 			fail();
 		}
 		catch (ConstraintViolationException e) {
-			assertNumberOfViolations( e.getConstraintViolations(), 3 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Min.class ), violationOf( NotBlank.class ), violationOf( NotNull.class )
+			);
 		}
 	}
 
@@ -90,7 +96,9 @@ public class FailFastTest {
 
 		final Validator validator = factory.getValidator();
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 	}
 
 	@Test
@@ -108,7 +116,9 @@ public class FailFastTest {
 			fail();
 		}
 		catch (ConstraintViolationException e) {
-			assertNumberOfViolations( e.getConstraintViolations(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Min.class )
+			);
 		}
 	}
 
@@ -124,7 +134,9 @@ public class FailFastTest {
 						.failFast( true )
 						.getValidator();
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 	}
 
 	@Test
@@ -146,7 +158,9 @@ public class FailFastTest {
 			fail();
 		}
 		catch (ConstraintViolationException e) {
-			assertNumberOfViolations( e.getConstraintViolations(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotBlank.class )
+			);
 		}
 	}
 
@@ -161,7 +175,9 @@ public class FailFastTest {
 		Validator validator = factory.getValidator();
 
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 
 		// without fail fast
 		configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
@@ -170,7 +186,10 @@ public class FailFastTest {
 
 		validator = factory.getValidator();
 		constraintViolations = validator.validate( testInstance );
-		assertNumberOfViolations( constraintViolations, 2 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "b" ),
+				violationOf( NotNull.class ).withProperty( "c" )
+		);
 	}
 
 	@Test
@@ -189,7 +208,9 @@ public class FailFastTest {
 			fail();
 		}
 		catch (ConstraintViolationException e) {
-			assertNumberOfViolations( e.getConstraintViolations(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotBlank.class )
+			);
 		}
 	}
 
@@ -205,7 +226,10 @@ public class FailFastTest {
 
 		final Validator validator = factory.getValidator();
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
-		assertNumberOfViolations( constraintViolations, 2 );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "b" ),
+				violationOf( NotNull.class ).withProperty( "c" )
+		);
 	}
 
 	@Test(expectedExceptions = ValidationException.class,
@@ -230,8 +254,9 @@ public class FailFastTest {
 
 		final Validator validator = factory.getValidator();
 		Set<ConstraintViolation<FooBar>> constraintViolations = validator.validate( new FooBar() );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintViolationMessages( constraintViolations, "Bar constraint failed!" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( BarConstraint.class ).withMessage( "Bar constraint failed!" )
+		);
 	}
 
 	public void testFailSafePerformance() {

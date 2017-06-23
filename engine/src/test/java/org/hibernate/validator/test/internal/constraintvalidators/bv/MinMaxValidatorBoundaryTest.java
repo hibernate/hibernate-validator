@@ -6,7 +6,11 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.Max;
@@ -15,10 +19,8 @@ import javax.validation.constraints.Min;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.AbstractMaxValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForNumber;
 import org.hibernate.validator.testutils.ValidatorUtil;
-import org.testng.annotations.Test;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import org.testng.annotations.Test;
 
 /**
  * Check correct behavior of {@link MinValidatorForNumber} and
@@ -31,6 +33,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
  * @author Hardy Ferentschik
  */
 public class MinMaxValidatorBoundaryTest {
+
 	@Min(value = 9223372036854775807L)
 	public long min;
 
@@ -46,8 +49,9 @@ public class MinMaxValidatorBoundaryTest {
 
 		// Current min value is smaller, should fail, but it doesn't
 		Set<ConstraintViolation<MinMaxValidatorBoundaryTest>> constraintViolations = validator.validate( this );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintTypes( constraintViolations, Min.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class )
+		);
 	}
 
 	@Test
@@ -59,7 +63,8 @@ public class MinMaxValidatorBoundaryTest {
 
 		// Current max value is bigger, should fail, but it doesn't
 		Set<ConstraintViolation<MinMaxValidatorBoundaryTest>> constraintViolations = validator.validate( this );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintTypes( constraintViolations, Max.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Max.class )
+		);
 	}
 }

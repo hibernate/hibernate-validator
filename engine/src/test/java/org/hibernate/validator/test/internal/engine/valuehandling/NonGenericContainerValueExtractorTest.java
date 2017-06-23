@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +31,7 @@ import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.testutils.CandidateForTck;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -54,35 +55,39 @@ public class NonGenericContainerValueExtractorTest {
 	@Test
 	public void testValueExtraction() {
 		Set<ConstraintViolation<Bean>> constraintViolations = validator.validate( Bean.valid() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( Bean.nullFoo() );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( "<map value>", true, "key", null, Map.class, 1 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( "<map value>", true, "key", null, Map.class, 1 )
+						)
 		);
 
 		// check that cascaded validation is working correctly
 		constraintViolations = validator.validate( Bean.invalid() );
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectConstraintTypes( constraintViolations, Min.class, NotBlank.class, Max.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.property( "foo", true, "key", null, Map.class, 1 )
-						.property( "property" ),
-				pathWith()
-						.property( "map" )
-						.property( "foo", true, "key", null, Map.class, 1 )
-						.property( "optionalInt" ),
-				pathWith()
-						.property( "map" )
-						.property( "foo", true, "key", null, Map.class, 1 )
-						.property( "bar" )
-						.property( "optionalLong" )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.property( "foo", true, "key", null, Map.class, 1 )
+								.property( "property" )
+						),
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.property( "foo", true, "key", null, Map.class, 1 )
+								.property( "optionalInt" )
+						),
+				violationOf( Max.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.property( "foo", true, "key", null, Map.class, 1 )
+								.property( "bar" )
+								.property( "optionalLong" )
+						)
 		);
 	}
 

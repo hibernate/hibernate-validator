@@ -6,19 +6,21 @@
  */
 package org.hibernate.validator.test.constraints.br;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class CPFValidatorTest {
 	private String[] invalidCPFs = {
@@ -39,21 +41,23 @@ public class CPFValidatorTest {
 	@TestForIssue(jiraKey = "HV-491")
 	public void correct_cpf_with_separator_validates() {
 		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "134.241.313-00" ) );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-933")
 	public void correct_cpf_without_separator_validates() {
 		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "13424131300" ) );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-491")
 	public void incorrect_formatted_cpf_is_invalid() {
 		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "48255-77" ) );
-		assertNumberOfViolations( violations, 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CPF.class ).withProperty( "cpf" )
+		);
 	}
 
 	@Test
@@ -61,7 +65,9 @@ public class CPFValidatorTest {
 	public void any_same_digit_cpf_with_separator_is_invalid() {
 		for ( String cpf : invalidCPFs ) {
 			Set<ConstraintViolation<Person>> violations = validator.validate( new Person( cpf ) );
-			assertNumberOfViolations( violations, 1 );
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( CPF.class ).withProperty( "cpf" )
+			);
 		}
 	}
 
@@ -71,7 +77,9 @@ public class CPFValidatorTest {
 		for ( String cpf : invalidCPFs ) {
 			String cpfWithoutseparator = cpf.replaceAll( "[^0-9]", "" );
 			Set<ConstraintViolation<Person>> violations = validator.validate( new Person( cpfWithoutseparator ) );
-			assertNumberOfViolations( violations, 1 );
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( CPF.class ).withProperty( "cpf" )
+			);
 		}
 	}
 
@@ -79,53 +87,65 @@ public class CPFValidatorTest {
 	@TestForIssue(jiraKey = "HV-808")
 	public void valid_cpfs_with_separator_validate() {
 		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "378.796.950-01" ) );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 
 		violations = validator.validate( new Person( "331.814.296-43" ) );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-933")
 	public void valid_cpf_without_separator_validates() {
 		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "37879695001" ) );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 
 		violations = validator.validate( new Person( "33181429643" ) );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-979")
 	public void correct_cpf_with_dash_only_separator_validates() {
 		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "134241313-00" ) );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-808")
 	public void invalid_cpf_with_separator_creates_constraint_violation() {
 		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "378.796.950-02" ) );
-		assertNumberOfViolations( violations, 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CPF.class ).withProperty( "cpf" )
+		);
 
 		violations = validator.validate( new Person( "331.814.296-52" ) );
-		assertNumberOfViolations( violations, 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CPF.class ).withProperty( "cpf" )
+		);
 
 		violations = validator.validate( new Person( "331.814.296-51" ) );
-		assertNumberOfViolations( violations, 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CPF.class ).withProperty( "cpf" )
+		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-933")
 	public void invalid_cpf_without_separator_creates_constraint_violation() {
 		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "37879695002" ) );
-		assertNumberOfViolations( violations, 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CPF.class ).withProperty( "cpf" )
+		);
 
 		violations = validator.validate( new Person( "33181429652" ) );
-		assertNumberOfViolations( violations, 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CPF.class ).withProperty( "cpf" )
+		);
 
 		violations = validator.validate( new Person( "33181429651" ) );
-		assertNumberOfViolations( violations, 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CPF.class ).withProperty( "cpf" )
+		);
 	}
 
 	public static class Person {

@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.bugs;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.Set;
 
@@ -17,6 +17,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.Test;
 
 /**
@@ -78,8 +79,9 @@ public class TooBigMessageTest {
 		GoldFish fish = new GoldFish();
 
 		Set<ConstraintViolation<GoldFish>> constraintViolations = validator.validate( fish );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintViolationMessages( constraintViolations, LARGE_MESSAGE );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( LARGE_MESSAGE )
+		);
 	}
 
 	private static class GoldFish {

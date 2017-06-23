@@ -31,7 +31,7 @@ public class Car {
 	 * By annotating the field with @NotNull we specify, that null is not a valid
 	 * value.
 	 */
-	@NotNull(message = "may not be null")
+	@NotNull(message = "must not be null")
 	private String manufacturer;
 
 	/**

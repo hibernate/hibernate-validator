@@ -6,10 +6,13 @@
  */
 package org.hibernate.validator.test.internal.engine.traversableresolver;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+
 import java.lang.annotation.ElementType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
@@ -17,14 +20,12 @@ import javax.validation.TraversableResolver;
 import javax.validation.Valid;
 import javax.validation.Validator;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -39,7 +40,7 @@ public class TraversableResolverTest {
 		Validator validator = config.buildValidatorFactory().getValidator();
 		Set<ConstraintViolation<Bar>> violations = validator.validate( new Bar() );
 
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 	}
 
 	@ScriptAssert(lang = "groovy", script = "return true;")

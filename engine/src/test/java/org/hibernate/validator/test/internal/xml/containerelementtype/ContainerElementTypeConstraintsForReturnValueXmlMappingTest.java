@@ -8,7 +8,8 @@
 package org.hibernate.validator.test.internal.xml.containerelementtype;
 
 import static org.assertj.core.api.Assertions.fail;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +24,9 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -50,12 +54,11 @@ public class ContainerElementTypeConstraintsForReturnValueXmlMappingTest {
 			fail( "Expected exception wasn't raised" );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages(
-					e.getConstraintViolations(),
-					"size must be between 3 and 10",
-					"size must be between 3 and 10",
-					"must be greater than or equal to 1",
-					"must be greater than or equal to 1"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Size.class ).withMessage( "size must be between 3 and 10" ),
+					violationOf( Size.class ).withMessage( "size must be between 3 and 10" ),
+					violationOf( Min.class ).withMessage( "must be greater than or equal to 1" ),
+					violationOf( Min.class ).withMessage( "must be greater than or equal to 1" )
 			);
 		}
 	}
@@ -73,9 +76,8 @@ public class ContainerElementTypeConstraintsForReturnValueXmlMappingTest {
 			fail( "Expected exception wasn't raised" );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages(
-					e.getConstraintViolations(),
-					"may not be null"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class ).withMessage( "must not be null" )
 			);
 		}
 	}
@@ -93,9 +95,8 @@ public class ContainerElementTypeConstraintsForReturnValueXmlMappingTest {
 			fail( "Expected exception wasn't raised" );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages(
-				e.getConstraintViolations(),
-				"may not be null"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class ).withMessage( "must not be null" )
 			);
 		}
 	}
@@ -113,9 +114,8 @@ public class ContainerElementTypeConstraintsForReturnValueXmlMappingTest {
 			fail( "Expected exception wasn't raised" );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages(
-				e.getConstraintViolations(),
-				"may not be null"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class ).withMessage( "must not be null" )
 			);
 		}
 	}
@@ -133,9 +133,8 @@ public class ContainerElementTypeConstraintsForReturnValueXmlMappingTest {
 			fail( "Expected exception wasn't raised" );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages(
-				e.getConstraintViolations(),
-				"size must be between 0 and 5"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
 			);
 		}
 	}
@@ -153,9 +152,8 @@ public class ContainerElementTypeConstraintsForReturnValueXmlMappingTest {
 			fail( "Expected exception wasn't raised" );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages(
-				e.getConstraintViolations(),
-				"size must be between 0 and 5"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
 			);
 		}
 	}
@@ -173,9 +171,8 @@ public class ContainerElementTypeConstraintsForReturnValueXmlMappingTest {
 			fail( "Expected exception wasn't raised" );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages(
-				e.getConstraintViolations(),
-				"size must be between 0 and 5"
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
 			);
 		}
 	}

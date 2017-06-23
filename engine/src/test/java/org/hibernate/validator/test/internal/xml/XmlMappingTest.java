@@ -7,8 +7,9 @@
 package org.hibernate.validator.test.internal.xml;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertEquals;
 
 import java.io.InputStream;
@@ -24,6 +25,7 @@ import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.validation.executable.ExecutableType;
 import javax.validation.groups.Default;
 import javax.validation.metadata.MethodDescriptor;
@@ -62,7 +64,9 @@ public class XmlMappingTest {
 
 		final Set<ConstraintViolation<Customer>> violations = validator.validate( new Customer(), Default.class );
 
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 	}
 
 	@Test
@@ -83,7 +87,7 @@ public class XmlMappingTest {
 				Properties.class, "listOfString", listOfString
 		);
 
-		assertEquals( violations.size(), 0 );
+		assertNoViolations( violations );
 	}
 
 	@Test
@@ -96,7 +100,9 @@ public class XmlMappingTest {
 		final Validator validator = validatorFactory.getValidator();
 		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 	}
 
 	@Test
@@ -109,7 +115,9 @@ public class XmlMappingTest {
 		final Validator validator = validatorFactory.getValidator();
 		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 	}
 
 	@Test
@@ -122,7 +130,7 @@ public class XmlMappingTest {
 		final Validator validator = validatorFactory.getValidator();
 		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
-		assertEquals( violations.size(), 0 );
+		assertNoViolations( violations );
 	}
 
 	@Test
@@ -152,10 +160,9 @@ public class XmlMappingTest {
 				);
 
 		//then
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"size must be between 1 and 10",
-				"size must be between 2 and 10"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "size must be between 1 and 10" ),
+				violationOf( Size.class ).withMessage( "size must be between 2 and 10" )
 		);
 	}
 
@@ -168,7 +175,9 @@ public class XmlMappingTest {
 		final Validator validator = validatorFactory.getValidator();
 		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 	}
 
 	@Test(
@@ -187,7 +196,9 @@ public class XmlMappingTest {
 		final Validator validator = validatorFactory.getValidator();
 		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
-		assertEquals( violations.size(), 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 	}
 
 	@Test
@@ -323,7 +334,8 @@ public class XmlMappingTest {
 		system.addPart( new Part() );
 		Set<ConstraintViolation<System>> violations = validator.validate( system );
 
-		assertEquals( violations.size(), 1 );
-		assertCorrectConstraintTypes( violations, NotNull.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+		);
 	}
 }

@@ -6,10 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.OptionalDouble;
@@ -23,6 +22,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 
 import org.hibernate.validator.testutils.CandidateForTck;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -42,21 +42,21 @@ public class OptionalPrimitivesValueExtractorTest {
 	@Test
 	public void testOptionalInt() {
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( Foo.valid() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( Foo.empty() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( Foo.invalid() );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith().property( "optionalInt" ),
-				pathWith().property( "optionalDouble" ),
-				pathWith().property( "optionalLong" )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class ).withProperty( "optionalInt" ),
+				violationOf( DecimalMin.class ).withProperty( "optionalDouble" ),
+				violationOf( Min.class ).withProperty( "optionalLong" )
 		);
-		assertCorrectConstraintTypes( constraintViolations, Min.class, DecimalMin.class, Min.class );
 	}
 
 	private static class Foo {
+
 		@Min(value = 5)
 		private final OptionalInt optionalInt;
 

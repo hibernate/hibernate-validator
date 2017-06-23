@@ -11,17 +11,14 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.io.File;
 import java.io.InputStream;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import javax.validation.Constraint;
@@ -39,6 +36,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -47,7 +45,7 @@ import org.testng.annotations.Test;
  *
  * @author Yoann Rodiere
  */
-@TestForIssue( jiraKey = "HV-501")
+@TestForIssue(jiraKey = "HV-501")
 public class ConstraintDefinitionTest {
 
 	private HibernateValidatorConfiguration config;
@@ -84,8 +82,9 @@ public class ConstraintDefinitionTest {
 		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedLongFieldBean() );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectValidatorTypes( violations, NonDefaultLongValidator.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( NonDefaultLongValidator.class ) )
+		);
 	}
 
 	@Test
@@ -100,8 +99,9 @@ public class ConstraintDefinitionTest {
 		 * (i.e. check that existing validators were actually included)
 		 */
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedStringFieldBean() );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectValidatorTypes( violations, DefaultStringValidator.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( DefaultStringValidator.class ) )
+		);
 	}
 
 	@Test
@@ -117,8 +117,9 @@ public class ConstraintDefinitionTest {
 		 * (i.e. check that existing validators were actually included)
 		 */
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedStringFieldBean() );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectValidatorTypes( violations, DefaultStringValidator.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( DefaultStringValidator.class ) )
+		);
 	}
 
 	@Test
@@ -131,8 +132,9 @@ public class ConstraintDefinitionTest {
 		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedIntegerFieldBean() );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectValidatorTypes( violations, NonDefaultIntegerValidator.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( NonDefaultIntegerValidator.class ) )
+		);
 	}
 
 	@Test
@@ -147,12 +149,14 @@ public class ConstraintDefinitionTest {
 		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedLongFieldBean() );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectValidatorTypes( violations, NonDefaultLongValidator.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( NonDefaultLongValidator.class ) )
+		);
 
 		violations = validator.validate( new ConstrainedIntegerFieldBean() );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectValidatorTypes( violations, NonDefaultIntegerValidator.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( NonDefaultIntegerValidator.class ) )
+		);
 	}
 
 	@Test(
@@ -203,18 +207,21 @@ public class ConstraintDefinitionTest {
 
 		// Defaults are untouched
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedStringFieldBean() );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectValidatorTypes( violations, DefaultStringValidator.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( DefaultStringValidator.class ) )
+		);
 
 		// XML configuration is taken into account
 		violations = validator.validate( new ConstrainedLongFieldBean() );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectValidatorTypes( violations, NonDefaultLongValidator.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( NonDefaultLongValidator.class ) )
+		);
 
 		// Programmatic configuration is also taken into account
 		violations = validator.validate( new ConstrainedShortFieldBean() );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectValidatorTypes( violations, NonDefaultShortValidator.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( NonDefaultShortValidator.class ) )
+		);
 	}
 
 	@Test
@@ -235,13 +242,15 @@ public class ConstraintDefinitionTest {
 
 		// Defaults are overridden
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedIntegerFieldBean() );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectValidatorTypes( violations, NonDefaultIntegerValidator.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( NonDefaultIntegerValidator.class ) )
+		);
 
 		// XML configuration is overridden by programmatic configuration
 		violations = validator.validate( new ConstrainedLongFieldBean() );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectValidatorTypes( violations, OtherNonDefaultLongValidator.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ConstraintAnnotation.class ).withMessage( getCorrectValidationMessage( OtherNonDefaultLongValidator.class ) )
+		);
 	}
 
 	@Test(
@@ -280,8 +289,9 @@ public class ConstraintDefinitionTest {
 		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new MyBean() );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintTypes( violations, Directory.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Directory.class ).withMessage( "" )
+		);
 	}
 
 	@Test
@@ -293,8 +303,9 @@ public class ConstraintDefinitionTest {
 		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new MyBean() );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintTypes( violations, Directory.class );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Directory.class ).withMessage( "" )
+		);
 	}
 
 	@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })
@@ -315,23 +326,8 @@ public class ConstraintDefinitionTest {
 		Class<? extends Payload>[] payload() default { };
 	}
 
-	/*
-	 * Implementation note: we are compiling in Java 6 mode, so {@code @SafeVarargs} is of no use here. Thus, we work
-	 * around the compiler warnings by not restraining the type of classes passed as parameters and just casting them.
-	 */
-	@SafeVarargs
-	@SuppressWarnings("unchecked")
-	private static void assertCorrectValidatorTypes(Set<? extends ConstraintViolation<?>> violations,
-			Class<? /* extends StubValidator */>... validatorClasses) {
-		List<String> expectedMessages = new ArrayList<>();
-		for ( Class<?> validatorClass : validatorClasses ) {
-			String identifyingMessage = StubValidator.getIdentifyingMessage(
-					(Class<? extends StubValidator<?>>) validatorClass
-					);
-			expectedMessages.add( identifyingMessage );
-		}
-		assertCorrectConstraintViolationMessages(
-				violations, expectedMessages.toArray( new String[expectedMessages.size()] ) );
+	private static String getCorrectValidationMessage(Class<? extends StubValidator> validatorClass) {
+		return StubValidator.getIdentifyingMessage( validatorClass );
 	}
 
 	private static class StubValidator<T>
@@ -343,7 +339,7 @@ public class ConstraintDefinitionTest {
 		 * <p>
 		 * This is useful for testing purposes.
 		 *
-		 * @param validator The validator class
+		 * @param validatorClass The validator class
 		 * @return The uniquely identifying message for this validator
 		 */
 		public static String getIdentifyingMessage(

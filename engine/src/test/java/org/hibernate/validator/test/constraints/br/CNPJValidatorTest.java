@@ -6,18 +6,21 @@
  */
 package org.hibernate.validator.test.constraints.br;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class CNPJValidatorTest {
 	private Validator validator;
@@ -31,34 +34,38 @@ public class CNPJValidatorTest {
 	@TestForIssue(jiraKey = "HV-491")
 	public void correct_cnpj_with_separator_validates() {
 		Set<ConstraintViolation<Company>> violations = validator.validate( new Company( "91.509.901/0001-69" ) );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-933")
 	public void correct_cnpj_without_separator_validates() {
 		Set<ConstraintViolation<Company>> violations = validator.validate( new Company( "91509901000169" ) );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-491")
 	public void incorrect_cnpj_with_separator_creates_constraint_violation() {
 		Set<ConstraintViolation<Company>> violations = validator.validate( new Company( "91.509.901/0001-60" ) );
-		assertNumberOfViolations( violations, 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CNPJ.class ).withProperty( "cnpj" )
+		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-933")
 	public void incorrect_cnpj_without_separator_creates_constraint_violation() {
 		Set<ConstraintViolation<Company>> violations = validator.validate( new Company( "91509901000160" ) );
-		assertNumberOfViolations( violations, 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CNPJ.class ).withProperty( "cnpj" )
+		);
 	}
 
 	@Test
 	public void correct_cnpj_with_check_digit_zero_validates() {
 		Set<ConstraintViolation<Company>> violations = validator.validate( new Company( "07755311000100" ) );
-		assertNumberOfViolations( violations, 0 );
+		assertNoViolations( violations );
 	}
 
 	public static class Company {

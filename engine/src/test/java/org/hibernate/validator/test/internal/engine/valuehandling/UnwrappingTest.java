@@ -12,9 +12,8 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -87,31 +86,31 @@ public class UnwrappingTest {
 	@Test
 	public void validate_wrapper_itself_if_there_is_no_value_extractor() {
 		Set<ConstraintViolation<Qux>> constraintViolations = validatorWithoutValueExtractor.validate( new Qux() );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "integerHolder" );
-		assertCorrectConstraintTypes( constraintViolations, ValueHolderConstraint.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ValueHolderConstraint.class ).withProperty( "integerHolder" )
+		);
 	}
 
 	@Test
 	public void validate_wrapper_itself_even_if_there_is_a_value_extractor() {
 		Set<ConstraintViolation<Qux>> constraintViolations = validatorWithValueExtractor.validate( new Qux() );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "integerHolder" );
-		assertCorrectConstraintTypes( constraintViolations, ValueHolderConstraint.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ValueHolderConstraint.class ).withProperty( "integerHolder" )
+		);
 
 		// execute validation twice to ensure that the handling for this case is not subjective to caching (see HV-976)
 		constraintViolations = validatorWithValueExtractor.validate( new Qux() );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "integerHolder" );
-		assertCorrectConstraintTypes( constraintViolations, ValueHolderConstraint.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ValueHolderConstraint.class ).withProperty( "integerHolder" )
+		);
 	}
 
 	@Test
 	public void validate_wrapper_itself_if_there_is_no_value_extractor_even_if_constraint_could_be_applied_to_unwrapped_value() {
 		Set<ConstraintViolation<Baz>> constraintViolations = validatorWithoutValueExtractor.validate( new Baz() );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "integerHolder" );
-		assertCorrectConstraintTypes( constraintViolations, Null.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Null.class ).withProperty( "integerHolder" )
+		);
 	}
 
 	@Test(enabled = false, expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000186.*")
@@ -123,9 +122,9 @@ public class UnwrappingTest {
 	@Test
 	public void validate_wrapped_value_if_value_extractor_unwraps_by_default() {
 		Set<ConstraintViolation<WrapperWithImplicitUnwrapping>> constraintViolations = validatorWithValueExtractor.validate( new WrapperWithImplicitUnwrapping() );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "integerWrapper" );
-		assertCorrectConstraintTypes( constraintViolations, Min.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class ).withProperty( "integerWrapper" )
+		);
 	}
 
 	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030.*")
@@ -136,9 +135,9 @@ public class UnwrappingTest {
 	@Test
 	public void validate_wrapped_value_if_value_extractor_unwraps_by_default_and_unwrapping_enabled_per_constraint() {
 		Set<ConstraintViolation<WrapperWithForcedUnwrapping>> constraintViolations = validatorWithValueExtractor.validate( new WrapperWithForcedUnwrapping() );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "integerWrapper" );
-		assertCorrectConstraintTypes( constraintViolations, Min.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Min.class ).withProperty( "integerWrapper" )
+		);
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000199.*")

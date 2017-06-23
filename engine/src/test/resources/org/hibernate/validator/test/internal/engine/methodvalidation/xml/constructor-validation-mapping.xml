@@ -17,7 +17,7 @@
           ignore-annotations="true">
         <getter name="name">
             <constraint annotation="javax.validation.constraints.NotNull">
-                <message>[XML] - may not be null</message>
+                <message>[XML] - must not be null</message>
             </constraint>
         </getter>
     </bean>
@@ -28,7 +28,7 @@
           ignore-annotations="true">
         <field name="customer">
             <constraint annotation="javax.validation.constraints.NotNull">
-                <message>[XML] - may not be null</message>
+                <message>[XML] - must not be null</message>
             </constraint>
         </field>
         <constructor>
@@ -46,7 +46,7 @@
         <constructor>
             <parameter type="java.lang.String">
                 <constraint annotation="javax.validation.constraints.NotNull">
-                    <message>[XML] - may not be null</message>
+                    <message>[XML] - must not be null</message>
                 </constraint>
             </parameter>
             <return-value>

@@ -6,22 +6,23 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.Size;
-
-import org.apache.log4j.Logger;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.hibernate.validator.testutil.MessageLoggedAssertionLogger;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import org.apache.log4j.Logger;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 /**
  * Tests for {@link org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator}
@@ -45,8 +46,11 @@ public class ParameterMessageInterpolatorTest {
 	public void testParameterMessageInterpolatorInterpolatesParameters() {
 		Foo foo = new Foo();
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validateProperty( foo, "snafu" );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintViolationMessages( constraintViolations, "1" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withProperty( "snafu" )
+						.withMessage( "1" )
+		);
 	}
 
 	@Test
@@ -57,8 +61,11 @@ public class ParameterMessageInterpolatorTest {
 
 		Foo foo = new Foo();
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validateProperty( foo, "bar" );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintViolationMessages( constraintViolations, "${validatedValue}" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withProperty( "bar" )
+						.withMessage( "${validatedValue}" )
+		);
 
 		assertingLogger.assertMessageLogged();
 		log4jRootLogger.removeAppender( assertingLogger );

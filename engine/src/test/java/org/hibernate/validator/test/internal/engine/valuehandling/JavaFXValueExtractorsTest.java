@@ -6,9 +6,10 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.Set;
@@ -24,9 +25,8 @@ import javax.validation.constraints.Size;
 import javax.validation.valueextraction.Unwrapping;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.testutils.CandidateForTck;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
@@ -45,6 +45,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Tests for JavaFX {@link ValueExtractor}s.
@@ -67,74 +69,92 @@ public class JavaFXValueExtractorsTest {
 	@Test
 	public void testJavaFXPropertyDefaultUnwrapping() {
 		Set<ConstraintViolation<BasicPropertiesEntity>> constraintViolations = validator.validate( new BasicPropertiesEntity() );
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"doubleProperty",
-				"integerProperty",
-				"booleanProperty" );
-		assertCorrectConstraintTypes(
-				constraintViolations,
-				Max.class,
-				Min.class,
-				AssertTrue.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Max.class ).withProperty( "doubleProperty" ),
+				violationOf( Min.class ).withProperty( "integerProperty" ),
+				violationOf( AssertTrue.class ).withProperty( "booleanProperty" )
+		);
 	}
 
 	@Test
 	public void testValueExtractionForPropertyList() {
 		Set<ConstraintViolation<ListPropertyEntity>> constraintViolations = validator.validate( ListPropertyEntity.valid() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( ListPropertyEntity.invalidList() );
-		assertCorrectPropertyPaths( constraintViolations, "listProperty" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class ).withProperty( "listProperty" )
+		);
 
 		constraintViolations = validator.validate( ListPropertyEntity.invalidListElement() );
-		assertCorrectPropertyPaths( constraintViolations, "listProperty[0].<list element>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "listProperty" )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, ListProperty.class, 0 )
+						)
+		);
 	}
 
 	@Test
 	public void testValueExtractionForPropertySet() {
 		Set<ConstraintViolation<SetPropertyEntity>> constraintViolations = validator.validate( SetPropertyEntity.valid() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( SetPropertyEntity.invalidSet() );
-		assertCorrectPropertyPaths( constraintViolations, "setProperty" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class ).withProperty( "setProperty" )
+		);
 
 		constraintViolations = validator.validate( SetPropertyEntity.invalidSetElement() );
-		assertCorrectPropertyPaths( constraintViolations, "setProperty[].<iterable element>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "setProperty" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, null, SetProperty.class, 0 )
+						)
+		);
+
 	}
 
 	@Test
 	public void testValueExtractionForPropertyMap() {
 		Set<ConstraintViolation<MapPropertyEntity>> constraintViolations = validator.validate( MapPropertyEntity.valid() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( MapPropertyEntity.invalidMap() );
-		assertCorrectPropertyPaths( constraintViolations, "mapProperty" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class ).withProperty( "mapProperty" )
+		);
 
 		constraintViolations = validator.validate( MapPropertyEntity.invalidMapKey() );
-		assertCorrectPropertyPaths( constraintViolations, "mapProperty<K>[app].<map key>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "mapProperty" )
+								.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, "app", null, MapProperty.class, 0 )
+						)
+		);
 
 		constraintViolations = validator.validate( MapPropertyEntity.invalidMapValue() );
-		assertCorrectPropertyPaths( constraintViolations, "mapProperty[pear].<map value>" );
-		assertCorrectConstraintTypes( constraintViolations, Email.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Email.class )
+						.withPropertyPath( pathWith()
+								.property( "mapProperty" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "pear", null, MapProperty.class, 1 )
+						)
+		);
 	}
 
 	@Test
 	public void testJavaFXPropertySkipUnwrapping() {
 		Set<ConstraintViolation<DefaultUnwrappingEntity>> constraintViolationsDefault = validator.validate( new DefaultUnwrappingEntity() );
-		assertNumberOfViolations( constraintViolationsDefault, 1 );
-		assertCorrectPropertyPaths( constraintViolationsDefault, "property" );
-		assertCorrectConstraintTypes( constraintViolationsDefault, NotNull.class );
+		assertThat( constraintViolationsDefault ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "property" )
+		);
 
 		Set<ConstraintViolation<SkipUnwrappingEntity>> constraintViolationsSkip = validator.validate( new SkipUnwrappingEntity() );
-		assertNumberOfViolations( constraintViolationsSkip, 0 );
+		assertNoViolations( constraintViolationsSkip );
 	}
 
 	public class BasicPropertiesEntity {
@@ -151,12 +171,12 @@ public class JavaFXValueExtractorsTest {
 
 	public static class ListPropertyEntity {
 
-		@Size(min = 3)
-		private ListProperty<@Size(min = 4) String> listProperty;
-
 		private ListPropertyEntity(ObservableList<String> innerList) {
 			this.listProperty = new ReadOnlyListWrapper<String>( innerList );
 		}
+
+		@Size(min = 3)
+		private ListProperty<@Size(min = 4) String> listProperty;
 
 		public static ListPropertyEntity valid() {
 			return new ListPropertyEntity( FXCollections.observableArrayList( "apple", "pear", "cherry" ) );

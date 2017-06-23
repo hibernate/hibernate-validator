@@ -6,7 +6,9 @@
  */
 package org.hibernate.validator.test.constraints.pl;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import javax.validation.Validator;
@@ -23,6 +25,7 @@ import org.testng.annotations.Test;
  * @author Marko Bekhta
  */
 public class PESELValidatorTest {
+
 	private Validator validator;
 
 	@BeforeMethod
@@ -32,31 +35,57 @@ public class PESELValidatorTest {
 
 	@Test
 	public void testCorrectPESELNumber() {
-		assertNumberOfViolations( validator.validate( new Person( "92041903790" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "44051401359" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "70100619901" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "80082107231" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "00301202868" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "00271100559" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "12241301417" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "12252918020" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "12262911406" ) ), 0 );
+		assertNoViolations( validator.validate( new Person( "92041903790" ) ) );
+		assertNoViolations( validator.validate( new Person( "44051401359" ) ) );
+		assertNoViolations( validator.validate( new Person( "70100619901" ) ) );
+		assertNoViolations( validator.validate( new Person( "80082107231" ) ) );
+		assertNoViolations( validator.validate( new Person( "00301202868" ) ) );
+		assertNoViolations( validator.validate( new Person( "00271100559" ) ) );
+		assertNoViolations( validator.validate( new Person( "12241301417" ) ) );
+		assertNoViolations( validator.validate( new Person( "12252918020" ) ) );
+		assertNoViolations( validator.validate( new Person( "12262911406" ) ) );
 
 	}
 
 	@Test
 	public void testIncorrectPESELNumber() {
-		assertNumberOfViolations( validator.validate( new Person( "44051401358" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "92041903791" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "80082107232" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "80062210349" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "00301202866" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "00271100557" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "12241301418" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "12252918029" ) ), 1 );
-		assertNumberOfViolations( validator.validate( new Person( "12262911402" ) ), 1 );
+		assertThat( validator.validate( new Person( "44051401358" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+		assertThat( validator.validate( new Person( "92041903791" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+		assertThat( validator.validate( new Person( "80082107232" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+		assertThat( validator.validate( new Person( "80062210349" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+		assertThat( validator.validate( new Person( "00301202866" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+		assertThat( validator.validate( new Person( "00271100557" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+		assertThat( validator.validate( new Person( "12241301418" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+		assertThat( validator.validate( new Person( "12252918029" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+		assertThat( validator.validate( new Person( "12262911402" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
 	}
-
 
 	public static class Person {
 

@@ -6,17 +6,19 @@
  */
 package org.hibernate.validator.test.internal.engine.packageprivateconstraint;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import static org.testng.Assert.assertEquals;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Tests the validation of package-private constraints.
@@ -36,10 +38,8 @@ public class PackagePrivateConstraintValidationTest {
 	@Test
 	public void shouldValidatePackagePrivateConstraint() {
 		Set<ConstraintViolation<Giraffe>> violations = validator.validate( new Giraffe() );
-		assertEquals( violations.size(), 1 );
-		assertEquals(
-				violations.iterator().next().getConstraintDescriptor().getAnnotation().annotationType(),
-				ValidAnimalName.class
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ValidAnimalName.class )
 		);
 	}
 
@@ -56,10 +56,8 @@ public class PackagePrivateConstraintValidationTest {
 	@Test
 	public void shouldValidatePackagePrivateMultiValueConstraint() {
 		Set<ConstraintViolation<PolarBear>> violations = validator.validate( new PolarBear() );
-		assertEquals( violations.size(), 1 );
-		assertEquals(
-				violations.iterator().next().getConstraintDescriptor().getAnnotation().annotationType(),
-				ValidAnimalName.class
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ValidAnimalName.class )
 		);
 	}
 }

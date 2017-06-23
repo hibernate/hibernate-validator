@@ -7,7 +7,8 @@
 
 package org.hibernate.validator.test.internal.xml.containerelementtype;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,9 @@ import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -38,13 +42,12 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"size must be between 0 and 5",
-				"size must be between 3 and 10",
-				"size must be between 3 and 10",
-				"must be greater than or equal to 1",
-				"must be greater than or equal to 1"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "size must be between 0 and 5" ),
+				violationOf( Size.class ).withMessage( "size must be between 3 and 10" ),
+				violationOf( Size.class ).withMessage( "size must be between 3 and 10" ),
+				violationOf( Min.class ).withMessage( "must be greater than or equal to 1" ),
+				violationOf( Min.class ).withMessage( "must be greater than or equal to 1" )
 		);
 	}
 
@@ -55,9 +58,8 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"may not be null"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( "must not be null" )
 		);
 	}
 
@@ -68,9 +70,8 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"may not be null"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( "must not be null" )
 		);
 	}
 
@@ -81,9 +82,8 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"may not be null"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( "must not be null" )
 		);
 	}
 
@@ -94,9 +94,8 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"size must be between 0 and 5"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
 		);
 	}
 
@@ -107,9 +106,8 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"size must be between 0 and 5"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
 		);
 	}
 
@@ -120,9 +118,8 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertCorrectConstraintViolationMessages(
-				violations,
-				"size must be between 0 and 5"
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
 		);
 	}
 

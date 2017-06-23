@@ -6,26 +6,28 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.defaultgroupsequenceprovider;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.GroupDefinitionException;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
@@ -68,14 +70,16 @@ public class DefaultGroupSequenceProviderTest {
 		User user = new User( "$password" );
 		Set<ConstraintViolation<User>> violations = validator.validate( user );
 
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "must match \"\\w+\"" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Pattern.class ).withMessage( "must match \"\\w+\"" )
+		);
 
 		User admin = new User( "short", true );
 		violations = validator.validate( admin );
 
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "length must be between 10 and 20" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Length.class ).withMessage( "length must be between 10 and 20" )
+		);
 	}
 
 	@Test
@@ -83,14 +87,16 @@ public class DefaultGroupSequenceProviderTest {
 		User user = new User( "$password" );
 		Set<ConstraintViolation<User>> violations = validator.validateProperty( user, "password" );
 
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "must match \"\\w+\"" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Pattern.class ).withMessage( "must match \"\\w+\"" )
+		);
 
 		User admin = new User( "short", true );
 		violations = validator.validateProperty( admin, "password" );
 
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "length must be between 10 and 20" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Length.class ).withMessage( "length must be between 10 and 20" )
+		);
 	}
 
 	@Test
@@ -99,8 +105,9 @@ public class DefaultGroupSequenceProviderTest {
 				User.class, "password", "$password"
 		);
 
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "must match \"\\w+\"" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Pattern.class ).withMessage( "must match \"\\w+\"" )
+		);
 	}
 
 	@Test
@@ -111,12 +118,14 @@ public class DefaultGroupSequenceProviderTest {
 		Set<ConstraintViolation<C>> violations = validator.forExecutables().validateReturnValue(
 				c, fooMethod, c.foo( null )
 		);
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "may not be null" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( "must not be null" )
+		);
 
 		violations = validator.forExecutables().validateReturnValue( c, fooMethod, c.foo( "foo" ) );
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "length must be between 10 and 20" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Length.class ).withMessage( "length must be between 10 and 20" )
+		);
 	}
 
 	@GroupSequenceProvider(NullGroupSequenceProvider.class)
@@ -134,7 +143,7 @@ public class DefaultGroupSequenceProviderTest {
 
 	private interface C {
 
-		@NotNull(message = "may not be null")
+		@NotNull(message = "must not be null")
 		@Length(min = 10, max = 20, groups = TestGroup.class, message = "length must be between {min} and {max}")
 		String foo(String param);
 	}

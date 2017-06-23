@@ -7,14 +7,19 @@
 
 package org.hibernate.validator.test.cfg;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+
 import java.lang.reflect.Method;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -22,11 +27,8 @@ import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class CascadingWithConstraintMappingTest {
 	private HibernateValidatorConfiguration config;
@@ -55,8 +57,9 @@ public class CascadingWithConstraintMappingTest {
 
 		Set<ConstraintViolation<B>> violations = validator.validate( b );
 
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "may not be null" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( "must not be null" )
+		);
 	}
 
 	@Test
@@ -78,8 +81,9 @@ public class CascadingWithConstraintMappingTest {
 
 		Set<ConstraintViolation<B>> violations = validator.validate( b );
 
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "may not be null" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( "must not be null" )
+		);
 	}
 
 	@Test
@@ -104,8 +108,9 @@ public class CascadingWithConstraintMappingTest {
 				b, method, b.getC()
 		);
 
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "may not be null" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( "must not be null" )
+		);
 	}
 
 	private static class A {

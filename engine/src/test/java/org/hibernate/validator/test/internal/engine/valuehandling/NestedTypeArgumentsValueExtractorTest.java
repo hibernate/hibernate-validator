@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.Arrays;
@@ -30,11 +30,11 @@ import javax.validation.valueextraction.Unwrapping;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 @TestForIssue(jiraKey = "HV-1237")
 @SuppressWarnings("restriction")
@@ -51,28 +51,30 @@ public class NestedTypeArgumentsValueExtractorTest {
 	@Test
 	public void validation_of_nested_type_arguments_works_with_map_of_list_of_optional() {
 		Set<ConstraintViolation<MapOfLists>> constraintViolations = validator.validate( MapOfLists.valid() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( MapOfLists.invalidKey() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map<K>[k].<map key>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, "k", null, Map.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, "k", null, Map.class, 0 )
+						)
 		);
 
 		constraintViolations = validator.validate( MapOfLists.invalidList() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key1].<map value>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+						)
 		);
 
 		constraintViolations = validator.validate( MapOfLists.invalidString() );
@@ -80,16 +82,19 @@ public class NestedTypeArgumentsValueExtractorTest {
 				constraintViolations,
 				"map[key1].<map value>[0].<list element>",
 				"map[key1].<map value>[1].<list element>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 ),
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						),
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+						)
 		);
 
 		constraintViolations = validator.validate( MapOfLists.reallyInvalid() );
@@ -98,66 +103,79 @@ public class NestedTypeArgumentsValueExtractorTest {
 				"map<K>[k].<map key>",
 				"map[k].<map value>",
 				"map[k].<map value>[0].<list element>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class, Size.class, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, "k", null, Map.class, 0 ),
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "k", null, Map.class, 1 ),
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "k", null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, "k", null, Map.class, 0 )
+						),
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "k", null, Map.class, 1 )
+						),
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "k", null, Map.class, 1 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						)
 		);
 	}
 
 	@Test
 	public void validation_of_nested_type_arguments_works_with_map_of_list_of_stringproperty() {
 		Set<ConstraintViolation<MapOfListsWithAutomaticUnwrapping>> constraintViolations = validator.validate( MapOfListsWithAutomaticUnwrapping.valid() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( MapOfListsWithAutomaticUnwrapping.invalidStringProperty() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key].<map value>[1].<list element>" );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key", null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key", null, Map.class, 1 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+						)
 		);
 
 		constraintViolations = validator.validate( MapOfListsWithAutomaticUnwrapping.invalidListElement() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key].<map value>[0].<list element>" );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key", null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key", null, Map.class, 1 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						)
 		);
 	}
 
 	@Test
 	public void validation_of_nested_type_arguments_works_with_array_of_optional_of_stringproperty() {
 		Set<ConstraintViolation<ArrayOfOptionalsWithAutomaticUnwrapping>> constraintViolations = validator.validate( ArrayOfOptionalsWithAutomaticUnwrapping.valid() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( ArrayOfOptionalsWithAutomaticUnwrapping.invalidArray() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"array[0].<iterable element>",
 				"array[1].<iterable element>" );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "array" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null ),
-				pathWith()
-						.property( "array" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "array" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+						),
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "array" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+						)
 		);
 	}
 
@@ -167,46 +185,52 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key1].<map value>[0].<list element>",
-				"map[key1].<map value>[1].<list element>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 ),
-				pathWith()
-						.property( "map" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
-						.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+				"map[key1].<map value>[1].<list element>"
+		);
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+						),
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "map" )
+								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+						)
 		);
 	}
 
 	@Test
 	public void validation_of_nested_type_arguments_works_on_nested_arrays() {
 		Set<ConstraintViolation<NestedArray>> constraintViolations = validator.validate( NestedArray.valid() );
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( NestedArray.invalidArrayFirstDimension() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"array[0].<iterable element>" );
-		assertCorrectConstraintTypes( constraintViolations, Size.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "array" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "array" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+						)
 		);
 
 		constraintViolations = validator.validate( NestedArray.invalidArraySecondDimension() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"array[1].<iterable element>[1].<iterable element>" );
-		assertCorrectConstraintTypes( constraintViolations, Email.class );
-		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith()
-						.property( "array" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Email.class )
+						.withPropertyPath( pathWith()
+								.property( "array" )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+						)
 		);
 	}
 

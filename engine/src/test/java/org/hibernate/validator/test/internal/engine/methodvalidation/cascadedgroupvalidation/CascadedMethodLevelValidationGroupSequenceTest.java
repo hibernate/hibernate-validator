@@ -6,7 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.cascadedgroupvalidation;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -44,13 +45,14 @@ public class CascadedMethodLevelValidationGroupSequenceTest {
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "must not be null" )
+							.withInvalidValue( null )
+							.withRootBeanClass( CompoundEntityRepositoryImpl.class )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertConstraintViolation(
-					constraintViolation, NotNull.class, "may not be null", CompoundEntityRepositoryImpl.class, null
-			);
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
 			);
@@ -68,13 +70,14 @@ public class CascadedMethodLevelValidationGroupSequenceTest {
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "must not be null" )
+							.withInvalidValue( null )
+							.withRootBeanClass( CompoundEntityRepositoryImpl.class )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertConstraintViolation(
-					constraintViolation, NotNull.class, "may not be null", CompoundEntityRepositoryImpl.class, null
-			);
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup2.class
 			);
@@ -93,13 +96,14 @@ public class CascadedMethodLevelValidationGroupSequenceTest {
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "must not be null" )
+							.withInvalidValue( null )
+							.withRootBeanClass( CompoundEntityRepositoryImpl.class )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertConstraintViolation(
-					constraintViolation, NotNull.class, "may not be null", CompoundEntityRepositoryImpl.class, null
-			);
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
 			);
@@ -117,11 +121,13 @@ public class CascadedMethodLevelValidationGroupSequenceTest {
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertConstraintViolation(
-					constraintViolation, NotNull.class, "may not be null", CompoundEntityRepositoryImpl.class, null
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "must not be null" )
+							.withInvalidValue( null )
+							.withRootBeanClass( CompoundEntityRepositoryImpl.class )
 			);
+			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
 			);
@@ -139,13 +145,14 @@ public class CascadedMethodLevelValidationGroupSequenceTest {
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "must not be null" )
+							.withInvalidValue( null )
+							.withRootBeanClass( CompoundEntityRepositoryImpl.class )
+			);
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertConstraintViolation(
-					constraintViolation, NotNull.class, "may not be null", CompoundEntityRepositoryImpl.class, null
-			);
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup2.class
 			);
@@ -164,13 +171,13 @@ public class CascadedMethodLevelValidationGroupSequenceTest {
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
-
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertConstraintViolation(
-					constraintViolation, NotNull.class, "may not be null", CompoundEntityRepositoryImpl.class, null
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( NotNull.class )
+							.withMessage( "must not be null" )
+							.withInvalidValue( null )
+							.withRootBeanClass( CompoundEntityRepositoryImpl.class )
 			);
+			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
 			);

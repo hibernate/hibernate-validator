@@ -13,11 +13,10 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.lang.annotation.Documented;
@@ -41,6 +40,7 @@ import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -68,10 +68,14 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateParameters( new ModelA(), method, values );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "method.valueWithoutTypeAnnotation" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "container" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "container" )
+						.withPropertyPath( pathWith()
+								.method( "method" )
+								.parameter( "valueWithoutTypeAnnotation", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -82,7 +86,7 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateParameters( new ModelA(), method, values );
 
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -93,10 +97,14 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateParameters( new ModelB(), method, values );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "method.valueWithNotNull" );
-		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "container" )
+						.withPropertyPath( pathWith()
+								.method( "method" )
+								.parameter( "valueWithNotNull", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -107,10 +115,14 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateParameters( new ModelB(), method, values );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "method.valueWithNotNull" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "type" )
+						.withPropertyPath( pathWith()
+								.method( "method" )
+								.parameter( "valueWithNotNull", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -121,11 +133,14 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateParameters( new ModelD(), method, values );
 
-
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "method.valueWithNullOrNotBlank" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "container" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "container" )
+						.withPropertyPath( pathWith()
+								.method( "method" )
+								.parameter( "valueWithNullOrNotBlank", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -147,10 +162,20 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateParameters( new ModelC(), method, values );
 
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "method.valueWithNotNullUnwrapped", "method.valueWithNotNullUnwrapped" );
-		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlank.class, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withMessage( "container" )
+						.withPropertyPath( pathWith()
+								.method( "method" )
+								.parameter( "valueWithNotNullUnwrapped", 0 )
+						),
+				violationOf( NotBlank.class )
+						.withMessage( "type" )
+						.withPropertyPath( pathWith()
+								.method( "method" )
+								.parameter( "valueWithNotNullUnwrapped", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -161,10 +186,14 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateParameters( new ModelD(), method, values );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "method.valueWithNullOrNotBlank" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "type" );
-		assertCorrectConstraintTypes( constraintViolations, NullOrNotBlank.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NullOrNotBlank.class )
+						.withMessage( "type" )
+						.withPropertyPath( pathWith()
+								.method( "method" )
+								.parameter( "valueWithNullOrNotBlank", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -175,7 +204,7 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateParameters( new ModelE(), method, values );
 
-		assertNumberOfViolations( constraintViolations, 0 );
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -186,10 +215,14 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateParameters( new ModelE(), method, values );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "method.valueReference" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "reference" );
-		assertCorrectConstraintTypes( constraintViolations, NullOrNotBlank.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NullOrNotBlank.class )
+						.withMessage( "reference" )
+						.withPropertyPath( pathWith()
+								.method( "method" )
+								.parameter( "valueReference", 0 )
+						)
+		);
 	}
 
 	@Test
@@ -200,7 +233,7 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateParameters( new ModelE(), method, values );
 
-		assertThat( constraintViolations ).isEmpty();
+		assertNoViolations( constraintViolations );
 	}
 
 	@Test
@@ -210,9 +243,14 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateReturnValue( new ModelF(), method, Optional.of( "" ) );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "method.<return value>" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "type" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NullOrNotBlank.class )
+						.withMessage( "type" )
+						.withPropertyPath( pathWith()
+								.method( "method" )
+								.returnValue()
+						)
+		);
 	}
 
 	@Test
@@ -222,9 +260,14 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateReturnValue( new ModelF(), method, Optional.of( "" ) );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "method.<return value>" );
-		assertCorrectConstraintViolationMessages( constraintViolations, "type" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NullOrNotBlank.class )
+						.withMessage( "type" )
+						.withPropertyPath( pathWith()
+								.method( "method" )
+								.returnValue()
+						)
+		);
 	}
 
 	@ConstraintComposition(CompositionType.OR)

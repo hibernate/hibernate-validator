@@ -109,7 +109,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter04/complete/C
 Validating an invalid `Car` instance yields constraint violations with the messages shown by the
 assertions in <<example-expected-error-messages>>:
 
-* the `@NotNull` constraint on the `manufacturer` field causes the error message "may not be null", as
+* the `@NotNull` constraint on the `manufacturer` field causes the error message "must not be null", as
 this is the default message defined by the Bean Validation specification and no specific descriptor
 is given in the message attribute
 

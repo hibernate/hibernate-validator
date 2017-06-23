@@ -171,7 +171,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 		MessageInterpolatorContext messageInterpolatorContext = createMessageInterpolatorContext( notNullDescriptor );
 
-		String expected = "may not be null";
+		String expected = "must not be null";
 		String actual = interpolator.interpolate( notNull.message(), messageInterpolatorContext );
 		assertEquals( actual, expected, "Wrong substitution" );
 

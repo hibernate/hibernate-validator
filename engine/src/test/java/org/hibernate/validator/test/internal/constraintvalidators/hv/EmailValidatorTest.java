@@ -7,27 +7,28 @@
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
 import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertEquals;
 
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import javax.validation.constraints.Email;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.EmailDef;
-import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -246,8 +247,9 @@ public class EmailValidatorTest {
 	}
 
 	private void assertOrgAddressesAreNotValid(Set<ConstraintViolation<EmailContainer>> violations) {
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "ORG addresses are not valid" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Email.class ).withMessage( "ORG addresses are not valid" )
+		);
 	}
 
 	private void isValidEmail(CharSequence email, String message) {

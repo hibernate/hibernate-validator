@@ -17,7 +17,7 @@
           ignore-annotations="true">
         <getter name="name">
             <constraint annotation="javax.validation.constraints.NotNull">
-                <message>[XML] - may not be null</message>
+                <message>[XML] - must not be null</message>
             </constraint>
         </getter>
         <getter name="address">
@@ -29,7 +29,7 @@
           ignore-annotations="true">
         <getter name="city">
             <constraint annotation="javax.validation.constraints.NotNull">
-                <message>[XML] - may not be null</message>
+                <message>[XML] - must not be null</message>
             </constraint>
         </getter>
     </bean>
@@ -48,7 +48,7 @@
             <parameter type="java.lang.Long">
                 <valid/>
                 <constraint annotation="javax.validation.constraints.NotNull">
-                    <message>[XML] - may not be null</message>
+                    <message>[XML] - must not be null</message>
                 </constraint>
             </parameter>
         </method>
@@ -57,7 +57,7 @@
             <parameter type="java.lang.Long">
                 <valid/>
                 <constraint annotation="javax.validation.constraints.NotNull">
-                    <message>[XML] - may not be null</message>
+                    <message>[XML] - must not be null</message>
                 </constraint>
             </parameter>
         </method>
@@ -82,7 +82,7 @@
             <parameter type="org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer">
                 <valid/>
                 <constraint annotation="javax.validation.constraints.NotNull">
-                    <message>[XML] - may not be null</message>
+                    <message>[XML] - must not be null</message>
                 </constraint>
             </parameter>
         </method>
@@ -90,7 +90,7 @@
         <method name="findCustomerByName">
             <parameter type="java.lang.String">
                 <constraint annotation="javax.validation.constraints.NotNull">
-                    <message>[XML] - may not be null</message>
+                    <message>[XML] - must not be null</message>
                 </constraint>
             </parameter>
             <return-value>
@@ -107,7 +107,7 @@
             </parameter>
             <parameter type="java.lang.String">
                 <constraint annotation="javax.validation.constraints.NotNull">
-                    <message>[XML] - may not be null</message>
+                    <message>[XML] - must not be null</message>
                 </constraint>
             </parameter>
         </method>
@@ -115,12 +115,12 @@
         <method name="methodWithCrossParameterConstraint">
             <parameter type="org.joda.time.DateMidnight">
                 <constraint annotation="javax.validation.constraints.NotNull">
-                    <message>[XML] - may not be null</message>
+                    <message>[XML] - must not be null</message>
                 </constraint>
             </parameter>
             <parameter type="org.joda.time.DateMidnight">
                 <constraint annotation="javax.validation.constraints.NotNull">
-                    <message>[XML] - may not be null</message>
+                    <message>[XML] - must not be null</message>
                 </constraint>
             </parameter>
             <cross-parameter>
@@ -133,7 +133,7 @@
         <method name="getFoo">
             <parameter type="java.lang.String">
                 <constraint annotation="org.hibernate.validator.constraints.NotEmpty">
-                    <message>[XML] - may not be null</message>
+                    <message>[XML] - must not be null</message>
                 </constraint>
             </parameter>
         </method>
@@ -201,7 +201,7 @@
         <method name="parameterConstraintInGroup">
             <parameter type="java.lang.String">
                 <constraint annotation="javax.validation.constraints.NotNull">
-                    <message>[XML] - may not be null</message>
+                    <message>[XML] - must not be null</message>
                     <groups>
                         <value>
                             org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepository$ValidationGroup

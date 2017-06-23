@@ -6,9 +6,8 @@
  */
 package org.hibernate.validator.test.constraintvalidator;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.Set;
@@ -17,6 +16,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -38,22 +38,27 @@ public class ConstraintDefinitionContributorTest {
 	@Test
 	public void constraint_definitions_can_be_configured_via_service_loader() {
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo() );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintTypes( constraintViolations, MustMatch.class );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( MustMatch.class )
+		);
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-953")
+	@TestForIssue(jiraKey = "HV-953")
 	public void constraints_defined_via_constraint_definition_contributor_can_have_default_message() {
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo() );
-		assertCorrectConstraintViolationMessages( constraintViolations, "MustMatch default message" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( MustMatch.class ).withMessage( "MustMatch default message" )
+		);
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-953")
+	@TestForIssue(jiraKey = "HV-953")
 	public void user_can_override_default_message_of_constraint_definition_contributor() {
 		Set<ConstraintViolation<Quz>> constraintViolations = validator.validate( new Quz() );
-		assertCorrectConstraintViolationMessages( constraintViolations, "MustNotMatch user message" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( MustNotMatch.class ).withMessage( "MustNotMatch user message" )
+		);
 	}
 
 	public class Foo {

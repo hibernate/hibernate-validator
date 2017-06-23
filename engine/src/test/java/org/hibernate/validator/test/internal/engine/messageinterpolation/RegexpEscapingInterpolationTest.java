@@ -6,7 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.Set;
 
@@ -27,7 +28,9 @@ public class RegexpEscapingInterpolationTest {
 
 		Set<ConstraintViolation<PatternWithCharactersUsedForInterpolationEntity>> violations = validator.validate( new PatternWithCharactersUsedForInterpolationEntity( "test" ) );
 
-		assertCorrectConstraintViolationMessages( violations, "must match \"" + REGEXP_CONTAINING_SPECIAL_CHARACTERS + "\"" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Pattern.class ).withMessage( "must match \"" + REGEXP_CONTAINING_SPECIAL_CHARACTERS + "\"" )
+		);
 	}
 
 	private static class PatternWithCharactersUsedForInterpolationEntity {

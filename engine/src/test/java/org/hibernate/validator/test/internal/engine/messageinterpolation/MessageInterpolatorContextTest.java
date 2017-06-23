@@ -7,8 +7,18 @@
 
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
+
 import java.util.Collections;
 import java.util.Set;
+
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
@@ -24,15 +34,8 @@ import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-import org.testng.annotations.Test;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -75,7 +78,9 @@ public class MessageInterpolatorContextTest {
 		replay( mock );
 
 		Set<ConstraintViolation<TestBean>> violations = validator.validate( new TestBean( validatedValue ) );
-		assertNumberOfViolations( violations, 1 );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "invalid" )
+		);
 
 		// verify that the right context was passed
 		verify( mock );
