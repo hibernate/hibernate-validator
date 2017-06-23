@@ -196,13 +196,6 @@ public class ValidationXmlParser {
 				: getValidatedExecutableTypes( executableValidationType.getDefaultValidatedExecutableTypes() );
 		boolean executableValidationEnabled = executableValidationType == null || executableValidationType.getEnabled();
 
-		Set<String> valueExtractorClassNames = new HashSet<>();
-		for ( String className : config.getValueExtractor() ) {
-			if ( !valueExtractorClassNames.add( className ) ) {
-				throw log.getDuplicateDefinitionsOfValueExtractorException( className );
-			}
-		}
-
 		return new BootstrapConfigurationImpl(
 				config.getDefaultProvider(),
 				config.getConstraintValidatorFactory(),
@@ -210,12 +203,22 @@ public class ValidationXmlParser {
 				config.getTraversableResolver(),
 				config.getParameterNameProvider(),
 				config.getClockProvider(),
-				valueExtractorClassNames,
+				getValueExtractorClassNames( config ),
 				defaultValidatedExecutableTypes,
 				executableValidationEnabled,
 				new HashSet<>( config.getConstraintMapping() ),
 				properties
 		);
+	}
+
+	private Set<String> getValueExtractorClassNames(ValidationConfigType config) {
+		Set<String> valueExtractorClassNames = CollectionHelper.newHashSet( config.getValueExtractor().size() );
+		for ( String className : config.getValueExtractor() ) {
+			if ( !valueExtractorClassNames.add( className ) ) {
+				throw log.getDuplicateDefinitionsOfValueExtractorException( className );
+			}
+		}
+		return valueExtractorClassNames;
 	}
 
 	/**

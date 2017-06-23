@@ -769,6 +769,6 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassObjectFormatter.class) Class<? extends ValueExtractor> extractorImplementationType,
 			@Cause Exception e);
 
-	@Message(id = 222, value = "The same value extractor %s is added more than once via the XML mapping configuration.")
+	@Message(id = 222, value = "The same value extractor %s is added more than once via the XML configuration.")
 	ValueExtractorDeclarationException getDuplicateDefinitionsOfValueExtractorException(String className);
 }
