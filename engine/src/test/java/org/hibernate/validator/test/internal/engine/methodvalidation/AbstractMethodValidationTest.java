@@ -274,7 +274,7 @@ public abstract class AbstractMethodValidationTest {
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"cascadingMapParameter.customer[Bob].name"
+					"cascadingMapParameter.customer[key('Bob')].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -623,7 +623,7 @@ public abstract class AbstractMethodValidationTest {
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"cascadingMapReturnValue.<return value>[Bob].name"
+					"cascadingMapReturnValue.<return value>[key('Bob')].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );

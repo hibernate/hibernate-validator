@@ -17,6 +17,8 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +66,7 @@ public class ContainerElementStringRepresentationTest {
 
 		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statistics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[null, Lyon].street" );
+		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[key('null, Lyon')].street" );
 
 		invalidAddress = new Address( "rue Garibaldi", new City( "L" ) );
 		statistics = new DemographicStatistics();
@@ -72,7 +74,7 @@ public class ContainerElementStringRepresentationTest {
 
 		constraintViolations = validator.validate( statistics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[rue Garibaldi, L].city.name" );
+		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[key('rue Garibaldi, L')].city.name" );
 	}
 
 	@Test
@@ -83,7 +85,7 @@ public class ContainerElementStringRepresentationTest {
 
 		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statistics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[rue Garibaldi, Lyon]" );
+		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[key('rue Garibaldi, Lyon')]" );
 	}
 
 	@Test
@@ -94,7 +96,7 @@ public class ContainerElementStringRepresentationTest {
 
 		Set<ConstraintViolation<State>> constraintViolations = validator.validate( state );
 
-		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[Lyon].<map value>" );
+		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[key('Lyon')].<map value>" );
 	}
 
 	@Test
@@ -106,7 +108,7 @@ public class ContainerElementStringRepresentationTest {
 
 		Set<ConstraintViolation<State>> constraintViolations = validator.validate( state );
 
-		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[Lyon].street" );
+		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[key('Lyon')].street" );
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
@@ -121,7 +123,7 @@ public class ContainerElementStringRepresentationTest {
 
 		constraintViolations = validator.validate( state );
 
-		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[Lyon].city.name" );
+		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[key('Lyon')].city.name" );
 	}
 
 	@Test
@@ -133,7 +135,7 @@ public class ContainerElementStringRepresentationTest {
 
 		Set<ConstraintViolation<State>> constraintViolations = validator.validate( state );
 
-		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[Lyon]" );
+		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[key('Lyon')]" );
 	}
 
 	@Test
@@ -178,6 +180,34 @@ public class ContainerElementStringRepresentationTest {
 		Set<ConstraintViolation<Block>> constraintViolations = validator.validate( block );
 
 		assertCorrectPropertyPaths( constraintViolations, "addresses[0]" );
+	}
+
+	@Test
+	public void booleanKeyPathTest() throws Exception {
+
+		Set<ConstraintViolation<Bar>> violations = validator.validate( Bar.invalid() );
+
+		assertCorrectPropertyPaths(
+				violations,
+				"property[].<map value>",
+				"property<K>[].<map key>",
+				"property[false].<map value>",
+				"property[true].<map value>"
+		);
+	}
+
+	@Test
+	public void dateKeyPathTest() throws Exception {
+
+		Set<ConstraintViolation<Foo>> violations = validator.validate( Foo.invalid() );
+
+		assertCorrectPropertyPaths(
+				violations,
+				"property[].<map value>",
+				"property<K>[].<map key>",
+				"property[2017-06-24].<map value>",
+				"property[2017-06-24T00:00].<map value>"
+		);
 	}
 
 	private static class DemographicStatistics {
@@ -245,6 +275,32 @@ public class ContainerElementStringRepresentationTest {
 			return name;
 		}
 
+	}
+
+	private static class Foo {
+
+		private final Map<@NotNull TemporalAccessor, @NotNull String> property = new HashMap<>();
+
+		private static Foo invalid() {
+			Foo foo = new Foo();
+			foo.property.put( null, null );
+			foo.property.put( LocalDate.of( 2017, 6, 24 ), null );
+			foo.property.put( LocalDate.of( 2017, 6, 24 ).atStartOfDay(), null );
+			return foo;
+		}
+	}
+
+	private static class Bar {
+
+		private final Map<@NotNull Boolean, @NotNull String> property = new HashMap<>();
+
+		private static Bar invalid() {
+			Bar foo = new Bar();
+			foo.property.put( null, null );
+			foo.property.put( true, null );
+			foo.property.put( false, null );
+			return foo;
+		}
 	}
 
 	@Target({ TYPE, ANNOTATION_TYPE })

@@ -56,7 +56,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		constraintViolations = validator.validate( MapOfLists.invalidKey() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map<K>[k].<map key>" );
+				"map<K>[key('k')].<map key>" );
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
@@ -68,7 +68,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		constraintViolations = validator.validate( MapOfLists.invalidList() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map[key1].<map value>" );
+				"map[key('key1')].<map value>" );
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
@@ -80,8 +80,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 		constraintViolations = validator.validate( MapOfLists.invalidString() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map[key1].<map value>[0].<list element>",
-				"map[key1].<map value>[1].<list element>" );
+				"map[key('key1')].<map value>[0].<list element>",
+				"map[key('key1')].<map value>[1].<list element>" );
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
@@ -100,9 +100,9 @@ public class NestedTypeArgumentsValueExtractorTest {
 		constraintViolations = validator.validate( MapOfLists.reallyInvalid() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map<K>[k].<map key>",
-				"map[k].<map value>",
-				"map[k].<map value>[0].<list element>" );
+				"map<K>[key('k')].<map key>",
+				"map[key('k')].<map value>",
+				"map[key('k')].<map value>[0].<list element>" );
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
@@ -131,7 +131,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		constraintViolations = validator.validate( MapOfListsWithAutomaticUnwrapping.invalidStringProperty() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map[key].<map value>[1].<list element>" );
+				"map[key('key')].<map value>[1].<list element>" );
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
@@ -144,7 +144,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		constraintViolations = validator.validate( MapOfListsWithAutomaticUnwrapping.invalidListElement() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map[key].<map value>[0].<list element>" );
+				"map[key('key')].<map value>[0].<list element>" );
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
@@ -184,8 +184,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 		Set<ConstraintViolation<MapOfListsUsingGetter>> constraintViolations = validator.validate( MapOfListsUsingGetter.invalidString() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map[key1].<map value>[0].<list element>",
-				"map[key1].<map value>[1].<list element>"
+				"map[key('key1')].<map value>[0].<list element>",
+				"map[key('key1')].<map value>[1].<list element>"
 		);
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( Size.class )
