@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
@@ -92,6 +93,11 @@ public class FieldCascadable implements Cascadable {
 		private Field getAccessible(Field original) {
 			if ( ( (AccessibleObject) original ).isAccessible() ) {
 				return original;
+			}
+
+			SecurityManager sm = System.getSecurityManager();
+			if ( sm != null ) {
+				sm.checkPermission( HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS );
 			}
 
 			Class<?> clazz = original.getDeclaringClass();

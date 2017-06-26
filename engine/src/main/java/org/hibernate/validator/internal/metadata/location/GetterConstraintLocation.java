@@ -12,6 +12,7 @@ import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -77,7 +78,6 @@ public class GetterConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
-	// TODO Probably this should be done with a security check to prevent direct usage by external clients
 	public Object getValue(Object parent) {
 		return ReflectionHelper.getValue( accessibleMethod, parent );
 	}
@@ -123,6 +123,11 @@ public class GetterConstraintLocation implements ConstraintLocation {
 	private static Method getAccessible(Method original) {
 		if ( ( (AccessibleObject) original ).isAccessible() ) {
 			return original;
+		}
+
+		SecurityManager sm = System.getSecurityManager();
+		if ( sm != null ) {
+			sm.checkPermission( HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS );
 		}
 
 		Class<?> clazz = original.getDeclaringClass();

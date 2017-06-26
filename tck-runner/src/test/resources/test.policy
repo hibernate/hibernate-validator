@@ -28,6 +28,8 @@ grant codeBase "file:${localRepository}/org/hibernate/validator/hibernate-valida
     permission java.lang.RuntimePermission "accessDeclaredMembers";
     permission java.lang.RuntimePermission "setContextClassLoader";
 
+    permission org.hibernate.validator.HibernateValidatorPermission "accessPrivateMembers";
+
     // JAXB
     permission java.util.PropertyPermission "mapAnyUriToUri", "read";
 };
@@ -38,6 +40,8 @@ grant codeBase "file:${basedir}/../engine/target/hibernate-validator-${project.v
     permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     permission java.lang.RuntimePermission "accessDeclaredMembers";
     permission java.lang.RuntimePermission "setContextClassLoader";
+
+    permission org.hibernate.validator.HibernateValidatorPermission "accessPrivateMembers";
 
     // JAXB
     permission java.util.PropertyPermission "mapAnyUriToUri", "read";
@@ -81,6 +85,7 @@ grant codeBase "file:${project.build.directory}/classes" {
     permission java.util.PropertyPermission "validation.provider", "read";
     permission java.io.FilePermission "${localRepository}/org/hibernate/beanvalidation/tck/beanvalidation-tck-tests/${tck.version}/beanvalidation-tck-tests-${tck.version}.jar", "read";
     permission java.util.PropertyPermission "user.language", "write";
+    permission org.hibernate.validator.HibernateValidatorPermission "accessPrivateMembers";
 };
 
 grant codeBase "file:${project.build.directory}/test-classes" {
