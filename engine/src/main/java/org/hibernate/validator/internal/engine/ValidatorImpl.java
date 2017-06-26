@@ -576,7 +576,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 				if ( value != null && cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements() ) {
 					if ( cascadingMetaData.isCascading() ) {
-						ValueExtractorDescriptor extractor = valueExtractorManager.getValueExtractor(
+						ValueExtractorDescriptor extractor = valueExtractorManager.getMaximallySpecificAndContainerElementCompliantValueExtractor(
 								value.getClass(),
 								cascadable.getCascadingMetaData().getTypeParameter() );
 
@@ -609,7 +609,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			);
 
 			for ( TypeVariable<?> cascadingTypeParameterOfValueType : cascadingTypeParametersOfValueType ) {
-				ValueExtractorDescriptor extractor = valueExtractorManager.getValueExtractor(
+				ValueExtractorDescriptor extractor = valueExtractorManager.getMaximallySpecificAndContainerElementCompliantValueExtractor(
 						value.getClass(),
 						cascadingTypeParameterOfValueType
 				);
