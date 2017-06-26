@@ -23,7 +23,7 @@
 
 // replace with this when debugging in the IDE with workspace resolution
 // grant codeBase "file:/<project-dir>/engine/target/classes/" {
-grant codeBase "file:${localRepository}/org/hibernate/hibernate-validator/${project.version}/hibernate-validator-${project.version}.jar" {
+grant codeBase "file:${localRepository}/org/hibernate/validator/hibernate-validator/${project.version}/hibernate-validator-${project.version}.jar" {
     permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     permission java.lang.RuntimePermission "accessDeclaredMembers";
     permission java.lang.RuntimePermission "setContextClassLoader";
