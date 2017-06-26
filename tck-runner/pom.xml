@@ -177,7 +177,9 @@
                 <!-- Use Local for testing without security manager -->
                 <arquillian.protocol>LocalSecurityManagerTesting</arquillian.protocol>
                 <!-- Remove for testing without security manager -->
-                <maven-surefire-plugin.argLine>-Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/test.policy -Djava.security.debug=access</maven-surefire-plugin.argLine>
+                <maven-surefire-plugin.argLine>-Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/test.policy</maven-surefire-plugin.argLine>
+                <!-- Uncomment the following line to obtain the access log of the security manager -->
+                <!--<maven-surefire-plugin.argLine>-Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/test.policy -Djava.security.debug=access</maven-surefire-plugin.argLine>-->
             </properties>
             <dependencies>
                 <dependency>
