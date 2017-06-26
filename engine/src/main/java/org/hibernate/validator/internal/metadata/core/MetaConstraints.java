@@ -12,8 +12,11 @@ import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.metadata.ValidateUnwrappedValue;
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
@@ -23,6 +26,7 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -72,28 +76,56 @@ public class MetaConstraints {
 		}
 
 		Class<?> declaredType = TypeHelper.getErasedReferenceType( location.getTypeForValidatorResolution() );
-		ValueExtractorDescriptor valueExtractorDescriptorCandidate = valueExtractorManager.getValueExtractor( declaredType );
+		Set<ValueExtractorDescriptor> valueExtractorDescriptorCandidates = valueExtractorManager.getMaximallySpecificValueExtractors( declaredType );
+		ValueExtractorDescriptor selectedValueExtractorDescriptor;
 
-		if ( ValidateUnwrappedValue.DEFAULT.equals( constraintDescriptor.validateUnwrappedValue() )
-				&& ( valueExtractorDescriptorCandidate == null
-						|| !valueExtractorDescriptorCandidate.isUnwrapByDefault() ) ) {
-			return location.getTypeForValidatorResolution();
-		}
-		else {
-			if ( valueExtractorDescriptorCandidate == null ) {
-				throw LOG.getNoValueExtractorFoundForTypeException( declaredType, null );
+		// we want to force the unwrapping so we require one and only one maximally specific value extractors
+		if ( ValidateUnwrappedValue.YES.equals( constraintDescriptor.validateUnwrappedValue() ) ) {
+			switch ( valueExtractorDescriptorCandidates.size() ) {
+				case 0:
+					throw LOG.getNoValueExtractorFoundForTypeException( declaredType, null );
+				case 1:
+					selectedValueExtractorDescriptor = valueExtractorDescriptorCandidates.iterator().next();
+					break;
+				default:
+					@SuppressWarnings("rawtypes")
+					List<Class<? extends ValueExtractor>> valueExtractorCandidates = valueExtractorDescriptorCandidates.stream()
+							.map( valueExtractorDescriptor -> valueExtractorDescriptor.getValueExtractor().getClass() )
+							.collect( Collectors.toList() );
+					throw LOG.unableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclared( declaredType, valueExtractorCandidates );
 			}
-
-			valueExtractionPath.add( TypeParameterAndExtractor.of( valueExtractorDescriptorCandidate ) );
-
-			return valueExtractorDescriptorCandidate.getExtractedType()
-					.orElseGet( () ->
-						getSingleTypeParameterBind( typeResolutionHelper,
-								location.getTypeForValidatorResolution(),
-								valueExtractorDescriptorCandidate.getContainerType()
-						)
-					);
 		}
+		// we are in the implicit (DEFAULT) case so:
+		// - if we don't have a maximally specific value extractor marked with @UnwrapByDefault, we don't unwrap
+		// - if we have one maximally specific value extractors that is marked with @UnwrapByDefault, we unwrap
+		// - otherwise, we throw an exception as we can't choose between the value extractors
+		else {
+			Set<ValueExtractorDescriptor> unwrapByDefaultValueExtractorDescriptorCandidates = valueExtractorDescriptorCandidates.stream()
+					.filter( ved -> ved.isUnwrapByDefault() )
+					.collect( Collectors.toSet() );
+
+			switch ( unwrapByDefaultValueExtractorDescriptorCandidates.size() ) {
+				case 0:
+					return location.getTypeForValidatorResolution();
+				case 1:
+					selectedValueExtractorDescriptor = unwrapByDefaultValueExtractorDescriptorCandidates.iterator().next();
+					break;
+				default:
+					@SuppressWarnings("rawtypes")
+					List<Class<? extends ValueExtractor>> unwrapByDefaultValueExtractorCandidates = unwrapByDefaultValueExtractorDescriptorCandidates.stream()
+							.map( valueExtractorDescriptor -> valueExtractorDescriptor.getValueExtractor().getClass() )
+							.collect( Collectors.toList() );
+					throw LOG.implicitUnwrappingNotAllowedWhenSeveralMaximallySpecificValueExtractorsMarkedWithUnwrapByDefaultDeclared( declaredType,
+							unwrapByDefaultValueExtractorCandidates );
+			}
+		}
+
+		valueExtractionPath.add( TypeParameterAndExtractor.of( selectedValueExtractorDescriptor ) );
+
+		return selectedValueExtractorDescriptor.getExtractedType()
+				.orElseGet( () -> getSingleTypeParameterBind( typeResolutionHelper,
+						location.getTypeForValidatorResolution(),
+						selectedValueExtractorDescriptor ) );
 	}
 
 	private static void addValueExtractorDescriptorForTypeArgumentLocation( ValueExtractorManager valueExtractorManager,
@@ -101,7 +133,8 @@ public class MetaConstraints {
 		Class<?> declaredType = typeArgumentConstraintLocation.getContainerClass();
 		TypeVariable<?> typeParameter = typeArgumentConstraintLocation.getTypeParameter();
 
-		ValueExtractorDescriptor valueExtractorDescriptor = valueExtractorManager.getValueExtractor( declaredType, typeParameter );
+		ValueExtractorDescriptor valueExtractorDescriptor = valueExtractorManager
+				.getMaximallySpecificAndContainerElementCompliantValueExtractor( declaredType, typeParameter );
 
 		if ( valueExtractorDescriptor == null ) {
 			throw LOG.getNoValueExtractorFoundForTypeException( declaredType, typeParameter );
@@ -114,18 +147,15 @@ public class MetaConstraints {
 	 * Returns the sub-types binding for the single type parameter of the super-type. E.g. for {@code IntegerProperty}
 	 * and {@code Property<T>}, {@code Integer} would be returned.
 	 */
-	static Class<?> getSingleTypeParameterBind(TypeResolutionHelper typeResolutionHelper, Type subType, Class<?> superType) {
-		ResolvedType resolvedType = typeResolutionHelper.getTypeResolver().resolve( subType );
-		List<ResolvedType> resolvedTypeParameters = resolvedType.typeParametersFor( superType );
+	static Class<?> getSingleTypeParameterBind(TypeResolutionHelper typeResolutionHelper, Type declaredType, ValueExtractorDescriptor valueExtractorDescriptor) {
+		ResolvedType resolvedType = typeResolutionHelper.getTypeResolver().resolve( declaredType );
+		List<ResolvedType> resolvedTypeParameters = resolvedType.typeParametersFor( valueExtractorDescriptor.getContainerType() );
 
 		if ( resolvedTypeParameters.isEmpty() ) {
-			throw LOG.getNoValueExtractorFoundForUnwrapException( subType );
-		}
-		else if ( resolvedTypeParameters.size() > 1 ) {
-			throw LOG.getUnableToExtractValueForTypeWithMultipleTypeParametersException(  subType );
+			throw LOG.getNoValueExtractorFoundForUnwrapException( declaredType );
 		}
 		else {
-			return resolvedTypeParameters.iterator().next().getErasedType();
+			return resolvedTypeParameters.get( TypeVariables.getTypeParameterIndex( valueExtractorDescriptor.getExtractedTypeParameter() ) ).getErasedType();
 		}
 	}
 

@@ -119,18 +119,24 @@ public class ValueExtractorManager {
 	}
 
 	/**
-	 * Returns the most specific value extractor extracting the given type or {@code null} if none was found.
+	 * Returns the maximally specific type compliant value extractors or an empty set if none was found.
 	 */
-	public ValueExtractorDescriptor getValueExtractor(Class<?> valueType) {
+	public Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> valueType) {
 		List<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
 				.stream()
 				.filter( e -> TypeHelper.isAssignable( TypeHelper.getErasedReferenceType( e.getContainerType() ), valueType ) )
 				.collect( Collectors.toList() );
 
-		return getMostSpecific( valueType, typeCompatibleExtractors );
+		return getMaximallySpecificValueExtractors( valueType, typeCompatibleExtractors );
 	}
 
-	public ValueExtractorDescriptor getValueExtractor(Class<?> valueType, TypeVariable<?> typeParameter) {
+	/**
+	 * Returns the maximally specific type-compliant and container-element-compliant value extractor or
+	 * {@code null} if none was found.
+	 * <p>
+	 * Throws an exception if more than 2 maximally specific container-element-compliant value extractors are found.
+	 */
+	public ValueExtractorDescriptor getMaximallySpecificAndContainerElementCompliantValueExtractor(Class<?> valueType, TypeVariable<?> typeParameter) {
 		boolean isInternal = TypeVariables.isInternal( typeParameter );
 		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings = null;
 
@@ -143,7 +149,7 @@ public class ValueExtractorManager {
 				.filter( e -> TypeHelper.isAssignable( e.getContainerType(), valueType ) )
 				.collect( Collectors.toList() );
 
-		List<ValueExtractorDescriptor> typeParameterCompatibleExtractors = new ArrayList<>();
+		List<ValueExtractorDescriptor> containerElementCompliantExtractors = new ArrayList<>();
 
 		for ( ValueExtractorDescriptor extractorDescriptor : typeCompatibleExtractors ) {
 			TypeVariable<?> typeParameterBoundToExtractorType;
@@ -157,36 +163,15 @@ public class ValueExtractorManager {
 			}
 
 			if ( Objects.equals( extractorDescriptor.getExtractedTypeParameter(), typeParameterBoundToExtractorType ) ) {
-				typeParameterCompatibleExtractors.add( extractorDescriptor );
+				containerElementCompliantExtractors.add( extractorDescriptor );
 			}
 		}
 
-		return getMostSpecific( valueType, typeParameterCompatibleExtractors );
+		return getMaximallySpecificValueExtractor( valueType, containerElementCompliantExtractors );
 	}
 
-	private ValueExtractorDescriptor getMostSpecific(Class<?> valueType, List<ValueExtractorDescriptor> extractors) {
-		Set<ValueExtractorDescriptor> candidates = CollectionHelper.newHashSet( extractors.size() );
-
-		for ( ValueExtractorDescriptor descriptor : extractors ) {
-			if ( candidates.isEmpty() ) {
-				candidates.add( descriptor );
-				continue;
-			}
-			Iterator<ValueExtractorDescriptor> candidatesIterator = candidates.iterator();
-			boolean isNewRoot = true;
-			while ( candidatesIterator.hasNext() ) {
-				ValueExtractorDescriptor candidate = candidatesIterator.next();
-				if ( TypeHelper.isAssignable( candidate.getContainerType(), descriptor.getContainerType() ) ) {
-					candidatesIterator.remove();
-				}
-				else if ( TypeHelper.isAssignable( descriptor.getContainerType(), candidate.getContainerType() ) ) {
-					isNewRoot = false;
-				}
-			}
-			if ( isNewRoot ) {
-				candidates.add( descriptor );
-			}
-		}
+	private ValueExtractorDescriptor getMaximallySpecificValueExtractor(Class<?> valueType, List<ValueExtractorDescriptor> extractors) {
+		Set<ValueExtractorDescriptor> candidates = getMaximallySpecificValueExtractors( valueType, extractors );
 
 		if ( candidates.isEmpty() ) {
 			return null;
@@ -199,8 +184,42 @@ public class ValueExtractorManager {
 			List<Class<? extends ValueExtractor>> valueExtractorCandidates = candidates.stream()
 					.map( valueExtractorDescriptor -> valueExtractorDescriptor.getValueExtractor().getClass() )
 					.collect( Collectors.toList() );
-			throw LOG.unableToGetMostSpecificValueExtractorDueToSeveralValueExtractorsDefinedForParallelHierarchies( valueType, valueExtractorCandidates );
+			throw LOG.unableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclared( valueType, valueExtractorCandidates );
 		}
+	}
+
+	private Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> valueType, List<ValueExtractorDescriptor> extractors) {
+		Set<ValueExtractorDescriptor> candidates = CollectionHelper.newHashSet( extractors.size() );
+
+		for ( ValueExtractorDescriptor descriptor : extractors ) {
+			if ( candidates.isEmpty() ) {
+				candidates.add( descriptor );
+				continue;
+			}
+			Iterator<ValueExtractorDescriptor> candidatesIterator = candidates.iterator();
+			boolean isNewRoot = true;
+			while ( candidatesIterator.hasNext() ) {
+				ValueExtractorDescriptor candidate = candidatesIterator.next();
+
+				// we consider the strictly more specific value extractor so 2 value extractors for the same container
+				// type should throw an error in the end if no other more specific value extractor is found.
+				if ( candidate.getContainerType().equals( descriptor.getContainerType() ) ) {
+					continue;
+				}
+
+				if ( TypeHelper.isAssignable( candidate.getContainerType(), descriptor.getContainerType() ) ) {
+					candidatesIterator.remove();
+				}
+				else if ( TypeHelper.isAssignable( descriptor.getContainerType(), candidate.getContainerType() ) ) {
+					isNewRoot = false;
+				}
+			}
+			if ( isNewRoot ) {
+				candidates.add( descriptor );
+			}
+		}
+
+		return candidates;
 	}
 
 	@Override

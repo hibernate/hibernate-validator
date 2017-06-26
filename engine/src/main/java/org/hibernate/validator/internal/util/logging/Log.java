@@ -689,9 +689,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 198, value = "No suitable value extractor found for type %1$s.")
 	ConstraintDeclarationException getNoValueExtractorFoundForUnwrapException(Type type);
 
-	@Message(id = 199, value = "Cannot extract value for type %1$s with more than one type parameters.")
-	ConstraintDeclarationException getUnableToExtractValueForTypeWithMultipleTypeParametersException(Type type);
-
 	@LogMessage(level = INFO)
 	@Message(id = 200, value = "Using %s as clock provider.")
 	void usingClockProvider(@FormatWith(ClassObjectFormatter.class) Class<? extends ClockProvider> clockProviderClass);
@@ -754,8 +751,9 @@ public interface Log extends BasicLogger {
 	ValueExtractorDefinitionException getParallelDefinitionsOfValueExtractorException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorImplementationType);
 
 	@SuppressWarnings("rawtypes")
-	@Message(id = 219, value = "Unable to get the most specific value extractor for type %1$s as several value extractors are defined in this type's parallel hierarchies: %2$s.")
-	ConstraintDeclarationException unableToGetMostSpecificValueExtractorDueToSeveralValueExtractorsDefinedForParallelHierarchies(@FormatWith(ClassObjectFormatter.class) Class<?> valueType,
+	@Message(id = 219, value = "Unable to get the most specific value extractor for type %1$s as several most specific value extractors are declared: %2$s.")
+	ConstraintDeclarationException unableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclared(
+			@FormatWith(ClassObjectFormatter.class) Class<?> valueType,
 			@FormatWith(CollectionOfClassesObjectFormatter.class) Collection<Class<? extends ValueExtractor>> valueExtractors);
 
 	@SuppressWarnings("rawtypes")
@@ -771,4 +769,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 222, value = "The same value extractor %s is added more than once via the XML configuration.")
 	ValueExtractorDeclarationException getDuplicateDefinitionsOfValueExtractorException(String className);
+
+	@SuppressWarnings("rawtypes")
+	@Message(id = 223, value = "Implicit unwrapping is not allowed for type %1$s as several maximally specific value extractors marked with @UnwrapByDefault are declared: %2$s.")
+	ConstraintDeclarationException implicitUnwrappingNotAllowedWhenSeveralMaximallySpecificValueExtractorsMarkedWithUnwrapByDefaultDeclared(
+			@FormatWith(ClassObjectFormatter.class) Class<?> valueType,
+			@FormatWith(CollectionOfClassesObjectFormatter.class) Collection<Class<? extends ValueExtractor>> valueExtractors);
 }
