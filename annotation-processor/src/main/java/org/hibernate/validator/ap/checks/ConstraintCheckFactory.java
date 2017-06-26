@@ -19,6 +19,7 @@ import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParamete
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersPatternCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersScriptAssertCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersSizeLengthCheck;
+import org.hibernate.validator.ap.checks.annotationparameters.AnnotationPayloadUnwrappingCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationUserMessageCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.GroupSequenceCheck;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
@@ -108,7 +109,8 @@ public class ConstraintCheckFactory {
 						new AnnotationParametersDigitsCheck( annotationApiHelper ),
 						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper ),
 						new AnnotationParametersGroupsCheck( annotationApiHelper ),
-						new AnnotationUserMessageCheck( annotationApiHelper )
+						new AnnotationUserMessageCheck( annotationApiHelper ),
+						new AnnotationPayloadUnwrappingCheck( annotationApiHelper, typeUtils )
 				)
 		);
 		fieldChecks.put(
@@ -123,7 +125,8 @@ public class ConstraintCheckFactory {
 						new AnnotationParametersDigitsCheck( annotationApiHelper ),
 						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper ),
 						new AnnotationParametersGroupsCheck( annotationApiHelper ),
-						new AnnotationUserMessageCheck( annotationApiHelper )
+						new AnnotationUserMessageCheck( annotationApiHelper ),
+						new AnnotationPayloadUnwrappingCheck( annotationApiHelper, typeUtils )
 				)
 		);
 		fieldChecks.put(
@@ -146,7 +149,8 @@ public class ConstraintCheckFactory {
 						new AnnotationParametersDigitsCheck( annotationApiHelper ),
 						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper ),
 						new AnnotationParametersGroupsCheck( annotationApiHelper ),
-						new AnnotationUserMessageCheck( annotationApiHelper )
+						new AnnotationUserMessageCheck( annotationApiHelper ),
+						new AnnotationPayloadUnwrappingCheck( annotationApiHelper, typeUtils )
 				)
 		);
 		methodChecks.put(
@@ -163,7 +167,8 @@ public class ConstraintCheckFactory {
 						new AnnotationParametersDigitsCheck( annotationApiHelper ),
 						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper ),
 						new AnnotationParametersGroupsCheck( annotationApiHelper ),
-						new AnnotationUserMessageCheck( annotationApiHelper )
+						new AnnotationUserMessageCheck( annotationApiHelper ),
+						new AnnotationPayloadUnwrappingCheck( annotationApiHelper, typeUtils )
 				)
 		);
 		methodChecks.put(
@@ -184,7 +189,8 @@ public class ConstraintCheckFactory {
 						new AnnotationParametersDigitsCheck( annotationApiHelper ),
 						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper ),
 						new AnnotationParametersGroupsCheck( annotationApiHelper ),
-						new AnnotationUserMessageCheck( annotationApiHelper )
+						new AnnotationUserMessageCheck( annotationApiHelper ),
+						new AnnotationPayloadUnwrappingCheck( annotationApiHelper, typeUtils )
 				)
 		);
 		annotationTypeChecks.put(
