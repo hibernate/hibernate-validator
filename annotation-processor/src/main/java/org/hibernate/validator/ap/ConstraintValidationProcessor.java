@@ -8,6 +8,7 @@ package org.hibernate.validator.ap;
 
 import java.util.List;
 import java.util.Set;
+
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
@@ -20,9 +21,11 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.element.TypeElement;
 
-import org.hibernate.validator.ap.util.AnnotationApiHelper;
-import org.hibernate.validator.ap.util.Configuration;
-import org.hibernate.validator.ap.util.MessagerAdapter;
+import org.hibernate.validator.ap.internal.ClassVisitor;
+import org.hibernate.validator.ap.internal.ConstraintAnnotationVisitor;
+import org.hibernate.validator.ap.internal.util.AnnotationApiHelper;
+import org.hibernate.validator.ap.internal.util.Configuration;
+import org.hibernate.validator.ap.internal.util.MessagerAdapter;
 
 /**
  * An annotation processor for checking <a
