@@ -16,9 +16,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.metadata.ValidateUnwrappedValue;
-import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorHelper;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint.TypeParameterAndExtractor;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -88,11 +88,8 @@ public class MetaConstraints {
 					selectedValueExtractorDescriptor = valueExtractorDescriptorCandidates.iterator().next();
 					break;
 				default:
-					@SuppressWarnings("rawtypes")
-					List<Class<? extends ValueExtractor>> valueExtractorCandidates = valueExtractorDescriptorCandidates.stream()
-							.map( valueExtractorDescriptor -> valueExtractorDescriptor.getValueExtractor().getClass() )
-							.collect( Collectors.toList() );
-					throw LOG.unableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclared( declaredType, valueExtractorCandidates );
+					throw LOG.unableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclared( declaredType,
+							ValueExtractorHelper.toValueExtractorClasses( valueExtractorDescriptorCandidates ) );
 			}
 		}
 		// we are in the implicit (DEFAULT) case so:
@@ -111,12 +108,8 @@ public class MetaConstraints {
 					selectedValueExtractorDescriptor = unwrapByDefaultValueExtractorDescriptorCandidates.iterator().next();
 					break;
 				default:
-					@SuppressWarnings("rawtypes")
-					List<Class<? extends ValueExtractor>> unwrapByDefaultValueExtractorCandidates = unwrapByDefaultValueExtractorDescriptorCandidates.stream()
-							.map( valueExtractorDescriptor -> valueExtractorDescriptor.getValueExtractor().getClass() )
-							.collect( Collectors.toList() );
 					throw LOG.implicitUnwrappingNotAllowedWhenSeveralMaximallySpecificValueExtractorsMarkedWithUnwrapByDefaultDeclared( declaredType,
-							unwrapByDefaultValueExtractorCandidates );
+							ValueExtractorHelper.toValueExtractorClasses( unwrapByDefaultValueExtractorDescriptorCandidates ) );
 			}
 		}
 

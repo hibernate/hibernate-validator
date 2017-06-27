@@ -167,24 +167,18 @@ public class ValueExtractorManager {
 			}
 		}
 
-		return getMaximallySpecificValueExtractor( valueType, containerElementCompliantExtractors );
-	}
+		Set<ValueExtractorDescriptor> maximallySpecificContainerElementCompliantValueExtractors =
+				getMaximallySpecificValueExtractors( valueType, containerElementCompliantExtractors );
 
-	private ValueExtractorDescriptor getMaximallySpecificValueExtractor(Class<?> valueType, List<ValueExtractorDescriptor> extractors) {
-		Set<ValueExtractorDescriptor> candidates = getMaximallySpecificValueExtractors( valueType, extractors );
-
-		if ( candidates.isEmpty() ) {
+		if ( maximallySpecificContainerElementCompliantValueExtractors.isEmpty() ) {
 			return null;
 		}
-		else if ( candidates.size() == 1 ) {
-			return candidates.iterator().next();
+		else if ( maximallySpecificContainerElementCompliantValueExtractors.size() == 1 ) {
+			return maximallySpecificContainerElementCompliantValueExtractors.iterator().next();
 		}
 		else {
-			@SuppressWarnings("rawtypes")
-			List<Class<? extends ValueExtractor>> valueExtractorCandidates = candidates.stream()
-					.map( valueExtractorDescriptor -> valueExtractorDescriptor.getValueExtractor().getClass() )
-					.collect( Collectors.toList() );
-			throw LOG.unableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclared( valueType, valueExtractorCandidates );
+			throw LOG.unableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclared( valueType,
+					ValueExtractorHelper.toValueExtractorClasses( maximallySpecificContainerElementCompliantValueExtractors ) );
 		}
 	}
 
