@@ -26,8 +26,8 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 
-import org.hibernate.validator.ap.util.CollectionHelper;
-import org.hibernate.validator.ap.util.Configuration;
+import org.hibernate.validator.ap.internal.util.CollectionHelper;
+import org.hibernate.validator.ap.internal.util.Configuration;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 
 import static org.testng.Assert.assertEquals;
