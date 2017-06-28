@@ -11,7 +11,7 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.NotNull;
 
 /**
- * Validate that the object is not <code>null</code>.
+ * Validate that the object is not {@code null}.
  *
  * @author Emmanuel Bernard
  */

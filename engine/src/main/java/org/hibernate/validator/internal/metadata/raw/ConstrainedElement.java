@@ -82,8 +82,8 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 * element has at least one constraint or a cascaded validation shall be
 	 * performed for it.
 	 *
-	 * @return <code>True</code>, if this element is constrained,
-	 *         <code>false</code> otherwise.
+	 * @return {@code True}, if this element is constrained,
+	 *         {@code false} otherwise.
 	 */
 	boolean isConstrained();
 

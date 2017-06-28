@@ -53,8 +53,8 @@ public abstract class MetaDataBuilder {
 	 *
 	 * @param constrainedElement The element to check.
 	 *
-	 * @return <code>true</code> if the given element can be added to this
-	 *         builder, <code>false</code> otherwise.
+	 * @return {@code true} if the given element can be added to this
+	 *         builder, {@code false} otherwise.
 	 */
 	public abstract boolean accepts(ConstrainedElement constrainedElement);
 

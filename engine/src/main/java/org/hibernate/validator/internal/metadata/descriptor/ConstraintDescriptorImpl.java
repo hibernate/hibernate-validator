@@ -138,7 +138,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private final boolean isReportAsSingleInvalidConstraint;
 
 	/**
-	 * Describes on which level (<code>TYPE</code>, <code>METHOD</code>, <code>FIELD</code>) the constraint was
+	 * Describes on which level ({@code TYPE}, {@code METHOD}, {@code FIELD}) the constraint was
 	 * defined on.
 	 */
 	private final ElementType elementType;

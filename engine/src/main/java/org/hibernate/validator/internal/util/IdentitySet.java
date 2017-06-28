@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Set that compares object by identity rather than equality. Wraps around a <code>IdentityHashMap</code>
+ * Set that compares object by identity rather than equality. Wraps around a {@code IdentityHashMap}
  *
  * @author Emmanuel Bernard
  */

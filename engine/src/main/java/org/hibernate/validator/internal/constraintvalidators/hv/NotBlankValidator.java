@@ -24,8 +24,8 @@ public class NotBlankValidator implements ConstraintValidator<NotBlank, CharSequ
 	 *
 	 * @param charSequence the character sequence to validate
 	 * @param constraintValidatorContext context in which the constraint is evaluated
-	 * @return returns <code>true</code> if the string is <code>null</code> or the length of the trimmed
-	 * <code>charSequence</code> is strictly superior to 0, <code>false</code> otherwise
+	 * @return returns {@code true} if the string is {@code null} or the length of the trimmed
+	 * {@code charSequence} is strictly superior to 0, {@code false} otherwise
 	 */
 	@Override
 	public boolean isValid(CharSequence charSequence, ConstraintValidatorContext constraintValidatorContext) {

@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.Date;
 
 /**
- * Check that the <code>java.util.Date</code> passed to be validated is in the
+ * Check that the {@code java.util.Date} passed to be validated is in the
  * past.
  *
  * @author Alaa Nassef
