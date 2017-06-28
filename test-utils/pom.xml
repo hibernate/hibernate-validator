@@ -18,6 +18,7 @@
 
     <properties>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+        <automatic.module.name>org.hibernate.validator.testutils</automatic.module.name>
     </properties>
 
     <build>
@@ -28,6 +29,25 @@
             <plugin>
                 <groupId>de.thetaphi</groupId>
                 <artifactId>forbiddenapis</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifestEntries>
+                                    <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

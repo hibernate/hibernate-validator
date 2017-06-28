@@ -22,6 +22,7 @@
 
     <properties>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+        <automatic.module.name>org.hibernate.validator.cdi</automatic.module.name>
     </properties>
 
     <dependencies>
@@ -140,7 +141,6 @@
                 <artifactId>forbiddenapis</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
@@ -155,6 +155,7 @@
                                 <manifestEntries>
                                     <Specification-Title>Bean Validation</Specification-Title>
                                     <Specification-Version>2.0</Specification-Version>
+                                    <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
                                 </manifestEntries>
                             </archive>
                         </configuration>
