@@ -4,47 +4,26 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.test.internal.engine.valuehandling;
+package org.hibernate.validator.test.internal.engine.path.stringrepresentation;
 
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;
-import javax.validation.Payload;
 import javax.validation.Valid;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class ContainerElementStringRepresentationTest {
-
-	private Validator validator;
-
-	@BeforeClass
-	public void setupValidator() {
-		validator = Validation.buildDefaultValidatorFactory().getValidator();
-	}
+public class ContainerElementPathStringRepresentationTest extends AbstractPathStringRepresentationTest {
 
 	@Test
 	public void testMapInvalidKeyTypeArgument() {
@@ -204,71 +183,6 @@ public class ContainerElementStringRepresentationTest {
 
 		public void put(City city, Address address) {
 			addressesPerCity.put( city, address );
-		}
-	}
-
-	@ValidLyonZipCode
-	private static class Address {
-		@NotNull
-		private String street;
-		@Valid
-		private City city;
-		private String zipCode;
-
-		public Address(String street, City city) {
-			this.street = street;
-			this.city = city;
-		}
-
-		public Address(String street, City city, String zipCode) {
-			this.street = street;
-			this.city = city;
-			this.zipCode = zipCode;
-		}
-
-		@Override
-		public String toString() {
-			return street + ", " + city;
-		}
-	}
-
-	private static class City {
-		@Size(min = 3)
-		private String name;
-
-		public City(String name) {
-			this.name = name;
-		}
-
-		@Override
-		public String toString() {
-			return name;
-		}
-
-	}
-
-	@Target({ TYPE, ANNOTATION_TYPE })
-	@Retention(RUNTIME)
-	@Constraint(validatedBy = { ValidLyonZipCodeValidator.class })
-	@Documented
-	public @interface ValidLyonZipCode {
-
-		String message() default "{org.hibernate.validator.test.internal.engine.valuehandling.ValidLyonZipCode.message}";
-
-		Class<?>[] groups() default { };
-
-		Class<? extends Payload>[] payload() default { };
-	}
-
-	public static class ValidLyonZipCodeValidator implements ConstraintValidator<ValidLyonZipCode, Address> {
-
-		@Override
-		public boolean isValid(Address address, ConstraintValidatorContext context) {
-			if ( address == null || address.zipCode == null || address.city == null || !"Lyon".equals( address.city.name ) ) {
-				return true;
-			}
-
-			return address.zipCode.length() == 5 && address.zipCode.startsWith( "6900" );
 		}
 	}
 
