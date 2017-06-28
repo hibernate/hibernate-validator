@@ -24,8 +24,8 @@ import javax.validation.ValidationException;
 import javax.validation.spi.ValidationProvider;
 import javax.validation.valueextraction.ValueExtractor;
 
-import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor.Key;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor.Key;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
