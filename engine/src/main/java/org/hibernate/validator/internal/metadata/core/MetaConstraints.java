@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 
 import javax.validation.metadata.ValidateUnwrappedValue;
 
-import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractorHelper;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorHelper;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint.TypeParameterAndExtractor;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
