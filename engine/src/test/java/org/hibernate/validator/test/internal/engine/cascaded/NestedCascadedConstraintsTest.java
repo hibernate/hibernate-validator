@@ -50,8 +50,8 @@ public class NestedCascadedConstraintsTest {
 
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map[invalid].<map value>[1].email",
-				"map[invalid].<map value>[2].email"
+				"map[key('invalid')].<map value>[1].email",
+				"map[key('invalid')].<map value>[2].email"
 		);
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( Email.class )
@@ -86,9 +86,9 @@ public class NestedCascadedConstraintsTest {
 
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map[Optional[Cinema<cinema2>]].<map value>[1].email",
-				"map[Optional[Cinema<cinema2>]].<map value>[2].email",
-				"map[Optional[Cinema<cinema3>]].<map value>[0].<list element>"
+				"map[key('Optional[Cinema<cinema2>]')].<map value>[1].email",
+				"map[key('Optional[Cinema<cinema2>]')].<map value>[2].email",
+				"map[key('Optional[Cinema<cinema3>]')].<map value>[0].<list element>"
 		);
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( Email.class )
@@ -122,7 +122,7 @@ public class NestedCascadedConstraintsTest {
 
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map<K>[Optional[Cinema<cinema4>]].<map key>.visitor.name"
+				"map<K>[key('Optional[Cinema<cinema4>]')].<map key>.visitor.name"
 		);
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( NotNull.class )

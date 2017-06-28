@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.engine.path;
 
 import java.io.Serializable;
+import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import javax.validation.Path.PropertyNode;
 import javax.validation.Path.ReturnValueNode;
 
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -405,12 +407,22 @@ public class NodeImpl
 				builder.append( index );
 			}
 			else if ( key != null ) {
-				builder.append( key );
+				builder.append( getKeyStringRepresentation( key ) );
 			}
 			builder.append( INDEX_CLOSE );
 		}
 
 		return builder.toString();
+	}
+
+	private static String getKeyStringRepresentation(Object key) {
+		if ( TypeHelper.isAssignable( Number.class, key.getClass() )
+				|| TypeHelper.isAssignable( Boolean.class, key.getClass() )
+				|| TypeHelper.isAssignable( TemporalAccessor.class, key.getClass() )
+				) {
+			return key.toString();
+		}
+		return String.format( "key('%s')", key );
 	}
 
 	// TODO: this is used to reduce the number of differences until we agree on the string representation

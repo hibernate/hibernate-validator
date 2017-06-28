@@ -83,7 +83,7 @@ public class CustomValueExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithMultimap>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType<V>[work].email", "addressByType<V>[work].email" );
+		assertCorrectPropertyPaths( violations, "addressByType<V>[key('work')].email", "addressByType<V>[key('work')].email" );
 	}
 
 	@Test
@@ -99,7 +99,7 @@ public class CustomValueExtractorTest {
 
 				Set<ConstraintViolation<CustomerWithMultimap>> violations = validator.validate( bob );
 
-				assertCorrectPropertyPaths( violations, "addressByType<V>[work].email", "addressByType<V>[work].email" );
+				assertCorrectPropertyPaths( violations, "addressByType<V>[key('work')].email", "addressByType<V>[key('work')].email" );
 		} );
 	}
 
@@ -114,7 +114,7 @@ public class CustomValueExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithStringStringMultimap>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType<V>[work].multimap_value", "addressByType<V>[work].multimap_value" );
+		assertCorrectPropertyPaths( violations, "addressByType<V>[key('work')].multimap_value", "addressByType<V>[key('work')].multimap_value" );
 	}
 
 	@Test

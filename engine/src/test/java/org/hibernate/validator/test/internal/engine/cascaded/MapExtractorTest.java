@@ -24,6 +24,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.testutils.CandidateForTck;
+
 import org.testng.annotations.Test;
 
 /**
@@ -43,7 +44,7 @@ public class MapExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithCascadingKeys>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType<K>[too short].type", "addressByType<K>[too small].type" );
+		assertCorrectPropertyPaths( violations, "addressByType<K>[key('too short')].type", "addressByType<K>[key('too small')].type" );
 	}
 
 	@Test
@@ -57,7 +58,7 @@ public class MapExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithConstrainedKeys>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType<K>[too short].<map key>", "addressByType<K>[too small].<map key>" );
+		assertCorrectPropertyPaths( violations, "addressByType<K>[key('too short')].<map key>", "addressByType<K>[key('too small')].<map key>" );
 	}
 
 	@Test
@@ -71,7 +72,7 @@ public class MapExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithCascadingKeyAndValueMap>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType[too small].email", "addressByType[long enough].email", "addressByType<K>[too small].type", "addressByType<K>[too short].type" );
+		assertCorrectPropertyPaths( violations, "addressByType[key('too small')].email", "addressByType[key('long enough')].email", "addressByType<K>[key('too small')].type", "addressByType<K>[key('too short')].type" );
 	}
 
 	@Test
@@ -85,7 +86,7 @@ public class MapExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithConstrainedKeysAndValues>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType<K>[too short].<map key>", "addressByType<K>[too small].<map key>", "addressByType[long enough].<map value>" );
+		assertCorrectPropertyPaths( violations, "addressByType<K>[key('too short')].<map key>", "addressByType<K>[key('too small')].<map key>", "addressByType[key('long enough')].<map value>" );
 	}
 
 	@Test

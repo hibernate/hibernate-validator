@@ -67,7 +67,7 @@ public class CascadedIterableMapPropertiesTest {
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"mapExt.value",
-				"mapExt[second].number"
+				"mapExt[key('second')].number"
 		);
 	}
 
