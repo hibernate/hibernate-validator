@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.Calendar;
 
 /**
- * Check that the <code>java.util.Calendar</code> passed to be validated is in
+ * Check that the {@code java.util.Calendar} passed to be validated is in
  * the past.
  *
  * @author Alaa Nassef

@@ -73,8 +73,8 @@ public class Configuration {
 	}
 
 	/**
-	 * Whether method constraints are allowed at any method (<code>true</code>) or only
-	 * getter methods (<code>false</code>).
+	 * Whether method constraints are allowed at any method ({@code true}) or only
+	 * getter methods ({@code false}).
 	 *
 	 * @return {@code true} if method constraints are allowed on any method, {code false} if only on getter methods
 	 */

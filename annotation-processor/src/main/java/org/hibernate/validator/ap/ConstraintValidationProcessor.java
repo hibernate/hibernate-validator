@@ -32,19 +32,19 @@ import org.hibernate.validator.ap.internal.util.MessagerAdapter;
  * href="http://jcp.org/en/jsr/detail?id=380">Bean Validation</a> constraints.
  * The processor supports the following options:
  * <ul>
- * <li><code>diagnosticKind</code>: the severity with which any occurred
+ * <li>{@code diagnosticKind}: the severity with which any occurred
  * problems shall be reported. Must be given in form of the string
  * representation of a value from {@link javax.tools.Diagnostic.Kind}, e.g.
  * "diagnosticKind=WARNING". Default is Kind.ERROR.</li>
- * <li><code>verbose</code>: whether a verbose output shall be created or not.
+ * <li>{@code verbose}: whether a verbose output shall be created or not.
  * Must be given as String parsable by {@link Boolean#parseBoolean}. Default is
- * <code>false</code>.</li>
- * <li><code>methodConstraintsSupported</code>: Whether constraints at other
+ * {@code false}.</li>
+ * <li>{@code methodConstraintsSupported}: Whether constraints at other
  * methods than JavaBeans getter methods may be annotated with constraints or
  * not. Must be given as String parsable by {@link Boolean#parseBoolean}. Can be
- * set to <code>false</code> in order to allow only getter based property
+ * set to {@code false} in order to allow only getter based property
  * constraints but not method level constraints as supported by Hibernate
- * Validator. Default is <code>true</code>.</li>
+ * Validator. Default is {@code true}.</li>
  * </ul>
  *
  * @author Hardy Ferentschik

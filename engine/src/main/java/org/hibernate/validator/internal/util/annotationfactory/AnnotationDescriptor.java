@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  * Encapsulates the data you need to create an annotation. In
- * particular, it stores the type of an <code>Annotation</code> instance
+ * particular, it stores the type of an {@code Annotation} instance
  * and the values of its elements.
  * The "elements" we're talking about are the annotation attributes,
  * not its targets (the term "element" is used ambiguously

@@ -65,7 +65,7 @@ public final class ConstraintAnnotationVisitor extends AbstractElementVisitor<Vo
 	 * Constraint annotations may only be given at non-static, JavaBeans getter
 	 * methods which's return type is supported by the constraints.</li>
 	 * <li>
-	 * The <code>@Valid</code> annotation may only be given at non-static,
+	 * The {@code @Valid} annotation may only be given at non-static,
 	 * non-primitive JavaBeans getter methods.</li>
 	 * </ul>
 	 */
@@ -89,7 +89,7 @@ public final class ConstraintAnnotationVisitor extends AbstractElementVisitor<Vo
 	 * Constraint annotations may only be given at non-static fields which's
 	 * type is supported by the constraints.</li>
 	 * <li>
-	 * The <code>@Valid</code> annotation may only be given at non-static,
+	 * The {@code @Valid} annotation may only be given at non-static,
 	 * non-primitive fields.</li>
 	 * </ul>
 	 */

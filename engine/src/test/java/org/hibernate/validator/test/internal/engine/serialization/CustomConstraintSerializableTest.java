@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
  * >this blog</a> gives a validation result that is not Serializable with
  * Hibernate Validator 4.0.2.GA with underlying cause that
  * <p/>
- * <code>org.hibernate.validator.internal.util.annotationfactory.AnnotationProxy</code>
+ * {@code org.hibernate.validator.internal.util.annotationfactory.AnnotationProxy}
  * <p/>
  * <p/>
  * Note that Hibernate Validator does not guarantee at all that a

@@ -138,38 +138,38 @@ public @interface SafeHtml {
 		NONE,
 
 		/**
-		 * This whitelist allows only simple text formatting: <code>b, em, i, strong, u</code>. All other HTML (tags and
+		 * This whitelist allows only simple text formatting: {@code b, em, i, strong, u}. All other HTML (tags and
 		 * attributes) will be removed.
 		 */
 		SIMPLE_TEXT,
 
 		/**
 		 * This whitelist allows a fuller range of text nodes:
-		 * <code>a, b, blockquote, br, cite, code, dd, dl, dt, em, i, li, ol, p, pre, q, small, span, strike, strong, sub,
-		 * sup, u, ul</code>, and appropriate attributes.
+		 * {@code a, b, blockquote, br, cite, code, dd, dl, dt, em, i, li, ol, p, pre, q, small, span, strike, strong, sub,
+		 * sup, u, ul}, and appropriate attributes.
 		 * <p>
-		 * Links (<code>a</code> elements) can point to <code>http, https, ftp, mailto</code>, and have an enforced
-		 * <code>rel=nofollow</code> attribute.
+		 * Links ({@code a} elements) can point to {@code http, https, ftp, mailto}, and have an enforced
+		 * {@code rel=nofollow} attribute.
 		 * </p>
 		 * Does not allow images.
 		 */
 		BASIC,
 
 		/**
-		 * This whitelist allows the same text tags as {@link WhiteListType#BASIC}, and also allows <code>img</code>
+		 * This whitelist allows the same text tags as {@link WhiteListType#BASIC}, and also allows {@code img}
 		 * tags,
 		 * with
-		 * appropriate attributes, with <code>src</code> pointing to <code>http</code> or <code>https</code>.
+		 * appropriate attributes, with {@code src} pointing to {@code http} or {@code https}.
 		 */
 		BASIC_WITH_IMAGES,
 
 		/**
 		 * This whitelist allows a full range of text and structural body HTML:
-		 * <code>a, b, blockquote, br, caption, cite, code, col, colgroup, dd, div, dl, dt, em, h1, h2, h3, h4, h5, h6,
+		 * {@code a, b, blockquote, br, caption, cite, code, col, colgroup, dd, div, dl, dt, em, h1, h2, h3, h4, h5, h6,
 		 * i, img, li, ol, p, pre, q, small, span, strike, strong, sub, sup, table, tbody, td, tfoot, th, thead, tr, u,
-		 * ul</code>
+		 * ul}
 		 * <p>
-		 * Links do not have an enforced <code>rel=nofollow</code> attribute, but you can add that if desired.
+		 * Links do not have an enforced {@code rel=nofollow} attribute, but you can add that if desired.
 		 * </p>
 		 */
 		RELAXED

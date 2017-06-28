@@ -21,8 +21,8 @@ import javax.lang.model.element.VariableElement;
  * </p>
  * <p>
  * For instance would a check ensuring that constraint annotations are only
- * given at non-static fields or methods only override <code>checkField()</code>
- * and <code>checkMethod()</code>.
+ * given at non-static fields or methods only override {@code checkField()}
+ * and {@code checkMethod()}.
  * </p>
  * <p>
  * All check methods not overridden will return an empty set.
