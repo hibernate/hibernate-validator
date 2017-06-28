@@ -176,11 +176,11 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * @param member The <code>Member</code> instance for which to retrieve the type.
+	 * @param member The {@code Member} instance for which to retrieve the type.
 	 *
-	 * @return Returns the <code>Type</code> of the given <code>Field</code> or <code>Method</code>.
+	 * @return Returns the {@code Type} of the given {@code Field} or {@code Method}.
 	 *
-	 * @throws IllegalArgumentException in case <code>member</code> is not a <code>Field</code> or <code>Method</code>.
+	 * @throws IllegalArgumentException in case {@code member} is not a {@code Field} or {@code Method}.
 	 */
 	public static Type typeOf(Member member) {
 		Type type;
@@ -290,7 +290,7 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Converts the given <code>Type</code> to a <code>Class</code>.
+	 * Converts the given {@code Type} to a {@code Class}.
 	 *
 	 * @param type the type to convert
 	 * @return the class corresponding to the type
@@ -311,7 +311,7 @@ public final class ReflectionHelper {
 	/**
 	 * @param type the type to check.
 	 *
-	 * @return Returns <code>true</code> if <code>type</code> is a iterable type, <code>false</code> otherwise.
+	 * @return Returns {@code true} if {@code type} is a iterable type, {@code false} otherwise.
 	 */
 	public static boolean isIterable(Type type) {
 		if ( type instanceof Class && Iterable.class.isAssignableFrom( (Class<?>) type ) ) {
@@ -330,7 +330,7 @@ public final class ReflectionHelper {
 	/**
 	 * @param type the type to check.
 	 *
-	 * @return Returns <code>true</code> if <code>type</code> is implementing <code>Map</code>, <code>false</code> otherwise.
+	 * @return Returns {@code true} if {@code type} is implementing {@code Map}, {@code false} otherwise.
 	 */
 	public static boolean isMap(Type type) {
 		if ( type instanceof Class && Map.class.isAssignableFrom( (Class<?>) type ) ) {
@@ -349,7 +349,7 @@ public final class ReflectionHelper {
 	/**
 	 * @param type the type to check.
 	 *
-	 * @return Returns <code>true</code> if <code>type</code> is implementing <code>List</code>, <code>false</code> otherwise.
+	 * @return Returns {@code true} if {@code type} is implementing {@code List}, {@code false} otherwise.
 	 */
 	public static boolean isList(Type type) {
 		if ( type instanceof Class && List.class.isAssignableFrom( (Class<?>) type ) ) {
@@ -368,12 +368,12 @@ public final class ReflectionHelper {
 	/**
 	 * Tries to retrieve the indexed value from the specified object.
 	 *
-	 * @param value The object from which to retrieve the indexed value. The object has to be non <code>null</code> and
+	 * @param value The object from which to retrieve the indexed value. The object has to be non {@code null} and
 	 * either a collection or array.
 	 * @param index The index.
 	 *
-	 * @return The indexed value or <code>null</code> if <code>value</code> is <code>null</code> or not a collection or array.
-	 *         <code>null</code> is also returned in case the index does not exist.
+	 * @return The indexed value or {@code null} if {@code value} is {@code null} or not a collection or array.
+	 *         {@code null} is also returned in case the index does not exist.
 	 */
 	public static Object getIndexedValue(Object value, int index) {
 		if ( value == null ) {

@@ -41,7 +41,7 @@ public class ConstraintCheckIssue {
 	 * @param annotationMirror The annotation that causes the error.
 	 * @param messageKey A key for retrieving an error message template from the bundle
 	 * <p>
-	 * <code>org.hibernate.validator.ap.ValidationProcessorMessages.</code>
+	 * {@code org.hibernate.validator.ap.ValidationProcessorMessages.}
 	 * </p>
 	 *
 	 * @param messageParameters An array with values to put into the error message template
@@ -101,7 +101,7 @@ public class ConstraintCheckIssue {
 	 * @param annotationMirror The annotation that causes the error.
 	 * @param messageKey A key for retrieving an error message template from the bundle
 	 * <p>
-	 * <code>org.hibernate.validator.ap.ValidationProcessorMessages.</code>
+	 * {@code org.hibernate.validator.ap.ValidationProcessorMessages.}
 	 * </p>
 	 * @param messageParameters An array with values to put into the error message template
 	 * using {@link java.text.MessageFormat}. The number of elements must match
@@ -118,7 +118,7 @@ public class ConstraintCheckIssue {
 	 * @param annotationMirror The annotation that causes the error.
 	 * @param messageKey A key for retrieving an error message template from the bundle
 	 * <p>
-	 * <code>org.hibernate.validator.ap.ValidationProcessorMessages.</code>
+	 * {@code org.hibernate.validator.ap.ValidationProcessorMessages.}
 	 * </p>
 	 * @param messageParameters An array with values to put into the error message template
 	 * using {@link java.text.MessageFormat}. The number of elements must match

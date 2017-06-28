@@ -22,9 +22,9 @@ public class SizeValidatorForArraysOfLong extends SizeValidatorForArraysOfPrimit
 	 * @param array The array to validate.
 	 * @param constraintValidatorContext context in which the constraint is evaluated.
 	 *
-	 * @return Returns <code>true</code> if the array is <code>null</code> or the number of entries in
-	 *         <code>array</code> is between the specified <code>min</code> and <code>max</code> values (inclusive),
-	 *         <code>false</code> otherwise.
+	 * @return Returns {@code true} if the array is {@code null} or the number of entries in
+	 *         {@code array} is between the specified {@code min} and {@code max} values (inclusive),
+	 *         {@code false} otherwise.
 	 */
 	@Override
 	public boolean isValid(long[] array, ConstraintValidatorContext constraintValidatorContext) {

@@ -15,7 +15,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
- * Validates that the <code>Number</code> being validates matches the pattern
+ * Validates that the {@code Number} being validated matches the pattern
  * defined in the constraint.
  *
  * @author Alaa Nassef

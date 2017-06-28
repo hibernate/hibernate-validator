@@ -95,8 +95,8 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 	 * <p/>
 	 * <ul>
 	 * <li>has a method with name "groups",</li>
-	 * <li>the return type of this method is <code>Class&lt;?&gt;[]</code>,</li>
-	 * <li>the default value of this method is <code>{}</code>.</li>
+	 * <li>the return type of this method is {@code Class&lt;?&gt;[]},</li>
+	 * <li>the default value of this method is {@code {}}.</li>
 	 * </ul>
 	 *
 	 * @param element The element of interest.
@@ -145,8 +145,8 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 	 * <p/>
 	 * <ul>
 	 * <li>has a method with name "payload",</li>
-	 * <li>the return type of this method is <code>Class&lt;? extends Payload&gt;[]</code>,</li>
-	 * <li>the default value of this method is <code>{}</code>.</li>
+	 * <li>the return type of this method is {@code Class&lt;? extends Payload&gt;[]},</li>
+	 * <li>the default value of this method is {@code {}}.</li>
 	 * </ul>
 	 *
 	 * @param element The element of interest.

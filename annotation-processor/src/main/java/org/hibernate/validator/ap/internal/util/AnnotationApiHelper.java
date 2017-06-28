@@ -59,14 +59,14 @@ public class AnnotationApiHelper {
 
 	/**
 	 * Returns a list containing those annotation mirrors from the input list,
-	 * which are of type <code>annotationType</code>. The input collection
+	 * which are of type {@code annotationType}. The input collection
 	 * remains untouched.
 	 *
 	 * @param annotationMirrors A list of annotation mirrors.
 	 * @param annotationType The type to be compared against.
 	 *
 	 * @return A list with those annotation mirrors from the input list, which
-	 *         are of type <code>annotationType</code>. May be empty but never
+	 *         are of type {@code annotationType}. May be empty but never
 	 *         null.
 	 */
 	public List<AnnotationMirror> filterByType(List<? extends AnnotationMirror> annotationMirrors, TypeMirror annotationType) {
@@ -288,16 +288,16 @@ public class AnnotationApiHelper {
 	 * </p>
 	 * <ul>
 	 * <li>
-	 * Input: <code>String</code>; Output: <code>String</code></li>
+	 * Input: {@code String}; Output: {@code String}</li>
 	 * <li>
-	 * Input: <code>Object</code>, <code>String</code>; Output:
-	 * <code>String</code></li>
+	 * Input: {@code Object}, {@code String}; Output:
+	 * {@code String}</li>
 	 * <li>
-	 * Input: <code>Object</code>, <code>Collection</code>, <code>List</code>;
-	 * Output: <code>List</code></li>
+	 * Input: {@code Object}, {@code Collection}, {@code List};
+	 * Output: {@code List}</li>
 	 * <li>
-	 * Input: <code>Collection</code>, <code>Set</code>, <code>List</code>;
-	 * Output: <code>List</code>, <code>Set</code></li>
+	 * Input: {@code Collection}, {@code Set}, {@code List};
+	 * Output: {@code List}, {@code Set}</li>
 	 * </ul>
 	 *
 	 * @param types A set of type mirrors.

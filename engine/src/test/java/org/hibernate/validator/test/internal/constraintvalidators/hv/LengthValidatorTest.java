@@ -19,7 +19,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
- * Tests the <code>LengthConstraint</code>.
+ * Tests the {@code LengthConstraint}.
  *
  * @author Hardy Ferentschik
  */

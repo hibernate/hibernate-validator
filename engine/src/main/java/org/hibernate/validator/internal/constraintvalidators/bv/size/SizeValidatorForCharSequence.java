@@ -40,8 +40,8 @@ public class SizeValidatorForCharSequence implements ConstraintValidator<Size, C
 	 * @param charSequence The character sequence to validate.
 	 * @param constraintValidatorContext context in which the constraint is evaluated.
 	 *
-	 * @return Returns <code>true</code> if the string is <code>null</code> or the length of <code>charSequence</code> between the specified
-	 *         <code>min</code> and <code>max</code> values (inclusive), <code>false</code> otherwise.
+	 * @return Returns {@code true} if the string is {@code null} or the length of {@code charSequence} between the specified
+	 *         {@code min} and {@code max} values (inclusive), {@code false} otherwise.
 	 */
 	@Override
 	public boolean isValid(CharSequence charSequence, ConstraintValidatorContext constraintValidatorContext) {

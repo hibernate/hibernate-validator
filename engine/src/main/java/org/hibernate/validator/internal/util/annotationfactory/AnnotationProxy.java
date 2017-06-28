@@ -29,11 +29,11 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
- * A concrete implementation of <code>Annotation</code> that pretends it is a
- * "real" source code annotation. It's also an <code>InvocationHandler</code>.
+ * A concrete implementation of {@code Annotation} that pretends it is a
+ * "real" source code annotation. It's also an {@code InvocationHandler}.
  * <p>
- * When you create an <code>AnnotationProxy</code>, you must initialize it
- * with an <code>AnnotationDescriptor</code>.
+ * When you create an {@code AnnotationProxy}, you must initialize it
+ * with an {@code AnnotationDescriptor}.
  * The adapter checks that the provided elements are the same elements defined
  * in the annotation interface. However, it does <i>not</i> check that their
  * values are the right type. If you omit an element, the adapter will use the

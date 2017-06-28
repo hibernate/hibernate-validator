@@ -92,15 +92,15 @@ public @interface ScriptAssert {
 
 	/**
 	 * @return The script to be executed. The script must return
-	 *         <code>Boolean.TRUE</code>, if the annotated element could
-	 *         successfully be validated, otherwise <code>Boolean.FALSE</code>.
+	 *         {@code Boolean.TRUE}, if the annotated element could
+	 *         successfully be validated, otherwise {@code Boolean.FALSE}.
 	 *         Returning null or any type other than Boolean will cause a
 	 *         {@link javax.validation.ConstraintDeclarationException} upon validation. Any
 	 *         exception occurring during script evaluation will be wrapped into
 	 *         a ConstraintDeclarationException, too. Within the script, the
 	 *         validated object can be accessed from the {@link javax.script.ScriptContext
 	 *         script context} using the name specified in the
-	 *         <code>alias</code> attribute.
+	 *         {@code alias} attribute.
 	 */
 	String script();
 

@@ -484,7 +484,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * @param type the element type on which the annotation/constraint is placed on
 	 * @param <A> the annotation type
 	 *
-	 * @return A list of constraint descriptors or the empty list in case <code>annotation</code> is neither a
+	 * @return A list of constraint descriptors or the empty list in case {@code annotation} is neither a
 	 * single nor multi-valued annotation.
 	 */
 	protected <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,

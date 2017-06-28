@@ -74,8 +74,8 @@ public @interface ParameterScriptAssert {
 
 	/**
 	 * @return The script to be executed. The script must return
-	 *         <code>Boolean.TRUE</code>, if the executable parameters could
-	 *         successfully be validated, otherwise <code>Boolean.FALSE</code>.
+	 *         {@code Boolean.TRUE}, if the executable parameters could
+	 *         successfully be validated, otherwise {@code Boolean.FALSE}.
 	 *         Returning null or any type other than Boolean will cause a
 	 *         {@link javax.validation.ConstraintDeclarationException} upon validation. Any
 	 *         exception occurring during script evaluation will be wrapped into
