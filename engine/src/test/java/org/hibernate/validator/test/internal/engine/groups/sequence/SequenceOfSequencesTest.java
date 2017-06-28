@@ -23,7 +23,7 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 
 /**
  * Sequences may comprise other sequences.
@@ -42,19 +42,19 @@ public class SequenceOfSequencesTest {
 		PlushAlligator alligator = new PlushAlligator();
 
 		Set<ConstraintViolation<PlushAlligator>> violations = validator.validate( alligator, AllConstraints.class );
-		assertCorrectPropertyPaths( violations, "name" );
+		assertCorrectPropertyPathStringRepresentations( violations, "name" );
 
 		alligator.name = "Ruben";
 		violations = validator.validate( alligator, AllConstraints.class );
-		assertCorrectPropertyPaths( violations, "highestEducationalDegree" );
+		assertCorrectPropertyPathStringRepresentations( violations, "highestEducationalDegree" );
 
 		alligator.highestEducationalDegree = "PhD";
 		violations = validator.validate( alligator, AllConstraints.class );
-		assertCorrectPropertyPaths( violations, "length" );
+		assertCorrectPropertyPathStringRepresentations( violations, "length" );
 
 		alligator.length = 540;
 		violations = validator.validate( alligator, AllConstraints.class );
-		assertCorrectPropertyPaths( violations, "age" );
+		assertCorrectPropertyPathStringRepresentations( violations, "age" );
 	}
 
 	/**
@@ -68,19 +68,19 @@ public class SequenceOfSequencesTest {
 		PlushCrocodile crocodile = new PlushCrocodile();
 
 		Set<ConstraintViolation<PlushCrocodile>> violations = validator.validate( crocodile );
-		assertCorrectPropertyPaths( violations, "name" );
+		assertCorrectPropertyPathStringRepresentations( violations, "name" );
 
 		crocodile.name = "Ruben";
 		violations = validator.validate( crocodile, AllConstraints.class );
-		assertCorrectPropertyPaths( violations, "highestEducationalDegree" );
+		assertCorrectPropertyPathStringRepresentations( violations, "highestEducationalDegree" );
 
 		crocodile.highestEducationalDegree = "PhD";
 		violations = validator.validate( crocodile, AllConstraints.class );
-		assertCorrectPropertyPaths( violations, "length" );
+		assertCorrectPropertyPathStringRepresentations( violations, "length" );
 
 		crocodile.length = 540;
 		violations = validator.validate( crocodile, AllConstraints.class );
-		assertCorrectPropertyPaths( violations, "age" );
+		assertCorrectPropertyPathStringRepresentations( violations, "age" );
 	}
 
 	public static class PlushAlligator {

@@ -15,7 +15,7 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 
 /**
  * @author Gunnar Morling
@@ -28,7 +28,7 @@ public class DefaultGroupWithInheritanceTest {
 		Validator validator = ValidatorUtil.getValidator();
 
 		Set<ConstraintViolation<A>> violations = validator.validate( new A() );
-		assertCorrectPropertyPaths( violations, "foo", "bar" );
+		assertCorrectPropertyPathStringRepresentations( violations, "foo", "bar" );
 	}
 
 	@Test
@@ -36,6 +36,6 @@ public class DefaultGroupWithInheritanceTest {
 		Validator validator = ValidatorUtil.getValidator();
 
 		Set<ConstraintViolation<B>> violations = validator.validate( new B(), Max.class, Min.class );
-		assertCorrectPropertyPaths( violations, "foo", "bar" );
+		assertCorrectPropertyPathStringRepresentations( violations, "foo", "bar" );
 	}
 }

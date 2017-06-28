@@ -74,7 +74,7 @@ public final class ConstraintViolationAssert {
 	 * @param violations The violation list to verify.
 	 * @param expectedPropertyPaths The expected property paths.
 	 */
-	public static void assertCorrectPropertyPaths(Set<? extends ConstraintViolation<?>> violations,
+	public static void assertCorrectPropertyPathStringRepresentations(Set<? extends ConstraintViolation<?>> violations,
 			String... expectedPropertyPaths) {
 		Set<String> actualPaths = violations.stream()
 			.map( ConstraintViolation::getPropertyPath )

@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.path.stringrepresentation;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 
 import java.util.Set;
 
@@ -23,7 +23,7 @@ public class BeanPathStringRepresentationTest extends AbstractPathStringRepresen
 		Address address = new Address( "str", new City( "Lyon" ), "invalid zip" );
 		Set<ConstraintViolation<Address>> constraintViolations = validator.validate( address );
 
-		assertCorrectPropertyPaths( constraintViolations, "" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "" );
 	}
 
 	@Test
@@ -31,7 +31,7 @@ public class BeanPathStringRepresentationTest extends AbstractPathStringRepresen
 		Address address = new Address( null, new City( "" ) );
 		Set<ConstraintViolation<Address>> constraintViolations = validator.validate( address );
 
-		assertCorrectPropertyPaths( constraintViolations, "street", "city.name" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "street", "city.name" );
 	}
 
 }

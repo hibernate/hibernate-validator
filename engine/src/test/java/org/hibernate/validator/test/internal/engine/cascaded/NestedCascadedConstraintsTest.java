@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.cascaded;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
@@ -48,7 +48,7 @@ public class NestedCascadedConstraintsTest {
 
 		constraintViolations = validator.validate( EmailAddressMap.invalidEmailAddressMap() );
 
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"map[invalid].<map value>[1].email",
 				"map[invalid].<map value>[2].email"
@@ -84,7 +84,7 @@ public class NestedCascadedConstraintsTest {
 		CinemaEmailAddresses invalidCinemaEmailAddresses = CinemaEmailAddresses.invalidCinemaEmailAddresses();
 		constraintViolations = validator.validate( invalidCinemaEmailAddresses );
 
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"map[Optional[Cinema<cinema2>]].<map value>[1].email",
 				"map[Optional[Cinema<cinema2>]].<map value>[2].email",
@@ -120,7 +120,7 @@ public class NestedCascadedConstraintsTest {
 		CinemaEmailAddresses invalidKeyCinemaEmailAddresses = CinemaEmailAddresses.invalidKey();
 		constraintViolations = validator.validate( invalidKeyCinemaEmailAddresses );
 
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"map<K>[Optional[Cinema<cinema4>]].<map key>.visitor.name"
 		);
@@ -151,7 +151,7 @@ public class NestedCascadedConstraintsTest {
 
 		constraintViolations = validator.validate( CinemaArray.invalidCinemaArray() );
 
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"array[0].<iterable element>[0].<list element>",
 				"array[0].<iterable element>[1].visitor.name"
@@ -189,7 +189,7 @@ public class NestedCascadedConstraintsTest {
 
 		constraintViolations = validator.validate( NestedCascadingListWithValidAllAlongTheWay.withNullList() );
 
-		assertCorrectPropertyPaths( constraintViolations, "list[0].<list element>" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "list[0].<list element>" );
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()

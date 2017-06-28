@@ -5,7 +5,7 @@ package org.hibernate.validator.test.internal.engine.path.stringrepresentation;/
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 
 import java.lang.reflect.Constructor;
 import java.util.Set;
@@ -29,7 +29,7 @@ public class ConstructorPathStringRepresentationTest extends AbstractPathStringR
 				constructor,
 				new Object[] { "" }
 		);
-		assertCorrectPropertyPaths( constraintViolations, "City.name" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "City.name" );
 	}
 
 	@Test
@@ -39,7 +39,7 @@ public class ConstructorPathStringRepresentationTest extends AbstractPathStringR
 				constructor,
 				new Object[] { null, new City( "" ) }
 		);
-		assertCorrectPropertyPaths( constraintViolations, "Address.street", "Address.city.name" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "Address.street", "Address.city.name" );
 	}
 
 	@Test
@@ -49,7 +49,7 @@ public class ConstructorPathStringRepresentationTest extends AbstractPathStringR
 				constructor,
 				new City( "" )
 		);
-		assertCorrectPropertyPaths( constraintViolations, "City.<return value>.name" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "City.<return value>.name" );
 	}
 
 	@Test
@@ -59,7 +59,7 @@ public class ConstructorPathStringRepresentationTest extends AbstractPathStringR
 				constructor,
 				new Address( "str", new City( "Lyon" ), "invalid zip" )
 		);
-		assertCorrectPropertyPaths( constraintViolations, "Address.<return value>" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "Address.<return value>" );
 	}
 
 	@Test
@@ -70,7 +70,7 @@ public class ConstructorPathStringRepresentationTest extends AbstractPathStringR
 				new Object[] { "good name", true }
 		);
 
-		assertCorrectPropertyPaths( constraintViolations, "SmartCity.<cross-parameter>" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "SmartCity.<cross-parameter>" );
 	}
 
 	private static class SmartCity extends City {
