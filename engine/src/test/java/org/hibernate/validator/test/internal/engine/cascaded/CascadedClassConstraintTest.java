@@ -8,7 +8,7 @@ package org.hibernate.validator.test.internal.engine.cascaded;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -41,7 +41,7 @@ public class CascadedClassConstraintTest {
 		Validator validator = ValidatorUtil.getValidator();
 		Set<ConstraintViolation<Bar>> violations = validator.validate( new Bar() );
 
-		assertCorrectPropertyPaths( violations, "foos[0]", "foos[1]" );
+		assertCorrectPropertyPathStringRepresentations( violations, "foos[0]", "foos[1]" );
 	}
 
 	@Test
@@ -49,7 +49,7 @@ public class CascadedClassConstraintTest {
 		Validator validator = ValidatorUtil.getValidator();
 		Set<ConstraintViolation<BarUsingTypeParameterOnField>> violations = validator.validate( new BarUsingTypeParameterOnField() );
 
-		assertCorrectPropertyPaths( violations, "foos[0]", "foos[1]" );
+		assertCorrectPropertyPathStringRepresentations( violations, "foos[0]", "foos[1]" );
 	}
 
 	@Test
@@ -57,7 +57,7 @@ public class CascadedClassConstraintTest {
 		Validator validator = ValidatorUtil.getValidator();
 		Set<ConstraintViolation<BarUsingTypeParameterOnGetter>> violations = validator.validate( new BarUsingTypeParameterOnGetter() );
 
-		assertCorrectPropertyPaths( violations, "foos[0]", "foos[1]" );
+		assertCorrectPropertyPathStringRepresentations( violations, "foos[0]", "foos[1]" );
 	}
 
 	@ValidFoo

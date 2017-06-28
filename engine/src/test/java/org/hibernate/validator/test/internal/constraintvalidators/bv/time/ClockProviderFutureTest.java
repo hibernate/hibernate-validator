@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.time;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
 import java.time.Clock;
@@ -63,7 +63,7 @@ public class ClockProviderFutureTest {
 		Order order = new Order();
 		order.shipmentDateAsReadableInstant = new DateTime( 2099, 2, 15, 4, 0, 0 );
 
-		assertCorrectPropertyPaths( validator.validate( order ), "shipmentDateAsReadableInstant" );
+		assertCorrectPropertyPathStringRepresentations( validator.validate( order ), "shipmentDateAsReadableInstant" );
 	}
 
 	@Test
@@ -71,7 +71,7 @@ public class ClockProviderFutureTest {
 		Order order = new Order();
 		order.shipmentDateAsReadablePartial = new org.joda.time.LocalDateTime( 2099, 2, 15, 4, 0, 0 );
 
-		assertCorrectPropertyPaths( validator.validate( order ), "shipmentDateAsReadablePartial" );
+		assertCorrectPropertyPathStringRepresentations( validator.validate( order ), "shipmentDateAsReadablePartial" );
 	}
 
 	private static class Order {

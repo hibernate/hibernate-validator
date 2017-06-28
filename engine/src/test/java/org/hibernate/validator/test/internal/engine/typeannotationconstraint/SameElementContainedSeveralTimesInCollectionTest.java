@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.typeannotationconstraint;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.Arrays;
@@ -46,7 +46,7 @@ public class SameElementContainedSeveralTimesInCollectionTest {
 
 		Set<ConstraintViolation<ListContainer>> constraintViolations = validator.validate( listContainer );
 
-		assertCorrectPropertyPaths( constraintViolations, "values[0].<list element>", "values[2].<list element>" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "values[0].<list element>", "values[2].<list element>" );
 	}
 
 	@Test
@@ -62,7 +62,7 @@ public class SameElementContainedSeveralTimesInCollectionTest {
 
 		Set<ConstraintViolation<MapContainer>> constraintViolations = validator.validate( withMap );
 
-		assertCorrectPropertyPaths( constraintViolations, "values[EMPTY_1].<map value>", "values[EMPTY_2].<map value>" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "values[EMPTY_1].<map value>", "values[EMPTY_2].<map value>" );
 	}
 
 	private static class ListContainer {

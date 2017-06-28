@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.path.stringrepresentation;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -39,7 +39,7 @@ public class MethodPathStringRepresentationTest extends AbstractPathStringRepres
 		Set<ConstraintViolation<CityService>> constraintViolations = validator.forExecutables()
 				.validateParameters( cityService, method, new Object[] { null } );
 
-		assertCorrectPropertyPaths( constraintViolations, "findByName.name" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "findByName.name" );
 	}
 
 	@Test
@@ -48,7 +48,7 @@ public class MethodPathStringRepresentationTest extends AbstractPathStringRepres
 		Set<ConstraintViolation<CityService>> constraintViolations = validator.forExecutables()
 				.validateParameters( cityService, method, new Object[] { null, null } );
 
-		assertCorrectPropertyPaths( constraintViolations, "findByCityAndStreet.city", "findByCityAndStreet.street" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "findByCityAndStreet.city", "findByCityAndStreet.street" );
 	}
 
 	@Test
@@ -57,7 +57,7 @@ public class MethodPathStringRepresentationTest extends AbstractPathStringRepres
 		Set<ConstraintViolation<CityService>> constraintViolations = validator.forExecutables()
 				.validateReturnValue( cityService, method, null );
 
-		assertCorrectPropertyPaths( constraintViolations, "findByName.<return value>" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "findByName.<return value>" );
 	}
 
 	@Test
@@ -66,7 +66,7 @@ public class MethodPathStringRepresentationTest extends AbstractPathStringRepres
 		Set<ConstraintViolation<CityService>> constraintViolations = validator.forExecutables()
 				.validateReturnValue( cityService, method, new Address( null, new City( "" ) ) );
 
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"findByCityAndStreet.<return value>.city.name",
 				"findByCityAndStreet.<return value>.street"
@@ -79,7 +79,7 @@ public class MethodPathStringRepresentationTest extends AbstractPathStringRepres
 		Set<ConstraintViolation<CityService>> constraintViolations = validator.forExecutables()
 				.validateParameters( cityService, method, new Object[] { null, null, null } );
 
-		assertCorrectPropertyPaths( constraintViolations, "findByCityAndStreetAndZip.<cross-parameter>" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "findByCityAndStreetAndZip.<cross-parameter>" );
 	}
 
 	private interface CityService {

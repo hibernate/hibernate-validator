@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.cfg;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 import static org.testng.Assert.assertTrue;
 
 import java.time.Instant;
@@ -88,7 +88,7 @@ public class ScriptAssertDefTest {
 				)
 		);
 
-		assertCorrectPropertyPaths( violations, propertyPath );
+		assertCorrectPropertyPathStringRepresentations( violations, propertyPath );
 	}
 
 	/**

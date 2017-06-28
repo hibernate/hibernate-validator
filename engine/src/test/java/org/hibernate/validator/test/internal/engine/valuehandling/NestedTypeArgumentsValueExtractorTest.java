@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
@@ -54,7 +54,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( MapOfLists.invalidKey() );
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"map<K>[k].<map key>" );
 		assertThat( constraintViolations ).containsOnlyViolations(
@@ -66,7 +66,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		);
 
 		constraintViolations = validator.validate( MapOfLists.invalidList() );
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"map[key1].<map value>" );
 		assertThat( constraintViolations ).containsOnlyViolations(
@@ -78,7 +78,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		);
 
 		constraintViolations = validator.validate( MapOfLists.invalidString() );
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"map[key1].<map value>[0].<list element>",
 				"map[key1].<map value>[1].<list element>" );
@@ -98,7 +98,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		);
 
 		constraintViolations = validator.validate( MapOfLists.reallyInvalid() );
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"map<K>[k].<map key>",
 				"map[k].<map value>",
@@ -129,7 +129,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( MapOfListsWithAutomaticUnwrapping.invalidStringProperty() );
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"map[key].<map value>[1].<list element>" );
 		assertThat( constraintViolations ).containsOnlyViolations(
@@ -142,7 +142,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		);
 
 		constraintViolations = validator.validate( MapOfListsWithAutomaticUnwrapping.invalidListElement() );
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"map[key].<map value>[0].<list element>" );
 		assertThat( constraintViolations ).containsOnlyViolations(
@@ -161,7 +161,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( ArrayOfOptionalsWithAutomaticUnwrapping.invalidArray() );
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"array[0].<iterable element>",
 				"array[1].<iterable element>" );
@@ -182,7 +182,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 	@Test
 	public void validation_of_nested_type_arguments_works_on_getter_with_map_of_list_of_optional() {
 		Set<ConstraintViolation<MapOfListsUsingGetter>> constraintViolations = validator.validate( MapOfListsUsingGetter.invalidString() );
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"map[key1].<map value>[0].<list element>",
 				"map[key1].<map value>[1].<list element>"
@@ -209,7 +209,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertNoViolations( constraintViolations );
 
 		constraintViolations = validator.validate( NestedArray.invalidArrayFirstDimension() );
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"array[0].<iterable element>" );
 		assertThat( constraintViolations ).containsOnlyViolations(
@@ -221,7 +221,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		);
 
 		constraintViolations = validator.validate( NestedArray.invalidArraySecondDimension() );
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"array[1].<iterable element>[1].<iterable element>" );
 		assertThat( constraintViolations ).containsOnlyViolations(

@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 
 import java.util.Set;
 
@@ -42,7 +42,7 @@ public class ValueExtractorDefinitionInHierarchyTest {
 
 		Set<ConstraintViolation<Entity>> violations = validator.validate( entity );
 
-		assertCorrectPropertyPaths( violations, "property.wrapped" );
+		assertCorrectPropertyPathStringRepresentations( violations, "property.wrapped" );
 	}
 
 	@Test
@@ -58,7 +58,7 @@ public class ValueExtractorDefinitionInHierarchyTest {
 
 		Set<ConstraintViolation<Entity>> violations = validator.validate( entity );
 
-		assertCorrectPropertyPaths( violations, "property.wrapped" );
+		assertCorrectPropertyPathStringRepresentations( violations, "property.wrapped" );
 	}
 
 	@Test(expectedExceptions = ValueExtractorDefinitionException.class, expectedExceptionsMessageRegExp = "HV000218.*")

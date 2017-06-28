@@ -8,7 +8,7 @@ package org.hibernate.validator.test.internal.engine.valuehandling;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 
 import java.util.Set;
 
@@ -51,7 +51,7 @@ public class MostSpecificValueExtractorTest {
 				.getValidator();
 
 		Set<ConstraintViolation<Entity1>> violations = validator.validate( new Entity1( null ) );
-		assertCorrectPropertyPaths( violations, "wrapper.IWrapper11" );
+		assertCorrectPropertyPathStringRepresentations( violations, "wrapper.IWrapper11" );
 	}
 
 	@Test
