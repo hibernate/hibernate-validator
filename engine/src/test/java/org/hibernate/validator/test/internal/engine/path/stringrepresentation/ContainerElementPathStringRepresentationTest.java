@@ -7,19 +7,23 @@
 package org.hibernate.validator.test.internal.engine.path.stringrepresentation;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.testng.annotations.Test;
 
@@ -159,6 +163,35 @@ public class ContainerElementPathStringRepresentationTest extends AbstractPathSt
 		assertCorrectPropertyPathStringRepresentations( constraintViolations, "addresses[0]" );
 	}
 
+	@Test
+	public void testNestedContainerElementConstraints() {
+		Set<ConstraintViolation<MapOfLists>> constraintViolations = validator.validate( MapOfLists.valid() );
+		assertNoViolations( constraintViolations );
+
+		constraintViolations = validator.validate( MapOfLists.invalidKey() );
+		assertCorrectPropertyPathStringRepresentations(
+				constraintViolations,
+				"map<K>[k].<map key>" );
+
+		constraintViolations = validator.validate( MapOfLists.invalidList() );
+		assertCorrectPropertyPathStringRepresentations(
+				constraintViolations,
+				"map[key1].<map value>" );
+
+		constraintViolations = validator.validate( MapOfLists.invalidString() );
+		assertCorrectPropertyPathStringRepresentations(
+				constraintViolations,
+				"map[key1].<map value>[0].<list element>",
+				"map[key1].<map value>[1].<list element>" );
+
+		constraintViolations = validator.validate( MapOfLists.reallyInvalid() );
+		assertCorrectPropertyPathStringRepresentations(
+				constraintViolations,
+				"map<K>[k].<map key>",
+				"map[k].<map value>",
+				"map[k].<map value>[0].<list element>" );
+	}
+
 	private static class DemographicStatistics {
 
 		private Map<@NotNull @Valid Address, @NotNull Integer> inhabitantsPerAddress = new HashMap<>();
@@ -186,4 +219,58 @@ public class ContainerElementPathStringRepresentationTest extends AbstractPathSt
 		}
 	}
 
+	private static class MapOfLists {
+
+		private Map<@Size(min = 2) String, @NotNull @Size(min = 2) List<Optional<@Size(min = 3) String>>> map;
+
+		private static MapOfLists valid() {
+			MapOfLists foo = new MapOfLists();
+
+			List<Optional<String>> list = Arrays.asList( Optional.of( "one" ), Optional.of( "two" ) );
+			foo.map = new HashMap<>();
+			foo.map.put( "key", list );
+
+			return foo;
+		}
+
+		private static MapOfLists invalidKey() {
+			MapOfLists foo = new MapOfLists();
+
+			List<Optional<String>> list = Arrays.asList( Optional.of( "one" ), Optional.of( "two" ) );
+			foo.map = new HashMap<>();
+			foo.map.put( "k", list );
+
+			return foo;
+		}
+
+		private static MapOfLists invalidList() {
+			MapOfLists foo = new MapOfLists();
+
+			List<Optional<String>> list = Arrays.asList( Optional.of( "only one value" ) );
+			foo.map = new HashMap<>();
+			foo.map.put( "key1", list );
+
+			return foo;
+		}
+
+		private static MapOfLists invalidString() {
+			MapOfLists foo = new MapOfLists();
+
+			List<Optional<String>> list = Arrays.asList( Optional.of( "1" ), Optional.of( "2" ) );
+			foo.map = new HashMap<>();
+			foo.map.put( "key1", list );
+
+			return foo;
+		}
+
+		private static MapOfLists reallyInvalid() {
+			MapOfLists foo = new MapOfLists();
+
+			List<Optional<String>> list = Arrays.asList( Optional.of( "1" ) );
+			foo.map = new HashMap<>();
+			foo.map.put( "k", list );
+
+			return foo;
+		}
+	}
 }
