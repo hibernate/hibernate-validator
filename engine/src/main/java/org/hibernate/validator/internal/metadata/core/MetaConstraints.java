@@ -12,6 +12,8 @@ import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,12 +22,13 @@ import javax.validation.metadata.ValidateUnwrappedValue;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorHelper;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint.TypeParameterAndExtractor;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint.ContainerClassTypeParameterAndExtractor;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.TypeVariableBindings;
 import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -46,7 +49,7 @@ public class MetaConstraints {
 
 	public static <A extends Annotation> MetaConstraint<A> create(TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
 			ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location) {
-		List<TypeParameterAndExtractor> valueExtractionPath = new ArrayList<>();
+		List<ContainerClassTypeParameterAndExtractor> valueExtractionPath = new ArrayList<>();
 
 		Type typeOfValidatedElement = addValueExtractorDescriptorForWrappedValue( typeResolutionHelper, valueExtractorManager, constraintDescriptor,
 				valueExtractionPath, location );
@@ -70,7 +73,7 @@ public class MetaConstraints {
 
 	private static <A extends Annotation> Type addValueExtractorDescriptorForWrappedValue(TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager, ConstraintDescriptorImpl<A> constraintDescriptor,
-			List<TypeParameterAndExtractor> valueExtractionPath, ConstraintLocation location) {
+			List<ContainerClassTypeParameterAndExtractor> valueExtractionPath, ConstraintLocation location) {
 		if ( ValidateUnwrappedValue.NO.equals( constraintDescriptor.validateUnwrappedValue() ) ) {
 			return location.getTypeForValidatorResolution();
 		}
@@ -113,16 +116,22 @@ public class MetaConstraints {
 			}
 		}
 
-		valueExtractionPath.add( TypeParameterAndExtractor.of( selectedValueExtractorDescriptor ) );
+		if ( selectedValueExtractorDescriptor.getExtractedType().isPresent() ) {
+			valueExtractionPath.add( new ContainerClassTypeParameterAndExtractor( declaredType, null, selectedValueExtractorDescriptor ) );
+			return selectedValueExtractorDescriptor.getExtractedType().get();
+		}
+		else {
+			Class<?> wrappedValueType = getWrappedValueType( typeResolutionHelper, location.getTypeForValidatorResolution(), selectedValueExtractorDescriptor );
+			TypeVariable<?> typeParameter = getContainerClassTypeParameter( declaredType, selectedValueExtractorDescriptor );
 
-		return selectedValueExtractorDescriptor.getExtractedType()
-				.orElseGet( () -> getSingleTypeParameterBind( typeResolutionHelper,
-						location.getTypeForValidatorResolution(),
-						selectedValueExtractorDescriptor ) );
+			valueExtractionPath.add( new ContainerClassTypeParameterAndExtractor( declaredType, typeParameter, selectedValueExtractorDescriptor ) );
+
+			return wrappedValueType;
+		}
 	}
 
 	private static void addValueExtractorDescriptorForTypeArgumentLocation( ValueExtractorManager valueExtractorManager,
-			List<TypeParameterAndExtractor> valueExtractionPath, TypeArgumentConstraintLocation typeArgumentConstraintLocation ) {
+			List<ContainerClassTypeParameterAndExtractor> valueExtractionPath, TypeArgumentConstraintLocation typeArgumentConstraintLocation ) {
 		Class<?> declaredType = typeArgumentConstraintLocation.getContainerClass();
 		TypeVariable<?> typeParameter = typeArgumentConstraintLocation.getTypeParameter();
 
@@ -133,14 +142,17 @@ public class MetaConstraints {
 			throw LOG.getNoValueExtractorFoundForTypeException( declaredType, typeParameter );
 		}
 
-		valueExtractionPath.add( TypeParameterAndExtractor.of( typeParameter, valueExtractorDescriptor ) );
+		valueExtractionPath.add( new ContainerClassTypeParameterAndExtractor(
+				TypeVariables.getContainerClass( typeParameter ),
+				TypeVariables.getActualTypeParameter( typeParameter ),
+				valueExtractorDescriptor ) );
 	}
 
 	/**
 	 * Returns the sub-types binding for the single type parameter of the super-type. E.g. for {@code IntegerProperty}
 	 * and {@code Property<T>}, {@code Integer} would be returned.
 	 */
-	static Class<?> getSingleTypeParameterBind(TypeResolutionHelper typeResolutionHelper, Type declaredType, ValueExtractorDescriptor valueExtractorDescriptor) {
+	private static Class<?> getWrappedValueType(TypeResolutionHelper typeResolutionHelper, Type declaredType, ValueExtractorDescriptor valueExtractorDescriptor) {
 		ResolvedType resolvedType = typeResolutionHelper.getTypeResolver().resolve( declaredType );
 		List<ResolvedType> resolvedTypeParameters = resolvedType.typeParametersFor( valueExtractorDescriptor.getContainerType() );
 
@@ -152,4 +164,19 @@ public class MetaConstraints {
 		}
 	}
 
+	private static TypeVariable<?> getContainerClassTypeParameter(Class<?> declaredType, ValueExtractorDescriptor selectedValueExtractorDescriptor) {
+		if ( selectedValueExtractorDescriptor.getExtractedTypeParameter() == null ) {
+			return null;
+		}
+
+		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings = TypeVariableBindings.getTypeVariableBindings( declaredType );
+		Map<TypeVariable<?>, TypeVariable<?>> extractorTypeBindings = allBindings.get( selectedValueExtractorDescriptor.getContainerType() );
+		if ( extractorTypeBindings == null ) {
+			return null;
+		}
+		return extractorTypeBindings.entrySet().stream()
+				.filter( e -> Objects.equals( e.getKey().getGenericDeclaration(), declaredType ) )
+				.collect( Collectors.toMap( Map.Entry::getValue, Map.Entry::getKey ) )
+				.get( selectedValueExtractorDescriptor.getExtractedTypeParameter() );
+	}
 }
