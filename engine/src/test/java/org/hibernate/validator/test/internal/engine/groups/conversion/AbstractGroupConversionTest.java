@@ -7,7 +7,7 @@
 package org.hibernate.validator.test.internal.engine.groups.conversion;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.Arrays;
@@ -44,13 +44,13 @@ public abstract class AbstractGroupConversionTest {
 	@Test
 	public void groupConversionOnField() {
 		Set<ConstraintViolation<User1>> violations = validator.validate( new User1() );
-		assertCorrectPropertyPaths( violations, "addresses[].street1", "addresses[].zipCode" );
+		assertCorrectPropertyPathStringRepresentations( violations, "addresses[].street1", "addresses[].zipCode" );
 	}
 
 	@Test
 	public void groupConversionOnGetter() {
 		Set<ConstraintViolation<User2>> violations = validator.validate( new User2() );
-		assertCorrectPropertyPaths( violations, "addresses[].street1", "addresses[].zipCode" );
+		assertCorrectPropertyPathStringRepresentations( violations, "addresses[].street1", "addresses[].zipCode" );
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public abstract class AbstractGroupConversionTest {
 				new List<?>[] { Arrays.asList( new Address() ) }
 		);
 
-		assertCorrectPropertyPaths( violations, "setAddresses.addresses[0].street1", "setAddresses.addresses[0].zipCode" );
+		assertCorrectPropertyPathStringRepresentations( violations, "setAddresses.addresses[0].street1", "setAddresses.addresses[0].zipCode" );
 	}
 
 	@Test
@@ -72,7 +72,7 @@ public abstract class AbstractGroupConversionTest {
 				Arrays.asList( new Address() )
 		);
 
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				violations,
 				"findAddresses.<return value>[0].street1",
 				"findAddresses.<return value>[0].zipCode"
@@ -82,28 +82,28 @@ public abstract class AbstractGroupConversionTest {
 	@Test
 	public void multipleGroupConversionsOnField() {
 		Set<ConstraintViolation<User3>> violations = validator.validate( new User3() );
-		assertCorrectPropertyPaths( violations, "addresses[].street1", "addresses[].zipCode" );
+		assertCorrectPropertyPathStringRepresentations( violations, "addresses[].street1", "addresses[].zipCode" );
 
 		violations = validator.validate( new User3(), Complete.class );
 		for ( ConstraintViolation<User3> constraintViolation : violations ) {
 			log.info( constraintViolation.getPropertyPath() );
 		}
-		assertCorrectPropertyPaths( violations, "addresses[].doorCode", "addresses[].street1", "addresses[].zipCode" );
+		assertCorrectPropertyPathStringRepresentations( violations, "addresses[].doorCode", "addresses[].street1", "addresses[].zipCode" );
 	}
 
 	@Test
 	public void multipleGroupConversionsOnGetter() {
 		Set<ConstraintViolation<User4>> violations = validator.validate( new User4() );
-		assertCorrectPropertyPaths( violations, "addresses[].street1", "addresses[].zipCode" );
+		assertCorrectPropertyPathStringRepresentations( violations, "addresses[].street1", "addresses[].zipCode" );
 
 		violations = validator.validate( new User4(), Complete.class );
-		assertCorrectPropertyPaths( violations, "addresses[].doorCode", "addresses[].street1", "addresses[].zipCode" );
+		assertCorrectPropertyPathStringRepresentations( violations, "addresses[].doorCode", "addresses[].street1", "addresses[].zipCode" );
 	}
 
 	@Test
 	public void conversionIsEvaluatedPerProperty() {
 		Set<ConstraintViolation<User5>> violations = validator.validate( new User5() );
-		assertCorrectPropertyPaths( violations, "addresses[].street1", "addresses[].zipCode", "phoneNumber.number" );
+		assertCorrectPropertyPathStringRepresentations( violations, "addresses[].street1", "addresses[].zipCode", "phoneNumber.number" );
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class,

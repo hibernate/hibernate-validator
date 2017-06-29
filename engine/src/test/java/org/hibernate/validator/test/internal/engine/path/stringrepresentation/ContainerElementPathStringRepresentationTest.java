@@ -4,47 +4,26 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.test.internal.engine.valuehandling;
+package org.hibernate.validator.test.internal.engine.path.stringrepresentation;
 
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;
-import javax.validation.Payload;
 import javax.validation.Valid;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class ContainerElementStringRepresentationTest {
-
-	private Validator validator;
-
-	@BeforeClass
-	public void setupValidator() {
-		validator = Validation.buildDefaultValidatorFactory().getValidator();
-	}
+public class ContainerElementPathStringRepresentationTest extends AbstractPathStringRepresentationTest {
 
 	@Test
 	public void testMapInvalidKeyTypeArgument() {
@@ -53,7 +32,7 @@ public class ContainerElementStringRepresentationTest {
 
 		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statistics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[].<map key>" ); // the key is null, thus the '[]'
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "inhabitantsPerAddress<K>[].<map key>" ); // the key is null, thus the '[]'
 	}
 
 	@Test
@@ -64,7 +43,7 @@ public class ContainerElementStringRepresentationTest {
 
 		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statistics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[null, Lyon].street" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "inhabitantsPerAddress<K>[null, Lyon].street" );
 
 		invalidAddress = new Address( "rue Garibaldi", new City( "L" ) );
 		statistics = new DemographicStatistics();
@@ -72,7 +51,7 @@ public class ContainerElementStringRepresentationTest {
 
 		constraintViolations = validator.validate( statistics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[rue Garibaldi, L].city.name" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "inhabitantsPerAddress<K>[rue Garibaldi, L].city.name" );
 	}
 
 	@Test
@@ -83,7 +62,7 @@ public class ContainerElementStringRepresentationTest {
 
 		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statistics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[rue Garibaldi, Lyon]" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "inhabitantsPerAddress<K>[rue Garibaldi, Lyon]" );
 	}
 
 	@Test
@@ -94,7 +73,7 @@ public class ContainerElementStringRepresentationTest {
 
 		Set<ConstraintViolation<State>> constraintViolations = validator.validate( state );
 
-		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[Lyon].<map value>" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "addressesPerCity[Lyon].<map value>" );
 	}
 
 	@Test
@@ -106,7 +85,7 @@ public class ContainerElementStringRepresentationTest {
 
 		Set<ConstraintViolation<State>> constraintViolations = validator.validate( state );
 
-		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[Lyon].street" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "addressesPerCity[Lyon].street" );
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
@@ -121,7 +100,7 @@ public class ContainerElementStringRepresentationTest {
 
 		constraintViolations = validator.validate( state );
 
-		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[Lyon].city.name" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "addressesPerCity[Lyon].city.name" );
 	}
 
 	@Test
@@ -133,7 +112,7 @@ public class ContainerElementStringRepresentationTest {
 
 		Set<ConstraintViolation<State>> constraintViolations = validator.validate( state );
 
-		assertCorrectPropertyPaths( constraintViolations, "addressesPerCity[Lyon]" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "addressesPerCity[Lyon]" );
 	}
 
 	@Test
@@ -143,7 +122,7 @@ public class ContainerElementStringRepresentationTest {
 
 		Set<ConstraintViolation<Block>> constraintViolations = validator.validate( block );
 
-		assertCorrectPropertyPaths( constraintViolations, "addresses[0].<list element>" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "addresses[0].<list element>" );
 	}
 
 	@Test
@@ -153,7 +132,7 @@ public class ContainerElementStringRepresentationTest {
 
 		Set<ConstraintViolation<Block>> constraintViolations = validator.validate( block );
 
-		assertCorrectPropertyPaths( constraintViolations, "addresses[0].street" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "addresses[0].street" );
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
@@ -167,7 +146,7 @@ public class ContainerElementStringRepresentationTest {
 
 		constraintViolations = validator.validate( block );
 
-		assertCorrectPropertyPaths( constraintViolations, "addresses[0].city.name" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "addresses[0].city.name" );
 	}
 
 	@Test
@@ -177,7 +156,7 @@ public class ContainerElementStringRepresentationTest {
 
 		Set<ConstraintViolation<Block>> constraintViolations = validator.validate( block );
 
-		assertCorrectPropertyPaths( constraintViolations, "addresses[0]" );
+		assertCorrectPropertyPathStringRepresentations( constraintViolations, "addresses[0]" );
 	}
 
 	private static class DemographicStatistics {
@@ -204,71 +183,6 @@ public class ContainerElementStringRepresentationTest {
 
 		public void put(City city, Address address) {
 			addressesPerCity.put( city, address );
-		}
-	}
-
-	@ValidLyonZipCode
-	private static class Address {
-		@NotNull
-		private String street;
-		@Valid
-		private City city;
-		private String zipCode;
-
-		public Address(String street, City city) {
-			this.street = street;
-			this.city = city;
-		}
-
-		public Address(String street, City city, String zipCode) {
-			this.street = street;
-			this.city = city;
-			this.zipCode = zipCode;
-		}
-
-		@Override
-		public String toString() {
-			return street + ", " + city;
-		}
-	}
-
-	private static class City {
-		@Size(min = 3)
-		private String name;
-
-		public City(String name) {
-			this.name = name;
-		}
-
-		@Override
-		public String toString() {
-			return name;
-		}
-
-	}
-
-	@Target({ TYPE, ANNOTATION_TYPE })
-	@Retention(RUNTIME)
-	@Constraint(validatedBy = { ValidLyonZipCodeValidator.class })
-	@Documented
-	public @interface ValidLyonZipCode {
-
-		String message() default "{org.hibernate.validator.test.internal.engine.valuehandling.ValidLyonZipCode.message}";
-
-		Class<?>[] groups() default { };
-
-		Class<? extends Payload>[] payload() default { };
-	}
-
-	public static class ValidLyonZipCodeValidator implements ConstraintValidator<ValidLyonZipCode, Address> {
-
-		@Override
-		public boolean isValid(Address address, ConstraintValidatorContext context) {
-			if ( address == null || address.zipCode == null || address.city == null || !"Lyon".equals( address.city.name ) ) {
-				return true;
-			}
-
-			return address.zipCode.length() == 5 && address.zipCode.startsWith( "6900" );
 		}
 	}
 

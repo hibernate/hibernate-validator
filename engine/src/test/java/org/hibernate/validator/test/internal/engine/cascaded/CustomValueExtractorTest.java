@@ -7,7 +7,7 @@
 package org.hibernate.validator.test.internal.engine.cascaded;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 
 import java.lang.reflect.TypeVariable;
 import java.util.Map;
@@ -68,7 +68,7 @@ public class CustomValueExtractorTest {
 
 		Set<ConstraintViolation<Cinema>> violations = validator.validate( cinema );
 
-		assertCorrectPropertyPaths( violations, "visitor.name" );
+		assertCorrectPropertyPathStringRepresentations( violations, "visitor.name" );
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class CustomValueExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithMultimap>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType<V>[work].email", "addressByType<V>[work].email" );
+		assertCorrectPropertyPathStringRepresentations( violations, "addressByType<V>[work].email", "addressByType<V>[work].email" );
 	}
 
 	@Test
@@ -99,7 +99,7 @@ public class CustomValueExtractorTest {
 
 				Set<ConstraintViolation<CustomerWithMultimap>> violations = validator.validate( bob );
 
-				assertCorrectPropertyPaths( violations, "addressByType<V>[work].email", "addressByType<V>[work].email" );
+				assertCorrectPropertyPathStringRepresentations( violations, "addressByType<V>[work].email", "addressByType<V>[work].email" );
 		} );
 	}
 
@@ -114,7 +114,7 @@ public class CustomValueExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithStringStringMultimap>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType<V>[work].multimap_value", "addressByType<V>[work].multimap_value" );
+		assertCorrectPropertyPathStringRepresentations( violations, "addressByType<V>[work].multimap_value", "addressByType<V>[work].multimap_value" );
 	}
 
 	@Test
@@ -127,7 +127,7 @@ public class CustomValueExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithOptionalAddress>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "address" );
+		assertCorrectPropertyPathStringRepresentations( violations, "address" );
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000197.*")
@@ -156,7 +156,7 @@ public class CustomValueExtractorTest {
 				Set<ConstraintViolation<CustomerWithOptionalAddress>> violations = validator.validate( bob );
 
 				// validation.xml overrides service loader
-				assertCorrectPropertyPaths( violations, "address.1" );
+				assertCorrectPropertyPathStringRepresentations( violations, "address.1" );
 
 				ValidatorFactory validatorFactory = Validation.byDefaultProvider()
 						.configure()
@@ -168,7 +168,7 @@ public class CustomValueExtractorTest {
 				violations = validator.validate( bob );
 
 				// VF overrides validation.xml
-				assertCorrectPropertyPaths( violations, "address.2" );
+				assertCorrectPropertyPathStringRepresentations( violations, "address.2" );
 
 				validator = validatorFactory.usingContext()
 						.addValueExtractor( new GuavaOptionalValueExtractor3() )
@@ -177,7 +177,7 @@ public class CustomValueExtractorTest {
 				violations = validator.validate( bob );
 
 				// V overrides VF
-				assertCorrectPropertyPaths( violations, "address.3" );
+				assertCorrectPropertyPathStringRepresentations( violations, "address.3" );
 			}
 		);
 	}

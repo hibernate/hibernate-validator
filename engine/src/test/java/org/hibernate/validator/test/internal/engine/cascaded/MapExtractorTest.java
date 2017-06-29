@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.cascaded;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 
@@ -43,7 +43,7 @@ public class MapExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithCascadingKeys>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType<K>[too short].type", "addressByType<K>[too small].type" );
+		assertCorrectPropertyPathStringRepresentations( violations, "addressByType<K>[too short].type", "addressByType<K>[too small].type" );
 	}
 
 	@Test
@@ -57,7 +57,7 @@ public class MapExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithConstrainedKeys>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType<K>[too short].<map key>", "addressByType<K>[too small].<map key>" );
+		assertCorrectPropertyPathStringRepresentations( violations, "addressByType<K>[too short].<map key>", "addressByType<K>[too small].<map key>" );
 	}
 
 	@Test
@@ -71,7 +71,7 @@ public class MapExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithCascadingKeyAndValueMap>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType[too small].email", "addressByType[long enough].email", "addressByType<K>[too small].type", "addressByType<K>[too short].type" );
+		assertCorrectPropertyPathStringRepresentations( violations, "addressByType[too small].email", "addressByType[long enough].email", "addressByType<K>[too small].type", "addressByType<K>[too short].type" );
 	}
 
 	@Test
@@ -85,7 +85,7 @@ public class MapExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithConstrainedKeysAndValues>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType<K>[too short].<map key>", "addressByType<K>[too small].<map key>", "addressByType[long enough].<map value>" );
+		assertCorrectPropertyPathStringRepresentations( violations, "addressByType<K>[too short].<map key>", "addressByType<K>[too small].<map key>", "addressByType[long enough].<map value>" );
 	}
 
 	@Test

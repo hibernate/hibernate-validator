@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 /**
@@ -40,7 +40,7 @@ public class CascadedIterableMapPropertiesTest {
 	public void testValidateCustomIterableType() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<IterableExtHolder>> constraintViolations = validator.validate( new IterableExtHolder() );
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"iterableExt.value",
 				"iterableExt[].number"
@@ -52,7 +52,7 @@ public class CascadedIterableMapPropertiesTest {
 	public void testValidateCustomListType() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<ListExtHolder>> constraintViolations = validator.validate( new ListExtHolder() );
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"listExt.value",
 				"listExt[1].number"
@@ -64,7 +64,7 @@ public class CascadedIterableMapPropertiesTest {
 	public void testValidateCustomMapType() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<MapExtHolder>> constraintViolations = validator.validate( new MapExtHolder() );
-		assertCorrectPropertyPaths(
+		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"mapExt.value",
 				"mapExt[second].number"
