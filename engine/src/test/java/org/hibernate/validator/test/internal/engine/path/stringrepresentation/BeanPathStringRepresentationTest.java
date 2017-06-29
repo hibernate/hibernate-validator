@@ -18,6 +18,7 @@ import org.testng.annotations.Test;
  * @author Marko Bekhta
  */
 public class BeanPathStringRepresentationTest extends AbstractPathStringRepresentationTest {
+
 	@Test
 	public void testBeanPath() throws Exception {
 		Address address = new Address( "str", new City( "Lyon" ), "invalid zip" );
@@ -33,5 +34,4 @@ public class BeanPathStringRepresentationTest extends AbstractPathStringRepresen
 
 		assertCorrectPropertyPathStringRepresentations( constraintViolations, "street", "city.name" );
 	}
-
 }

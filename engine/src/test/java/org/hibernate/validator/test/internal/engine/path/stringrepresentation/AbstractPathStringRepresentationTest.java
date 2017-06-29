@@ -38,7 +38,6 @@ public abstract class AbstractPathStringRepresentationTest {
 		validator = Validation.buildDefaultValidatorFactory().getValidator();
 	}
 
-
 	@ValidLyonZipCode
 	protected static class Address {
 

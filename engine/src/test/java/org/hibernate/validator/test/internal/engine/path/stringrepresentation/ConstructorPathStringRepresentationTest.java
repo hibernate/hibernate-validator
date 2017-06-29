@@ -75,6 +75,7 @@ public class ConstructorPathStringRepresentationTest extends AbstractPathStringR
 
 	private static class SmartCity extends City {
 
+		@SuppressWarnings("unused")
 		private final boolean isSmart;
 
 		@ParameterScriptAssert(lang = "groovy", script = "false")
@@ -83,5 +84,4 @@ public class ConstructorPathStringRepresentationTest extends AbstractPathStringR
 			this.isSmart = isSmart;
 		}
 	}
-
 }
