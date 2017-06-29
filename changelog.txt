@@ -1,6 +1,55 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.0.CR1 (29-06-2017)
+-------------------------
+
+** Bug
+    * HV-1403 - engine                       - Container class and type argument index information not present in case of implicit unwrapping
+    * HV-1381 - engine                       - Unwrapping should work if there is only one VE compatible with the type even if there are 2 type arguments
+    * HV-1377 - annotation-processor         - StackOverflowError during compilation with annotation-processor enabled
+    * HV-1358 - engine                       - Class loading issue in modularized environment for value extractors loader by the service loader
+    * HV-1347 - documentation                - Broken link in documentation: "Anatomy of Credit Card Numbers"
+
+** Improvement
+    * HV-1402 - engine                       - Rename internal.engine.cascading package to internal.engine.valueextraction
+    * HV-1393 - documentation                - Update schema coordinates in the documentation to use BV 2.0 schemas
+    * HV-1392 - annotation-processor         - Annotation Processor should check that constraint payload does not contains both Unwrap and Skip at the same time
+    * HV-1378 - engine                       - Having both Unwrap and Skip in the payload should throw a ConstraintDeclarationException and not a ConstraintDefinitionException
+    * HV-1375 - engine                       - English javax.validation.constraints.NotNull.message not in line with the spec
+    * HV-1360 - tests                        - Various infelicities in container element constraints XML tests
+    * HV-1337 - tests                        - Test framework adjustments to improve consistency with the TCK
+
+** New Feature
+    * HV-1382 - engine                       - Implement @PastOrPresent and @FutureOrPresent constraints
+    * HV-1376 - annotation-processor         - Check that @Positive/@Negative and OrZero versions are taken into account in the annotation processor
+    * HV-1362 - engine                       - Add support for @OverridesAttribute default name()
+    * HV-1356 - engine                       - Enable CDI for value extractors added via the ServiceLoader
+
+** Task
+    * HV-1406 - build                        - Upgrade to Bean Validation and TCK 2.0.0.CR1
+    * HV-1401 - engine                       - Add missing Export clause to manifest file
+    * HV-1400 - annotation-processor, engine - Replace remaining package.html files with equivalent package-info.java
+    * HV-1399 - documentation                - Increase TOC depth for reference guide
+    * HV-1396 - annotation-processor         - Move non-public classes of annotation processor to org.hibernate.validator.ap.internal
+    * HV-1394 - tck-runner                   - Disable the access log of the security manager by default
+    * HV-1387 - tests                        - Add tests for the string representation of the property path
+    * HV-1385 - engine                       - Metadata adjustments following BVAL-655
+    * HV-1383 - engine                       - Default type of @ExtractedValue is now void.class instead of Void.class
+    * HV-1380 - engine                       - Wrap ValueExtractor#extractValues() exceptions in ValidationException
+    * HV-1372 - engine                       - Implement @PositiveOrZero and @NegativeOrZero support
+    * HV-1369 - engine                       - Add programmatic definitions for @Positive/@Negative and allegates
+    * HV-1368 - engine                       - Update NotEmptyDef, NotBlankDef... to use the specification constraints
+    * HV-1366 - engine                       - Declaring the exact same value extractor twice in XML should throw an exception
+    * HV-1365 - tests                        - Make spec example 6.6 (property paths) an executable test
+    * HV-1354 - tck-runner                   - Make JavaFX classes visible when running the TCK in incontainer mode
+    * HV-1350 - tests                        - Use the new containsOnlyViolations test framework
+    * HV-1349 - tests                        - Add an annotation to mark candidates for TCK
+    * HV-1348 - engine                       - Add a toString() for GroupConversionHelper
+    * HV-1325 - build                        - Add an Automatic-Module-Name entry to the jar manifests
+    * HV-1151 - documentation                - Update the XML schema images of the documentation for BV 2.0
+    * HV-1051 - build                        - OSGi tests fail using JDK 9
+
 6.0.0.Beta2 (24-05-2017)
 -------------------------
 
