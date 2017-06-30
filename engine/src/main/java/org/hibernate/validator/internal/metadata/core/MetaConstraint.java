@@ -257,7 +257,7 @@ public class MetaConstraint<A extends Annotation> {
 
 		@Override
 		public String toString() {
-			return "TypeParameterAndExtractor [containerClass=" + containerClass +
+			return "ContainerClassTypeParameterAndExtractor [containerClass=" + containerClass +
 					", typeParameter=" + typeParameter +
 					", valueExtractorDescriptor=" + valueExtractorDescriptor + "]";
 		}
