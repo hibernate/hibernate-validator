@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,8 +54,6 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * A CDI portable extension which integrates Bean Validation with CDI. It registers the following objects:
@@ -133,7 +132,7 @@ public class ValidationExtension implements Extension {
 
 		// Register the interceptor explicitly. This way, no beans.xml is needed
 		AnnotatedType<ValidationInterceptor> annotatedType = beanManager.createAnnotatedType( ValidationInterceptor.class );
-		beforeBeanDiscoveryEvent.addAnnotatedType( annotatedType );
+		beforeBeanDiscoveryEvent.addAnnotatedType( annotatedType, ValidationInterceptor.class.getName() );
 	}
 
 	/**
@@ -232,7 +231,7 @@ public class ValidationExtension implements Extension {
 		Set<AnnotatedCallable<? super T>> constrainedCallables = determineConstrainedCallables( type );
 
 		if ( !constrainedCallables.isEmpty() ) {
-			ValidationEnabledAnnotatedType<T> wrappedType = new ValidationEnabledAnnotatedType<T>(
+			ValidationEnabledAnnotatedType<T> wrappedType = new ValidationEnabledAnnotatedType<>(
 					type,
 					constrainedCallables
 			);
@@ -241,7 +240,7 @@ public class ValidationExtension implements Extension {
 	}
 
 	private <T> Set<AnnotatedCallable<? super T>> determineConstrainedCallables(AnnotatedType<T> type) {
-		Set<AnnotatedCallable<? super T>> callables = newHashSet();
+		Set<AnnotatedCallable<? super T>> callables = new HashSet<>();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( type.getJavaClass() );
 
 		determineConstrainedConstructors( type, beanDescriptor, callables );
@@ -405,7 +404,7 @@ public class ValidationExtension implements Extension {
 	}
 
 	public Method replaceWithOverriddenOrInterfaceMethod(Method method, List<Method> allMethodsOfType) {
-		LinkedList<Method> list = new LinkedList<Method>( allMethodsOfType );
+		LinkedList<Method> list = new LinkedList<>( allMethodsOfType );
 		Iterator<Method> iterator = list.descendingIterator();
 		while ( iterator.hasNext() ) {
 			Method overriddenOrInterfaceMethod = iterator.next();
