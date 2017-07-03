@@ -4,31 +4,23 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.test.constraints.br;
+package org.hibernate.validator.test.constraints.annotations.hv.br;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 
 import org.hibernate.validator.constraints.br.CNPJ;
+import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class CNPJValidatorTest {
-	private Validator validator;
-
-	@BeforeMethod
-	public void setUp() {
-		validator = getValidator();
-	}
+public class CNPJValidatorTest extends AbstractConstrainedTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-491")
