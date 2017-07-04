@@ -18,12 +18,12 @@ To create a custom constraint, the following three steps are required:
 ==== The constraint annotation
 
 This section shows how to write a constraint annotation which can be used to ensure that a given
-string is either completely upper case or lower case. Later on this constraint will be applied to
-the `licensePlate` field of the `Car` class from <<validator-gettingstarted>> to ensure, that
+string is either completely upper case or lower case. Later on, this constraint will be applied to
+the `licensePlate` field of the `Car` class from <<validator-gettingstarted>> to ensure that
 the field is always an upper-case string.
 
 The first thing needed is a way to express the two case modes. While you could use `String` constants,
-a better approach is using a Java 5 enum for that purpose:
+a better approach is using an enum for that purpose:
 
 .Enum `CaseMode` to express upper vs. lower case
 ====
@@ -47,7 +47,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CheckCase.
 
 An annotation type is defined using the `@interface` keyword. All attributes of an annotation type are
 declared in a method-like manner. The specification of the Bean Validation API demands, that any
-constraint annotation defines
+constraint annotation defines:
 
 * an attribute `message` that returns the default key for creating error messages in case the
 constraint is violated
@@ -104,9 +104,12 @@ each data type.
 * `@Documented`: Says, that the use of `@CheckCase` will be contained in the JavaDoc of elements
 annotated with it
 
-Finally, there is an inner annotation type named `List`. This annotation allows to specify several
+* `@Repeatable(List.class)`: Indicates that the annotation can be repeated several times at the
+same place, usually with a different configuration. `List` is the containing annotation type.
+
+This containing annotation type named `List` is also shown in the example. It allows to specify several
 `@CheckCase` annotations on the same element, e.g. with different validation groups and messages.
-While also another name could be used, the Bean Validation specification recommends to use the name
+While another name could be used, the Bean Validation specification recommends to use the name
 `List` and make the annotation an inner annotation of the corresponding constraint type.
 
 [[section-constraint-validator]]
@@ -145,7 +148,7 @@ explicitly.
 
 <<example-constraint-validator>>
 relies on the default error message generation by just returning `true` or `false` from the `isValid()`
-method. Using the passed `ConstraintValidatorContext` object it is possible to either add additional
+method. Using the passed `ConstraintValidatorContext` object, it is possible to either add additional
 error messages or completely disable the default error message generation and solely define custom
 error messages. The `ConstraintValidatorContext` API is modeled as fluent interface and is best
 demonstrated with an example:
@@ -222,7 +225,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CarTest.ja
 === Class-level constraints
 
 As discussed earlier, constraints can also be applied on the class level to validate the state of an
-entire object. Class-level constraints are defined in the same was as are property constraints.
+entire object. Class-level constraints are defined in the same way as are property constraints.
 <<example-implementing-classlevel-constraint>> shows constraint annotation and validator of the
 `@ValidPassengerCount` constraint you already saw in use in <<example-class-level>>.
 
@@ -275,9 +278,9 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/custompath
 Bean Validation distinguishes between two different kinds of constraints.
 
 Generic constraints (which have been discussed so far) apply to the annotated element, e.g. a type,
-field, method parameter or return value etc. Cross-parameter constraints, in contrast, apply to the
-array of parameters of a method or constructor and can be used to express validation logic which
-depends on several parameter values.
+field, container element, method parameter or return value etc.
+Cross-parameter constraints, in contrast, apply to the array of parameters of a method or constructor
+and can be used to express validation logic which depends on several parameter values.
 
 In order to define a cross-parameter constraint, its validator class must be annotated with
 `@SupportedValidationTarget(ValidationTarget.PARAMETERS)`. The type parameter `T` from the
@@ -307,7 +310,7 @@ composed constraints based on `@ConsistentDateParameters` (see
 ====
 Cross-parameter constraints are specified directly on the declaration of a method or constructor,
 which is also the case for return value constraints. In order to improve code readability, it is
-therefore recommended to chose constraint names - such as `@ConsistentDateParameters` - which make the
+therefore recommended to choose constraint names - such as `@ConsistentDateParameters` - which make the
 constraint target apparent.
 ====
 
@@ -344,7 +347,7 @@ it has a generic and a cross-parameter validator class.
 
 When declaring such a constraint on a method which has parameters and also a return value, the
 intended constraint target can't be determined. Constraints which are generic and cross-parameter at
-the same time, must therefore define a member `validationAppliesTo()` which allows the constraint user
+the same time must therefore define a member `validationAppliesTo()` which allows the constraint user
 to specify the constraint's target as shown in <<example-dual-cross-parameter-constraint>>.
 
 [[example-dual-cross-parameter-constraint]]
@@ -377,8 +380,8 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/crossparam
 === Constraint composition
 
 Looking at the `licensePlate` field of the `Car` class in <<example-car-with-checkcase>>, you see three
-constraint annotations already. In complexer scenarios, where even more constraints could be applied
-to one element, this might become a bit confusing easily. Furthermore, if there was a `licensePlate`
+constraint annotations already. In more complex scenarios, where even more constraints could be applied
+to one element, this might easily become a bit confusing. Furthermore, if there was a `licensePlate`
 field in another class, you would have to copy all constraint declarations to the other class as
 well, violating the DRY principle.
 
@@ -411,7 +414,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraint
 ----
 ====
 
-The set of `ConstraintViolations` retrieved when validating a `Car` instance will contain an entry for
+The set of ``ConstraintViolation``s retrieved when validating a `Car` instance will contain an entry for
 each violated composing constraint of the `@ValidLicensePlate` constraint. If you rather prefer a
 single `ConstraintViolation` in case any of the composing constraints is violated, the
 `@ReportAsSingleViolation` meta constraint can be used as follows:

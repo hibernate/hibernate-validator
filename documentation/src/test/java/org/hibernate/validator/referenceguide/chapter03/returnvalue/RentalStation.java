@@ -17,7 +17,7 @@ public class RentalStation {
 
 	@NotNull
 	@Size(min = 1)
-	public List<Customer> getCustomers() {
+	public List<@NotNull Customer> getCustomers() {
 		//...
 		return null;
 	}

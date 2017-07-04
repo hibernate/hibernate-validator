@@ -12,7 +12,7 @@ import javax.validation.ReportAsSingleViolation;
 public @interface ValidLicensePlate {
 
 	String message() default "{org.hibernate.validator.referenceguide.chapter06." +
-			"constraintcomposition.ValidLicensePlate.message}";
+			"constraintcomposition.reportassingle.ValidLicensePlate.message}";
 
 	Class<?>[] groups() default { };
 

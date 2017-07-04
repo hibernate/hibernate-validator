@@ -2,7 +2,7 @@
 == Grouping constraints
 
 All validation methods on `Validator` and `ExecutableValidator` discussed in earlier chapters also take
-a var-arg argument groups. So far we have been ignoring this parameter, but it is time to have a
+a var-arg argument `groups`. So far we have been ignoring this parameter, but it is time to have a
 closer look.
 
 === Requesting groups
@@ -95,7 +95,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/GroupTest.
 ====
 
 The first `validate()` call in <<example-drive-away>> is done using no explicit group. There are no
-validation errors, even though the property `passedVehicleInspection` is per default `false`. However,
+validation errors, even though the property `passedVehicleInspection` is per default `false` as
 the constraint defined on this property does not belong to the default group.
 
 The next validation using the `CarChecks` group fails until the car passes the vehicle inspection.
@@ -155,7 +155,7 @@ belts coming from the `RaceCarChecks` group.
 === Defining group sequences
 
 By default, constraints are evaluated in no particular order, regardless of which groups they belong
-to. In some situations, however, it is useful to control the order constraints are evaluated.
+to. In some situations, however, it is useful to control the order in which constraints are evaluated.
 
 In the example from <<example-drive-away>> it could for instance be required that first all default
 car constraints are passing before checking the road worthiness of the car. Finally, before driving
@@ -163,7 +163,7 @@ away, the actual driver constraints should be checked.
 
 In order to implement such a validation order you just need to define an interface and annotate it
 with `@GroupSequence`, defining the order in which the groups have to be validated (see
-<<example-defining-group-sequence>>). If at least one constraint fails in a sequenced group none of the
+<<example-defining-group-sequence>>). If at least one constraint fails in a sequenced group, none of the
 constraints of the following groups in the sequence get validated.
 
 [[example-defining-group-sequence]]
@@ -201,7 +201,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/GroupTest.
 
 Besides defining group sequences, the `@GroupSequence` annotation also allows to redefine the default
 group for a given class. To do so, just add the `@GroupSequence` annotation to the class and specify
-the sequence of groups which substitute Default for this class within the annotation.
+the sequence of groups which substitute `Default` for this class within the annotation.
 
 <<example-rental-car>> introduces a new class `RentalCar` with a redefined default group.
 
@@ -233,13 +233,13 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/GroupTest.
 
 [NOTE]
 ====
-Since there must no cyclic dependency in the group and group sequence definitions one cannot just
+Since there must be no cyclic dependency in the group and group sequence definitions, one cannot just
 add `Default` to the sequence redefining `Default` for a class. Instead the class itself has to be
-added!
+added.
 ====
 
 The `Default` group sequence overriding is local to the class it is defined on and is not propagated
-to associated objects. For the example this means that adding `DriverChecks` to the default group
+to associated objects. For the example, this means that adding `DriverChecks` to the default group
 sequence of `RentalCar` would not have any effects. Only the group `Default` will be propagated to the
 driver association.
 
@@ -252,9 +252,9 @@ In addition to statically redefining default group sequences via `@GroupSequence
 also provides an SPI for the dynamic redefinition of default group sequences depending on the object
 state.
 
-For that purpose you need to implement the interface `DefaultGroupSequenceProvider` and register this
+For that purpose, you need to implement the interface `DefaultGroupSequenceProvider` and register this
 implementation with the target class via the `@GroupSequenceProvider` annotation. In the rental car
-scenario you could for instance dynamically add the `CarChecks` as seen in
+scenario, you could for instance dynamically add the `CarChecks` as seen in
 <<example-implementing-using-default-group-sequence-provider>>.
 
 [[example-implementing-using-default-group-sequence-provider]]
@@ -277,7 +277,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupseque
 What if you wanted to validate the car related checks together with the driver checks? Of course you
 could pass the required groups to the validate call explicitly, but what if you wanted to make these
 validations occur as part of the `Default` group validation? Here `@ConvertGroup` comes into play which
-allows you during cascaded validation to use a different group than the originally requested one.
+allows you to use a different group than the originally requested one during cascaded validation.
 
 Let's have a look at <<example-group-conversion-dedault-to-driver-checks>>. Here `@GroupSequence({
 CarChecks.class, Car.class })` is used to combine the car related constraints under the `Default` group
@@ -324,7 +324,7 @@ However, the following restrictions apply:
 * It is not legal to have multiple conversion rules on the same element with the same from value.
 In this case, a `ConstraintDeclarationException` is raised.
 
-* The from attribute must not refer to a group sequence. A `ConstraintDeclarationException` is
+* The `from` attribute must not refer to a group sequence. A `ConstraintDeclarationException` is
 raised in this situation.
 
 [NOTE]

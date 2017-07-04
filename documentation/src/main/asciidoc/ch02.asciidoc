@@ -13,11 +13,11 @@ If you are interested in applying constraints to method parameters and return va
 === Declaring bean constraints
 
 Constraints in Bean Validation are expressed via Java annotations. In this section you will learn
-how to enhance an object model with these annotations. There are the following three types of bean
-constraints:
+how to enhance an object model with these annotations. There are four types of bean constraints:
 
 * field constraints
 * property constraints
+* container element constraints
 * class constraints
 
 [NOTE]
@@ -51,7 +51,7 @@ static fields are not supported, though.
 
 [TIP]
 ====
-When validating byte code enhanced objects property level constraints should be used, because the
+When validating byte code enhanced objects, property level constraints should be used, because the
 byte code enhancing library won't be able to determine a field access via reflection.
 ====
 
@@ -88,122 +88,191 @@ recommended to annotate a field _and_ the accompanying getter method as this wou
 to be validated twice.
 ====
 
-[[type-arguments-constraints]]
-==== Type argument constraints
+[[container-element-constraints]]
+==== Container element constraints
 
-Starting from Java 8, it is possible to specify constraints directly on the type argument of a
-parameterized type. This requires that `ElementType.TYPE_USE` is specified via `@Target`
+It is possible to specify constraints directly on the type argument of a
+parameterized type: these constraints are called container element constraints.
+
+This requires that `ElementType.TYPE_USE` is specified via `@Target`
 in the constraint definition. As of Bean Validation 2.0, built-in Bean Validation as well as
 Hibernate Validator specific constraints specify `ElementType.TYPE_USE` and can be used
 directly in this context.
 
-Hibernate Validator validates type arguments constraints specified on collections, map values,
-`java.util.Optional`, and custom parameterized types.
+Hibernate Validator validates container element constraints specified on the following standard
+Java containers:
+
+ * implementations of `java.util.Iterable` (e.g. ``List``s, ``Set``s),
+ * implementations of `java.util.Map`, with support for keys and values,
+ * `java.util.Optional`, `java.util.OptionalInt`, `java.util.OptionalDouble`, `java.util.OptionalLong`,
+ * the various implementations of JavaFX's `javafx.beans.observable.ObservableValue`.
+
+It also supports container element constraints on custom container types (see <<chapter-valueextraction>>).
+
+[NOTE]
+====
+In versions prior to 6, a subset of container element constraints were supported. A `@Valid` annotation
+was required at the container level to enable them.
+This is not required anymore as of Hibernate Validator 6.
+====
+
+We present below a couple of examples illustrating container element constraints on various Java types.
+
+In these examples, `@ValidPart` is a custom constraint allowed to be used in the `TYPE_USE` context.
 
 ===== With `Iterable`
 
 When applying constraints on an `Iterable` type argument, Hibernate Validator will validate each
-element. <<example-type-arguments-constraints-collections>> shows an example of a
-`List` with a type argument constraint.
+element. <<example-container-element-constraints-iterable>> shows an example of a
+`Set` with a container element constraint.
 
-In this example, `@ValidPart` is a custom constraint allowed to be used in the `TYPE_USE` context.
-
-[[example-type-arguments-constraints-collections]]
-.Type argument constraint on `List`
+[[example-container-element-constraints-iterable]]
+.Container element constraint on `Set`
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/list/Car.java[tags=include]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/set/Car.java[tags=include]
 ----
 
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/list/CarTest.java[tags=validateListTypeArgumentConstraint]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/set/CarTest.java[tags=validateSetContainerElementConstraint]
 ----
 ====
+
+Note how the property path clearly states that the violation comes from an element of the iterable.
+
+===== With `List`
+
+When applying constraints on a `List` type argument, Hibernate Validator will validate each
+element. <<example-container-element-constraints-list>> shows an example of a
+`List` with a container element constraint.
+
+[[example-container-element-constraints-list]]
+.Container element constraint on `List`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/list/Car.java[tags=include]
+----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/list/CarTest.java[tags=validateListContainerElementConstraint]
+----
+====
+
+Here, the property path also contains the index of the invalid element.
 
 ===== With `Map`
 
-Type argument constraints are also validated for map values. Constraints on the key are ignored.
-<<example-type-arguments-constraints-map>> shows an example of a `Map` value with a type
-argument constraint.
+Container element constraints are also validated on map keys and values.
+<<example-container-element-constraints-map>> shows an example of a `Map` with a constraint on the key
+and a constraint on the value.
 
-[[example-type-arguments-constraints-map]]
-.Type argument constraint on maps
+[[example-container-element-constraints-map]]
+.Container element constraint on map keys and values
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/map/Car.java[tags=include]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/map/Car.java[tags=include]
 ----
 
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/map/CarTest.java[tags=validateMapTypeArgumentConstraint]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/map/CarTest.java[tags=validateMapValueContainerElementConstraint]
+----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/map/CarTest.java[tags=validateMapKeyContainerElementConstraint]
 ----
 ====
 
+The property paths of the violations are particularly interesting:
+
+ * The key of the invalid element is included in the property path (in the second example, the key is `null`).
+ * In the first example, the violation concerns the `<map value>`, in the second one, the `<map key>`.
+ * In the second example, you might have noticed the presence of the type argument `<K>`, more on this later.
 
 ===== With `java.util.Optional`
 
 When applying a constraint on the type argument of `Optional`, Hibernate Validator will automatically
-unwrap the type and validate the internal value. <<example-type-arguments-constraints-optional>> shows
-an example of an `Optional` with a type argument constraint.
+unwrap the type and validate the internal value. <<example-container-element-constraints-optional>> shows
+an example of an `Optional` with a container element constraint.
 
-[[example-type-arguments-constraints-optional]]
-.Type argument constraint on Optional
+[[example-container-element-constraints-optional]]
+.Container element constraint on Optional
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/optional/Car.java[tags=include]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/optional/Car.java[tags=include]
 ----
 
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/optional/CarTest.java[tags=validateOptionalTypeArgumentConstraint]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/optional/CarTest.java[tags=validateOptionalContainerElementConstraint]
 ----
 ====
 
+Here, the property path only contains the name of the property as we are considering `Optional` as a "transparent"
+container.
 
-===== With custom parameterized types
+===== With custom container types
 
-Type arguments constraints can with two restrictions also be used with custom types. First, a
-`ValidatedValueUnwrapper` must be registered for the custom type allowing to retrieve
-the value to validate (see <<section-value-handling>>). Second, only types with one type arguments
-are supported. Parameterized types with two or more type arguments are not checked for type argument
-constraints. This limitation might change in future versions.
+Container element constraints can also be used with custom containers.
 
-<<example-type-arguments-constraints-custom-parameterized-type>> shows an example of a custom
+A `ValueExtractor` must be registered for the custom type allowing to retrieve
+the value(s) to validate (see <<chapter-valueextraction>> for more information about how to implement
+your own `ValueExtractor` and how to register it).
+
+<<example-container-element-constraints-custom-container-type>> shows an example of a custom
 parameterized type with a type argument constraint.
 
-[[example-type-arguments-constraints-custom-parameterized-type]]
-.Type argument constraint on custom parameterized type
+[[example-container-element-constraints-custom-container-type]]
+.Container element constraint on custom container type
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/custom/Car.java[tags=include]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/custom/Car.java[tags=include]
 ----
 
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/custom/GearBox.java[tags=include]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/custom/GearBox.java[tags=include]
 ----
 
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/custom/Gear.java[tags=include]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/custom/Gear.java[tags=include]
 ----
 
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/custom/GearBoxExtractor.java[tags=include]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/custom/GearBoxValueExtractor.java[tags=include]
 ----
 
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/custom/CarTest.java[tags=validateCustomTypeArgumentConstraint]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/custom/CarTest.java[tags=validateCustomContainerElementConstraint]
 ----
 ====
 
+===== Nested container elements
+
+Constraints are also supported on nested container elements.
+
+When validating a `Car` object as presented in <<example-container-element-nested>>, both the `@NotNull`
+constraints on `Part` and `Manufacturer` will be enforced.
+
+[[example-container-element-nested]]
+.Constraints on nested container elements
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/nested/Car.java[tags=include]
+----
+====
 
 [[validator-usingvalidator-classlevel]]
 ==== Class-level constraints
@@ -212,8 +281,8 @@ Last but not least, a constraint can also be placed on the class level. In this 
 property is subject of the validation but the complete object. Class-level constraints are useful if
 the validation depends on a correlation between several properties of an object.
 
-The Car class in <<example-class-level>> has the two attributes `seatCount` and `passengers` and it
-should be ensured that the list of passengers has not more entries than seats are available. For
+The `Car` class in <<example-class-level>> has the two attributes `seatCount` and `passengers` and it
+should be ensured that the list of passengers does not have more entries than available seats. For
 that purpose the `@ValidPassengerCount` constraint is added on the class level. The validator of that
 constraint has access to the complete `Car` object, allowing to compare the numbers of seats and
 passengers.
@@ -292,34 +361,57 @@ loops occur during cascaded validation, for example if two objects hold referenc
 
 Note that `null` values are getting ignored during cascaded validation.
 
-Object graph validation also works for collection-typed fields. That means any attributes that
-
-
-* are arrays
-* implement `java.lang.Iterable` (especially `Collection`, `List` and `Set`)
-* implement `java.util.Map`
-
-can be annotated with `@Valid`, which will cause each contained element to be validated, when the
+As constraints, object graph validation also works for container elements. That means any type argument
+of a container can be annotated with `@Valid`, which will cause each contained element to be validated when the
 parent object is validated.
 
+[NOTE]
+====
+Cascaded validation is also supported for nested container elements.
+====
+
 [[example-cascaded-validation-list]]
-.Cascaded validation of a collection
+.Cascaded validation of containers
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/objectgraph/list/Car.java[tags=include]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/objectgraph/containerelement/Car.java[tags=include]
+----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/objectgraph/containerelement/Part.java[tags=include]
+----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/objectgraph/containerelement/Manufacturer.java[tags=include]
 ----
 ====
 
-So when validating an instance of the `Car` class shown in <<example-cascaded-validation-list>>, a
-`ConstraintViolation` will be created, if any of the `Person` objects contained in the passengers list
+When validating an instance of the `Car` class shown in <<example-cascaded-validation-list>>, a
+`ConstraintViolation` will be created:
+
+ * if any of the `Person` objects contained in the passengers list has a `null` name;
+ * if any of the `Part` objects contained in the map keys has a `null` name;
+ * if any of the `Manufacturer` objects contained in the list nested in the map values
 has a `null` name.
+
+[NOTE]
+====
+In versions prior to 6, Hibernate Validator supported cascaded validation for a subset of container elements
+and it was implemented at the container level (e.g. you would use `@Valid private List<Person>` to enable
+cascaded validation for `Person`).
+
+This is still supported but is not recommended. Please use container element level `@Valid` annotations instead
+as it is more expressive.
+====
 
 [[section-validating-bean-constraints]]
 === Validating bean constraints
 
 The `Validator` interface is the most important object in Bean Validation. The next section shows how
-to obtain an `Validator` instance. Afterwards you'll learn how to use the different methods of the
+to obtain a `Validator` instance. Afterwards you'll learn how to use the different methods of the
 `Validator` interface.
 
 [[section-obtaining-validator]]
@@ -349,8 +441,8 @@ or just single properties of the entity.
 All three methods return a `Set<ConstraintViolation>`. The set is empty, if the validation succeeds.
 Otherwise a `ConstraintViolation` instance is added for each violated constraint.
 
-All the validation methods have a var-args parameter which can be used to specify, which validation
-groups shall be considered when performing the validation. If the parameter is not specified the
+All the validation methods have a var-args parameter which can be used to specify which validation
+groups shall be considered when performing the validation. If the parameter is not specified, the
 default validation group (`javax.validation.groups.Default`) is used. The topic of validation groups
 is discussed in detail in <<chapter-groups>>.
 
@@ -546,10 +638,6 @@ impact portability of your application between Bean Validation providers.
 	Supported data types::: `CharSequence`, `Collection`, `Map` and arrays
 	Hibernate metadata impact::: Column length will be set to `max`
 
-`@Valid`:: Performs validation recursively on the associated object. If the object is a collection or an array, the elements are validated recursively. If the object is a map, the value elements are validated recursively.
-	Supported data types::: Any non-primitive type
-	Hibernate metadata impact::: None
-
 [NOTE]
 ====
 On top of the parameters listed above each constraint has the parameters
@@ -559,7 +647,7 @@ message, groups and payload. This is a requirement of the Bean Validation specif
 [[validator-defineconstraints-hv-constraints]]
 ==== Additional constraints
 
-In addition to the constraints defined by the Bean Validation API Hibernate Validator provides several useful custom constraints which are listed below.
+In addition to the constraints defined by the Bean Validation API, Hibernate Validator provides several useful custom constraints which are listed below.
 With one exception also these constraints apply to the field/property level, only `@ScriptAssert` is a class-level constraint.
 
 `@CreditCardNumber(ignoreNonDigitCharacters=)`:: Checks that the annotated character sequence passes the Luhn checksum test. Note, this validation aims to check for user mistakes, not credit card validity! See also http://www.dirigodev.com/blog/ecommerce/anatomy-of-a-credit-card-number/[Anatomy of a credit card number]. `ignoreNonDigitCharacters` allows to ignore non digit characters. The default is `false`.
@@ -582,10 +670,6 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
-`@Email`:: Checks whether the specified character sequence is a valid email address. The optional parameters `regexp` and `flags` allow to specify an additional regular expression (including regular expression flags) which the email must match. Is *deprecated* in favor of corresponding Bean Validation annotation (see <<validator-defineconstraints-spec>>).
-	Supported data types::: `CharSequence`
-	Hibernate metadata impact::: None
-
 `@Length(min=, max=)`:: Validates that the annotated character sequence is between `min` and `max` included
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: Column length will be set to max
@@ -600,14 +684,6 @@ With one exception also these constraints apply to the field/property level, onl
 
 `@Mod11Check(threshold=, startIndex=, endIndex=, checkDigitIndex=, ignoreNonDigitCharacters=, treatCheck10As=, treatCheck11As=)`:: Checks that the digits within the annotated character sequence pass the mod 11 checksum algorithm. `threshold` specifies the threshold for the mod11 multiplier growth; if no value is specified the multiplier will grow indefinitely. `treatCheck10As` and `treatCheck11As` specify the check digits to be used when the mod 11 checksum equals 10 or 11, respectively. Default to X and 0, respectively. `startIndex`, `endIndex` `checkDigitIndex` and `ignoreNonDigitCharacters` carry the same semantics as in `@Mod10Check`.
 	Supported data types::: `CharSequence`
-	Hibernate metadata impact::: None
-
-`@NotBlank`:: Checks that the annotated character sequence is not null and the trimmed length is greater than 0. The difference to `@NotEmpty` is that this constraint can only be applied on strings and that trailing white-spaces are ignored.  Is *deprecated* in favor of corresponding Bean Validation annotation (see <<validator-defineconstraints-spec>>).
-	Supported data types::: `CharSequence`
-	Hibernate metadata impact::: None
-
-`@NotEmpty`:: Checks whether the annotated element is not null nor empty.  Is *deprecated* in favor of corresponding Bean Validation annotation (see <<validator-defineconstraints-spec>>).
-	Supported data types::: `CharSequence`, `Collection`, `Map` and arrays
 	Hibernate metadata impact::: None
 
 `@Range(min=, max=)`:: Checks whether the annotated value lies between (inclusive) the specified minimum and maximum

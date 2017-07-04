@@ -1,5 +1,5 @@
 = Hibernate Validator {hvVersion} - JSR 380 Reference Implementation: Reference Guide
-Hardy Ferentschik; Gunnar Morling
+Hardy Ferentschik; Gunnar Morling; Guillaume Smet
 :doctype: book
 :revdate: {docdate}
 :sectanchors:
