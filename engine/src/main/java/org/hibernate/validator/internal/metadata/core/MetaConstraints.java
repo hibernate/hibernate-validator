@@ -74,7 +74,7 @@ public class MetaConstraints {
 	private static <A extends Annotation> Type addValueExtractorDescriptorForWrappedValue(TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager, ConstraintDescriptorImpl<A> constraintDescriptor,
 			List<ContainerClassTypeParameterAndExtractor> valueExtractionPath, ConstraintLocation location) {
-		if ( ValidateUnwrappedValue.NO.equals( constraintDescriptor.validateUnwrappedValue() ) ) {
+		if ( ValidateUnwrappedValue.SKIP.equals( constraintDescriptor.getValueUnwrapping() ) ) {
 			return location.getTypeForValidatorResolution();
 		}
 
@@ -83,7 +83,7 @@ public class MetaConstraints {
 		ValueExtractorDescriptor selectedValueExtractorDescriptor;
 
 		// we want to force the unwrapping so we require one and only one maximally specific value extractors
-		if ( ValidateUnwrappedValue.YES.equals( constraintDescriptor.validateUnwrappedValue() ) ) {
+		if ( ValidateUnwrappedValue.UNWRAP.equals( constraintDescriptor.getValueUnwrapping() ) ) {
 			switch ( valueExtractorDescriptorCandidates.size() ) {
 				case 0:
 					throw LOG.getNoValueExtractorFoundForTypeException( declaredType, null );
