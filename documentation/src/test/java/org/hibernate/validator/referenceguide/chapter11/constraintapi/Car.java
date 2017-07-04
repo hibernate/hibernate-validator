@@ -1,6 +1,10 @@
 package org.hibernate.validator.referenceguide.chapter11.constraintapi;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.validation.constraints.NotNull;
 
 public class Car {
 
@@ -9,6 +13,8 @@ public class Car {
 	private String licensePlate;
 
 	private Person driver;
+
+	private Map<Part, List<Manufacturer>> partManufacturers = new HashMap<>();
 
 	public Car(String manufacturer) {
 	}

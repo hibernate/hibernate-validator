@@ -1,7 +1,8 @@
 <constraint-mappings
         xmlns="http://xmlns.jcp.org/xml/ns/validation/mapping"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/validation/mapping validation-mapping-2.0.xsd"
+        xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/validation/mapping
+            http://xmlns.jcp.org/xml/ns/validation/mapping/validation-mapping-2.0.xsd"
         version="2.0">
 
     <default-package>org.hibernate.validator.referenceguide.chapter07</default-package>
@@ -40,6 +41,15 @@
                 <constraint annotation="javax.validation.constraints.Min">
                     <element name="value">1</element>
                 </constraint>
+            </parameter>
+        </method>
+
+        <method name="addCars">
+            <parameter type="java.util.List">
+                <container-element-type>
+                    <valid/>
+                    <constraint annotation="javax.validation.constraints.NotNull"/>
+                </container-element-type>
             </parameter>
         </method>
     </bean>

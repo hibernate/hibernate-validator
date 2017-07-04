@@ -1,0 +1,58 @@
+<constraint-mappings
+        xmlns="http://xmlns.jcp.org/xml/ns/validation/mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/validation/mapping
+            http://xmlns.jcp.org/xml/ns/validation/mapping/validation-mapping-2.0.xsd"
+        version="2.0">
+
+    <default-package>org.hibernate.validator.referenceguide.chapter05</default-package>
+    <bean class="Car" ignore-annotations="true">
+        <field name="manufacturer">
+            <constraint annotation="javax.validation.constraints.NotNull"/>
+        </field>
+        <field name="licensePlate">
+            <constraint annotation="javax.validation.constraints.NotNull"/>
+        </field>
+        <field name="seatCount">
+            <constraint annotation="javax.validation.constraints.Min">
+                <element name="value">2</element>
+            </constraint>
+        </field>
+        <field name="driver">
+            <valid/>
+        </field>
+        <field name="partManufacturers">
+            <container-element-type type-argument-index="0">
+                <valid/>
+            </container-element-type>
+            <container-element-type type-argument-index="1">
+                <container-element-type>
+                    <valid/>
+                    <constraint annotation="javax.validation.constraints.NotNull"/>
+                </container-element-type>
+            </container-element-type>
+        </field>
+        <getter name="passedVehicleInspection" ignore-annotations="true">
+            <constraint annotation="javax.validation.constraints.AssertTrue">
+                <message>The car has to pass the vehicle inspection first</message>
+                <groups>
+                    <value>CarChecks</value>
+                </groups>
+                <element name="max">10</element>
+            </constraint>
+        </getter>
+    </bean>
+    <bean class="RentalCar" ignore-annotations="true">
+        <class ignore-annotations="true">
+            <group-sequence>
+                <value>RentalCar</value>
+                <value>CarChecks</value>
+            </group-sequence>
+        </class>
+    </bean>
+    <constraint-definition annotation="org.mycompany.CheckCase">
+        <validated-by include-existing-validators="false">
+            <value>org.mycompany.CheckCaseValidator</value>
+        </validated-by>
+    </constraint-definition>
+</constraint-mappings>

@@ -68,6 +68,35 @@ public class ConstraintApiTest {
 	}
 
 	@Test
+	public void nestedContainerElementConstraint() {
+		HibernateValidatorConfiguration configuration = Validation
+				.byProvider( HibernateValidator.class )
+				.configure();
+
+		//tag::nestedContainerElementConstraint[]
+		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
+
+		constraintMapping
+			.type( Car.class )
+				.property( "manufacturer", FIELD )
+					.constraint( new NotNullDef() )
+				.property( "licensePlate", FIELD )
+					.ignoreAnnotations( true )
+					.constraint( new NotNullDef() )
+					.constraint( new SizeDef().min( 2 ).max( 14 ) )
+				.property( "partManufacturers", FIELD )
+					.containerElementType( 0 )
+						.constraint( new NotNullDef() )
+					.containerElementType( 1, 0 )
+						.constraint( new NotNullDef() )
+			.type( RentalCar.class )
+				.property( "rentalStation", METHOD )
+					.constraint( new NotNullDef() );
+		//end::nestedContainerElementConstraint[]
+	}
+
+
+	@Test
 	public void cascaded() {
 		HibernateValidatorConfiguration configuration = Validation
 				.byProvider( HibernateValidator.class )
@@ -82,6 +111,11 @@ public class ConstraintApiTest {
 					.constraint( new NotNullDef() )
 					.valid()
 					.convertGroup( Default.class ).to( PersonDefault.class )
+				.property( "partManufacturers", FIELD )
+					.containerElementType( 0 )
+						.valid()
+					.containerElementType( 1, 0 )
+						.valid()
 			.type( Person.class )
 				.property( "name", FIELD )
 					.constraint( new NotNullDef().groups( PersonDefault.class ) );

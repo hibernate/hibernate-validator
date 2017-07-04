@@ -180,7 +180,7 @@ These module names are preliminary and may be changed when providing real module
 [[validator-gettingstarted-createmodel]]
 === Applying constraints
 
-Lets dive directly into an example to see how to apply constraints.
+Let's dive directly into an example to see how to apply constraints.
 
 [[example-class-car]]
 .Class Car annotated with constraints
@@ -239,42 +239,10 @@ Note that only classes from the package `javax.validation` are used. These are p
 Validation API. No classes from Hibernate Validator are directly referenced, resulting in portable
 code.
 
-=== Java 8 support
-
-Java 8 introduces several enhancements which are valuable from a Hibernate Validator point of view.
-This section briefly introduces the Hibernate Validator features based on Java 8.
-They are only available in Hibernate Validator 5.2 and later.
-
-==== Type arguments constraints
-
-In Java 8 it is possible to use annotations in any location a type is used. This includes type
-arguments. Hibernate Validator supports the validation of constraints defined on type arguments
-of collections, maps, and custom parameterized types. The <<type-arguments-constraints>> chapter
-provides further information on how to apply and use type argument constraints.
-
-==== Actual parameter names
-
-The Java 8 Reflection API can now retrieve the actual parameter names of a method or constructor.
-Hibernate Validator uses this ability to report the actual parameter names instead of `arg0`,
-`arg1`, etc. The <<section-parameter-name-provider>> chapter explains how to use the new reflection
-based parameter name provider.
-
-==== New date/time API
-
-Java 8 introduces a new date/time API. Hibernate Validator provides full support for the new API
-where `@Future` and `@Past` constraints can be applied on the new types.
-The complete list of types supported for `@Future` and `@Past` can be found in <<validator-defineconstraints-spec>>.
-
-==== Optional type
-
-Hibernate Validator provides also support for Java 8 `Optional` type, by unwrapping the `Optional`
-instance and validating the internal value. <<section-optional-unwrapper>> provides examples and a
-further discussion.
-
 [[validator-gettingstarted-whatsnext]]
 === Where to go next?
 
-That concludes the 5 minute tour through the world of Hibernate Validator and Bean Validation.
+That concludes the 5 minutes tour through the world of Hibernate Validator and Bean Validation.
 Continue exploring the code examples or look at further examples referenced in
 <<validator-further-reading>>.
 

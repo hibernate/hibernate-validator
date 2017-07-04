@@ -1,0 +1,31 @@
+<validation-config
+        xmlns="http://xmlns.jcp.org/xml/ns/validation/configuration"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/validation/configuration
+            http://xmlns.jcp.org/xml/ns/validation/configuration/validation-configuration-2.0.xsd"
+        version="2.0">
+
+    <default-provider>com.acme.ValidationProvider</default-provider>
+
+    <message-interpolator>com.acme.MessageInterpolator</message-interpolator>
+    <traversable-resolver>com.acme.TraversableResolver</traversable-resolver>
+    <constraint-validator-factory>
+        com.acme.ConstraintValidatorFactory
+    </constraint-validator-factory>
+    <parameter-name-provider>com.acme.ParameterNameProvider</parameter-name-provider>
+    <clock-provider>com.acme.ClockProvider</clock-provider>
+
+    <value-extractor>com.acme.ContainerValueExtractor</value-extractor>
+
+    <executable-validation enabled="true">
+        <default-validated-executable-types>
+            <executable-type>CONSTRUCTORS</executable-type>
+            <executable-type>NON_GETTER_METHODS</executable-type>
+            <executable-type>GETTER_METHODS</executable-type>
+        </default-validated-executable-types>
+    </executable-validation>
+
+    <constraint-mapping>META-INF/validation/constraints-car.xml</constraint-mapping>
+
+    <property name="hibernate.validator.fail_fast">false</property>
+</validation-config>
