@@ -43,6 +43,10 @@ maven-eclipse.xml
 *.sublime-project
 *.sublime-workspace
 
+# Vim
+.*.swp
+.*.swo
+
 # Miscellaneous
 *.log
 .clover
