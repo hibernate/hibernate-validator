@@ -60,14 +60,15 @@ Unified EL in error messages.
 [TIP]
 ====
 You can find the formal definition of the interpolation algorithm in section
-link:http://beanvalidation.org/2.0/spec/#default-resolution-algorithm[5.3.1.1] of the Bean
-Validation specification.
+http://beanvalidation.org/2.0/spec/#validationapi-message-defaultmessageinterpolation-resolutionalgorithm[6.3.1.1]
+of the Bean Validation specification.
 ====
 
 [[section-special-characters]]
 ==== Special characters
 
-Since the characters `{`, `}` and `$` have a special meaning in message descriptors they need to be escaped if you want to use them literally. The following rules apply:
+Since the characters `{`, `}` and `$` have a special meaning in message descriptors, they need to be
+escaped if you want to use them literally. The following rules apply:
 
 * `\{` is considered as the literal `{`
 * `\}` is considered as the literal `}`
@@ -117,14 +118,14 @@ is given in the message attribute
 (`{min}`, `{max}`) and how to add the validated value to the error message using the EL
 expression `${validatedValue}`
 
-* the `@Min` constraint on `seatCount` demonstrates how use an EL expression with a ternery expression to
-dynamically chose singular or plural form, depending on an attribute of the constraint ("There must
+* the `@Min` constraint on `seatCount` demonstrates how to use an EL expression with a ternary expression to
+dynamically choose singular or plural form, depending on an attribute of the constraint ("There must
 be at least 1 seat" vs. "There must be at least 2 seats")
 
 * the message for the `@DecimalMax` constraint on `topSpeed` shows how to format the validated
 value using the formatter instance
 
-* finally, the `@DecimalMax` constraint on price shows that parameter interpolation has precedence over
+* finally, the `@DecimalMax` constraint on `price` shows that parameter interpolation has precedence over
 expression evaluation, causing the `$` sign to show up in front of the maximum price
 
 [TIP]
@@ -147,7 +148,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter04/complete/C
 [[section-custom-message-interpolation]]
 === Custom message interpolation
 
-If the default message interpolation algorithm does not fit your requirements it is also possible to
+If the default message interpolation algorithm does not fit your requirements, it is also possible to
 plug in a custom `MessageInterpolator` implementation.
 
 Custom interpolators must implement the interface `javax.validation.MessageInterpolator`. Note that
@@ -164,7 +165,7 @@ Bean Validation XML descriptor _META-INF/validation.xml_ (see
 [[section-resource-bundle-locator]]
 ==== `ResourceBundleLocator`
 
-In some use cases you want to use the message interpolation algorithm as defined by the Bean
+In some use cases, you want to use the message interpolation algorithm as defined by the Bean
 Validation specification, but retrieve error messages from other resource bundles than
 _ValidationMessages_. In this situation Hibernate Validator's `ResourceBundleLocator` SPI can help.
 
@@ -183,7 +184,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter04/resourcebu
 ====
 
 Of course you also could implement a completely different `ResourceBundleLocator`, which for instance
-returns bundles backed by records in a database. In this case you can obtain the default locator via
+returns bundles backed by records in a database. In this case, you can obtain the default locator via
 `HibernateValidatorConfiguration#getDefaultResourceBundleLocator()`, which you e.g. could use as
 fall-back for your custom locator.
 

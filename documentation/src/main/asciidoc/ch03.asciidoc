@@ -132,7 +132,7 @@ annotated element)
 
 In these situations you don't have to specify the constraint target. It is still recommended to do
 so if it increases readability of the source code. If the constraint target is not specified in
-situations where it can't be determined automatically, a ConstraintDeclarationException is raised.
+situations where it can't be determined automatically, a `ConstraintDeclarationException` is raised.
 
 ==== Return value constraints
 
@@ -148,10 +148,17 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/returnvalu
 ----
 ====
 
-The following constraints apply to the executables of RentalStation:
+The following constraints apply to the executables of `RentalStation`:
 
 * Any newly created `RentalStation` object must satisfy the `@ValidRentalStation` constraint
 * The customer list returned by `getCustomers()` must not be `null` and must contain at least on element
+* The customer list returned by `getCustomers()` must no contain `null` objects
+
+[NOTE]
+====
+As you can see in the above example, container element constraints are supported on method return value.
+They are also supported on method parameters.
+====
 
 ==== Cascaded validation
 
@@ -190,24 +197,20 @@ during constructor return value validation) and cascaded validation is performed
 if a parameter or return value object which is marked for cascaded validation itself has properties
 marked with `@Valid`, the constraints declared on the referenced elements will be validated as well.
 
-Cascaded validation can not only be applied to simple object references but also to collection-typed
-parameters and return values. This means when putting the `@Valid` annotation to a parameter or return
-value which
+Same as for fields and properties, cascaded validation can also be declared on container
+elements (e.g. elements of collections, maps or custom containers) of return values and parameters.
 
-* is an array
-* implements `java.lang.Iterable`
-* or implements `java.util.Map`
+In this case, each element contained by the container gets validated.
+So when validating the arguments of the `checkCars()` method in
+<<example-cascaded-executable-validation-container-elements>>, each element instance of the passed list
+will be validated and a `ConstraintViolation` created when any of the contained `Car` instances is invalid.
 
-each contained element gets validated. So when validating the arguments of the `checkCars()` method in
-<<example-cascaded-executable-validation-listtyped>>, each element instance of the passed list will
-be validated and a `ConstraintViolation` created when any of the contained `Car` instances is invalid.
-
-[[example-cascaded-executable-validation-listtyped]]
-.List-typed method parameter marked for cascaded validation
+[[example-cascaded-executable-validation-container-elements]]
+.Container elements of method parameter marked for cascaded validation
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/cascaded/collection/Garage.java[tags=include]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/cascaded/containerelement/Garage.java[tags=include]
 ----
 ====
 
@@ -402,9 +405,9 @@ on individual parameters as well as cross-parameter constraints.
 
 ===== `ExecutableValidator#validateReturnValue()`
 
-Using `validateReturnValue()` the return value of a method can can be validated. The validation in
+Using `validateReturnValue()` the return value of a method can be validated. The validation in
 <<example-executable-validator-validate-return-value>> yields one constraint violation since the
-`getPassengers()` method is expect to return at least one `Passenger` instance.
+`getPassengers()` method is expected to return at least one `Passenger` instance.
 
 [[example-executable-validator-validate-return-value]]
 .Using `ExecutableValidator#validateReturnValue()`
@@ -419,7 +422,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/validation
 
 The arguments of constructor invocations can be validated with `validateConstructorParameters()` as
 shown in method <<example-executable-validator-validate-constructor-parameters>>. Due to the
-`@NotNull` constraint on the manufacturer parameter, the validation call returns one constraint
+`@NotNull` constraint on the `manufacturer` parameter, the validation call returns one constraint
 violation.
 
 [[example-executable-validator-validate-constructor-parameters]]
@@ -458,9 +461,10 @@ method or constructor parameter validation, while `ConstraintViolation#getExecut
 provides access to the validated object in case of return value validation.
 
 All the other `ConstraintViolation` methods generally work for method validation in the same way as
-for validation of beans. Refer to the link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1
-/api/index.html?javax/validation/metadata/BeanDescriptor.html$$[JavaDoc] to learn more about the
-behavior of the individual methods and their return values during bean and method validation.
+for validation of beans. Refer to the
+http://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api/index.html?javax/validation/metadata/BeanDescriptor.html[JavaDoc]
+to learn more about the behavior of the individual methods and their return values during bean and
+method validation.
 
 Note that `getPropertyPath()` can be very useful in order to obtain detailed information about the
 validated parameter or return value, e.g. for logging purposes. In particular, you can retrieve name
@@ -477,7 +481,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/validation
 ====
 
 The parameter name is determined using the current `ParameterNameProvider` (see
-<<section-parameter-name-provider>>) and defaults to `arg0`, `arg1` etc.
+<<section-parameter-name-provider>>).
 
 [[section-builtin-method-constraints]]
 === Built-in method constraints

@@ -1,8 +1,8 @@
 [[chapter-bootstrapping]]
 == Bootstrapping
 
-In <<section-obtaining-validator>> you already saw one way for creating a Validator instance - via
-`Validation#buildDefaultValidatorFactory()`. In this chapter you will learn how to use the other
+In <<section-obtaining-validator>>, you already saw one way of creating a `Validator` instance - via
+`Validation#buildDefaultValidatorFactory()`. In this chapter, you will learn how to use the other
 methods in `javax.validation.Validation` in order to bootstrap specifically configured validators.
 
 [[section-retrieving-validator-factory-validator]]
@@ -34,11 +34,11 @@ Bean Validation supports working with several providers such as Hibernate Valida
 application. If more than one provider is present on the classpath, it is not guaranteed which one
 is chosen when creating a factory via `buildDefaultValidatorFactory()`.
 
-In this case you can explicitly specify the provider to use via `Validation#byProvider()`, passing the
+In this case, you can explicitly specify the provider to use via `Validation#byProvider()`, passing the
 provider's `ValidationProvider` class as shown in <<example-using-specific-provider>>.
 
 [[example-using-specific-provider]]
-.Bootstrapping `ValidatorFactory` and Validator using a specific provider
+.Bootstrapping `ValidatorFactory` and `Validator` using a specific provider
 ====
 [source, JAVA, indent=0]
 ----
@@ -72,20 +72,20 @@ If a `ValidatorFactory` instance is no longer in use, it should be disposed by c
 ==== `ValidationProviderResolver`
 
 By default, available Bean Validation providers are discovered using the
-link:http://docs.oracle.com/javase/8/docs/technotes/guides/jar/jar.html#Service%20Provider[Java
+http://docs.oracle.com/javase/8/docs/technotes/guides/jar/jar.html#Service_Provider[Java
 Service Provider] mechanism.
 
 For that purpose, each provider includes the file _META-
 INF/services/javax.validation.spi.ValidationProvider_, containing the fully qualified classname of
-its `ValidationProvider` implementation. In the case of Hibernate Validator this is
+its `ValidationProvider` implementation. In the case of Hibernate Validator, this is
 `org.hibernate.validator.HibernateValidator`.
 
 Depending on your environment and its classloading specifics, provider discovery via the Java's
-service loader mechanism might not work. In this case you can plug in a custom
+service loader mechanism might not work. In this case, you can plug in a custom
 `ValidationProviderResolver` implementation which performs the provider retrieval. An example is OSGi,
 where you could implement a provider resolver which uses OSGi services for provider discovery.
 
-To use a custom provider resolver pass it via `providerResolver()` as shown shown in
+To use a custom provider resolver, pass it via `providerResolver()` as shown in
 <<example-using-custom-validation-provider-resolver>>.
 
 [[example-using-custom-validation-provider-resolver]]
@@ -105,7 +105,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/Bootstrapp
 [[section-configuring-validator-factory]]
 === Configuring a `ValidatorFactory`
 
-By default validator factories retrieved from `Validation` and any validators they create are
+By default, validator factories retrieved from `Validation` and any validators they create are
 configured as per the XML descriptor _META-INF/validation.xml_ (see <<chapter-xml-configuration>>),
 if present.
 
@@ -290,18 +290,19 @@ Alternatively, you can specify the fully-qualified classname of a `ClockProvider
 ====
 When validating `@Future` and `@Past` constraints, you might want to obtain the current time.
 
-You can obtain the `ClockProvider` in your validators via the `ConstraintValidatorContext`.
+You can obtain the `ClockProvider` in your validators by calling the
+`ConstraintValidatorContext#getClockProvider()` method.
 
-For instance, this might be useful if you want to replace the default message of the `@Future` constraint with a more
-explicit one.
+For instance, this might be useful if you want to replace the default message of the `@Future`
+constraint with a more explicit one.
 ====
 
 ==== Adding mapping streams
 
-As discussed earlier you can configure the constraints applying for your Java beans using XML based
+As discussed earlier, you can configure the constraints applied to your Java beans using XML based
 constraint mappings.
 
-Besides the mapping files specified in _META-INF/validation.xml_ you can add further mappings via
+Besides the mapping files specified in _META-INF/validation.xml_, you can add further mappings via
 `Configuration#addMapping()` (see <<example-adding-mapping-streams>>). Note that the passed input
 stream(s) must adhere to the XML schema for constraint mappings presented in
 <<section-mapping-xml-constraints>>.
@@ -320,10 +321,10 @@ You should close any passed input stream after the validator factory has been cr
 [[section-provider-specific-settings]]
 ==== Provider-specific settings
 
-Via the configuration object returned by `Validation#byProvider()` provider specific options can be
+Via the configuration object returned by `Validation#byProvider()`, provider specific options can be
 configured.
 
-In case of Hibernate Validator this e.g. allows you to enable the fail fast mode and pass one or
+In the case of Hibernate Validator, this e.g. allows you to enable the fail fast mode and pass one or
 more programmatic constraint mappings as demonstrated in
 <<example-hibernate-validator-specific-options>>.
 

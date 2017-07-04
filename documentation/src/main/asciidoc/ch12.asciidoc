@@ -24,7 +24,7 @@ usual Maven repositories such as Maven Central under the GAV
 
 The Hibernate Validator Annotation Processor is based on the "Pluggable Annotation Processing API"
 as defined by http://jcp.org/en/jsr/detail?id=269[JSR 269] which is part of the Java
-Platform since Java 6.
+Platform.
 
 [[validator-annotationprocessor-features]]
 === Features
@@ -69,54 +69,13 @@ http://docs.oracle.com/javase/8/docs/technotes/tools/windows/javac.html#BHCHACIB
 === Using the Annotation Processor
 
 This section shows in detail how to integrate the Hibernate Validator Annotation Processor into
-command line builds (javac, Ant, Maven) as well as IDE-based builds (Eclipse, IntelliJ IDEA,
+command line builds (Maven, Ant, javac) as well as IDE-based builds (Eclipse, IntelliJ IDEA,
 NetBeans).
 
 [[validator-annotationprocessor-commandline]]
-
-
 ==== Command line builds
 
-[[validator-annotationprocessor-javac]]
-===== javac
-
-When compiling on the command line using
-http://docs.oracle.com/javase/8/docs/technotes/guides/javac/index.html[javac], specify the JAR
-_hibernate-validator-annotation-processor-{hvVersion}.jar_ using the "processorpath" option as shown in
-the following listing. The processor will be detected automatically by the compiler and invoked
-during compilation.
-
-.Using the annotation processor with javac
-====
-[subs="verbatim,attributes"]
-----
-javac src/main/java/org/hibernate/validator/ap/demo/Car.java \
-   -cp /path/to/validation-api-{bvVersion}.jar \
-   -processorpath /path/to/hibernate-validator-annotation-processor-{hvVersion}.jar
-----
-====
-
-[[validator-annotationprocessor-ant]]
-===== Apache Ant
-
-Similar to directly working with javac, the annotation processor can be added as as compiler
-argument when invoking the http://ant.apache.org/manual/CoreTasks/javac.html[javac task]
-for http://ant.apache.org/[Apache Ant]:
-
-.Using the annotation processor with Ant
-====
-[source, XML]
-[subs="verbatim,attributes"]
-----
-<javac srcdir="src/main"
-       destdir="build/classes"
-       classpath="/path/to/validation-api-{bvVersion}.jar">
-       <compilerarg value="-processorpath" />
-       <compilerarg value="/path/to/hibernate-validator-annotation-processor-{hvVersion}.jar"/>
-</javac>
-----
-====
-
+[[validator-annotationprocessor-maven]]
 ===== Maven
 
 For using the Hibernate Validator annotation processor with Maven, set it up via the `annotationProcessorPaths` option like this:
@@ -154,6 +113,46 @@ For using the Hibernate Validator annotation processor with Maven, set it up via
     </build>
     [...]
 </project>
+----
+====
+
+[[validator-annotationprocessor-ant]]
+===== Apache Ant
+
+Similar to directly working with javac, the annotation processor can be added as as compiler
+argument when invoking the http://ant.apache.org/manual/CoreTasks/javac.html[javac task]
+for http://ant.apache.org/[Apache Ant]:
+
+.Using the annotation processor with Ant
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+<javac srcdir="src/main"
+       destdir="build/classes"
+       classpath="/path/to/validation-api-{bvVersion}.jar">
+       <compilerarg value="-processorpath" />
+       <compilerarg value="/path/to/hibernate-validator-annotation-processor-{hvVersion}.jar"/>
+</javac>
+----
+====
+
+[[validator-annotationprocessor-javac]]
+===== javac
+
+When compiling on the command line using
+http://docs.oracle.com/javase/8/docs/technotes/guides/javac/index.html[javac], specify the JAR
+_hibernate-validator-annotation-processor-{hvVersion}.jar_ using the "processorpath" option as shown in
+the following listing. The processor will be detected automatically by the compiler and invoked
+during compilation.
+
+.Using the annotation processor with javac
+====
+[subs="verbatim,attributes"]
+----
+javac src/main/java/org/hibernate/validator/ap/demo/Car.java \
+   -cp /path/to/validation-api-{bvVersion}.jar \
+   -processorpath /path/to/hibernate-validator-annotation-processor-{hvVersion}.jar
 ----
 ====
 
@@ -201,7 +200,7 @@ image::annotation_processor_intellij.png[]
 [[validator-annotationprocessor-netbeans]]
 ===== NetBeans
 
-Starting with version 6.9, also the http://www.netbeans.org/[NetBeans] IDE supports using
+The http://www.netbeans.org/[NetBeans] IDE supports using
 annotation processors within the IDE build. To do so, do the following:
 
 * Right-click your project, choose "Properties"
@@ -217,7 +216,13 @@ image::annotation_processor_netbeans.png[]
 [[validator-annotationprocessor-known-issues]]
 === Known issues
 
-The following known issues exist as of May 2010:
+The following known issues exist as of July 2017:
+
+* Container element constraints are not supported for now.
+
+* Constraints applied to a container but in reality applied to the container elements (be it via
+the `Unwrapping.Unwrap` payload or via a value extractor marked with `@UnwrapByDefault`) are not supported
+correctly.
 
 * https://hibernate.atlassian.net/browse/HV-308[HV-308]: Additional validators
 registered for a constraint
