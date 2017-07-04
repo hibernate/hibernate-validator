@@ -55,7 +55,7 @@
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="groupConversionType">
-        <xs:attribute type="xs:string" name="from" use="required"/>
+        <xs:attribute type="xs:string" name="from" use="optional"/>
         <xs:attribute type="xs:string" name="to" use="required"/>
     </xs:complexType>
     <xs:complexType name="constraint-mappingsType">
@@ -169,7 +169,8 @@
                         maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute type="xs:string" name="class" use="required"/>
-        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional" default="true"/>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"
+                default="true"/>
     </xs:complexType>
     <xs:complexType name="annotationType">
         <xs:sequence>
