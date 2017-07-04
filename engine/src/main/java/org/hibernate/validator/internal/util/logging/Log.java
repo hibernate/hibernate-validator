@@ -775,4 +775,7 @@ public interface Log extends BasicLogger {
 	ConstraintDeclarationException implicitUnwrappingNotAllowedWhenSeveralMaximallySpecificValueExtractorsMarkedWithUnwrapByDefaultDeclared(
 			@FormatWith(ClassObjectFormatter.class) Class<?> valueType,
 			@FormatWith(CollectionOfClassesObjectFormatter.class) Collection<Class<? extends ValueExtractor>> valueExtractors);
+
+	@Message(id = 224, value = "Unwrapping of ConstraintDescriptor is not supported yet.")
+	ValidationException getUnwrappingOfConstraintDescriptorNotSupportedYetException();
 }

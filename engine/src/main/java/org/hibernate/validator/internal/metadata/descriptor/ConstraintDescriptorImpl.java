@@ -67,6 +67,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Hardy Ferentschik
  * @author Federico Mancini
  * @author Dag Hovland
+ * @author Guillaume Smet
  */
 public class ConstraintDescriptorImpl<T extends Annotation> implements ConstraintDescriptor<T>, Serializable {
 
@@ -156,7 +157,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	/**
 	 * The unwrapping behavior defined on the constraint.
 	 */
-	private final ValidateUnwrappedValue validateUnwrappedValue;
+	private final ValidateUnwrappedValue valueUnwrapping;
 
 	/**
 	 * Type indicating how composing constraints should be combined. By default this is set to
@@ -188,7 +189,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this.groups = buildGroupSet( implicitGroup );
 		this.payloads = buildPayloadSet( annotation );
 
-		this.validateUnwrappedValue = determineValidateUnwrappedValue( this.payloads, member, annotationType );
+		this.valueUnwrapping = determineValueUnwrapping( this.payloads, member, annotationType );
 
 		this.constraintValidatorClasses = constraintHelper.getAllValidatorDescriptors( annotationType )
 				.stream()
@@ -274,8 +275,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	@Override
-	public ValidateUnwrappedValue validateUnwrappedValue() {
-		return validateUnwrappedValue;
+	public ValidateUnwrappedValue getValueUnwrapping() {
+		return valueUnwrapping;
 	}
 
 	@Override
@@ -325,6 +326,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	@Override
+	public <U> U unwrap(Class<U> type) {
+		throw LOG.getUnwrappingOfConstraintDescriptorNotSupportedYetException();
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
@@ -360,7 +366,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		sb.append( ", groups=" ).append( groups );
 		sb.append( ", attributes=" ).append( attributes );
 		sb.append( ", constraintType=" ).append( constraintType );
-		sb.append( ", validateUnwrappedValue=" ).append( validateUnwrappedValue );
+		sb.append( ", valueUnwrapping=" ).append( valueUnwrapping );
 		sb.append( '}' );
 		return sb.toString();
 	}
@@ -471,17 +477,17 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return constraintType;
 	}
 
-	private static ValidateUnwrappedValue determineValidateUnwrappedValue(Set<Class<? extends Payload>> payloads, Member member, Class<? extends Annotation> annotationType) {
+	private static ValidateUnwrappedValue determineValueUnwrapping(Set<Class<? extends Payload>> payloads, Member member, Class<? extends Annotation> annotationType) {
 		if ( payloads.contains( Unwrapping.Unwrap.class ) ) {
 			if ( payloads.contains( Unwrapping.Skip.class ) ) {
 				throw LOG.getInvalidUnwrappingConfigurationForConstraintException( member, annotationType );
 			}
 
-			return ValidateUnwrappedValue.YES;
+			return ValidateUnwrappedValue.UNWRAP;
 		}
 
 		if ( payloads.contains( Unwrapping.Skip.class ) ) {
-			return ValidateUnwrappedValue.NO;
+			return ValidateUnwrappedValue.SKIP;
 		}
 
 		return ValidateUnwrappedValue.DEFAULT;
