@@ -23,4 +23,4 @@ Hibernate Validator is the reference implementation of this JSR 380. The impleme
 well as the Bean Validation API and TCK are all provided and distributed under the
 http://www.apache.org/licenses/LICENSE-2.0[Apache Software License 2.0].
 
-Hibernate Validator 6 and Bean Validation 2.0 requires Java 8 or later.
+Hibernate Validator 6 and Bean Validation 2.0 require Java 8 or later.
