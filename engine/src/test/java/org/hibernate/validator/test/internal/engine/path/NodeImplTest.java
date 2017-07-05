@@ -19,6 +19,7 @@ import static org.testng.Assert.assertSame;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,9 +40,13 @@ import javax.validation.Validator;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.path.ContainerElementNode;
 import org.hibernate.validator.path.PropertyNode;
-
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -318,6 +323,188 @@ public class NodeImplTest {
 		assertFalse( nodeIterator.hasNext() );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1419")
+	public void testContainerElementNodeGetValueForSet() {
+		Validator validator = ValidatorUtil.getConfiguration()
+				.addValueExtractor( new CustomContainerValueExtractor() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		BuildingWithContainerElementConstraints building = new BuildingWithContainerElementConstraints();
+		building.apartments.add( "Apartment 123" );
+		building.apartments.add( "A" );
+
+		Set<ConstraintViolation<BuildingWithContainerElementConstraints>> constraintViolations = validator.validate( building );
+
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "apartments" )
+								.containerElement( "<iterable element>", true, null, null, Set.class, 0 )
+						)
+		);
+
+		Path path = constraintViolations.iterator().next().getPropertyPath();
+		Iterator<Path.Node> nodeIterator = path.iterator();
+
+		Path.Node node = nodeIterator.next();
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+
+		node = nodeIterator.next();
+		assertEquals( node.getKind(), ElementKind.CONTAINER_ELEMENT, "unexpected node kind" );
+		assertEquals( node.as( ContainerElementNode.class ).getValue(), "A" );
+
+		assertFalse( nodeIterator.hasNext() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1419")
+	public void testContainerElementNodeGetValueForList() {
+		Validator validator = ValidatorUtil.getConfiguration()
+				.addValueExtractor( new CustomContainerValueExtractor() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		BuildingWithContainerElementConstraints building = new BuildingWithContainerElementConstraints();
+		building.floors.add( 9 );
+		building.floors.add( 10 );
+		building.floors.add( 11 );
+
+		Set<ConstraintViolation<BuildingWithContainerElementConstraints>> constraintViolations = validator.validate( building );
+
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Max.class )
+						.withPropertyPath( pathWith()
+								.property( "floors" )
+								.containerElement( "<list element>", true, null, 2, List.class, 0 )
+						)
+		);
+
+		Path path = constraintViolations.iterator().next().getPropertyPath();
+		Iterator<Path.Node> nodeIterator = path.iterator();
+
+		Path.Node node = nodeIterator.next();
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+
+		node = nodeIterator.next();
+		assertEquals( node.getKind(), ElementKind.CONTAINER_ELEMENT, "unexpected node kind" );
+		assertEquals( node.as( ContainerElementNode.class ).getValue(), 11 );
+
+		assertFalse( nodeIterator.hasNext() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1419")
+	public void testContainerElementNodeGetValueForMap() {
+		Validator validator = ValidatorUtil.getConfiguration()
+				.addValueExtractor( new CustomContainerValueExtractor() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		BuildingWithContainerElementConstraints building = new BuildingWithContainerElementConstraints();
+		building.managers.put( "main", "Ron" );
+		building.managers.put( "stand-in", "Ronnie" );
+
+		Set<ConstraintViolation<BuildingWithContainerElementConstraints>> constraintViolations = validator.validate( building );
+
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "managers" )
+								.containerElement( "<map value>", true, "main", null, Map.class, 1 )
+						)
+		);
+
+		Path path = constraintViolations.iterator().next().getPropertyPath();
+		Iterator<Path.Node> nodeIterator = path.iterator();
+
+		Path.Node node = nodeIterator.next();
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+
+		node = nodeIterator.next();
+		assertEquals( node.getKind(), ElementKind.CONTAINER_ELEMENT, "unexpected node kind" );
+		assertEquals( node.as( ContainerElementNode.class ).getValue(), "Ron" );
+
+		assertFalse( nodeIterator.hasNext() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1419")
+	public void testContainerElementNodeGetValueForCustomContainer() {
+		Validator validator = ValidatorUtil.getConfiguration()
+				.addValueExtractor( new CustomContainerValueExtractor() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		BuildingWithContainerElementConstraints building = new BuildingWithContainerElementConstraints();
+		building.inhabitants.values.add( "Bo" );
+		building.inhabitants.values.add( "Billy" );
+
+		Set<ConstraintViolation<BuildingWithContainerElementConstraints>> constraintViolations = validator.validate( building );
+
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "inhabitants" )
+								.containerElement( "<iterable element>", true, null, null, CustomContainer.class, 0 )
+						)
+		);
+
+		Path path = constraintViolations.iterator().next().getPropertyPath();
+		Iterator<Path.Node> nodeIterator = path.iterator();
+
+		Path.Node node = nodeIterator.next();
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+
+		node = nodeIterator.next();
+		assertEquals( node.getKind(), ElementKind.CONTAINER_ELEMENT, "unexpected node kind" );
+		assertEquals( node.as( ContainerElementNode.class ).getValue(), "Bo" );
+
+		assertFalse( nodeIterator.hasNext() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1419")
+	public void testContainerElementNodeGetValueForNestedContainer() {
+		Validator validator = ValidatorUtil.getConfiguration()
+				.addValueExtractor( new CustomContainerValueExtractor() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		BuildingWithContainerElementConstraints building = new BuildingWithContainerElementConstraints();
+
+		List<String> floor1Inhabitants = Arrays.asList( "Pa", "Paul" );
+		building.inhabitantsPerFloor.put( 1, floor1Inhabitants );
+
+		Set<ConstraintViolation<BuildingWithContainerElementConstraints>> constraintViolations = validator.validate( building );
+
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Size.class )
+						.withPropertyPath( pathWith()
+								.property( "inhabitantsPerFloor" )
+								.containerElement( "<map value>", true, 1, null, Map.class, 1 )
+								.containerElement( "<list element>", true, null, 0, List.class, 0 )
+						)
+		);
+
+		Path path = constraintViolations.iterator().next().getPropertyPath();
+		Iterator<Path.Node> nodeIterator = path.iterator();
+
+		Path.Node node = nodeIterator.next();
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+
+		node = nodeIterator.next();
+		assertEquals( node.getKind(), ElementKind.CONTAINER_ELEMENT, "unexpected node kind" );
+		assertEquals( node.as( ContainerElementNode.class ).getValue(), floor1Inhabitants );
+
+		node = nodeIterator.next();
+		assertEquals( node.getKind(), ElementKind.CONTAINER_ELEMENT, "unexpected node kind" );
+		assertEquals( node.as( ContainerElementNode.class ).getValue(), "Pa" );
+
+		assertFalse( nodeIterator.hasNext() );
+	}
+
 	private void assertConstraintViolationToOneValidation(Set<ConstraintViolation<AWithB>> constraintViolations) {
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( NotNull.class )
@@ -418,11 +605,31 @@ public class NodeImplTest {
 
 	private static class Building {
 
-		private Set<@Valid Apartment> apartments = new HashSet<Apartment>();
+		private Set<@Valid Apartment> apartments = new HashSet<>();
 
-		private List<@Valid Floor> floors = new ArrayList<Floor>();
+		private List<@Valid Floor> floors = new ArrayList<>();
 
-		private Map<String, @Valid Person> managers = new HashMap<String, Person>();
+		private Map<String, @Valid Person> managers = new HashMap<>();
+	}
+
+	private class BuildingWithContainerElementConstraints {
+
+		private Set<@Size(min = 3) String> apartments = new HashSet<>();
+
+		private List<@Max(10) Integer> floors = new ArrayList<>();
+
+		private Map<String, @Size(min = 5) String> managers = new HashMap<>();
+
+		private CustomContainer<@Size(min = 3) String> inhabitants = new CustomContainer<>();
+
+		private Map<Integer, List<@Size(min = 3) String>> inhabitantsPerFloor = new HashMap<>();
+	}
+
+	// Due to a bug in JDT and Java, this class cannot be static: if static, the @ExtractedValue annotation is not found
+	// in the ValueExtractor declaration.
+	private class CustomContainer<T> {
+
+		private List<T> values = new ArrayList<>();
 	}
 
 	private static class Apartment {
@@ -533,6 +740,16 @@ public class NodeImplTest {
 		@Override
 		public boolean isValid(Object o, ConstraintValidatorContext context) {
 			return false;
+		}
+	}
+
+	private static final class CustomContainerValueExtractor implements ValueExtractor<CustomContainer<@ExtractedValue ?>> {
+
+		@Override
+		public void extractValues(CustomContainer<?> originalValue, ValueExtractor.ValueReceiver receiver) {
+			for ( Object element : originalValue.values ) {
+				receiver.iterableValue( "<iterable element>", element );
+			}
 		}
 	}
 }
