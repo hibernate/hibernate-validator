@@ -1,6 +1,25 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.0.CR2 (05-07-2017)
+-------------------------
+
+** Bug
+    * HV-1359 - engine        - Loading ConstraintValidators with service loader does not take into account externalClassLoader
+
+** Improvement
+    * HV-1411 - engine, tests - Use the full URLs in xsi:schemaLocation of our XML files
+    * HV-1410 - extensions    - CDI Integration uses deprecated API
+    * HV-1409 - engine        - Fix ContainerClassTypeParameterAndExtractor toString()
+
+** Task
+    * HV-1425 - build         - Upgrade the Bean Validation API and TCK to 2.0.0.CR2
+    * HV-1423 - engine        - from of @ConvertGroup and <convert-group /> now has a default value
+    * HV-1419 - engine        - Introduce an HV specific ContainerElementNode with a getValue() method
+    * HV-1412 - engine        - Take into account API changes introduced as part of BVAL-674
+    * HV-1408 - engine        - Add small usage tests for each HV annotation
+    * HV-1391 - documentation - First pass on the documentation for Bean Validation 2.0
+
 6.0.0.CR1 (29-06-2017)
 -------------------------
 
