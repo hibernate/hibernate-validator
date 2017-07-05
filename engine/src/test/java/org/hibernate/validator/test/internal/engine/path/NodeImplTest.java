@@ -47,6 +47,7 @@ import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 public class NodeImplTest {
 	private Validator validator;
@@ -348,23 +349,25 @@ public class NodeImplTest {
 		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
 	}
 
-	static class A {
+	private static class A {
+
 		@NotNull
-		String a;
+		private String a;
 	}
 
-	static class AWithB {
+	private static class AWithB {
+
 		@Valid
-		B b;
+		private B b;
 
 		public AWithB() {
 			b = new B();
 		}
 	}
 
-	static class AWithListOfB {
-		@Valid
-		Collection<B> bs;
+	private static class AWithListOfB {
+
+		private Collection<@Valid B> bs;
 
 		public AWithListOfB() {
 			bs = new ArrayList<B>();
@@ -372,9 +375,10 @@ public class NodeImplTest {
 		}
 	}
 
-	static class AWithArrayOfB {
+	private static class AWithArrayOfB {
+
 		@Valid
-		B[] bs;
+		private B[] bs;
 
 		public AWithArrayOfB() {
 			bs = new B[1];
@@ -382,9 +386,9 @@ public class NodeImplTest {
 		}
 	}
 
-	static class AWithMapOfB {
-		@Valid
-		Map<String, B> bs;
+	private static class AWithMapOfB {
+
+		private Map<String, @Valid B> bs;
 
 		public AWithMapOfB() {
 			bs = new HashMap<String, B>();
@@ -392,42 +396,41 @@ public class NodeImplTest {
 		}
 	}
 
-	static class B {
+	private static class B {
+
 		@NotNull
-		String b;
+		private String b;
 	}
 
 	@CustomConstraint
-	static class C {
+	private static class C {
 	}
 
-	static class D {
+	private static class D {
+
 		@Valid
-		C c;
+		private C c;
 
 		public D() {
 			c = new C();
 		}
 	}
 
-	static class Building {
+	private static class Building {
 
-		@Valid
-		Set<Apartment> apartments = new HashSet<Apartment>();
+		private Set<@Valid Apartment> apartments = new HashSet<Apartment>();
 
-		@Valid
-		List<Floor> floors = new ArrayList<Floor>();
+		private List<@Valid Floor> floors = new ArrayList<Floor>();
 
-		@Valid
-		Map<String, Person> managers = new HashMap<String, Person>();
+		private Map<String, @Valid Person> managers = new HashMap<String, Person>();
 	}
 
-	static class Apartment {
+	private static class Apartment {
 
 		@Valid
-		Person resident;
+		private Person resident;
 
-		Apartment(Person resident) {
+		public Apartment(Person resident) {
 			this.resident = resident;
 		}
 
@@ -463,22 +466,22 @@ public class NodeImplTest {
 		}
 	}
 
-	static class Floor {
+	private static class Floor {
 
 		@Max(10)
-		int number;
+		private int number;
 
 		public Floor(int number) {
 			this.number = number;
 		}
 	}
 
-	static class Person {
+	private static class Person {
 
 		@Size(min = 5)
-		String name;
+		private String name;
 
-		Person(String name) {
+		public Person(String name) {
 			this.name = name;
 		}
 
