@@ -55,6 +55,8 @@ import com.example.CustomerDecimalMin;
 import com.example.ExampleConstraintValidatorFactory;
 import com.example.Order;
 import com.example.RetailOrder;
+import com.example.constraintvalidator.Bean;
+import com.example.constraintvalidator.MustMatch;
 import com.example.money.ExternalClassLoaderJavaxMoneyServiceProvider;
 import com.example.money.JavaxMoneyOrder;
 
@@ -251,6 +253,19 @@ public class OsgiIntegrationTest {
 
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals( "invalid currency (must be one of [EUR])", constraintViolations.iterator().next().getMessage() );
+	}
+
+	@Test
+	public void constraintDefinitionsCanBeConfiguredViaServiceLoader() {
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.externalClassLoader( getClass().getClassLoader() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		Set<ConstraintViolation<Bean>> constraintViolations = validator.validate( new Bean() );
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals( MustMatch.class, constraintViolations.iterator().next().getConstraintDescriptor().getAnnotation().annotationType() );
 	}
 
 	private ExpressionFactory buildExpressionFactory() {

@@ -47,6 +47,7 @@ import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
@@ -188,6 +189,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		this.constraintMappings = Collections.unmodifiableSet(
 				getConstraintMappings(
+						typeResolutionHelper,
 						configurationState,
 						externalClassLoader
 				)
@@ -237,7 +239,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return ( configurationState instanceof ConfigurationImpl ) ? ( (ConfigurationImpl) configurationState ).getExternalClassLoader() : null;
 	}
 
-	private static Set<DefaultConstraintMapping> getConstraintMappings(ConfigurationState configurationState, ClassLoader externalClassLoader) {
+	private static Set<DefaultConstraintMapping> getConstraintMappings(TypeResolutionHelper typeResolutionHelper,
+			ConfigurationState configurationState, ClassLoader externalClassLoader) {
 		Set<DefaultConstraintMapping> constraintMappings = newHashSet();
 
 		if ( configurationState instanceof ConfigurationImpl ) {
@@ -250,8 +253,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			constraintMappings.addAll( hibernateConfiguration.getProgrammaticMappings() );
 
 			// service loader based config
-			ConstraintMappingContributor serviceLoaderBasedContributor =
-					hibernateConfiguration.getServiceLoaderBasedConstraintMappingContributor();
+			ConstraintMappingContributor serviceLoaderBasedContributor = new ServiceLoaderBasedConstraintMappingContributor(
+					typeResolutionHelper,
+					externalClassLoader != null ? externalClassLoader : run( GetClassLoader.fromContext() ) );
 			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
 			serviceLoaderBasedContributor.createConstraintMappings( builder );
 		}

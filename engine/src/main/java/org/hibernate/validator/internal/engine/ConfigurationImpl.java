@@ -41,7 +41,6 @@ import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolv
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -52,7 +51,6 @@ import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
-import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
@@ -84,7 +82,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
 	private final ParameterNameProvider defaultParameterNameProvider;
 	private final ClockProvider defaultClockProvider;
-	private final ConstraintMappingContributor serviceLoaderBasedConstraintMappingContributor;
 
 	private ValidationProviderResolver providerResolver;
 	private final ValidationBootstrapParameters validationBootstrapParameters;
@@ -120,7 +117,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	private ConfigurationImpl() {
 		this.validationBootstrapParameters = new ValidationBootstrapParameters();
-		TypeResolutionHelper typeResolutionHelper = new TypeResolutionHelper();
 
 		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator(
 				ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES
@@ -129,9 +125,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
-		this.serviceLoaderBasedConstraintMappingContributor = new ServiceLoaderBasedConstraintMappingContributor(
-				typeResolutionHelper
-		);
 	}
 
 	@Override
@@ -286,10 +279,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			validationBootstrapParameters.addConfigProperty( name, value );
 		}
 		return this;
-	}
-
-	public final ConstraintMappingContributor getServiceLoaderBasedConstraintMappingContributor() {
-		return serviceLoaderBasedConstraintMappingContributor;
 	}
 
 	@Override

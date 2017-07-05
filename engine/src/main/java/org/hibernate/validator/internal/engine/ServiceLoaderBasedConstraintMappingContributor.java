@@ -6,24 +6,25 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+
 import java.lang.annotation.Annotation;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 import javax.validation.ConstraintValidator;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.internal.util.privilegedactions.GetConstraintValidatorsFromServiceLoader;
+import org.hibernate.validator.internal.util.privilegedactions.GetInstancesFromServiceLoader;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 
 import com.fasterxml.classmate.ResolvedType;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * Contributor of constraint definitions discovered by the Java service loader mechanism.
@@ -31,23 +32,34 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
  * @author Hardy Ferentschik
  */
 public class ServiceLoaderBasedConstraintMappingContributor implements ConstraintMappingContributor {
+
 	/**
 	 * Used for resolving type parameters. Thread-safe.
 	 */
 	private final TypeResolutionHelper typeResolutionHelper;
 
-	public ServiceLoaderBasedConstraintMappingContributor(TypeResolutionHelper typeResolutionHelper) {
+	/**
+	 * The primary class loader passed to the {@link ServiceLoader}.
+	 * <p>
+	 * Tries this one then tries the class loader used to load Hibernate Validator classes.
+	 */
+	private final ClassLoader primaryClassLoader;
+
+	public ServiceLoaderBasedConstraintMappingContributor(TypeResolutionHelper typeResolutionHelper, ClassLoader primaryClassLoader) {
+		this.primaryClassLoader = primaryClassLoader;
 		this.typeResolutionHelper = typeResolutionHelper;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void createConstraintMappings(ConstraintMappingBuilder builder) {
 		Map<Class<?>, List<Class<?>>> customValidators = newHashMap();
 
 		// find additional constraint validators via the Java ServiceLoader mechanism
-		List<ConstraintValidator<?, ?>> discoveredConstraintValidators = run( GetConstraintValidatorsFromServiceLoader.action() );
+		List<ConstraintValidator> discoveredConstraintValidators = run( GetInstancesFromServiceLoader.action( primaryClassLoader,
+				ConstraintValidator.class ) );
 
-		for ( ConstraintValidator<?, ?> constraintValidator : discoveredConstraintValidators ) {
+		for ( ConstraintValidator constraintValidator : discoveredConstraintValidators ) {
 			Class<?> constraintValidatorClass = constraintValidator.getClass();
 			Class<?> annotationType = determineAnnotationType( constraintValidatorClass );
 
