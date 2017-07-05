@@ -219,6 +219,8 @@ public class MetaConstraint<A extends Annotation> {
 				valueContext.appendTypeParameterNode( nodeName );
 			}
 
+			valueContext.setCurrentValidatedValue( value );
+
 			if ( currentValueExtractionPathNode.hasNext() ) {
 				if ( value != null ) {
 					currentValueExtractionPathNode = currentValueExtractionPathNode.getNext();
@@ -230,7 +232,6 @@ public class MetaConstraint<A extends Annotation> {
 				}
 			}
 			else {
-				valueContext.setCurrentValidatedValue( value );
 				success &= doValidateConstraint( validationContext, valueContext );
 			}
 
