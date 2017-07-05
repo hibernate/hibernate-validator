@@ -36,7 +36,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class NodeImpl
 		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Path.ContainerElementNode,
-		org.hibernate.validator.path.PropertyNode, Serializable {
+		org.hibernate.validator.path.PropertyNode, org.hibernate.validator.path.ContainerElementNode, Serializable {
 	private static final long serialVersionUID = 2075466571633860499L;
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[]{};
 
@@ -348,7 +348,8 @@ public class NodeImpl
 				( kind == ElementKind.PARAMETER && nodeType == ParameterNode.class ) ||
 				( kind == ElementKind.PROPERTY && ( nodeType == PropertyNode.class || nodeType == org.hibernate.validator.path.PropertyNode.class ) ) ||
 				( kind == ElementKind.RETURN_VALUE && nodeType == ReturnValueNode.class ) ||
-				( kind == ElementKind.CONTAINER_ELEMENT && nodeType == ContainerElementNode.class ) ) {
+				( kind == ElementKind.CONTAINER_ELEMENT
+						&& ( nodeType == ContainerElementNode.class || nodeType == org.hibernate.validator.path.ContainerElementNode.class ) ) ) {
 			return nodeType.cast( this );
 		}
 
