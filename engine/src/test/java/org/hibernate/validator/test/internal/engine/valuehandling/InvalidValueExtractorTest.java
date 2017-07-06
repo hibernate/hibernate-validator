@@ -41,13 +41,36 @@ public class InvalidValueExtractorTest {
 				.getValidator();
 	}
 
+	@Test(expectedExceptions = ValueExtractorDefinitionException.class, expectedExceptionsMessageRegExp = "HV000225.*")
+	public void boundWilcardTypeArgument1ThrowsException() {
+		ValidatorUtil.getConfiguration()
+				.addValueExtractor( new BoundWildcardTypeArgumentValueExtractor1() )
+				.buildValidatorFactory()
+				.getValidator();
+	}
+
+	@Test(expectedExceptions = ValueExtractorDefinitionException.class, expectedExceptionsMessageRegExp = "HV000225.*")
+	public void boundWilcardTypeArgument2ThrowsException() {
+		ValidatorUtil.getConfiguration()
+				.addValueExtractor( new BoundWildcardTypeArgumentValueExtractor2() )
+				.buildValidatorFactory()
+				.getValidator();
+	}
+
+	@Test(expectedExceptions = ValueExtractorDefinitionException.class, expectedExceptionsMessageRegExp = "HV000225.*")
+	public void boundWilcardTypeArgument3ThrowsException() {
+		ValidatorUtil.getConfiguration()
+				.addValueExtractor( new BoundWildcardTypeArgumentValueExtractor3() )
+				.buildValidatorFactory()
+				.getValidator();
+	}
+
 	private class SeveralExtractedValuesValueExtractor implements ValueExtractor<Map<@ExtractedValue ?, @ExtractedValue ?>> {
 
 		@Override
 		public void extractValues(Map<?, ?> originalValue, ValueReceiver receiver) {
 			throw new IllegalStateException( "May not be called" );
 		}
-
 	}
 
 	private class NoExtractedValueValueExtractor implements ValueExtractor<List<?>> {
@@ -56,7 +79,29 @@ public class InvalidValueExtractorTest {
 		public void extractValues(List<?> originalValue, ValueReceiver receiver) {
 			throw new IllegalStateException( "May not be called" );
 		}
-
 	}
 
+	private class BoundWildcardTypeArgumentValueExtractor1 implements ValueExtractor<List<@ExtractedValue ? extends String>> {
+
+		@Override
+		public void extractValues(List<? extends String> originalValue, ValueExtractor.ValueReceiver receiver) {
+			throw new IllegalStateException( "May not be called" );
+		}
+	}
+
+	private class BoundWildcardTypeArgumentValueExtractor2 implements ValueExtractor<List<@ExtractedValue String>> {
+
+		@Override
+		public void extractValues(List<String> originalValue, ValueExtractor.ValueReceiver receiver) {
+			throw new IllegalStateException( "May not be called" );
+		}
+	}
+
+	private class BoundWildcardTypeArgumentValueExtractor3 implements ValueExtractor<List<@ExtractedValue ? super String>> {
+
+		@Override
+		public void extractValues(List<? super String> originalValue, ValueExtractor.ValueReceiver receiver) {
+			throw new IllegalStateException( "May not be called" );
+		}
+	}
 }

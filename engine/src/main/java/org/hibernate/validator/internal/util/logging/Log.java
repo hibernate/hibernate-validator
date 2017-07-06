@@ -778,4 +778,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 224, value = "Unwrapping of ConstraintDescriptor is not supported yet.")
 	ValidationException getUnwrappingOfConstraintDescriptorNotSupportedYetException();
+
+	@SuppressWarnings("rawtypes")
+	@Message(id = 225, value = "Only unbound wildcard type arguments are supported for the container type of the value extractor: %1$s.")
+	ValueExtractorDefinitionException getOnlyUnboundWildcardTypeArgumentsSupportedForContainerTypeOfValueExtractorException(
+			@FormatWith(ClassObjectFormatter.class) Class<? extends ValueExtractor> valueExtractorClass);
 }
