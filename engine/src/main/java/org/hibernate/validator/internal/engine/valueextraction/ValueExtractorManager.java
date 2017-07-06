@@ -177,7 +177,7 @@ public class ValueExtractorManager {
 			return maximallySpecificContainerElementCompliantValueExtractors.iterator().next();
 		}
 		else {
-			throw LOG.unableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclared( valueType,
+			throw LOG.getUnableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclaredException( valueType,
 					ValueExtractorHelper.toValueExtractorClasses( maximallySpecificContainerElementCompliantValueExtractors ) );
 		}
 	}

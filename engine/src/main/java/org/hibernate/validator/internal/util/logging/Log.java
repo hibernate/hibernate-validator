@@ -752,13 +752,13 @@ public interface Log extends BasicLogger {
 
 	@SuppressWarnings("rawtypes")
 	@Message(id = 219, value = "Unable to get the most specific value extractor for type %1$s as several most specific value extractors are declared: %2$s.")
-	ConstraintDeclarationException unableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclared(
+	ConstraintDeclarationException getUnableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclaredException(
 			@FormatWith(ClassObjectFormatter.class) Class<?> valueType,
 			@FormatWith(CollectionOfClassesObjectFormatter.class) Collection<Class<? extends ValueExtractor>> valueExtractors);
 
 	@SuppressWarnings("rawtypes")
 	@Message(id = 220, value = "When @ExtractedValue is defined on a type parameter of a container type, the type attribute may not be set: %1$s.")
-	ValueExtractorDefinitionException extractedValueOnTypeParameterOfContainerTypeMayNotDefineTypeAttribute(
+	ValueExtractorDefinitionException getExtractedValueOnTypeParameterOfContainerTypeMayNotDefineTypeAttributeException(
 			@FormatWith(ClassObjectFormatter.class) Class<? extends ValueExtractor> extractorImplementationType);
 
 	@SuppressWarnings("rawtypes")
@@ -772,7 +772,7 @@ public interface Log extends BasicLogger {
 
 	@SuppressWarnings("rawtypes")
 	@Message(id = 223, value = "Implicit unwrapping is not allowed for type %1$s as several maximally specific value extractors marked with @UnwrapByDefault are declared: %2$s.")
-	ConstraintDeclarationException implicitUnwrappingNotAllowedWhenSeveralMaximallySpecificValueExtractorsMarkedWithUnwrapByDefaultDeclared(
+	ConstraintDeclarationException getImplicitUnwrappingNotAllowedWhenSeveralMaximallySpecificValueExtractorsMarkedWithUnwrapByDefaultDeclaredException(
 			@FormatWith(ClassObjectFormatter.class) Class<?> valueType,
 			@FormatWith(CollectionOfClassesObjectFormatter.class) Collection<Class<? extends ValueExtractor>> valueExtractors);
 

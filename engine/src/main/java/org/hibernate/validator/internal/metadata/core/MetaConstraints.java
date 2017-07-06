@@ -91,7 +91,8 @@ public class MetaConstraints {
 					selectedValueExtractorDescriptor = valueExtractorDescriptorCandidates.iterator().next();
 					break;
 				default:
-					throw LOG.unableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclared( declaredType,
+					throw LOG.getUnableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclaredException(
+							declaredType,
 							ValueExtractorHelper.toValueExtractorClasses( valueExtractorDescriptorCandidates ) );
 			}
 		}
@@ -111,7 +112,8 @@ public class MetaConstraints {
 					selectedValueExtractorDescriptor = unwrapByDefaultValueExtractorDescriptorCandidates.iterator().next();
 					break;
 				default:
-					throw LOG.implicitUnwrappingNotAllowedWhenSeveralMaximallySpecificValueExtractorsMarkedWithUnwrapByDefaultDeclared( declaredType,
+					throw LOG.getImplicitUnwrappingNotAllowedWhenSeveralMaximallySpecificValueExtractorsMarkedWithUnwrapByDefaultDeclaredException(
+							declaredType,
 							ValueExtractorHelper.toValueExtractorClasses( unwrapByDefaultValueExtractorDescriptorCandidates ) );
 			}
 		}

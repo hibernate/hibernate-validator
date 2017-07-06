@@ -82,7 +82,7 @@ public class ValueExtractorDescriptor {
 						throw LOG.getValueExtractorDeclaresExtractedValueMultipleTimesException( extractorImplementationType );
 					}
 					if ( !void.class.equals( typeArgument.getAnnotation( ExtractedValue.class ).type() ) ) {
-						throw LOG.extractedValueOnTypeParameterOfContainerTypeMayNotDefineTypeAttribute( extractorImplementationType );
+						throw LOG.getExtractedValueOnTypeParameterOfContainerTypeMayNotDefineTypeAttributeException( extractorImplementationType );
 					}
 
 					extractedTypeParameter = containerTypeRaw.getTypeParameters()[i];
