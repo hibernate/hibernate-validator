@@ -602,7 +602,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( annotatedType, typeParameters );
 
 		try {
-			return getCascadingMetaData( parameter.getType().isArray(), ReflectionHelper.typeOf( parameter.getDeclaringExecutable(), i ),
+			return getCascadingMetaData( ReflectionHelper.typeOf( parameter.getDeclaringExecutable(), i ),
 					parameter, containerElementTypesCascadingMetaData );
 		}
 		catch (ArrayIndexOutOfBoundsException ex) {
@@ -617,26 +617,23 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( annotatedType, typeParameters );
 
-		return getCascadingMetaData( field.getType().isArray(), ReflectionHelper.typeOf( field ), field, containerElementTypesCascadingMetaData );
+		return getCascadingMetaData( ReflectionHelper.typeOf( field ), field, containerElementTypesCascadingMetaData );
 	}
 
 	private CascadingTypeParameter findCascadingMetaData(Executable executable) {
-		boolean isArray;
 		TypeVariable<?>[] typeParameters;
 
 		if ( executable instanceof Method ) {
-			isArray =  ( (Method) executable ).getReturnType().isArray();
 			typeParameters = ( (Method) executable ).getReturnType().getTypeParameters();
 		}
 		else {
-			isArray = false;
 			typeParameters = ( (Constructor<?>) executable ).getDeclaringClass().getTypeParameters();
 		}
 		AnnotatedType annotatedType = executable.getAnnotatedReturnType();
 
 		Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( annotatedType, typeParameters );
 
-		return getCascadingMetaData( isArray, ReflectionHelper.typeOf( executable ), executable, containerElementTypesCascadingMetaData );
+		return getCascadingMetaData( ReflectionHelper.typeOf( executable ), executable, containerElementTypesCascadingMetaData );
 	}
 
 	private Map<TypeVariable<?>, CascadingTypeParameter> getTypeParametersCascadingMetadata(AnnotatedType annotatedType,
@@ -797,12 +794,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, descriptor, constraintLocation );
 	}
 
-	private CascadingTypeParameter getCascadingMetaData(boolean isArray, Type type, AnnotatedElement annotatedElement,
+	private CascadingTypeParameter getCascadingMetaData(Type type, AnnotatedElement annotatedElement,
 			Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData) {
-		return isArray
-				? CascadingTypeParameter.arrayElement( type, annotatedElement.isAnnotationPresent( Valid.class ), containerElementTypesCascadingMetaData,
-						getGroupConversions( annotatedElement ) )
-				: CascadingTypeParameter.annotatedObject( type, annotatedElement.isAnnotationPresent( Valid.class ), containerElementTypesCascadingMetaData,
+		return CascadingTypeParameter.annotatedObject( type, annotatedElement.isAnnotationPresent( Valid.class ), containerElementTypesCascadingMetaData,
 						getGroupConversions( annotatedElement ) );
 	}
 
