@@ -91,6 +91,11 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 	public ContainerElementConstraintMappingContext containerElement(ContainerElementTarget parent, TypeConstraintMappingContextImpl<?> typeContext,
 			ConstraintLocation location) {
 
+		// HV-1428 Container element support is disabled for arrays
+		if ( TypeHelper.isArray( configuredType ) ) {
+			throw LOG.getContainerElementConstraintsAndCascadedValidationNotSupportedOnArraysException( configuredType );
+		}
+
 		if ( configuredType instanceof ParameterizedType ) {
 			if ( ( (ParameterizedType) configuredType ).getActualTypeArguments().length > 1 ) {
 				throw LOG.getNoTypeArgumentIndexIsGivenForTypeWithMultipleTypeArgumentsException( configuredType );
@@ -106,6 +111,11 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 	public ContainerElementConstraintMappingContext containerElement(ContainerElementTarget parent, TypeConstraintMappingContextImpl<?> typeContext,
 			ConstraintLocation location, int index, int... nestedIndexes) {
 		Contracts.assertTrue( index >= 0, "Type argument index must not be negative" );
+
+		// HV-1428 Container element support is disabled for arrays
+		if ( TypeHelper.isArray( configuredType ) ) {
+			throw LOG.getContainerElementConstraintsAndCascadedValidationNotSupportedOnArraysException( configuredType );
+		}
 
 		if ( !( configuredType instanceof ParameterizedType ) && !( TypeHelper.isArray( configuredType ) ) ) {
 			throw LOG.getTypeIsNotAParameterizedNorArrayTypeException( configuredType );
