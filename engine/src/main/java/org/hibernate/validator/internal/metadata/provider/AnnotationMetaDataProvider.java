@@ -673,20 +673,22 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private Map<TypeVariable<?>, CascadingTypeParameter> getTypeParametersCascadingMetaDataForArrayType(AnnotatedArrayType annotatedArrayType) {
-		Map<TypeVariable<?>, CascadingTypeParameter> typeParametersCascadingMetadata = CollectionHelper.newHashMap( 1 );
-		AnnotatedType containerElementAnnotatedType = annotatedArrayType.getAnnotatedGenericComponentType();
-
-		Map<TypeVariable<?>, CascadingTypeParameter> nestedTypeParametersCascadingMetadata = getTypeParametersCascadingMetaDataForAnnotatedType(
-				containerElementAnnotatedType );
-
-		TypeVariable<?> arrayElement = new ArrayElement( annotatedArrayType );
-		typeParametersCascadingMetadata.put( arrayElement, new CascadingTypeParameter( annotatedArrayType.getType(),
-				arrayElement,
-				annotatedArrayType.isAnnotationPresent( Valid.class ),
-				nestedTypeParametersCascadingMetadata,
-				getGroupConversions( annotatedArrayType ) ) );
-
-		return typeParametersCascadingMetadata;
+		// HV-1428 Container element support is disabled for arrays
+		return Collections.emptyMap();
+//		Map<TypeVariable<?>, CascadingTypeParameter> typeParametersCascadingMetadata = CollectionHelper.newHashMap( 1 );
+//		AnnotatedType containerElementAnnotatedType = annotatedArrayType.getAnnotatedGenericComponentType();
+//
+//		Map<TypeVariable<?>, CascadingTypeParameter> nestedTypeParametersCascadingMetadata = getTypeParametersCascadingMetaDataForAnnotatedType(
+//				containerElementAnnotatedType );
+//
+//		TypeVariable<?> arrayElement = new ArrayElement( annotatedArrayType );
+//		typeParametersCascadingMetadata.put( arrayElement, new CascadingTypeParameter( annotatedArrayType.getType(),
+//				arrayElement,
+//				annotatedArrayType.isAnnotationPresent( Valid.class ),
+//				nestedTypeParametersCascadingMetadata,
+//				getGroupConversions( annotatedArrayType ) ) );
+//
+//		return typeParametersCascadingMetadata;
 	}
 
 	private Map<TypeVariable<?>, CascadingTypeParameter> getTypeParametersCascadingMetaDataForAnnotatedType(AnnotatedType annotatedType) {
@@ -726,7 +728,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, TypeArgumentLocation location, AnnotatedType annotatedType) {
-		if ( !(annotatedType instanceof AnnotatedArrayType) && !(annotatedType instanceof AnnotatedParameterizedType) ) {
+		// HV-1428 Container element support is disabled for arrays
+		if ( !(annotatedType instanceof AnnotatedParameterizedType) ) {
 			return Collections.emptySet();
 		}
 

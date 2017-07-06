@@ -88,7 +88,12 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 		this.parentLocation = parentLocation;
 		this.configuredType = parentLocation.getTypeForValidatorResolution();
 
-		if ( parentLocation.getTypeForValidatorResolution() instanceof ParameterizedType ) {
+		// HV-1428 Container element support is disabled for arrays
+		if ( TypeHelper.isArray( configuredType ) ) {
+			throw LOG.getContainerElementConstraintsAndCascadedValidationNotSupportedOnArraysException( configuredType );
+		}
+
+		if ( configuredType instanceof ParameterizedType ) {
 			TypeVariable<?>[] typeParameters = ReflectionHelper.getClassFromType( configuredType ).getTypeParameters();
 
 			if ( index > typeParameters.length - 1 ) {

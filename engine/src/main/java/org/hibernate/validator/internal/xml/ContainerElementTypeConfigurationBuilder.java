@@ -64,6 +64,11 @@ class ContainerElementTypeConfigurationBuilder {
 			return new ContainerElementTypeConfiguration( Collections.emptySet(), Collections.emptyMap() );
 		}
 
+		// HV-1428 Container element support is disabled for arrays
+		if ( TypeHelper.isArray( enclosingType ) ) {
+			throw LOG.getContainerElementConstraintsAndCascadedValidationNotSupportedOnArraysException( enclosingType );
+		}
+
 		if ( !( enclosingType instanceof ParameterizedType ) && !TypeHelper.isArray( enclosingType ) ) {
 			throw LOG.getTypeIsNotAParameterizedNorArrayTypeException( enclosingType );
 		}

@@ -783,4 +783,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 225, value = "Only unbound wildcard type arguments are supported for the container type of the value extractor: %1$s.")
 	ValueExtractorDefinitionException getOnlyUnboundWildcardTypeArgumentsSupportedForContainerTypeOfValueExtractorException(
 			@FormatWith(ClassObjectFormatter.class) Class<? extends ValueExtractor> valueExtractorClass);
+
+	@Message(id = 226, value = "Container element constraints and cascading validation are not supported on arrays: %1$s")
+	ValidationException getContainerElementConstraintsAndCascadedValidationNotSupportedOnArraysException(@FormatWith(TypeFormatter.class) Type type);
 }
