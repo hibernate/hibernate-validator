@@ -137,7 +137,8 @@ public class NestedCascadedConstraintsTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	public void testNestedOnArray() {
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()

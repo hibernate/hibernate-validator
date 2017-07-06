@@ -155,7 +155,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	public void validation_of_nested_type_arguments_works_with_array_of_optional_of_stringproperty() {
 		Set<ConstraintViolation<ArrayOfOptionalsWithAutomaticUnwrapping>> constraintViolations = validator.validate( ArrayOfOptionalsWithAutomaticUnwrapping.valid() );
 		assertNoViolations( constraintViolations );
@@ -203,7 +204,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	public void validation_of_nested_type_arguments_works_on_nested_arrays() {
 		Set<ConstraintViolation<NestedArray>> constraintViolations = validator.validate( NestedArray.valid() );
 		assertNoViolations( constraintViolations );

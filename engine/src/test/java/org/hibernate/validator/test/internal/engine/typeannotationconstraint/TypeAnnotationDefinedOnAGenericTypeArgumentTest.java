@@ -36,23 +36,27 @@ public class TypeAnnotationDefinedOnAGenericTypeArgumentTest {
 		validator = getValidator();
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
+	// HV-1428 Container element support is disabled for arrays
+	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*", enabled = false)
 	public void constraintOnGenericTypeArgumentOfArrayFieldThrowsException() {
 		validator.validate( new GenericArrayEntity<>( new String[]{ "Too long" } ) );
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
+	// HV-1428 Container element support is disabled for arrays
+	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*", enabled = false)
 	public void constraintOnGenericTypeArgumentOfArrayGetterThrowsException() {
 		validator.validate( new GenericArrayWithGetterEntity<>( new String[]{ "Too long" } ) );
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
+	// HV-1428 Container element support is disabled for arrays
+	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*", enabled = false)
 	public void constraintOnGenericTypeArgumentOfArrayParameterThrowsException() {
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
 		fishTank.test2( new String[]{ "Too long" } );
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
+	// HV-1428 Container element support is disabled for arrays
+	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*", enabled = false)
 	public void constraintOnGenericTypeArgumentOfArrayReturnValueThrowsException() {
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
 		fishTank.test4( new String[]{ "Too long" } );
