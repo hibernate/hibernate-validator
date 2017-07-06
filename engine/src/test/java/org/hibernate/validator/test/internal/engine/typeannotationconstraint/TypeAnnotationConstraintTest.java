@@ -704,7 +704,8 @@ public class TypeAnnotationConstraintTest {
 
 	// Array
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void field_constraint_provided_on_type_parameter_of_an_array_gets_validated() {
 		TypeWithArray1 a = new TypeWithArray1();
@@ -731,7 +732,8 @@ public class TypeAnnotationConstraintTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void constraint_provided_on_custom_bean_used_as_array_parameter_gets_validated() {
 		TypeWithArray3 a = new TypeWithArray3();
@@ -751,7 +753,8 @@ public class TypeAnnotationConstraintTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void constraints_specified_on_array_and_on_type_parameter_of_array_get_validated() {
 		TypeWithArray4 a = new TypeWithArray4();
@@ -778,7 +781,8 @@ public class TypeAnnotationConstraintTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void getter_constraint_provided_on_type_parameter_of_an_array_gets_validated() {
 		TypeWithArray5 a = new TypeWithArray5();
@@ -806,7 +810,8 @@ public class TypeAnnotationConstraintTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void return_value_constraint_provided_on_type_parameter_of_an_array_gets_validated() throws Exception {
 		Method method = TypeWithArray6.class.getDeclaredMethod( "returnStrings" );
@@ -838,7 +843,8 @@ public class TypeAnnotationConstraintTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void property_path_contains_index_information_for_array() {
 		TypeWithArray1 a = new TypeWithArray1();
@@ -855,7 +861,8 @@ public class TypeAnnotationConstraintTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void method_parameter_constraint_provided_as_type_parameter_of_an_array_gets_validated() throws Exception {
 		Method method = TypeWithArray7.class.getDeclaredMethod( "setValues", String[].class );
@@ -889,7 +896,8 @@ public class TypeAnnotationConstraintTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void constructor_parameter_constraint_provided_on_type_parameter_of_an_array_gets_validated()
 			throws Exception {
@@ -925,7 +933,8 @@ public class TypeAnnotationConstraintTest {
 
 	// Array of primitives
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void field_constraint_provided_on_type_parameter_of_an_array_of_primitives_gets_validated() {
 		TypeWithArrayOfPrimitives1 a = new TypeWithArrayOfPrimitives1();
@@ -944,7 +953,8 @@ public class TypeAnnotationConstraintTest {
 
 	// case 3 does not make sense here so we skip it
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void constraints_specified_on_array_and_on_type_parameter_of_array_of_primitives_get_validated() {
 		TypeWithArrayOfPrimitives4 a = new TypeWithArrayOfPrimitives4();
@@ -966,7 +976,8 @@ public class TypeAnnotationConstraintTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void getter_constraint_provided_on_type_parameter_of_an_array_of_primitives_gets_validated() {
 		TypeWithArrayOfPrimitives5 a = new TypeWithArrayOfPrimitives5();
@@ -983,7 +994,8 @@ public class TypeAnnotationConstraintTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void return_value_constraint_provided_on_type_parameter_of_an_array_of_primitives_gets_validated()
 			throws Exception {
@@ -1003,7 +1015,8 @@ public class TypeAnnotationConstraintTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void property_path_contains_index_information_for_array_of_primitives() {
 		TypeWithArrayOfPrimitives1 a = new TypeWithArrayOfPrimitives1();
@@ -1019,7 +1032,8 @@ public class TypeAnnotationConstraintTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void method_parameter_constraint_provided_as_type_parameter_of_an_array_of_primitives_gets_validated()
 			throws Exception {
@@ -1041,7 +1055,8 @@ public class TypeAnnotationConstraintTest {
 		);
 	}
 
-	@Test
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
 	@TestForIssue(jiraKey = "HV-1175")
 	public void constructor_parameter_constraint_provided_on_type_parameter_of_an_array_of_primitives_gets_validated()
 			throws Exception {
@@ -1446,12 +1461,12 @@ public class TypeAnnotationConstraintTest {
 	}
 
 	static class TypeWithArrayOfPrimitives7 {
-		public void setValues(@Valid int @Min(4) [] arrayParameter) {
+		public void setValues(int @Min(4) [] arrayParameter) {
 		}
 	}
 
 	static class TypeWithArrayOfPrimitives8 {
-		public TypeWithArrayOfPrimitives8(@Valid int @Min(4) [] arrayParameter) {
+		public TypeWithArrayOfPrimitives8(int @Min(4) [] arrayParameter) {
 		}
 	}
 
