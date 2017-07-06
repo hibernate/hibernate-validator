@@ -284,9 +284,6 @@ public class CascadingTypeParameter {
 			Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
 		Class<?> cascadableClass = ReflectionHelper.getClassFromType( cascadableType );
 
-		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> map = TypeVariableBindings.getTypeVariableBindings( cascadableClass );
-		map.get( List.class );
-
 		if ( Map.class.isAssignableFrom( cascadableClass ) ) {
 			return addLegacyCascadingMetaData( cascadableClass, Map.class, 1, containerElementTypesCascadingMetaData, groupConversions );
 		}
@@ -298,6 +295,10 @@ public class CascadingTypeParameter {
 		}
 		else if ( Optional.class.isAssignableFrom( cascadableClass ) ) {
 			return addLegacyCascadingMetaData( cascadableClass, Optional.class, 0, containerElementTypesCascadingMetaData, groupConversions );
+		}
+		else if ( cascadableClass.isArray() ) {
+			// for arrays, we need to add an ArrayElement cascading metadata: it's the only way arrays support cascading at the moment.
+			return addArrayElementCascadingMetaData( cascadableClass, containerElementTypesCascadingMetaData, groupConversions );
 		}
 		else {
 			return containerElementTypesCascadingMetaData;
@@ -338,6 +339,20 @@ public class CascadingTypeParameter {
 					new CascadingTypeParameter( cascadableClass, cascadableTypeParameter, enclosingType, correspondingTypeParameter, true,
 							Collections.emptyMap(), groupConversions ) );
 		}
+
+		return amendedCascadingMetadata;
+	}
+
+	private static Map<TypeVariable<?>, CascadingTypeParameter> addArrayElementCascadingMetaData(final Class<?> enclosingType,
+			Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData,
+			Map<Class<?>, Class<?>> groupConversions) {
+		Map<TypeVariable<?>, CascadingTypeParameter> amendedCascadingMetadata = CollectionHelper.newHashMap( containerElementTypesCascadingMetaData.size() + 1 );
+		amendedCascadingMetadata.putAll( containerElementTypesCascadingMetaData );
+
+		TypeVariable<?> cascadableTypeParameter = new ArrayElement( enclosingType );
+
+		amendedCascadingMetadata.put( cascadableTypeParameter,
+				new CascadingTypeParameter( enclosingType, cascadableTypeParameter, true, Collections.emptyMap(), groupConversions ) );
 
 		return amendedCascadingMetadata;
 	}
