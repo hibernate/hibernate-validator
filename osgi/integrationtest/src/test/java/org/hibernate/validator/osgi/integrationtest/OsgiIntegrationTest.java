@@ -20,9 +20,11 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.el.ELManager;
 import javax.el.ExpressionFactory;
@@ -47,11 +49,8 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.options.MavenUrlReference;
-import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import com.example.Customer;
-import com.example.CustomerDecimalMin;
 import com.example.ExampleConstraintValidatorFactory;
 import com.example.Order;
 import com.example.RetailOrder;
@@ -69,7 +68,6 @@ import com.example.money.JavaxMoneyOrder;
  * @author Gunnar Morling
  */
 @RunWith(PaxExam.class)
-@ExamReactorStrategy(PerClass.class)
 public class OsgiIntegrationTest {
 
 	private static final boolean DEBUG = false;
@@ -117,38 +115,52 @@ public class OsgiIntegrationTest {
 	}
 
 	@Test
-	public void canObtainValidatorFactoryAndPerformValidationWithExpressionFactoryFromTccl() {
-		ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-
-		try {
-			Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
-
-			Set<ConstraintViolation<Customer>> constraintViolations = Validation.byDefaultProvider()
-					.providerResolver( new MyValidationProviderResolver() )
-					.configure()
-					.buildValidatorFactory()
-					.getValidator()
-					.validate( new Customer() );
-
-			assertEquals( 1, constraintViolations.size() );
-			assertEquals( "must be greater than or equal to 2", constraintViolations.iterator().next().getMessage() );
-		}
-		finally {
-			Thread.currentThread().setContextClassLoader( originalClassLoader );
-		}
-	}
-
-	@Test
-	public void canObtainValidatorFactoryAndPerformValidationWithExpressionFactoryFromExternalClassLoader() {
-		Set<ConstraintViolation<Customer>> constraintViolations = Validation.byProvider( HibernateValidator.class )
+	public void canObtainValidatorFactoryAndPerformValidationWithDefaultMessageInterpolator() {
+		Set<ConstraintViolation<Customer>> constraintViolations = Validation.byDefaultProvider()
+				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
-				.externalClassLoader( getClass().getClassLoader() )
+				.ignoreXmlConfiguration()
 				.buildValidatorFactory()
 				.getValidator()
 				.validate( new Customer() );
 
-		assertEquals( 1, constraintViolations.size() );
-		assertEquals( "must be greater than or equal to 2", constraintViolations.iterator().next().getMessage() );
+		Set<String> actualMessages = constraintViolations.stream()
+			.map( ConstraintViolation::getMessage )
+			.collect( Collectors.toSet() );
+
+		Set<String> expectedMessages = new HashSet<>();
+		expectedMessages.add( "must be greater than or equal to 1" );
+		expectedMessages.add( "must be greater than or equal to 1.00" );
+
+		assertEquals( expectedMessages, actualMessages );
+	}
+
+	@Test
+	public void canUseExpressionLanguageInConstraintMessageWithExternallyConfiguredExpressionFactory() {
+		ExpressionFactory expressionFactory = buildExpressionFactory();
+
+		Set<ConstraintViolation<Customer>> constraintViolations = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.ignoreXmlConfiguration()
+				.externalClassLoader( getClass().getClassLoader() )
+				.messageInterpolator( new ResourceBundleMessageInterpolator(
+						new PlatformResourceBundleLocator( ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES ),
+						true,
+						expressionFactory )
+				)
+				.buildValidatorFactory()
+				.getValidator()
+				.validate( new Customer() );
+
+		Set<String> actualMessages = constraintViolations.stream()
+				.map( ConstraintViolation::getMessage )
+				.collect( Collectors.toSet() );
+
+			Set<String> expectedMessages = new HashSet<>();
+			expectedMessages.add( "must be greater than or equal to 1" );
+			expectedMessages.add( "must be greater than or equal to 1.00" );
+
+			assertEquals( expectedMessages, actualMessages );
 	}
 
 	@Test
@@ -177,28 +189,22 @@ public class OsgiIntegrationTest {
 
 	@Test
 	public void canConfigureConstraintViaXmlMapping() {
-		Set<ConstraintViolation<Customer>> constraintViolations = Validation.byProvider( HibernateValidator.class )
+		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
 				.externalClassLoader( getClass().getClassLoader() )
 				.buildValidatorFactory()
-				.getValidator()
-				.validate( new Customer() );
+				.getValidator();
 
-		assertEquals( 1, constraintViolations.size() );
-		assertEquals( "must be greater than or equal to 2", constraintViolations.iterator().next().getMessage() );
-	}
+		Set<ConstraintViolation<Customer>> customerViolations = validator.validate( new Customer() );
 
-	@Test
-	public void canConfigureCustomConstraintViaXmlMapping() {
-		Set<ConstraintViolation<Order>> constraintViolations = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.externalClassLoader( getClass().getClassLoader() )
-				.buildValidatorFactory()
-				.getValidator()
-				.validate( new Order() );
+		assertEquals( 1, customerViolations.size() );
+		assertEquals( "must be greater than or equal to 2", customerViolations.iterator().next().getMessage() );
 
-		assertEquals( 1, constraintViolations.size() );
-		assertEquals( "Invalid", constraintViolations.iterator().next().getMessage() );
+		// custom constraint configured in XML
+		Set<ConstraintViolation<Order>> orderViolations = validator.validate( new Order() );
+
+		assertEquals( 1, orderViolations.size() );
+		assertEquals( "Invalid", orderViolations.iterator().next().getMessage() );
 	}
 
 	@Test
@@ -212,26 +218,6 @@ public class OsgiIntegrationTest {
 
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals( "Not a valid retail order name", constraintViolations.iterator().next().getMessage() );
-	}
-
-	@Test
-	public void canUseExpressionLanguageInConstraintMessageWithExternallyConfiguredExpressionFactory() {
-		ExpressionFactory expressionFactory = buildExpressionFactory();
-
-		Set<ConstraintViolation<CustomerDecimalMin>> constraintViolations = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.externalClassLoader( getClass().getClassLoader() )
-				.messageInterpolator( new ResourceBundleMessageInterpolator(
-						new PlatformResourceBundleLocator( ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES ),
-						true,
-						expressionFactory )
-				)
-				.buildValidatorFactory()
-				.getValidator()
-				.validate( new CustomerDecimalMin() );
-
-		assertEquals( 1, constraintViolations.size() );
-		assertEquals( "must be greater than or equal to 1.00", constraintViolations.iterator().next().getMessage() );
 	}
 
 	@Test
