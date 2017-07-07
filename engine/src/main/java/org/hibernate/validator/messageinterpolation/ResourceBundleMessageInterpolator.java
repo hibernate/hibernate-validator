@@ -8,6 +8,8 @@ package org.hibernate.validator.messageinterpolation;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import javax.el.ELManager;
@@ -82,26 +84,43 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	 * @return the {@link ExpressionFactory}
 	 */
 	private static ExpressionFactory buildExpressionFactory() {
-		Throwable threadContextClassLoaderThrowable;
+		final ClassLoader originalContextClassLoader = run( GetClassLoader.fromContext() );
+
+		List<Throwable> suppressedExceptions = new ArrayList<>();
 
 		// First, we try to load the instance from the original TCCL.
 		try {
 			return ELManager.getExpressionFactory();
 		}
 		catch (Throwable e) {
-			threadContextClassLoaderThrowable = e;
+			suppressedExceptions.add( e );
 		}
 
 		// Then we try the Hibernate Validator class loader. In a fully-functional modular environment such as
 		// WildFly or Jigsaw, it is the way to go.
-		final ClassLoader originalContextClassLoader = run( GetClassLoader.fromContext() );
 
 		try {
 			run( SetContextClassLoader.action( ResourceBundleMessageInterpolator.class.getClassLoader() ) );
 			return ELManager.getExpressionFactory();
 		}
 		catch (Throwable e) {
-			e.addSuppressed( threadContextClassLoaderThrowable );
+			suppressedExceptions.add( e );
+		}
+		finally {
+			run( SetContextClassLoader.action( originalContextClassLoader ) );
+		}
+
+		// And in last resort, this is for OSGi environments and due to the fact that the ExpressionFactory
+		// initialization is buggy, we set the TCCL to the class loader used to load a javax.el class.
+
+		try {
+			run( SetContextClassLoader.action( ELManager.class.getClassLoader() ) );
+			return ELManager.getExpressionFactory();
+		}
+		catch (Throwable e) {
+			for ( Throwable suppressedException : suppressedExceptions ) {
+				e.addSuppressed( suppressedException );
+			}
 
 			// HV-793 - We fail eagerly in case we have no EL dependencies on the classpath
 			throw LOG.getUnableToInitializeELExpressionFactoryException( e );
