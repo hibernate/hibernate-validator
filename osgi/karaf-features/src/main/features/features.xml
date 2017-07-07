@@ -26,6 +26,6 @@
     <feature name="hibernate-validator-paranamer" version="${project.version}">
         <feature prerequisite="true">wrap</feature>
         <feature>hibernate-validator</feature>
-        <bundle>wrap:mvn:com.thoughtworks.paranamer:paranamer:${paranamer.version}</bundle>
+        <bundle>wrap:mvn:com.thoughtworks.paranamer/paranamer/${paranamer.version}</bundle>
     </feature>
 </features>
