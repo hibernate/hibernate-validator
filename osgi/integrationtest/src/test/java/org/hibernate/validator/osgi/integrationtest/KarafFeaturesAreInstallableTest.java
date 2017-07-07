@@ -6,10 +6,25 @@
  */
 package org.hibernate.validator.osgi.integrationtest;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.options;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.when;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
+
 import java.io.File;
 import java.net.URI;
 import java.util.Locale;
+
 import javax.inject.Inject;
+
 import org.apache.karaf.features.Feature;
 import org.apache.karaf.features.FeaturesService;
 import org.junit.BeforeClass;
@@ -23,22 +38,13 @@ import org.ops4j.pax.exam.options.MavenArtifactUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import static org.junit.Assert.assertTrue;
-import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.ops4j.pax.exam.CoreOptions.options;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-import static org.ops4j.pax.exam.CoreOptions.when;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
-
 /**
  * Integration test for Bean Validation and Hibernate Validator under OSGi.
  * <p>
- * This test makes sure that the karaf features provided by this project are installable.
+ * This test makes sure that the Karaf features provided by this project are installable.
+ * <p>
+ * Note that if a feature is not installable, the test gets stuck for a while but it is a
+ * good indication that something is wrong.
  *
  * @author Toni Menzel (toni@rebaze.com)
  */
@@ -47,7 +53,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 public class KarafFeaturesAreInstallableTest {
 
 	@Inject
-	protected FeaturesService featuresService;
+	private FeaturesService featuresService;
 
 	private static final boolean DEBUG = false;
 
@@ -107,8 +113,8 @@ public class KarafFeaturesAreInstallableTest {
 
 	public void canInstallFeature(String featureName) throws Exception {
 		Feature feature = featuresService.getFeature( featureName );
-		assertTrue( featureName + " feature is not available from features list", feature != null );
+		assertNotNull( "Feature " + featureName + " is not available from features list", feature );
 		featuresService.installFeature( featureName );
-		assertTrue( featureName + " feature isn't installed, though available from features list", featuresService.isInstalled( feature ) );
+		assertTrue( "Feature " + featureName + " isn't installed, though available from features list", featuresService.isInstalled( feature ) );
 	}
 }
