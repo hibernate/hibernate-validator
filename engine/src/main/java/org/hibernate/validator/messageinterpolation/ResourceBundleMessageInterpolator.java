@@ -82,32 +82,58 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	 * @return the {@link ExpressionFactory}
 	 */
 	private static ExpressionFactory buildExpressionFactory() {
-		Throwable threadContextClassLoaderThrowable;
-
 		// First, we try to load the instance from the original TCCL.
-		try {
-			return ELManager.getExpressionFactory();
-		}
-		catch (Throwable e) {
-			threadContextClassLoaderThrowable = e;
+		if ( canLoadExpressionFactory() ) {
+			ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
+			LOG.debug( "Loaded expression factory via original TCCL" );
+			return expressionFactory;
 		}
 
-		// Then we try the Hibernate Validator class loader. In a fully-functional modular environment such as
-		// WildFly or Jigsaw, it is the way to go.
 		final ClassLoader originalContextClassLoader = run( GetClassLoader.fromContext() );
 
 		try {
+			// Then we try the Hibernate Validator class loader. In a fully-functional modular environment such as
+			// WildFly or Jigsaw, it is the way to go.
 			run( SetContextClassLoader.action( ResourceBundleMessageInterpolator.class.getClassLoader() ) );
-			return ELManager.getExpressionFactory();
+
+			if ( canLoadExpressionFactory() ) {
+				ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
+				LOG.debug( "Loaded expression factory via HV classloader" );
+				return expressionFactory;
+			}
+
+			// Finally we try the CL of the EL module itself; the EL RI uses the TCCL to load the implementation from
+			// its own module, so this should work
+			run( SetContextClassLoader.action( ELManager.class.getClassLoader() ) );
+			if ( canLoadExpressionFactory() ) {
+				ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
+				LOG.debug( "Loaded expression factory via EL classloader" );
+				return expressionFactory;
+			}
 		}
 		catch (Throwable e) {
-			e.addSuppressed( threadContextClassLoaderThrowable );
-
-			// HV-793 - We fail eagerly in case we have no EL dependencies on the classpath
 			throw LOG.getUnableToInitializeELExpressionFactoryException( e );
 		}
 		finally {
 			run( SetContextClassLoader.action( originalContextClassLoader ) );
+		}
+
+		// HV-793 - We fail eagerly in case we have no EL dependencies on the classpath
+		throw LOG.getUnableToInitializeELExpressionFactoryException( null );
+	}
+
+	/**
+	 * Instead of testing the different class loaders via {@link ELManager}, we directly access the
+	 * {@link ExpressionFactory}. This avoids issues with loading the {@code ELUtil} class (used by {@code ELManager})
+	 * after a failed attempt.
+	 */
+	private static boolean canLoadExpressionFactory() {
+		try {
+			ExpressionFactory.newInstance();
+			return true;
+		}
+		catch (Throwable e) {
+			return false;
 		}
 	}
 
