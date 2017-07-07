@@ -6,6 +6,7 @@
  */
 package com.example;
 
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 
 /**
@@ -14,5 +15,6 @@ import javax.validation.constraints.Min;
 public class Customer {
 
 	@Min(1)
+	@DecimalMin("1.00")
 	private final int status = 0;
 }
