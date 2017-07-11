@@ -1,6 +1,28 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.0.CR3 (11-07-2017)
+-------------------------
+
+** Bug
+    * HV-1429 - integration   - Incorrect URL in Paranamer Karaf feature
+    * HV-1384 - engine        - Fix CascadingMetaData for arrays
+
+** Improvement
+    * HV-1434 - engine        - Make order of <constraint> and <container-element-type> consistent in XSD
+    * HV-1433 - validators    - Don't apply regular expression for @Email if no pattern or flags are given
+    * HV-1431 - engine        - Clean up for constraint locations
+
+** Task
+    * HV-1435 - build         - Upgrade to Bean Validation 2.0.0.CR3 (API + TCK)
+    * HV-1427 - engine        - Improve consistency of method names in the Log class
+    * HV-1426 - integration   - Make javax.el work in OSGi environment without requiring setting the external class loader
+    * HV-1389 - tests         - Clean up @CandidateForTck tests
+    * HV-1371 - tests         - Add missing examples to the specexample PropertyPath test
+    * HV-1351 - engine        - Throw an exception when declaring a ValueExtractor with @ExtractedValue on a non wildcard type
+    * HV-1315 - engine        - Remove container element type support for arrays
+    * HV-1248 - documentation - Update links to the spec
+
 6.0.0.CR2 (05-07-2017)
 -------------------------
 
