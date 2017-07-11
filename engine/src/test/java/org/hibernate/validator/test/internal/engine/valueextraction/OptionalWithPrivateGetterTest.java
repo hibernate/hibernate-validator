@@ -19,15 +19,12 @@ import javax.validation.Validator;
 import javax.validation.constraints.AssertTrue;
 
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.CandidateForTck;
-
 import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HV-975")
-@CandidateForTck
 public class OptionalWithPrivateGetterTest {
 
 	@Test

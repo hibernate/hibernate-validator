@@ -12,19 +12,15 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.util.Set;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.ConstraintViolation;
 import javax.validation.Payload;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.Validator;
@@ -38,7 +34,6 @@ import javax.validation.valueextraction.Unwrapping;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -51,7 +46,6 @@ import org.testng.annotations.Test;
  */
 @TestForIssue(jiraKey = "HV-925")
 @SuppressWarnings("unused")
-@CandidateForTck
 public class UnwrappingTest {
 	private Validator validatorWithValueExtractor;
 	private Validator validatorWithoutValueExtractor;
@@ -82,74 +76,9 @@ public class UnwrappingTest {
 		validatorWithoutValueExtractor.validate( new Foobar() );
 	}
 
-	@Test
-	public void validate_wrapper_itself_if_there_is_no_value_extractor() {
-		Set<ConstraintViolation<Qux>> constraintViolations = validatorWithoutValueExtractor.validate( new Qux() );
-		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( ValueHolderConstraint.class ).withProperty( "integerHolder" )
-		);
-	}
-
-	@Test
-	public void validate_wrapper_itself_even_if_there_is_a_value_extractor() {
-		Set<ConstraintViolation<Qux>> constraintViolations = validatorWithValueExtractor.validate( new Qux() );
-		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( ValueHolderConstraint.class ).withProperty( "integerHolder" )
-		);
-
-		// execute validation twice to ensure that the handling for this case is not subjective to caching (see HV-976)
-		constraintViolations = validatorWithValueExtractor.validate( new Qux() );
-		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( ValueHolderConstraint.class ).withProperty( "integerHolder" )
-		);
-	}
-
-	@Test
-	public void validate_wrapper_itself_if_there_is_no_value_extractor_even_if_constraint_could_be_applied_to_unwrapped_value() {
-		Set<ConstraintViolation<Baz>> constraintViolations = validatorWithoutValueExtractor.validate( new Baz() );
-		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( Null.class ).withProperty( "integerHolder" )
-		);
-	}
-
-	@Test(enabled = false, expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000186.*")
-	// TODO implicit unwrapping not supported for now
-	public void constraint_declaration_exception_if_there_are_validators_for_wrapper_and_wrapped_value() {
-		validatorWithValueExtractor.validate( new Baz() );
-	}
-
-	@Test
-	public void validate_wrapped_value_if_value_extractor_unwraps_by_default() {
-		Set<ConstraintViolation<WrapperWithImplicitUnwrapping>> constraintViolations = validatorWithValueExtractor.validate( new WrapperWithImplicitUnwrapping() );
-		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( Min.class ).withProperty( "integerWrapper" )
-		);
-	}
-
 	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030.*")
 	public void validation_exception_if_unwrapping_disabled_per_constraint() {
 		validatorWithValueExtractor.validate( new WrapperWithDisabledUnwrapping() );
-	}
-
-	@Test
-	public void validate_wrapped_value_if_value_extractor_unwraps_by_default_and_unwrapping_enabled_per_constraint() {
-		Set<ConstraintViolation<WrapperWithForcedUnwrapping>> constraintViolations = validatorWithValueExtractor.validate( new WrapperWithForcedUnwrapping() );
-		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( Min.class ).withProperty( "integerWrapper" )
-		);
-	}
-
-	@Test
-	public void validate_wrapped_value_while_wrapper_has_two_type_parameters_but_only_one_value_extractor_is_ok() {
-		Validator validator = ValidatorUtil.getConfiguration()
-				.addValueExtractor( new WrapperWithTwoTypeArgumentsFirstValueExtractor() )
-				.buildValidatorFactory()
-				.getValidator();
-
-		Set<ConstraintViolation<BeanWithWrapperWithTwoTypeArguments>> constraintViolations = validator.validate( new BeanWithWrapperWithTwoTypeArguments() );
-		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( Min.class ).withProperty( "wrapper" )
-		);
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000223.*")

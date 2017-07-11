@@ -15,7 +15,6 @@ import javax.validation.ValidationException;
 
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.CandidateForTck;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.classloader.ShrinkWrapClassLoader;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -25,7 +24,6 @@ import org.testng.annotations.Test;
  * @author Davide D'Alto
  */
 @TestForIssue(jiraKey = "HV-1017")
-@CandidateForTck
 public class JavaFXClassLoadingTest {
 
 	/**

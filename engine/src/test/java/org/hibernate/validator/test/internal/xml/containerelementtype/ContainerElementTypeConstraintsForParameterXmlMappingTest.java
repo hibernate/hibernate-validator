@@ -13,7 +13,6 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,13 +23,9 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
 
@@ -38,102 +33,7 @@ import org.testng.annotations.Test;
  * @author Gunnar Morling
  * @author Guillaume Smet
  */
-@CandidateForTck
 public class ContainerElementTypeConstraintsForParameterXmlMappingTest {
-
-	@Test
-	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementTypeConstraintsForParameterWithXmlMapping() {
-		Validator validator = getValidator( "parameter-canDeclareContainerElementTypeConstraints-mapping.xml" );
-
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-
-		try {
-			HashMap<String, Integer> fishCountByType = new HashMap<>();
-			fishCountByType.put( "A", -1 );
-			fishCountByType.put( "BB", -2 );
-
-			fishTank.test1( Optional.of( "Too long" ), fishCountByType );
-
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Size.class ).withMessage( "size must be between 0 and 5" ),
-					violationOf( Size.class ).withMessage( "size must be between 3 and 10" ),
-					violationOf( Size.class ).withMessage( "size must be between 3 and 10" ),
-					violationOf( Min.class ).withMessage( "must be greater than or equal to 1" ),
-					violationOf( Min.class ).withMessage( "must be greater than or equal to 1" )
-			);
-		}
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareNestedContainerElementTypeConstraintsForParameterWithXmlMapping() {
-		Validator validator = getValidator( "parameter-canDeclareNestedContainerElementTypeConstraints-mapping.xml" );
-
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-
-		try {
-			Map<String, List<Fish>> fishOfTheMonth = new HashMap<>();
-			List<Fish> january = Arrays.asList( null, new Fish() );
-			fishOfTheMonth.put( "january", january );
-
-			fishTank.test2( fishOfTheMonth );
-
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class ).withMessage( "must not be null" )
-			);
-		}
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareDeeplyNestedContainerElementTypeConstraintsForParameterWithXmlMapping() {
-		Validator validator = getValidator( "parameter-canDeclareDeeplyNestedContainerElementTypeConstraints-mapping.xml" );
-
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-
-		try {
-			Set<String> bobsTags = CollectionHelper.asSet( (String) null );
-			Map<String, Set<String>> januaryTags = new HashMap<>();
-			januaryTags.put( "bob", bobsTags );
-			List<Map<String, Set<String>>> tagsOfFishOfTheMonth = new ArrayList<>();
-			tagsOfFishOfTheMonth.add( januaryTags );
-
-			fishTank.test3( tagsOfFishOfTheMonth );
-
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class ).withMessage( "must not be null" )
-			);
-		}
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementCascadesForParameterWithXmlMapping() {
-		Validator validator = getValidator( "parameter-canDeclareContainerElementCascades-mapping.xml" );
-
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-
-		try {
-			fishTank.test4( Optional.of( new Fish() ) );
-
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class ).withMessage( "must not be null" )
-			);
-		}
-	}
 
 	// HV-1428 Container element support is disabled for arrays
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000226:.*")

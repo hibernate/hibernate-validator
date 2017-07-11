@@ -22,13 +22,10 @@ import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
 
@@ -36,60 +33,7 @@ import org.testng.annotations.Test;
  * @author Gunnar Morling
  * @author Guillaume Smet
  */
-@CandidateForTck
 public class ContainerElementTypeConstraintsForFieldXmlMappingTest {
-
-	@Test
-	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementTypeConstraintsForFieldWithXmlMapping() {
-		Validator validator = getValidator( "field-canDeclareContainerElementTypeConstraints-mapping.xml" );
-
-		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
-
-		assertThat( violations ).containsOnlyViolations(
-				violationOf( Size.class ).withMessage( "size must be between 0 and 5" ),
-				violationOf( Size.class ).withMessage( "size must be between 3 and 10" ),
-				violationOf( Size.class ).withMessage( "size must be between 3 and 10" ),
-				violationOf( Min.class ).withMessage( "must be greater than or equal to 1" ),
-				violationOf( Min.class ).withMessage( "must be greater than or equal to 1" )
-		);
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareNestedContainerElementTypeConstraintsForFieldWithXmlMapping() {
-		Validator validator = getValidator( "field-canDeclareNestedContainerElementTypeConstraints-mapping.xml" );
-
-		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
-
-		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withMessage( "must not be null" )
-		);
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareDeeplyNestedContainerElementTypeConstraintsForFieldWithXmlMapping() {
-		Validator validator = getValidator( "field-canDeclareDeeplyNestedContainerElementTypeConstraints-mapping.xml" );
-
-		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
-
-		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withMessage( "must not be null" )
-		);
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementCascadesForFieldWithXmlMapping() {
-		Validator validator = getValidator( "field-canDeclareContainerElementCascades-mapping.xml" );
-
-		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
-
-		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withMessage( "must not be null" )
-		);
-	}
 
 	// HV-1428 Container element support is disabled for arrays
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000226:.*")

@@ -25,18 +25,16 @@ import javax.validation.Valid;
 import javax.validation.Validator;
 
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-@CandidateForTck
-public class CascadedClassConstraintTest {
+public class CascadingOnClassLevelConstraintTest {
 
 	@Test
-	@TestForIssue( jiraKey = "HV-509")
+	@TestForIssue(jiraKey = "HV-509")
 	public void testCascadedValidation() {
 		Validator validator = ValidatorUtil.getValidator();
 		Set<ConstraintViolation<Bar>> violations = validator.validate( new Bar() );
@@ -100,5 +98,3 @@ public class CascadedClassConstraintTest {
 		}
 	}
 }
-
-
