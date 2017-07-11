@@ -6,19 +6,19 @@
  */
 package org.hibernate.validator.test.internal.engine.path.specexample;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
 @AvailableInStore(groups = { Availability.class })
 public class Book {
 
-	@NotEmpty(groups = { FirstLevelCheck.class, Default.class })
+	@NonEmpty(groups = { FirstLevelCheck.class, Default.class })
 	private String title;
 
 	@Valid
@@ -40,6 +40,14 @@ public class Book {
 	private Map<Integer, List<@Valid Author>> authorsByChapter;
 
 	// [...]
+
+	public Book() {
+	}
+
+	public Book(String title, Author author) {
+		this.title = title;
+		this.authors = Arrays.asList( author );
+	}
 
 	public String getTitle() {
 		return title;

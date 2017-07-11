@@ -40,7 +40,22 @@ public @interface NewPasswordsIdentical {
 
 		@Override
 		public boolean isValid(Object[] args, ConstraintValidatorContext constraintValidatorContext) {
-			return false;
+			if ( args[1] == null || args[2] == null ) {
+				return true;
+			}
+
+			if ( !args[1].equals( args[2] ) ) {
+				constraintValidatorContext.disableDefaultConstraintViolation();
+				constraintValidatorContext
+						.buildConstraintViolationWithTemplate( "New passwords are not identical" )
+						.addParameterNode( 2 )
+						.addConstraintViolation();
+
+				return false;
+			}
+			else {
+				return true;
+			}
 		}
 	}
 }

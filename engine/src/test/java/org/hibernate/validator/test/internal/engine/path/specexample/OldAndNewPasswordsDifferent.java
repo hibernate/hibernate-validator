@@ -40,7 +40,10 @@ public @interface OldAndNewPasswordsDifferent {
 
 		@Override
 		public boolean isValid(Object[] args, ConstraintValidatorContext constraintValidatorContext) {
-			return false;
+			if ( args[0] == null || args[1] == null ) {
+				return true;
+			}
+			return !args[0].equals( args[1] );
 		}
 	}
 }
