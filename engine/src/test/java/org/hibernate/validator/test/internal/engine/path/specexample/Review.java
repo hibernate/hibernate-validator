@@ -10,7 +10,12 @@ import javax.validation.constraints.Min;
 
 public class Review {
 
-	@Min(0) private int rating;
+	@Min(0)
+	private int rating;
+
+	public Review(int rating) {
+		this.rating = rating;
+	}
 
 	// [...]
 }

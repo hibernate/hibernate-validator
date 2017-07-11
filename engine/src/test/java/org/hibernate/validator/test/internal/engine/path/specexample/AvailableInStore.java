@@ -35,10 +35,10 @@ public @interface AvailableInStore {
 
 	Class<? extends Payload>[] payload() default { };
 
-	class Validator implements ConstraintValidator<AvailableInStore, Author> {
+	class Validator implements ConstraintValidator<AvailableInStore, Book> {
 
 		@Override
-		public boolean isValid(Author value, ConstraintValidatorContext constraintValidatorContext) {
+		public boolean isValid(Book value, ConstraintValidatorContext constraintValidatorContext) {
 			return false;
 		}
 	}
