@@ -229,7 +229,7 @@ type `T` is used, also a subtype `S` of `T` may be used without altering the pro
 As an example, consider a class invoking a method on an object with the static type `T`. If the
 runtime type of that object was `S` and `S` imposed additional preconditions, the client class might
 fail to satisfy these preconditions as is not aware of them. The rules of behavioral subtyping are
-also known as the link:$$http://en.wikipedia.org/wiki/Liskov_substitution_principle$$[Liskov
+also known as the http://en.wikipedia.org/wiki/Liskov_substitution_principle[Liskov
 substitution principle].
 
 The Bean Validation specification implements the first rule by disallowing parameter constraints on
@@ -462,7 +462,7 @@ provides access to the validated object in case of return value validation.
 
 All the other `ConstraintViolation` methods generally work for method validation in the same way as
 for validation of beans. Refer to the
-http://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api/index.html?javax/validation/metadata/BeanDescriptor.html[JavaDoc]
+{bv_api_docs}metadata/BeanDescriptor.html[JavaDoc]
 to learn more about the behavior of the individual methods and their return values during bean and
 method validation.
 

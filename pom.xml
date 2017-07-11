@@ -195,6 +195,8 @@
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
 
         <hibernate-validator-parent.path>.</hibernate-validator-parent.path>
+        <java.doc.base.url>http://docs.oracle.com/javase/8/docs/</java.doc.base.url>
+        <bv.doc.base.url>http://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api/</bv.doc.base.url>
     </properties>
 
     <prerequisites>
