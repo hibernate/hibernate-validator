@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.cascaded;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,12 +21,8 @@ import javax.validation.Validator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import org.testng.annotations.Test;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.CandidateForTck;
-
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import org.testng.annotations.Test;
 
 /**
  * Test for cascaded validation of custom iterable and map types. For those, property-level and class-level constraints
@@ -32,8 +31,7 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
  * @author Khalid Alqinyah
  * @author Gunnar Morling
  */
-@CandidateForTck
-public class CascadedIterableMapPropertiesTest {
+public class CascadingOnIterableMapWithAdditionalPropertiesTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-902")

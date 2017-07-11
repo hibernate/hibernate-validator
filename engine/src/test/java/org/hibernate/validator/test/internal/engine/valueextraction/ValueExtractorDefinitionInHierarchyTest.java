@@ -20,13 +20,11 @@ import javax.validation.valueextraction.ValueExtractorDefinitionException;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.Test;
 
 /**
  * @author Guillaume Smet
  */
-@CandidateForTck
 public class ValueExtractorDefinitionInHierarchyTest {
 
 	@Test

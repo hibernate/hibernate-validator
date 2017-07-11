@@ -13,7 +13,6 @@ import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 import javax.validation.valueextraction.ValueExtractorDefinitionException;
 
-import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
 
@@ -22,7 +21,6 @@ import org.testng.annotations.Test;
  *
  * @author Guillaume Smet
  */
-@CandidateForTck
 public class InvalidValueExtractorTest {
 
 	@Test(expectedExceptions = ValueExtractorDefinitionException.class, expectedExceptionsMessageRegExp = "HV000204.*")

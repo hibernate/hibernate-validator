@@ -24,8 +24,6 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -40,85 +38,6 @@ import org.testng.annotations.Test;
  */
 @CandidateForTck
 public class ContainerElementTypeConstraintsForReturnValueXmlMappingTest {
-
-	@Test
-	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementTypeConstraintsForReturnValueWithXmlMapping() {
-		Validator validator = getValidator( "returnvalue-canDeclareContainerElementTypeConstraints-mapping.xml" );
-
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-
-		try {
-			fishTank.test1();
-
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Size.class ).withMessage( "size must be between 3 and 10" ),
-					violationOf( Size.class ).withMessage( "size must be between 3 and 10" ),
-					violationOf( Min.class ).withMessage( "must be greater than or equal to 1" ),
-					violationOf( Min.class ).withMessage( "must be greater than or equal to 1" )
-			);
-		}
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareNestedContainerElementTypeConstraintsForReturnValueWithXmlMapping() {
-		Validator validator = getValidator( "returnvalue-canDeclareNestedContainerElementTypeConstraints-mapping.xml" );
-
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-
-		try {
-			fishTank.test2();
-
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class ).withMessage( "must not be null" )
-			);
-		}
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareDeeplyNestedContainerElementTypeConstraintsForReturnValueWithXmlMapping() {
-		Validator validator = getValidator( "returnvalue-canDeclareDeeplyNestedContainerElementTypeConstraints-mapping.xml" );
-
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-
-		try {
-			fishTank.test3();
-
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class ).withMessage( "must not be null" )
-			);
-		}
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-1291")
-	public void canDeclareContainerElementCascadesForReturnValueWithXmlMapping() {
-		Validator validator = getValidator( "returnvalue-canDeclareContainerElementCascades-mapping.xml" );
-
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-
-		try {
-			fishTank.test4();
-
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class ).withMessage( "must not be null" )
-			);
-		}
-	}
 
 	// HV-1428 Container element support is disabled for arrays
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000226:.*")
