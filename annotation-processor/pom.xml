@@ -93,8 +93,8 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <links>
-                        <link>http://docs.oracle.com/javase/8/docs/api/</link>
-                        <link>http://docs.jboss.org/hibernate/stable/beanvalidation/api/</link>
+                        <link>${java.doc.base.url}api/</link>
+                        <link>${bv.doc.base.url}</link>
                     </links>
                     <packagesheader>Hibernate Validator Annotation Processor Packages</packagesheader>
                     <doctitle>Hibernate Validator Annotation Processor ${project.version}</doctitle>
