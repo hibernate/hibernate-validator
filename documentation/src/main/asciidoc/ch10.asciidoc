@@ -138,7 +138,7 @@ specification.
 [TIP]
 ====
 The integration between JSF 2 and Bean Validation is described in the "Bean Validation Integration"
-chapter of link:$$http://jcp.org/en/jsr/detail?id=314$$[JSR-314]. It is interesting to know that JSF
+chapter of http://jcp.org/en/jsr/detail?id=314[JSR-314]. It is interesting to know that JSF
 2 implements a custom `MessageInterpolator` to ensure proper localization. To encourage the use
 of the Bean Validation message facility, JSF 2 will per default only display the generated Bean
 Validation message. This can, however, be configured via the application resource bundle by
