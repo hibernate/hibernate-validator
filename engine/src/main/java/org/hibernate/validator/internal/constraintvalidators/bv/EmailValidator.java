@@ -38,11 +38,14 @@ public class EmailValidator extends AbstractEmailValidator<Email> {
 			intFlag = intFlag | flag.getValue();
 		}
 
-		try {
-			pattern = java.util.regex.Pattern.compile( emailAnnotation.regexp(), intFlag );
-		}
-		catch (PatternSyntaxException e) {
-			throw LOG.getInvalidRegularExpressionException( e );
+		// we only apply the regexp if there is one to apply
+		if ( !".*".equals( emailAnnotation.regexp() ) || emailAnnotation.flags().length > 0 ) {
+			try {
+				pattern = java.util.regex.Pattern.compile( emailAnnotation.regexp(), intFlag );
+			}
+			catch (PatternSyntaxException e) {
+				throw LOG.getInvalidRegularExpressionException( e );
+			}
 		}
 	}
 
