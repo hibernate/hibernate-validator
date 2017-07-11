@@ -116,12 +116,12 @@
                         name="convert-group"
                         minOccurs="0"
                         maxOccurs="unbounded"/>
-            <xs:element type="map:constraintType"
-                        name="constraint"
-                        maxOccurs="unbounded"
-                        minOccurs="0"/>
             <xs:element type="map:containerElementTypeType"
                         name="container-element-type"
+                        maxOccurs="unbounded"
+                        minOccurs="0"/>
+            <xs:element type="map:constraintType"
+                        name="constraint"
                         maxOccurs="unbounded"
                         minOccurs="0"/>
         </xs:sequence>
