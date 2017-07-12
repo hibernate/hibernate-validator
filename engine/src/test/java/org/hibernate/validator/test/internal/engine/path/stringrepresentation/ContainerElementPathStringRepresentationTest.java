@@ -214,13 +214,16 @@ public class ContainerElementPathStringRepresentationTest extends AbstractPathSt
 				new AddressBook()
 						.add( new Address( null, null ) )
 						.add( new Address( "Street", new City( "C" ) ) )
-						.add( new Address( "Street2", new City( "C" ) ) ) // expected to fail ?
+						.add( new Address( "Street2", new City( "C" ) ) )
+						.add( new Address( "other", new City( "a" ) ) )
 						.add( null )
 		);
 
 		assertCorrectPropertyPathStringRepresentations(
 				constraintViolations,
 				"addresses[].street",
+				"addresses[].city.name",
+				"addresses[].city.name",
 				"addresses[].city.name",
 				"addresses[].<iterable element>"
 		);
