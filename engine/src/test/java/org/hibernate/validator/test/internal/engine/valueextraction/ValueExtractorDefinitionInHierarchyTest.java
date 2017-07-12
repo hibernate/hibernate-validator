@@ -6,7 +6,10 @@
  */
 package org.hibernate.validator.test.internal.engine.valueextraction;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
+
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.Set;
 
@@ -39,8 +42,12 @@ public class ValueExtractorDefinitionInHierarchyTest {
 				.getValidator();
 
 		Set<ConstraintViolation<Entity>> violations = validator.validate( entity );
-
-		assertCorrectPropertyPathStringRepresentations( violations, "property.wrapped" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith()
+						.property( "property" )
+						.containerElement( "wrapped", false, null, null, Wrapper.class, 0 )
+				)
+		);
 	}
 
 	@Test
@@ -56,7 +63,12 @@ public class ValueExtractorDefinitionInHierarchyTest {
 
 		Set<ConstraintViolation<Entity>> violations = validator.validate( entity );
 
-		assertCorrectPropertyPathStringRepresentations( violations, "property.wrapped" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith()
+						.property( "property" )
+						.containerElement( "wrapped", false, null, null, Wrapper.class, 0 )
+				)
+		);
 	}
 
 	@Test(expectedExceptions = ValueExtractorDefinitionException.class, expectedExceptionsMessageRegExp = "HV000218.*")

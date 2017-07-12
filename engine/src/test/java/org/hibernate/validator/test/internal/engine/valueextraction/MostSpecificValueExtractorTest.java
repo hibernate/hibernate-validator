@@ -8,7 +8,8 @@ package org.hibernate.validator.test.internal.engine.valueextraction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.Set;
 
@@ -16,6 +17,7 @@ import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
@@ -29,7 +31,9 @@ import org.hibernate.validator.test.internal.engine.valueextraction.model.IWrapp
 import org.hibernate.validator.test.internal.engine.valueextraction.model.IWrapper212;
 import org.hibernate.validator.test.internal.engine.valueextraction.model.IWrapper22;
 import org.hibernate.validator.test.internal.engine.valueextraction.model.IWrapper221;
+import org.hibernate.validator.test.internal.engine.valueextraction.model.Wrapper1;
 import org.hibernate.validator.test.internal.engine.valueextraction.model.Wrapper2;
+import org.hibernate.validator.testutil.ConstraintViolationAssert;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.Test;
@@ -51,7 +55,12 @@ public class MostSpecificValueExtractorTest {
 				.getValidator();
 
 		Set<ConstraintViolation<Entity1>> violations = validator.validate( new Entity1( null ) );
-		assertCorrectPropertyPathStringRepresentations( violations, "wrapper.IWrapper11" );
+		ConstraintViolationAssert.assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith()
+						.property( "wrapper" )
+						.containerElement( "IWrapper11", false, null, null, Wrapper1.class, 0 )
+				)
+		);
 	}
 
 	@Test

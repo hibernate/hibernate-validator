@@ -6,7 +6,9 @@
  */
 package org.hibernate.validator.test.cfg;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertTrue;
 
 import java.time.Instant;
@@ -20,6 +22,8 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.ScriptAssertDef;
+import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.testutil.ConstraintViolationAssert;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
@@ -42,7 +46,7 @@ public class ScriptAssertDefTest {
 				);
 		configuration.addMapping( programmaticMapping );
 
-		assertCalendarEventViolations( configuration.buildValidatorFactory().getValidator(), "startDate" );
+		assertCalendarEventViolations( configuration.buildValidatorFactory().getValidator(), pathWith().property( "startDate" ) );
 	}
 
 	@Test
@@ -57,7 +61,7 @@ public class ScriptAssertDefTest {
 				);
 		configuration.addMapping( programmaticMapping );
 
-		assertCalendarEventViolations( configuration.buildValidatorFactory().getValidator(), "" );
+		assertCalendarEventViolations( configuration.buildValidatorFactory().getValidator(), pathWith().bean() );
 	}
 
 	@Test(expectedExceptions = ValidationException.class)
@@ -72,10 +76,10 @@ public class ScriptAssertDefTest {
 				);
 		configuration.addMapping( programmaticMapping );
 
-		assertCalendarEventViolations( configuration.buildValidatorFactory().getValidator(), "" );
+		assertCalendarEventViolations( configuration.buildValidatorFactory().getValidator(), pathWith().bean() );
 	}
 
-	private void assertCalendarEventViolations(Validator validator, String propertyPath) {
+	private void assertCalendarEventViolations(Validator validator, ConstraintViolationAssert.PathExpectation propertyPath) {
 		assertTrue( validator.validate( new CalendarEvent(
 						Instant.now(),
 						Instant.now().plusMillis( 1000L )
@@ -88,7 +92,10 @@ public class ScriptAssertDefTest {
 				)
 		);
 
-		assertCorrectPropertyPathStringRepresentations( violations, propertyPath );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ScriptAssert.class ).withPropertyPath( propertyPath )
+
+		);
 	}
 
 	/**
