@@ -1,369 +1,184 @@
-[[chapter-bootstrapping]]
-== Bootstrapping
+[[chapter-xml-configuration]]
+== Configuring via XML
 
-In <<section-obtaining-validator>>, you already saw one way of creating a `Validator` instance - via
-`Validation#buildDefaultValidatorFactory()`. In this chapter, you will learn how to use the other
-methods in `javax.validation.Validation` in order to bootstrap specifically configured validators.
-
-[[section-retrieving-validator-factory-validator]]
-=== Retrieving `ValidatorFactory` and `Validator`
-
-You obtain a `Validator` by retrieving a `ValidatorFactory` via one of the static methods on
-`javax.validation.Validation` and calling `getValidator()` on the factory instance.
-
-<<example-build-default-validator-factory>> shows how to obtain a validator from the default
-validator factory:
-
-[[example-build-default-validator-factory]]
-.Bootstrapping default `ValidatorFactory` and `Validator`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=buildDefaultValidatorFactory]
-----
-====
-
-[TIP]
-====
-The generated `ValidatorFactory` and `Validator` instances are thread-safe and can be cached. As
-Hibernate Validator uses the factory as context for caching constraint metadata it is recommended to
-work with one factory instance within an application.
-====
-
-Bean Validation supports working with several providers such as Hibernate Validator within one
-application. If more than one provider is present on the classpath, it is not guaranteed which one
-is chosen when creating a factory via `buildDefaultValidatorFactory()`.
-
-In this case, you can explicitly specify the provider to use via `Validation#byProvider()`, passing the
-provider's `ValidationProvider` class as shown in <<example-using-specific-provider>>.
-
-[[example-using-specific-provider]]
-.Bootstrapping `ValidatorFactory` and `Validator` using a specific provider
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=byProvider]
-----
-====
-
-Note that the configuration object returned by `configure()` allows to specifically customize the
-factory before calling `buildValidatorFactory()`. The available options are discussed later in this
-chapter.
-
-Similarly you can retrieve the default validator factory for configuration which is demonstrated in
-<<example-configuring-default-provider>>.
-
-[[example-configuring-default-provider]]
-.Retrieving the default `ValidatorFactory` for configuration
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=byDefaultProvider]
-----
-====
+So far we have used the default configuration source for Bean Validation, namely annotations.
+However, there also exist two kinds of XML descriptors allowing configuration via XML. The first
+descriptor describes general Bean Validation behaviour and is provided as _META-INF/validation.xml_.
+The second one describes constraint declarations and closely matches the constraint declaration
+approach via annotations. Let's have a look at these two document types.
 
 [NOTE]
 ====
-If a `ValidatorFactory` instance is no longer in use, it should be disposed by calling
-`ValidatorFactory#close()`. This will free any resources possibly allocated by the factory.
+The XSD files are available via
+http://xmlns.jcp.org/xml/ns/validation/configuration and
+http://xmlns.jcp.org/xml/ns/validation/mapping.
+
+More information about the XML schemas can be found on the
+http://beanvalidation.org/xml/ns/validation/[Bean Validation website].
 ====
 
-[[section-validation-provider-resolver]]
-==== `ValidationProviderResolver`
+[[section-configuration-validation-xml]]
+=== Configuring the validator factory in _validation.xml_
 
-By default, available Bean Validation providers are discovered using the
-{javaTechnotesBaseUrl}/guides/jar/jar.html#Service_Provider[Java
-Service Provider] mechanism.
+The key to enable XML configuration for Hibernate Validator is the file _META-INF/validation.xml_.
+If this file exists on the classpath its configuration will be applied when the `ValidatorFactory`
+gets created. <<image-validation-configuration>> shows a model view of the XML schema to which
+_validation.xml_ has to adhere.
 
-For that purpose, each provider includes the file _META-
-INF/services/javax.validation.spi.ValidationProvider_, containing the fully qualified classname of
-its `ValidationProvider` implementation. In the case of Hibernate Validator, this is
-`org.hibernate.validator.HibernateValidator`.
+[[image-validation-configuration]]
+.Validation configuration schema
+image::validation-configuration-2.0.png[validation-configuration-2.0.xsd]
 
-Depending on your environment and its classloading specifics, provider discovery via the Java's
-service loader mechanism might not work. In this case, you can plug in a custom
-`ValidationProviderResolver` implementation which performs the provider retrieval. An example is OSGi,
-where you could implement a provider resolver which uses OSGi services for provider discovery.
+<<example-validation-xml>>
+shows the several configuration options of _validation.xml_. All settings are optional and the same
+configuration options are also available programmatically through `javax.validation.Configuration`. In
+fact, the XML configuration will be overridden by values explicitly specified via the programmatic
+API. It is even possible to ignore the XML configuration completely via
+`Configuration#ignoreXmlConfiguration()`. See also <<section-configuring-validator-factory>>.
 
-To use a custom provider resolver, pass it via `providerResolver()` as shown in
-<<example-using-custom-validation-provider-resolver>>.
-
-[[example-using-custom-validation-provider-resolver]]
-.Using a custom `ValidationProviderResolver`
+[[example-validation-xml]]
+.`validation.xml`
 ====
-[source, JAVA, indent=0]
+[source, XML, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/OsgiServiceDiscoverer.java[tags=include]
-----
-
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=providerResolver]
-----
-====
-
-[[section-configuring-validator-factory]]
-=== Configuring a `ValidatorFactory`
-
-By default, validator factories retrieved from `Validation` and any validators they create are
-configured as per the XML descriptor _META-INF/validation.xml_ (see <<chapter-xml-configuration>>),
-if present.
-
-If you want to disable the XML based configuration, you can do so by invoking
-`Configuration#ignoreXmlConfiguration()`.
-
-The different values of the XML configuration can be accessed via
-`Configuration#getBootstrapConfiguration()`. This can for instance be helpful if you want to integrate
-Bean Validation into a managed environment and want to create managed instances of the objects
-configured via XML.
-
-Using the fluent configuration API, you can override one or more of the settings when bootstrapping
-the factory. The following sections show how to make use of the different options. Note that the
-`Configuration` class exposes the default implementations of the different extension points which can
-be useful if you want to use these as delegates for your custom implementations.
-
-[[section-validator-factory-message-interpolator]]
-==== `MessageInterpolator`
-
-Message interpolators are used by the validation engine to create user readable error messages from
-constraint message descriptors.
-
-In case the default message interpolation algorithm described in <<chapter-message-interpolation>>
-is not sufficient for your needs, you can pass in your own implementation of the `MessageInterpolator`
-interface via `Configuration#messageInterpolator()` as shown in
-<<example-using-custom-message-interpolator>>.
-
-[[example-using-custom-message-interpolator]]
-.Using a custom `MessageInterpolator`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/MyMessageInterpolator.java[tags=include]
-----
-
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=messageInterpolator]
-----
-====
-
-==== `TraversableResolver`
-
-In some cases the validation engine should not access the state of a bean property. The most obvious
-example for that is a lazily loaded property or association of a JPA entity. Validating this lazy
-property or association would mean that its state would have to be accessed, triggering a load from
-the database.
-
-Which properties can be accessed and which ones not is controlled by querying the
-`TraversableResolver` interface. <<example-using-custom-traversable-resolver>> shows how to use a
-custom traversable resolver implementation.
-
-[[example-using-custom-traversable-resolver]]
-.Using a custom `TraversableResolver`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/MyTraversableResolver.java[tags=include]
-----
-
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=traversableResolver]
-----
-====
-
-If no specific traversable resolver has been configured, the default behavior is to consider all properties as reachable and cascadable.
-When using Hibernate Validator together with a JPA 2 provider such as Hibernate ORM, only those properties will be considered reachable
-which already have been loaded by the persistence provider and all properties will be considered cascadable.
-
-==== `ConstraintValidatorFactory`
-
-`ConstraintValidatorFactory` is the extension point for customizing how constraint validators are
-instantiated and released.
-
-The default `ConstraintValidatorFactory` provided by Hibernate Validator requires a public no-arg
-constructor to instantiate `ConstraintValidator` instances (see <<section-constraint-validator>>).
-Using a custom `ConstraintValidatorFactory` offers for example the possibility to use dependency
-injection in constraint validator implementations.
-
-To configure a custom constraint validator factory call `Configuration#constraintValidatorFactory()`
-(see <<example-using-custom-constraint-validator-factory>>.
-
-[[example-using-custom-constraint-validator-factory]]
-.Using a custom `ConstraintValidatorFactory`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/MyConstraintValidatorFactory.java[tags=include]
-----
-
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=constraintValidatorFactory]
+include::{resourcesdir}/org/hibernate/validator/referenceguide/chapter08/validation.xml[]
 ----
 ====
 
 [WARNING]
 ====
-Any constraint implementations relying on `ConstraintValidatorFactory` behaviors specific to an
-implementation (dependency injection, no no-arg constructor and so on) are not considered portable.
+There must only be one file named _META-INF/validation.xml_ on the classpath. If more than one is
+found an exception is thrown.
 ====
+
+The node `default-provider` allows to choose the Bean Validation provider. This is useful if there is
+more than one provider on the classpath. `message-interpolator`, `traversable-resolver`,
+`constraint-validator-factory`, `parameter-name-provider` and `clock-provider` allow to customize
+the used implementations for the interfaces `MessageInterpolator`, `TraversableResolver`,
+`ConstraintValidatorFactory`, `ParameterNameProvider` and `ClockProvider` defined in the
+`javax.validation` package.
+See the sub-sections of <<section-configuring-validator-factory>> for more information about these
+interfaces.
+
+`value-extractor` allows to declare additional value extractors either to extract values from custom
+container types or to override the built-in value extractors. See <<chapter-valueextraction>> for
+more information about how to implement `javax.validation.valueextraction.ValueExtractor`.
+
+`executable-validation` and its subnodes define defaults for method validation. The Bean Validation
+specification defines constructor and non getter methods as defaults. The enabled attribute acts as
+global switch to turn method validation on and off (see also <<chapter-method-constraints>>).
+
+Via the `constraint-mapping` element you can list an arbitrary number of additional XML files
+containing the actual constraint configuration. Mapping file names must be specified using their
+fully-qualified name on the classpath. Details on writing mapping files can be found in the next
+section.
+
+Last but not least, you can specify provider specific properties via the `property` nodes. In the
+example, we are using the Hibernate Validator specific `hibernate.validator.fail_fast` property (see
+<<section-fail-fast>>).
+
+[[section-mapping-xml-constraints]]
+=== Mapping constraints via `constraint-mappings`
+
+Expressing constraints in XML is possible via files adhering to the schema seen in
+<<image-mapping-configuration>>. Note that these mapping files are only processed if listed via
+constraint-mapping in _validation.xml_.
+
+[[image-mapping-configuration]]
+.Validation mapping schema
+image::validation-mapping-2.0.png[validation-mapping-2.0.xsd]
+
+<<example-constraints-car>> shows how the classes +Car+ and +RentalCar+ from <<example-car>> resp.
+<<example-rental-car>> could be mapped in XML.
+
+[[example-constraints-car]]
+.Bean constraints configured via XML
+====
+[source, XML, indent=0]
+----
+include::{resourcesdir}/org/hibernate/validator/referenceguide/chapter08/rental-car-mapping.xml[]
+----
+====
+
+<<example-rental-station-xml>> shows how the constraints from
+<<example-declaring-parameter-constraints>>, <<example-declaring-return-value-constraints>>
+and <<example-specifying-constraint-target>> can be expressed in XML.
+
+[[example-rental-station-xml]]
+.Method constraints configured via XML
+====
+[source, XML, indent=0]
+----
+include::{resourcesdir}/org/hibernate/validator/referenceguide/chapter08/rental-station-mapping.xml[]
+----
+====
+
+The XML configuration is closely mirroring the programmatic API. For this reason it should suffice
+to just add some comments. `default-package` is used for all fields where a class name is expected. If
+the specified class is not fully qualified the configured default package will be used. Every
+mapping file can then have several bean nodes, each describing the constraints on the entity with
+the specified class name.
+
+[WARNING]
+====
+A given class can only be configured once across all configuration files. The same applies for
+constraint definitions for a given constraint annotation. It can only occur in one mapping file. If
+these rules are violated a `ValidationException` is thrown.
+====
+
+Setting `ignore-annotations` to `true` means that constraint annotations placed on the configured bean
+are ignored. The default for this value is true. `ignore-annotations` is also available for the nodes
+`class`, `fields`, `getter`, `constructor`, `method`, `parameter`, `cross-parameter` and `return-value`.
+If not explicitly specified on these levels the configured bean value applies.
+
+The nodes `class`, `field`, `getter`, `container-element-type`, `constructor` and `method`
+(and its sub node parameter) determine on which level the constraint gets placed.
+The `valid` node is used to enable cascaded validation and the `constraint` node to add a constraint
+on the corresponding level.
+Each constraint definition must define the class via the `annotation` attribute.
+The constraint attributes required by the Bean Validation specification (`message`, `groups` and
+`payload`) have dedicated nodes. All other constraint specific attributes are configured using the
+`element` node.
 
 [NOTE]
 ====
-`ConstraintValidatorFactory` implementations should not cache validator instances as the state of each
-instance can be altered in the `initialize()` method.
+`container-element-type` allows to define the cascaded validation behavior and the constraints for
+container elements. In the above examples, you can see an example of nested container element
+constraints on a `List` nested in the values of a `Map`. `type-argument-index` is used to precise
+which type argument of the `Map` is concerned by the configuration. It can be ommitted if the
+type only has one type argument (e.g. the ``List``s in our examples).
 ====
 
-[[section-parameter-name-provider]]
-==== `ParameterNameProvider`
+The `class` node also allows to reconfigure the default group sequence (see
+<<section-default-group-class>>) via the `group-sequence` node. Not shown in the example is the use
+of `convert-group` to
+specify group conversions (see <<section-group-conversion>>). This node is available on `field`,
+`getter`, `container-element-type`, `parameter` and `return-value` and specifies a `from` and a `to`
+attributes to specify the groups.
 
-In case a method or constructor parameter constraint is violated, the `ParameterNameProvider`
-interface is used to retrieve the parameter name and make it available to the user via the
-property path of the constraint violation.
-
-The default implementation returns parameter names as obtained through the Java reflection API.
-If you compile your sources using the `-parameters` compiler flag, the actual parameter names as
-in the source code will be returned. Otherwise synthetic names in the form of `arg0`, `arg1` etc.
-will be used.
-
-To use a custom parameter name provider either pass an instance of
-the provider during bootstrapping as shown in <<example-using-custom-parameter-name-provider>>,
-or specify the fully qualified class name of the provider as value for
-the `<parameter-name-provider>` element in the _META-INF/validation.xml_ file
-(see <<section-configuration-validation-xml>>). This is demonstrated in
-<<example-using-custom-parameter-name-provider>>.
-
-[[example-using-custom-parameter-name-provider]]
-.Using a custom `ParameterNameProvider`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/MyParameterNameProvider.java[tags=include]
-----
-
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=parameterNameProvider]
-----
-====
-
+Last but not least, the list of `ConstraintValidator` instances associated to a given constraint
+can be altered via the `constraint-definition` node. The annotation attribute represents the constraint
+annotation being altered. The `validated-by` element represent the (ordered) list of `ConstraintValidator`
+implementations associated to the constraint. If `include-existing-validator` is set to `false`,
+validators defined on the constraint annotation are ignored. If set to `true`, the list of constraint
+validators described in XML is concatenated to the list of validators specified on the annotation.
 
 [TIP]
 ====
-Hibernate Validator comes with a custom `ParameterNameProvider` implementation based on the
-link:https://github.com/paul-hammant/paranamer/[ParaNamer] library which provides several ways
-for obtaining parameter names at runtime. Refer to <<section-paranamer-parameternameprovider>>
-to learn more about this specific implementation.
-====
+One use case for constraint-definition is to change the default constraint definition for `@URL`.
+Historically, Hibernate Validator's default constraint validator for this constraint uses the
+`java.net.URL` constructor to verify that an URL is valid.
+However, there is also a purely regular expression based version available which can be configured using
+XML:
 
-[[section-clock-provider]]
-==== `ClockProvider`
-
-For time related validation (`@Past` and `@Future` constraints for instance), it might be useful to define what is
-considered `now`.
-
-This is especially important when you want to test your constraints in a reliable manner.
-
-The reference time is defined by the `ClockProvider` contract. The responsibility of the `ClockProvider` is to
-provide a `java.time.Clock` defining `now` for time related validators.
-
-[[example-using-custom-clock-provider]]
-.Using a custom `ClockProvider`
-====
-[source, JAVA, indent=0]
+.Using XML to register a regular expression based constraint definition for `@URL`
+[source, XML]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/FixedClockProvider.java[tags=include]
-----
-
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=clockProvider]
+<constraint-definition annotation="org.hibernate.validator.constraints.URL">
+  <validated-by include-existing-validators="false">
+    <value>org.hibernate.validator.constraintvalidators.RegexpURLValidator</value>
+  </validated-by>
+</constraint-definition>
 ----
 ====
 
-Alternatively, you can specify the fully-qualified classname of a `ClockProvider` implementation using the
-`<clock-provider>` element when configuring the default validator factory via _META-INF/validation.xml_
-(see <<chapter-xml-configuration>>).
-
-[NOTE]
-====
-When validating `@Future` and `@Past` constraints, you might want to obtain the current time.
-
-You can obtain the `ClockProvider` in your validators by calling the
-`ConstraintValidatorContext#getClockProvider()` method.
-
-For instance, this might be useful if you want to replace the default message of the `@Future`
-constraint with a more explicit one.
-====
-
-==== Adding mapping streams
-
-As discussed earlier, you can configure the constraints applied to your Java beans using XML based
-constraint mappings.
-
-Besides the mapping files specified in _META-INF/validation.xml_, you can add further mappings via
-`Configuration#addMapping()` (see <<example-adding-mapping-streams>>). Note that the passed input
-stream(s) must adhere to the XML schema for constraint mappings presented in
-<<section-mapping-xml-constraints>>.
-
-[[example-adding-mapping-streams]]
-.Adding constraint mapping streams
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=addMapping]
-----
-====
-
-You should close any passed input stream after the validator factory has been created.
-
-[[section-provider-specific-settings]]
-==== Provider-specific settings
-
-Via the configuration object returned by `Validation#byProvider()`, provider specific options can be
-configured.
-
-In the case of Hibernate Validator, this e.g. allows you to enable the fail fast mode and pass one or
-more programmatic constraint mappings as demonstrated in
-<<example-hibernate-validator-specific-options>>.
-
-[[example-hibernate-validator-specific-options]]
-.Setting Hibernate Validator specific options
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=providerSpecificOptions]
-----
-====
-
-Alternatively, provider-specific options can be passed via `Configuration#addProperty()`. Hibernate
-Validator supports enabling the fail fast mode that way, too:
-
-[[example-hibernate-validator-specific-option-via-addproperty]]
-.Enabling a Hibernate Validator specific option via `addProperty()`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=providerSpecificOptionViaAddProperty]
-----
-====
-
-Refer to <<section-fail-fast>> and <<section-programmatic-api>> to learn more about the fail fast
-mode and the constraint declaration API.
-
-[[section-configuring-validator]]
-=== Configuring a Validator
-
-When working with a configured validator factory it can occasionally be required to apply a
-different configuration to a single `Validator` instance. <<example-using-context>> shows how this can
-be achieved by calling `ValidatorFactory#usingContext()`.
-
-[[example-using-context]]
-.Configuring a `Validator` instance via `usingContext()`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=usingContext]
-----
-====
