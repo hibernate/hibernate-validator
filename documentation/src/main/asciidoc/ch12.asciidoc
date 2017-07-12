@@ -47,7 +47,7 @@ annotations themselves
 === Options
 
 The behavior of the Hibernate Validator Annotation Processor can be controlled using the following
-{java_se_docs}technotes/tools/windows/javac.html#BHCHACIB[processor options]:
+{javaTechnotesBaseUrl}/tools/windows/javac.html#BHCHACIB[processor options]:
 
 `diagnosticKind`:: Controls how constraint problems are reported. Must be the
             string representation of one of the values from the enum `javax.tools.Diagnostic.Kind`,
@@ -141,7 +141,7 @@ for http://ant.apache.org/[Apache Ant]:
 ===== javac
 
 When compiling on the command line using
-{java_se_docs}technotes/guides/javac/index.html[javac], specify the JAR
+{javaTechnotesBaseUrl}/guides/javac/index.html[javac], specify the JAR
 _hibernate-validator-annotation-processor-{hvVersion}.jar_ using the "processorpath" option as shown in
 the following listing. The processor will be detected automatically by the compiler and invoked
 during compilation.

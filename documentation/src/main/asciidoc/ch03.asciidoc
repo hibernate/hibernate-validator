@@ -462,7 +462,7 @@ provides access to the validated object in case of return value validation.
 
 All the other `ConstraintViolation` methods generally work for method validation in the same way as
 for validation of beans. Refer to the
-{bv_api_docs}metadata/BeanDescriptor.html[JavaDoc]
+{bvApiDocsUrl}?javax/validation/metadata/BeanDescriptor.html[JavaDoc]
 to learn more about the behavior of the individual methods and their return values during bean and
 method validation.
 

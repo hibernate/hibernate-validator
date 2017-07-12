@@ -103,10 +103,10 @@
                         ${basedir}/../annotation-processor/src/main/java
                     </sourcepath>
                     <links>
-                        <link>${java.doc.base.url}api</link>
-                        <link>http://docs.oracle.com/javaee/7/api</link>
-                        <link>${bv.doc.base.url}</link>
-                        <link>http://javamoney.github.io/apidocs</link>
+                        <link>${java.api-docs.base-url}</link>
+                        <link>${javaee.api-docs.base-url}</link>
+                        <link>${bv.api-docs.base-url}</link>
+                        <link>${javamoney.api-docs.base-url}</link>
                     </links>
                     <tags>
                         <tag>

@@ -230,9 +230,11 @@
                         <hvVersion>${project.version}</hvVersion>
                         <bvVersion>${bv.api.version}</bvVersion>
                         <wildflyVersion>${wildfly.version}</wildflyVersion>
+
                         <!-- URLs -->
-                        <java_se_docs>${java.doc.base.url}</java_se_docs>
-                        <bv_api_docs>${bv.doc.base.url}index.html?javax/validation/</bv_api_docs>
+                        <javaApiDocsUrl>${java.api-docs.base-url}/</javaApiDocsUrl>
+                        <bvApiDocsUrl>${bv.api-docs.base-url}/</bvApiDocsUrl>
+                        <javaTechnotesBaseUrl>${java.technotes.base-url}</javaTechnotesBaseUrl>
                     </attributes>
                 </configuration>
             </plugin>

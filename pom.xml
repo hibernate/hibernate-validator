@@ -166,6 +166,13 @@
         <asciidoctorj.version>1.6.0-alpha.3</asciidoctorj.version>
         <asciidoctorj-pdf.version>1.5.0-alpha.15</asciidoctorj-pdf.version>
 
+        <!-- URLs used in javadoc and documentation generation -->
+        <java.api-docs.base-url>http://docs.oracle.com/javase/8/docs/api</java.api-docs.base-url>
+        <java.technotes.base-url>http://docs.oracle.com/javase/8/docs/technotes</java.technotes.base-url>
+        <javaee.api-docs.base-url>http://docs.oracle.com/javaee/7/api</javaee.api-docs.base-url>
+        <bv.api-docs.base-url>http://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api</bv.api-docs.base-url>
+        <javamoney.api-docs.base-url>http://javamoney.github.io/apidocs</javamoney.api-docs.base-url>
+
         <!--
         Do not upgrade Surefire and Failsafe to 2.19+.
         See https://hibernate.atlassian.net/browse/HV-1117
@@ -195,8 +202,6 @@
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
 
         <hibernate-validator-parent.path>.</hibernate-validator-parent.path>
-        <java.doc.base.url>http://docs.oracle.com/javase/8/docs/</java.doc.base.url>
-        <bv.doc.base.url>http://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api/</bv.doc.base.url>
     </properties>
 
     <prerequisites>
