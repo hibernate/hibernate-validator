@@ -706,6 +706,14 @@ entries from all the bundles with this name found on the classpath in addition t
 This mechanism is also helpful when creating large multi-module applications: instead of putting all the constraint
 messages into one single bundle, you can have one resource bundle per module containing only those messages of that module.
 
+[NOTE]
+====
+We highly recommend the reading of
+http://in.relation.to/2017/03/02/adding-custom-constraint-definitions-via-the-java-service-loader/[this blog post by Marko Bekhta],
+guiding you step by step through the process of creating an independent JAR that contains your custom constraints
+and declares them via the `ServiceLoader`.
+====
+
 [[section-programmatic-constraint-definition]]
 ==== Adding constraint definitions programmatically
 
