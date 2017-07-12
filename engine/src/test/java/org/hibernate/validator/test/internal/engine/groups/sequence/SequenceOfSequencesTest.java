@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.sequence;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -22,8 +25,6 @@ import org.hibernate.validator.test.internal.engine.groups.sequence.SequenceOfSe
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
-
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 
 /**
  * Sequences may comprise other sequences.
@@ -42,19 +43,27 @@ public class SequenceOfSequencesTest {
 		PlushAlligator alligator = new PlushAlligator();
 
 		Set<ConstraintViolation<PlushAlligator>> violations = validator.validate( alligator, AllConstraints.class );
-		assertCorrectPropertyPathStringRepresentations( violations, "name" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "name" )
+		);
 
 		alligator.name = "Ruben";
 		violations = validator.validate( alligator, AllConstraints.class );
-		assertCorrectPropertyPathStringRepresentations( violations, "highestEducationalDegree" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "highestEducationalDegree" )
+		);
 
 		alligator.highestEducationalDegree = "PhD";
 		violations = validator.validate( alligator, AllConstraints.class );
-		assertCorrectPropertyPathStringRepresentations( violations, "length" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "length" )
+		);
 
 		alligator.length = 540;
 		violations = validator.validate( alligator, AllConstraints.class );
-		assertCorrectPropertyPathStringRepresentations( violations, "age" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "age" )
+		);
 	}
 
 	/**
@@ -68,19 +77,27 @@ public class SequenceOfSequencesTest {
 		PlushCrocodile crocodile = new PlushCrocodile();
 
 		Set<ConstraintViolation<PlushCrocodile>> violations = validator.validate( crocodile );
-		assertCorrectPropertyPathStringRepresentations( violations, "name" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "name" )
+		);
 
 		crocodile.name = "Ruben";
 		violations = validator.validate( crocodile, AllConstraints.class );
-		assertCorrectPropertyPathStringRepresentations( violations, "highestEducationalDegree" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "highestEducationalDegree" )
+		);
 
 		crocodile.highestEducationalDegree = "PhD";
 		violations = validator.validate( crocodile, AllConstraints.class );
-		assertCorrectPropertyPathStringRepresentations( violations, "length" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "length" )
+		);
 
 		crocodile.length = 540;
 		violations = validator.validate( crocodile, AllConstraints.class );
-		assertCorrectPropertyPathStringRepresentations( violations, "age" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "age" )
+		);
 	}
 
 	public static class PlushAlligator {
