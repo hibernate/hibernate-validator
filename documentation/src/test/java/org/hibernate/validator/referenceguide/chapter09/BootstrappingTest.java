@@ -97,6 +97,19 @@ public class BootstrappingTest {
 
 	@Test
 	@SuppressWarnings("unused")
+	public void valueExtractor() {
+		//tag::valueExtractor[]
+		ValidatorFactory validatorFactory = Validation.byDefaultProvider()
+				.configure()
+				.addValueExtractor( new MultimapKeyValueExtractor() )
+				.addValueExtractor( new MultimapValueValueExtractor() )
+				.buildValidatorFactory();
+		Validator validator = validatorFactory.getValidator();
+		//end::valueExtractor[]
+	}
+
+	@Test
+	@SuppressWarnings("unused")
 	public void constraintValidatorFactory() {
 		//tag::constraintValidatorFactory[]
 		ValidatorFactory validatorFactory = Validation.byDefaultProvider()

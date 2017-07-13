@@ -283,6 +283,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.
 ----
 ====
 
+[[section-valueextraction-registeringvalueextractor]]
 === Registering a `ValueExtractor`
 
 Hibernate Validator does not detect automatically the value extractors in the
@@ -301,11 +302,11 @@ Via the Java service loader mechanism::
 
 In the `META-INF/validation.xml` file::
     See <<section-configuration-validation-xml>> for more information about
-    how to declare value extractors in the XML configuration.
+    how to register value extractors in the XML configuration.
 
 By calling `Configuration#addValueExtractor(ValueExtractor<?>)`::
-    See <<section-bootstrapping-valueextractors>> for more information
-    about how to declare value extractors during bootstrapping.
+    See <<section-bootstrapping-valueextractors>>
+    for more information.
 
 By invoking `ValidatorContext#addValueExtractor(ValueExtractor<?>)`::
     It only declares the value extractor for this `Validator` instance.

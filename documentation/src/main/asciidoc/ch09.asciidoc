@@ -297,6 +297,24 @@ For instance, this might be useful if you want to replace the default message of
 constraint with a more explicit one.
 ====
 
+[[section-bootstrapping-valueextractors]]
+==== Registering ``ValueExtractor``s
+
+As mentioned in <<chapter-valueextraction>>, additional value extractors can be registered during bootstrapping
+(see <<section-valueextraction-registeringvalueextractor>> for the other ways to register a value extractor).
+
+<<example-registering-value-extractor>> shows how we would register the value extractors we previously created
+to extract the keys and the values of Guava's `Multimap`.
+
+[[example-registering-value-extractor]]
+.Registering additional value extractors
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=valueExtractor]
+----
+====
+
 ==== Adding mapping streams
 
 As discussed earlier, you can configure the constraints applied to your Java beans using XML based
