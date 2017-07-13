@@ -1,3 +1,332 @@
 [[chapter-valueextraction]]
 == Value extraction
 
+Value extraction is the process of extracting values from a container so that
+they can be validated.
+
+It is used when dealing with <<container-element-constraints,container element
+constraints>> and <<example-cascaded-validation-list,cascaded validation inside
+containers>>.
+
+[[section-valueextraction-builtinvalueextractors]]
+=== Built-in value extractors
+
+Hibernate Validator comes with built-in value extractors for the usual Java container
+types so, except if you are using your own custom container types (or the ones
+of external libraries such as https://github.com/google/guava[Guava]'s `Multimap`),
+you should not have to add your own value extractors.
+
+Built-in value extractors are present for all the following container types:
+
+ * `java.util.Iterable`;
+ * `java.util.List`;
+ * `java.util.Map`: for keys and values;
+ * `java.util.Optional`, `java.util.OptionalInt`, `java.util.OptionalLong` and `java.util.OptionalDouble`;
+ * {javafxDocsUrl}[JavaFX]'s `ObservableValue` (see <<section-valueextraction-javafx>>
+   for more details).
+
+The complete list of built-in value extractors with all the details on how they
+behave can be found in the
+{bvSpecUrl}#valueextractordefinition-builtinvalueextractors[Bean Validation specification].
+
+=== Implementing a `ValueExtractor`
+
+To extract values from a custom container, one needs to implement a `ValueExtractor`.
+
+[NOTE]
+====
+Implementing a `ValueExtractor` is not enough, you also need to register it.
+See <<section-valueextraction-registeringvalueextractor>> for more details.
+====
+
+`ValueExtractor` is a very simple API as the only purpose of a value extractor is to provide
+the extracted values to a `ValueReceiver`.
+
+For instance, let's consider the case of Guava's `Optional`. It is an easy example
+as we can shape its value extractor after the `java.util.Optional` one:
+
+[[example-valueextraction-guava-optional-valueextractor]]
+.A `ValueExtractor` for Guava's `Optional`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/valueextractor/OptionalValueExtractor.java[tags=include]
+----
+====
+
+Some explanations are in order:
+
+ * The `@ExtractedValue` annotation marks the type argument under consideration: it
+   is going to be used to resolve the type of the validated value;
+ * We use the `value()` method of the receiver as `Optional` is a pure wrapper type;
+ * We don't want to add a node to the property path of the constraint violation
+   as we want the violation to be reported as if it were directly on the property
+   so we pass a `null` node name to `value()`.
+
+A more interesting example is the case of Guava's `Multimap`: we would like to be
+able to validate both the keys and the values of this container type.
+
+Let's first consider the case of the values. A value extractor extracting them
+is required:
+
+[[example-valueextraction-guava-multimap-value-valueextractor]]
+.A `ValueExtractor` for `Multimap` values
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/valueextractor/MultimapValueValueExtractor.java[tags=include]
+----
+====
+
+It allows to validate constraints for the values of the `Multimap`:
+
+.Constraints on the values of a `Multimap`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=multimapValues]
+----
+====
+
+Another value extractor is required to be able to put constraints on the keys
+of a `Multimap`:
+
+[[example-valueextraction-guava-multimap-key-valueextractor]]
+.A `ValueExtractor` for `Multimap` keys
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/valueextractor/MultimapKeyValueExtractor.java[tags=include]
+----
+====
+
+Once these two value extractors are registered, you can declare constraints on the
+keys and values of a `Multimap`:
+
+.Constraints on the keys and values of a `Multimap`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=multimapKeysAndValues]
+----
+====
+
+The differences between the two value extractors may be a bit subtle at a first
+glance so let's shed some light on them:
+
+ * The `@ExtractedValue` annotation marks the targeted type argument (either
+   `K` or `V` in this case).
+ * We use different node names (`<multimap key>` vs. `<multimap value>`).
+ * In one case, we pass the values to the receiver (third argument of the
+   `keyedValue()` call), in the other, we pass the keys.
+
+Depending on your container type, you should choose the `ValueReceiver`
+method fitting the best:
+
+`value()`::
+    for a simple wrapping container - it is used for ``Optional``s
+`iterableValue()`::
+    for an iterable container - it is used for ``Set``s
+`indexedValue()`::
+    for a container containing indexed values - it is used for ``List``s
+`keyedValue()`::
+    for a container containing keyed values - it is used for ``Map``s.
+    It is used for both the keys and the values. In the case of keys,
+    the key is also passed as the validated value.
+
+For all these methods, you need to pass a node name: it is the name included in
+the node added to the property path of the constraint violation. As mentioned
+earlier, if the node name is `null`, no node is added to the property path:
+it is be useful for pure wrapper types similar to `Optional`.
+
+The choice of the method used is important as it adds contextual information to the
+property path of the constraint violation e.g. the index or the key of the
+validated value.
+
+=== Non generic containers
+
+You might have noticed that, until now, we only implemented value extractors
+for generic containers.
+
+Hibernate Validator also supports value extraction for non generic containers.
+
+Let's take the case of `java.util.OptionalInt` which wraps a primitive `int`
+into an ``Optional``-like container.
+
+A first attempt at a value extractor for `OptionalInt` would look like:
+
+[[example-valueextraction-optionalint-valueextractor]]
+.A `ValueExtractor` for `OptionalInt`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/nongeneric/OptionalIntValueExtractor.java[tags=include]
+----
+====
+
+There is an obvious thing missing for a non generic container: we don't have
+a type parameter. It has two consequences:
+
+ * we cannot determine the type of the validated value using the type argument;
+ * we cannot add constraints on the type argument (e.g. `Container<@NotNull String>`).
+
+First things first, we need a way to tell Hibernate Validator that the value
+extracted from an `OptionalInt` is of type `Integer`.
+As you can see in the above example, the `type` attribute of the `@ExtractedValue`
+annotation allows to provide this information to the validation engine.
+
+Then you have to tell the validation engine that the `Min` constraint you want to
+add to the `OptionalInt` property relates to the wrapped value and not the wrapper.
+
+Bean Validation provides the `Unwrapping.Unwrap` payload for this situation:
+
+[[example-valueextraction-optionalint-unwrapping]]
+.Using `Unwrapping.Unwrap` payload
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=optionalIntUnwrap]
+----
+====
+
+If we take a step back, most - if not all - the constraints we would like to add to an
+`OptionalInt` property would be applied to the wrapped value so having a way to make it
+the default would be nice.
+
+This is exactly what the `@UnwrapByDefault` annotation is for:
+
+[[example-valueextraction-optionalint-unwrapbydefault-valueextractor]]
+.A `ValueExtractor` for `OptionalInt` marked with `@UnwrapByDefault`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/nongeneric/UnwrapByDefaultOptionalIntValueExtractor.java[tags=include]
+----
+====
+
+When declaring this value extractor for `OptionalInt`, constraint annotations will
+by default be applied to the wrapped value:
+
+[[example-valueextraction-optionalint-implicitunwrapping]]
+.Implicit unwrapping thanks to `@UnwrapByDefault`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=optionalInt]
+----
+====
+
+Note that you can still declare an annotation for the wrapper itself by using
+the `Unwrapping.Skip` payload:
+
+[[example-valueextraction-optionalint-avoid-implicitunwrapping]]
+.Avoid implicit unwrapping with `Unwrapping.Skip`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=optionalIntSkip]
+----
+====
+
+[NOTE]
+====
+The `@UnwrapByDefault` value extractor for `OptionalInt` is part of the built-in
+value extractors: there is no need to add one.
+====
+
+[[section-valueextraction-javafx]]
+=== JavaFX value extractors
+
+Bean properties in JavaFX are typically not of simple data types like `String`
+or `int`, but are wrapped in `Property` types which allows to make them observable,
+use them for data binding etc.
+
+Thus, value extraction is required to be able to apply constraints on the
+wrapped values.
+
+The JavaFX `ObservableValue` value extractor is marked with `@UnwrapByDefault`.
+As such, the constraints hosted on the container target the wrapped value by
+default.
+
+Thus, you can constrain a `StringProperty` as below:
+
+.Constraining a `StringProperty`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=stringProperty]
+----
+====
+
+Or a `LongProperty`:
+
+.Constraining a `LongProperty`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=longProperty]
+----
+====
+
+The iterable property types, namely `ReadOnlyListProperty`,
+`ListProperty` and their `Set` and `Map` counterparts are generic and, as such,
+container element constraints can be used. Thus, they have specific value
+extractors that are not marked with `@UnwrapByDefault`.
+
+A `ReadOnlyListProperty` would naturally be constrained as a `List`:
+
+.Constraining a `ReadOnlyListProperty`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=listProperty]
+----
+====
+
+=== Registering a `ValueExtractor`
+
+Hibernate Validator does not detect automatically the value extractors in the
+classpath so they have to be registered.
+
+There are several ways to register value extractors (in increasing order of
+priority):
+
+Provided by the validation engine itself::
+    See <<section-valueextraction-builtinvalueextractors>>.
+
+Via the Java service loader mechanism::
+    The file `META-INF/services/javax.validation.valueextraction.ValueExtractor`
+    must be provided, with the fully-qualified names of one or more value
+    extractor implementations as its contents, each on a separate line.
+
+In the `META-INF/validation.xml` file::
+    See <<section-configuration-validation-xml>> for more information about
+    how to declare value extractors in the XML configuration.
+
+By calling `Configuration#addValueExtractor(ValueExtractor<?>)`::
+    See <<section-bootstrapping-valueextractors>> for more information
+    about how to declare value extractors during bootstrapping.
+
+By invoking `ValidatorContext#addValueExtractor(ValueExtractor<?>)`::
+    It only declares the value extractor for this `Validator` instance.
+
+A value extractor for a given type and type parameter specified at a higher
+priority overrides any other extractors for the same type and type parameter
+given at lower priorities.
+
+=== Resolution algorithms
+
+In most cases, you should not have to worry about this but, if you are overriding
+existing value extractors, you can find a detailed description of the value
+extractors resolution algorithms in the Bean Validation specification:
+
+ * for {bvSpecUrl}#constraintdeclarationvalidationprocess-validationroutine-valueextractorresolution-algorithm-constraints[container element constraints],
+ * for {bvSpecUrl}#constraintdeclarationvalidationprocess-validationroutine-valueextractorresolution-algorithm-cascaded[cascaded validation],
+ * and for {bvSpecUrl}#constraintdeclarationvalidationprocess-validationroutine-valueextractorresolution-implicitunwrapping[implicit unwrapping].
+
+One important thing to have in mind is that:
+
+ * for container element constraints, the declared type is used to resolve the value
+   extractors;
+ * for cascaded validation, it is the runtime type.
+
