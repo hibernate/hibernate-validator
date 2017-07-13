@@ -226,7 +226,7 @@ Container element constraints are supported by the programmatic API, using `cont
 <<example-nested-container-element-constraints>> show an example where constraints are declared on
 nested container elements.
 
-[[example-generic-constraint-mapping]]
+[[example-nested-container-element-constraints]]
 .Programmatic declaration of a nested container element constraint
 ====
 [source, JAVA, indent=0]
