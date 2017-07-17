@@ -79,8 +79,6 @@ public class ValueExtractorManager {
 		specDefinedExtractors.add( OptionalDoubleValueExtractor.DESCRIPTOR );
 		specDefinedExtractors.add( OptionalLongValueExtractor.DESCRIPTOR );
 
-		specDefinedExtractors.add( ObjectValueExtractor.DESCRIPTOR );
-
 		SPEC_DEFINED_EXTRACTORS = Collections.unmodifiableSet( specDefinedExtractors );
 	}
 
