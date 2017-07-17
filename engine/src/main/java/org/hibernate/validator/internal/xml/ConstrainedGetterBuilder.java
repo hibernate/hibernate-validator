@@ -106,7 +106,6 @@ class ConstrainedGetterBuilder {
 
 	private CascadingTypeParameter getCascadingMetaDataForGetter(Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Method method,
 			GetterType getterType, String defaultPackage) {
-		boolean isArray = method.getReturnType().isArray();
 		Type type = ReflectionHelper.typeOf( method );
 		boolean isCascaded = getterType.getValid() != null;
 		Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
@@ -114,9 +113,7 @@ class ConstrainedGetterBuilder {
 				defaultPackage
 		);
 
-		return isArray
-				? CascadingTypeParameter.arrayElement( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions )
-				: CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
+		return CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
 	private static Method findGetter(Class<?> beanClass, String getterName, List<String> alreadyProcessedGetterNames) {

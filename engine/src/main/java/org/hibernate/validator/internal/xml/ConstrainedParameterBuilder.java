@@ -102,15 +102,12 @@ class ConstrainedParameterBuilder {
 
 	private CascadingTypeParameter getCascadingMetaDataForParameter(Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Type type,
 			ParameterType parameterType, String defaultPackage) {
-		boolean isArray = ReflectionHelper.getClassFromType( type ).isArray();
 		boolean isCascaded = parameterType.getValid() != null;
 		Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
 				parameterType.getConvertGroup(),
 				defaultPackage
 		);
 
-		return isArray
-				? CascadingTypeParameter.arrayElement( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions )
-				: CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
+		return CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
 	}
 }
