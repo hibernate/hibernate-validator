@@ -322,7 +322,6 @@ class ConstrainedExecutableBuilder {
 
 	private CascadingTypeParameter getCascadingMetaDataForReturnValue(Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Executable executable,
 			ReturnValueType returnValueType, String defaultPackage) {
-		boolean isArray = executable instanceof Method && ( (Method) executable ).getReturnType().isArray();
 		Type type = ReflectionHelper.typeOf( executable );
 		boolean isCascaded = returnValueType.getValid() != null;
 		Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
@@ -330,9 +329,7 @@ class ConstrainedExecutableBuilder {
 				defaultPackage
 		);
 
-		return isArray
-				? CascadingTypeParameter.arrayElement( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions )
-				: CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
+		return CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
 	/**
