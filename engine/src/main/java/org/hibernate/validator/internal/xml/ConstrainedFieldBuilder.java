@@ -100,7 +100,6 @@ class ConstrainedFieldBuilder {
 
 	private CascadingTypeParameter getCascadingMetaDataForField(Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Field field,
 			FieldType fieldType, String defaultPackage) {
-		boolean isArray = field.getType().isArray();
 		Type type = ReflectionHelper.typeOf( field );
 		boolean isCascaded = fieldType.getValid() != null;
 		Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
@@ -108,9 +107,7 @@ class ConstrainedFieldBuilder {
 				defaultPackage
 		);
 
-		return isArray
-				? CascadingTypeParameter.arrayElement( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions )
-				: CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
+		return CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
 	private static Field findField(Class<?> beanClass, String fieldName, List<String> alreadyProcessedFieldNames) {
