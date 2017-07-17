@@ -747,8 +747,8 @@ public interface Log extends BasicLogger {
 	ValidationException getContainerElementTypeHasAlreadyBeenConfiguredViaXmlMappingConfigurationException(ConstraintLocation rootConstraintLocation,
 			ContainerElementTypePath path);
 
-	@Message(id = 218, value = "Having parallel definitions of ValueExtractor on a given class is not allowed: %s.")
-	ValueExtractorDefinitionException getParallelDefinitionsOfValueExtractorException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorImplementationType);
+	@Message(id = 218, value = "Having parallel definitions of value extractors on a given class is not allowed: %s.")
+	ValueExtractorDefinitionException getParallelDefinitionsOfValueExtractorsException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorImplementationType);
 
 	@SuppressWarnings("rawtypes")
 	@Message(id = 219, value = "Unable to get the most specific value extractor for type %1$s as several most specific value extractors are declared: %2$s.")
