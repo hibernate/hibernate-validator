@@ -86,7 +86,7 @@ public class MetaConstraints {
 		if ( ValidateUnwrappedValue.UNWRAP.equals( constraintDescriptor.getValueUnwrapping() ) ) {
 			switch ( valueExtractorDescriptorCandidates.size() ) {
 				case 0:
-					throw LOG.getNoValueExtractorFoundForTypeException( declaredType, null );
+					throw LOG.getNoValueExtractorFoundForUnwrapException( declaredType );
 				case 1:
 					selectedValueExtractorDescriptor = valueExtractorDescriptorCandidates.iterator().next();
 					break;
