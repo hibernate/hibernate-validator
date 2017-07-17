@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,9 +17,14 @@ import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
+import org.hibernate.validator.internal.util.TypeVariables;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -28,6 +34,8 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Guillaume Smet
  */
 public class CascadingMetaData {
+
+	private static final Log LOG = LoggerFactory.make();
 
 	/**
 	 * The enclosing type that defines this type parameter.
@@ -75,18 +83,38 @@ public class CascadingMetaData {
 	 */
 	private final boolean hasGroupConversionsOnElementOrContainerElements;
 
-	public CascadingMetaData(CascadingTypeParameter cascadingMetaData) {
+	/**
+	 * The set of value extractors which are type compliant and container element compliant with the element where
+	 * the cascaded validation was declared. The final value extractor is chosen among these ones, based on the
+	 * runtime type.
+	 */
+	private final Set<ValueExtractorDescriptor> valueExtractorCandidates;
+
+	public CascadingMetaData(ValueExtractorManager valueExtractorManager, CascadingTypeParameter cascadingMetaData) {
 		this.enclosingType = cascadingMetaData.getEnclosingType();
 		this.typeParameter = cascadingMetaData.getTypeParameter();
 		this.declaredContainerClass = cascadingMetaData.getDeclaredContainerClass();
 		this.declaredTypeParameter = cascadingMetaData.getDeclaredTypeParameter();
 		this.containerElementTypesCascadingMetaData = cascadingMetaData.getContainerElementTypesCascadingMetaData().entrySet().stream()
-				.map( entry -> new CascadingMetaData( entry.getValue() ) )
+				.map( entry -> new CascadingMetaData( valueExtractorManager, entry.getValue() ) )
 				.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) );
 		this.groupConversionHelper = new GroupConversionHelper( cascadingMetaData.getGroupConversions() );
 		this.cascading = cascadingMetaData.isCascading();
 		this.markedForCascadingOnElementOrContainerElements = cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements();
 		this.hasGroupConversionsOnElementOrContainerElements = cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements();
+
+		if ( TypeVariables.isAnnotatedObject( this.typeParameter ) || !markedForCascadingOnElementOrContainerElements ) {
+			this.valueExtractorCandidates = Collections.emptySet();
+		}
+		else {
+			this.valueExtractorCandidates = CollectionHelper.toImmutableSet(
+					valueExtractorManager.getValueExtractorCandidatesForCascadedValidation( this.enclosingType, this.typeParameter )
+			);
+
+			if ( this.valueExtractorCandidates.size() == 0 ) {
+				throw LOG.getNoValueExtractorFoundForTypeException( this.declaredContainerClass, this.declaredTypeParameter );
+			}
+		}
 	}
 
 	public TypeVariable<?> getTypeParameter() {
@@ -127,6 +155,10 @@ public class CascadingMetaData {
 
 	public Set<GroupConversionDescriptor> getGroupConversionDescriptors() {
 		return groupConversionHelper.asDescriptors();
+	}
+
+	public Set<ValueExtractorDescriptor> getValueExtractorCandidates() {
+		return valueExtractorCandidates;
 	}
 
 	// FIXME GSM: probably better to move it to the constructor but we would need to pass the context to the constructor

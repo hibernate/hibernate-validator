@@ -13,15 +13,12 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
-import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
@@ -70,8 +67,6 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
-import org.hibernate.validator.internal.util.TypeVariableBindings;
-import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -617,53 +612,18 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				continue;
 			}
 
-			List<TypeVariable<?>> cascadingTypeParametersOfValueType = getCorrespondingTypeParametersInSubType(
-					value.getClass(),
-					TypeHelper.getErasedReferenceType( cascadingMetaData.getEnclosingType() ),
-					cascadingMetaData.getTypeParameter()
+			ValueExtractorDescriptor extractor = valueExtractorManager.getMaximallySpecificAndContainerElementCompliantValueExtractor(
+					cascadingMetaData.getValueExtractorCandidates(),
+					value.getClass()
 			);
 
-			for ( TypeVariable<?> cascadingTypeParameterOfValueType : cascadingTypeParametersOfValueType ) {
-				ValueExtractorDescriptor extractor = valueExtractorManager.getMaximallySpecificAndContainerElementCompliantValueExtractor(
-						value.getClass(),
-						cascadingTypeParameterOfValueType
-				);
-
-				if ( extractor == null ) {
-					throw log.getNoValueExtractorFoundForTypeException( value.getClass(), cascadingTypeParameterOfValueType );
-				}
-
-				CascadingValueReceiver receiver = new CascadingValueReceiver( validationContext, valueContext, cascadingMetaData );
-				ValueExtractorHelper.extractValues( extractor, value, receiver );
+			if ( extractor == null ) {
+				throw log.getNoValueExtractorFoundForTypeException( cascadingMetaData.getEnclosingType(), cascadingMetaData.getTypeParameter(), value.getClass() );
 			}
+
+			CascadingValueReceiver receiver = new CascadingValueReceiver( validationContext, valueContext, cascadingMetaData );
+			ValueExtractorHelper.extractValues( extractor, value, receiver );
 		}
-	}
-
-	/**
-	 * Returns those type parameter(s) of the given value type which correspond to the given type variable of the given
-	 * super-type.
-	 */
-	private List<TypeVariable<?>> getCorrespondingTypeParametersInSubType(Class<?> subType, Class<?> superType, TypeVariable<?> typeParameterOfSuperType) {
-		if ( TypeVariables.isInternal( typeParameterOfSuperType ) ) {
-			return Collections.singletonList( typeParameterOfSuperType );
-		}
-
-		List<TypeVariable<?>> correspondingTypeParameters = new ArrayList<>();
-
-		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings = TypeVariableBindings.getTypeVariableBindings( subType );
-		Map<TypeVariable<?>, TypeVariable<?>> bindingsOfSuperType = allBindings.get( superType );
-
-		// collect all type parameters of the sub-type that map to the given type parameter of the super-type
-		// TODO should only be null until migrated off of value unwrappers
-		if ( bindingsOfSuperType != null ) {
-			for ( Entry<TypeVariable<?>, TypeVariable<?>> binding : bindingsOfSuperType.entrySet() ) {
-				if ( typeParameterOfSuperType == binding.getValue() ) {
-					correspondingTypeParameters.add( binding.getKey() );
-				}
-			}
-		}
-
-		return correspondingTypeParameters;
 	}
 
 	private class CascadingValueReceiver implements ValueExtractor.ValueReceiver {

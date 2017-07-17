@@ -6,10 +6,12 @@
  */
 package org.hibernate.validator.internal.util;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
+import java.util.Collection;
+
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * @author Gunnar Morling
@@ -67,6 +69,18 @@ public final class Contracts {
 	public static void assertNotEmpty(String s, String message) {
 		if ( s.length() == 0 ) {
 			throw log.getIllegalArgumentException( message );
+		}
+	}
+
+	public static void assertNotEmpty(Collection<?> collection, String message) {
+		if ( collection.size() == 0 ) {
+			throw log.getIllegalArgumentException( message );
+		}
+	}
+
+	public static void assertNotEmpty(Collection<?> collection, String message, Object... messageParameters) {
+		if ( collection.size() == 0 ) {
+			throw log.getIllegalArgumentException( String.format( message, messageParameters ) );
 		}
 	}
 }
