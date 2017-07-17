@@ -138,7 +138,7 @@ public class ValueExtractorDescriptor {
 			return (AnnotatedParameterizedType) valueExtractorAnnotatedTypes.get( 0 );
 		}
 		else if ( valueExtractorAnnotatedTypes.size() > 1 ) {
-			throw LOG.getParallelDefinitionsOfValueExtractorException( extractorImplementationType );
+			throw LOG.getParallelDefinitionsOfValueExtractorsException( extractorImplementationType );
 		}
 		else {
 			throw new AssertionError( extractorImplementationType.getName() + " should be a subclass of " + ValueExtractor.class.getSimpleName() );
