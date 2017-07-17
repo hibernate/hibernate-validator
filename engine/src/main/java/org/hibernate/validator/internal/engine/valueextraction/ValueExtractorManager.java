@@ -9,12 +9,11 @@ package org.hibernate.validator.internal.engine.valueextraction;
 import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -122,10 +121,10 @@ public class ValueExtractorManager {
 	 * Returns the maximally specific type compliant value extractors or an empty set if none was found.
 	 */
 	public Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> valueType) {
-		List<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
+		Set<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
 				.stream()
 				.filter( e -> TypeHelper.isAssignable( TypeHelper.getErasedReferenceType( e.getContainerType() ), valueType ) )
-				.collect( Collectors.toList() );
+				.collect( Collectors.toSet() );
 
 		return getMaximallySpecificValueExtractors( valueType, typeCompatibleExtractors );
 	}
@@ -144,12 +143,12 @@ public class ValueExtractorManager {
 			allBindings = TypeVariableBindings.getTypeVariableBindings( (Class<?>) typeParameter.getGenericDeclaration() );
 		}
 
-		List<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
+		Set<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
 				.stream()
 				.filter( e -> TypeHelper.isAssignable( e.getContainerType(), valueType ) )
-				.collect( Collectors.toList() );
+				.collect( Collectors.toSet() );
 
-		List<ValueExtractorDescriptor> containerElementCompliantExtractors = new ArrayList<>();
+		Set<ValueExtractorDescriptor> containerElementCompliantExtractors = new HashSet<>();
 
 		for ( ValueExtractorDescriptor extractorDescriptor : typeCompatibleExtractors ) {
 			TypeVariable<?> typeParameterBoundToExtractorType;
@@ -182,7 +181,7 @@ public class ValueExtractorManager {
 		}
 	}
 
-	private Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> valueType, List<ValueExtractorDescriptor> extractors) {
+	private Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> valueType, Set<ValueExtractorDescriptor> extractors) {
 		Set<ValueExtractorDescriptor> candidates = CollectionHelper.newHashSet( extractors.size() );
 
 		for ( ValueExtractorDescriptor descriptor : extractors ) {
