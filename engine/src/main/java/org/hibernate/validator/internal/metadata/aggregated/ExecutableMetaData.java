@@ -382,7 +382,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
-					new CascadingMetaData( cascadingMetaData ),
+					new CascadingMetaData( valueExtractorManager, cascadingMetaData ),
 					isConstrained,
 					isGetterMethod
 			);

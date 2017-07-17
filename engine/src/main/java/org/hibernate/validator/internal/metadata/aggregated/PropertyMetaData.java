@@ -209,7 +209,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					Cascadable.Builder builder = cascadableBuilders.get( field );
 
 					if ( builder == null ) {
-						builder = new FieldCascadable.Builder( field, constrainedElement.getCascadingMetaData() );
+						builder = new FieldCascadable.Builder( valueExtractorManager, field, constrainedElement.getCascadingMetaData() );
 						cascadableBuilders.put( field, builder );
 					}
 					else {
@@ -221,7 +221,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					Cascadable.Builder builder = cascadableBuilders.get( method );
 
 					if ( builder == null ) {
-						builder = new GetterCascadable.Builder( method, constrainedElement.getCascadingMetaData() );
+						builder = new GetterCascadable.Builder( valueExtractorManager, method, constrainedElement.getCascadingMetaData() );
 						cascadableBuilders.put( method, builder );
 					}
 					else {

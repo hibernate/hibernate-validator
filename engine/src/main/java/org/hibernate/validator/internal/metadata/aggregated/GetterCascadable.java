@@ -14,6 +14,7 @@ import java.security.PrivilegedAction;
 
 import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -67,10 +68,12 @@ public class GetterCascadable implements Cascadable {
 
 	public static class Builder implements Cascadable.Builder {
 
+		private final ValueExtractorManager valueExtractorManager;
 		private final Method method;
 		private CascadingTypeParameter cascadingMetaData;
 
-		public Builder(Method method, CascadingTypeParameter cascadingMetaData) {
+		public Builder(ValueExtractorManager valueExtractorManager, Method method, CascadingTypeParameter cascadingMetaData) {
+			this.valueExtractorManager = valueExtractorManager;
 			this.method = method;
 			this.cascadingMetaData = cascadingMetaData;
 		}
@@ -82,7 +85,7 @@ public class GetterCascadable implements Cascadable {
 
 		@Override
 		public GetterCascadable build() {
-			return new GetterCascadable( getAccessible( method ), new CascadingMetaData( cascadingMetaData ) );
+			return new GetterCascadable( getAccessible( method ), new CascadingMetaData( valueExtractorManager, cascadingMetaData ) );
 		}
 
 		/**
