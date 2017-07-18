@@ -104,7 +104,7 @@ public class BeanMetaDataManager {
 	 */
 	private final ExecutableHelper executableHelper;
 
-	private final ValidationOrderGenerator validationOrderGenerator = new ValidationOrderGenerator();
+	private final ValidationOrderGenerator validationOrderGenerator;
 
 	/**
 	 * the three properties in this field affect the invocation of rules associated to section 4.5.5
@@ -118,6 +118,7 @@ public class BeanMetaDataManager {
 			TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ValueExtractorManager valueExtractorManager,
+			ValidationOrderGenerator validationOrderGenerator,
 			List<MetaDataProvider> optionalMetaDataProviders,
 			MethodValidationConfiguration methodValidationConfiguration) {
 		this.constraintHelper = constraintHelper;
@@ -125,6 +126,7 @@ public class BeanMetaDataManager {
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
 		this.parameterNameProvider = parameterNameProvider;
+		this.validationOrderGenerator = validationOrderGenerator;
 
 		this.metaDataProviders = newArrayList();
 		this.metaDataProviders.addAll( optionalMetaDataProviders );

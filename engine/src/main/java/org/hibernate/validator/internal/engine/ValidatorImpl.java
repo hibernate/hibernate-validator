@@ -145,6 +145,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ClockProvider clockProvider,
 			ValueExtractorManager valueExtractorManager,
 			ConstraintValidatorManager constraintValidatorManager,
+			ValidationOrderGenerator validationOrderGenerator,
 			boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
@@ -154,9 +155,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.clockProvider = clockProvider;
 		this.valueExtractorManager = valueExtractorManager;
 		this.constraintValidatorManager = constraintValidatorManager;
+		this.validationOrderGenerator = validationOrderGenerator;
 		this.failFast = failFast;
-
-		validationOrderGenerator = new ValidationOrderGenerator();
 	}
 
 	@Override
