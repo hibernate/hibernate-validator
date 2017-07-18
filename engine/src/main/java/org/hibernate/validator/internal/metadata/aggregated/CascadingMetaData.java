@@ -98,7 +98,7 @@ public class CascadingMetaData {
 		this.containerElementTypesCascadingMetaData = cascadingMetaData.getContainerElementTypesCascadingMetaData().entrySet().stream()
 				.map( entry -> new CascadingMetaData( valueExtractorManager, entry.getValue() ) )
 				.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) );
-		this.groupConversionHelper = new GroupConversionHelper( cascadingMetaData.getGroupConversions() );
+		this.groupConversionHelper = GroupConversionHelper.of( cascadingMetaData.getGroupConversions() );
 		this.cascading = cascadingMetaData.isCascading();
 		this.markedForCascadingOnElementOrContainerElements = cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements();
 		this.hasGroupConversionsOnElementOrContainerElements = cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements();

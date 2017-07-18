@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -27,12 +28,25 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Gunnar Morling
  */
 public class GroupConversionHelper {
+
 	private static final Log log = LoggerFactory.make();
+
+	private static final GroupConversionHelper EMPTY = new GroupConversionHelper( Collections.emptyMap() );
+
 	@Immutable
 	private final Map<Class<?>, Class<?>> groupConversions;
 
-	public GroupConversionHelper(Map<Class<?>, Class<?>> groupConversions) {
+	private GroupConversionHelper(Map<Class<?>, Class<?>> groupConversions) {
 		this.groupConversions = CollectionHelper.toImmutableMap( groupConversions );
+	}
+
+	public static GroupConversionHelper of(Map<Class<?>, Class<?>> groupConversions) {
+		if ( groupConversions.isEmpty() ) {
+			return GroupConversionHelper.EMPTY;
+		}
+		else {
+			return new GroupConversionHelper( groupConversions );
+		}
 	}
 
 	/**
