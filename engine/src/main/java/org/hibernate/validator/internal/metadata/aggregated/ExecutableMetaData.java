@@ -377,7 +377,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					ReflectionHelper.typeOf( executable ),
 					executable.getParameterTypes(),
 					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
-					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? Collections.singleton( ExecutableHelper.getSignature( executable ) ) : signatures,
+					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? Collections.singleton( ExecutableHelper.getSignature( executable ) ) :
+							CollectionHelper.toImmutableSet( signatures ),
 					adaptOriginsAndImplicitGroups( getDirectConstraints() ),
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
 					findParameterMetaData(),
