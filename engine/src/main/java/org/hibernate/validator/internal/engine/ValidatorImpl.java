@@ -443,7 +443,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private <U> void validateConstraintsForDefaultGroup(ValidationContext<?> validationContext, ValueContext<U, Object> valueContext) {
-		final BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
+		final BeanMetaData<U> beanMetaData = valueContext.getCurrentBeanMetaData();
 		final Map<Class<?>, Class<?>> validatedInterfaces = newHashMap();
 
 		// evaluating the constraints of a bean per class in hierarchy, this is necessary to detect potential default group re-definitions
@@ -515,8 +515,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private void validateConstraintsForNonDefaultGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
-		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
-		validateMetaConstraints( validationContext, valueContext, valueContext.getCurrentBean(), beanMetaData.getMetaConstraints() );
+		validateMetaConstraints( validationContext, valueContext, valueContext.getCurrentBean(), valueContext.getCurrentBeanMetaData().getMetaConstraints() );
 		validationContext.markCurrentBeanAsProcessed( valueContext );
 	}
 
@@ -776,7 +775,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		ValueContext<?, Object> valueContext = getValueContextForValueValidation( context, propertyPath );
 		valueContext.setCurrentValidatedValue( value );
 
-		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
+		BeanMetaData<?> beanMetaData = valueContext.getCurrentBeanMetaData();
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			validationOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( null ) );
 		}
@@ -828,6 +827,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			);
 		}
 
+		if ( parameterValues.length != executableMetaData.getParameterTypes().length ) {
+			throw log.getInvalidParameterCountForExecutableException(
+					ExecutableHelper.getExecutableAsString(
+							executableMetaData.getType().toString() + "#" + executableMetaData.getName(),
+							executableMetaData.getParameterTypes()
+					), parameterValues.length, executableMetaData.getParameterTypes().length
+			);
+		}
+
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			validationOrder.assertDefaultGroupSequenceIsExpandable(
 					beanMetaData.getDefaultGroupSequence(
@@ -839,7 +847,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		// process first single groups
 		Iterator<Group> groupIterator = validationOrder.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
-			validateParametersForGroup( validationContext, parameterValues, groupIterator.next() );
+			validateParametersForGroup( validationContext, executableMetaData, parameterValues, groupIterator.next() );
 			if ( shouldFailFast( validationContext ) ) {
 				return;
 			}
@@ -871,7 +879,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				int numberOfViolations = validationContext.getFailingConstraints().size();
 
 				for ( Group group : groupOfGroups ) {
-					validateParametersForGroup( validationContext, parameterValues, group );
+					validateParametersForGroup( validationContext, executableMetaData, parameterValues, group );
 					if ( shouldFailFast( validationContext ) ) {
 						return;
 					}
@@ -891,18 +899,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private <T> void validateParametersForGroup(ValidationContext<T> validationContext, Object[] parameterValues, Group group) {
-		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
-		ExecutableMetaData executableMetaData = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
-
-		if ( parameterValues.length != executableMetaData.getParameterTypes().length ) {
-			throw log.getInvalidParameterCountForExecutableException(
-					ExecutableHelper.getExecutableAsString(
-							executableMetaData.getType().toString() + "#" + executableMetaData.getName(),
-							executableMetaData.getParameterTypes()
-					), parameterValues.length, executableMetaData.getParameterTypes().length
-			);
-		}
+	private <T> void validateParametersForGroup(ValidationContext<T> validationContext, ExecutableMetaData executableMetaData, Object[] parameterValues,
+			Group group) {
+		Contracts.assertNotNull( executableMetaData, "executableMetaData may not be null" );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -910,7 +909,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		// For now a redefined default sequence will only be considered if specified at the bean
 		// hosting the validated itself, but no other default sequence from parent types
 		if ( group.isDefaultGroup() ) {
-			Iterator<Sequence> defaultGroupSequence = beanMetaData.getDefaultValidationSequence( validationContext.getRootBean() );
+			Iterator<Sequence> defaultGroupSequence = validationContext.getRootBeanMetaData().getDefaultValidationSequence( validationContext.getRootBean() );
 
 			while ( defaultGroupSequence.hasNext() ) {
 				Sequence sequence = defaultGroupSequence.next();
@@ -1027,7 +1026,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		// process first single groups
 		while ( groupIterator.hasNext() ) {
-			validateReturnValueForGroup( context, bean, value, groupIterator.next() );
+			validateReturnValueForGroup( context, executableMetaData, bean, value, groupIterator.next() );
 			if ( shouldFailFast( context ) ) {
 				return;
 			}
@@ -1062,7 +1061,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			for ( GroupWithInheritance groupOfGroups : sequence ) {
 				int numberOfFailingConstraintsBeforeGroup = context.getFailingConstraints().size();
 				for ( Group group : groupOfGroups ) {
-					validateReturnValueForGroup( context, bean, value, group );
+					validateReturnValueForGroup( context, executableMetaData, bean, value, group );
 					if ( shouldFailFast( context ) ) {
 						return;
 					}
@@ -1085,14 +1084,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	//TODO GM: if possible integrate with validateParameterForGroup()
-	private <T> void validateReturnValueForGroup(ValidationContext<T> validationContext, T bean, Object value, Group group) {
-		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
-		ExecutableMetaData executableMetaData = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
-
-		if ( executableMetaData == null ) {
-			// nothing to validate
-			return;
-		}
+	private <T> void validateReturnValueForGroup(ValidationContext<T> validationContext, ExecutableMetaData executableMetaData, T bean, Object value,
+			Group group) {
+		Contracts.assertNotNull( executableMetaData, "executableMetaData may not be null" );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -1101,7 +1095,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		// hosting the validated itself, but no other default sequence from parent types
 
 		if ( group.isDefaultGroup() ) {
-			Iterator<Sequence> defaultGroupSequence = beanMetaData.getDefaultValidationSequence( bean );
+			Iterator<Sequence> defaultGroupSequence = validationContext.getRootBeanMetaData().getDefaultValidationSequence( bean );
 
 			while ( defaultGroupSequence.hasNext() ) {
 				Sequence sequence = defaultGroupSequence.next();
