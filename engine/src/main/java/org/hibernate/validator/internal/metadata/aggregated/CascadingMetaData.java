@@ -35,7 +35,14 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  */
 public class CascadingMetaData {
 
+
 	private static final Log LOG = LoggerFactory.make();
+
+	private static final CascadingMetaData NON_CASCADING_NON_CONTAINER_WITHOUT_GROUP_CONVERSIONS = new CascadingMetaData( null, null, AnnotatedObject.INSTANCE,
+			null, null, Collections.emptyList(), false, GroupConversionHelper.of( Collections.emptyMap() ), false, false );
+
+	private static final CascadingMetaData CASCADING_NON_CONTAINER_WITHOUT_GROUP_CONVERSIONS = new CascadingMetaData( null, null, AnnotatedObject.INSTANCE,
+			null, null, Collections.emptyList(), true, GroupConversionHelper.of( Collections.emptyMap() ), true, false );
 
 	/**
 	 * The enclosing type that defines this type parameter.
@@ -90,18 +97,47 @@ public class CascadingMetaData {
 	 */
 	private final Set<ValueExtractorDescriptor> valueExtractorCandidates;
 
-	public CascadingMetaData(ValueExtractorManager valueExtractorManager, CascadingTypeParameter cascadingMetaData) {
-		this.enclosingType = cascadingMetaData.getEnclosingType();
-		this.typeParameter = cascadingMetaData.getTypeParameter();
-		this.declaredContainerClass = cascadingMetaData.getDeclaredContainerClass();
-		this.declaredTypeParameter = cascadingMetaData.getDeclaredTypeParameter();
-		this.containerElementTypesCascadingMetaData = cascadingMetaData.getContainerElementTypesCascadingMetaData().entrySet().stream()
-				.map( entry -> new CascadingMetaData( valueExtractorManager, entry.getValue() ) )
-				.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) );
-		this.groupConversionHelper = GroupConversionHelper.of( cascadingMetaData.getGroupConversions() );
-		this.cascading = cascadingMetaData.isCascading();
-		this.markedForCascadingOnElementOrContainerElements = cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements();
-		this.hasGroupConversionsOnElementOrContainerElements = cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements();
+	public static CascadingMetaData of(ValueExtractorManager valueExtractorManager, CascadingTypeParameter cascadingMetaData) {
+		// in the case when we don't have metadata for cascading elements, we can use constants
+		// note that we need to exclude the situation where there are group conversions even in
+		// the non cascading case as we have some error reporting done after that
+		if ( cascadingMetaData.getContainerElementTypesCascadingMetaData().isEmpty() && cascadingMetaData.getGroupConversions().isEmpty() ) {
+			return cascadingMetaData.isCascading() ? CASCADING_NON_CONTAINER_WITHOUT_GROUP_CONVERSIONS : NON_CASCADING_NON_CONTAINER_WITHOUT_GROUP_CONVERSIONS;
+		}
+
+		return new CascadingMetaData( valueExtractorManager, cascadingMetaData );
+	}
+
+	private CascadingMetaData(ValueExtractorManager valueExtractorManager, CascadingTypeParameter cascadingMetaData) {
+		this(
+				valueExtractorManager,
+				cascadingMetaData.getEnclosingType(),
+				cascadingMetaData.getTypeParameter(),
+				cascadingMetaData.getDeclaredContainerClass(),
+				cascadingMetaData.getDeclaredTypeParameter(),
+				cascadingMetaData.getContainerElementTypesCascadingMetaData().entrySet().stream()
+						.map( entry -> new CascadingMetaData( valueExtractorManager, entry.getValue() ) )
+						.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) ),
+				cascadingMetaData.isCascading(),
+				GroupConversionHelper.of( cascadingMetaData.getGroupConversions() ),
+				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
+				cascadingMetaData.hasGroupConversionsOnElementOrContainerElements()
+		);
+	}
+
+	private CascadingMetaData(ValueExtractorManager valueExtractorManager, Type enclosingType, TypeVariable<?> typeParameter, Class<?> declaredContainerClass,
+			TypeVariable<?> declaredTypeParameter, List<CascadingMetaData> containerElementTypesCascadingMetaData, boolean cascading,
+			GroupConversionHelper groupConversionHelper, boolean markedForCascadingOnElementOrContainerElements,
+			boolean hasGroupConversionsOnElementOrContainerElements) {
+		this.enclosingType = enclosingType;
+		this.typeParameter = typeParameter;
+		this.declaredContainerClass = declaredContainerClass;
+		this.declaredTypeParameter = declaredTypeParameter;
+		this.containerElementTypesCascadingMetaData = containerElementTypesCascadingMetaData;
+		this.cascading = cascading;
+		this.groupConversionHelper = groupConversionHelper;
+		this.markedForCascadingOnElementOrContainerElements = markedForCascadingOnElementOrContainerElements;
+		this.hasGroupConversionsOnElementOrContainerElements = hasGroupConversionsOnElementOrContainerElements;
 
 		if ( TypeVariables.isAnnotatedObject( this.typeParameter ) || !markedForCascadingOnElementOrContainerElements ) {
 			this.valueExtractorCandidates = Collections.emptySet();
