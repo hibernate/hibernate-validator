@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +20,6 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
-import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -54,7 +52,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 		);
 
 
-		this.cascadables = CollectionHelper.toImmutableList( isCascading() ? Arrays.<Cascadable>asList( this ) : Collections.<Cascadable>emptyList() );
+		this.cascadables = isCascading() ? Collections.singletonList( this ) : Collections.emptyList();
 		this.cascadingMetaData = cascadingMetaData;
 		this.cascadingMetaData.validateGroupConversions( this.toString() );
 	}
