@@ -118,14 +118,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	@Override
 	public <T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass) {
 		@SuppressWarnings("unchecked")
-		BeanConfiguration<T> configuration = (BeanConfiguration<T>) configuredBeans.get( beanClass );
-
-		if ( configuration != null ) {
-			return configuration;
-		}
-
-		configuration = retrieveBeanConfiguration( beanClass );
-		configuredBeans.put( beanClass, configuration );
+		BeanConfiguration<T> configuration = (BeanConfiguration<T>) configuredBeans.
+				computeIfAbsent( beanClass, bc -> retrieveBeanConfiguration( beanClass ) );
 
 		return configuration;
 	}
