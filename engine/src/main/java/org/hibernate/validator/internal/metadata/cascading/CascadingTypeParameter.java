@@ -18,6 +18,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.validation.GroupSequence;
+
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -198,6 +200,24 @@ public class CascadingTypeParameter {
 						Collectors.toMap( entry -> entry.getKey(), entry -> entry.getValue(), ( value1, value2 ) -> value1.merge( value2 ) ) );
 
 		return new CascadingTypeParameter( this.enclosingType, this.typeParameter, cascading, nestedCascadingTypeParameterMap, groupConversions );
+	}
+
+	public void validateGroupConversions(Object context) {
+		// group conversions may only be configured for cascadable elements
+		if ( !cascading && !groupConversions.isEmpty() ) {
+			throw LOG.getGroupConversionOnNonCascadingElementException( context );
+		}
+
+		// group conversions may not be configured using a sequence as source
+		for ( Class<?> group : groupConversions.keySet() ) {
+			if ( group.isAnnotationPresent( GroupSequence.class ) ) {
+				throw LOG.getGroupConversionForSequenceException( group );
+			}
+		}
+
+		for ( CascadingTypeParameter containerElementCascadingTypeParameter : containerElementTypesCascadingMetaData.values() ) {
+			containerElementCascadingTypeParameter.validateGroupConversions( context );
+		}
 	}
 
 	@Override

@@ -38,7 +38,6 @@ public class GetterCascadable implements Cascadable {
 		this.propertyName = ReflectionHelper.getPropertyName( method );
 		this.cascadableType = ReflectionHelper.typeOf( method );
 		this.cascadingMetaData = cascadingMetaData;
-		this.cascadingMetaData.validateGroupConversions( method.toString() );
 	}
 
 	@Override
@@ -85,7 +84,7 @@ public class GetterCascadable implements Cascadable {
 
 		@Override
 		public GetterCascadable build() {
-			return new GetterCascadable( getAccessible( method ), CascadingMetaData.of( valueExtractorManager, cascadingMetaData ) );
+			return new GetterCascadable( getAccessible( method ), CascadingMetaData.of( valueExtractorManager, cascadingMetaData, method ) );
 		}
 
 		/**

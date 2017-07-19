@@ -433,10 +433,10 @@ public interface Log extends BasicLogger {
 	ConstraintDeclarationException getMultipleGroupConversionsForSameSourceException(@FormatWith(ClassObjectFormatter.class) Class<?> from,
 			@FormatWith(CollectionOfClassesObjectFormatter.class) Collection<Class<?>> tos);
 
-	@Message(id = 125, value = "Found group conversions for non-cascading element: %s.")
-	ConstraintDeclarationException getGroupConversionOnNonCascadingElementException(String location);
+	@Message(id = 125, value = "Found group conversions for non-cascading element at: %s.")
+	ConstraintDeclarationException getGroupConversionOnNonCascadingElementException(Object context);
 
-	@Message(id = 127, value = "Found group conversion using a group sequence as source: %s.")
+	@Message(id = 127, value = "Found group conversion using a group sequence as source at: %s.")
 	ConstraintDeclarationException getGroupConversionForSequenceException(@FormatWith(ClassObjectFormatter.class) Class<?> from);
 
 	@LogMessage(level = WARN)

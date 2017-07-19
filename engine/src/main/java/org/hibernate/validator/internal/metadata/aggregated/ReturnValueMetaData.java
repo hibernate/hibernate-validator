@@ -54,7 +54,6 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 
 		this.cascadables = isCascading() ? Collections.singletonList( this ) : Collections.emptyList();
 		this.cascadingMetaData = cascadingMetaData;
-		this.cascadingMetaData.validateGroupConversions( this.toString() );
 	}
 
 	@Override

@@ -58,7 +58,6 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		this.index = index;
 
 		this.cascadingMetaData = cascadingMetaData;
-		this.cascadingMetaData.validateGroupConversions( this.toString() );
 	}
 
 	public int getIndex() {
@@ -172,7 +171,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 					parameterType,
 					adaptOriginsAndImplicitGroups( getDirectConstraints() ),
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
-					CascadingMetaData.of( valueExtractorManager, cascadingMetaData )
+					CascadingMetaData.of( valueExtractorManager, cascadingMetaData, executableForNameRetrieval )
 			);
 		}
 	}

@@ -13,13 +13,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.validation.GroupSequence;
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.metadata.descriptor.GroupConversionDescriptorImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -28,8 +25,6 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Gunnar Morling
  */
 public class GroupConversionHelper {
-
-	private static final Log log = LoggerFactory.make();
 
 	private static final GroupConversionHelper EMPTY = new GroupConversionHelper( Collections.emptyMap() );
 
@@ -86,20 +81,6 @@ public class GroupConversionHelper {
 		return CollectionHelper.toImmutableSet( descriptors );
 	}
 
-	public void validateGroupConversions(boolean isCascaded, String location) {
-		//group conversions may only be configured for cascadable elements
-		if ( !isCascaded && !groupConversions.isEmpty() ) {
-			throw log.getGroupConversionOnNonCascadingElementException( location );
-		}
-
-		//group conversions may not be configured using a sequence as source
-		for ( Class<?> oneGroup : groupConversions.keySet() ) {
-			if ( isGroupSequence( oneGroup ) ) {
-				throw log.getGroupConversionForSequenceException( oneGroup );
-			}
-		}
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -108,9 +89,5 @@ public class GroupConversionHelper {
 		sb.append( "groupConversions=" ).append( groupConversions );
 		sb.append( "]" );
 		return sb.toString();
-	}
-
-	private boolean isGroupSequence(Class<?> oneGroup) {
-		return oneGroup.isAnnotationPresent( GroupSequence.class );
 	}
 }

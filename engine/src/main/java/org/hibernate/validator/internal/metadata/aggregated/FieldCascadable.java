@@ -37,7 +37,6 @@ public class FieldCascadable implements Cascadable {
 		this.field = field;
 		this.cascadableType = ReflectionHelper.typeOf( field );
 		this.cascadingMetaData = cascadingMetaData;
-		this.cascadingMetaData.validateGroupConversions( field.toString() );
 	}
 
 	@Override
@@ -84,7 +83,7 @@ public class FieldCascadable implements Cascadable {
 
 		@Override
 		public FieldCascadable build() {
-			return new FieldCascadable( getAccessible( field ), CascadingMetaData.of( valueExtractorManager, cascadingMetaData ) );
+			return new FieldCascadable( getAccessible( field ), CascadingMetaData.of( valueExtractorManager, cascadingMetaData, field ) );
 		}
 
 		/**

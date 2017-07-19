@@ -97,7 +97,9 @@ public class CascadingMetaData {
 	 */
 	private final Set<ValueExtractorDescriptor> valueExtractorCandidates;
 
-	public static CascadingMetaData of(ValueExtractorManager valueExtractorManager, CascadingTypeParameter cascadingMetaData) {
+	public static CascadingMetaData of(ValueExtractorManager valueExtractorManager, CascadingTypeParameter cascadingMetaData, Object context) {
+		cascadingMetaData.validateGroupConversions( context );
+
 		// in the case when we don't have metadata for cascading elements, we can use constants
 		// note that we need to exclude the situation where there are group conversions even in
 		// the non cascading case as we have some error reporting done after that
@@ -197,14 +199,6 @@ public class CascadingMetaData {
 		return valueExtractorCandidates;
 	}
 
-	// FIXME GSM: probably better to move it to the constructor but we would need to pass the context to the constructor
-	public void validateGroupConversions(String context) {
-		groupConversionHelper.validateGroupConversions( cascading, context );
-		for ( CascadingMetaData cascadingMetaData : containerElementTypesCascadingMetaData ) {
-			cascadingMetaData.validateGroupConversions( context );
-		}
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -218,5 +212,4 @@ public class CascadingMetaData {
 		sb.append( "]" );
 		return sb.toString();
 	}
-
 }
