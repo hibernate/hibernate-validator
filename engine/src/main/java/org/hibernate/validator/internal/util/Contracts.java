@@ -66,6 +66,12 @@ public final class Contracts {
 		}
 	}
 
+	public static void assertTrue(boolean condition, String message, Object... messageParameters) {
+		if ( !condition ) {
+			throw log.getIllegalArgumentException( String.format( message, messageParameters ) );
+		}
+	}
+
 	public static void assertNotEmpty(String s, String message) {
 		if ( s.length() == 0 ) {
 			throw log.getIllegalArgumentException( message );
