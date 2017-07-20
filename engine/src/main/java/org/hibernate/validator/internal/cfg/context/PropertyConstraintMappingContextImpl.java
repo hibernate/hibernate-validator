@@ -119,7 +119,7 @@ final class PropertyConstraintMappingContextImpl
 					(Field) member,
 					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-					getCascadingMetaData()
+					getCascadingMetaDataBuilder()
 			);
 		}
 		else {
@@ -128,7 +128,7 @@ final class PropertyConstraintMappingContextImpl
 					(Executable) member,
 					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-					getCascadingMetaData()
+					getCascadingMetaDataBuilder()
 			);
 		}
 	}

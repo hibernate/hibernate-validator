@@ -68,7 +68,7 @@ public abstract class MetaDataBuilder {
 	public void add(ConstrainedElement constrainedElement) {
 		directConstraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getConstraints() ) );
 		containerElementsConstraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getTypeArgumentConstraints() ) );
-		isCascading = isCascading || constrainedElement.getCascadingMetaData().isMarkedForCascadingOnElementOrContainerElements();
+		isCascading = isCascading || constrainedElement.getCascadingMetaDataBuilder().isMarkedForCascadingOnElementOrContainerElements();
 	}
 
 	/**

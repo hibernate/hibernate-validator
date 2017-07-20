@@ -32,7 +32,7 @@ import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueTarget;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
@@ -204,15 +204,15 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 		return ConstraintType.GENERIC;
 	}
 
-	CascadingTypeParameter getCascadingTypeParameter() {
-		return new CascadingTypeParameter(
+	CascadingMetaDataBuilder getContainerElementCascadingMetaDataBuilder() {
+		return new CascadingMetaDataBuilder(
 			parentLocation.getTypeForValidatorResolution(),
 			typeParameter,
 			isCascading,
 			nestedContainerElementContexts.values()
 					.stream()
-					.map( ContainerElementConstraintMappingContextImpl::getCascadingTypeParameter )
-					.collect( Collectors.toMap( CascadingTypeParameter::getTypeParameter, Function.identity() ) ),
+					.map( ContainerElementConstraintMappingContextImpl::getContainerElementCascadingMetaDataBuilder )
+					.collect( Collectors.toMap( CascadingMetaDataBuilder::getTypeParameter, Function.identity() ) ),
 			groupConversions
 		);
 	}

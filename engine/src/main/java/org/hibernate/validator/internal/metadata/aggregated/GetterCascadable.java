@@ -15,7 +15,6 @@ import java.security.PrivilegedAction;
 import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
@@ -69,22 +68,22 @@ public class GetterCascadable implements Cascadable {
 
 		private final ValueExtractorManager valueExtractorManager;
 		private final Method method;
-		private CascadingTypeParameter cascadingMetaData;
+		private CascadingMetaDataBuilder cascadingMetaDataBuilder;
 
-		public Builder(ValueExtractorManager valueExtractorManager, Method method, CascadingTypeParameter cascadingMetaData) {
+		public Builder(ValueExtractorManager valueExtractorManager, Method method, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 			this.valueExtractorManager = valueExtractorManager;
 			this.method = method;
-			this.cascadingMetaData = cascadingMetaData;
+			this.cascadingMetaDataBuilder = cascadingMetaDataBuilder;
 		}
 
 		@Override
-		public void mergeCascadingMetaData(CascadingTypeParameter cascadingMetaData) {
-			this.cascadingMetaData = this.cascadingMetaData.merge( cascadingMetaData );
+		public void mergeCascadingMetaData(CascadingMetaDataBuilder cascadingMetaData) {
+			this.cascadingMetaDataBuilder = this.cascadingMetaDataBuilder.merge( cascadingMetaData );
 		}
 
 		@Override
 		public GetterCascadable build() {
-			return new GetterCascadable( getAccessible( method ), cascadingMetaData.build( valueExtractorManager, method ) );
+			return new GetterCascadable( getAccessible( method ), cascadingMetaDataBuilder.build( valueExtractorManager, method ) );
 		}
 
 		/**

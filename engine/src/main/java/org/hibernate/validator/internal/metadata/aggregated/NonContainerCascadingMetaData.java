@@ -13,7 +13,6 @@ import java.util.Set;
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -42,22 +41,22 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 	 */
 	private GroupConversionHelper groupConversionHelper;
 
-	public static NonContainerCascadingMetaData of(CascadingTypeParameter cascadingMetaData, Object context) {
-		if ( !cascadingMetaData.isCascading() ) {
+	public static NonContainerCascadingMetaData of(CascadingMetaDataBuilder cascadingMetaDataBuilder, Object context) {
+		if ( !cascadingMetaDataBuilder.isCascading() ) {
 			return NON_CASCADING;
 		}
-		else if ( cascadingMetaData.getGroupConversions().isEmpty() ) {
+		else if ( cascadingMetaDataBuilder.getGroupConversions().isEmpty() ) {
 			return CASCADING_WITHOUT_GROUP_CONVERSIONS;
 		}
 		else {
-			return new NonContainerCascadingMetaData( cascadingMetaData );
+			return new NonContainerCascadingMetaData( cascadingMetaDataBuilder );
 		}
 	}
 
-	private NonContainerCascadingMetaData(CascadingTypeParameter cascadingMetaData) {
+	private NonContainerCascadingMetaData(CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 		this(
-				cascadingMetaData.isCascading(),
-				GroupConversionHelper.of( cascadingMetaData.getGroupConversions() )
+				cascadingMetaDataBuilder.isCascading(),
+				GroupConversionHelper.of( cascadingMetaDataBuilder.getGroupConversions() )
 		);
 	}
 

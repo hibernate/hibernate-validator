@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -104,7 +104,7 @@ class ConstrainedGetterBuilder {
 		return constrainedExecutables;
 	}
 
-	private CascadingTypeParameter getCascadingMetaDataForGetter(Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Method method,
+	private CascadingMetaDataBuilder getCascadingMetaDataForGetter(Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Method method,
 			GetterType getterType, String defaultPackage) {
 		Type type = ReflectionHelper.typeOf( method );
 		boolean isCascaded = getterType.getValid() != null;
@@ -113,7 +113,7 @@ class ConstrainedGetterBuilder {
 				defaultPackage
 		);
 
-		return CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
+		return CascadingMetaDataBuilder.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
 	private static Method findGetter(Class<?> beanClass, String getterName, List<String> alreadyProcessedGetterNames) {

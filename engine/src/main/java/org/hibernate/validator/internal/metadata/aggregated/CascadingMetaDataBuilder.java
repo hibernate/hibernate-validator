@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.metadata.cascading;
+package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -23,9 +23,6 @@ import javax.validation.GroupSequence;
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.ContainerCascadingMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.NonContainerCascadingMetaData;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
@@ -36,17 +33,17 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
- * A type parameter that is marked for cascaded validation and/or has one or more nested type parameters marked for
- * cascaded validation.
+ * A temporary data structure used to build {@link CascadingMetaData}. It is not a builder per se but it's as much as it
+ * gets.
  *
  * @author Guillaume Smet
  */
-public class CascadingTypeParameter {
+public class CascadingMetaDataBuilder {
 
 	private static final Log LOG = LoggerFactory.make();
 
-	private static final CascadingTypeParameter NON_CASCADING =
-			new CascadingTypeParameter( null, null, null, null, false, Collections.emptyMap(), Collections.emptyMap() );
+	private static final CascadingMetaDataBuilder NON_CASCADING =
+			new CascadingMetaDataBuilder( null, null, null, null, false, Collections.emptyMap(), Collections.emptyMap() );
 
 	/**
 	 * The enclosing type that defines this type parameter.
@@ -72,7 +69,7 @@ public class CascadingTypeParameter {
 	 * Possibly the cascading type parameters corresponding to this type parameter if it is a parameterized type.
 	 */
 	@Immutable
-	private final Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData;
+	private final Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData;
 
 	/**
 	 * If this type parameter is marked for cascading.
@@ -95,15 +92,15 @@ public class CascadingTypeParameter {
 	 */
 	private final boolean hasGroupConversionsOnElementOrContainerElements;
 
-	public CascadingTypeParameter(Type enclosingType, TypeVariable<?> typeParameter, boolean cascading,
-			Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
+	public CascadingMetaDataBuilder(Type enclosingType, TypeVariable<?> typeParameter, boolean cascading,
+			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
 		this( enclosingType, typeParameter,
 				TypeVariables.getContainerClass( typeParameter ), TypeVariables.getActualTypeParameter( typeParameter ),
 				cascading, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
-	private CascadingTypeParameter(Type enclosingType, TypeVariable<?> typeParameter, Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter,
-			boolean cascading, Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData,
+	private CascadingMetaDataBuilder(Type enclosingType, TypeVariable<?> typeParameter, Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter,
+			boolean cascading, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData,
 			Map<Class<?>, Class<?>> groupConversions) {
 		this.enclosingType = enclosingType;
 		this.typeParameter = typeParameter;
@@ -115,7 +112,7 @@ public class CascadingTypeParameter {
 
 		boolean tmpMarkedForCascadingOnElementOrContainerElements = cascading;
 		boolean tmpHasGroupConversionsOnElementOrContainerElements = !groupConversions.isEmpty();
-		for ( CascadingTypeParameter nestedCascadingTypeParameter : containerElementTypesCascadingMetaData.values() ) {
+		for ( CascadingMetaDataBuilder nestedCascadingTypeParameter : containerElementTypesCascadingMetaData.values() ) {
 			tmpMarkedForCascadingOnElementOrContainerElements = tmpMarkedForCascadingOnElementOrContainerElements
 					|| nestedCascadingTypeParameter.markedForCascadingOnElementOrContainerElements;
 			tmpHasGroupConversionsOnElementOrContainerElements = tmpHasGroupConversionsOnElementOrContainerElements
@@ -125,13 +122,13 @@ public class CascadingTypeParameter {
 		hasGroupConversionsOnElementOrContainerElements = tmpHasGroupConversionsOnElementOrContainerElements;
 	}
 
-	public static CascadingTypeParameter nonCascading() {
+	public static CascadingMetaDataBuilder nonCascading() {
 		return NON_CASCADING;
 	}
 
-	public static CascadingTypeParameter annotatedObject(Type cascadableType, boolean cascading,
-			Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
-		Map<TypeVariable<?>, CascadingTypeParameter> amendedContainerElementsCascadingMetaData;
+	public static CascadingMetaDataBuilder annotatedObject(Type cascadableType, boolean cascading,
+			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
+		Map<TypeVariable<?>, CascadingMetaDataBuilder> amendedContainerElementsCascadingMetaData;
 		if ( cascading ) {
 			amendedContainerElementsCascadingMetaData = addPotentialLegacyCascadingMetaData( cascadableType, containerElementTypesCascadingMetaData,
 					groupConversions );
@@ -140,12 +137,12 @@ public class CascadingTypeParameter {
 			amendedContainerElementsCascadingMetaData = containerElementTypesCascadingMetaData;
 		}
 
-		return new CascadingTypeParameter( cascadableType, AnnotatedObject.INSTANCE, cascading, amendedContainerElementsCascadingMetaData, groupConversions );
+		return new CascadingMetaDataBuilder( cascadableType, AnnotatedObject.INSTANCE, cascading, amendedContainerElementsCascadingMetaData, groupConversions );
 	}
 
-	public static CascadingTypeParameter arrayElement(Type cascadableType, boolean cascading,
-			Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
-		return new CascadingTypeParameter( cascadableType, new ArrayElement( cascadableType ), cascading,
+	public static CascadingMetaDataBuilder arrayElement(Type cascadableType, boolean cascading,
+			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
+		return new CascadingMetaDataBuilder( cascadableType, new ArrayElement( cascadableType ), cascading,
 				containerElementTypesCascadingMetaData, groupConversions );
 	}
 
@@ -181,11 +178,11 @@ public class CascadingTypeParameter {
 		return hasGroupConversionsOnElementOrContainerElements;
 	}
 
-	public Map<TypeVariable<?>, CascadingTypeParameter> getContainerElementTypesCascadingMetaData() {
+	public Map<TypeVariable<?>, CascadingMetaDataBuilder> getContainerElementTypesCascadingMetaData() {
 		return containerElementTypesCascadingMetaData;
 	}
 
-	public CascadingTypeParameter merge(CascadingTypeParameter otherCascadingTypeParameter) {
+	public CascadingMetaDataBuilder merge(CascadingMetaDataBuilder otherCascadingTypeParameter) {
 		if ( this == NON_CASCADING ) {
 			return otherCascadingTypeParameter;
 		}
@@ -197,13 +194,13 @@ public class CascadingTypeParameter {
 
 		Map<Class<?>, Class<?>> groupConversions = mergeGroupConversion( this.groupConversions, otherCascadingTypeParameter.groupConversions );
 
-		Map<TypeVariable<?>, CascadingTypeParameter> nestedCascadingTypeParameterMap = Stream
+		Map<TypeVariable<?>, CascadingMetaDataBuilder> nestedCascadingTypeParameterMap = Stream
 				.concat( this.containerElementTypesCascadingMetaData.entrySet().stream(),
 						otherCascadingTypeParameter.containerElementTypesCascadingMetaData.entrySet().stream() )
 				.collect(
 						Collectors.toMap( entry -> entry.getKey(), entry -> entry.getValue(), ( value1, value2 ) -> value1.merge( value2 ) ) );
 
-		return new CascadingTypeParameter( this.enclosingType, this.typeParameter, cascading, nestedCascadingTypeParameterMap, groupConversions );
+		return new CascadingMetaDataBuilder( this.enclosingType, this.typeParameter, cascading, nestedCascadingTypeParameterMap, groupConversions );
 	}
 
 	public CascadingMetaData build(ValueExtractorManager valueExtractorManager, Object context) {
@@ -230,7 +227,7 @@ public class CascadingTypeParameter {
 			}
 		}
 
-		for ( CascadingTypeParameter containerElementCascadingTypeParameter : containerElementTypesCascadingMetaData.values() ) {
+		for ( CascadingMetaDataBuilder containerElementCascadingTypeParameter : containerElementTypesCascadingMetaData.values() ) {
 			containerElementCascadingTypeParameter.validateGroupConversions( context );
 		}
 	}
@@ -275,7 +272,7 @@ public class CascadingTypeParameter {
 		if ( getClass() != obj.getClass() ) {
 			return false;
 		}
-		CascadingTypeParameter other = (CascadingTypeParameter) obj;
+		CascadingMetaDataBuilder other = (CascadingMetaDataBuilder) obj;
 		if ( !typeParameter.equals( other.typeParameter ) ) {
 			return false;
 		}
@@ -315,8 +312,8 @@ public class CascadingTypeParameter {
 		return mergedGroupConversions;
 	}
 
-	private static Map<TypeVariable<?>, CascadingTypeParameter> addPotentialLegacyCascadingMetaData(Type cascadableType,
-			Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
+	private static Map<TypeVariable<?>, CascadingMetaDataBuilder> addPotentialLegacyCascadingMetaData(Type cascadableType,
+			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
 		Class<?> cascadableClass = ReflectionHelper.getClassFromType( cascadableType );
 
 		if ( Map.class.isAssignableFrom( cascadableClass ) ) {
@@ -340,8 +337,8 @@ public class CascadingTypeParameter {
 		}
 	}
 
-	private static Map<TypeVariable<?>, CascadingTypeParameter> addLegacyCascadingMetaData(final Class<?> enclosingType, Class<?> referenceType,
-			int typeParameterIndex, Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData,
+	private static Map<TypeVariable<?>, CascadingMetaDataBuilder> addLegacyCascadingMetaData(final Class<?> enclosingType, Class<?> referenceType,
+			int typeParameterIndex, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData,
 			Map<Class<?>, Class<?>> groupConversions) {
 		// we try to find a corresponding type parameter in the current cascadable type
 		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> typeVariableBindings = TypeVariableBindings.getTypeVariableBindings( enclosingType );
@@ -362,7 +359,7 @@ public class CascadingTypeParameter {
 			cascadableTypeParameter = referenceType.getTypeParameters()[typeParameterIndex];
 		}
 
-		Map<TypeVariable<?>, CascadingTypeParameter> amendedCascadingMetadata = CollectionHelper.newHashMap( containerElementTypesCascadingMetaData.size() + 1 );
+		Map<TypeVariable<?>, CascadingMetaDataBuilder> amendedCascadingMetadata = CollectionHelper.newHashMap( containerElementTypesCascadingMetaData.size() + 1 );
 		amendedCascadingMetadata.putAll( containerElementTypesCascadingMetaData );
 
 		if ( containerElementTypesCascadingMetaData.containsKey( cascadableTypeParameter ) ) {
@@ -371,29 +368,29 @@ public class CascadingTypeParameter {
 		}
 		else {
 			amendedCascadingMetadata.put( cascadableTypeParameter,
-					new CascadingTypeParameter( cascadableClass, cascadableTypeParameter, enclosingType, correspondingTypeParameter, true,
+					new CascadingMetaDataBuilder( cascadableClass, cascadableTypeParameter, enclosingType, correspondingTypeParameter, true,
 							Collections.emptyMap(), groupConversions ) );
 		}
 
 		return amendedCascadingMetadata;
 	}
 
-	private static Map<TypeVariable<?>, CascadingTypeParameter> addArrayElementCascadingMetaData(final Class<?> enclosingType,
-			Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData,
+	private static Map<TypeVariable<?>, CascadingMetaDataBuilder> addArrayElementCascadingMetaData(final Class<?> enclosingType,
+			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData,
 			Map<Class<?>, Class<?>> groupConversions) {
-		Map<TypeVariable<?>, CascadingTypeParameter> amendedCascadingMetadata = CollectionHelper.newHashMap( containerElementTypesCascadingMetaData.size() + 1 );
+		Map<TypeVariable<?>, CascadingMetaDataBuilder> amendedCascadingMetadata = CollectionHelper.newHashMap( containerElementTypesCascadingMetaData.size() + 1 );
 		amendedCascadingMetadata.putAll( containerElementTypesCascadingMetaData );
 
 		TypeVariable<?> cascadableTypeParameter = new ArrayElement( enclosingType );
 
 		amendedCascadingMetadata.put( cascadableTypeParameter,
-				new CascadingTypeParameter( enclosingType, cascadableTypeParameter, true, Collections.emptyMap(), groupConversions ) );
+				new CascadingMetaDataBuilder( enclosingType, cascadableTypeParameter, true, Collections.emptyMap(), groupConversions ) );
 
 		return amendedCascadingMetadata;
 	}
 
-	private static CascadingTypeParameter makeCascading(CascadingTypeParameter cascadingTypeParameter, Map<Class<?>, Class<?>> groupConversions) {
-		return new CascadingTypeParameter( cascadingTypeParameter.enclosingType, cascadingTypeParameter.typeParameter, true,
+	private static CascadingMetaDataBuilder makeCascading(CascadingMetaDataBuilder cascadingTypeParameter, Map<Class<?>, Class<?>> groupConversions) {
+		return new CascadingMetaDataBuilder( cascadingTypeParameter.enclosingType, cascadingTypeParameter.typeParameter, true,
 				cascadingTypeParameter.containerElementTypesCascadingMetaData,
 				cascadingTypeParameter.groupConversions.isEmpty() ? groupConversions : cascadingTypeParameter.groupConversions );
 	}

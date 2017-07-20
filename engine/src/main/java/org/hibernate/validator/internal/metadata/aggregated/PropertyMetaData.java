@@ -200,20 +200,20 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		public final void add(ConstrainedElement constrainedElement) {
 			super.add( constrainedElement );
 
-			cascadingProperty = cascadingProperty || constrainedElement.getCascadingMetaData().isCascading();
+			cascadingProperty = cascadingProperty || constrainedElement.getCascadingMetaDataBuilder().isCascading();
 
-			if ( constrainedElement.getCascadingMetaData().isMarkedForCascadingOnElementOrContainerElements() ||
-					constrainedElement.getCascadingMetaData().hasGroupConversionsOnElementOrContainerElements() ) {
+			if ( constrainedElement.getCascadingMetaDataBuilder().isMarkedForCascadingOnElementOrContainerElements() ||
+					constrainedElement.getCascadingMetaDataBuilder().hasGroupConversionsOnElementOrContainerElements() ) {
 				if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
 					Field field = ( (ConstrainedField) constrainedElement ).getField();
 					Cascadable.Builder builder = cascadableBuilders.get( field );
 
 					if ( builder == null ) {
-						builder = new FieldCascadable.Builder( valueExtractorManager, field, constrainedElement.getCascadingMetaData() );
+						builder = new FieldCascadable.Builder( valueExtractorManager, field, constrainedElement.getCascadingMetaDataBuilder() );
 						cascadableBuilders.put( field, builder );
 					}
 					else {
-						builder.mergeCascadingMetaData( constrainedElement.getCascadingMetaData() );
+						builder.mergeCascadingMetaData( constrainedElement.getCascadingMetaDataBuilder() );
 					}
 				}
 				else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
@@ -221,11 +221,11 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					Cascadable.Builder builder = cascadableBuilders.get( method );
 
 					if ( builder == null ) {
-						builder = new GetterCascadable.Builder( valueExtractorManager, method, constrainedElement.getCascadingMetaData() );
+						builder = new GetterCascadable.Builder( valueExtractorManager, method, constrainedElement.getCascadingMetaDataBuilder() );
 						cascadableBuilders.put( method, builder );
 					}
 					else {
-						builder.mergeCascadingMetaData( constrainedElement.getCascadingMetaData() );
+						builder.mergeCascadingMetaData( constrainedElement.getCascadingMetaDataBuilder() );
 					}
 				}
 			}

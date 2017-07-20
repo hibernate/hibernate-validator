@@ -28,7 +28,6 @@ import javax.validation.metadata.ParameterDescriptor;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
@@ -261,7 +260,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		private final Set<MethodConfigurationRule> rules;
 		private boolean isConstrained = false;
-		private CascadingTypeParameter cascadingMetaData;
+		private CascadingMetaDataBuilder cascadingMetaDataBuilder;
 
 		/**
 		 * Holds a merged representation of the configurations for one method
@@ -329,11 +328,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			constrainedExecutables.add( constrainedExecutable );
 			isConstrained = isConstrained || constrainedExecutable.isConstrained();
 			crossParameterConstraints.addAll( constrainedExecutable.getCrossParameterConstraints() );
-			if ( cascadingMetaData == null ) {
-				cascadingMetaData = constrainedExecutable.getCascadingMetaData();
+			if ( cascadingMetaDataBuilder == null ) {
+				cascadingMetaDataBuilder = constrainedExecutable.getCascadingMetaDataBuilder();
 			}
 			else {
-				cascadingMetaData = cascadingMetaData.merge( constrainedExecutable.getCascadingMetaData() );
+				cascadingMetaDataBuilder = cascadingMetaDataBuilder.merge( constrainedExecutable.getCascadingMetaDataBuilder() );
 			}
 
 			addToExecutablesByDeclaringType( constrainedExecutable );
@@ -383,7 +382,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
-					cascadingMetaData.build( valueExtractorManager, executable ),
+					cascadingMetaDataBuilder.build( valueExtractorManager, executable ),
 					isConstrained,
 					isGetterMethod
 			);
