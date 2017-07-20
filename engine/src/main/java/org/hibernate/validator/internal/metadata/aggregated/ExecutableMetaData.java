@@ -16,7 +16,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -289,7 +288,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			this.parameterNameProvider = parameterNameProvider;
 			this.kind = constrainedExecutable.getKind();
 			this.executable = constrainedExecutable.getExecutable();
-			this.rules = new HashSet<>( methodValidationConfiguration.getConfiguredRuleSet() );
+			this.rules = methodValidationConfiguration.getConfiguredRuleSet();
 			this.isGetterMethod = constrainedExecutable.isGetterMethod();
 
 			add( constrainedExecutable );
