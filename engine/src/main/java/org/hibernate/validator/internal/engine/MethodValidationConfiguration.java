@@ -18,10 +18,11 @@ import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethods
 import org.hibernate.validator.internal.metadata.aggregated.rule.ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine;
 import org.hibernate.validator.internal.metadata.aggregated.rule.VoidMethodsMustNotBeReturnValueConstrained;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
- * These properties modify the behavior of the {@code }Validator} with respect to the Bean Validation
- * specification section 4.5.5. In particular:
+ * These properties modify the behavior of the {@code Validator} with respect to the Bean Validation
+ * specification section 5.6.5. In particular:
  * <pre>
  * "Out of the box, a conforming Bean Validation provider must throw a
  * ConstraintDeclarationException when discovering that any of these rules are violated.
@@ -33,6 +34,7 @@ import org.hibernate.validator.internal.util.CollectionHelper;
  * </pre>
  *
  * @author Chris Beckey &lt;cbeckey@paypal.com&gt;
+ * @author Guillaume Smet
  */
 public class MethodValidationConfiguration {
 
@@ -40,11 +42,17 @@ public class MethodValidationConfiguration {
 	private boolean allowMultipleCascadedValidationOnReturnValues = false;
 	private boolean allowParallelMethodsDefineParameterConstraints = false;
 
+	@Immutable
+	private Set<MethodConfigurationRule> configuredRuleSet;
+
 	private MethodValidationConfiguration(boolean allowOverridingMethodAlterParameterConstraint, boolean allowMultipleCascadedValidationOnReturnValues,
 			boolean allowParallelMethodsDefineParameterConstraints) {
 		this.allowOverridingMethodAlterParameterConstraint = allowOverridingMethodAlterParameterConstraint;
 		this.allowMultipleCascadedValidationOnReturnValues = allowMultipleCascadedValidationOnReturnValues;
 		this.allowParallelMethodsDefineParameterConstraints = allowParallelMethodsDefineParameterConstraints;
+
+		this.configuredRuleSet = buildConfiguredRuleSet( allowOverridingMethodAlterParameterConstraint, allowMultipleCascadedValidationOnReturnValues,
+				allowParallelMethodsDefineParameterConstraints );
 	}
 
 	/**
@@ -77,19 +85,24 @@ public class MethodValidationConfiguration {
 	 * @return a set of method configuration rules based on this configuration state
 	 */
 	public Set<MethodConfigurationRule> getConfiguredRuleSet() {
-		HashSet<MethodConfigurationRule> result = newHashSet();
+		return configuredRuleSet;
+	}
 
-		if ( !this.isAllowOverridingMethodAlterParameterConstraint() ) {
+	private static Set<MethodConfigurationRule> buildConfiguredRuleSet(boolean allowOverridingMethodAlterParameterConstraint,
+			boolean allowMultipleCascadedValidationOnReturnValues, boolean allowParallelMethodsDefineParameterConstraints) {
+		HashSet<MethodConfigurationRule> result = newHashSet( 5 );
+
+		if ( !allowOverridingMethodAlterParameterConstraint ) {
 			result.add( new OverridingMethodMustNotAlterParameterConstraints() );
 		}
 
-		if ( !this.isAllowParallelMethodsDefineParameterConstraints() ) {
+		if ( !allowParallelMethodsDefineParameterConstraints ) {
 			result.add( new ParallelMethodsMustNotDefineParameterConstraints() );
 		}
 
 		result.add( new VoidMethodsMustNotBeReturnValueConstrained() );
 
-		if ( !this.isAllowMultipleCascadedValidationOnReturnValues() ) {
+		if ( !allowMultipleCascadedValidationOnReturnValues ) {
 			result.add( new ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine() );
 		}
 
@@ -151,7 +164,7 @@ public class MethodValidationConfiguration {
 		 * Define whether overriding methods that override constraints should throw a {@code ConstraintDefinitionException}.
 		 * The default value is {@code false}, i.e. do not allow.
 		 *
-		 * See Section 4.5.5 of JSR-380 Specification, specifically
+		 * See Section 5.6.5 of the JSR-380 Specification, specifically
 		 * <pre>
 		 * "In sub types (be it sub classes/interfaces or interface implementations), no parameter constraints may
 		 * be declared on overridden or implemented methods, nor may parameters be marked for cascaded validation.
@@ -185,12 +198,11 @@ public class MethodValidationConfiguration {
 			return this;
 		}
 
-
 		/**
 		 * Define whether parallel methods that define constraints should throw a {@code ConstraintDefinitionException}. The
 		 * default value is {@code false}, i.e. do not allow.
 		 *
-		 * See Section 4.5.5 of JSR-380 Specification, specifically
+		 * See Section 5.6.5 of the JSR-380 Specification, specifically
 		 * "If a sub type overrides/implements a method originally defined in several parallel types of the hierarchy
 		 * (e.g. two interfaces not extending each other, or a class and an interface not implemented by said class),
 		 * no parameter constraints may be declared for that method at all nor parameters be marked for cascaded validation.
@@ -224,6 +236,5 @@ public class MethodValidationConfiguration {
 					allowParallelMethodsDefineParameterConstraints
 			);
 		}
-
 	}
 }
