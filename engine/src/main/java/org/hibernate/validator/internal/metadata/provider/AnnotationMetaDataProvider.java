@@ -324,12 +324,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			cascadingMetaDataBuilder = CascadingMetaDataBuilder.nonCascading();
 		}
 		else {
-			typeArgumentsConstraints = findTypeAnnotationConstraints( executable );
+			AnnotatedType annotatedReturnType = executable.getAnnotatedReturnType();
+
+			typeArgumentsConstraints = findTypeAnnotationConstraints( executable, annotatedReturnType );
 			returnValueConstraints = convertToMetaConstraints(
 					executableConstraints.get( ConstraintType.GENERIC ),
 					executable
 			);
-			cascadingMetaDataBuilder = findCascadingMetaData( executable );
+			cascadingMetaDataBuilder = findCascadingMetaData( executable, annotatedReturnType );
 		}
 
 		return new ConstrainedExecutable(
@@ -416,8 +418,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				}
 			}
 
-			Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable, i );
-			CascadingMetaDataBuilder cascadingMetaData = findCascadingMetaData( executable, i );
+			AnnotatedType parameterAnnotatedType = parameter.getAnnotatedType();
+
+			Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable, i, parameterAnnotatedType );
+			CascadingMetaDataBuilder cascadingMetaData = findCascadingMetaData( executable, i, parameterAnnotatedType );
 
 			metaData.add(
 					new ConstrainedParameter(
@@ -492,8 +496,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			return Collections.emptyList();
 		}
 
-		List<ConstraintDescriptorImpl<?>> constraintDescriptors = newArrayList();
-
 		List<Annotation> constraints = newArrayList();
 		Class<? extends Annotation> annotationType = annotation.annotationType();
 		if ( constraintHelper.isConstraintAnnotation( annotationType ) ) {
@@ -503,13 +505,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			constraints.addAll( constraintHelper.getConstraintsFromMultiValueConstraint( annotation ) );
 		}
 
-		for ( Annotation constraint : constraints ) {
-			final ConstraintDescriptorImpl<?> constraintDescriptor = buildConstraintDescriptor(
-					member, constraint, type
-			);
-			constraintDescriptors.add( constraintDescriptor );
-		}
-		return constraintDescriptors;
+		return constraints.stream()
+				.map( c -> buildConstraintDescriptor( member, c, type ) )
+				.collect( Collectors.toList() );
 	}
 
 	private Map<Class<?>, Class<?>> getGroupConversions(AnnotatedElement annotatedElement) {
@@ -580,20 +578,20 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Finds type arguments constraints for method return values.
 	 */
-	protected Set<MetaConstraint<?>> findTypeAnnotationConstraints(Executable executable) {
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraints(Executable executable, AnnotatedType annotatedReturnType) {
 		return findTypeArgumentsConstraints(
 			executable,
 			new TypeArgumentReturnValueLocation( executable ),
-			executable.getAnnotatedReturnType()
+			annotatedReturnType
 		);
 	}
 
-	private CascadingMetaDataBuilder findCascadingMetaData(Executable executable, int i) {
+	private CascadingMetaDataBuilder findCascadingMetaData(Executable executable, int i, AnnotatedType parameterAnnotatedType) {
 		Parameter parameter = executable.getParameters()[i];
 		TypeVariable<?>[] typeParameters = parameter.getType().getTypeParameters();
-		AnnotatedType annotatedType = parameter.getAnnotatedType();
 
-		Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( annotatedType, typeParameters );
+		Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( parameterAnnotatedType,
+				typeParameters );
 
 		try {
 			return getCascadingMetaData( ReflectionHelper.typeOf( parameter.getDeclaringExecutable(), i ),
@@ -614,7 +612,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return getCascadingMetaData( ReflectionHelper.typeOf( field ), field, containerElementTypesCascadingMetaData );
 	}
 
-	private CascadingMetaDataBuilder findCascadingMetaData(Executable executable) {
+	private CascadingMetaDataBuilder findCascadingMetaData(Executable executable, AnnotatedType annotatedReturnType) {
 		TypeVariable<?>[] typeParameters;
 
 		if ( executable instanceof Method ) {
@@ -623,9 +621,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		else {
 			typeParameters = ( (Constructor<?>) executable ).getDeclaringClass().getTypeParameters();
 		}
-		AnnotatedType annotatedType = executable.getAnnotatedReturnType();
 
-		Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( annotatedType, typeParameters );
+		Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( annotatedReturnType,
+				typeParameters );
 
 		return getCascadingMetaData( ReflectionHelper.typeOf( executable ), executable, containerElementTypesCascadingMetaData );
 	}
@@ -703,13 +701,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @return a set of type arguments constraints, or an empty set if no constrained type arguments are found
 	 */
-	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(Executable executable, int i) {
-		Parameter parameter = executable.getParameters()[i];
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(Executable executable, int i, AnnotatedType parameterAnnotatedType) {
 		try {
 			return findTypeArgumentsConstraints(
 					executable,
 					new TypeArgumentExecutableParameterLocation( executable, i ),
-					parameter.getAnnotatedType()
+					parameterAnnotatedType
 			);
 		}
 		catch (ArrayIndexOutOfBoundsException ex) {
