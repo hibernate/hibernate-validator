@@ -612,6 +612,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private static class BuilderDelegate {
 		private final Class<?> beanClass;
+		private final ConstrainedElement constrainedElement;
 		private final ConstraintHelper constraintHelper;
 		private final ExecutableHelper executableHelper;
 		private final TypeResolutionHelper typeResolutionHelper;
@@ -620,7 +621,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		private MetaDataBuilder propertyBuilder;
 		private ExecutableMetaData.Builder methodBuilder;
 		private final MethodValidationConfiguration methodValidationConfiguration;
-
+		private final int hashCode;
 
 		public BuilderDelegate(
 				Class<?> beanClass,
@@ -633,6 +634,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				MethodValidationConfiguration methodValidationConfiguration
 		) {
 			this.beanClass = beanClass;
+			this.constrainedElement = constrainedElement;
 			this.constraintHelper = constraintHelper;
 			this.executableHelper = executableHelper;
 			this.typeResolutionHelper = typeResolutionHelper;
@@ -692,6 +694,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					);
 					break;
 			}
+
+			this.hashCode = buildHashCode();
 		}
 
 		public boolean add(ConstrainedElement constrainedElement) {
@@ -737,6 +741,40 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 
 			return metaDataSet;
+		}
+
+		@Override
+		public int hashCode() {
+			return hashCode;
+		}
+
+		private int buildHashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + beanClass.hashCode();
+			result = prime * result + constrainedElement.hashCode();
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) {
+				return true;
+			}
+			if ( !super.equals( obj ) ) {
+				return false;
+			}
+			if ( getClass() != obj.getClass() ) {
+				return false;
+			}
+			BuilderDelegate other = (BuilderDelegate) obj;
+			if ( !beanClass.equals( other.beanClass ) ) {
+				return false;
+			}
+			if ( !constrainedElement.equals( other.constrainedElement ) ) {
+				return false;
+			}
+			return true;
 		}
 	}
 
