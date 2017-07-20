@@ -51,6 +51,7 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ContainerCascadingMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
@@ -576,15 +577,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				Object value = getCascadableValue( validationContext, valueContext.getCurrentBean(), cascadable );
 				CascadingMetaData cascadingMetaData = cascadable.getCascadingMetaData();
 
-				if ( value != null && cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements() ) {
+				if ( value != null ) {
 					// validate cascading on the annotated object
 					if ( cascadingMetaData.isCascading() ) {
 						validateCascadedAnnotatedObjectForCurrentGroup( value, validationContext, valueContext, cascadingMetaData );
 					}
 
-					// validate cascading on the container elements
-					validateCascadedContainerElementsForCurrentGroup( value, validationContext, valueContext,
-							cascadable.getCascadingMetaData().getContainerElementTypesCascadingMetaData() );
+					if ( cascadingMetaData.isContainer() && cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements() ) {
+						// validate cascading on the container elements
+						validateCascadedContainerElementsForCurrentGroup( value, validationContext, valueContext,
+								cascadingMetaData.as( ContainerCascadingMetaData.class ).getContainerElementTypesCascadingMetaData() );
+					}
 				}
 			}
 
@@ -614,8 +617,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private void validateCascadedContainerElementsForCurrentGroup(Object value, ValidationContext<?> validationContext, ValueContext<?, ?> valueContext,
-			List<CascadingMetaData> containerElementTypesCascadingMetaData) {
-		for ( CascadingMetaData cascadingMetaData : containerElementTypesCascadingMetaData ) {
+			List<ContainerCascadingMetaData> containerElementTypesCascadingMetaData) {
+		for ( ContainerCascadingMetaData cascadingMetaData : containerElementTypesCascadingMetaData ) {
 			if ( !cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements() ) {
 				continue;
 			}
@@ -638,9 +641,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		private final ValidationContext<?> validationContext;
 		private final ValueContext<?, ?> valueContext;
-		private final CascadingMetaData cascadingMetaData;
+		private final ContainerCascadingMetaData cascadingMetaData;
 
-		public CascadingValueReceiver(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext, CascadingMetaData cascadingMetaData) {
+		public CascadingValueReceiver(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext, ContainerCascadingMetaData cascadingMetaData) {
 			this.validationContext = validationContext;
 			this.valueContext = valueContext;
 			this.cascadingMetaData = cascadingMetaData;
@@ -714,7 +717,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private void validateCascadedContainerElementsInContext(Object value, ValidationContext<?> validationContext, ValueContext<?, ?> valueContext,
-			CascadingMetaData cascadingMetaData, ValidationOrder validationOrder) {
+			ContainerCascadingMetaData cascadingMetaData, ValidationOrder validationOrder) {
 		Iterator<Group> groupIterator = validationOrder.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();

@@ -84,7 +84,7 @@ public class GetterCascadable implements Cascadable {
 
 		@Override
 		public GetterCascadable build() {
-			return new GetterCascadable( getAccessible( method ), CascadingMetaData.of( valueExtractorManager, cascadingMetaData, method ) );
+			return new GetterCascadable( getAccessible( method ), cascadingMetaData.build( valueExtractorManager, method ) );
 		}
 
 		/**

@@ -22,6 +22,10 @@ import javax.validation.GroupSequence;
 
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ContainerCascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.NonContainerCascadingMetaData;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
@@ -202,7 +206,18 @@ public class CascadingTypeParameter {
 		return new CascadingTypeParameter( this.enclosingType, this.typeParameter, cascading, nestedCascadingTypeParameterMap, groupConversions );
 	}
 
-	public void validateGroupConversions(Object context) {
+	public CascadingMetaData build(ValueExtractorManager valueExtractorManager, Object context) {
+		validateGroupConversions( context );
+
+		if ( containerElementTypesCascadingMetaData.isEmpty() ) {
+			return NonContainerCascadingMetaData.of( this, context );
+		}
+		else {
+			return ContainerCascadingMetaData.of( valueExtractorManager, this, context );
+		}
+	}
+
+	private void validateGroupConversions(Object context) {
 		// group conversions may only be configured for cascadable elements
 		if ( !cascading && !groupConversions.isEmpty() ) {
 			throw LOG.getGroupConversionOnNonCascadingElementException( context );

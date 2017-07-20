@@ -83,7 +83,7 @@ public class FieldCascadable implements Cascadable {
 
 		@Override
 		public FieldCascadable build() {
-			return new FieldCascadable( getAccessible( field ), CascadingMetaData.of( valueExtractorManager, cascadingMetaData, field ) );
+			return new FieldCascadable( getAccessible( field ), cascadingMetaData.build( valueExtractorManager, field ) );
 		}
 
 		/**
