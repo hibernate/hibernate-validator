@@ -345,6 +345,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	@Override
 	public void close() {
 		constraintValidatorManager.clear();
+		constraintHelper.clear();
 		for ( BeanMetaDataManager beanMetaDataManager : beanMetaDataManagers.values() ) {
 			beanMetaDataManager.clear();
 		}
