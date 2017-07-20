@@ -307,9 +307,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return attributes.getParameters();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Set<ConstraintDescriptor<?>> getComposingConstraints() {
-		return CollectionHelper.<ConstraintDescriptor<?>>toImmutableSet( composingConstraints );
+		return (Set<ConstraintDescriptor<?>>) (Object) composingConstraints;
 	}
 
 	public Set<ConstraintDescriptorImpl<?>> getComposingConstraintImpls() {
@@ -528,7 +529,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * same constraint type (generic or cross-parameter).
 	 */
 	private void validateComposingConstraintTypes() {
-		for ( ConstraintDescriptorImpl<?> composingConstraint : composingConstraints ) {
+		for ( ConstraintDescriptorImpl<?> composingConstraint : getComposingConstraintImpls() ) {
 			if ( composingConstraint.constraintType != constraintType ) {
 				throw LOG.getComposedAndComposingConstraintsHaveDifferentTypesException(
 						annotationType,
