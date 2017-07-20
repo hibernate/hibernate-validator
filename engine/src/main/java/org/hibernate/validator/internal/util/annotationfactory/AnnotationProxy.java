@@ -6,11 +6,13 @@
  */
 package org.hibernate.validator.internal.util.annotationfactory;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
@@ -23,10 +25,9 @@ import java.util.TreeSet;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
+import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameters;
+import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameters.AnnotationParameters;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * A concrete implementation of {@code Annotation} that pretends it is a
@@ -44,6 +45,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
  * @author Paolo Perrotta
  * @author Davide Marchignoli
  * @author Gunnar Morling
+ * @author Guillaume Smet
  * @see java.lang.annotation.Annotation
  */
 class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
@@ -97,11 +99,16 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 
 		Annotation other = annotationType.cast( obj );
 
-		//compare annotation member values
-		for ( Entry<String, Object> member : values.entrySet() ) {
+		Map<String, Object> otherValues = getAnnotationValues( other );
 
+		if ( values.size() != otherValues.size() ) {
+			return false;
+		}
+
+		// compare annotation member values
+		for ( Entry<String, Object> member : values.entrySet() ) {
 			Object value = member.getValue();
-			Object otherValue = getAnnotationMemberValue( other, member.getKey() );
+			Object otherValue = otherValues.get( member.getKey() );
 
 			if ( !areEqual( value, otherValue ) ) {
 				return false;
@@ -143,7 +150,6 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 		return result.toString();
 	}
 
-
 	private Map<String, Object> getAnnotationValues(AnnotationDescriptor<?> descriptor) {
 		Map<String, Object> result = newHashMap();
 		int processedValuesFromDescriptor = 0;
@@ -174,6 +180,18 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 			);
 		}
 		return result;
+	}
+
+	private Map<String, Object> getAnnotationValues(Annotation annotation) {
+		if ( Proxy.isProxyClass( annotation.getClass() ) ) {
+			InvocationHandler invocationHandler = Proxy.getInvocationHandler( annotation );
+			if ( invocationHandler instanceof AnnotationProxy ) {
+				return ( (AnnotationProxy) invocationHandler ).values;
+			}
+		}
+
+		AnnotationParameters annotationParameters = run( GetAnnotationParameters.action( annotation ) );
+		return annotationParameters.getParameters();
 	}
 
 	private int calculateHashCode() {
@@ -241,21 +259,6 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 																								(Object[]) o1,
 																								(Object[]) o2
 																						);
-	}
-
-	private Object getAnnotationMemberValue(Annotation annotation, String name) {
-		try {
-			return run( GetDeclaredMethod.action( annotation.annotationType(), name ) ).invoke( annotation );
-		}
-		catch (IllegalAccessException e) {
-			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
-		}
-		catch (IllegalArgumentException e) {
-			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
-		}
-		catch (InvocationTargetException e) {
-			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
-		}
 	}
 
 	/**
