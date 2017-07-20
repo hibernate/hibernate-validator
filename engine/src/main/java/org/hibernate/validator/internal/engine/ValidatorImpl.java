@@ -583,10 +583,14 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						validateCascadedAnnotatedObjectForCurrentGroup( value, validationContext, valueContext, cascadingMetaData );
 					}
 
-					if ( cascadingMetaData.isContainer() && cascadingMetaData.isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ) {
-						// validate cascading on the container elements
-						validateCascadedContainerElementsForCurrentGroup( value, validationContext, valueContext,
-								cascadingMetaData.as( ContainerCascadingMetaData.class ).getContainerElementTypesCascadingMetaData() );
+					if ( cascadingMetaData.isContainer() ) {
+						ContainerCascadingMetaData containerCascadingMetaData = cascadingMetaData.as( ContainerCascadingMetaData.class );
+
+						if ( containerCascadingMetaData.hasContainerElementsMarkedForCascading() ) {
+							// validate cascading on the container elements
+							validateCascadedContainerElementsForCurrentGroup( value, validationContext, valueContext,
+									containerCascadingMetaData.getContainerElementTypesCascadingMetaData() );
+						}
 					}
 				}
 			}
@@ -701,7 +705,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 
 			// Cascade validation to container elements if we are dealing with a container element
-			if ( cascadingMetaData.isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ) {
+			if ( cascadingMetaData.hasContainerElementsMarkedForCascading() ) {
 				ValueContext<?, Object> cascadedTypeArgumentValueContext = buildNewLocalExecutionContext( valueContext, value );
 				if ( cascadingMetaData.getTypeParameter() != null ) {
 					cascadedValueContext.setTypeParameter( cascadingMetaData.getDeclaredContainerClass(), cascadingMetaData.getDeclaredTypeParameter() );

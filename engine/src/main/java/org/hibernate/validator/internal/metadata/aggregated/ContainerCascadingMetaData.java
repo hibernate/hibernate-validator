@@ -73,9 +73,9 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	private GroupConversionHelper groupConversionHelper;
 
 	/**
-	 * Whether the constrained element is directly or indirectly (via type arguments) marked for cascaded validation.
+	 * Whether any container element (it can be nested) is marked for cascaded validation.
 	 */
-	private final boolean markedForCascadingOnAnnotatedObjectOrContainerElements;
+	private final boolean hasContainerElementsMarkedForCascading;
 
 	/**
 	 * The set of value extractors which are type compliant and container element compliant with the element where
@@ -107,7 +107,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 
 	private ContainerCascadingMetaData(ValueExtractorManager valueExtractorManager, Type enclosingType, TypeVariable<?> typeParameter,
 			Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter, List<ContainerCascadingMetaData> containerElementTypesCascadingMetaData,
-			boolean cascading, GroupConversionHelper groupConversionHelper, boolean markedForCascadingOnElementOrContainerElements) {
+			boolean cascading, GroupConversionHelper groupConversionHelper, boolean markedForCascadingOnContainerElements) {
 		this.enclosingType = enclosingType;
 		this.typeParameter = typeParameter;
 		this.declaredContainerClass = declaredContainerClass;
@@ -115,9 +115,9 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		this.containerElementTypesCascadingMetaData = containerElementTypesCascadingMetaData;
 		this.cascading = cascading;
 		this.groupConversionHelper = groupConversionHelper;
-		this.markedForCascadingOnAnnotatedObjectOrContainerElements = markedForCascadingOnElementOrContainerElements;
+		this.hasContainerElementsMarkedForCascading = markedForCascadingOnContainerElements;
 
-		if ( TypeVariables.isAnnotatedObject( this.typeParameter ) || !markedForCascadingOnElementOrContainerElements ) {
+		if ( TypeVariables.isAnnotatedObject( this.typeParameter ) || !markedForCascadingOnContainerElements ) {
 			this.valueExtractorCandidates = Collections.emptySet();
 		}
 		else {
@@ -158,9 +158,13 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		return cascading;
 	}
 
+	public boolean hasContainerElementsMarkedForCascading() {
+		return hasContainerElementsMarkedForCascading;
+	}
+
 	@Override
 	public boolean isMarkedForCascadingOnAnnotatedObjectOrContainerElements() {
-		return markedForCascadingOnAnnotatedObjectOrContainerElements;
+		return cascading || hasContainerElementsMarkedForCascading;
 	}
 
 	public List<ContainerCascadingMetaData> getContainerElementTypesCascadingMetaData() {
