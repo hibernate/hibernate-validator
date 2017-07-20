@@ -229,7 +229,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 				containerElementMetaConstraintTree.addConstraint( constraintPath, constraint );
 			}
 
-			if ( cascadingMetaData != null && cascadingMetaData.isContainer() && cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements() ) {
+			if ( cascadingMetaData != null && cascadingMetaData.isContainer() && cascadingMetaData.isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ) {
 				containerElementMetaConstraintTree.addCascadingMetaData( new ArrayList<>(), cascadingMetaData.as( ContainerCascadingMetaData.class ) );
 			}
 
@@ -264,7 +264,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 				tree.cascading = nestedCascadingMetaData.isCascading();
 				tree.groupConversionDescriptors = nestedCascadingMetaData.getGroupConversionDescriptors();
 
-				if ( nestedCascadingMetaData.isMarkedForCascadingOnElementOrContainerElements() ) {
+				if ( nestedCascadingMetaData.isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ) {
 					addCascadingMetaData( nestedPath, nestedCascadingMetaData );
 				}
 			}

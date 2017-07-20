@@ -32,7 +32,7 @@ public interface CascadingMetaData {
 
 	boolean isCascading();
 
-	boolean isMarkedForCascadingOnElementOrContainerElements();
+	boolean isMarkedForCascadingOnAnnotatedObjectOrContainerElements();
 
 	Class<?> convertGroup(Class<?> originalGroup);
 

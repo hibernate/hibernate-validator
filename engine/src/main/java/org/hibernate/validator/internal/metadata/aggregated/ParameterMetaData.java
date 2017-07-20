@@ -50,8 +50,8 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				type,
 				constraints,
 				containerElementsConstraints,
-				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
-				!constraints.isEmpty() || !containerElementsConstraints.isEmpty() || cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements()
+				cascadingMetaData.isMarkedForCascadingOnAnnotatedObjectOrContainerElements(),
+				!constraints.isEmpty() || !containerElementsConstraints.isEmpty() || cascadingMetaData.isMarkedForCascadingOnAnnotatedObjectOrContainerElements()
 		);
 
 		this.index = index;

@@ -75,7 +75,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	/**
 	 * Whether the constrained element is directly or indirectly (via type arguments) marked for cascaded validation.
 	 */
-	private final boolean markedForCascadingOnElementOrContainerElements;
+	private final boolean markedForCascadingOnAnnotatedObjectOrContainerElements;
 
 	/**
 	 * The set of value extractors which are type compliant and container element compliant with the element where
@@ -101,7 +101,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 						.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) ),
 				cascadingMetaDataBuilder.isCascading(),
 				GroupConversionHelper.of( cascadingMetaDataBuilder.getGroupConversions() ),
-				cascadingMetaDataBuilder.isMarkedForCascadingOnElementOrContainerElements()
+				cascadingMetaDataBuilder.isMarkedForCascadingOnAnnotatedObjectOrContainerElements()
 		);
 	}
 
@@ -115,7 +115,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		this.containerElementTypesCascadingMetaData = containerElementTypesCascadingMetaData;
 		this.cascading = cascading;
 		this.groupConversionHelper = groupConversionHelper;
-		this.markedForCascadingOnElementOrContainerElements = markedForCascadingOnElementOrContainerElements;
+		this.markedForCascadingOnAnnotatedObjectOrContainerElements = markedForCascadingOnElementOrContainerElements;
 
 		if ( TypeVariables.isAnnotatedObject( this.typeParameter ) || !markedForCascadingOnElementOrContainerElements ) {
 			this.valueExtractorCandidates = Collections.emptySet();
@@ -159,8 +159,8 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	}
 
 	@Override
-	public boolean isMarkedForCascadingOnElementOrContainerElements() {
-		return markedForCascadingOnElementOrContainerElements;
+	public boolean isMarkedForCascadingOnAnnotatedObjectOrContainerElements() {
+		return markedForCascadingOnAnnotatedObjectOrContainerElements;
 	}
 
 	public List<ContainerCascadingMetaData> getContainerElementTypesCascadingMetaData() {

@@ -95,7 +95,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				returnType,
 				returnValueConstraints,
 				returnValueContainerElementConstraints,
-				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
+				cascadingMetaData.isMarkedForCascadingOnAnnotatedObjectOrContainerElements(),
 				isConstrained
 		);
 

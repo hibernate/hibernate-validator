@@ -85,12 +85,12 @@ public class CascadingMetaDataBuilder {
 	/**
 	 * Whether the constrained element is directly or indirectly (via type arguments) marked for cascaded validation.
 	 */
-	private final boolean markedForCascadingOnElementOrContainerElements;
+	private final boolean markedForCascadingOnAnnotatedObjectOrContainerElements;
 
 	/**
 	 * Whether the constrained element has directly or indirectly (via type arguments) group conversions defined.
 	 */
-	private final boolean hasGroupConversionsOnElementOrContainerElements;
+	private final boolean hasGroupConversionsOnAnnotatedObjectOrContainerElements;
 
 	public CascadingMetaDataBuilder(Type enclosingType, TypeVariable<?> typeParameter, boolean cascading,
 			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
@@ -110,16 +110,16 @@ public class CascadingMetaDataBuilder {
 		this.groupConversions = CollectionHelper.toImmutableMap( groupConversions );
 		this.containerElementTypesCascadingMetaData = CollectionHelper.toImmutableMap( containerElementTypesCascadingMetaData );
 
-		boolean tmpMarkedForCascadingOnElementOrContainerElements = cascading;
-		boolean tmpHasGroupConversionsOnElementOrContainerElements = !groupConversions.isEmpty();
+		boolean tmpMarkedForCascadingOnAnnotatedObjectOrContainerElements = cascading;
+		boolean tmpHasGroupConversionsOnAnnotatedObjectOrContainerElements = !groupConversions.isEmpty();
 		for ( CascadingMetaDataBuilder nestedCascadingTypeParameter : containerElementTypesCascadingMetaData.values() ) {
-			tmpMarkedForCascadingOnElementOrContainerElements = tmpMarkedForCascadingOnElementOrContainerElements
-					|| nestedCascadingTypeParameter.markedForCascadingOnElementOrContainerElements;
-			tmpHasGroupConversionsOnElementOrContainerElements = tmpHasGroupConversionsOnElementOrContainerElements
-					|| nestedCascadingTypeParameter.hasGroupConversionsOnElementOrContainerElements;
+			tmpMarkedForCascadingOnAnnotatedObjectOrContainerElements = tmpMarkedForCascadingOnAnnotatedObjectOrContainerElements
+					|| nestedCascadingTypeParameter.markedForCascadingOnAnnotatedObjectOrContainerElements;
+			tmpHasGroupConversionsOnAnnotatedObjectOrContainerElements = tmpHasGroupConversionsOnAnnotatedObjectOrContainerElements
+					|| nestedCascadingTypeParameter.hasGroupConversionsOnAnnotatedObjectOrContainerElements;
 		}
-		markedForCascadingOnElementOrContainerElements = tmpMarkedForCascadingOnElementOrContainerElements;
-		hasGroupConversionsOnElementOrContainerElements = tmpHasGroupConversionsOnElementOrContainerElements;
+		markedForCascadingOnAnnotatedObjectOrContainerElements = tmpMarkedForCascadingOnAnnotatedObjectOrContainerElements;
+		hasGroupConversionsOnAnnotatedObjectOrContainerElements = tmpHasGroupConversionsOnAnnotatedObjectOrContainerElements;
 	}
 
 	public static CascadingMetaDataBuilder nonCascading() {
@@ -170,12 +170,12 @@ public class CascadingMetaDataBuilder {
 		return groupConversions;
 	}
 
-	public boolean isMarkedForCascadingOnElementOrContainerElements() {
-		return markedForCascadingOnElementOrContainerElements;
+	public boolean isMarkedForCascadingOnAnnotatedObjectOrContainerElements() {
+		return markedForCascadingOnAnnotatedObjectOrContainerElements;
 	}
 
-	public boolean hasGroupConversionsOnElementOrContainerElements() {
-		return hasGroupConversionsOnElementOrContainerElements;
+	public boolean hasGroupConversionsOnAnnotatedObjectOrContainerElements() {
+		return hasGroupConversionsOnAnnotatedObjectOrContainerElements;
 	}
 
 	public Map<TypeVariable<?>, CascadingMetaDataBuilder> getContainerElementTypesCascadingMetaData() {

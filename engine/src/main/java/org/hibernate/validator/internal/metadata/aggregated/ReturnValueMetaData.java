@@ -47,8 +47,8 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 				type,
 				constraints,
 				containerElementsConstraints,
-				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
-				!constraints.isEmpty() || containerElementsConstraints.isEmpty() || cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements()
+				cascadingMetaData.isMarkedForCascadingOnAnnotatedObjectOrContainerElements(),
+				!constraints.isEmpty() || containerElementsConstraints.isEmpty() || cascadingMetaData.isMarkedForCascadingOnAnnotatedObjectOrContainerElements()
 		);
 
 

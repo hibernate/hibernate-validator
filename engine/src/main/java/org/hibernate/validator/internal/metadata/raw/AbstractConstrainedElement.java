@@ -69,7 +69,8 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 
 	@Override
 	public boolean isConstrained() {
-		return cascadingMetaDataBuilder.isMarkedForCascadingOnElementOrContainerElements() || !constraints.isEmpty() || !typeArgumentConstraints.isEmpty();
+		return cascadingMetaDataBuilder.isMarkedForCascadingOnAnnotatedObjectOrContainerElements() || !constraints.isEmpty()
+				|| !typeArgumentConstraints.isEmpty();
 	}
 
 	@Override

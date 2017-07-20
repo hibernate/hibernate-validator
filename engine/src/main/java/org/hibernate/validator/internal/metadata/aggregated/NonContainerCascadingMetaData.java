@@ -76,7 +76,7 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 	}
 
 	@Override
-	public boolean isMarkedForCascadingOnElementOrContainerElements() {
+	public boolean isMarkedForCascadingOnAnnotatedObjectOrContainerElements() {
 		return cascading;
 	}
 
