@@ -18,7 +18,6 @@ import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParamete
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 /**
  * A {@link Cascadable} backed by a property getter of a Java bean.
@@ -100,9 +99,7 @@ public class GetterCascadable implements Cascadable {
 			}
 
 			Class<?> clazz = original.getDeclaringClass();
-			Method member = run( GetDeclaredMethod.action( clazz, original.getName() ) );
-
-			run( SetAccessibility.action( member ) );
+			Method member = run( GetDeclaredMethod.andMakeAccessible( clazz, original.getName() ) );
 
 			return member;
 		}

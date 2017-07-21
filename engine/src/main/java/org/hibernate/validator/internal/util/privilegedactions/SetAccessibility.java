@@ -17,6 +17,10 @@ import java.security.PrivilegedAction;
 public final class SetAccessibility implements PrivilegedAction<Object> {
 	private final Member member;
 
+	/**
+	 * Before using this method, you need to check the {@code HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS}
+	 * permission against the security manager.
+	 */
 	public static SetAccessibility action(Member member) {
 		return new SetAccessibility( member );
 	}
