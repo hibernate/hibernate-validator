@@ -202,8 +202,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 			cascadingProperty = cascadingProperty || constrainedElement.getCascadingMetaDataBuilder().isCascading();
 
-			if ( constrainedElement.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ||
-					constrainedElement.getCascadingMetaDataBuilder().hasGroupConversionsOnAnnotatedObjectOrContainerElements() ) {
+			if ( constrainedElement.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ) {
 				if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
 					Field field = ( (ConstrainedField) constrainedElement ).getField();
 					Cascadable.Builder builder = cascadableBuilders.get( field );
