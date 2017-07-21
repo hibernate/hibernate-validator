@@ -31,6 +31,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -368,14 +369,21 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * executable.
 	 *
 	 * @param executable The executable of interest.
+	 * @param parameters The parameters of the executable.
 	 *
 	 * @return A list with parameter meta data for the given executable.
 	 */
 	private List<ConstrainedParameter> getParameterMetaData(Executable executable) {
-		List<ConstrainedParameter> metaData = newArrayList();
+		if ( executable.getParameterCount() == 0 ) {
+			return Collections.emptyList();
+		}
+
+		Parameter[] parameters = executable.getParameters();
+
+		List<ConstrainedParameter> metaData = new ArrayList<>( parameters.length );
 
 		int i = 0;
-		for ( Parameter parameter : executable.getParameters() ) {
+		for ( Parameter parameter : parameters ) {
 			Annotation[] parameterAnnotations;
 			try {
 				parameterAnnotations = parameter.getAnnotations();
@@ -421,7 +429,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			AnnotatedType parameterAnnotatedType = parameter.getAnnotatedType();
 
 			Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable, i, parameterAnnotatedType );
-			CascadingMetaDataBuilder cascadingMetaData = findCascadingMetaData( executable, i, parameterAnnotatedType );
+			CascadingMetaDataBuilder cascadingMetaData = findCascadingMetaData( executable, parameters, i, parameterAnnotatedType );
 
 			metaData.add(
 					new ConstrainedParameter(
@@ -586,8 +594,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 	}
 
-	private CascadingMetaDataBuilder findCascadingMetaData(Executable executable, int i, AnnotatedType parameterAnnotatedType) {
-		Parameter parameter = executable.getParameters()[i];
+	private CascadingMetaDataBuilder findCascadingMetaData(Executable executable, Parameter[] parameters, int i, AnnotatedType parameterAnnotatedType) {
+		Parameter parameter = parameters[i];
 		TypeVariable<?>[] typeParameters = parameter.getType().getTypeParameters();
 
 		Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( parameterAnnotatedType,
