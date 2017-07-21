@@ -18,21 +18,37 @@ public final class GetDeclaredMethod implements PrivilegedAction<Method> {
 	private final Class<?> clazz;
 	private final String methodName;
 	private final Class<?>[] parameterTypes;
+	private final boolean makeAccessible;
 
 	public static GetDeclaredMethod action(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
-		return new GetDeclaredMethod( clazz, methodName, parameterTypes );
+		return new GetDeclaredMethod( clazz, methodName, false, parameterTypes );
 	}
 
-	private GetDeclaredMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+	/**
+	 * Before using this method, you need to check the {@code HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS}
+	 * permission against the security manager.
+	 */
+	public static GetDeclaredMethod andMakeAccessible(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+		return new GetDeclaredMethod( clazz, methodName, true, parameterTypes );
+	}
+
+	private GetDeclaredMethod(Class<?> clazz, String methodName, boolean makeAccessible, Class<?>... parameterTypes) {
 		this.clazz = clazz;
 		this.methodName = methodName;
 		this.parameterTypes = parameterTypes;
+		this.makeAccessible = makeAccessible;
 	}
 
 	@Override
 	public Method run() {
 		try {
-			return clazz.getDeclaredMethod( methodName, parameterTypes );
+			Method method = clazz.getDeclaredMethod( methodName, parameterTypes );
+
+			if ( makeAccessible ) {
+				method.setAccessible( true );
+			}
+
+			return method;
 		}
 		catch (NoSuchMethodException e) {
 			return null;

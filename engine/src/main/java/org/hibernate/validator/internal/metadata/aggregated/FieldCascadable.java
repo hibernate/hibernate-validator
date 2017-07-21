@@ -19,7 +19,6 @@ import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParamete
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
-import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 /**
  * A {@link Cascadable} backed by a field of a Java bean.
@@ -101,11 +100,8 @@ public class FieldCascadable implements Cascadable {
 			}
 
 			Class<?> clazz = original.getDeclaringClass();
-			Field member = run( GetDeclaredField.action( clazz, original.getName() ) );
 
-			run( SetAccessibility.action( member ) );
-
-			return member;
+			return run( GetDeclaredField.andMakeAccessible( clazz, original.getName() ) );
 		}
 
 		/**
