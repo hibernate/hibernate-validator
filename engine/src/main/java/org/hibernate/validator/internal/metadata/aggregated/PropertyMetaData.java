@@ -43,7 +43,6 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -325,11 +324,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			}
 
 			Class<?> clazz = original.getDeclaringClass();
-			Method member = run( GetDeclaredMethod.action( clazz, original.getName() ) );
 
-			run( SetAccessibility.action( member ) );
-
-			return member;
+			return run( GetDeclaredMethod.andMakeAccessible( clazz, original.getName() ) );
 		}
 
 		private <T> T run(PrivilegedAction<T> action) {
