@@ -10,6 +10,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.ElementKind;
 
+import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -39,6 +42,8 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
+import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -55,6 +60,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * </p>
  *
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class PropertyMetaData extends AbstractConstraintMetaData {
 
@@ -154,6 +160,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		private final Map<Member, Cascadable.Builder> cascadableBuilders = new HashMap<>();
 		private final Type propertyType;
 		private boolean cascadingProperty = false;
+		private Method getterAccessibleMethod;
 
 		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
 				ValueExtractorManager valueExtractorManager) {
@@ -198,11 +205,18 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 		@Override
 		public final void add(ConstrainedElement constrainedElement) {
+			// if we are in the case of a getter and if we have constraints (either on the annotated object itself or on
+			// a container element) or cascaded validation, we want to create an accessible version of the getter only once.
+			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD && constrainedElement.isConstrained() ) {
+				getterAccessibleMethod = getAccessible( (Method) ( (ConstrainedExecutable) constrainedElement ).getExecutable() );
+			}
+
 			super.add( constrainedElement );
 
 			cascadingProperty = cascadingProperty || constrainedElement.getCascadingMetaDataBuilder().isCascading();
 
-			if ( constrainedElement.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ) {
+			if ( constrainedElement.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ||
+					constrainedElement.getCascadingMetaDataBuilder().hasGroupConversionsOnAnnotatedObjectOrContainerElements() ) {
 				if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
 					Field field = ( (ConstrainedField) constrainedElement ).getField();
 					Cascadable.Builder builder = cascadableBuilders.get( field );
@@ -220,7 +234,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					Cascadable.Builder builder = cascadableBuilders.get( method );
 
 					if ( builder == null ) {
-						builder = new GetterCascadable.Builder( valueExtractorManager, method, constrainedElement.getCascadingMetaDataBuilder() );
+						builder = new GetterCascadable.Builder( valueExtractorManager, getterAccessibleMethod, constrainedElement.getCascadingMetaDataBuilder() );
 						cascadableBuilders.put( method, builder );
 					}
 					else {
@@ -231,23 +245,25 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		}
 
 		@Override
-		protected Set<MetaConstraint<?>> adaptConstraints(ConstrainedElementKind kind, Set<MetaConstraint<?>> constraints) {
-			if ( kind == ConstrainedElementKind.FIELD || kind == ConstrainedElementKind.TYPE ) {
+		protected Set<MetaConstraint<?>> adaptConstraints(ConstrainedElement constrainedElement, Set<MetaConstraint<?>> constraints) {
+			if ( constraints.isEmpty() || constrainedElement.getKind() != ConstrainedElementKind.METHOD ) {
 				return constraints;
 			}
 
+			ConstraintLocation getterConstraintLocation = ConstraintLocation.forGetter( getterAccessibleMethod );
+
 			// convert return value locations into getter locations for usage within this meta-data
 			return constraints.stream()
-				.map( this::withGetterLocation )
-				.collect( Collectors.toSet() );
+					.map( c -> withGetterLocation( getterConstraintLocation, c ) )
+					.collect( Collectors.toSet() );
 		}
 
-		private MetaConstraint<?> withGetterLocation(MetaConstraint<?> constraint) {
+		private MetaConstraint<?> withGetterLocation(ConstraintLocation getterConstraintLocation, MetaConstraint<?> constraint) {
 			ConstraintLocation converted = null;
 
 			// fast track if it's a regular constraint
 			if ( !(constraint.getLocation() instanceof TypeArgumentConstraintLocation) ) {
-				converted = ConstraintLocation.forGetter( (Method) constraint.getLocation().getMember() );
+				converted = getterConstraintLocation;
 			}
 			else {
 				Deque<ConstraintLocation> locationStack = new ArrayDeque<>();
@@ -268,7 +284,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				// 2. beginning at the root, transform each location so it references the transformed delegate
 				for ( ConstraintLocation location : locationStack ) {
 					if ( !(location instanceof TypeArgumentConstraintLocation) ) {
-						converted = ConstraintLocation.forGetter( (Method) location.getMember() );
+						converted = getterConstraintLocation;
 					}
 					else {
 						converted = ConstraintLocation.forTypeArgument(
@@ -292,6 +308,32 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			}
 
 			return null;
+		}
+
+		/**
+		 * Returns an accessible version of the given member. Will be the given member itself in case it is accessible,
+		 * otherwise a copy which is set accessible.
+		 */
+		private Method getAccessible(Method original) {
+			if ( original.isAccessible() ) {
+				return original;
+			}
+
+			SecurityManager sm = System.getSecurityManager();
+			if ( sm != null ) {
+				sm.checkPermission( HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS );
+			}
+
+			Class<?> clazz = original.getDeclaringClass();
+			Method member = run( GetDeclaredMethod.action( clazz, original.getName() ) );
+
+			run( SetAccessibility.action( member ) );
+
+			return member;
+		}
+
+		private <T> T run(PrivilegedAction<T> action) {
+			return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 		}
 
 		@Override

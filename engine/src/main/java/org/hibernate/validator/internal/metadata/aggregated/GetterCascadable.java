@@ -9,16 +9,11 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
-import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 /**
  * A {@link Cascadable} backed by a property getter of a Java bean.
@@ -70,6 +65,7 @@ public class GetterCascadable implements Cascadable {
 		private final Method method;
 		private CascadingMetaDataBuilder cascadingMetaDataBuilder;
 
+		// Note: the method passed here has to be accessible: the caller is responsible for that
 		public Builder(ValueExtractorManager valueExtractorManager, Method method, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 			this.valueExtractorManager = valueExtractorManager;
 			this.method = method;
@@ -83,39 +79,7 @@ public class GetterCascadable implements Cascadable {
 
 		@Override
 		public GetterCascadable build() {
-			return new GetterCascadable( getAccessible( method ), cascadingMetaDataBuilder.build( valueExtractorManager, method ) );
-		}
-
-		/**
-		 * Returns an accessible version of the given member. Will be the given member itself in case it is accessible,
-		 * otherwise a copy which is set accessible.
-		 */
-		private Method getAccessible(Method original) {
-			if ( original.isAccessible() ) {
-				return original;
-			}
-
-			SecurityManager sm = System.getSecurityManager();
-			if ( sm != null ) {
-				sm.checkPermission( HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS );
-			}
-
-			Class<?> clazz = original.getDeclaringClass();
-			Method member = run( GetDeclaredMethod.action( clazz, original.getName() ) );
-
-			run( SetAccessibility.action( member ) );
-
-			return member;
-		}
-
-		/**
-		 * Runs the given privileged action, using a privileged block if required.
-		 * <p>
-		 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-		 * privileged actions within HV's protection domain.
-		 */
-		private <T> T run(PrivilegedAction<T> action) {
-			return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+			return new GetterCascadable( method, cascadingMetaDataBuilder.build( valueExtractorManager, method ) );
 		}
 	}
 }
