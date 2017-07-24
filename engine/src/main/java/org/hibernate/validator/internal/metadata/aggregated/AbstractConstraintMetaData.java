@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.validation.ElementKind;
 import javax.validation.metadata.ContainerElementTypeDescriptor;
 import javax.validation.metadata.GroupConversionDescriptor;
 
@@ -43,9 +42,9 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Hardy Ferentschik
  */
 public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
+
 	private final String name;
 	private final Type type;
-	private final ElementKind constrainedMetaDataKind;
 	@Immutable
 	private final Set<MetaConstraint<?>> directConstraints;
 	@Immutable
@@ -59,7 +58,6 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 									  Type type,
 									  Set<MetaConstraint<?>> directConstraints,
 									  Set<MetaConstraint<?>> containerElementsConstraints,
-									  ElementKind constrainedMetaDataKind,
 									  boolean isCascading,
 									  boolean isConstrained) {
 		this.name = name;
@@ -68,7 +66,6 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 		this.containerElementsConstraints = CollectionHelper.toImmutableSet( containerElementsConstraints );
 		this.allConstraints = Stream.concat( directConstraints.stream(), containerElementsConstraints.stream() )
 				.collect( Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) );
-		this.constrainedMetaDataKind = constrainedMetaDataKind;
 		this.isCascading = isCascading;
 		this.isConstrained = isConstrained;
 	}
@@ -101,11 +98,6 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	}
 
 	@Override
-	public ElementKind getKind() {
-		return constrainedMetaDataKind;
-	}
-
-	@Override
 	public final boolean isCascading() {
 		return isCascading;
 	}
@@ -118,7 +110,6 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	@Override
 	public String toString() {
 		return "AbstractConstraintMetaData [name=" + name + ", type=" + type
-				+ ", constrainedMetaDataKind=" + constrainedMetaDataKind
 				+ ", directConstraints=" + directConstraints
 				+ ", containerElementsConstraints=" + containerElementsConstraints
 				+ ", isCascading=" + isCascading
@@ -210,13 +201,13 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	 */
 	private static class ContainerElementMetaDataTree {
 
-		private Map<TypeVariable<?>, ContainerElementMetaDataTree> nodes = new HashMap<>();
+		private final Map<TypeVariable<?>, ContainerElementMetaDataTree> nodes = new HashMap<>();
 
 		private Type elementType = null;
 
 		private Class<?> containerClass;
 
-		private Set<MetaConstraint<?>> constraints = new HashSet<>();
+		private final Set<MetaConstraint<?>> constraints = new HashSet<>();
 
 		private boolean cascading = false;
 

@@ -76,6 +76,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	private final Set<String> signatures;
 
 	private final ReturnValueMetaData returnValueMetaData;
+	private final ElementKind kind;
 
 	private ExecutableMetaData(
 			String name,
@@ -95,7 +96,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				returnType,
 				returnValueConstraints,
 				returnValueContainerElementConstraints,
-				kind,
 				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
 				isConstrained
 		);
@@ -111,6 +111,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				cascadingMetaData
 		);
 		this.isGetter = isGetter;
+		this.kind = kind;
 	}
 
 	/**
@@ -190,6 +191,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		}
 
 		return parameterDescriptorList;
+	}
+
+	@Override
+	public ElementKind getKind() {
+		return kind;
 	}
 
 	@Override
