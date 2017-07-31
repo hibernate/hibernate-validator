@@ -25,7 +25,7 @@
         <protocol type="Servlet 3.0"/>
         <!-- Takes no effect - ARQ-579 -->
         <configuration>
-            <property name="jbossHome">${wildflyTargetDir}</property>
+            <property name="jbossHome">${wildfly.target-dir}</property>
             <property name="javaVmArguments">${arquillian.javaVmArguments.add-opens}
                 -Xmx1024m -XX:MaxPermSize=512m ${remote.debug}
                 -Dvalidation.provider=${validation.provider}
