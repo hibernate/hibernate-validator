@@ -51,7 +51,6 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				type,
 				constraints,
 				containerElementsConstraints,
-				ElementKind.PARAMETER,
 				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
 				!constraints.isEmpty() || !containerElementsConstraints.isEmpty() || cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements()
 		);
@@ -104,6 +103,11 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	@Override
 	public CascadingMetaData getCascadingMetaData() {
 		return cascadingMetaData;
+	}
+
+	@Override
+	public ElementKind getKind() {
+		return ElementKind.PARAMETER;
 	}
 
 	public static class Builder extends MetaDataBuilder {

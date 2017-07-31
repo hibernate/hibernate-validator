@@ -29,13 +29,11 @@ import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 public class FieldCascadable implements Cascadable {
 
 	private final Field field;
-	private final String propertyName;
 	private final Type cascadableType;
 	private final CascadingMetaData cascadingMetaData;
 
 	FieldCascadable(Field field, CascadingMetaData cascadingMetaData) {
 		this.field = field;
-		this.propertyName = field.getName();
 		this.cascadableType = ReflectionHelper.typeOf( field );
 		this.cascadingMetaData = cascadingMetaData;
 		this.cascadingMetaData.validateGroupConversions( field.toString() );
@@ -58,7 +56,7 @@ public class FieldCascadable implements Cascadable {
 
 	@Override
 	public void appendTo(PathImpl path) {
-		path.addPropertyNode( propertyName );
+		path.addPropertyNode( field.getName() );
 	}
 
 	@Override

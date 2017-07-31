@@ -72,7 +72,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				type,
 				constraints,
 				containerElementsConstraints,
-				ElementKind.PROPERTY,
 				!cascadables.isEmpty(),
 				!cascadables.isEmpty() || !constraints.isEmpty() || !containerElementsConstraints.isEmpty()
 		);
@@ -117,6 +116,11 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 	@Override
 	public String toString() {
 		return "PropertyMetaData [type=" + getType() + ", propertyName=" + getName() + "]]";
+	}
+
+	@Override
+	public ElementKind getKind() {
+		return ElementKind.PROPERTY;
 	}
 
 	@Override

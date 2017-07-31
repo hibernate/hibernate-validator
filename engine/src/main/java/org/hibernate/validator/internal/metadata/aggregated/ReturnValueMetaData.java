@@ -49,7 +49,6 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 				type,
 				constraints,
 				containerElementsConstraints,
-				ElementKind.RETURN_VALUE,
 				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
 				!constraints.isEmpty() || containerElementsConstraints.isEmpty() || cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements()
 		);
@@ -101,5 +100,10 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	@Override
 	public CascadingMetaData getCascadingMetaData() {
 		return cascadingMetaData;
+	}
+
+	@Override
+	public ElementKind getKind() {
+		return ElementKind.RETURN_VALUE;
 	}
 }
