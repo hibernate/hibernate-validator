@@ -335,18 +335,7 @@
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
                 <executions>
-                    <!-- Currently the WF Maven plug-in cannot apply offline commands, although patch itself wouldn't require a running
-                    server; see https://issues.jboss.org/projects/WFMP/issues/WFMP-11 -->
-                    <execution>
-                        <id>start-wildfly-current-for-patching</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>start</goal>
-                        </goals>
-                        <configuration>
-                            <jbossHome>${project.build.directory}/wildfly-${wildfly.version}/</jbossHome>
-                        </configuration>
-                    </execution>
+                    <!-- WildFly current -->
                     <execution>
                         <id>apply-wildfly-current-patch-file</id>
                         <phase>pre-integration-test</phase>
@@ -354,6 +343,7 @@
                             <goal>execute-commands</goal>
                         </goals>
                         <configuration>
+                            <offline>true</offline>
                             <jbossHome>${project.build.directory}/wildfly-${wildfly.version}/</jbossHome>
                             <fail-on-error>false</fail-on-error>
                             <commands>
@@ -361,27 +351,7 @@
                             </commands>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>shutdown-wildfly-current-for-patching</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>shutdown</goal>
-                        </goals>
-                        <configuration>
-                            <jbossHome>${project.build.directory}/wildfly-${wildfly.version}/</jbossHome>
-                        </configuration>
-                    </execution>
                     <!-- WildFly next -->
-                    <execution>
-                        <id>start-wildfly-next-for-patching</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>start</goal>
-                        </goals>
-                        <configuration>
-                            <jbossHome>${project.build.directory}/wildfly-${wildfly-next.version}/</jbossHome>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>apply-wildfly-next-patch-file</id>
                         <phase>pre-integration-test</phase>
@@ -389,21 +359,12 @@
                             <goal>execute-commands</goal>
                         </goals>
                         <configuration>
+                            <offline>true</offline>
                             <jbossHome>${project.build.directory}/wildfly-${wildfly-next.version}/</jbossHome>
                             <fail-on-error>false</fail-on-error>
                             <commands>
                                 <command>patch apply --path ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly-next.version}-patch.zip</command>
                             </commands>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>shutdown-wildfly-next-for-patching</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>shutdown</goal>
-                        </goals>
-                        <configuration>
-                            <jbossHome>${project.build.directory}/wildfly-${wildfly-next.version}/</jbossHome>
                         </configuration>
                     </execution>
                 </executions>
