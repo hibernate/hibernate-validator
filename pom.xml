@@ -141,7 +141,7 @@
         <wildfly-patch-gen-maven-plugin.version>2.0.1.Alpha5</wildfly-patch-gen-maven-plugin.version>
         <wildfly-patch-gen-maven-plugin.woodstox.version>5.0.3</wildfly-patch-gen-maven-plugin.woodstox.version>
         <wildfly-maven-plugin.version>1.2.0.Alpha6</wildfly-maven-plugin.version>
-        <wildfly-core.version>1.0.1.Final</wildfly-core.version>
+        <wildfly-core.version>3.0.0.Beta27</wildfly-core.version>
 
         <!-- Test dependencies -->
         <arquillian.version>1.1.11.Final</arquillian.version>
