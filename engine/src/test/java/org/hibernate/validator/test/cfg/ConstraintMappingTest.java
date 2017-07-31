@@ -210,7 +210,7 @@ public class ConstraintMappingTest {
 
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( Future.class ).withMessage( "must be in the future" )
+				violationOf( Future.class ).withMessage( "must be a future date" )
 		);
 	}
 
