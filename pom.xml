@@ -1144,9 +1144,9 @@
                             <artifactId>wildfly-maven-plugin</artifactId>
                             <configuration>
                                 <javaOpts>
-                                    <javaOpt>--add-opens=java.base/java.lang=ALL-UNNAMED</javaOpt>
-                                    <javaOpt>--add-opens=java.base/java.security=ALL-UNNAMED</javaOpt>
-                                    <javaOpt>--add-opens=java.base/java.io=ALL-UNNAMED</javaOpt>
+                                    --add-opens=java.base/java.lang=ALL-UNNAMED
+                                    --add-opens=java.base/java.security=ALL-UNNAMED
+                                    --add-opens=java.base/java.io=ALL-UNNAMED
                                 </javaOpts>
                             </configuration>
                         </plugin>
