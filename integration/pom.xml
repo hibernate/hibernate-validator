@@ -17,12 +17,16 @@
 
     <artifactId>hibernate-validator-integrationtest-wildfly</artifactId>
 
-    <name>Hibernate Validator Wildfly Integration Tests</name>
-    <description>Hibernate Validator integration tests.</description>
+    <name>Hibernate Validator WildFly Integration Tests</name>
+    <description>Hibernate Validator WildFly integration tests.</description>
 
     <properties>
-        <wildflyTargetDir>${basedir}/target/wildfly-${wildfly.version}</wildflyTargetDir>
-        <wildflyModulesDir>${wildflyTargetDir}/modules/system/layers/base</wildflyModulesDir>
+        <wildfly.target-dir>${project.build.directory}/wildfly-${wildfly.version}</wildfly.target-dir>
+        <wildfly.modules-dir>${wildfly.target-dir}/modules/system/layers/base</wildfly.modules-dir>
+
+        <wildfly-next.target-dir>${project.build.directory}/wildfly-${wildfly-next.version}</wildfly-next.target-dir>
+        <wildfly-next.modules-dir>${wildfly-next.target-dir}/modules/system/layers/base</wildfly-next.modules-dir>
+
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
 
@@ -147,6 +151,46 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <!-- WildFly current -->
+                    <execution>
+                        <id>wildfly-current-integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <arquillian.launch>wildfly-current</arquillian.launch>
+                            </systemPropertyVariables>
+                            <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-current.xml</summaryFile>
+                        </configuration>
+                    </execution>
+                    <!-- WildFly next -->
+                    <execution>
+                        <id>wildfly-next-integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <arquillian.launch>wildfly-next</arquillian.launch>
+                            </systemPropertyVariables>
+                            <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-next.xml</summaryFile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>verify</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <summaryFiles>
+                                <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-current.xml</summaryFile>
+                                <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-next.xml</summaryFile>
+                            </summaryFiles>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -159,10 +203,20 @@
                         </goals>
                         <configuration>
                             <artifactItems>
+                                <!-- WildFly current -->
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
                                     <artifactId>wildfly-dist</artifactId>
                                     <version>${wildfly.version}</version>
+                                    <type>tar.gz</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </artifactItem>
+                                <!-- WildFly next -->
+                                <artifactItem>
+                                    <groupId>org.wildfly</groupId>
+                                    <artifactId>wildfly-dist</artifactId>
+                                    <version>${wildfly-next.version}</version>
                                     <type>tar.gz</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
@@ -178,11 +232,21 @@
                         </goals>
                         <configuration>
                             <artifactItems>
+                                <!-- WildFly current -->
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>hibernate-validator-modules</artifactId>
                                     <version>${project.version}</version>
                                     <classifier>wildfly-${wildfly.version}-patch</classifier>
+                                    <type>zip</type>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </artifactItem>
+                                <!-- WildFly next -->
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>hibernate-validator-modules</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>wildfly-${wildfly-next.version}-patch</classifier>
                                     <type>zip</type>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
@@ -197,17 +261,31 @@
                         </goals>
                         <configuration>
                             <artifactItems>
+                                <!-- WildFly current -->
                                 <artifactItem>
                                     <groupId>javax.money</groupId>
                                     <artifactId>money-api</artifactId>
                                     <version>${javax-money.version}</version>
-                                    <outputDirectory>${wildflyModulesDir}/javax/money/api/main/</outputDirectory>
+                                    <outputDirectory>${wildfly.modules-dir}/javax/money/api/main/</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.javamoney</groupId>
                                     <artifactId>moneta</artifactId>
                                     <version>${moneta.version}</version>
-                                    <outputDirectory>${wildflyModulesDir}/org/javamoney/moneta/main/</outputDirectory>
+                                    <outputDirectory>${wildfly.modules-dir}/org/javamoney/moneta/main/</outputDirectory>
+                                </artifactItem>
+                                <!-- WildFly next -->
+                                <artifactItem>
+                                    <groupId>javax.money</groupId>
+                                    <artifactId>money-api</artifactId>
+                                    <version>${javax-money.version}</version>
+                                    <outputDirectory>${wildfly-next.modules-dir}/javax/money/api/main/</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.javamoney</groupId>
+                                    <artifactId>moneta</artifactId>
+                                    <version>${moneta.version}</version>
+                                    <outputDirectory>${wildfly-next.modules-dir}/org/javamoney/moneta/main/</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -217,14 +295,32 @@
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
+                    <!-- WildFly current -->
                     <execution>
-                        <id>copy-resources</id>
+                        <id>copy-wildfly-current-resources</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${wildflyModulesDir}</outputDirectory>
+                            <outputDirectory>${wildfly.modules-dir}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/test/modules</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <!-- WildFly next -->
+                    <execution>
+                        <id>copy-wildfly-next-resources</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${wildfly-next.modules-dir}</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/test/modules</directory>
@@ -242,19 +338,23 @@
                     <!-- Currently the WF Maven plug-in cannot apply offline commands, although patch itself wouldn't require a running
                     server; see https://issues.jboss.org/projects/WFMP/issues/WFMP-11 -->
                     <execution>
-                        <id>start-wildfly-for-patching</id>
+                        <id>start-wildfly-current-for-patching</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>start</goal>
                         </goals>
+                        <configuration>
+                            <jbossHome>${project.build.directory}/wildfly-${wildfly.version}/</jbossHome>
+                        </configuration>
                     </execution>
                     <execution>
-                        <id>apply-patch-file</id>
+                        <id>apply-wildfly-current-patch-file</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>execute-commands</goal>
                         </goals>
                         <configuration>
+                            <jbossHome>${project.build.directory}/wildfly-${wildfly.version}/</jbossHome>
                             <fail-on-error>false</fail-on-error>
                             <commands>
                                 <command>patch apply --path ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly.version}-patch.zip</command>
@@ -262,16 +362,51 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>shutdown-wildfly-for-patching</id>
+                        <id>shutdown-wildfly-current-for-patching</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>shutdown</goal>
                         </goals>
+                        <configuration>
+                            <jbossHome>${project.build.directory}/wildfly-${wildfly.version}/</jbossHome>
+                        </configuration>
+                    </execution>
+                    <!-- WildFly next -->
+                    <execution>
+                        <id>start-wildfly-next-for-patching</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                        <configuration>
+                            <jbossHome>${project.build.directory}/wildfly-${wildfly-next.version}/</jbossHome>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>apply-wildfly-next-patch-file</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>execute-commands</goal>
+                        </goals>
+                        <configuration>
+                            <jbossHome>${project.build.directory}/wildfly-${wildfly-next.version}/</jbossHome>
+                            <fail-on-error>false</fail-on-error>
+                            <commands>
+                                <command>patch apply --path ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly-next.version}-patch.zip</command>
+                            </commands>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>shutdown-wildfly-next-for-patching</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>shutdown</goal>
+                        </goals>
+                        <configuration>
+                            <jbossHome>${project.build.directory}/wildfly-${wildfly-next.version}/</jbossHome>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <jbossHome>${project.build.directory}/wildfly-${wildfly.version}/</jbossHome>
-                </configuration>
             </plugin>
         </plugins>
     </build>

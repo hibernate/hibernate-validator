@@ -18,7 +18,7 @@
     <artifactId>hibernate-validator-modules</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Validator WildFly Module</name>
+    <name>Hibernate Validator WildFly Modules</name>
     <description>Hibernate Validator modules creation to use in WildFly</description>
 
     <properties>
@@ -26,9 +26,16 @@
         <hibernate.validator.module.slot>main</hibernate.validator.module.slot>
         <hibernate.validator.cdi.module.slot>main</hibernate.validator.cdi.module.slot>
         <javax.validation.api.module.slot>main</javax.validation.api.module.slot>
-        <wildflyOriginalTargetDir>${project.build.directory}/wildfly-original/wildfly-${wildfly.version}</wildflyOriginalTargetDir>
-        <wildflyPatchedTargetDir>${project.build.directory}/wildfly-patched/wildfly-${wildfly.version}</wildflyPatchedTargetDir>
-        <patchFile>${project.build.directory}/hv-patch.zip</patchFile>
+
+        <!-- WildFly current -->
+        <wildfly.original.target-dir>${project.build.directory}/wildfly-original/wildfly-${wildfly.version}</wildfly.original.target-dir>
+        <wildfly.patched.target-dir>${project.build.directory}/wildfly-patched/wildfly-${wildfly.version}</wildfly.patched.target-dir>
+        <wildfly.patch-file>${project.build.directory}/wildfly-current-hv-patch.zip</wildfly.patch-file>
+
+        <!-- WildFly next -->
+        <wildfly-next.original.target-dir>${project.build.directory}/wildfly-original/wildfly-${wildfly-next.version}</wildfly-next.original.target-dir>
+        <wildfly-next.patched.target-dir>${project.build.directory}/wildfly-patched/wildfly-${wildfly-next.version}</wildfly-next.patched.target-dir>
+        <wildfly-next.patch-file>${project.build.directory}/wildfly-next-hv-patch.zip</wildfly-next.patch-file>
 
         <patch-gen-maven-plugin.argLine.add-opens></patch-gen-maven-plugin.argLine.add-opens>
 
@@ -94,12 +101,58 @@
                         </goals>
                         <configuration>
                             <artifacts>
+                                <!-- WildFly current -->
                                 <artifact>
-                                    <file>${patchFile}</file>
+                                    <file>${wildfly.patch-file}</file>
                                     <type>zip</type>
                                     <classifier>wildfly-${wildfly.version}-patch</classifier>
                                 </artifact>
+                                <!-- WildFly next -->
+                                <artifact>
+                                    <file>${wildfly-next.patch-file}</file>
+                                    <type>zip</type>
+                                    <classifier>wildfly-${wildfly-next.version}-patch</classifier>
+                                </artifact>
                             </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Update module.xml descriptors in the second WF copy -->
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <executions>
+                    <!-- WildFly current -->
+                    <execution>
+                        <id>update-wildfly-current-modules</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <scripts>
+                                <script>file:///${pom.basedir}/src/script/setupModules.groovy</script>
+                            </scripts>
+                            <properties>
+                                <wildflyPatchedTargetDir>${wildfly.patched.target-dir}</wildflyPatchedTargetDir>
+                            </properties>
+                        </configuration>
+                    </execution>
+                    <!-- WildFly next -->
+                    <execution>
+                        <id>update-wildfly-next-modules</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <scripts>
+                                <script>file:///${pom.basedir}/src/script/setupModules.groovy</script>
+                            </scripts>
+                            <properties>
+                                <wildflyPatchedTargetDir>${wildfly-next.patched.target-dir}</wildflyPatchedTargetDir>
+                            </properties>
                         </configuration>
                     </execution>
                 </executions>
@@ -110,12 +163,13 @@
                     <!-- Extract WildFly twice: one copy to be left as is, the other to be updated with the new JARs -->
                     <execution>
                         <id>unpack-wildfly</id>
-                        <phase>prepare-package</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
                         <configuration>
                             <artifactItems>
+                                <!-- WildFly current -->
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
                                     <artifactId>wildfly-dist</artifactId>
@@ -132,6 +186,23 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/wildfly-patched</outputDirectory>
                                 </artifactItem>
+                                <!-- WildFly next -->
+                                <artifactItem>
+                                    <groupId>org.wildfly</groupId>
+                                    <artifactId>wildfly-dist</artifactId>
+                                    <version>${wildfly-next.version}</version>
+                                    <type>tar.gz</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/wildfly-original</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.wildfly</groupId>
+                                    <artifactId>wildfly-dist</artifactId>
+                                    <version>${wildfly-next.version}</version>
+                                    <type>tar.gz</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/wildfly-patched</outputDirectory>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -144,12 +215,13 @@
                         </goals>
                         <configuration>
                             <artifactItems>
+                                <!-- WildFly current -->
                                 <artifactItem>
                                     <groupId>javax.validation</groupId>
                                     <artifactId>validation-api</artifactId>
                                     <version>${bv.api.version}</version>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${wildflyPatchedTargetDir}/modules/system/layers/base/javax/validation/api/main</outputDirectory>
+                                    <outputDirectory>${wildfly.patched.target-dir}/modules/system/layers/base/javax/validation/api/main</outputDirectory>
                                     <!-- Specifying name to avoid timestamp in version on CI -->
                                     <destFileName>validation-api-${bv.api.version}.jar</destFileName>
                                 </artifactItem>
@@ -158,7 +230,7 @@
                                     <artifactId>hibernate-validator</artifactId>
                                     <version>${project.version}</version>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${wildflyPatchedTargetDir}/modules/system/layers/base/org/hibernate/validator/main</outputDirectory>
+                                    <outputDirectory>${wildfly.patched.target-dir}/modules/system/layers/base/org/hibernate/validator/main</outputDirectory>
                                     <destFileName>hibernate-validator-${project.version}.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
@@ -166,29 +238,36 @@
                                     <artifactId>hibernate-validator-cdi</artifactId>
                                     <version>${project.version}</version>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${wildflyPatchedTargetDir}/modules/system/layers/base/org/hibernate/validator/cdi/main</outputDirectory>
+                                    <outputDirectory>${wildfly.patched.target-dir}/modules/system/layers/base/org/hibernate/validator/cdi/main</outputDirectory>
+                                    <destFileName>hibernate-validator-cdi-${project.version}.jar</destFileName>
+                                </artifactItem>
+                                <!-- WildFly next -->
+                                <artifactItem>
+                                    <groupId>javax.validation</groupId>
+                                    <artifactId>validation-api</artifactId>
+                                    <version>${bv.api.version}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${wildfly-next.patched.target-dir}/modules/system/layers/base/javax/validation/api/main</outputDirectory>
+                                    <!-- Specifying name to avoid timestamp in version on CI -->
+                                    <destFileName>validation-api-${bv.api.version}.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>hibernate-validator</artifactId>
+                                    <version>${project.version}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${wildfly-next.patched.target-dir}/modules/system/layers/base/org/hibernate/validator/main</outputDirectory>
+                                    <destFileName>hibernate-validator-${project.version}.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>hibernate-validator-cdi</artifactId>
+                                    <version>${project.version}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${wildfly-next.patched.target-dir}/modules/system/layers/base/org/hibernate/validator/cdi/main</outputDirectory>
                                     <destFileName>hibernate-validator-cdi-${project.version}.jar</destFileName>
                                 </artifactItem>
                             </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Update module.xml descriptors in the second WF copy -->
-            <plugin>
-                <groupId>org.codehaus.gmavenplus</groupId>
-                <artifactId>gmavenplus-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>update-modules</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>execute</goal>
-                        </goals>
-                        <configuration>
-                            <scripts>
-                                <script>file:///${pom.basedir}/src/script/setupModules.groovy</script>
-                            </scripts>
                         </configuration>
                     </execution>
                 </executions>
@@ -199,17 +278,31 @@
                 <artifactId>patch-gen-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>create-patch-file</id>
+                        <id>create-wildfly-current-patch-file</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>generate-patch</goal>
                         </goals>
                         <configuration>
                             <argLine>${patch-gen-maven-plugin.argLine.add-opens}</argLine>
-                            <appliesToDist>${wildflyOriginalTargetDir}</appliesToDist>
-                            <patchConfig>${module.xml.targetdir}/patch.xml</patchConfig>
-                            <updatedDist>${wildflyPatchedTargetDir}</updatedDist>
-                            <outputFile>${patchFile}</outputFile>
+                            <appliesToDist>${wildfly.original.target-dir}</appliesToDist>
+                            <patchConfig>${module.xml.targetdir}/wildfly-current-patch.xml</patchConfig>
+                            <updatedDist>${wildfly.patched.target-dir}</updatedDist>
+                            <outputFile>${wildfly.patch-file}</outputFile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-wildfly-next-patch-file</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>generate-patch</goal>
+                        </goals>
+                        <configuration>
+                            <argLine>${patch-gen-maven-plugin.argLine.add-opens}</argLine>
+                            <appliesToDist>${wildfly-next.original.target-dir}</appliesToDist>
+                            <patchConfig>${module.xml.targetdir}/wildfly-next-patch.xml</patchConfig>
+                            <updatedDist>${wildfly-next.patched.target-dir}</updatedDist>
+                            <outputFile>${wildfly-next.patch-file}</outputFile>
                         </configuration>
                     </execution>
                 </executions>
