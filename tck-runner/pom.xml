@@ -23,7 +23,7 @@
     <properties>
         <tck.version>2.0.0-SNAPSHOT</tck.version>
         <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-tests-suite.xml</tck.suite.file>
-        <wildflyTargetDir>${project.build.directory}/wildfly-${wildfly.version}</wildflyTargetDir>
+        <wildfly.target-dir>${project.build.directory}/wildfly-${wildfly.version}</wildfly.target-dir>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug />
 
@@ -287,15 +287,6 @@
                         <groupId>org.wildfly.plugins</groupId>
                         <artifactId>wildfly-maven-plugin</artifactId>
                         <executions>
-                            <!-- Currently the WF Maven plug-in cannot apply offline commands, although patch itself wouldn't require a running
-                            server; see https://issues.jboss.org/projects/WFMP/issues/WFMP-11 -->
-                            <execution>
-                                <id>start-wildfly-for-patching</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>start</goal>
-                                </goals>
-                            </execution>
                             <execution>
                                 <id>apply-patch-file</id>
                                 <phase>generate-test-resources</phase>
@@ -303,22 +294,16 @@
                                     <goal>execute-commands</goal>
                                 </goals>
                                 <configuration>
+                                    <offline>true</offline>
                                     <fail-on-error>false</fail-on-error>
                                     <commands>
                                         <command>patch apply --path ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly.version}-patch.zip</command>
                                     </commands>
                                 </configuration>
                             </execution>
-                            <execution>
-                                <id>shutdown-wildfly-for-patching</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>shutdown</goal>
-                                </goals>
-                            </execution>
                         </executions>
                         <configuration>
-                            <jbossHome>${wildflyTargetDir}</jbossHome>
+                            <jbossHome>${wildfly.target-dir}</jbossHome>
                         </configuration>
                     </plugin>
                     <!-- Copy additional modules -->
@@ -332,7 +317,7 @@
                                     <goal>copy-resources</goal>
                                 </goals>
                                 <configuration>
-                                    <outputDirectory>${wildflyTargetDir}/modules/system/layers/base/</outputDirectory>
+                                    <outputDirectory>${wildfly.target-dir}/modules/system/layers/base/</outputDirectory>
                                     <resources>
                                         <resource>
                                             <directory>src/test/modules</directory>
