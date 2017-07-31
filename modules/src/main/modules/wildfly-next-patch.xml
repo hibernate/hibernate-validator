@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<patch-config xmlns="urn:jboss:patch-config:1.0">
+    <name>wildfly-${wildfly-next.version}-hibernate-validator-${project.version}</name>
+    <description>This patch upgrades Hibernate Validator ${project.version} within a WildFly ${wildfly-next.version} installation</description>
+    <element patch-id="layer-base-wildfly-${wildfly-next.version}-hibernate-validor-${project.version}">
+        <one-off name="base" />
+        <description>This patch upgrades Hibernate Validator ${project.version} within a WildFly ${wildfly-next.version} installation</description>
+        <specified-content>
+            <modules>
+                <updated name="javax.validation.api" />
+                <updated name="org.hibernate.validator" />
+                <updated name="org.hibernate.validator.cdi" />
+            </modules>
+        </specified-content>
+    </element>
+    <specified-content/>
+</patch-config>
