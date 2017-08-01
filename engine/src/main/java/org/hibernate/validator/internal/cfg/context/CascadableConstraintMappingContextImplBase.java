@@ -167,13 +167,7 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 			}
 		}
 
-
-		boolean isArray = TypeHelper.isArray( configuredType );
-		CascadingTypeParameter cascadingMetaData = isArray
-				? CascadingTypeParameter.arrayElement( configuredType, isCascading, typeParametersCascadingMetaData, groupConversions )
-				: CascadingTypeParameter.annotatedObject( configuredType, isCascading, typeParametersCascadingMetaData, groupConversions );
-
-		return cascadingMetaData;
+		return CascadingTypeParameter.annotatedObject( configuredType, isCascading, typeParametersCascadingMetaData, groupConversions );
 	}
 
 	private static class ContainerElementPathKey {

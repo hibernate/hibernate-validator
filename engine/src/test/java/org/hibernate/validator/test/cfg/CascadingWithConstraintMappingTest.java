@@ -10,6 +10,7 @@ package org.hibernate.validator.test.cfg;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
@@ -113,6 +114,33 @@ public class CascadingWithConstraintMappingTest {
 		);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1442")
+	public void testProgrammaticCascadingOnArray() {
+		ConstraintMapping newMapping = config.createConstraintMapping();
+		newMapping
+				.type( Bean.class )
+				.property( "property", FIELD )
+				.constraint( new NotNullDef() )
+				.type( ArrayHolder.class )
+				.property( "beans", FIELD )
+				.valid();
+		config.addMapping( newMapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		ArrayHolder arrayHolder = new ArrayHolder( new Bean[]{ new Bean( null ) } );
+
+		Set<ConstraintViolation<ArrayHolder>> violations = validator.validate( arrayHolder );
+
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "beans" )
+								.property( "property", true, null, 0, Object[].class, null )
+						)
+		);
+	}
+
 	private static class A {
 		protected C c;
 
@@ -129,6 +157,30 @@ public class CascadingWithConstraintMappingTest {
 
 		public String getString() {
 			return string;
+		}
+	}
+
+	private static class ArrayHolder {
+
+		@SuppressWarnings("unused")
+		private Bean[] beans;
+
+		private ArrayHolder(Bean[] beans) {
+			this.beans = beans;
+		}
+	}
+
+	private static class Bean {
+
+		private String property;
+
+		private Bean(String property) {
+			this.property = property;
+		}
+
+		@SuppressWarnings("unused")
+		public String getProperty() {
+			return property;
 		}
 	}
 }
