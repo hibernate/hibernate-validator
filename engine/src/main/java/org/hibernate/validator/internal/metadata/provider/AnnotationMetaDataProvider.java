@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.metadata.provider;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.Annotation;
@@ -63,7 +62,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -81,19 +79,17 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  *
  * @author Gunnar Morling
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private static final Log log = LoggerFactory.make();
-	/**
-	 * The default initial capacity for this cache.
-	 */
-	static final int DEFAULT_INITIAL_CAPACITY = 16;
 
-	protected final ConstraintHelper constraintHelper;
-	protected final TypeResolutionHelper typeResolutionHelper;
-	protected final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
-	protected final AnnotationProcessingOptions annotationProcessingOptions;
-	protected final ValueExtractorManager valueExtractorManager;
+	private final ConstraintHelper constraintHelper;
+	private final TypeResolutionHelper typeResolutionHelper;
+	private final AnnotationProcessingOptions annotationProcessingOptions;
+	private final ValueExtractorManager valueExtractorManager;
+
+	private final BeanConfiguration<Object> objectBeanConfiguration;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper,
@@ -103,11 +99,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
 		this.annotationProcessingOptions = annotationProcessingOptions;
-		this.configuredBeans = new ConcurrentReferenceHashMap<>(
-				DEFAULT_INITIAL_CAPACITY,
-				SOFT,
-				SOFT
-		);
+
+		this.objectBeanConfiguration = retrieveBeanConfiguration( Object.class );
 	}
 
 	@Override
@@ -116,18 +109,13 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass) {
-		@SuppressWarnings("unchecked")
-		BeanConfiguration<T> configuration = (BeanConfiguration<T>) configuredBeans.get( beanClass );
-
-		if ( configuration != null ) {
-			return configuration;
+		if ( Object.class.equals( beanClass ) ) {
+			return (BeanConfiguration<T>) objectBeanConfiguration;
 		}
 
-		configuration = retrieveBeanConfiguration( beanClass );
-		configuredBeans.put( beanClass, configuration );
-
-		return configuration;
+		return retrieveBeanConfiguration( beanClass );
 	}
 
 	/**
