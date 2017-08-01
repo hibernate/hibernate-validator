@@ -183,7 +183,9 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 	}
 
 	private Map<String, Object> getAnnotationValues(Annotation annotation) {
-		if ( Proxy.isProxyClass( annotation.getClass() ) ) {
+		// We only enable this optimization if the security manager is not enabled. Otherwise,
+		// we would have to add every package containing constraints to the security policy.
+		if ( Proxy.isProxyClass( annotation.getClass() ) && System.getSecurityManager() == null ) {
 			InvocationHandler invocationHandler = Proxy.getInvocationHandler( annotation );
 			if ( invocationHandler instanceof AnnotationProxy ) {
 				return ( (AnnotationProxy) invocationHandler ).values;
