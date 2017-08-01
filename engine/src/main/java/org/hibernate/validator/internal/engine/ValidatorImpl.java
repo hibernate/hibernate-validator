@@ -167,6 +167,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	@Override
 	public final <T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups) {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
+		sanityCheckGroups( groups );
 
 		ValidationContext<T> validationContext = getValidationContextBuilder().forValidate( object );
 
@@ -188,8 +189,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	@Override
 	public final <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
-
 		sanityCheckPropertyPath( propertyName );
+		sanityCheckGroups( groups );
+
 		ValidationContext<T> context = getValidationContextBuilder().forValidateProperty( object );
 
 		if ( !context.getRootBeanMetaData().hasConstraints() ) {
@@ -211,6 +213,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	@Override
 	public final <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
 		Contracts.assertNotNull( beanType, MESSAGES.beanTypeCannotBeNull() );
+		sanityCheckPropertyPath( propertyName );
+		sanityCheckGroups( groups );
 
 		ValidationContext<T> context = getValidationContextBuilder().forValidateValue( beanType );
 
@@ -218,7 +222,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			return Collections.emptySet();
 		}
 
-		sanityCheckPropertyPath( propertyName );
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
 		return validateValueInContext(
@@ -263,7 +266,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private <T> Set<ConstraintViolation<T>> validateParameters(T object, Executable executable, Object[] parameterValues, Class<?>... groups) {
-		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
+		sanityCheckGroups( groups );
 
 		ValidationContext<T> context = getValidationContextBuilder().forValidateParameters(
 				parameterNameProvider,
@@ -276,13 +279,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			return Collections.emptySet();
 		}
 
+		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
+
 		validateParametersInContext( context, parameterValues, validationOrder );
 
 		return context.getFailingConstraints();
 	}
 
 	private <T> Set<ConstraintViolation<T>> validateReturnValue(T object, Executable executable, Object returnValue, Class<?>... groups) {
-		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
+		sanityCheckGroups( groups );
 
 		ValidationContext<T> context = getValidationContextBuilder().forValidateReturnValue(
 				object,
@@ -293,6 +298,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		if ( !context.getRootBeanMetaData().hasConstraints() ) {
 			return Collections.emptySet();
 		}
+
+		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
 		validateReturnValueInContext( context, object, returnValue, validationOrder );
 
@@ -339,14 +346,16 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private ValidationOrder determineGroupValidationOrder(Class<?>[] groups) {
+	private void sanityCheckGroups(Class<?>[] groups) {
 		Contracts.assertNotNull( groups, MESSAGES.groupMustNotBeNull() );
 		for ( Class<?> clazz : groups ) {
 			if ( clazz == null ) {
 				throw new IllegalArgumentException( MESSAGES.groupMustNotBeNull() );
 			}
 		}
+	}
 
+	private ValidationOrder determineGroupValidationOrder(Class<?>[] groups) {
 		Collection<Class<?>> resultGroups;
 		// if no groups is specified use the default
 		if ( groups.length == 0 ) {
