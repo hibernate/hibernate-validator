@@ -833,6 +833,8 @@ public class ConstraintHelper {
 	 * @return {@code true} if the annotation fulfills the above conditions, {@code false} otherwise.
 	 */
 	public boolean isConstraintAnnotation(Class<? extends Annotation> annotationType) {
+		// Note: we don't use isJdkAnnotation() here as it does more harm than good.
+
 		if ( isBuiltinConstraint( annotationType ) ) {
 			return true;
 		}
