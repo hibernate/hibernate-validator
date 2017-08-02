@@ -1,255 +1,387 @@
-[[validator-metadata-api]]
-== Using constraint metadata
+[[chapter-bootstrapping]]
+== Bootstrapping
 
-The Bean Validation specification provides not only a validation engine, but also an API for
-retrieving constraint metadata in a uniform way, no matter whether the constraints are declared
-using annotations or via XML mappings. Read this chapter to learn more about this API and its
-possibilities. You can find all the metadata API types in the package `javax.validation.metadata`.
+In <<section-obtaining-validator>>, you already saw one way of creating a `Validator` instance - via
+`Validation#buildDefaultValidatorFactory()`. In this chapter, you will learn how to use the other
+methods in `javax.validation.Validation` in order to bootstrap specifically configured validators.
 
-The examples presented in this chapter are based on the classes and constraint declarations shown in
-<<metadata-example-car>>.
+[[section-retrieving-validator-factory-validator]]
+=== Retrieving `ValidatorFactory` and `Validator`
 
-[[metadata-example-car]]
-.Example classes
+You obtain a `Validator` by retrieving a `ValidatorFactory` via one of the static methods on
+`javax.validation.Validation` and calling `getValidator()` on the factory instance.
+
+<<example-build-default-validator-factory>> shows how to obtain a validator from the default
+validator factory:
+
+[[example-build-default-validator-factory]]
+.Bootstrapping default `ValidatorFactory` and `Validator`
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Person.java[tags=include]
-----
-
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Vehicle.java[tags=include]
-----
-
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Car.java[tags=include]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=buildDefaultValidatorFactory]
 ----
 ====
-
-
-=== `BeanDescriptor`
-
-The entry point into the metadata API is the method `Validator#getConstraintsForClass()`, which
-returns an instance of the {bvApiDocsUrl}?javax/validation/metadata/BeanDescriptor.html[`BeanDescriptor`] interface. Using this
-descriptor, you can obtain metadata for constraints declared directly on the bean itself (class- or
-property-level), but also retrieve metadata descriptors representing single properties, methods and
-constructors.
-
-<<metadata-example-using-beandescriptor>> demonstrates how to retrieve a `BeanDescriptor` for the
-`Car` class and how to use this descriptor in form of assertions.
 
 [TIP]
 ====
-If a constraint declaration hosted by the requested class is invalid, a `ValidationException` is thrown.
+The generated `ValidatorFactory` and `Validator` instances are thread-safe and can be cached. As
+Hibernate Validator uses the factory as context for caching constraint metadata it is recommended to
+work with one factory instance within an application.
 ====
 
-[[metadata-example-using-beandescriptor]]
-.Using `BeanDescriptor`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CarTest.java[tags=testBeanDescriptor]
-----
-====
+Bean Validation supports working with several providers such as Hibernate Validator within one
+application. If more than one provider is present on the classpath, it is not guaranteed which one
+is chosen when creating a factory via `buildDefaultValidatorFactory()`.
 
-You can determine whether the specified class hosts any class- or property-level constraints via
-`isBeanConstrained()`. Method or constructor constraints are not considered by `isBeanConstrained()`.
+In this case, you can explicitly specify the provider to use via `Validation#byProvider()`, passing the
+provider's `ValidationProvider` class as shown in <<example-using-specific-provider>>.
 
-The method `getConstraintDescriptors()` is common to all descriptors derived from `ElementDescriptor`
-(see <<validator-metadata-api-elementdescriptor>>) and returns a set of descriptors representing the
-constraints directly declared on the given element. In case of `BeanDescriptor`, the bean's class-
-level constraints are returned. More details on `ConstraintDescriptor` can be found in
-<<section-constraint-descriptor>>.
-
-Via `getConstraintsForProperty()`, `getConstraintsForMethod()` and `getConstraintsForConstructor()` you
-can obtain a descriptor representing one given property or executable element, identified by its
-name and, in case of methods and constructors, parameter types. The different descriptor types
-returned by these methods are described in the following sections.
-
-Note that these methods consider constraints declared at super-types according to the rules for
-constraint inheritance as described in <<section-constraint-inheritance>>. An example is the
-descriptor for the `manufacturer` property, which provides access to all constraints defined on
-`Vehicle#getManufacturer()` and the implementing method `Car#getManufacturer()`. `null` is returned in
-case the specified element does not exist or is not constrained.
-
-The methods `getConstrainedProperties()`, `getConstrainedMethods()` and `getConstrainedConstructors()`
-return (potentially empty) sets with all constrained properties, methods and constructors,
-respectively. An element is considered constrained if it has at least one constraint or is marked
-for cascaded validation. When invoking `getConstrainedMethods()`, you can specify the type of the
-methods to be returned (getters, non-getters or both).
-
-[[section-property-descriptor]]
-=== `PropertyDescriptor`
-
-The interface
-{bvApiDocsUrl}?javax/validation/metadata/PropertyDescriptor.html[`PropertyDescriptor`] represents one given property of a
-class. It is transparent whether constraints are declared on a field or a property getter, provided
-the JavaBeans naming conventions are respected. <<metadata-example-using-propertydescriptor>> shows
-how to use the `PropertyDescriptor` interface.
-
-[[metadata-example-using-propertydescriptor]]
-.Using `PropertyDescriptor`
+[[example-using-specific-provider]]
+.Bootstrapping `ValidatorFactory` and `Validator` using a specific provider
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CarTest.java[tags=testPropertyDescriptor]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=byProvider]
 ----
 ====
 
-Using `getConstraintDescriptors()`, you can retrieve a set of `ConstraintDescriptors` providing more
-information on the individual constraints of a given property. The method `isCascaded()` returns
-`true` if the property is marked for cascaded validation (either using the `@Valid` annotation or via
-XML), `false` otherwise. Any configured group conversions are returned by `getGroupConversions()`. See
-<<section-group-conversion-descriptor>> for more details on `GroupConversionDescriptor`.
+Note that the configuration object returned by `configure()` allows to specifically customize the
+factory before calling `buildValidatorFactory()`. The available options are discussed later in this
+chapter.
 
-=== `MethodDescriptor` and `ConstructorDescriptor`
+Similarly you can retrieve the default validator factory for configuration which is demonstrated in
+<<example-configuring-default-provider>>.
 
-Constrained methods and constructors are represented by the interfaces
-{bvApiDocsUrl}?javax/validation/metadata/MethodDescriptor.html[`MethodDescriptor`]
-{bvApiDocsUrl}?javax/validation/metadata/ConstructorDescriptor.html[`ConstructorDescriptor`], respectively.
-<<metadata-example-using-methodandconstructordescriptor>> demonstrates how to work with these
-descriptors.
-
-[[metadata-example-using-methodandconstructordescriptor]]
-.Using `MethodDescriptor` and `ConstructorDescriptor`
+[[example-configuring-default-provider]]
+.Retrieving the default `ValidatorFactory` for configuration
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CarTest.java[tags=testMethodAndConstructorDescriptor]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=byDefaultProvider]
 ----
 ====
 
-`getName()` returns the name of the given method or constructor. The methods
-`hasConstrainedParameters()` and `hasConstrainedReturnValue()` can be used to perform a quick check
-whether an executable element has any parameter constraints (either constraints on single parameters
-or cross-parameter constraints) or return value constraints.
-
-Note that constraints are not directly exposed on `MethodDescriptor` and `ConstructorDescriptor`,
-but rather on dedicated descriptors representing an executable's parameters, its return value and
-its cross-parameter constraints. To get hold of one of these descriptors, invoke
-`getParameterDescriptors()`, `getReturnValueDescriptor()` or `getCrossParameterDescriptor()`,
-respectively.
-
-These descriptors provide access to the element's constraints (`getConstraintDescriptors()`) and, in
-the case of parameters and return value, to its configuration for cascaded validation (`isValid()` and
-`getGroupConversions()`). For parameters, you also can retrieve the index and the name, as returned by
-the currently used parameter name provider (see <<section-parameter-name-provider>>) via `getName()`
-and `getIndex()`.
-
-[TIP]
+[NOTE]
 ====
-Getter methods following the JavaBeans naming conventions are considered as bean properties but also
-as constrained methods.
-
-That means you can retrieve the related metadata either by obtaining a `PropertyDescriptor` (e.g.
-`BeanDescriptor.getConstraintsForProperty("foo")`) or by examining the return value descriptor of the
-getter's `MethodDescriptor` (e.g.
-`BeanDescriptor.getConstraintsForMethod("getFoo").getReturnValueDescriptor())`.
+If a `ValidatorFactory` instance is no longer in use, it should be disposed by calling
+`ValidatorFactory#close()`. This will free any resources possibly allocated by the factory.
 ====
 
+[[section-validation-provider-resolver]]
+==== `ValidationProviderResolver`
 
-[[validator-metadata-api-elementdescriptor]]
-=== `ElementDescriptor`
+By default, available Bean Validation providers are discovered using the
+{javaTechnotesBaseUrl}/guides/jar/jar.html#Service_Provider[Java
+Service Provider] mechanism.
 
-The {bvApiDocsUrl}?javax/validation/metadata/ElementDescriptor.html[`ElementDiscriptor`]
-interface is the common base class for the
-individual descriptor types such as `BeanDescriptor`, `PropertyDescriptor` etc. Besides
-`getConstraintDescriptors()` it provides some more methods common to all descriptors.
+For that purpose, each provider includes the file _META-
+INF/services/javax.validation.spi.ValidationProvider_, containing the fully qualified classname of
+its `ValidationProvider` implementation. In the case of Hibernate Validator, this is
+`org.hibernate.validator.HibernateValidator`.
 
-`hasConstraints()` allows for a quick check whether an element has any direct constraints (e.g. class-
-level constraints in case of `BeanDescriptor`). `getElementClass()` returns the Java type of the element
-represented by a given descriptor. More specifically, the method returns
+Depending on your environment and its classloading specifics, provider discovery via the Java's
+service loader mechanism might not work. In this case, you can plug in a custom
+`ValidationProviderResolver` implementation which performs the provider retrieval. An example is OSGi,
+where you could implement a provider resolver which uses OSGi services for provider discovery.
 
-* the object type when invoked on `BeanDescriptor`,
-* the type of a property or parameter when invoked on `PropertyDescriptor` or `ParameterDescriptor`
-respectively,
-* `Object[].class` when invoked on `CrossParameterDescriptor`,
-* the return type when invoked on `ConstructorDescriptor`, `MethodDescriptor` or `ReturnValueDescriptor`.
-`void.class` will be returned for methods which don't have a return value.
+To use a custom provider resolver, pass it via `providerResolver()` as shown in
+<<example-using-custom-validation-provider-resolver>>.
 
-<<metadata-example-using-elementdescriptor>> shows how these methods are used.
-
-[[metadata-example-using-elementdescriptor]]
-.Using `ElementDescriptor methods`
+[[example-using-custom-validation-provider-resolver]]
+.Using a custom `ValidationProviderResolver`
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CarTest.java[tags=testElementDescriptor]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/OsgiServiceDiscoverer.java[tags=include]
+----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=providerResolver]
 ----
 ====
 
-Finally, `ElementDescriptor` offers access to the `ConstraintFinder` API which allows you to query for
-constraint metadata in a fine grained way. <<example-constraint-finder>> shows how to retrieve a
-`ConstraintFinder` instance via `findConstraints()` and use the API to query for constraint metadata.
+[[section-configuring-validator-factory]]
+=== Configuring a `ValidatorFactory`
 
-[[example-constraint-finder]]
-.Usage of `ConstraintFinder`
+By default, validator factories retrieved from `Validation` and any validators they create are
+configured as per the XML descriptor _META-INF/validation.xml_ (see <<chapter-xml-configuration>>),
+if present.
+
+If you want to disable the XML based configuration, you can do so by invoking
+`Configuration#ignoreXmlConfiguration()`.
+
+The different values of the XML configuration can be accessed via
+`Configuration#getBootstrapConfiguration()`. This can for instance be helpful if you want to integrate
+Bean Validation into a managed environment and want to create managed instances of the objects
+configured via XML.
+
+Using the fluent configuration API, you can override one or more of the settings when bootstrapping
+the factory. The following sections show how to make use of the different options. Note that the
+`Configuration` class exposes the default implementations of the different extension points which can
+be useful if you want to use these as delegates for your custom implementations.
+
+[[section-validator-factory-message-interpolator]]
+==== `MessageInterpolator`
+
+Message interpolators are used by the validation engine to create user readable error messages from
+constraint message descriptors.
+
+In case the default message interpolation algorithm described in <<chapter-message-interpolation>>
+is not sufficient for your needs, you can pass in your own implementation of the `MessageInterpolator`
+interface via `Configuration#messageInterpolator()` as shown in
+<<example-using-custom-message-interpolator>>.
+
+[[example-using-custom-message-interpolator]]
+.Using a custom `MessageInterpolator`
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CarTest.java[tags=testConstraintFinderApi]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/MyMessageInterpolator.java[tags=include]
+----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=messageInterpolator]
 ----
 ====
 
-Via `declaredOn()` you can search for `ConstraintDescriptors` declared on certain element types. This is
-useful to find property constraints declared on either fields or getter methods.
+==== `TraversableResolver`
 
-`unorderedAndMatchingGroups()` restricts the resulting constraints to those matching the given
-validation group(s).
+In some cases the validation engine should not access the state of a bean property. The most obvious
+example for that is a lazily loaded property or association of a JPA entity. Validating this lazy
+property or association would mean that its state would have to be accessed, triggering a load from
+the database.
 
-`lookingAt()` allows to distinguish between constraints directly specified on the element
-(`Scope.LOCAL_ELEMENT`) or constraints belonging to the element but hosted anywhere in the class
-hierarchy (`Scope.HIERARCHY`).
+Which properties can be accessed and which ones not is controlled by querying the
+`TraversableResolver` interface. <<example-using-custom-traversable-resolver>> shows how to use a
+custom traversable resolver implementation.
 
-You can also combine the different options as shown in the last example.
+[[example-using-custom-traversable-resolver]]
+.Using a custom `TraversableResolver`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/MyTraversableResolver.java[tags=include]
+----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=traversableResolver]
+----
+====
+
+If no specific traversable resolver has been configured, the default behavior is to consider all properties as reachable and cascadable.
+When using Hibernate Validator together with a JPA 2 provider such as Hibernate ORM, only those properties will be considered reachable
+which already have been loaded by the persistence provider and all properties will be considered cascadable.
+
+==== `ConstraintValidatorFactory`
+
+`ConstraintValidatorFactory` is the extension point for customizing how constraint validators are
+instantiated and released.
+
+The default `ConstraintValidatorFactory` provided by Hibernate Validator requires a public no-arg
+constructor to instantiate `ConstraintValidator` instances (see <<section-constraint-validator>>).
+Using a custom `ConstraintValidatorFactory` offers for example the possibility to use dependency
+injection in constraint validator implementations.
+
+To configure a custom constraint validator factory call `Configuration#constraintValidatorFactory()`
+(see <<example-using-custom-constraint-validator-factory>>.
+
+[[example-using-custom-constraint-validator-factory]]
+.Using a custom `ConstraintValidatorFactory`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/MyConstraintValidatorFactory.java[tags=include]
+----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=constraintValidatorFactory]
+----
+====
 
 [WARNING]
 ====
-Order is not respected by `unorderedAndMatchingGroups()`, but group inheritance and inheritance via
-sequence are.
+Any constraint implementations relying on `ConstraintValidatorFactory` behaviors specific to an
+implementation (dependency injection, no no-arg constructor and so on) are not considered portable.
 ====
 
-[[section-group-conversion-descriptor]]
-=== `GroupConversionDescriptor`
-
-All those descriptor types that represent elements which can be subject of cascaded validation
-(i.e., `PropertyDescriptor`, `ParameterDescriptor` and `ReturnValueDescriptor`) provide access to the
-element's group conversions via `getGroupConversions()`. The returned set contains a
-{bvApiDocsUrl}?javax/validation//metadata/GroupConversionDescriptor.html[`GroupConversionDescriptor`]
-for each configured conversion, allowing to retrieve
-source and target groups of the conversion. <<metadata-example-using-groupconversiondescriptor>>
-shows an example.
-
-[[metadata-example-using-groupconversiondescriptor]]
-.Using `GroupConversionDescriptor`
+[NOTE]
 ====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CarTest.java[tags=testGroupConversionDescriptor]
-----
+`ConstraintValidatorFactory` implementations should not cache validator instances as the state of each
+instance can be altered in the `initialize()` method.
 ====
 
-[[section-constraint-descriptor]]
-=== `ConstraintDescriptor`
+[[section-parameter-name-provider]]
+==== `ParameterNameProvider`
 
-Last but not least, the
-{bvApiDocsUrl}?javax/validation/metadata/ConstraintDescriptor.html[`ConstraintDescriptor`]
-interface describes a
-single constraint together with its composing constraints. Via an instance of this interface you get
-access to the constraint annotation and its parameters.
+In case a method or constructor parameter constraint is violated, the `ParameterNameProvider`
+interface is used to retrieve the parameter name and make it available to the user via the
+property path of the constraint violation.
 
-<<metadata-example-using-constraintdescriptor>>
-shows how to retrieve default constraint attributes (such as message template, groups etc.) as well
-as custom constraint attributes (`piecesOfLuggagePerPassenger`) and other metadata such as the
-constraint's annotation type and its validators from a `ConstraintDescriptor`.
+The default implementation returns parameter names as obtained through the Java reflection API.
+If you compile your sources using the `-parameters` compiler flag, the actual parameter names as
+in the source code will be returned. Otherwise synthetic names in the form of `arg0`, `arg1` etc.
+will be used.
 
-[[metadata-example-using-constraintdescriptor]]
-.Using `ConstraintDescriptor`
+To use a custom parameter name provider either pass an instance of
+the provider during bootstrapping as shown in <<example-using-custom-parameter-name-provider>>,
+or specify the fully qualified class name of the provider as value for
+the `<parameter-name-provider>` element in the _META-INF/validation.xml_ file
+(see <<section-configuration-validation-xml>>). This is demonstrated in
+<<example-using-custom-parameter-name-provider>>.
+
+[[example-using-custom-parameter-name-provider]]
+.Using a custom `ParameterNameProvider`
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CarTest.java[tags=testConstraintDescriptor]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/MyParameterNameProvider.java[tags=include]
+----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=parameterNameProvider]
+----
+====
+
+
+[TIP]
+====
+Hibernate Validator comes with a custom `ParameterNameProvider` implementation based on the
+link:https://github.com/paul-hammant/paranamer/[ParaNamer] library which provides several ways
+for obtaining parameter names at runtime. Refer to <<section-paranamer-parameternameprovider>>
+to learn more about this specific implementation.
+====
+
+[[section-clock-provider]]
+==== `ClockProvider`
+
+For time related validation (`@Past` and `@Future` constraints for instance), it might be useful to define what is
+considered `now`.
+
+This is especially important when you want to test your constraints in a reliable manner.
+
+The reference time is defined by the `ClockProvider` contract. The responsibility of the `ClockProvider` is to
+provide a `java.time.Clock` defining `now` for time related validators.
+
+[[example-using-custom-clock-provider]]
+.Using a custom `ClockProvider`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/FixedClockProvider.java[tags=include]
+----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=clockProvider]
+----
+====
+
+Alternatively, you can specify the fully-qualified classname of a `ClockProvider` implementation using the
+`<clock-provider>` element when configuring the default validator factory via _META-INF/validation.xml_
+(see <<chapter-xml-configuration>>).
+
+[NOTE]
+====
+When validating `@Future` and `@Past` constraints, you might want to obtain the current time.
+
+You can obtain the `ClockProvider` in your validators by calling the
+`ConstraintValidatorContext#getClockProvider()` method.
+
+For instance, this might be useful if you want to replace the default message of the `@Future`
+constraint with a more explicit one.
+====
+
+[[section-bootstrapping-valueextractors]]
+==== Registering ``ValueExtractor``s
+
+As mentioned in <<chapter-valueextraction>>, additional value extractors can be registered during bootstrapping
+(see <<section-valueextraction-registeringvalueextractor>> for the other ways to register a value extractor).
+
+<<example-registering-value-extractor>> shows how we would register the value extractors we previously created
+to extract the keys and the values of Guava's `Multimap`.
+
+[[example-registering-value-extractor]]
+.Registering additional value extractors
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=valueExtractor]
+----
+====
+
+==== Adding mapping streams
+
+As discussed earlier, you can configure the constraints applied to your Java beans using XML based
+constraint mappings.
+
+Besides the mapping files specified in _META-INF/validation.xml_, you can add further mappings via
+`Configuration#addMapping()` (see <<example-adding-mapping-streams>>). Note that the passed input
+stream(s) must adhere to the XML schema for constraint mappings presented in
+<<section-mapping-xml-constraints>>.
+
+[[example-adding-mapping-streams]]
+.Adding constraint mapping streams
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=addMapping]
+----
+====
+
+You should close any passed input stream after the validator factory has been created.
+
+[[section-provider-specific-settings]]
+==== Provider-specific settings
+
+Via the configuration object returned by `Validation#byProvider()`, provider specific options can be
+configured.
+
+In the case of Hibernate Validator, this e.g. allows you to enable the fail fast mode and pass one or
+more programmatic constraint mappings as demonstrated in
+<<example-hibernate-validator-specific-options>>.
+
+[[example-hibernate-validator-specific-options]]
+.Setting Hibernate Validator specific options
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=providerSpecificOptions]
+----
+====
+
+Alternatively, provider-specific options can be passed via `Configuration#addProperty()`. Hibernate
+Validator supports enabling the fail fast mode that way, too:
+
+[[example-hibernate-validator-specific-option-via-addproperty]]
+.Enabling a Hibernate Validator specific option via `addProperty()`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=providerSpecificOptionViaAddProperty]
+----
+====
+
+Refer to <<section-fail-fast>> and <<section-programmatic-api>> to learn more about the fail fast
+mode and the constraint declaration API.
+
+[[section-configuring-validator]]
+=== Configuring a Validator
+
+When working with a configured validator factory it can occasionally be required to apply a
+different configuration to a single `Validator` instance. <<example-using-context>> shows how this can
+be achieved by calling `ValidatorFactory#usingContext()`.
+
+[[example-using-context]]
+.Configuring a `Validator` instance via `usingContext()`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=usingContext]
 ----
 ====

@@ -170,9 +170,11 @@
         <asciidoctorj-pdf.version>1.5.0-alpha.15</asciidoctorj-pdf.version>
 
         <!-- URLs used in javadoc and documentation generation -->
+        <bv.spec.url>http://beanvalidation.org/2.0/spec/</bv.spec.url>
         <java.api-docs.base-url>http://docs.oracle.com/javase/8/docs/api</java.api-docs.base-url>
         <java.technotes.base-url>http://docs.oracle.com/javase/8/docs/technotes</java.technotes.base-url>
         <javaee.api-docs.base-url>http://docs.oracle.com/javaee/7/api</javaee.api-docs.base-url>
+        <javafx.docs.url>http://docs.oracle.com/javase/8/javase-clienttechnologies.htm</javafx.docs.url>
         <bv.api-docs.base-url>http://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api</bv.api-docs.base-url>
         <javamoney.api-docs.base-url>http://javamoney.github.io/apidocs</javamoney.api-docs.base-url>
 

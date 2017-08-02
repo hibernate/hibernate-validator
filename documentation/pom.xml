@@ -67,6 +67,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -234,7 +239,9 @@
                         <!-- URLs -->
                         <javaApiDocsUrl>${java.api-docs.base-url}/</javaApiDocsUrl>
                         <bvApiDocsUrl>${bv.api-docs.base-url}/</bvApiDocsUrl>
+                        <bvSpecUrl>${bv.spec.url}</bvSpecUrl>
                         <javaTechnotesBaseUrl>${java.technotes.base-url}</javaTechnotesBaseUrl>
+                        <javafxDocsUrl>${javafx.docs.url}</javafxDocsUrl>
                     </attributes>
                 </configuration>
             </plugin>
