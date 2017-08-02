@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import java.lang.reflect.Executable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.validation.ConstraintDeclarationException;
@@ -80,7 +81,7 @@ public final class UnconstrainedEntityMetaDataSingleton<T> implements BeanMetaDa
 	}
 
 	@Override
-	public ExecutableMetaData getMetaDataFor(Executable executable) throws ConstraintDeclarationException {
+	public Optional<ExecutableMetaData> getMetaDataFor(Executable executable) throws ConstraintDeclarationException {
 		throw new UnsupportedOperationException();
 	}
 

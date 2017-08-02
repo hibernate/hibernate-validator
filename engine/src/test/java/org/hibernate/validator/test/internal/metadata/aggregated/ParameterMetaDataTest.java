@@ -72,7 +72,7 @@ public class ParameterMetaDataTest {
 	@Test
 	public void constrainedParameterMetaData() throws Exception {
 		Method method = CustomerRepository.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 1 );
 
@@ -89,7 +89,7 @@ public class ParameterMetaDataTest {
 	@Test
 	public void cascadingParameterMetaData() throws Exception {
 		Method method = CustomerRepository.class.getMethod( "saveCustomer", Customer.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 
@@ -103,19 +103,13 @@ public class ParameterMetaDataTest {
 	@Test
 	public void unconstrainedParameterMetaData() throws Exception {
 		Method method = CustomerRepository.class.getMethod( "updateCustomer", Customer.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
-
-		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
-
-		assertFalse( parameterMetaData.isCascading() );
-		assertFalse( parameterMetaData.isConstrained() );
-		assertThat( parameterMetaData ).isEmpty();
+		assertFalse( beanMetaData.getMetaDataFor( method ).isPresent() );
 	}
 
 	@Test
 	public void locallyDefinedGroupConversion() throws Exception {
 		Method method = CustomerRepository.class.getMethod( "methodWithParameterGroupConversion", Set.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat(
 				methodMetaData.getParameterMetaData( 0 )
@@ -144,7 +138,7 @@ public class ParameterMetaDataTest {
 		BeanMetaData<ServiceImpl> localBeanMetaData = beanMetaDataManager.getBeanMetaData( ServiceImpl.class );
 
 		Method method = Service.class.getMethod( "sayHello", String.class );
-		ExecutableMetaData methodMetaData = localBeanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = localBeanMetaData.getMetaDataFor( method ).get();
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 

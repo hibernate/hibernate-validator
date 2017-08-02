@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.validation.ClockProvider;
@@ -824,15 +825,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			Object[] parameterValues,
 			ValidationOrder validationOrder) {
 		BeanMetaData<T> beanMetaData = validationContext.getRootBeanMetaData();
-		ExecutableMetaData executableMetaData = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
 
-		if ( executableMetaData == null ) {
-			// there is no executable metadata - specified object and method do not match
-			throw log.getMethodOrConstructorNotDefinedByValidatedTypeException(
-					beanMetaData.getBeanClass(),
-					validationContext.getExecutable()
-			);
+		Optional<ExecutableMetaData> executableMetaDataOptional = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
+
+		if ( !executableMetaDataOptional.isPresent() ) {
+			// the method is unconstrained
+			return;
 		}
+
+		ExecutableMetaData executableMetaData = executableMetaDataOptional.get();
 
 		if ( parameterValues.length != executableMetaData.getParameterTypes().length ) {
 			throw log.getInvalidParameterCountForExecutableException(
@@ -1019,11 +1020,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private <V, T> void validateReturnValueInContext(ValidationContext<T> context, T bean, V value, ValidationOrder validationOrder) {
 		BeanMetaData<T> beanMetaData = context.getRootBeanMetaData();
-		ExecutableMetaData executableMetaData = beanMetaData.getMetaDataFor( context.getExecutable() );
 
-		if ( executableMetaData == null ) {
+		Optional<ExecutableMetaData> executableMetaDataOptional = beanMetaData.getMetaDataFor( context.getExecutable() );
+
+		if ( !executableMetaDataOptional.isPresent() ) {
+			// the method is unconstrained
 			return;
 		}
+
+		ExecutableMetaData executableMetaData = executableMetaDataOptional.get();
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			validationOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( bean ) );
@@ -1389,12 +1394,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			throw log.getInvalidPropertyPathException( beanMetaData.getBeanClass(), propertyNode.getName() );
 		}
 
-		PropertyMetaData propertyMetaData = beanMetaData.getMetaDataFor( propertyNode.getName() );
-
-		if ( propertyMetaData == null ) {
-			throw log.getInvalidPropertyPathException( beanMetaData.getBeanClass(), propertyNode.getName() );
-		}
-		return propertyMetaData;
+		return beanMetaData.getMetaDataFor( propertyNode.getName() );
 	}
 
 	private Object getCascadableValue(ValidationContext<?> validationContext, Object object, Cascadable cascadable) {

@@ -787,6 +787,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 226, value = "Container element constraints and cascading validation are not supported on arrays: %1$s")
 	ValidationException getContainerElementConstraintsAndCascadedValidationNotSupportedOnArraysException(@FormatWith(TypeFormatter.class) Type type);
 
+	@Message(id = 227, value = "The validated type %1$s does not specify the property: %2$s")
+	IllegalArgumentException getPropertyNotDefinedByValidatedTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> validatedType, String propertyName);
+
 	@Message(id = 228, value = "No value extractor found when narrowing down to the runtime type %3$s among the value extractors for type parameter '%2$s' of type %1$s.")
 	ConstraintDeclarationException getNoValueExtractorFoundForTypeException(@FormatWith(TypeFormatter.class) Type declaredType,
 			TypeVariable<?> declaredTypeParameter, @FormatWith(ClassObjectFormatter.class) Class<?> valueType);

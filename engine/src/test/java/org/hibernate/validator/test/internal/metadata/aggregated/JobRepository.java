@@ -6,10 +6,12 @@
  */
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * @author Gunnar Morling
  */
 public interface JobRepository<T> {
 
-	void createJob(T id);
+	void createJob(@NotNull T id);
 }

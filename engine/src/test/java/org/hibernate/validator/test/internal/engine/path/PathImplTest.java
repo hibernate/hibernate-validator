@@ -203,7 +203,7 @@ public class PathImplTest {
 		);
 
 		ExecutableMetaData executableMetaData = beanMetaDataManager.getBeanMetaData( Container.class )
-				.getMetaDataFor( executable );
+				.getMetaDataFor( executable ).get();
 
 		PathImpl methodParameterPath = PathImpl.createPathForExecutable( executableMetaData );
 
@@ -219,7 +219,7 @@ public class PathImplTest {
 		@Valid
 		Map<Key, Item> store = new HashMap<>();
 
-		public void addItem(Key id, Item item) {
+		public void addItem(@NotNull Key id, @NotNull Item item) {
 			store.put( id, item );
 		}
 	}
