@@ -14,6 +14,7 @@ import java.security.PrivilegedAction;
 
 import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
@@ -46,10 +47,10 @@ public class GetterConstraintLocation implements ConstraintLocation {
 	private final Type typeForValidatorResolution;
 
 
-	GetterConstraintLocation(Method method) {
+	GetterConstraintLocation( Method method, ExecutableHelper executableHelper) {
 		this.method = method;
 		this.accessibleMethod = getAccessible( method );
-		this.propertyName = ReflectionHelper.getPropertyName( method );
+		this.propertyName = executableHelper.getPropertyName( method );
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( ReflectionHelper.typeOf( method ) );
 	}
 

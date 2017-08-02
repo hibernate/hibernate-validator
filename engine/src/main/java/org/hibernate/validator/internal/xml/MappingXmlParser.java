@@ -42,6 +42,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -67,6 +68,7 @@ public class MappingXmlParser {
 	private final Set<Class<?>> processedClasses = newHashSet();
 	private final ConstraintHelper constraintHelper;
 	private final TypeResolutionHelper typeResolutionHelper;
+	private final ExecutableHelper executableHelper;
 	private final ValueExtractorManager valueExtractorManager;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
@@ -88,10 +90,11 @@ public class MappingXmlParser {
 		return schemasByVersion;
 	}
 
-	public MappingXmlParser(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
+	public MappingXmlParser(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ExecutableHelper executableHelper, ValueExtractorManager valueExtractorManager,
 			ClassLoader externalClassLoader) {
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
+		this.executableHelper = executableHelper;
 		this.valueExtractorManager = valueExtractorManager;
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 		this.defaultSequences = newHashMap();
@@ -116,6 +119,7 @@ public class MappingXmlParser {
 					classLoadingHelper,
 					constraintHelper,
 					typeResolutionHelper,
+					executableHelper,
 					valueExtractorManager
 			);
 			GroupConversionBuilder groupConversionBuilder = new GroupConversionBuilder( classLoadingHelper );

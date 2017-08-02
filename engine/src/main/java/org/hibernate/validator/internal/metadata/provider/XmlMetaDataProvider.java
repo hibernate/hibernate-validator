@@ -18,6 +18,7 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.xml.MappingXmlParser;
@@ -39,11 +40,12 @@ public class XmlMetaDataProvider implements MetaDataProvider {
 
 	public XmlMetaDataProvider(ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper,
+			ExecutableHelper executableHelper,
 			ValueExtractorManager valueExtractorManager,
 			Set<InputStream> mappingStreams,
 			ClassLoader externalClassLoader) {
 
-		MappingXmlParser mappingParser = new MappingXmlParser( constraintHelper, typeResolutionHelper, valueExtractorManager,
+		MappingXmlParser mappingParser = new MappingXmlParser( constraintHelper, typeResolutionHelper, executableHelper, valueExtractorManager,
 				externalClassLoader );
 		mappingParser.parse( mappingStreams );
 

@@ -41,7 +41,7 @@ class ConfiguredConstraint<A extends Annotation> {
 		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forClass( beanType ), ElementType.TYPE );
 	}
 
-	static <A extends Annotation> ConfiguredConstraint<A> forProperty(ConstraintDef<?, A> constraint, Member member) {
+	static <A extends Annotation> ConfiguredConstraint<A> forProperty(ConstraintDef<?, A> constraint, Member member, ExecutableHelper executableHelper) {
 		if ( member instanceof Field ) {
 			return new ConfiguredConstraint<>(
 				constraint,
@@ -52,7 +52,7 @@ class ConfiguredConstraint<A extends Annotation> {
 		else {
 			return new ConfiguredConstraint<>(
 				constraint,
-				ConstraintLocation.forGetter( (Method) member ),
+				ConstraintLocation.forGetter( (Method) member, executableHelper ),
 				ElementType.METHOD
 			);
 		}

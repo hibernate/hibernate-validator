@@ -25,6 +25,7 @@ import javax.validation.constraints.DecimalMin;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.MappingXmlParser;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -38,12 +39,15 @@ public class MappingXmlParserTest {
 
 	private MappingXmlParser xmlMappingParser;
 	private ConstraintHelper constraintHelper;
+	private ExecutableHelper executableHelper;
 
 	@BeforeMethod
 	public void setupParserHelper() {
 		constraintHelper = new ConstraintHelper();
+		TypeResolutionHelper typeResolutionHelper = new TypeResolutionHelper();
+		executableHelper = new ExecutableHelper( typeResolutionHelper );
 		xmlMappingParser = new MappingXmlParser(
-				constraintHelper, new TypeResolutionHelper(), new ValueExtractorManager( Collections.emptySet() ), null
+				constraintHelper, typeResolutionHelper, executableHelper, new ValueExtractorManager( Collections.emptySet() ), null
 		);
 	}
 

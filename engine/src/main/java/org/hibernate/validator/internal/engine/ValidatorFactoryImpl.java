@@ -6,27 +6,6 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
-import java.lang.annotation.Annotation;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.validation.ClockProvider;
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.MessageInterpolator;
-import javax.validation.ParameterNameProvider;
-import javax.validation.TraversableResolver;
-import javax.validation.Validator;
-import javax.validation.spi.ConfigurationState;
-
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
@@ -53,6 +32,27 @@ import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
+import org.hibernate.validator.spi.property.PropertyAccessorSelector;
+
+import javax.validation.ClockProvider;
+import javax.validation.ConstraintValidatorFactory;
+import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
+import javax.validation.TraversableResolver;
+import javax.validation.Validator;
+import javax.validation.spi.ConfigurationState;
+import java.lang.annotation.Annotation;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is the Hibernate Validator default
@@ -142,7 +142,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private final ValueExtractorManager valueExtractorManager;
 
-	public ValidatorFactoryImpl(ConfigurationState configurationState) {
+	public ValidatorFactoryImpl( ConfigurationState configurationState ) {
 		ClassLoader externalClassLoader = getExternalClassLoader( configurationState );
 
 		this.messageInterpolator = configurationState.getMessageInterpolator();
@@ -153,7 +153,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.beanMetaDataManagers = new ConcurrentHashMap<>();
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
-		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
+		this.executableHelper = new ExecutableHelper( typeResolutionHelper, propertyAccessorSelector( configurationState ) );
 
 		boolean tmpFailFast = false;
 		boolean tmpAllowOverridingMethodAlterParameterConstraint = false;
@@ -167,14 +167,14 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			tmpFailFast = hibernateSpecificConfig.getFailFast();
 
 			tmpAllowOverridingMethodAlterParameterConstraint =
-					hibernateSpecificConfig.getMethodValidationConfiguration()
-							.isAllowOverridingMethodAlterParameterConstraint();
+							hibernateSpecificConfig.getMethodValidationConfiguration()
+											.isAllowOverridingMethodAlterParameterConstraint();
 			tmpAllowMultipleCascadedValidationOnReturnValues =
-					hibernateSpecificConfig.getMethodValidationConfiguration()
-							.isAllowMultipleCascadedValidationOnReturnValues();
+							hibernateSpecificConfig.getMethodValidationConfiguration()
+											.isAllowMultipleCascadedValidationOnReturnValues();
 			tmpAllowParallelMethodsDefineParameterConstraints =
-					hibernateSpecificConfig.getMethodValidationConfiguration()
-							.isAllowParallelMethodsDefineParameterConstraints();
+							hibernateSpecificConfig.getMethodValidationConfiguration()
+											.isAllowParallelMethodsDefineParameterConstraints();
 		}
 
 		// HV-302; don't load XmlMappingParser if not necessary
@@ -183,16 +183,17 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 		else {
 			this.xmlMetaDataProvider = new XmlMetaDataProvider(
-					constraintHelper, typeResolutionHelper, valueExtractorManager, configurationState.getMappingStreams(), externalClassLoader
+							constraintHelper, typeResolutionHelper, executableHelper, valueExtractorManager, configurationState.getMappingStreams(), externalClassLoader
 			);
 		}
 
 		this.constraintMappings = Collections.unmodifiableSet(
-				getConstraintMappings(
-						typeResolutionHelper,
-						configurationState,
-						externalClassLoader
-				)
+						getConstraintMappings(
+										typeResolutionHelper,
+										executableHelper,
+										configurationState,
+										externalClassLoader
+						)
 		);
 
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
@@ -205,67 +206,68 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 
 		tmpAllowOverridingMethodAlterParameterConstraint = checkPropertiesForBoolean(
-				properties,
-				HibernateValidatorConfiguration.ALLOW_PARAMETER_CONSTRAINT_OVERRIDE,
-				tmpAllowOverridingMethodAlterParameterConstraint
+						properties,
+						HibernateValidatorConfiguration.ALLOW_PARAMETER_CONSTRAINT_OVERRIDE,
+						tmpAllowOverridingMethodAlterParameterConstraint
 		);
 		methodValidationConfigurationBuilder.allowOverridingMethodAlterParameterConstraint(
-				tmpAllowOverridingMethodAlterParameterConstraint
+						tmpAllowOverridingMethodAlterParameterConstraint
 		);
 
 		tmpAllowMultipleCascadedValidationOnReturnValues = checkPropertiesForBoolean(
-				properties,
-				HibernateValidatorConfiguration.ALLOW_MULTIPLE_CASCADED_VALIDATION_ON_RESULT,
-				tmpAllowMultipleCascadedValidationOnReturnValues
+						properties,
+						HibernateValidatorConfiguration.ALLOW_MULTIPLE_CASCADED_VALIDATION_ON_RESULT,
+						tmpAllowMultipleCascadedValidationOnReturnValues
 		);
 		methodValidationConfigurationBuilder.allowMultipleCascadedValidationOnReturnValues(
-				tmpAllowMultipleCascadedValidationOnReturnValues
+						tmpAllowMultipleCascadedValidationOnReturnValues
 		);
 
 		tmpAllowParallelMethodsDefineParameterConstraints = checkPropertiesForBoolean(
-				properties,
-				HibernateValidatorConfiguration.ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS,
-				tmpAllowParallelMethodsDefineParameterConstraints
+						properties,
+						HibernateValidatorConfiguration.ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS,
+						tmpAllowParallelMethodsDefineParameterConstraints
 		);
 		methodValidationConfigurationBuilder.allowParallelMethodsDefineParameterConstraints(
-				tmpAllowParallelMethodsDefineParameterConstraints
+						tmpAllowParallelMethodsDefineParameterConstraints
 		);
 		this.methodValidationConfiguration = methodValidationConfigurationBuilder.build();
 
 		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
 	}
 
-	private static ClassLoader getExternalClassLoader(ConfigurationState configurationState) {
+	private static ClassLoader getExternalClassLoader( ConfigurationState configurationState ) {
 		return ( configurationState instanceof ConfigurationImpl ) ? ( (ConfigurationImpl) configurationState ).getExternalClassLoader() : null;
 	}
 
-	private static Set<DefaultConstraintMapping> getConstraintMappings(TypeResolutionHelper typeResolutionHelper,
-			ConfigurationState configurationState, ClassLoader externalClassLoader) {
+	private static Set<DefaultConstraintMapping> getConstraintMappings( TypeResolutionHelper typeResolutionHelper,
+	                                                                    ExecutableHelper executableHelper,
+	                                                                    ConfigurationState configurationState, ClassLoader externalClassLoader ) {
 		Set<DefaultConstraintMapping> constraintMappings = newHashSet();
 
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateConfiguration = (ConfigurationImpl) configurationState;
 
 			// programmatic config
-			/* We add these first so that constraint mapping created through DefaultConstraintMappingBuilder will take
+		  /* We add these first so that constraint mapping created through DefaultConstraintMappingBuilder will take
 			 * these programmatically defined mappings into account when checking for constraint definition uniqueness
 			 */
 			constraintMappings.addAll( hibernateConfiguration.getProgrammaticMappings() );
 
 			// service loader based config
 			ConstraintMappingContributor serviceLoaderBasedContributor = new ServiceLoaderBasedConstraintMappingContributor(
-					typeResolutionHelper,
-					externalClassLoader != null ? externalClassLoader : run( GetClassLoader.fromContext() ) );
-			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
+							typeResolutionHelper,
+							externalClassLoader != null ? externalClassLoader : run( GetClassLoader.fromContext() ) );
+			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings, executableHelper );
 			serviceLoaderBasedContributor.createConstraintMappings( builder );
 		}
 
 		// XML-defined constraint mapping contributors
 		List<ConstraintMappingContributor> contributors = getPropertyConfiguredConstraintMappingContributors( configurationState.getProperties(),
-				externalClassLoader );
+						externalClassLoader );
 
 		for ( ConstraintMappingContributor contributor : contributors ) {
-			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
+			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings, executableHelper );
 			contributor.createConstraintMappings( builder );
 		}
 
@@ -275,14 +277,14 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	@Override
 	public Validator getValidator() {
 		return createValidator(
-				constraintValidatorManager.getDefaultConstraintValidatorFactory(),
-				messageInterpolator,
-				traversableResolver,
-				parameterNameProvider,
-				clockProvider,
-				failFast,
-				valueExtractorManager,
-				methodValidationConfiguration
+						constraintValidatorManager.getDefaultConstraintValidatorFactory(),
+						messageInterpolator,
+						traversableResolver,
+						parameterNameProvider,
+						clockProvider,
+						failFast,
+						valueExtractorManager,
+						methodValidationConfiguration
 		);
 	}
 
@@ -328,7 +330,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	@Override
-	public <T> T unwrap(Class<T> type) {
+	public <T> T unwrap( Class<T> type ) {
 		//allow unwrapping into public super types
 		if ( type.isAssignableFrom( HibernateValidatorFactory.class ) ) {
 			return type.cast( this );
@@ -349,38 +351,38 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 	}
 
-	Validator createValidator(ConstraintValidatorFactory constraintValidatorFactory,
-			MessageInterpolator messageInterpolator,
-			TraversableResolver traversableResolver,
-			ExecutableParameterNameProvider parameterNameProvider,
-			ClockProvider clockProvider,
-			boolean failFast,
-			ValueExtractorManager valueExtractorManager,
-			MethodValidationConfiguration methodValidationConfiguration) {
+	Validator createValidator( ConstraintValidatorFactory constraintValidatorFactory,
+	                           MessageInterpolator messageInterpolator,
+	                           TraversableResolver traversableResolver,
+	                           ExecutableParameterNameProvider parameterNameProvider,
+	                           ClockProvider clockProvider,
+	                           boolean failFast,
+	                           ValueExtractorManager valueExtractorManager,
+	                           MethodValidationConfiguration methodValidationConfiguration ) {
 
 		BeanMetaDataManager beanMetaDataManager = beanMetaDataManagers.computeIfAbsent(
-				new BeanMetaDataManagerKey( parameterNameProvider, valueExtractorManager, methodValidationConfiguration ),
-				key -> new BeanMetaDataManager(
-						constraintHelper,
-						executableHelper,
-						typeResolutionHelper,
-						parameterNameProvider,
-						valueExtractorManager,
-						buildDataProviders(),
-						methodValidationConfiguration
-				)
-		 );
+						new BeanMetaDataManagerKey( parameterNameProvider, valueExtractorManager, methodValidationConfiguration ),
+						key -> new BeanMetaDataManager(
+										constraintHelper,
+										executableHelper,
+										typeResolutionHelper,
+										parameterNameProvider,
+										valueExtractorManager,
+										buildDataProviders(),
+										methodValidationConfiguration
+						)
+		);
 
 		return new ValidatorImpl(
-				constraintValidatorFactory,
-				messageInterpolator,
-				traversableResolver,
-				beanMetaDataManager,
-				parameterNameProvider,
-				clockProvider,
-				valueExtractorManager,
-				constraintValidatorManager,
-				failFast
+						constraintValidatorFactory,
+						messageInterpolator,
+						traversableResolver,
+						beanMetaDataManager,
+						parameterNameProvider,
+						clockProvider,
+						valueExtractorManager,
+						constraintValidatorManager,
+						failFast
 		);
 	}
 
@@ -392,18 +394,18 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		if ( !constraintMappings.isEmpty() ) {
 			metaDataProviders.add(
-					new ProgrammaticMetaDataProvider(
-							constraintHelper,
-							typeResolutionHelper,
-							valueExtractorManager,
-							constraintMappings
-					)
+							new ProgrammaticMetaDataProvider(
+											constraintHelper,
+											typeResolutionHelper,
+											valueExtractorManager,
+											constraintMappings
+							)
 			);
 		}
 		return metaDataProviders;
 	}
 
-	private boolean checkPropertiesForBoolean(Map<String, String> properties, String propertyKey, boolean programmaticValue) {
+	private boolean checkPropertiesForBoolean( Map<String, String> properties, String propertyKey, boolean programmaticValue ) {
 		boolean value = programmaticValue;
 		String propertyStringValue = properties.get( propertyKey );
 		if ( propertyStringValue != null ) {
@@ -422,11 +424,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * {@link HibernateValidatorConfiguration#CONSTRAINT_MAPPING_CONTRIBUTORS} property.
 	 *
 	 * @param properties the properties used to bootstrap the factory
-	 *
 	 * @return a list with property-configured {@link ContraintMappingContributor}s; May be empty but never {@code null}
 	 */
 	private static List<ConstraintMappingContributor> getPropertyConfiguredConstraintMappingContributors(
-			Map<String, String> properties, ClassLoader externalClassLoader) {
+					Map<String, String> properties, ClassLoader externalClassLoader ) {
 		String propertyValue = properties.get( HibernateValidatorConfiguration.CONSTRAINT_MAPPING_CONTRIBUTORS );
 
 		if ( StringHelper.isNullOrEmptyString( propertyValue ) ) {
@@ -439,15 +440,23 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		for ( String contributorName : contributorNames ) {
 			@SuppressWarnings("unchecked")
 			Class<? extends ConstraintMappingContributor> contributorType = (Class<? extends ConstraintMappingContributor>) run(
-					LoadClass.action( contributorName, externalClassLoader ) );
+							LoadClass.action( contributorName, externalClassLoader ) );
 			contributors.add( run( NewInstance.action( contributorType, "constraint mapping contributor class" ) ) );
 		}
 
 		return contributors;
 	}
 
-	private static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,
-			ConstraintHelper constraintHelper) {
+	private static PropertyAccessorSelector propertyAccessorSelector( ConfigurationState state ) {
+		PropertyAccessorSelector selector = null;
+		if ( state instanceof ConfigurationImpl ) {
+			selector = ( (ConfigurationImpl) state ).getPropertyAccessorSelector();
+		}
+		return selector;
+	}
+
+	private static void registerCustomConstraintValidators( Set<DefaultConstraintMapping> constraintMappings,
+	                                                        ConstraintHelper constraintHelper ) {
 		Set<Class<?>> definedConstraints = newHashSet();
 		for ( DefaultConstraintMapping constraintMapping : constraintMappings ) {
 			for ( ConstraintDefinitionContribution<?> contribution : constraintMapping.getConstraintDefinitionContributions() ) {
@@ -457,17 +466,17 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	private static <A extends Annotation> void processConstraintDefinitionContribution(
-			ConstraintDefinitionContribution<A> constraintDefinitionContribution, ConstraintHelper constraintHelper,
-			Set<Class<?>> definedConstraints) {
+					ConstraintDefinitionContribution<A> constraintDefinitionContribution, ConstraintHelper constraintHelper,
+					Set<Class<?>> definedConstraints ) {
 		Class<A> constraintType = constraintDefinitionContribution.getConstraintType();
 		if ( definedConstraints.contains( constraintType ) ) {
 			throw log.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( constraintType );
 		}
 		definedConstraints.add( constraintType );
 		constraintHelper.putValidatorDescriptors(
-				constraintType,
-				constraintDefinitionContribution.getValidatorDescriptors(),
-				constraintDefinitionContribution.includeExisting()
+						constraintType,
+						constraintDefinitionContribution.getValidatorDescriptors(),
+						constraintDefinitionContribution.includeExisting()
 		);
 	}
 
@@ -477,7 +486,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
 	 * privileged actions within HV's protection domain.
 	 */
-	private static <T> T run(PrivilegedAction<T> action) {
+	private static <T> T run( PrivilegedAction<T> action ) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
@@ -485,17 +494,19 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * The one and only {@link ConstraintMappingContributor.ConstraintMappingBuilder} implementation.
 	 */
 	private static class DefaultConstraintMappingBuilder
-			implements ConstraintMappingContributor.ConstraintMappingBuilder {
+					implements ConstraintMappingContributor.ConstraintMappingBuilder {
 		private final Set<DefaultConstraintMapping> mappings;
+		private final ExecutableHelper executableHelper;
 
-		public DefaultConstraintMappingBuilder(Set<DefaultConstraintMapping> mappings) {
+		public DefaultConstraintMappingBuilder( Set<DefaultConstraintMapping> mappings, ExecutableHelper executableHelper ) {
 			super();
 			this.mappings = mappings;
+			this.executableHelper = executableHelper;
 		}
 
 		@Override
 		public ConstraintMapping addConstraintMapping() {
-			DefaultConstraintMapping mapping = new DefaultConstraintMapping();
+			DefaultConstraintMapping mapping = new DefaultConstraintMapping( executableHelper );
 			mappings.add( mapping );
 			return mapping;
 		}
@@ -507,19 +518,19 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		private final MethodValidationConfiguration methodValidationConfiguration;
 		private final int hashCode;
 
-		public BeanMetaDataManagerKey(ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager, MethodValidationConfiguration methodValidationConfiguration) {
+		public BeanMetaDataManagerKey( ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager, MethodValidationConfiguration methodValidationConfiguration ) {
 			this.parameterNameProvider = parameterNameProvider;
 			this.valueExtractorManager = valueExtractorManager;
 			this.methodValidationConfiguration = methodValidationConfiguration;
 			this.hashCode = buildHashCode( parameterNameProvider, valueExtractorManager, methodValidationConfiguration );
 		}
 
-		private static int buildHashCode(ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager, MethodValidationConfiguration methodValidationConfiguration) {
+		private static int buildHashCode( ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager, MethodValidationConfiguration methodValidationConfiguration ) {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + ( ( methodValidationConfiguration == null ) ? 0 : methodValidationConfiguration.hashCode() );
-			result = prime * result + ( ( parameterNameProvider == null ) ? 0 : parameterNameProvider.hashCode() );
-			result = prime * result + ( ( valueExtractorManager == null ) ? 0 : valueExtractorManager.hashCode() );
+			result = prime * result + ((methodValidationConfiguration == null) ? 0 : methodValidationConfiguration.hashCode());
+			result = prime * result + ((parameterNameProvider == null) ? 0 : parameterNameProvider.hashCode());
+			result = prime * result + ((valueExtractorManager == null) ? 0 : valueExtractorManager.hashCode());
 			return result;
 		}
 
@@ -529,7 +540,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 
 		@Override
-		public boolean equals(Object obj) {
+		public boolean equals( Object obj ) {
 			if ( this == obj ) {
 				return true;
 			}
@@ -542,14 +553,14 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			BeanMetaDataManagerKey other = (BeanMetaDataManagerKey) obj;
 
 			return methodValidationConfiguration.equals( other.methodValidationConfiguration ) &&
-					parameterNameProvider.equals( other.parameterNameProvider ) &&
-					valueExtractorManager.equals( other.valueExtractorManager );
+							parameterNameProvider.equals( other.parameterNameProvider ) &&
+							valueExtractorManager.equals( other.valueExtractorManager );
 		}
 
 		@Override
 		public String toString() {
 			return "BeanMetaDataManagerKey [parameterNameProvider=" + parameterNameProvider + ", valueExtractorManager=" + valueExtractorManager
-					+ ", methodValidationConfiguration=" + methodValidationConfiguration + "]";
+							+ ", methodValidationConfiguration=" + methodValidationConfiguration + "]";
 		}
 	}
 }

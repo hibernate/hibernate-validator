@@ -64,12 +64,15 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	private final Set<PropertyConstraintMappingContextImpl> propertyContexts = newHashSet();
 	private final Set<Member> configuredMembers = newHashSet();
 
+	private final ExecutableHelper executableHelper;
+
 	private List<Class<?>> defaultGroupSequence;
 	private Class<? extends DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass;
 
-	TypeConstraintMappingContextImpl(DefaultConstraintMapping mapping, Class<C> beanClass) {
+	TypeConstraintMappingContextImpl(DefaultConstraintMapping mapping, Class<C> beanClass, ExecutableHelper executableHelper) {
 		super( mapping );
 		this.beanClass = beanClass;
+		this.executableHelper = executableHelper;
 		mapping.getAnnotationProcessingOptions().ignoreAnnotationConstraintForClass( beanClass, Boolean.FALSE );
 	}
 
@@ -123,7 +126,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 		PropertyConstraintMappingContextImpl context = new PropertyConstraintMappingContextImpl(
 				this,
-				member
+				member, executableHelper
 		);
 
 		configuredMembers.add( member );
@@ -263,6 +266,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			member = run( GetDeclaredField.action( clazz, property ) );
 		}
 		else {
+			// TODO add find method to PropertyAccessorSelector ?
 			String methodName = property.substring( 0, 1 ).toUpperCase() + property.substring( 1 );
 			for ( String prefix : ReflectionHelper.PROPERTY_ACCESSOR_PREFIXES ) {
 				member = run( GetMethod.action( clazz, prefix + methodName ) );

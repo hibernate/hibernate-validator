@@ -25,6 +25,7 @@ import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
@@ -44,16 +45,18 @@ final class PropertyConstraintMappingContextImpl
 	// either Field or Method
 	private final Member member;
 	private final ConstraintLocation location;
+	private final ExecutableHelper executableHelper;
 
-	PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Member member) {
+	PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Member member, ExecutableHelper executableHelper) {
 		super( typeContext.getConstraintMapping(), ReflectionHelper.typeOf( member ) );
 		this.typeContext = typeContext;
 		this.member = member;
+		this.executableHelper = executableHelper;
 		if ( member instanceof Field ) {
 			this.location = ConstraintLocation.forField( (Field) member );
 		}
 		else {
-			this.location = ConstraintLocation.forGetter( (Method) member );
+			this.location = ConstraintLocation.forGetter( (Method) member, executableHelper );
 		}
 	}
 
@@ -63,11 +66,11 @@ final class PropertyConstraintMappingContextImpl
 	}
 
 	@Override
-	public PropertyConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
+	public PropertyConstraintMappingContext constraint( ConstraintDef<?, ?> definition) {
 		if ( member instanceof Field ) {
 			super.addConstraint(
 					ConfiguredConstraint.forProperty(
-							definition, member
+							definition, member, executableHelper
 					)
 			);
 		}

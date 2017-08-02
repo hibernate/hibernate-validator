@@ -37,6 +37,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
@@ -155,9 +156,10 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		private final Type propertyType;
 		private boolean cascadingProperty = false;
 
-		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-				ValueExtractorManager valueExtractorManager) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
+		public Builder( Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
+		                ExecutableHelper executableHelper,
+		                ValueExtractorManager valueExtractorManager) {
+			super( beanClass, constraintHelper, typeResolutionHelper, executableHelper, valueExtractorManager );
 
 			this.propertyName = constrainedField.getField().getName();
 			this.propertyType = ReflectionHelper.typeOf( constrainedField.getField() );
@@ -165,8 +167,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		}
 
 		public Builder(Class<?> beanClass, ConstrainedType constrainedType, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-				ValueExtractorManager valueExtractorManager) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
+				ExecutableHelper executableHelper, ValueExtractorManager valueExtractorManager) {
+			super( beanClass, constraintHelper, typeResolutionHelper, executableHelper, valueExtractorManager );
 
 			this.propertyName = null;
 			this.propertyType = null;
@@ -174,8 +176,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		}
 
 		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedMethod, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-				ValueExtractorManager valueExtractorManager) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
+				ExecutableHelper executableHelper, ValueExtractorManager valueExtractorManager) {
+			super( beanClass, constraintHelper, typeResolutionHelper, executableHelper, valueExtractorManager );
 
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getExecutable() );
 			this.propertyType = ReflectionHelper.typeOf( constrainedMethod.getExecutable() );
@@ -221,7 +223,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					Cascadable.Builder builder = cascadableBuilders.get( method );
 
 					if ( builder == null ) {
-						builder = new GetterCascadable.Builder( method, constrainedElement.getCascadingMetaData() );
+						builder = new GetterCascadable.Builder( method, executableHelper, constrainedElement.getCascadingMetaData() );
 						cascadableBuilders.put( method, builder );
 					}
 					else {
@@ -248,7 +250,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 			// fast track if it's a regular constraint
 			if ( !(constraint.getLocation() instanceof TypeArgumentConstraintLocation) ) {
-				converted = ConstraintLocation.forGetter( (Method) constraint.getLocation().getMember() );
+				converted = ConstraintLocation.forGetter( (Method) constraint.getLocation().getMember(), executableHelper );
 			}
 			else {
 				Deque<ConstraintLocation> locationStack = new ArrayDeque<>();
@@ -269,7 +271,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				// 2. beginning at the root, transform each location so it references the transformed delegate
 				for ( ConstraintLocation location : locationStack ) {
 					if ( !(location instanceof TypeArgumentConstraintLocation) ) {
-						converted = ConstraintLocation.forGetter( (Method) location.getMember() );
+						converted = ConstraintLocation.forGetter( (Method) location.getMember() , executableHelper );
 					}
 					else {
 						converted = ConstraintLocation.forTypeArgument(

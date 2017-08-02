@@ -16,6 +16,7 @@ import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
@@ -32,9 +33,9 @@ public class GetterCascadable implements Cascadable {
 	private final Type cascadableType;
 	private final CascadingMetaData cascadingMetaData;
 
-	GetterCascadable(Method method, CascadingMetaData cascadingMetaData) {
+	GetterCascadable( Method method, ExecutableHelper executableHelper, CascadingMetaData cascadingMetaData) {
 		this.method = method;
-		this.propertyName = ReflectionHelper.getPropertyName( method );
+		this.propertyName = executableHelper.getPropertyName( method );
 		this.cascadableType = ReflectionHelper.typeOf( method );
 		this.cascadingMetaData = cascadingMetaData;
 		this.cascadingMetaData.validateGroupConversions( method.toString() );
@@ -68,10 +69,12 @@ public class GetterCascadable implements Cascadable {
 	public static class Builder implements Cascadable.Builder {
 
 		private final Method method;
+		private final ExecutableHelper executableHelper;
 		private CascadingTypeParameter cascadingMetaData;
 
-		public Builder(Method method, CascadingTypeParameter cascadingMetaData) {
+		public Builder(Method method, ExecutableHelper executableHelper, CascadingTypeParameter cascadingMetaData) {
 			this.method = method;
+			this.executableHelper = executableHelper;
 			this.cascadingMetaData = cascadingMetaData;
 		}
 
@@ -82,7 +85,7 @@ public class GetterCascadable implements Cascadable {
 
 		@Override
 		public GetterCascadable build() {
-			return new GetterCascadable( getAccessible( method ), new CascadingMetaData( cascadingMetaData ) );
+			return new GetterCascadable( getAccessible( method ), executableHelper, new CascadingMetaData( cascadingMetaData ) );
 		}
 
 		/**

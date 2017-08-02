@@ -19,6 +19,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
@@ -32,6 +33,7 @@ public abstract class MetaDataBuilder {
 
 	protected final ConstraintHelper constraintHelper;
 	protected final TypeResolutionHelper typeResolutionHelper;
+	protected final ExecutableHelper executableHelper;
 	protected final ValueExtractorManager valueExtractorManager;
 
 	private final Class<?> beanClass;
@@ -39,10 +41,11 @@ public abstract class MetaDataBuilder {
 	private final Set<MetaConstraint<?>> containerElementsConstraints = newHashSet();
 	private boolean isCascading = false;
 
-	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
+	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ExecutableHelper executableHelper, ValueExtractorManager valueExtractorManager) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
+		this.executableHelper = executableHelper;
 		this.valueExtractorManager = valueExtractorManager;
 	}
 

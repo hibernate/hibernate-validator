@@ -12,6 +12,7 @@ import javax.validation.Configuration;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.spi.property.PropertyAccessorSelector;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
@@ -170,6 +171,20 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @since 5.3
 	 */
 	HibernateValidatorConfiguration allowOverridingMethodAlterParameterConstraint(boolean allow);
+
+
+	/**
+	 * Registers custom property accessor which allows extracting bean properties with different naming convention than
+	 * standard Java Beans (eg. {@code foo()} vs {@code getFoo()}).
+	 *
+	 * @param selector custom property selector
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.0
+	 */
+	HibernateValidatorConfiguration propertyAccessorSelector(PropertyAccessorSelector selector);
+
 
 	/**
 	 * Define whether more than one constraint on a return value may be marked for cascading validation are allowed.

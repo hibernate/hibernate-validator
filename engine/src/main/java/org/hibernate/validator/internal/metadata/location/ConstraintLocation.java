@@ -14,6 +14,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
@@ -43,8 +44,8 @@ public interface ConstraintLocation {
 		return new FieldConstraintLocation( field );
 	}
 
-	static ConstraintLocation forGetter(Method getter) {
-		return new GetterConstraintLocation( getter );
+	static ConstraintLocation forGetter( Method getter, ExecutableHelper executableHelper) {
+		return new GetterConstraintLocation( getter, executableHelper );
 	}
 
 	static ConstraintLocation forTypeArgument(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type typeOfAnnotatedElement) {
