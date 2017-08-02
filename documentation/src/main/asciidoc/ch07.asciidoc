@@ -1,7 +1,7 @@
 [[chapter-valueextraction]]
 == Value extraction
 
-Value extraction is the process extracting values from a container so that
+Value extraction is the process of extracting values from a container so that
 they can be validated.
 
 It is used when dealing with <<container-element-constraints,container element
@@ -12,9 +12,9 @@ containers>>.
 === Built-in value extractors
 
 Hibernate Validator comes with built-in value extractors for the usual Java container
-types so, apart if you are using your own custom container types (or the ones
-of external libraries such as Guava's `Multimap`), you should not have to add your
-own value extractors.
+types so, except if you are using your own custom container types (or the ones
+of external libraries such as https://github.com/google/guava[Guava]'s `Multimap`),
+you should not have to add your own value extractors.
 
 Built-in value extractors are present for all the following container types:
 
@@ -33,10 +33,16 @@ behave can be found in the
 
 To extract values from a custom container, one needs to implement a `ValueExtractor`.
 
-It is a very simple API as the only purpose of a value extractor is to provide
+[NOTE]
+====
+Implementing a `ValueExtractor` is not enough, you also need to register it.
+See <<section-valueextraction-registeringvalueextractor>> for more details.
+====
+
+`ValueExtractor` is a very simple API as the only purpose of a value extractor is to provide
 the extracted values to a `ValueReceiver`.
 
-For instance, let's consider the case of Guava's `Optional`. It is a simple example
+For instance, let's consider the case of Guava's `Optional`. It is an easy example
 as we can shape its value extractor after the `java.util.Optional` one:
 
 [[example-valueextraction-guava-optional-valueextractor]]
@@ -124,14 +130,16 @@ method fitting the best:
 `indexedValue()`::
     for a container containing indexed values - it is used for ``List``s
 `keyedValue()`::
-    for a container containing keyed values - it is used for ``Map``s
+    for a container containing keyed values - it is used for ``Map``s.
+    It is used for both the keys and the values. In the case of keys,
+    the key is also passed as the validated value.
 
 For all these methods, you need to pass a node name: it is the name included in
 the node added to the property path of the constraint violation. As mentioned
 earlier, if the node name is `null`, no node is added to the property path:
 it is be useful for pure wrapper types similar to `Optional`.
 
-The choice of the method used is important as it adds important information to the
+The choice of the method used is important as it adds contextual information to the
 property path of the constraint violation e.g. the index or the key of the
 validated value.
 
@@ -168,7 +176,7 @@ As you can see in the above example, the `type` attribute of the `@ExtractedValu
 annotation allows to provide this information to the validation engine.
 
 Then you have to tell the validation engine that the `Min` constraint you want to
-add to the `OptionalInt` property concerns the wrapped value and not the wrapper.
+add to the `OptionalInt` property relates to the wrapped value and not the wrapper.
 
 Bean Validation provides the `Unwrapping.Unwrap` payload for this situation:
 
@@ -182,7 +190,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.
 ====
 
 If we take a step back, most - if not all - the constraints we would like to add to an
-`OptionalInt` property would concern the wrapped value so having a way to make it
+`OptionalInt` property would be applied to the wrapped value so having a way to make it
 the default would be nice.
 
 This is exactly what the `@UnwrapByDefault` annotation is for:
@@ -197,7 +205,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/nongeneric
 ====
 
 When declaring this value extractor for `OptionalInt`, constraint annotations will
-by default concern the wrapped value:
+by default be applied to the wrapped value:
 
 [[example-valueextraction-optionalint-implicitunwrapping]]
 .Implicit unwrapping thanks to `@UnwrapByDefault`
@@ -237,7 +245,7 @@ Thus, value extraction is required to be able to apply constraints on the
 wrapped values.
 
 The JavaFX `ObservableValue` value extractor is marked with `@UnwrapByDefault`.
-As such, the constraints hosted on the container targets the wrapped value by
+As such, the constraints hosted on the container target the wrapped value by
 default.
 
 Thus, you can constrain a `StringProperty` as below:
@@ -290,7 +298,7 @@ Provided by the validation engine itself::
 Via the Java service loader mechanism::
     The file `META-INF/services/javax.validation.valueextraction.ValueExtractor`
     must be provided, with the fully-qualified names of one or more value
-    extractor implementations as its contents.
+    extractor implementations as its contents, each on a separate line.
 
 In the `META-INF/validation.xml` file::
     See <<section-configuration-validation-xml>> for more information about
