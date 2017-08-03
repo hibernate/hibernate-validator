@@ -185,6 +185,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				ExecutableHelper executableHelper, ValueExtractorManager valueExtractorManager) {
 			super( beanClass, constraintHelper, typeResolutionHelper, executableHelper, valueExtractorManager );
 
+//			this.propertyName = executableHelper.getPropertyName( constrainedMethod.getExecutable() );
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getExecutable() );
 			this.propertyType = ReflectionHelper.typeOf( constrainedMethod.getExecutable() );
 			add( constrainedMethod );
@@ -197,9 +198,14 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			}
 
 			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
-					!( (ConstrainedExecutable) constrainedElement ).isGetterMethod() ) {
+							!( (ConstrainedExecutable) constrainedElement ).isGetterMethod() ) {
 				return false;
 			}
+
+//			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
+//					!executableHelper.isGetterMethod( ( (ConstrainedExecutable) constrainedElement ).getExecutable() ) ) {
+//				return false;
+//			}
 
 			return Objects.equals( getPropertyName( constrainedElement ), propertyName );
 		}
@@ -305,7 +311,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				return ReflectionHelper.getPropertyName( ( (ConstrainedField) constrainedElement ).getField() );
 			}
 			else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
-				return ReflectionHelper.getPropertyName( ( (ConstrainedExecutable) constrainedElement ).getExecutable() );
+				return executableHelper.getPropertyName( ( (ConstrainedExecutable) constrainedElement ).getExecutable() );
 			}
 
 			return null;

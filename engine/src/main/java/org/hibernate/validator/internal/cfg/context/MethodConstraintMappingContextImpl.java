@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.cfg.context;
 import java.lang.reflect.Method;
 
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 
 /**
  * Constraint mapping creational context representing a method.
@@ -17,8 +18,8 @@ import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
  */
 class MethodConstraintMappingContextImpl extends ExecutableConstraintMappingContextImpl implements MethodConstraintMappingContext {
 
-	MethodConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Method method) {
-		super( typeContext, method );
+	MethodConstraintMappingContextImpl( TypeConstraintMappingContextImpl<?> typeContext, Method method, ExecutableHelper executableHelper) {
+		super( typeContext, method, executableHelper );
 	}
 
 	@Override

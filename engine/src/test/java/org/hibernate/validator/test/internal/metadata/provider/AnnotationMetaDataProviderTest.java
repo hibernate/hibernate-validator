@@ -40,6 +40,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.joda.time.DateMidnight;
@@ -60,6 +61,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		provider = new AnnotationMetaDataProvider(
 				new ConstraintHelper(),
 				new TypeResolutionHelper(),
+				new ExecutableHelper( new TypeResolutionHelper() ),
 				new ValueExtractorManager( Collections.emptySet() ),
 				new AnnotationProcessingOptionsImpl()
 		);

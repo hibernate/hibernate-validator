@@ -57,14 +57,17 @@ class ConstrainedExecutableBuilder {
 
 	private final ClassLoadingHelper classLoadingHelper;
 	private final MetaConstraintBuilder metaConstraintBuilder;
+	private final ExecutableHelper executableHelper;
 	private final GroupConversionBuilder groupConversionBuilder;
 	private final ConstrainedParameterBuilder constrainedParameterBuilder;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 
 	ConstrainedExecutableBuilder(ClassLoadingHelper classLoadingHelper, MetaConstraintBuilder metaConstraintBuilder,
-			GroupConversionBuilder groupConversionBuilder, AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+			ExecutableHelper executableHelper, GroupConversionBuilder groupConversionBuilder,
+			AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		this.classLoadingHelper = classLoadingHelper;
 		this.metaConstraintBuilder = metaConstraintBuilder;
+		this.executableHelper = executableHelper;
 		this.groupConversionBuilder = groupConversionBuilder;
 		this.constrainedParameterBuilder = new ConstrainedParameterBuilder(
 				metaConstraintBuilder,
@@ -220,6 +223,7 @@ class ConstrainedExecutableBuilder {
 		return new ConstrainedExecutable(
 				ConfigurationSource.XML,
 				executable,
+				executableHelper,
 				parameterMetaData,
 				crossParameterConstraints,
 				returnValueConstraints,

@@ -151,7 +151,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			);
 		}
 
-		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, method );
+		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, method, executableHelper );
 		configuredMembers.add( method );
 		executableContexts.add( context );
 
@@ -178,7 +178,8 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 		ConstructorConstraintMappingContextImpl context = new ConstructorConstraintMappingContextImpl(
 				this,
-				constructor
+				constructor,
+				executableHelper
 		);
 		configuredMembers.add( constructor );
 		executableContexts.add( context );

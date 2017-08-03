@@ -138,6 +138,7 @@ public class MappingXmlParser {
 			ConstrainedExecutableBuilder constrainedExecutableBuilder = new ConstrainedExecutableBuilder(
 					classLoadingHelper,
 					metaConstraintBuilder,
+					executableHelper,
 					groupConversionBuilder,
 					annotationProcessingOptions
 			);

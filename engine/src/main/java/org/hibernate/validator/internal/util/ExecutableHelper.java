@@ -103,8 +103,16 @@ public final class ExecutableHelper {
 		return instanceMethodParametersResolveToSameTypes( subTypeMethod, superTypeMethod );
 	}
 
-	public String getPropertyName(Method method) {
-		return selector.propertyName( method );
+	public String getPropertyName(Executable executable) {
+		if ( !( executable instanceof Method ) ) {
+			return null;
+		}
+
+		return selector.propertyName( (Method) executable );
+	}
+
+	public boolean isGetterMethod(Executable executable) {
+		return executable instanceof Method && selector.isGetterMethod( (Method) executable );
 	}
 
 	public static String getSimpleName(Executable executable) {

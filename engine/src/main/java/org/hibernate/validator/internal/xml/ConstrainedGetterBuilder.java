@@ -84,6 +84,7 @@ class ConstrainedGetterBuilder {
 			ConstrainedExecutable constrainedGetter = new ConstrainedExecutable(
 					ConfigurationSource.XML,
 					getter,
+					metaConstraintBuilder.executableHelper,
 					Collections.<ConstrainedParameter>emptyList(),
 					Collections.<MetaConstraint<?>>emptySet(),
 					metaConstraints,

@@ -17,7 +17,7 @@ public class JavaBeanPropertySelector implements PropertyAccessorSelector {
 
 	@Override
 	public MethodType methodType( Method method ) {
-		return MethodType.PROPERTY_READ_ACCESSOR;
+		return ReflectionHelper.isGetterMethod( method ) ?  MethodType.PROPERTY_READ_ACCESSOR : MethodType.OTHER;
 	}
 
 	@Override

@@ -129,6 +129,7 @@ final class PropertyConstraintMappingContextImpl
 			return new ConstrainedExecutable(
 					ConfigurationSource.API,
 					(Executable) member,
+					executableHelper,
 					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					getCascadingMetaDataBuilder()
