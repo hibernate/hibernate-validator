@@ -69,7 +69,7 @@ the Apache Software License 2.0. Refer to license.txt for more information.
 ## Build from Source
 
 You can build Hibernate Validator from source by cloning the git repository git://github.com/hibernate/hibernate-validator.git.
-You will also need a JDK 8 and Maven 3 (>= 3.0.3). With these prerequisites in place you can compile the source via
+You will also need a JDK 8 and Maven 3 (>= 3.3.1). With these prerequisites in place you can compile the source via:
 
     mvn -s settings-example.xml clean install
 
@@ -84,8 +84,6 @@ To build Hibernate Validator with JDK 9, export the following environment variab
 Then the build can be started like this:
 
     mvn -s settings-example.xml clean install
-
-Also the OSGi integration tests will fail on Java 9 currently, hence the "osgi" module is excluded automatically when building on JDK 9. We are waiting for the release of a Karaf version supporting the latest Java 9 builds.
 
 Here are the reasons why we added the various build options:
 
