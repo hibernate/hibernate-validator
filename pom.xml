@@ -209,10 +209,6 @@
         <hibernate-validator-parent.path>.</hibernate-validator-parent.path>
     </properties>
 
-    <prerequisites>
-        <maven>3.3.1</maven>
-    </prerequisites>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -432,7 +428,7 @@
                                     <version>[1.8.0-20,)</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
-                                    <version>3.0.3</version>
+                                    <version>3.3.1</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
