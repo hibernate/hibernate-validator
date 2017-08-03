@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -98,9 +98,8 @@ class ConstrainedFieldBuilder {
 		return constrainedFields;
 	}
 
-	private CascadingTypeParameter getCascadingMetaDataForField(Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Field field,
+	private CascadingMetaDataBuilder getCascadingMetaDataForField(Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Field field,
 			FieldType fieldType, String defaultPackage) {
-		boolean isArray = field.getType().isArray();
 		Type type = ReflectionHelper.typeOf( field );
 		boolean isCascaded = fieldType.getValid() != null;
 		Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
@@ -108,9 +107,7 @@ class ConstrainedFieldBuilder {
 				defaultPackage
 		);
 
-		return isArray
-				? CascadingTypeParameter.arrayElement( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions )
-				: CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
+		return CascadingMetaDataBuilder.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
 	private static Field findField(Class<?> beanClass, String fieldName, List<String> alreadyProcessedFieldNames) {

@@ -14,6 +14,7 @@ import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration.Builder;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
+import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -346,6 +347,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	@Override
 	public void close() {
 		constraintValidatorManager.clear();
+		constraintHelper.clear();
 		for ( BeanMetaDataManager beanMetaDataManager : beanMetaDataManagers.values() ) {
 			beanMetaDataManager.clear();
 		}
@@ -360,6 +362,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	                           ValueExtractorManager valueExtractorManager,
 	                           MethodValidationConfiguration methodValidationConfiguration ) {
 
+
+		ValidationOrderGenerator validationOrderGenerator = new ValidationOrderGenerator();
+
 		BeanMetaDataManager beanMetaDataManager = beanMetaDataManagers.computeIfAbsent(
 						new BeanMetaDataManagerKey( parameterNameProvider, valueExtractorManager, methodValidationConfiguration ),
 						key -> new BeanMetaDataManager(
@@ -368,6 +373,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 										typeResolutionHelper,
 										parameterNameProvider,
 										valueExtractorManager,
+										validationOrderGenerator,
 										buildDataProviders(),
 										methodValidationConfiguration
 						)
@@ -382,8 +388,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						clockProvider,
 						valueExtractorManager,
 						constraintValidatorManager,
+						validationOrderGenerator,
 						failFast
 		);
+
 	}
 
 	private List<MetaDataProvider> buildDataProviders() {

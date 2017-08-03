@@ -17,21 +17,33 @@ import java.security.PrivilegedAction;
 public final class GetDeclaredField implements PrivilegedAction<Field> {
 	private final Class<?> clazz;
 	private final String fieldName;
+	private final boolean makeAccessible;
 
 	public static GetDeclaredField action(Class<?> clazz, String fieldName) {
-		return new GetDeclaredField( clazz, fieldName );
+		return new GetDeclaredField( clazz, fieldName, false );
 	}
 
-	private GetDeclaredField(Class<?> clazz, String fieldName) {
+	/**
+	 * Before using this method, you need to check the {@code HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS}
+	 * permission against the security manager.
+	 */
+	public static GetDeclaredField andMakeAccessible(Class<?> clazz, String fieldName) {
+		return new GetDeclaredField( clazz, fieldName, true );
+	}
+
+	private GetDeclaredField(Class<?> clazz, String fieldName, boolean makeAccessible) {
 		this.clazz = clazz;
 		this.fieldName = fieldName;
+		this.makeAccessible = makeAccessible;
 	}
 
 	@Override
 	public Field run() {
 		try {
 			final Field field = clazz.getDeclaredField( fieldName );
-			field.setAccessible( true );
+			if ( makeAccessible ) {
+				field.setAccessible( true );
+			}
 			return field;
 		}
 		catch (NoSuchFieldException e) {

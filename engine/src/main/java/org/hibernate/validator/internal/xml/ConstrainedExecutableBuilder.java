@@ -23,7 +23,7 @@ import java.util.Set;
 
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -209,7 +209,7 @@ class ConstrainedExecutableBuilder {
 		// parse the return value
 		Set<MetaConstraint<?>> returnValueConstraints = new HashSet<>();
 		Set<MetaConstraint<?>> returnValueTypeArgumentConstraints = new HashSet<>();
-		CascadingTypeParameter cascadingMetaData = parseReturnValueType(
+		CascadingMetaDataBuilder cascadingMetaDataBuilder = parseReturnValueType(
 				returnValueType,
 				executable,
 				returnValueConstraints,
@@ -224,7 +224,7 @@ class ConstrainedExecutableBuilder {
 				crossParameterConstraints,
 				returnValueConstraints,
 				returnValueTypeArgumentConstraints,
-				cascadingMetaData
+				cascadingMetaDataBuilder
 		);
 	}
 
@@ -261,13 +261,13 @@ class ConstrainedExecutableBuilder {
 		return crossParameterConstraints;
 	}
 
-	private CascadingTypeParameter parseReturnValueType(ReturnValueType returnValueType,
+	private CascadingMetaDataBuilder parseReturnValueType(ReturnValueType returnValueType,
 												Executable executable,
 												Set<MetaConstraint<?>> returnValueConstraints,
 												Set<MetaConstraint<?>> returnValueTypeArgumentConstraints,
 												String defaultPackage) {
 		if ( returnValueType == null ) {
-			return CascadingTypeParameter.nonCascading();
+			return CascadingMetaDataBuilder.nonCascading();
 		}
 
 		ConstraintLocation constraintLocation = ConstraintLocation.forReturnValue( executable );
@@ -320,9 +320,8 @@ class ConstrainedExecutableBuilder {
 		return parameterTypes;
 	}
 
-	private CascadingTypeParameter getCascadingMetaDataForReturnValue(Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Executable executable,
+	private CascadingMetaDataBuilder getCascadingMetaDataForReturnValue(Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Executable executable,
 			ReturnValueType returnValueType, String defaultPackage) {
-		boolean isArray = executable instanceof Method && ( (Method) executable ).getReturnType().isArray();
 		Type type = ReflectionHelper.typeOf( executable );
 		boolean isCascaded = returnValueType.getValid() != null;
 		Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
@@ -330,9 +329,7 @@ class ConstrainedExecutableBuilder {
 				defaultPackage
 		);
 
-		return isArray
-				? CascadingTypeParameter.arrayElement( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions )
-				: CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
+		return CascadingMetaDataBuilder.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
 	/**

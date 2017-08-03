@@ -433,10 +433,10 @@ public interface Log extends BasicLogger {
 	ConstraintDeclarationException getMultipleGroupConversionsForSameSourceException(@FormatWith(ClassObjectFormatter.class) Class<?> from,
 			@FormatWith(CollectionOfClassesObjectFormatter.class) Collection<Class<?>> tos);
 
-	@Message(id = 125, value = "Found group conversions for non-cascading element: %s.")
-	ConstraintDeclarationException getGroupConversionOnNonCascadingElementException(String location);
+	@Message(id = 125, value = "Found group conversions for non-cascading element at: %s.")
+	ConstraintDeclarationException getGroupConversionOnNonCascadingElementException(Object context);
 
-	@Message(id = 127, value = "Found group conversion using a group sequence as source: %s.")
+	@Message(id = 127, value = "Found group conversion using a group sequence as source at: %s.")
 	ConstraintDeclarationException getGroupConversionForSequenceException(@FormatWith(ClassObjectFormatter.class) Class<?> from);
 
 	@LogMessage(level = WARN)
@@ -747,8 +747,8 @@ public interface Log extends BasicLogger {
 	ValidationException getContainerElementTypeHasAlreadyBeenConfiguredViaXmlMappingConfigurationException(ConstraintLocation rootConstraintLocation,
 			ContainerElementTypePath path);
 
-	@Message(id = 218, value = "Having parallel definitions of ValueExtractor on a given class is not allowed: %s.")
-	ValueExtractorDefinitionException getParallelDefinitionsOfValueExtractorException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorImplementationType);
+	@Message(id = 218, value = "Having parallel definitions of value extractors on a given class is not allowed: %s.")
+	ValueExtractorDefinitionException getParallelDefinitionsOfValueExtractorsException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorImplementationType);
 
 	@SuppressWarnings("rawtypes")
 	@Message(id = 219, value = "Unable to get the most specific value extractor for type %1$s as several most specific value extractors are declared: %2$s.")
@@ -786,4 +786,14 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 226, value = "Container element constraints and cascading validation are not supported on arrays: %1$s")
 	ValidationException getContainerElementConstraintsAndCascadedValidationNotSupportedOnArraysException(@FormatWith(TypeFormatter.class) Type type);
+
+	@Message(id = 227, value = "The validated type %1$s does not specify the property: %2$s")
+	IllegalArgumentException getPropertyNotDefinedByValidatedTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> validatedType, String propertyName);
+
+	@Message(id = 228, value = "No value extractor found when narrowing down to the runtime type %3$s among the value extractors for type parameter '%2$s' of type %1$s.")
+	ConstraintDeclarationException getNoValueExtractorFoundForTypeException(@FormatWith(TypeFormatter.class) Type declaredType,
+			TypeVariable<?> declaredTypeParameter, @FormatWith(ClassObjectFormatter.class) Class<?> valueType);
+
+	@Message(id = 229, value = "Unable to cast %1$s to %2$s.")
+	ClassCastException getUnableToCastException(Object object, @FormatWith(ClassObjectFormatter.class) Class<?> clazz);
 }

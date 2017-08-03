@@ -108,7 +108,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>hibernate-validator-performance</finalName>
+                            <finalName>hibernate-validator-performance-${validator}</finalName>
                             <transformers>
                                 <!-- Add a transformer to exclude any other manifest files (possibly from dependencies). -->
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
@@ -203,7 +203,7 @@
             <properties>
                 <validation-api.version>1.1.0.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>5.4.0.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>5.4.1.Final</beanvalidation-impl.version>
             </properties>
             <dependencies>
                 <dependency>

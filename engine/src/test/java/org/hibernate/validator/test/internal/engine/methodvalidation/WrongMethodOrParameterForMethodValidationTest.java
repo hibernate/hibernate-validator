@@ -31,9 +31,15 @@ public class WrongMethodOrParameterForMethodValidationTest {
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "HV000162.*")
-	public void testPassingNonMatchingMethodThrowsException() throws Exception {
+	public void testPassingNonMatchingMethodForParameterValidationThrowsException() throws Exception {
 		Method wrongMethod = WrongMethodOrParameterForMethodValidationTest.class.getMethod( "setUp" );
 		validator.validateParameters( customerRepository, wrongMethod, new Object[] { } );
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "HV000162.*")
+	public void testPassingNonMatchingMethodForReturnValueValidationThrowsException() throws Exception {
+		Method wrongMethod = WrongMethodOrParameterForMethodValidationTest.class.getMethod( "setUp" );
+		validator.validateReturnValue( customerRepository, wrongMethod, new Object[] { } );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "HV000163.*")

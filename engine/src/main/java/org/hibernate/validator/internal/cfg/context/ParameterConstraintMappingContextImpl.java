@@ -131,7 +131,7 @@ final class ParameterConstraintMappingContextImpl
 				parameterIndex,
 				getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 				getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-				getCascadingMetaData()
+				getCascadingMetaDataBuilder()
 		);
 	}
 

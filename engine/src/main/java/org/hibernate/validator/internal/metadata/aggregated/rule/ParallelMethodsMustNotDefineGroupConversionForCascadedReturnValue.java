@@ -18,10 +18,10 @@ public class ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue e
 
 	@Override
 	public void apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
-		boolean isCascaded = method.getCascadingMetaData().isMarkedForCascadingOnElementOrContainerElements() ||
-				otherMethod.getCascadingMetaData().isMarkedForCascadingOnElementOrContainerElements();
-		boolean hasGroupConversions = method.getCascadingMetaData().hasGroupConversionsOnElementOrContainerElements() ||
-				otherMethod.getCascadingMetaData().hasGroupConversionsOnElementOrContainerElements();
+		boolean isCascaded = method.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ||
+				otherMethod.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements();
+		boolean hasGroupConversions = method.getCascadingMetaDataBuilder().hasGroupConversionsOnAnnotatedObjectOrContainerElements() ||
+				otherMethod.getCascadingMetaDataBuilder().hasGroupConversionsOnAnnotatedObjectOrContainerElements();
 
 		if ( isDefinedOnParallelType( method, otherMethod ) && isCascaded && hasGroupConversions ) {
 			throw log.getMethodsFromParallelTypesMustNotDefineGroupConversionsForCascadedReturnValueException(

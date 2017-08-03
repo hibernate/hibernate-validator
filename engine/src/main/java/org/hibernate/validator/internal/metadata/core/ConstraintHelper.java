@@ -275,6 +275,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationPara
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Keeps track of builtin constraints and their validator implementations, as well as already resolved validator definitions.
@@ -296,8 +297,12 @@ public class ConstraintHelper {
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
 	private static final String JAVA_MONEY_CLASS_NAME = "javax.money.MonetaryAmount";
 
-	// immutable
+	@Immutable
 	private final Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> builtinConstraints;
+
+	private final ConcurrentMap<Class<? extends Annotation>, Boolean> externalConstraints = new ConcurrentHashMap<>();
+
+	private final ConcurrentMap<Class<? extends Annotation>, Boolean> multiValueConstraints = new ConcurrentHashMap<>();
 
 	private final ValidatorDescriptorMap validatorDescriptors = new ValidatorDescriptorMap();
 
@@ -771,22 +776,24 @@ public class ConstraintHelper {
 			return false;
 		}
 
-		boolean isMultiValueConstraint = false;
-		final Method method = run( GetMethod.action( annotationType, "value" ) );
-		if ( method != null ) {
-			Class<?> returnType = method.getReturnType();
-			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
-				@SuppressWarnings("unchecked")
-				Class<? extends Annotation> componentType = (Class<? extends Annotation>) returnType.getComponentType();
-				if ( isConstraintAnnotation( componentType ) || isBuiltinConstraint( componentType ) ) {
-					isMultiValueConstraint = true;
-				}
-				else {
-					isMultiValueConstraint = false;
+		return multiValueConstraints.computeIfAbsent( annotationType, a -> {
+			boolean isMultiValueConstraint = false;
+			final Method method = run( GetMethod.action( a, "value" ) );
+			if ( method != null ) {
+				Class<?> returnType = method.getReturnType();
+				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
+					@SuppressWarnings("unchecked")
+					Class<? extends Annotation> componentType = (Class<? extends Annotation>) returnType.getComponentType();
+					if ( isConstraintAnnotation( componentType ) ) {
+						isMultiValueConstraint = Boolean.TRUE;
+					}
+					else {
+						isMultiValueConstraint = Boolean.FALSE;
+					}
 				}
 			}
-		}
-		return isMultiValueConstraint;
+			return isMultiValueConstraint;
+		} );
 	}
 
 	/**
@@ -826,17 +833,25 @@ public class ConstraintHelper {
 	 * @return {@code true} if the annotation fulfills the above conditions, {@code false} otherwise.
 	 */
 	public boolean isConstraintAnnotation(Class<? extends Annotation> annotationType) {
+		// Note: we don't use isJdkAnnotation() here as it does more harm than good.
+
+		if ( isBuiltinConstraint( annotationType ) ) {
+			return true;
+		}
+
 		if ( annotationType.getAnnotation( Constraint.class ) == null ) {
 			return false;
 		}
 
-		assertMessageParameterExists( annotationType );
-		assertGroupsParameterExists( annotationType );
-		assertPayloadParameterExists( annotationType );
-		assertValidationAppliesToParameterSetUpCorrectly( annotationType );
-		assertNoParameterStartsWithValid( annotationType );
+		return externalConstraints.computeIfAbsent( annotationType, a -> {
+			assertMessageParameterExists( a );
+			assertGroupsParameterExists( a );
+			assertPayloadParameterExists( a );
+			assertValidationAppliesToParameterSetUpCorrectly( a );
+			assertNoParameterStartsWithValid( a );
 
-		return true;
+			return Boolean.TRUE;
+		} );
 	}
 
 	private void assertNoParameterStartsWithValid(Class<? extends Annotation> annotationType) {
@@ -930,6 +945,11 @@ public class ConstraintHelper {
 		Package pakkage = annotation.getPackage();
 		return pakkage != null && pakkage.getName() != null &&
 				( pakkage.getName().startsWith( "java." ) || pakkage.getName().startsWith( "jdk.internal" ) );
+	}
+
+	public void clear() {
+		externalConstraints.clear();
+		multiValueConstraints.clear();
 	}
 
 	private static boolean isJodaTimeInClasspath() {

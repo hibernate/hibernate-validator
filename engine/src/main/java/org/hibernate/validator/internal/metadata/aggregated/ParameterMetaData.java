@@ -17,7 +17,6 @@ import javax.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ParameterDescriptorImpl;
@@ -52,14 +51,13 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				type,
 				constraints,
 				containerElementsConstraints,
-				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
-				!constraints.isEmpty() || !containerElementsConstraints.isEmpty() || cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements()
+				cascadingMetaData.isMarkedForCascadingOnAnnotatedObjectOrContainerElements(),
+				!constraints.isEmpty() || !containerElementsConstraints.isEmpty() || cascadingMetaData.isMarkedForCascadingOnAnnotatedObjectOrContainerElements()
 		);
 
 		this.index = index;
 
 		this.cascadingMetaData = cascadingMetaData;
-		this.cascadingMetaData.validateGroupConversions( this.toString() );
 	}
 
 	public int getIndex() {
@@ -116,7 +114,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		private final Type parameterType;
 		private final int parameterIndex;
 		private Executable executableForNameRetrieval;
-		private CascadingTypeParameter cascadingMetaData;
+		private CascadingMetaDataBuilder cascadingMetaDataBuilder;
 
 		public Builder(Class<?> beanClass,
 				ConstrainedParameter constrainedParameter,
@@ -149,11 +147,11 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 
 			ConstrainedParameter newConstrainedParameter = (ConstrainedParameter) constrainedElement;
 
-			if ( cascadingMetaData == null ) {
-				cascadingMetaData = newConstrainedParameter.getCascadingMetaData();
+			if ( cascadingMetaDataBuilder == null ) {
+				cascadingMetaDataBuilder = newConstrainedParameter.getCascadingMetaDataBuilder();
 			}
 			else {
-				cascadingMetaData = cascadingMetaData.merge( newConstrainedParameter.getCascadingMetaData() );
+				cascadingMetaDataBuilder = cascadingMetaDataBuilder.merge( newConstrainedParameter.getCascadingMetaDataBuilder() );
 			}
 
 			// If the current parameter is from a method hosted on a parent class,
@@ -174,7 +172,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 					parameterType,
 					adaptOriginsAndImplicitGroups( getDirectConstraints() ),
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
-					new CascadingMetaData( cascadingMetaData )
+					cascadingMetaDataBuilder.build( valueExtractorManager, executableForNameRetrieval )
 			);
 		}
 	}

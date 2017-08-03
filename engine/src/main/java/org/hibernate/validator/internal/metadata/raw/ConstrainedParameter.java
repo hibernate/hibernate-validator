@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
 /**
@@ -40,7 +40,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				index,
 				Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<MetaConstraint<?>>emptySet(),
-				CascadingTypeParameter.nonCascading()
+				CascadingMetaDataBuilder.nonCascading()
 		);
 	}
 
@@ -54,7 +54,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * @param constraints The constraints of the represented method parameter, if
 	 * any.
 	 * @param typeArgumentConstraints Type arguments constraints, if any.
-	 * @param cascadingMetaData The cascaded validation metadata for this element and its container elements.
+	 * @param cascadingMetaDataBuilder The cascaded validation metadata for this element and its container elements.
 	 */
 	public ConstrainedParameter(ConfigurationSource source,
 								Executable executable,
@@ -62,13 +62,13 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 								int index,
 								Set<MetaConstraint<?>> constraints,
 								Set<MetaConstraint<?>> typeArgumentConstraints,
-								CascadingTypeParameter cascadingMetaData) {
+								CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 		super(
 				source,
 				ConstrainedElementKind.PARAMETER,
 				constraints,
 				typeArgumentConstraints,
-				cascadingMetaData
+				cascadingMetaDataBuilder
 		);
 
 		this.executable = executable;
@@ -105,7 +105,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		Set<MetaConstraint<?>> mergedTypeArgumentConstraints = new HashSet<>( typeArgumentConstraints );
 		mergedTypeArgumentConstraints.addAll( other.typeArgumentConstraints );
 
-		CascadingTypeParameter mergedCascadingMetaData = cascadingMetaData.merge( other.cascadingMetaData );
+		CascadingMetaDataBuilder mergedCascadingMetaData = cascadingMetaDataBuilder.merge( other.cascadingMetaDataBuilder );
 
 		return new ConstrainedParameter(
 				mergedSource,

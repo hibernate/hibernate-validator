@@ -18,7 +18,6 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
-import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 /**
  * Field constraint location.
@@ -131,13 +130,8 @@ public class FieldConstraintLocation implements ConstraintLocation {
 		}
 
 		Class<?> clazz = original.getDeclaringClass();
-		Field accessibleField;
 
-		accessibleField = run( GetDeclaredField.action( clazz, original.getName() ) );
-
-		run( SetAccessibility.action( accessibleField ) );
-
-		return accessibleField;
+		return run( GetDeclaredField.andMakeAccessible( clazz, original.getName() ) );
 	}
 
 	/**

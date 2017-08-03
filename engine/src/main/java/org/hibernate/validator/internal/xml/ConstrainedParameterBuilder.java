@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -100,17 +100,14 @@ class ConstrainedParameterBuilder {
 	}
 
 
-	private CascadingTypeParameter getCascadingMetaDataForParameter(Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Type type,
+	private CascadingMetaDataBuilder getCascadingMetaDataForParameter(Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Type type,
 			ParameterType parameterType, String defaultPackage) {
-		boolean isArray = ReflectionHelper.getClassFromType( type ).isArray();
 		boolean isCascaded = parameterType.getValid() != null;
 		Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
 				parameterType.getConvertGroup(),
 				defaultPackage
 		);
 
-		return isArray
-				? CascadingTypeParameter.arrayElement( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions )
-				: CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
+		return CascadingMetaDataBuilder.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
 	}
 }

@@ -36,7 +36,6 @@ import javax.validation.ConstraintValidator;
 import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
-import javax.validation.ValidationException;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 import javax.validation.groups.Default;
@@ -56,6 +55,8 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
+import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameters;
+import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameters.AnnotationParameters;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
@@ -119,7 +120,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * parameter value as specified in the constraint.
 	 */
 	@Immutable
-	private final Map<String, Object> attributes;
+	private final AnnotationParameters attributes;
 
 	/**
 	 * The specified payload of the constraint.
@@ -160,6 +161,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private final ValidateUnwrappedValue valueUnwrapping;
 
 	/**
+	 * The target of the constraint.
+	 */
+	private final ConstraintTarget validationAppliesTo;
+
+	/**
 	 * Type indicating how composing constraints should be combined. By default this is set to
 	 * {@code ConstraintComposition.CompositionType.AND}.
 	 */
@@ -185,11 +191,13 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 		// HV-181 - To avoid any thread visibility issues we are building the different data structures in tmp variables and
 		// then assign them to the final variables
-		this.attributes = buildAnnotationParameterMap( annotation );
-		this.groups = buildGroupSet( implicitGroup );
-		this.payloads = buildPayloadSet( annotation );
+		this.attributes = buildAnnotationParameters( annotation );
+		this.groups = buildGroupSet( this.attributes, implicitGroup );
+		this.payloads = buildPayloadSet( this.attributes );
 
 		this.valueUnwrapping = determineValueUnwrapping( this.payloads, member, annotationType );
+
+		this.validationAppliesTo = determineValidationAppliesTo( this.attributes );
 
 		this.constraintValidatorClasses = constraintHelper.getAllValidatorDescriptors( annotationType )
 				.stream()
@@ -271,7 +279,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@Override
 	public ConstraintTarget getValidationAppliesTo() {
-		return (ConstraintTarget) attributes.get( ConstraintHelper.VALIDATION_APPLIES_TO );
+		return validationAppliesTo;
 	}
 
 	@Override
@@ -296,12 +304,13 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@Override
 	public Map<String, Object> getAttributes() {
-		return attributes;
+		return attributes.getParameters();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Set<ConstraintDescriptor<?>> getComposingConstraints() {
-		return CollectionHelper.<ConstraintDescriptor<?>>toImmutableSet( composingConstraints );
+		return (Set<ConstraintDescriptor<?>>) (Object) composingConstraints;
 	}
 
 	public Set<ConstraintDescriptorImpl<?>> getComposingConstraintImpls() {
@@ -404,7 +413,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			boolean hasGenericValidators,
 			boolean hasCrossParameterValidator,
 			ConstraintType externalConstraintType) {
-		ConstraintTarget constraintTarget = (ConstraintTarget) attributes.get( ConstraintHelper.VALIDATION_APPLIES_TO );
+		ConstraintTarget constraintTarget = validationAppliesTo;
 		ConstraintType constraintType = null;
 		boolean isExecutable = isExecutable( elementType );
 
@@ -493,6 +502,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return ValidateUnwrappedValue.DEFAULT;
 	}
 
+	private static ConstraintTarget determineValidationAppliesTo(AnnotationParameters attributes) {
+		return attributes.getParameter( ConstraintHelper.VALIDATION_APPLIES_TO, ConstraintTarget.class );
+	}
+
 	private void validateCrossParameterConstraintType(Member member, boolean hasCrossParameterValidator) {
 		if ( !hasCrossParameterValidator ) {
 			throw LOG.getCrossParameterConstraintHasNoValidatorException( annotationType );
@@ -516,7 +529,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * same constraint type (generic or cross-parameter).
 	 */
 	private void validateComposingConstraintTypes() {
-		for ( ConstraintDescriptorImpl<?> composingConstraint : composingConstraints ) {
+		for ( ConstraintDescriptorImpl<?> composingConstraint : getComposingConstraintImpls() ) {
 			if ( composingConstraint.constraintType != constraintType ) {
 				throw LOG.getComposedAndComposingConstraintsHaveDifferentTypesException(
 						annotationType,
@@ -562,30 +575,20 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	@SuppressWarnings("unchecked")
-	private Set<Class<? extends Payload>> buildPayloadSet(T annotation) {
+	private static Set<Class<? extends Payload>> buildPayloadSet(AnnotationParameters attributes) {
 		Set<Class<? extends Payload>> payloadSet = newHashSet();
-		Class<Payload>[] payloadFromAnnotation;
-		try {
-			//TODO be extra safe and make sure this is an array of Payload
-			payloadFromAnnotation = run(
-					GetAnnotationParameter.action( annotation, ConstraintHelper.PAYLOAD, Class[].class )
-			);
-		}
-		catch (ValidationException e) {
-			//ignore people not defining payloads
-			payloadFromAnnotation = null;
-		}
+
+		Class<Payload>[] payloadFromAnnotation = attributes.getParameter( ConstraintHelper.PAYLOAD, Class[].class );
+
 		if ( payloadFromAnnotation != null ) {
 			payloadSet.addAll( Arrays.asList( payloadFromAnnotation ) );
 		}
 		return CollectionHelper.toImmutableSet( payloadSet );
 	}
 
-	private Set<Class<?>> buildGroupSet(Class<?> implicitGroup) {
+	private static Set<Class<?>> buildGroupSet(AnnotationParameters attributes, Class<?> implicitGroup) {
 		Set<Class<?>> groupSet = newHashSet();
-		final Class<?>[] groupsFromAnnotation = run(
-				GetAnnotationParameter.action( annotation, ConstraintHelper.GROUPS, Class[].class )
-		);
+		final Class<?>[] groupsFromAnnotation = attributes.getMandatoryParameter( ConstraintHelper.GROUPS, Class[].class );
 		if ( groupsFromAnnotation.length == 0 ) {
 			groupSet.add( Default.class );
 		}
@@ -600,14 +603,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return CollectionHelper.toImmutableSet( groupSet );
 	}
 
-	private Map<String, Object> buildAnnotationParameterMap(Annotation annotation) {
-		final Method[] declaredMethods = run( GetDeclaredMethods.action( annotation.annotationType() ) );
-		Map<String, Object> parameters = newHashMap( declaredMethods.length );
-		for ( Method m : declaredMethods ) {
-			Object value = run( GetAnnotationParameter.action( annotation, m.getName(), Object.class ) );
-			parameters.put( m.getName(), value );
-		}
-		return CollectionHelper.toImmutableMap( parameters );
+	private static AnnotationParameters buildAnnotationParameters(Annotation annotation) {
+		return run( GetAnnotationParameters.action( annotation ) );
 	}
 
 	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
@@ -751,7 +748,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 		// use a annotation proxy
 		AnnotationDescriptor<U> annotationDescriptor = new AnnotationDescriptor<>(
-				annotationType, buildAnnotationParameterMap( constraintAnnotation )
+				annotationType, buildAnnotationParameters( constraintAnnotation ).getParameters()
 		);
 
 		// get the right override parameters
@@ -797,7 +794,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
 	 * privileged actions within HV's protection domain.
 	 */
-	private <P> P run(PrivilegedAction<P> action) {
+	private static <P> P run(PrivilegedAction<P> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 

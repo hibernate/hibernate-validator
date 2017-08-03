@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -74,7 +74,8 @@ class ContainerElementTypeConfigurationBuilder {
 		}
 
 		Set<MetaConstraint<?>> metaConstraints = new HashSet<>();
-		Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData = CollectionHelper.newHashMap( xmlContainerElementTypes.size() );
+		Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaDataBuilder =
+				CollectionHelper.newHashMap( xmlContainerElementTypes.size() );
 
 		boolean isArray = TypeHelper.isArray( enclosingType );
 		TypeVariable<?>[] typeParameters = isArray ? new TypeVariable[0] : ReflectionHelper.getClassFromType( enclosingType ).getTypeParameters();
@@ -111,13 +112,13 @@ class ContainerElementTypeConfigurationBuilder {
 
 			boolean isCascaded = xmlContainerElementType.getValid() != null;
 
-			containerElementTypesCascadingMetaData.put( typeParameter, new CascadingTypeParameter( enclosingType, typeParameter, isCascaded,
+			containerElementTypesCascadingMetaDataBuilder.put( typeParameter, new CascadingMetaDataBuilder( enclosingType, typeParameter, isCascaded,
 					nestedContainerElementTypeConfiguration.getTypeParametersCascadingMetaData(),
 					groupConversionBuilder.buildGroupConversionMap( xmlContainerElementType.getConvertGroup(), defaultPackage ) )
 			);
 		}
 
-		return new ContainerElementTypeConfiguration( metaConstraints, containerElementTypesCascadingMetaData );
+		return new ContainerElementTypeConfiguration( metaConstraints, containerElementTypesCascadingMetaDataBuilder );
 	}
 
 	private Integer getTypeArgumentIndex(ContainerElementTypeType xmlContainerElementType, TypeVariable<?>[] typeParameters, boolean isArray, Type enclosingType) {
@@ -166,19 +167,19 @@ class ContainerElementTypeConfigurationBuilder {
 
 		private final Set<MetaConstraint<?>> metaConstraints;
 
-		private final Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData;
+		private final Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaDataBuilder;
 
-		private ContainerElementTypeConfiguration(Set<MetaConstraint<?>> metaConstraints, Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData) {
+		private ContainerElementTypeConfiguration(Set<MetaConstraint<?>> metaConstraints, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData) {
 			this.metaConstraints = metaConstraints;
-			this.containerElementTypesCascadingMetaData = containerElementTypesCascadingMetaData;
+			this.containerElementTypesCascadingMetaDataBuilder = containerElementTypesCascadingMetaData;
 		}
 
 		public Set<MetaConstraint<?>> getMetaConstraints() {
 			return metaConstraints;
 		}
 
-		public Map<TypeVariable<?>, CascadingTypeParameter> getTypeParametersCascadingMetaData() {
-			return containerElementTypesCascadingMetaData;
+		public Map<TypeVariable<?>, CascadingMetaDataBuilder> getTypeParametersCascadingMetaData() {
+			return containerElementTypesCascadingMetaDataBuilder;
 		}
 	}
 }
