@@ -7,9 +7,7 @@
 package org.hibernate.validator.spi.property;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 /**
