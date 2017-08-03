@@ -100,6 +100,8 @@
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
         <bv.api.version>2.0.0.Final</bv.api.version>
+        <tck.version>2.0.0.Final</tck.version>
+
         <!-- Version to be used as baseline for API/SPI change reports -->
         <previous.stable>5.4.1.Final</previous.stable>
 
@@ -891,6 +893,11 @@
                             </exclusions>
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.netbeans.tools</groupId>
+                    <artifactId>sigtest-maven-plugin</artifactId>
+                    <version>1.0</version>
                 </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>
