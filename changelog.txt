@@ -1,6 +1,16 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.0.Final (04-08-2017)
+-------------------------
+
+** Improvement
+    * HV-1458 - engine - Avoid performance regression for cascaded validation
+    * HV-1451 - engine - Add @PastOrPresent and @FutureOrPresent messages
+
+** Task
+    * HV-1453 - build  - Upgrade to final versions of BV API and TCK
+
 6.0.0.CR3 (11-07-2017)
 -------------------------
 
