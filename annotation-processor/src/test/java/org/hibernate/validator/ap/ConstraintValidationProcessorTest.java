@@ -57,6 +57,7 @@ import org.hibernate.validator.ap.testmodel.customconstraints.CheckCase;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCaseValidator;
 import org.hibernate.validator.ap.testmodel.customconstraints.FieldLevelValidationUsingCustomConstraints;
 import org.hibernate.validator.ap.testmodel.customconstraints.HibernateValidatorProvidedCustomConstraints;
+import org.hibernate.validator.ap.testmodel.customconstraints.UnwrappingConstraints;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.BazDefaultGroupSequenceProvider;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.FooBarBazDefaultGroupSequenceProvider;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.FooBarDefaultGroupSequenceProvider;
@@ -662,5 +663,22 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 63 )
 		);
 
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1395")
+	public void unwrappingConstraints() {
+		File sourceFile = compilerHelper.getSourceFile( UnwrappingConstraints.class );
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 32 ),
+				new DiagnosticExpectation( Kind.ERROR, 35 ),
+				new DiagnosticExpectation( Kind.ERROR, 38 )
+		);
 	}
 }
