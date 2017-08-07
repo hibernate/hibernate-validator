@@ -102,7 +102,7 @@ public class ConstraintCheckFactory {
 				AnnotationType.CONSTRAINT_ANNOTATION,
 				new SingleValuedChecks(
 						new StaticCheck(),
-						new TypeCheck( constraintHelper ),
+						new TypeCheck( constraintHelper, typeUtils, annotationApiHelper ),
 						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
 						new AnnotationParametersPatternCheck( annotationApiHelper ),
 						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
@@ -118,7 +118,7 @@ public class ConstraintCheckFactory {
 				new MultiValuedChecks(
 						constraintHelper,
 						new StaticCheck(),
-						new TypeCheck( constraintHelper ),
+						new TypeCheck( constraintHelper, typeUtils, annotationApiHelper ),
 						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
 						new AnnotationParametersPatternCheck( annotationApiHelper ),
 						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
@@ -142,7 +142,7 @@ public class ConstraintCheckFactory {
 						new GetterCheck( methodConstraintsSupported ),
 						new StaticCheck(),
 						new MethodAnnotationCheck( constraintHelper ),
-						new TypeCheck( constraintHelper ),
+						new TypeCheck( constraintHelper, typeUtils, annotationApiHelper ),
 						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
 						new AnnotationParametersPatternCheck( annotationApiHelper ),
 						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
@@ -160,7 +160,7 @@ public class ConstraintCheckFactory {
 						new GetterCheck( methodConstraintsSupported ),
 						new StaticCheck(),
 						new MethodAnnotationCheck( constraintHelper ),
-						new TypeCheck( constraintHelper ),
+						new TypeCheck( constraintHelper, typeUtils, annotationApiHelper ),
 						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
 						new AnnotationParametersPatternCheck( annotationApiHelper ),
 						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
@@ -224,7 +224,7 @@ public class ConstraintCheckFactory {
 		nonAnnotationTypeChecks.put(
 				AnnotationType.CONSTRAINT_ANNOTATION,
 				new SingleValuedChecks(
-						new TypeCheck( constraintHelper ),
+						new TypeCheck( constraintHelper, typeUtils, annotationApiHelper ),
 						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
 						new AnnotationParametersPatternCheck( annotationApiHelper ),
 						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
@@ -237,7 +237,7 @@ public class ConstraintCheckFactory {
 				AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION,
 				new MultiValuedChecks(
 						constraintHelper,
-						new TypeCheck( constraintHelper ),
+						new TypeCheck( constraintHelper, typeUtils, annotationApiHelper ),
 						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
 						new AnnotationParametersPatternCheck( annotationApiHelper ),
 						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),

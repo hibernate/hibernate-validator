@@ -101,4 +101,10 @@ public class TypeNames {
 
 	}
 
+	public static class SupportedForUnwrapTypes {
+		public static final String OPTIONAL_INT = "java.util.OptionalInt";
+		public static final String OPTIONAL_LONG = "java.util.OptionalLong";
+		public static final String OPTIONAL_DOUBLE = "java.util.OptionalDouble";
+	}
+
 }
