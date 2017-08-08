@@ -60,6 +60,12 @@
             <organization>Red Hat, Inc.</organization>
             <url>http://in.relation.to/guillaume-smet/</url>
         </developer>
+        <developer>
+            <id>marko.bekhta</id>
+            <name>Marko Bekhta</name>
+            <email>marko.prykladna@gmail.com</email>
+            <url>http://in.relation.to/marko-bekhta/</url>
+        </developer>
     </developers>
 
     <contributors>
