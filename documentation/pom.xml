@@ -235,6 +235,7 @@
                         <hvVersion>${project.version}</hvVersion>
                         <bvVersion>${bv.api.version}</bvVersion>
                         <wildflyVersion>${wildfly.version}</wildflyVersion>
+                        <wildflyNextVersion>${wildfly-next.version}</wildflyNextVersion>
 
                         <!-- URLs -->
                         <javaApiDocsUrl>${java.api-docs.base-url}/</javaApiDocsUrl>
