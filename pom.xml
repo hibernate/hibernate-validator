@@ -113,7 +113,7 @@
         <!-- Currently supported version of WildFly -->
         <wildfly.version>10.1.0.Final</wildfly.version>
         <!-- Used to create a patch file for WildFly next -->
-        <wildfly-next.version>11.0.0.Alpha1</wildfly-next.version>
+        <wildfly-next.version>11.0.0.Beta1</wildfly-next.version>
 
         <!--
             These dependencies should be aligned with the ones from the WildFly version we support
