@@ -137,6 +137,23 @@ You can download the patch file from http://sourceforge.net/projects/hibernate/f
 ----
 ====
 
+We also provide a patch for the version of WildFly currently under development:
+
+.Maven dependency for WildFly {wildflyNextVersion} patch file
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+<dependency>
+    <groupId>org.hibernate.validator</groupId>
+    <artifactId>hibernate-validator-modules</artifactId>
+    <version>{hvVersion}</version>
+    <classifier>wildfly-{wildflyNextVersion}-patch</classifier>
+    <type>zip</type>
+</dependency>
+----
+====
+
 Having downloaded the patch file, you can apply it to WildFly by running this command:
 
 .Applying the WildFly patch

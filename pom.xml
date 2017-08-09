@@ -10,7 +10,7 @@
 
     <groupId>org.hibernate.validator</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
-    <version>6.0.1-SNAPSHOT</version>
+    <version>6.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Validator Aggregator</name>
@@ -60,6 +60,12 @@
             <organization>Red Hat, Inc.</organization>
             <url>http://in.relation.to/guillaume-smet/</url>
         </developer>
+        <developer>
+            <id>marko.bekhta</id>
+            <name>Marko Bekhta</name>
+            <email>marko.prykladna@gmail.com</email>
+            <url>http://in.relation.to/marko-bekhta/</url>
+        </developer>
     </developers>
 
     <contributors>
@@ -99,7 +105,9 @@
         <!-- No need to build the javadocs per module. Aggregated javadocs are build in the distribution module. See also HV-894 -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
-        <bv.api.version>2.0.0.CR3</bv.api.version>
+        <bv.api.version>2.0.0.Final</bv.api.version>
+        <tck.version>2.0.0.Final</tck.version>
+
         <!-- Version to be used as baseline for API/SPI change reports -->
         <previous.stable>5.4.1.Final</previous.stable>
 
@@ -111,7 +119,7 @@
         <!-- Currently supported version of WildFly -->
         <wildfly.version>10.1.0.Final</wildfly.version>
         <!-- Used to create a patch file for WildFly next -->
-        <wildfly-next.version>11.0.0.Alpha1</wildfly-next.version>
+        <wildfly-next.version>11.0.0.Beta1</wildfly-next.version>
 
         <!--
             These dependencies should be aligned with the ones from the WildFly version we support
@@ -208,10 +216,6 @@
 
         <hibernate-validator-parent.path>.</hibernate-validator-parent.path>
     </properties>
-
-    <prerequisites>
-        <maven>3.3.1</maven>
-    </prerequisites>
 
     <dependencyManagement>
         <dependencies>
@@ -432,7 +436,7 @@
                                     <version>[1.8.0-20,)</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
-                                    <version>3.0.3</version>
+                                    <version>3.3.1</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
@@ -895,6 +899,11 @@
                             </exclusions>
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.netbeans.tools</groupId>
+                    <artifactId>sigtest-maven-plugin</artifactId>
+                    <version>1.0</version>
                 </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>

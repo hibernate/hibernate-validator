@@ -1,6 +1,44 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.1.Final (04-08-2017)
+-------------------------
+
+** Improvement
+    * HV-1460 - build         - Remove the Maven version prerequisite as it's redundant with the enforcer configuration and now generates a warning
+    * HV-1459 - build         - Add a "sigtest" profile to make running the SigTest test easier
+    * HV-1457 - translations  - Update the Persian translation
+    * HV-1456 - engine        - Fix comments mixed up by Eclipse refactorings
+    * HV-1455 - engine        - Improve Validator#validate...() sanity checks
+    * HV-1454 - build         - Support JDK 9 build 180
+    * HV-1452 - engine        - Add Spanish translations for BV 2.0 constraints
+    * HV-1448 - engine        - Remove some superfluous fields from metamodel
+    * HV-1447 - engine        - Remove metadata for unconstrained methods from the aggregated metamodel
+    * HV-1445 - engine        - Remove BeanConfiguration cache in AnnotationMetadataProvider
+    * HV-1443 - engine        - AbstractConstrainedElement#isConstrained() should also return true if there are group conversions without cascading
+    * HV-1442 - engine        - Fix root cascading metadata for arrays in the programmatic API
+    * HV-1441 - engine        - Clean up the initialization of CascadingMetaData
+    * HV-1439 - engine        - Improve overall performances
+    * HV-1438 - engine        - Narrow down value extractors considered for cascaded validation to the ones compatible
+    * HV-1437 - engine        - Look at reducing the runtime memory usage of the ValidatorFactory
+    * HV-1422 - documentation - Extract properties for base URLs commonly used in the reference guide
+    * HV-1405 - tests         - Review assertCorrectPropertyPathStringRepresentations usage
+
+** Task
+    * HV-1446 - engine        - Remove UnconstrainedEntityMetaDataSingleton
+    * HV-1440 - integration   - Provide patch file for WildFly 11 Alpha1
+    * HV-1420 - documentation - Reference documentation update
+
+6.0.0.Final (04-08-2017)
+-------------------------
+
+** Improvement
+    * HV-1458 - engine - Avoid performance regression for cascaded validation
+    * HV-1451 - engine - Add @PastOrPresent and @FutureOrPresent messages
+
+** Task
+    * HV-1453 - build  - Upgrade to final versions of BV API and TCK
+
 6.0.0.CR3 (11-07-2017)
 -------------------------
 
