@@ -39,7 +39,7 @@ public class JavaBeanPropertySelector implements PropertyAccessorSelector {
 	public Method findMethod(Class<?> clazz, String property) {
 		Contracts.assertNotNull( clazz, MESSAGES.classCannotBeNull() );
 
-		if (property == null || property.isEmpty()) {
+		if ( property == null || property.isEmpty() ) {
 			throw log.getPropertyNameCannotBeNullOrEmptyException();
 
 		}
