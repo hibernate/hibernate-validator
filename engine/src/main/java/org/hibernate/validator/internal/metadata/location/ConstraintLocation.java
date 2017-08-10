@@ -44,7 +44,7 @@ public interface ConstraintLocation {
 		return new FieldConstraintLocation( field );
 	}
 
-	static ConstraintLocation forGetter( Method getter, ExecutableHelper executableHelper) {
+	static ConstraintLocation forGetter(Method getter, ExecutableHelper executableHelper) {
 		return new GetterConstraintLocation( getter, executableHelper );
 	}
 

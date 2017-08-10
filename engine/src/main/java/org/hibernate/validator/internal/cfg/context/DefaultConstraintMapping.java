@@ -47,7 +47,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 	private final Set<ConstraintDefinitionContextImpl<?>> constraintContexts;
 	private final ExecutableHelper executableHelper;
 
-	public DefaultConstraintMapping( ExecutableHelper executableHelper ) {
+	public DefaultConstraintMapping(ExecutableHelper executableHelper) {
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 		this.configuredTypes = newHashSet();
 		this.typeContexts = newHashSet();

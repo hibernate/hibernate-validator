@@ -28,7 +28,7 @@ public class GetterCascadable implements Cascadable {
 	private final Type cascadableType;
 	private final CascadingMetaData cascadingMetaData;
 
-	GetterCascadable( Method method, ExecutableHelper executableHelper, CascadingMetaData cascadingMetaData) {
+	GetterCascadable(Method method, ExecutableHelper executableHelper, CascadingMetaData cascadingMetaData) {
 		this.method = method;
 		this.propertyName = executableHelper.getPropertyName( method );
 		this.cascadableType = ReflectionHelper.typeOf( method );

@@ -181,7 +181,7 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 *
 	 * @return {@code this} following the chaining method pattern
 	 *
-	 * @since 6.0
+	 * @since 6.1
 	 */
 	HibernateValidatorConfiguration propertyAccessorSelector(PropertyAccessorSelector selector);
 

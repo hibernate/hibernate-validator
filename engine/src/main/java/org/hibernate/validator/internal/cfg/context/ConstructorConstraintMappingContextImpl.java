@@ -18,7 +18,7 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
  */
 class ConstructorConstraintMappingContextImpl extends ExecutableConstraintMappingContextImpl implements ConstructorConstraintMappingContext {
 
-	<T> ConstructorConstraintMappingContextImpl( TypeConstraintMappingContextImpl<T> typeContext, Constructor<T> constructor, ExecutableHelper executableHelper) {
+	<T> ConstructorConstraintMappingContextImpl(TypeConstraintMappingContextImpl<T> typeContext, Constructor<T> constructor, ExecutableHelper executableHelper) {
 		super( typeContext, constructor, executableHelper );
 	}
 

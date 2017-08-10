@@ -162,7 +162,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		private boolean cascadingProperty = false;
 		private Method getterAccessibleMethod;
 
-		public Builder( Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
+		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
 		                ExecutableHelper executableHelper,
 		                ValueExtractorManager valueExtractorManager) {
 			super( beanClass, constraintHelper, typeResolutionHelper, executableHelper, valueExtractorManager );
@@ -185,8 +185,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				ExecutableHelper executableHelper, ValueExtractorManager valueExtractorManager) {
 			super( beanClass, constraintHelper, typeResolutionHelper, executableHelper, valueExtractorManager );
 
-//			this.propertyName = executableHelper.getPropertyName( constrainedMethod.getExecutable() );
-			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getExecutable() );
+			this.propertyName = executableHelper.getPropertyName( constrainedMethod.getExecutable() );
 			this.propertyType = ReflectionHelper.typeOf( constrainedMethod.getExecutable() );
 			add( constrainedMethod );
 		}
@@ -201,11 +200,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 							!( (ConstrainedExecutable) constrainedElement ).isGetterMethod() ) {
 				return false;
 			}
-
-//			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
-//					!executableHelper.isGetterMethod( ( (ConstrainedExecutable) constrainedElement ).getExecutable() ) ) {
-//				return false;
-//			}
 
 			return Objects.equals( getPropertyName( constrainedElement ), propertyName );
 		}

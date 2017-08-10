@@ -47,7 +47,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 	private ReturnValueConstraintMappingContextImpl returnValueContext;
 	private CrossParameterConstraintMappingContextImpl crossParameterContext;
 
-	protected ExecutableConstraintMappingContextImpl( TypeConstraintMappingContextImpl<?> typeContext, Executable executable, ExecutableHelper executableHelper) {
+	protected ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Executable executable, ExecutableHelper executableHelper) {
 		this.typeContext = typeContext;
 		this.executable = executable;
 		this.executableHelper = executableHelper;

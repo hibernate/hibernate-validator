@@ -47,7 +47,7 @@ public class GetterConstraintLocation implements ConstraintLocation {
 	private final Type typeForValidatorResolution;
 
 
-	GetterConstraintLocation( Method method, ExecutableHelper executableHelper) {
+	GetterConstraintLocation(Method method, ExecutableHelper executableHelper) {
 		this.method = method;
 		this.accessibleMethod = getAccessible( method );
 		this.propertyName = executableHelper.getPropertyName( method );

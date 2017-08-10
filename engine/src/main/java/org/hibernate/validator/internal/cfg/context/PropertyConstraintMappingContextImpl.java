@@ -66,11 +66,11 @@ final class PropertyConstraintMappingContextImpl
 	}
 
 	@Override
-	public PropertyConstraintMappingContext constraint( ConstraintDef<?, ?> definition) {
+	public PropertyConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
 		if ( member instanceof Field ) {
 			super.addConstraint(
 					ConfiguredConstraint.forProperty(
-							definition, member, executableHelper
+									executableHelper, definition, member
 					)
 			);
 		}

@@ -9,25 +9,24 @@ package org.hibernate.validator.spi.property;
 import java.lang.reflect.Method;
 
 /**
- * Allows to customize property selection and retrieval based on method instance.
- *
- * Work in progress.
+ * Allows to customize property selection and retrieval based on concrete method / class
+ * <p>
  */
 public interface PropertyAccessorSelector {
 
-	MethodType methodType( Method method );
+	String getPropertyName(Method method);
 
-	String propertyName( Method method );
+	boolean isGetterMethod(Method method);
 
-	default boolean isGetterMethod( Method method ) {
-		return methodType( method ) == MethodType.PROPERTY_READ_ACCESSOR;
-	}
+	Method findMethod(Class<?> type, String property);
 
-	boolean supports( Method method );
+	/**
+	 * Allows to have composite (multiple) selectors. Useful in cases when both classic Java Beans and custom POJOs
+	 * have to be validated by the same Validator instance.
+	 *
+	 * Experimental since the exact API has not been decided (perhaps check {@code getPropertyName(method) != null} is sufficient.
+	 */
+	boolean supports(Method method);
 
-	enum MethodType {
-		PROPERTY_READ_ACCESSOR,
-		OTHER
-	}
 
 }

@@ -108,7 +108,11 @@ public final class ExecutableHelper {
 			return null;
 		}
 
-		return selector.propertyName( (Method) executable );
+		return selector.getPropertyName( (Method) executable );
+	}
+
+	public Method findMethod(Class<?> clazz, String property) {
+		return selector.findMethod( clazz, property );
 	}
 
 	public boolean isGetterMethod(Executable executable) {
