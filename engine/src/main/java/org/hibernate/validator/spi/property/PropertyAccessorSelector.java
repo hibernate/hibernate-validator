@@ -30,7 +30,7 @@ public interface PropertyAccessorSelector {
 	 * Checks if current method is a (zero arguments) property accessor (aka "getter")
 	 *
 	 * @param method method to be analyzed
-	 * @return true if current method can be used to access class property, {@code false} otherwise
+	 * @return {@code true} if current method can be used to access class property, {@code false} otherwise
 	 */
 	boolean isGetterMethod(Method method);
 
@@ -49,6 +49,10 @@ public interface PropertyAccessorSelector {
 	 *
 	 * Experimental since the exact API has not been decided (perhaps check {@code getPropertyName(method) != null} is sufficient.
 	 * TODO perhaps it is redundant
+	 *
+	 * @param method method to be analyzed
+	 *
+	 * @return {@code true} if current selector is aware of this method, {@code false} otherwise
 	 */
 	boolean supports(Method method);
 
