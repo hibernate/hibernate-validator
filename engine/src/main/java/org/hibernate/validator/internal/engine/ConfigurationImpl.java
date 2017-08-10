@@ -100,6 +100,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = new HashMap<>();
 
 	private PropertyAccessorSelector selector;
+	private ExecutableHelper executableHelper;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -240,11 +241,16 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@Override
 	public HibernateValidatorConfiguration propertyAccessorSelector(PropertyAccessorSelector selector) {
 		this.selector = selector;
+		this.executableHelper = null;
 		return this;
 	}
 
-	public PropertyAccessorSelector getPropertyAccessorSelector() {
-		return selector;
+	public ExecutableHelper getExecutableHelper() {
+		if ( executableHelper == null ) {
+			executableHelper = new ExecutableHelper( new TypeResolutionHelper(), selector );
+		}
+
+		return executableHelper;
 	}
 
 	public boolean isAllowOverridingMethodAlterParameterConstraint() {
@@ -277,8 +283,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final DefaultConstraintMapping createConstraintMapping() {
-		// TODO should be single instance of ExecutableHelper per validator
-		return new DefaultConstraintMapping( new ExecutableHelper( new TypeResolutionHelper(), selector ) );
+		return new DefaultConstraintMapping( getExecutableHelper() );
 	}
 
 	@Override

@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -51,7 +50,6 @@ import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
-import org.hibernate.validator.spi.property.PropertyAccessorSelector;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -155,7 +153,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.beanMetaDataManagers = new ConcurrentHashMap<>();
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
-		this.executableHelper = new ExecutableHelper( typeResolutionHelper, propertyAccessorSelector( configurationState ) );
+		this.executableHelper = executableHelper( configurationState );
 
 		boolean tmpFailFast = false;
 		boolean tmpAllowOverridingMethodAlterParameterConstraint = false;
@@ -455,12 +453,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return contributors;
 	}
 
-	private static PropertyAccessorSelector propertyAccessorSelector(ConfigurationState state ) {
-		PropertyAccessorSelector selector = null;
+	private static ExecutableHelper executableHelper(ConfigurationState state ) {
+		ExecutableHelper helper = null;
 		if ( state instanceof ConfigurationImpl ) {
-			selector = ( (ConfigurationImpl) state ).getPropertyAccessorSelector();
+			helper = ( (ConfigurationImpl) state ).getExecutableHelper();
 		}
-		return selector;
+		return helper;
 	}
 
 	private static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,
