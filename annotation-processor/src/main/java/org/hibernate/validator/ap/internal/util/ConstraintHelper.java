@@ -29,6 +29,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -52,6 +53,7 @@ import org.hibernate.validator.ap.internal.util.TypeNames.BeanValidationTypes;
 import org.hibernate.validator.ap.internal.util.TypeNames.HibernateValidatorTypes;
 import org.hibernate.validator.ap.internal.util.TypeNames.JavaMoneyTypes;
 import org.hibernate.validator.ap.internal.util.TypeNames.JodaTypes;
+import org.hibernate.validator.ap.internal.util.TypeNames.SupportedForUnwrapTypes;
 
 /**
  * Helper class that deals with all constraint-related stuff, such as
@@ -223,6 +225,8 @@ public class ConstraintHelper {
 
 	private final Map<Name, AnnotationType> annotationTypeCache;
 
+	private final Map<Name, TypeMirror> supportedTypesUnwrappedByDefault;
+
 	/**
 	 * Caches composing constraints.
 	 */
@@ -240,6 +244,7 @@ public class ConstraintHelper {
 		annotationTypeCache = CollectionHelper.newHashMap();
 		supportedTypesByConstraint = CollectionHelper.newHashMap();
 		composingConstraintsByConstraints = CollectionHelper.newHashMap();
+		supportedTypesUnwrappedByDefault = CollectionHelper.newHashMap();
 
 		//register BV-defined constraints
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.ASSERT_FALSE, Boolean.class );
@@ -299,6 +304,10 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SAFE_HTML, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SCRIPT_ASSERT, Object.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.URL, CharSequence.class );
+
+		registerSupportedTypesUnwrappedByDefault( SupportedForUnwrapTypes.OPTIONAL_INT, Integer.class.getName() );
+		registerSupportedTypesUnwrappedByDefault( SupportedForUnwrapTypes.OPTIONAL_LONG, Long.class.getName() );
+		registerSupportedTypesUnwrappedByDefault( SupportedForUnwrapTypes.OPTIONAL_DOUBLE, Double.class.getName() );
 	}
 
 	/**
@@ -568,6 +577,14 @@ public class ConstraintHelper {
 
 	public Types getTypeUtils() {
 		return typeUtils;
+	}
+
+	public boolean isSupportedForUnwrappingByDefault(Name typeName) {
+		return supportedTypesUnwrappedByDefault.containsKey( typeName );
+	}
+
+	public Optional<TypeMirror> getUnwrappedToByDefault(Name typeName) {
+		return Optional.ofNullable( supportedTypesUnwrappedByDefault.get( typeName ) );
 	}
 
 	// ==================================
@@ -1049,6 +1066,19 @@ public class ConstraintHelper {
 		else {
 			types.addAll( supportedTypes );
 		}
+	}
+
+	private void registerSupportedTypesUnwrappedByDefault(String typeName, String unwrappedToTypeName) {
+		DeclaredType typeToUnwrap = annotationApiHelper.getDeclaredTypeByName( typeName );
+
+		if ( typeToUnwrap == null ) {
+			return;
+		}
+
+		supportedTypesUnwrappedByDefault.put(
+				getName( typeToUnwrap ),
+				annotationApiHelper.getDeclaredTypeByName( unwrappedToTypeName )
+		);
 	}
 
 	private Name getName(DeclaredType type) {
