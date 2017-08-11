@@ -18,6 +18,8 @@ public interface PropertyAccessorSelector {
 	/**
 	 * Derives property name from a method. If it is not possible will return {@code null}.
 	 *
+	 * TODO: should this support non-getters methods as well (like setters, void return type etc.) ?
+	 *
 	 * <p>Example for classic java bean convention: {@code getFoo()} -> {@code foo}</p>
 	 *
 	 * @param method method to be analyzed
@@ -36,6 +38,8 @@ public interface PropertyAccessorSelector {
 
 	/**
 	 * Locates method which is a "getter" for {@code property} in {@code clazz}.
+	 *
+	 * TODO: should this support non-getters methods as well (like setters, void return type etc.) ?
 	 *
 	 * @param clazz class to be introspected (can't be {@code null})
 	 * @param property name of the property (can't be {@code null} or empty)
