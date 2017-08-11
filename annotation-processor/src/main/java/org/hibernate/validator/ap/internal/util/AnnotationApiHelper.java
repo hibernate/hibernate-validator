@@ -16,6 +16,7 @@ import java.util.Set;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
@@ -343,6 +344,40 @@ public class AnnotationApiHelper {
 	 */
 	public boolean isClass(TypeMirror typeMirror) {
 		return TypeKind.DECLARED.equals( typeMirror.getKind() ) && ( (DeclaredType) typeMirror ).asElement().getKind().isClass();
+	}
+
+	/**
+	 * Checks the annotation's payload for unwrapping option ({@code javax.validation.valueextraction.Unwrapping.Unwrap},
+	 * {@code javax.validation.valueextraction.Unwrapping.Skip}) of constraint.
+	 *
+	 * @param annotationMirror constraint annotation mirror under check
+	 * @return unwrapping option, if one is present in the annotation payload, {@link UnwrapMode#NONE} otherwise
+	 */
+	public UnwrapMode determineUnwrapMode(AnnotationMirror annotationMirror) {
+		return getAnnotationArrayValue( annotationMirror, "payload" ).stream()
+				.map( AnnotationValue::getValue )
+				.map( type -> (TypeMirror) type )
+				.map( typeUtils::asElement )
+				.map( elem -> ( (TypeElement) elem ).getQualifiedName() )
+				.filter( name -> name.toString().startsWith( "javax.validation.valueextraction.Unwrapping." ) )
+				.map( UnwrapMode::of )
+				.findAny().orElse( UnwrapMode.NONE );
+	}
+
+	public enum UnwrapMode {
+		UNWRAP, SKIP, NONE;
+
+		public static UnwrapMode of(Name qualifiedName) {
+			if ( "javax.validation.valueextraction.Unwrapping.Unwrap".equals( qualifiedName.toString() ) ) {
+				return UNWRAP;
+			}
+			else if ( "javax.validation.valueextraction.Unwrapping.Skip".equals( qualifiedName.toString() ) ) {
+				return SKIP;
+			}
+			else {
+				return NONE;
+			}
+		}
 	}
 
 }
