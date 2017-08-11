@@ -20,7 +20,7 @@ public interface PropertyAccessorSelector {
 	 *
 	 * TODO: should this support non-getters methods as well (like setters, void return type etc.) ?
 	 *
-	 * <p>Example for classic java bean convention: {@code getFoo()} -> {@code foo}</p>
+	 * <p>Example for classic java bean convention: {@code getFoo()} -&gt; {@code foo}
 	 *
 	 * @param method method to be analyzed
 	 * @return property name which is exposed by this method, {@code null} if method is unknown to current
