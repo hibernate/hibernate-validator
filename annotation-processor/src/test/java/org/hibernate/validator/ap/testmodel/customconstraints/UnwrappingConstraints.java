@@ -12,6 +12,7 @@ import java.util.OptionalLong;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Past;
+import javax.validation.valueextraction.Unwrapping;
 
 public class UnwrappingConstraints {
 
@@ -37,4 +38,19 @@ public class UnwrappingConstraints {
 
 	@Past
 	public OptionalDouble badOptionalDouble;
+
+	@Min(value = 10, payload = Unwrapping.Skip.class)
+	public OptionalInt skipOptionalInt;
+
+	@Min(value = 10, payload = Unwrapping.Skip.class)
+	public OptionalLong skipOptionalLong;
+
+	@Min(value = 10, payload = Unwrapping.Skip.class)
+	public OptionalDouble skipOptionalDouble;
+
+	/**
+	 * Warning
+	 */
+	@Min(value = 10, payload = Unwrapping.Unwrap.class)
+	public Integer unwrappedInteger;
 }

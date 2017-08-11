@@ -13,6 +13,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -26,7 +27,7 @@ import javax.validation.valueextraction.Unwrapping;
 public class InvalidUnwrappingCombination {
 
 	@OptionalConstraint(payload = { Unwrapping.Unwrap.class, Unwrapping.Skip.class })
-	private final Optional<Integer> number;
+	private final OptionalInt number;
 
 	@OptionalConstraint(payload = { Unwrapping.Skip.class })
 	private final Optional<Integer> number2;
@@ -34,7 +35,7 @@ public class InvalidUnwrappingCombination {
 	@OptionalConstraint(payload = { Unwrapping.Unwrap.class })
 	private final Optional<Integer> number3;
 
-	public InvalidUnwrappingCombination(Optional<Integer> number, Optional<Integer> number2, Optional<Integer> number3) {
+	public InvalidUnwrappingCombination(OptionalInt number, Optional<Integer> number2, Optional<Integer> number3) {
 		this.number = number;
 		this.number2 = number2;
 		this.number3 = number3;

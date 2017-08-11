@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Name;
@@ -22,6 +21,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
 import org.hibernate.validator.ap.internal.util.AnnotationApiHelper;
+import org.hibernate.validator.ap.internal.util.AnnotationApiHelper.UnwrapMode;
 import org.hibernate.validator.ap.internal.util.CollectionHelper;
 import org.hibernate.validator.ap.internal.util.ConstraintHelper;
 import org.hibernate.validator.ap.internal.util.ConstraintHelper.AnnotationProcessorValidationTarget;
@@ -74,11 +74,23 @@ public class TypeCheck extends AbstractConstraintCheck {
 	}
 
 	private Set<ConstraintCheckIssue> checkInternal(Element element, AnnotationMirror annotation, TypeMirror type, String messageKey) {
-		TypeMirror typeToCheck = usesUnwrapping( annotation, type ) ? getUnwrappedType( type ) : type;
-		if ( !isAnnotationAllowedForType( annotation, typeToCheck ) ) {
+		Optional<TypeMirror> typeToCheck = usesUnwrapping( annotation, type ) ?
+				getUnwrappedType( type ) :
+				Optional.of( type );
+		if ( typeToCheck.isPresent() ) {
+			if ( !isAnnotationAllowedForType( annotation, typeToCheck.get() ) ) {
+				return CollectionHelper.asSet(
+						ConstraintCheckIssue.error(
+								element, annotation, messageKey,
+								annotation.getAnnotationType().asElement().getSimpleName()
+						) );
+			}
+		}
+		else {
+			// it means that the type was marked for unwrapping but unwrapped value type was not found
 			return CollectionHelper.asSet(
-					ConstraintCheckIssue.error(
-							element, annotation, messageKey,
+					ConstraintCheckIssue.warning(
+							element, annotation, "NOT_FOUND_UNWRAPPED_TYPE",
 							annotation.getAnnotationType().asElement().getSimpleName()
 					) );
 		}
@@ -91,30 +103,22 @@ public class TypeCheck extends AbstractConstraintCheck {
 	}
 
 	private boolean usesUnwrapping(AnnotationMirror annotationMirror, TypeMirror typeMirror) {
+		UnwrapMode mode = annotationApiHelper.determineUnwrapMode( annotationMirror );
+		if ( UnwrapMode.SKIP.equals( mode ) ) {
+			return false;
+		}
+
 		//need to check if this annotation is not on one of the types that are automatically unwrapped:
 		if ( constraintHelper.isSupportedForUnwrappingByDefault( getQualifiedName( typeMirror ) ) ) {
 			return true;
 		}
 
 		//otherwise look for Unwrapping type in payload:
-		return annotationApiHelper.getAnnotationArrayValue( annotationMirror, "payload" ).stream()
-				.map( AnnotationValue::getValue )
-				.map( type -> (TypeMirror) type )
-				.map( typeUtils::asElement )
-				.map( elem -> ( (TypeElement) elem ).getQualifiedName() )
-				.filter( name -> name.toString().equals( "javax.validation.valueextraction.Unwrapping.Unwrap" ) )
-				.findAny().isPresent();
+		return UnwrapMode.UNWRAP.equals( mode );
 	}
 
-	private TypeMirror getUnwrappedType(TypeMirror type) {
-		Optional<TypeMirror> optional = constraintHelper.getUnwrappedToByDefault( getQualifiedName( type ) );
-		if ( optional.isPresent() ) {
-			return optional.get();
-		}
-		else {
-			//TODO: need to find a way to check for unwrapping
-			return type;
-		}
+	private Optional<TypeMirror> getUnwrappedType(TypeMirror type) {
+		return constraintHelper.getUnwrappedToByDefault( getQualifiedName( type ) );
 	}
 
 	private Name getQualifiedName(TypeMirror typeMirror) {
