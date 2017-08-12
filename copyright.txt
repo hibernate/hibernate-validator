@@ -26,6 +26,7 @@ Guillaume Smet
 Gunnar Morling
 Hardy Ferentschik
 Henno Vermeulen
+Hilmer Chona
 Jan-Willem Willebrands
 Jason T. Greene
 Jiri Bilek
