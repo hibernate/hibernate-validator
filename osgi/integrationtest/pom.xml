@@ -66,6 +66,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- script engines -->
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-jsr223</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Pax Exam -->
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>

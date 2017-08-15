@@ -215,6 +215,7 @@
                         <Import-Package>
                             javax.persistence.*;version="[2.0.0,3.0.0)";resolution:=optional,
                             javax.validation.*;version="[2.0.0,3.0.0)",
+                            javax.script.*;version="0",
                             javax.xml.*;version="0",
                             javax.el.*;version="[2.0.0,4.0.0)";resolution:=optional,
                             org.xml.sax.*;version="0",
