@@ -26,8 +26,6 @@ import javax.validation.UnexpectedTypeException;
 import javax.validation.Validator;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Null;
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.UnwrapByDefault;
 import javax.validation.valueextraction.Unwrapping;
@@ -45,7 +43,6 @@ import org.testng.annotations.Test;
  * @author Guillaume Smet
  */
 @TestForIssue(jiraKey = "HV-925")
-@SuppressWarnings("unused")
 public class UnwrappingTest {
 	private Validator validatorWithValueExtractor;
 	private Validator validatorWithoutValueExtractor;
@@ -109,38 +106,9 @@ public class UnwrappingTest {
 		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
-	private class Bar {
-		@Min(10)
-		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
-
-		private final ValueHolder<@NotBlank String> stringHolder = new ValueHolder<>( "" );
-	}
-
-	private class Baz {
-		@Null
-		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
-	}
-
-	private class Qux {
-		@ValueHolderConstraint
-		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
-	}
-
-	private class WrapperWithImplicitUnwrapping {
-
-		@Min(10)
-		private final Wrapper<Integer> integerWrapper = new Wrapper<>( 5 );
-	}
-
 	private class WrapperWithDisabledUnwrapping {
 
 		@Min(value = 10, payload = { Unwrapping.Skip.class })
-		private final Wrapper<Integer> integerWrapper = new Wrapper<>( 5 );
-	}
-
-	private class WrapperWithForcedUnwrapping {
-
-		@Min(value = 10, payload = { Unwrapping.Unwrap.class })
 		private final Wrapper<Integer> integerWrapper = new Wrapper<>( 5 );
 	}
 
@@ -158,6 +126,7 @@ public class UnwrappingTest {
 			this.value = value;
 		}
 
+		@SuppressWarnings("unused")
 		public T getValue() {
 			return value;
 		}
@@ -171,6 +140,7 @@ public class UnwrappingTest {
 			this.value = value;
 		}
 
+		@SuppressWarnings("unused")
 		public T getValue() {
 			return value;
 		}
