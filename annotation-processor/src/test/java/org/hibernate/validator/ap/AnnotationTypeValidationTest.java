@@ -104,10 +104,10 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		boolean compilationResult =
 				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile1, sourceFile2 );
 
-		assertFalse( compilationResult );
+		assertTrue( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 24 )
+				new DiagnosticExpectation( Kind.WARNING, 24 )
 		);
 	}
 
