@@ -534,7 +534,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private boolean validateMetaConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, MetaConstraint<?> metaConstraint) {
-		PathImpl currentPath = valueContext.getPropertyPath();
+		ValueContext.ValueState<Object> originalValueState = valueContext.getCurrentValueState();
 		valueContext.appendNode( metaConstraint.getLocation() );
 		boolean success = true;
 
@@ -554,8 +554,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			validationContext.markConstraintProcessed( valueContext.getCurrentBean(), valueContext.getPropertyPath(), metaConstraint );
 		}
 
-		// reset the path to the state before this call
-		valueContext.setPropertyPath( currentPath );
+		// reset the value context to the state before this call
+		valueContext.resetValueState( originalValueState );
 
 		return success;
 	}
@@ -569,7 +569,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private void validateCascadedConstraints(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		Validatable validatable = valueContext.getCurrentValidatable();
-		PathImpl originalPath = valueContext.getPropertyPath();
+		ValueContext.ValueState<Object> originalValueState = valueContext.getCurrentValueState();
 
 		for ( Cascadable cascadable : validatable.getCascadables() ) {
 			valueContext.appendNode( cascadable );
@@ -597,8 +597,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				}
 			}
 
-			// reset the path
-			valueContext.setPropertyPath( originalPath );
+			// reset the value context
+			valueContext.resetValueState( originalValueState );
 		}
 	}
 

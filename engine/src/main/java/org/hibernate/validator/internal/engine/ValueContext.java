@@ -137,10 +137,6 @@ public class ValueContext<T, V> {
 		return currentValue;
 	}
 
-	public final void setPropertyPath(PathImpl propertyPath) {
-		this.propertyPath = propertyPath;
-	}
-
 	public final void appendNode(Cascadable node) {
 		PathImpl newPath = PathImpl.createCopy( propertyPath );
 		node.appendTo( newPath );
@@ -212,6 +208,15 @@ public class ValueContext<T, V> {
 		this.elementType = elementType;
 	}
 
+	public final ValueState<V> getCurrentValueState() {
+		return new ValueState<V>( propertyPath, currentValue );
+	}
+
+	public final void resetValueState(ValueState<V> valueState) {
+		this.propertyPath = valueState.propertyPath;
+		this.currentValue = valueState.currentValue;
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
@@ -229,5 +234,17 @@ public class ValueContext<T, V> {
 	public Object getValue(Object parent, ConstraintLocation location) {
 		// TODO: For BVAL-214 we'd get the value from a map or another alternative structure instead
 		return location.getValue( parent );
+	}
+
+	public static class ValueState<V> {
+
+		private final PathImpl propertyPath;
+
+		private final V currentValue;
+
+		private ValueState(PathImpl propertyPath, V currentValue) {
+			this.propertyPath = propertyPath;
+			this.currentValue = currentValue;
+		}
 	}
 }
