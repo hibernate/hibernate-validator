@@ -47,7 +47,7 @@ public class ConstraintValidatorCheck extends AbstractConstraintCheck {
 		if ( !( atLeastOneValidatorGiven || constraintHelper.isComposedConstraint( element ) ) ) {
 
 			return CollectionHelper.asSet(
-					ConstraintCheckIssue.error(
+					ConstraintCheckIssue.warning(
 							element,
 							constraintMirror,
 							"CONSTRAINT_TYPE_WITHOUT_VALIDATOR"
