@@ -19,7 +19,6 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
-import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -208,7 +207,7 @@ public class MetaConstraint<A extends Annotation> {
 		}
 
 		private void doValidate(Object value, String nodeName) {
-			PathImpl before = valueContext.getPropertyPath();
+			ValueContext.ValueState<Object> originalValueState = valueContext.getCurrentValueState();
 
 			Class<?> containerClass = currentValueExtractionPathNode.getContainerClass();
 			if ( containerClass != null ) {
@@ -235,8 +234,8 @@ public class MetaConstraint<A extends Annotation> {
 				success &= doValidateConstraint( validationContext, valueContext );
 			}
 
-			// reset the path to the state before this call
-			valueContext.setPropertyPath( before );
+			// reset the value context to the state before this call
+			valueContext.resetValueState( originalValueState );
 		}
 
 		public boolean isSuccess() {
