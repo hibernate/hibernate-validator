@@ -11,13 +11,15 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
+import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
+
 /**
  * A wrapper around JSR 223 {@link ScriptEngine}s. This class is thread-safe.
  *
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-public class ScriptEvaluator {
+public class ScriptEvaluatorImpl implements ScriptEvaluator {
 
 	private final ScriptEngine engine;
 
@@ -26,7 +28,7 @@ public class ScriptEvaluator {
 	 *
 	 * @param engine The engine to be wrapped.
 	 */
-	public ScriptEvaluator(ScriptEngine engine) {
+	public ScriptEvaluatorImpl(ScriptEngine engine) {
 		this.engine = engine;
 	}
 
@@ -41,6 +43,7 @@ public class ScriptEvaluator {
 	 *
 	 * @throws ScriptException In case of any errors during script execution.
 	 */
+	@Override
 	public Object evaluate(String script, Map<String, Object> bindings) throws ScriptException {
 		if ( engineAllowsParallelAccessFromMultipleThreads() ) {
 			return doEvaluate( script, bindings );

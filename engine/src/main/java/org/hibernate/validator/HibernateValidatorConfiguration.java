@@ -13,6 +13,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
@@ -236,4 +237,6 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @since 6.0.3
 	 */
 	HibernateValidatorConfiguration enableTraversableResolverResultCache(boolean enabled);
+
+	HibernateValidatorConfiguration scripEngineFactory(ScriptEvaluatorFactory scripEngineFactory);
 }

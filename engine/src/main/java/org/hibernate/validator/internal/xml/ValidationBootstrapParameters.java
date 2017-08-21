@@ -24,6 +24,7 @@ import javax.validation.ValidationException;
 import javax.validation.spi.ValidationProvider;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor.Key;
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -43,6 +44,7 @@ public class ValidationBootstrapParameters {
 	private TraversableResolver traversableResolver;
 	private ParameterNameProvider parameterNameProvider;
 	private ClockProvider clockProvider;
+	private ScriptEvaluatorFactory scriptEvaluatorFactory;
 	private ValidationProvider<?> provider;
 	private Class<? extends ValidationProvider<?>> providerClass = null;
 	private final Map<String, String> configProperties = new HashMap<>();
@@ -59,6 +61,8 @@ public class ValidationBootstrapParameters {
 		setConstraintFactory( bootstrapConfiguration.getConstraintValidatorFactoryClassName(), externalClassLoader );
 		setParameterNameProvider( bootstrapConfiguration.getParameterNameProviderClassName(), externalClassLoader );
 		setClockProvider( bootstrapConfiguration.getClockProviderClassName(), externalClassLoader );
+		// TODO: implement
+		// setScriptEvaluatorFactory( bootstrapConfiguration.get(), externalClassLoader );
 		setValueExtractors( bootstrapConfiguration.getValueExtractorClassNames(), externalClassLoader );
 		setMappingStreams( bootstrapConfiguration.getConstraintMappingResourcePaths(), externalClassLoader );
 		setConfigProperties( bootstrapConfiguration.getProperties() );
@@ -138,6 +142,14 @@ public class ValidationBootstrapParameters {
 
 	public void setClockProvider(ClockProvider clockProvider) {
 		this.clockProvider = clockProvider;
+	}
+
+	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
+		return scriptEvaluatorFactory;
+	}
+
+	public void setScriptEvaluatorFactory(ScriptEvaluatorFactory scriptEvaluatorFactory) {
+		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 	}
 
 	public Map<Key, ValueExtractorDescriptor> getValueExtractorDescriptors() {
@@ -239,6 +251,22 @@ public class ValidationBootstrapParameters {
 			}
 			catch (ValidationException e) {
 				throw log.getUnableToInstantiateClockProviderClassException( clockProviderFqcn, e );
+			}
+		}
+	}
+
+	private void setScriptEvaluatorFactory(String scriptEvaluatorFactoryFqcn, ClassLoader externalClassLoader) {
+		if ( scriptEvaluatorFactoryFqcn != null ) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<? extends ScriptEvaluatorFactory> clazz = (Class<? extends ScriptEvaluatorFactory>) run(
+						LoadClass.action( scriptEvaluatorFactoryFqcn, externalClassLoader )
+				);
+				scriptEvaluatorFactory = run( NewInstance.action( clazz, "script evaluator factory class" ) );
+				log.usingScriptEvaluatorFactory( clazz );
+			}
+			catch (ValidationException e) {
+				throw log.getUnableToInstantiateScriptEvaluatorFactoryClassException( scriptEvaluatorFactoryFqcn, e );
 			}
 		}
 	}

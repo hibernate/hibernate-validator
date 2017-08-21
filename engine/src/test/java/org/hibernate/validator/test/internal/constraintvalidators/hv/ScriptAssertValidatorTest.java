@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.time.Instant;
@@ -20,12 +20,14 @@ import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintViolation;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
@@ -37,45 +39,55 @@ import org.testng.annotations.Test;
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
-public class ScriptAssertValidatorTest {
+public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 
 	@Test
 	public void scriptEvaluatesToTrue() throws Exception {
-		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "groovy", "true" );
+		@ScriptAssert(lang = "groovy", script = "true") class TmpType { }
+		assertNoViolations( validator.validate( new TmpType() ) );
 
-		assertTrue( validator.isValid( new Object(), null ) );
 	}
 
 	@Test
 	public void scriptEvaluatesToFalse() throws Exception {
-		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "groovy", "false" );
-
-		assertFalse( validator.isValid( new Object(), null ) );
+		@ScriptAssert(lang = "groovy", script = "false") class TmpType { }
+		assertThat( validator.validate( new TmpType() ) ).containsOnlyViolations(
+				violationOf( ScriptAssert.class )
+		);
 	}
 
 	@Test
 	public void scriptExpressionReferencingAnnotatedObject() throws Exception {
-		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator(
-				"groovy", "_this.startDate.before(_this.endDate)"
-		);
+		@ScriptAssert(lang = "groovy", script = "_this.startDate.before(_this.endDate)") class TmpType extends CalendarEvent {
+			public TmpType(Date startDate, Date endDate) {
+				super( startDate, endDate );
+			}
+		}
 
 		Date startDate = new GregorianCalendar( 2009, 8, 20 ).getTime();
 		Date endDate = new GregorianCalendar( 2009, 8, 21 ).getTime();
 
-		assertTrue( validator.isValid( new CalendarEvent( startDate, endDate ), null ) );
-		assertFalse( validator.isValid( new CalendarEvent( endDate, startDate ), null ) );
+		assertNoViolations( validator.validate( new TmpType( startDate, endDate ) ) );
+		assertThat( validator.validate( new TmpType( endDate, startDate ) ) ).containsOnlyViolations(
+				violationOf( ScriptAssert.class )
+		);
 	}
 
 	@Test
 	public void scriptExpressionUsingCustomizedAlias() throws Exception {
-		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator(
-				"groovy", "_.startDate.before(_.endDate)", "_"
-		);
+		@ScriptAssert(lang = "groovy", script = "_.startDate.before(_.endDate)", alias = "_") class TmpType extends CalendarEvent {
+			public TmpType(Date startDate, Date endDate) {
+				super( startDate, endDate );
+			}
+		}
 
 		Date startDate = new GregorianCalendar( 2009, 8, 20 ).getTime();
 		Date endDate = new GregorianCalendar( 2009, 8, 21 ).getTime();
 
-		assertFalse( validator.isValid( new CalendarEvent( endDate, startDate ), null ) );
+		assertNoViolations( validator.validate( new TmpType( startDate, endDate ) ) );
+		assertThat( validator.validate( new TmpType( endDate, startDate ) ) ).containsOnlyViolations(
+				violationOf( ScriptAssert.class )
+		);
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
@@ -93,34 +105,52 @@ public class ScriptAssertValidatorTest {
 		getInitializedValidator( "lang", "script", "" );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@Test
 	public void unknownLanguageNameRaisesException() throws Exception {
-		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "foo", "script" );
+		@ScriptAssert(lang = "foo", script = "script") class TmpType { }
 
-		validator.isValid( new Object(), null );
+		try {
+			assertNoViolations( validator.validate( new TmpType() ) );
+		}
+		catch (ValidationException e) {
+			assertTrue( e.getCause() instanceof ConstraintDeclarationException );
+		}
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@Test
 	public void illegalScriptExpressionRaisesException() throws Exception {
-		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "groovy", "foo" );
+		@ScriptAssert(lang = "groovy", script = "foo") class TmpType { }
 
-		validator.isValid( new Object(), null );
+		try {
+			assertNoViolations( validator.validate( new TmpType() ) );
+		}
+		catch (ValidationException e) {
+			assertTrue( e.getCause() instanceof ConstraintDeclarationException );
+		}
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@Test
 	public void scriptExpressionReturningNullRaisesException() throws Exception {
-		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "groovy", "null" );
+		@ScriptAssert(lang = "groovy", script = "null") class TmpType { }
 
-		validator.isValid( new Object(), null );
+		try {
+			assertNoViolations( validator.validate( new TmpType() ) );
+		}
+		catch (ValidationException e) {
+			assertTrue( e.getCause() instanceof ConstraintDeclarationException );
+		}
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@Test
 	public void scriptExpressionReturningNoBooleanRaisesException() throws Exception {
-		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator(
-				"groovy", "new java.util.Date()"
-		);
+		@ScriptAssert(lang = "groovy", script = "new java.util.Date()") class TmpType { }
 
-		validator.isValid( new Object(), null );
+		try {
+			assertNoViolations( validator.validate( new TmpType() ) );
+		}
+		catch (ValidationException e) {
+			assertTrue( e.getCause() instanceof ConstraintDeclarationException );
+		}
 	}
 
 	@Test
@@ -136,8 +166,8 @@ public class ScriptAssertValidatorTest {
 
 		Set<ConstraintViolation<AnnotatedCalendarEvent>> fieldViolations = validator.validate(
 				new AnnotatedCalendarEvent(
-					Date.from( Instant.now().plusMillis( 1000L ) ),
-					Date.from( Instant.now().minusMillis( 1000L ) )
+						Date.from( Instant.now().plusMillis( 1000L ) ),
+						Date.from( Instant.now().minusMillis( 1000L ) )
 				)
 		);
 

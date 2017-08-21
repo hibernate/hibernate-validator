@@ -114,6 +114,7 @@ public class ConstraintTree<A extends Annotation> {
 			ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
 					validationContext.getParameterNames(),
 					validationContext.getClockProvider(),
+					validationContext.getScriptEvaluatorFactory(),
 					valueContext.getPropertyPath(),
 					descriptor
 			);

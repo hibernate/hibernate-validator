@@ -27,6 +27,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
@@ -129,6 +130,11 @@ public class ValidationContext<T> {
 	private final ClockProvider clockProvider;
 
 	/**
+	 * Script evaluator factory which should be used in this context.
+	 */
+	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
+
+	/**
 	 * Whether or not validation should fail on the first constraint violation.
 	 */
 	private final boolean failFast;
@@ -144,6 +150,7 @@ public class ValidationContext<T> {
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ClockProvider clockProvider,
+			ScriptEvaluatorFactory scriptEvaluatorFactory,
 			boolean failFast,
 			T rootBean,
 			Class<T> rootBeanClass,
@@ -157,6 +164,7 @@ public class ValidationContext<T> {
 		this.traversableResolver = traversableResolver;
 		this.parameterNameProvider = parameterNameProvider;
 		this.clockProvider = clockProvider;
+		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.failFast = failFast;
 
 		this.rootBean = rootBean;
@@ -178,6 +186,7 @@ public class ValidationContext<T> {
 			ConstraintValidatorFactory constraintValidatorFactory,
 			TraversableResolver traversableResolver,
 			ClockProvider clockProvider,
+			ScriptEvaluatorFactory scriptEvaluatorFactory,
 			boolean failFast) {
 
 		return new ValidationContextBuilder(
@@ -187,6 +196,7 @@ public class ValidationContext<T> {
 				constraintValidatorFactory,
 				traversableResolver,
 				clockProvider,
+				scriptEvaluatorFactory,
 				failFast
 		);
 	}
@@ -236,6 +246,10 @@ public class ValidationContext<T> {
 
 	public ClockProvider getClockProvider() {
 		return clockProvider;
+	}
+
+	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
+		return scriptEvaluatorFactory;
 	}
 
 	public Set<ConstraintViolation<T>> createConstraintViolations(ValueContext<?, ?> localContext,
@@ -448,6 +462,7 @@ public class ValidationContext<T> {
 		private final ConstraintValidatorFactory constraintValidatorFactory;
 		private final TraversableResolver traversableResolver;
 		private final ClockProvider clockProvider;
+		private final ScriptEvaluatorFactory scriptEvaluatorFactory;
 		private final boolean failFast;
 
 		private ValidationContextBuilder(
@@ -457,6 +472,7 @@ public class ValidationContext<T> {
 				ConstraintValidatorFactory constraintValidatorFactory,
 				TraversableResolver traversableResolver,
 				ClockProvider clockProvider,
+				ScriptEvaluatorFactory scriptEvaluatorFactory,
 				boolean failFast) {
 			this.beanMetaDataManager = beanMetaDataManager;
 			this.constraintValidatorManager = constraintValidatorManager;
@@ -464,6 +480,7 @@ public class ValidationContext<T> {
 			this.constraintValidatorFactory = constraintValidatorFactory;
 			this.traversableResolver = traversableResolver;
 			this.clockProvider = clockProvider;
+			this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 			this.failFast = failFast;
 		}
 
@@ -477,6 +494,7 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider
 					clockProvider,
+					scriptEvaluatorFactory,
 					failFast,
 					rootBean,
 					rootBeanClass,
@@ -497,6 +515,7 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider
 					clockProvider,
+					scriptEvaluatorFactory,
 					failFast,
 					rootBean,
 					rootBeanClass,
@@ -515,6 +534,7 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider
 					clockProvider,
+					scriptEvaluatorFactory,
 					failFast,
 					null,
 					rootBeanClass, //root bean
@@ -539,6 +559,7 @@ public class ValidationContext<T> {
 					traversableResolver,
 					parameterNameProvider,
 					clockProvider,
+					scriptEvaluatorFactory,
 					failFast,
 					rootBean,
 					rootBeanClass,
@@ -562,6 +583,7 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider
 					clockProvider,
+					scriptEvaluatorFactory,
 					failFast,
 					rootBean,
 					rootBeanClass,

@@ -6,7 +6,10 @@
  */
 package org.hibernate.validator.constraintvalidation;
 
+import javax.script.ScriptException;
 import javax.validation.ConstraintValidatorContext;
+
+import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
 
 /**
  * A custom {@link ConstraintValidatorContext} which allows to set additional message parameters for
@@ -106,4 +109,6 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 * @since 5.3
 	 */
 	HibernateConstraintValidatorContext withDynamicPayload(Object payload);
+
+	ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) throws ScriptException;
 }

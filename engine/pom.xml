@@ -224,7 +224,8 @@
                             org.joda.time.*;version="[2.0.0,3.0.0)";resolution:=optional,
                             org.jsoup.*;version="[1.5.2,2.0.0)";resolution:=optional,
                             javax.money;version="[1.0.0,2.0.0)";resolution:=optional,
-                            com.thoughtworks.paranamer.*;version="[2.5.5,3.0.0)";resolution:=optional
+                            com.thoughtworks.paranamer.*;version="[2.5.5,3.0.0)";resolution:=optional,
+                            org.codehaus.groovy.jsr223;version="[2.4.0,3.0.0)";resolution:=optional
                         </Import-Package>
                         <Export-Package>
                             org.hibernate.validator;version="${project.version}",

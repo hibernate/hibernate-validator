@@ -35,6 +35,7 @@ import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
@@ -47,6 +48,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.GetInstancesFromServiceLoader;
 import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
+import org.hibernate.validator.internal.util.scriptengine.DefaultLookupScriptEvaluatorFactory;
 import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
@@ -82,6 +84,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
 	private final ParameterNameProvider defaultParameterNameProvider;
 	private final ClockProvider defaultClockProvider;
+	private final ScriptEvaluatorFactory defaultScriptEvaluatorFactory;
 
 	private ValidationProviderResolver providerResolver;
 	private final ValidationBootstrapParameters validationBootstrapParameters;
@@ -126,6 +129,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
+		this.defaultScriptEvaluatorFactory = DefaultLookupScriptEvaluatorFactory.getInstance();
 	}
 
 	@Override
@@ -260,6 +264,17 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@Override
 	public HibernateValidatorConfiguration allowParallelMethodsDefineParameterConstraints(boolean allow) {
 		this.methodValidationConfigurationBuilder.allowParallelMethodsDefineParameterConstraints( allow );
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorConfiguration scripEngineFactory(ScriptEvaluatorFactory scripEngineFactory) {
+		if ( log.isDebugEnabled() ) {
+			if ( scripEngineFactory != null ) {
+				log.debug( "Setting custom ScripEngineFactory of type " + scripEngineFactory.getClass().getName() );
+			}
+		}
+		this.validationBootstrapParameters.setScriptEvaluatorFactory( scripEngineFactory );
 		return this;
 	}
 
@@ -405,6 +420,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@Override
 	public ClockProvider getClockProvider() {
 		return validationBootstrapParameters.getClockProvider();
+	}
+
+	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
+		return validationBootstrapParameters.getScriptEvaluatorFactory();
 	}
 
 	@Override
@@ -556,6 +575,15 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 			else {
 				validationBootstrapParameters.setClockProvider( defaultClockProvider );
+			}
+		}
+
+		if ( validationBootstrapParameters.getScriptEvaluatorFactory() == null ) {
+			if ( xmlParameters.getScriptEvaluatorFactory() != null ) {
+				validationBootstrapParameters.setScriptEvaluatorFactory( xmlParameters.getScriptEvaluatorFactory() );
+			}
+			else {
+				validationBootstrapParameters.setScriptEvaluatorFactory( defaultScriptEvaluatorFactory );
 			}
 		}
 

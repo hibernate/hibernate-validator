@@ -57,6 +57,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	private final String traversableResolverClassName;
 	private final String parameterNameProviderClassName;
 	private final String clockProviderClassName;
+	private final String scriptEvaluatorFactoryClassName;
 	private final Set<String> valueExtractorClassNames;
 	private final Set<String> constraintMappingResourcePaths;
 	private final Map<String, String> properties;
@@ -70,6 +71,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.traversableResolverClassName = null;
 		this.parameterNameProviderClassName = null;
 		this.clockProviderClassName = null;
+		this.scriptEvaluatorFactoryClassName = null;
 		this.valueExtractorClassNames = new HashSet<>();
 		this.validatedExecutableTypes = DEFAULT_VALIDATED_EXECUTABLE_TYPES;
 		this.isExecutableValidationEnabled = true;
@@ -83,6 +85,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 									  String traversableResolverClassName,
 									  String parameterNameProviderClassName,
 									  String clockProviderClassName,
+									  String scriptEvaluatorFactoryClassName,
 									  Set<String> valueExtractorClassNames,
 									  EnumSet<ExecutableType> validatedExecutableTypes,
 									  boolean isExecutableValidationEnabled,
@@ -94,6 +97,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.traversableResolverClassName = traversableResolverClassName;
 		this.parameterNameProviderClassName = parameterNameProviderClassName;
 		this.clockProviderClassName = clockProviderClassName;
+		this.scriptEvaluatorFactoryClassName = scriptEvaluatorFactoryClassName;
 		this.valueExtractorClassNames = valueExtractorClassNames;
 		this.validatedExecutableTypes = prepareValidatedExecutableTypes( validatedExecutableTypes );
 		this.isExecutableValidationEnabled = isExecutableValidationEnabled;

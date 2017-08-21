@@ -18,6 +18,7 @@ import javax.validation.Validator;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -42,6 +43,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private ExecutableParameterNameProvider parameterNameProvider;
 	private ClockProvider clockProvider;
+	private ScriptEvaluatorFactory scriptEvaluatorFactory;
 	private boolean failFast;
 	private boolean traversableResolverResultCacheEnabled;
 	private final ValueExtractorManager valueExtractorManager;
@@ -55,6 +57,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
 		this.parameterNameProvider = validatorFactory.getExecutableParameterNameProvider();
 		this.clockProvider = validatorFactory.getClockProvider();
+		this.scriptEvaluatorFactory = validatorFactory.getScriptEvaluatorFactory();
 		this.failFast = validatorFactory.isFailFast();
 		this.traversableResolverResultCacheEnabled = validatorFactory.isTraversableResolverResultCacheEnabled();
 		this.methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder( validatorFactory.getMethodValidationConfiguration() );
@@ -167,6 +170,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				traversableResolver,
 				parameterNameProvider,
 				clockProvider,
+				scriptEvaluatorFactory,
 				failFast,
 				valueExtractorDescriptors.isEmpty() ? valueExtractorManager : new ValueExtractorManager( valueExtractorManager, valueExtractorDescriptors ),
 				methodValidationConfigurationBuilder.build(),

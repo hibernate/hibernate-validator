@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.script.ScriptException;
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.ContainerElementNodeBuilderCustomizableContext;
@@ -26,6 +27,8 @@ import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.No
 import javax.validation.ElementKind;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
+import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -46,16 +49,18 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private Map<String, Object> expressionVariables;
 	private final List<String> methodParameterNames;
 	private final ClockProvider clockProvider;
+	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
 	private final PathImpl basePath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private List<ConstraintViolationCreationContext> constraintViolationCreationContexts;
 	private boolean defaultDisabled;
 	private Object dynamicPayload;
 
-	public ConstraintValidatorContextImpl(List<String> methodParameterNames, ClockProvider clockProvider, PathImpl propertyPath,
-			ConstraintDescriptor<?> constraintDescriptor) {
+	public ConstraintValidatorContextImpl(List<String> methodParameterNames, ClockProvider clockProvider, ScriptEvaluatorFactory scriptEvaluatorFactory,
+			PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor) {
 		this.methodParameterNames = methodParameterNames;
 		this.clockProvider = clockProvider;
+		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.basePath = propertyPath;
 		this.constraintDescriptor = constraintDescriptor;
 	}
@@ -121,6 +126,11 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	public HibernateConstraintValidatorContext withDynamicPayload(Object violationContext) {
 		this.dynamicPayload = violationContext;
 		return this;
+	}
+
+	@Override
+	public ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) throws ScriptException {
+		return scriptEvaluatorFactory.getScriptEvaluatorByLanguageName( languageName );
 	}
 
 	public final ConstraintDescriptor<?> getConstraintDescriptor() {

@@ -31,6 +31,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration.Builder;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
@@ -88,6 +89,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * Provider for the current time when validating {@code @Future} or {@code @Past}
 	 */
 	private final ClockProvider clockProvider;
+
+	/**
+	 * Used to get {@code ScriptEvaluatorFactory} when validating {@code @ScriptAssert} and {@code @ParameterScriptAssert}.
+	 */
+	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
 
 	/**
 	 * The default constraint validator factory for this factory.
@@ -155,6 +161,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.traversableResolver = configurationState.getTraversableResolver();
 		this.parameterNameProvider = new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() );
 		this.clockProvider = configurationState.getClockProvider();
+		this.scriptEvaluatorFactory = ( (ConfigurationImpl) configurationState ).getScriptEvaluatorFactory();
 		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
 		this.beanMetaDataManagers = new ConcurrentHashMap<>();
 		this.constraintHelper = new ConstraintHelper();
@@ -293,6 +300,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				traversableResolver,
 				parameterNameProvider,
 				clockProvider,
+				scriptEvaluatorFactory,
 				failFast,
 				valueExtractorManager,
 				methodValidationConfiguration,
@@ -327,6 +335,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	@Override
 	public ClockProvider getClockProvider() {
 		return clockProvider;
+	}
+
+	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
+		return scriptEvaluatorFactory;
 	}
 
 	public boolean isFailFast() {
@@ -373,6 +385,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ClockProvider clockProvider,
+			ScriptEvaluatorFactory scriptEvaluatorFactory,
 			boolean failFast,
 			ValueExtractorManager valueExtractorManager,
 			MethodValidationConfiguration methodValidationConfiguration,
@@ -401,6 +414,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				beanMetaDataManager,
 				parameterNameProvider,
 				clockProvider,
+				scriptEvaluatorFactory,
 				valueExtractorManager,
 				constraintValidatorManager,
 				validationOrderGenerator,

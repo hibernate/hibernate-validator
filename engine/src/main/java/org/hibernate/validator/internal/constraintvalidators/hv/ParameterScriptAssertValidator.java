@@ -52,7 +52,7 @@ public class ParameterScriptAssertValidator implements ConstraintValidator<Param
 
 		Map<String, Object> bindings = getBindings( arguments, parameterNames );
 
-		return scriptAssertContext.evaluateScriptAssertExpression( bindings );
+		return scriptAssertContext.evaluateScriptAssertExpression( bindings, constraintValidatorContext );
 	}
 
 	private Map<String, Object> getBindings(Object[] arguments, List<String> parameterNames) {

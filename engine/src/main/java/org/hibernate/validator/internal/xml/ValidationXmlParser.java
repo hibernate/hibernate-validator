@@ -203,6 +203,7 @@ public class ValidationXmlParser {
 				config.getTraversableResolver(),
 				config.getParameterNameProvider(),
 				config.getClockProvider(),
+				"", // TODO: need to change xml
 				getValueExtractorClassNames( config ),
 				defaultValidatedExecutableTypes,
 				executableValidationEnabled,

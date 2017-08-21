@@ -36,6 +36,7 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.Group;
@@ -133,6 +134,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private final ClockProvider clockProvider;
 
 	/**
+	 * Used to get {@code ScriptEvaluatorFactory} when validating {@code @ScriptAssert} and {@code @ParameterScriptAssert}.
+	 */
+	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
+
+	/**
 	 * Indicates if validation has to be stopped on first constraint violation.
 	 */
 	private final boolean failFast;
@@ -150,6 +156,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			BeanMetaDataManager beanMetaDataManager,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ClockProvider clockProvider,
+			ScriptEvaluatorFactory scriptEvaluatorFactory,
 			ValueExtractorManager valueExtractorManager,
 			ConstraintValidatorManager constraintValidatorManager,
 			ValidationOrderGenerator validationOrderGenerator,
@@ -161,6 +168,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.parameterNameProvider = parameterNameProvider;
 		this.clockProvider = clockProvider;
+		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.valueExtractorManager = valueExtractorManager;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.validationOrderGenerator = validationOrderGenerator;
@@ -340,6 +348,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				constraintValidatorFactory,
 				TraversableResolvers.wrapWithCachingForSingleValidation( traversableResolver, traversableResolverResultCacheEnabled ),
 				clockProvider,
+				scriptEvaluatorFactory,
 				failFast
 		);
 	}

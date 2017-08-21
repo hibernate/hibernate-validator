@@ -14,7 +14,6 @@ import org.hibernate.validator.constraints.ScriptAssert;
  * @author Marko Bekhta
  */
 @ScriptAssert(lang = "groovy", script = "_this.start < _this.end", message = "start of event cannot be after the end")
-//@ScriptAssert(lang = "javascript", script = "true", message = "message")
 public class Event {
 
 	private final LocalDate start;
@@ -24,5 +23,11 @@ public class Event {
 	public Event(LocalDate start, LocalDate end) {
 		this.start = start;
 		this.end = end;
+	}
+
+	@ScriptAssert(lang = "groovy", script = "true", message = "groovy message")
+	@ScriptAssert(lang = "ECMAScript", script = "true", message = "ECMAScript message")
+	public static class EventLocation {
+
 	}
 }

@@ -50,7 +50,7 @@ public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, 
 			constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class ).addMessageParameter( "script", escapedScript );
 		}
 
-		boolean validationResult = scriptAssertContext.evaluateScriptAssertExpression( value, alias );
+		boolean validationResult = scriptAssertContext.evaluateScriptAssertExpression( value, alias, constraintValidatorContext );
 
 		if ( !validationResult && !reportOn.isEmpty() ) {
 			constraintValidatorContext.disableDefaultConstraintViolation();
