@@ -1,6 +1,18 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.2.Final (22-08-2017)
+-------------------------
+
+** Bug
+    * HV-1471 - engine               - Properly reset the context after constraint validation
+    * HV-1470 - annotation-processor - ConstraintValidatorCheck should be made a warning
+
+** Task
+    * HV-1467 - translations         - Add missing Portuguese constraint violation messages
+    * HV-1462 - integration          - Provide patch file for WildFly 11 Beta1
+    * HV-1395 - annotation-processor - Support OptionalInt/OptionalDouble/OptionalLong in the annotation processor
+
 6.0.1.Final (04-08-2017)
 -------------------------
 
