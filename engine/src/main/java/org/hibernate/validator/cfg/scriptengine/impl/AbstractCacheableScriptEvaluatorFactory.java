@@ -11,13 +11,14 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import javax.validation.ConstraintDeclarationException;
+import javax.validation.ValidationException;
 
 import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
 import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
-import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluatorImpl;
 
 /**
- * Basic cacheable factory responsible for the creation of {@link ScriptEvaluatorImpl}s. This
+ * Basic cacheable factory responsible for the creation of {@link ScriptEvaluator}s. This
  * class is thread-safe. Caches {@code ScriptEvaluator} when they are requested.
  *
  * @author Gunnar Morling
@@ -35,16 +36,21 @@ public abstract class AbstractCacheableScriptEvaluatorFactory implements ScriptE
 	 * Retrieves a script executor for the given language.
 	 *
 	 * @param languageName The name of a scripting language as expected by {@link ScriptEngineManager#getEngineByName(String)}.
-	 *
 	 * @return A script executor for the given language. Never null.
 	 *
-	 * @throws ScriptException In case no JSR 223 compatible engine for the given language could be found.
+	 * @throws ValidationException In case no compatible evaluator for the given language could be found.
 	 */
 	@Override
-	public ScriptEvaluator getScriptEvaluatorByLanguageName(String languageName) throws ScriptException {
+	public ScriptEvaluator getScriptEvaluatorByLanguageName(String languageName) {
 		if ( !scriptExecutorCache.containsKey( languageName ) ) {
 
-			ScriptEvaluator scriptExecutor = createNewScriptEvaluator( languageName );
+			ScriptEvaluator scriptExecutor = null;
+			try {
+				scriptExecutor = createNewScriptEvaluator( languageName );
+			}
+			catch (ScriptException e) {
+				throw new ConstraintDeclarationException( "Wasn't able to find a script evaluator for '" + languageName + "' language.", e );
+			}
 			scriptExecutorCache.putIfAbsent( languageName, scriptExecutor );
 		}
 
@@ -54,8 +60,7 @@ public abstract class AbstractCacheableScriptEvaluatorFactory implements ScriptE
 	/**
 	 * Creates a new script executor for the given language.
 	 *
-	 * @param languageName A JSR 223 language name.
-	 *
+	 * @param languageName A language name.
 	 * @return A newly created script executor for the given language.
 	 *
 	 * @throws ScriptException In case no JSR 223 compatible engine for the given language could be found.

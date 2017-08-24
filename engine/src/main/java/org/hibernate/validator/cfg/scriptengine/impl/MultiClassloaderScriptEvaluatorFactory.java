@@ -13,9 +13,14 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
+import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluatorImpl;
 
 /**
+ * {@link ScriptEvaluatorFactory} which allows you to pass multiple {@link ClassLoader}s that will be used
+ * to search for {@link ScriptEngine}s. Is useful in environments similar to OSGi, where script engines can be
+ * found only by {@link ClassLoader} different from default one.
+ *
  * @author Marko Bekhta
  */
 public class MultiClassloaderScriptEvaluatorFactory extends AbstractCacheableScriptEvaluatorFactory {

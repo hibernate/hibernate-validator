@@ -21,6 +21,10 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluatorImpl;
 
 /**
+ * Allows to pass a list of {@link ScriptEngineFactory} instances, which will be used to create {@link ScriptEvaluator}s.
+ * Might be useful in cases where you want to control which exact {@link ScriptEngineFactory} is used to create
+ * {@link ScriptEvaluator} (when there's multiple options present for a language of interest).
+ *
  * @author Marko Bekhta
  */
 public class DeclarativeScriptEvaluatorFactory extends AbstractCacheableScriptEvaluatorFactory {

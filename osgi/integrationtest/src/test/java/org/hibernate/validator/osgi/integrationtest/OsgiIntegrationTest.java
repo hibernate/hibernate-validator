@@ -42,6 +42,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
 import org.hibernate.validator.cfg.scriptengine.impl.DeclarativeScriptEvaluatorFactory;
 import org.hibernate.validator.cfg.scriptengine.impl.MultiClassloaderScriptEvaluatorFactory;
+import org.hibernate.validator.cfg.scriptengine.impl.OSGiScriptEvaluatorFactory;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
@@ -52,6 +53,9 @@ import org.javamoney.moneta.spi.MonetaryConfig;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.osgi.framework.FrameworkUtil;
+
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -274,6 +278,9 @@ public class OsgiIntegrationTest {
 				new DeclarativeScriptEvaluatorFactory(
 						new GroovyScriptEngineFactory()
 				)
+		);
+		canUseScripAssertConstraint(
+				new OSGiScriptEvaluatorFactory( FrameworkUtil.getBundle( this.getClass() ).getBundleContext() )
 		);
 	}
 
