@@ -8,9 +8,6 @@ package org.hibernate.validator.internal.util.scriptengine;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -29,11 +26,6 @@ import org.hibernate.validator.cfg.scriptengine.impl.AbstractCacheableScriptEval
  */
 public class DefaultLookupScriptEvaluatorFactory extends AbstractCacheableScriptEvaluatorFactory {
 
-	/**
-	 * A reference with an instance of this factory. Allows the factory to be reused several times, but can be GC'ed if required.
-	 */
-	private static Reference<ScriptEvaluatorFactory> INSTANCE = new SoftReference<>( new DefaultLookupScriptEvaluatorFactory() );
-
 	private DefaultLookupScriptEvaluatorFactory() {
 	}
 
@@ -42,15 +34,8 @@ public class DefaultLookupScriptEvaluatorFactory extends AbstractCacheableScript
 	 *
 	 * @return A script evaluator factory. Never null.
 	 */
-	public static synchronized ScriptEvaluatorFactory getInstance() {
-		ScriptEvaluatorFactory theValue = INSTANCE.get();
-
-		if ( theValue == null ) {
-			theValue = new DefaultLookupScriptEvaluatorFactory();
-			INSTANCE = new SoftReference<>( theValue );
-		}
-
-		return theValue;
+	public static ScriptEvaluatorFactory getInstance() {
+		return new DefaultLookupScriptEvaluatorFactory();
 	}
 
 	@Override
