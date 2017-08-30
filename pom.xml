@@ -155,7 +155,7 @@
         <arquillian.version>1.1.11.Final</arquillian.version>
         <testng.version>6.8</testng.version>
         <!-- it must be the exact same version than the one used in the Bean Validation TCK -->
-        <assertj-core.version>3.7.0</assertj-core.version>
+        <assertj-core.version>3.8.0</assertj-core.version>
         <junit.version>4.12</junit.version>
         <easymock.version>3.4</easymock.version>
 
@@ -167,7 +167,9 @@
 
         <puppycrawl.checkstyle.version>7.6</puppycrawl.checkstyle.version>
 
-        <groovy.version>2.4.8</groovy.version>
+        <groovy.version>2.4.12</groovy.version>
+
+        <guava.version>23.0</guava.version>
 
         <!-- Asciidoctor -->
         <hibernate-asciidoctor-theme.version>1.0.1.Final</hibernate-asciidoctor-theme.version>
@@ -407,7 +409,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>20.0</version>
+                <version>${guava.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
