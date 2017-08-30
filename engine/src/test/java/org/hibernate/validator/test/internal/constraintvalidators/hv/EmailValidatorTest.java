@@ -115,6 +115,23 @@ public class EmailValidatorTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-1477")
+	public void testIpV4AddressesEmails() {
+		isValidEmail( "abc@[127.0.0.1]" );
+		isValidEmail( "abc@[255.255.255.255]" );
+		isValidEmail( "abc@[124.135.1.2]" );
+		isValidEmail( "abc@[192.168.1.10]" );
+
+		isInvalidEmail( "abc@[127.0.0.01]" ); // 01
+		isInvalidEmail( "abc@[255.256.255.255]" ); // 256
+		isInvalidEmail( "abc@[324.135.1.2]" ); // 324
+		isInvalidEmail( "abc@[192.168.1.10.0]" ); // 5 sections
+		isInvalidEmail( "abc@[999.999.999.999]" ); // 999
+		isInvalidEmail( "abc@[256.256.256.256]" ); // 256x4
+		isInvalidEmail( "abc@[001.002.003.004]" ); // leading 0
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HV-339")
 	public void testAccent() {
 		isValidEmail( "Test^Email@example.com" );
