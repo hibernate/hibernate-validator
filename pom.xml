@@ -165,7 +165,7 @@
         <apache.karaf.version>4.1.1</apache.karaf.version>
         <osgi-core.version>6.0.0</osgi-core.version>
 
-        <puppycrawl.checkstyle.version>7.6</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>8.1</puppycrawl.checkstyle.version>
 
         <groovy.version>2.4.12</groovy.version>
 
