@@ -69,7 +69,7 @@ public class SimpleValidation {
 	@Fork(value = 1)
 	@Threads(50)
 	@Warmup(iterations = 10)
-	@Measurement(iterations = 50)
+	@Measurement(iterations = 20)
 	public void testSimpleBeanValidation(ValidationState state, Blackhole bh) {
 		DriverSetup driverSetup = new DriverSetup( state );
 		Set<ConstraintViolation<Driver>> violations = state.validator.validate( driverSetup.getDriver() );
