@@ -439,7 +439,6 @@ public class NodeImpl
 		result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
 		result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
 		result = prime * result + ( ( parameterTypes == null ) ? 0 : Arrays.hashCode( parameterTypes ) );
-		result = prime * result + ( ( parent == null ) ? 0 : parent.hashCode() );
 		result = prime * result + ( ( containerClass == null ) ? 0 : containerClass.hashCode() );
 		result = prime * result + ( ( typeArgumentIndex == null ) ? 0 : typeArgumentIndex.hashCode() );
 		return result;
@@ -526,14 +525,6 @@ public class NodeImpl
 			}
 		}
 		else if ( !Arrays.equals( parameterTypes, other.parameterTypes ) ) {
-			return false;
-		}
-		if ( parent == null ) {
-			if ( other.parent != null ) {
-				return false;
-			}
-		}
-		else if ( !parent.equals( other.parent ) ) {
 			return false;
 		}
 		return true;
