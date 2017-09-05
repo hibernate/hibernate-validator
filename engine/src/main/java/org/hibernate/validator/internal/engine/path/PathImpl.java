@@ -353,7 +353,6 @@ public final class PathImpl implements Path, Serializable {
 	 */
 	private PathImpl(PathImpl path) {
 		this( path.nodeList );
-		currentLeafNode = (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		hashCode = path.hashCode;
 	}
 
@@ -365,6 +364,7 @@ public final class PathImpl implements Path, Serializable {
 
 	private PathImpl(List<Node> nodeList) {
 		this.nodeList = nodeList;
+		currentLeafNode = (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		hashCode = -1;
 		nodeListRequiresCopy = true;
 	}
