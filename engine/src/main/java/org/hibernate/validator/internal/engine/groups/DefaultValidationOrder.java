@@ -7,21 +7,22 @@
 package org.hibernate.validator.internal.engine.groups;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.validation.GroupDefinitionException;
 
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * An instance of {@code ValidationOrder} defines the group order during one validation call.
  *
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 public final class DefaultValidationOrder implements ValidationOrder {
 	private static final Log log = LoggerFactory.make();
@@ -29,25 +30,35 @@ public final class DefaultValidationOrder implements ValidationOrder {
 	/**
 	 * The list of single groups to be used this validation.
 	 */
-	private List<Group> groupList = newArrayList();
+	private List<Group> groupList;
 
 	/**
 	 * The different sequences for this validation. The map contains the sequences mapped to their sequence
 	 * name.
 	 */
-	private Map<Class<?>, Sequence> sequenceMap = newHashMap();
+	private Map<Class<?>, Sequence> sequenceMap;
 
 	@Override
 	public Iterator<Group> getGroupIterator() {
+		if ( groupList == null ) {
+			return Collections.<Group>emptyIterator();
+		}
 		return groupList.iterator();
 	}
 
 	@Override
 	public Iterator<Sequence> getSequenceIterator() {
+		if ( sequenceMap == null ) {
+			return Collections.<Sequence>emptyIterator();
+		}
 		return sequenceMap.values().iterator();
 	}
 
 	public void insertGroup(Group group) {
+		if ( groupList == null ) {
+			groupList = new ArrayList<>( 5 );
+		}
+
 		if ( !groupList.contains( group ) ) {
 			groupList.add( group );
 		}
@@ -58,9 +69,11 @@ public final class DefaultValidationOrder implements ValidationOrder {
 			return;
 		}
 
-		if ( !sequenceMap.containsKey( sequence.getDefiningClass() ) ) {
-			sequenceMap.put( sequence.getDefiningClass(), sequence );
+		if ( sequenceMap == null ) {
+			sequenceMap = CollectionHelper.newHashMap( 5 );
 		}
+
+		sequenceMap.putIfAbsent( sequence.getDefiningClass(), sequence );
 	}
 
 	@Override
@@ -83,6 +96,10 @@ public final class DefaultValidationOrder implements ValidationOrder {
 	@Override
 	public void assertDefaultGroupSequenceIsExpandable(List<Class<?>> defaultGroupSequence)
 			throws GroupDefinitionException {
+		if ( sequenceMap == null ) {
+			return;
+		}
+
 		for ( Map.Entry<Class<?>, Sequence> entry : sequenceMap.entrySet() ) {
 			List<Group> sequenceGroups = entry.getValue().getComposingGroups();
 			int defaultGroupIndex = sequenceGroups.indexOf( Group.DEFAULT_GROUP );
