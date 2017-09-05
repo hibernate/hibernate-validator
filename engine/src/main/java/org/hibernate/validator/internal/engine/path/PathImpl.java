@@ -178,8 +178,7 @@ public final class PathImpl implements Path, Serializable {
 	public NodeImpl makeLeafNodeIterable() {
 		currentLeafNode = NodeImpl.makeIterable( currentLeafNode );
 
-		nodeList.remove( nodeList.size() - 1 );
-		nodeList.add( currentLeafNode );
+		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
 	}
@@ -187,8 +186,7 @@ public final class PathImpl implements Path, Serializable {
 	public NodeImpl setLeafNodeIndex(Integer index) {
 		currentLeafNode = NodeImpl.setIndex( currentLeafNode, index );
 
-		nodeList.remove( nodeList.size() - 1 );
-		nodeList.add( currentLeafNode );
+		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
 	}
@@ -196,8 +194,7 @@ public final class PathImpl implements Path, Serializable {
 	public NodeImpl setLeafNodeMapKey(Object key) {
 		currentLeafNode = NodeImpl.setMapKey( currentLeafNode, key );
 
-		nodeList.remove( nodeList.size() - 1 );
-		nodeList.add( currentLeafNode );
+		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
 	}
@@ -205,8 +202,7 @@ public final class PathImpl implements Path, Serializable {
 	public NodeImpl setLeafNodeValue(Object value) {
 		currentLeafNode = NodeImpl.setPropertyValue( currentLeafNode, value );
 
-		nodeList.remove( nodeList.size() - 1 );
-		nodeList.add( currentLeafNode );
+		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
 	}
@@ -214,8 +210,7 @@ public final class PathImpl implements Path, Serializable {
 	public NodeImpl setLeafNodeTypeParameter(Class<?> containerClass, Integer typeArgumentIndex) {
 		currentLeafNode = NodeImpl.setTypeParameter( currentLeafNode, containerClass, typeArgumentIndex );
 
-		nodeList.remove( nodeList.size() - 1 );
-		nodeList.add( currentLeafNode );
+		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
 	}
