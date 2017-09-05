@@ -52,7 +52,7 @@ public class CascadedValidation {
 	@Fork(value = 1)
 	@Threads(50)
 	@Warmup(iterations = 10)
-	@Measurement(iterations = 50)
+	@Measurement(iterations = 20)
 	public void testCascadedValidation(CascadedValidationState state, Blackhole bh) {
 		// TODO graphs needs to be generated and deeper
 		Person kermit = new Person( "kermit" );
