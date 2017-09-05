@@ -16,6 +16,7 @@ import javax.validation.GroupDefinitionException;
  * Interface defining the methods needed to execute groups and sequences in the right order.
  *
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 public interface ValidationOrder {
 
@@ -36,16 +37,21 @@ public interface ValidationOrder {
 			throws GroupDefinitionException;
 
 	/**
+	 * A {@link org.hibernate.validator.internal.engine.groups.ValidationOrder} which contains a single group, {@code Default}.
+	 */
+	ValidationOrder DEFAULT_GROUP = new DefaultGroupValidationOrder();
+
+	/**
 	 * A {@link org.hibernate.validator.internal.engine.groups.ValidationOrder} which contains a single sequence which
 	 * in turn contains a single group, {@code Default}.
 	 */
-	ValidationOrder DEFAULT_SEQUENCE = new DefaultValidationOrder();
+	ValidationOrder DEFAULT_SEQUENCE = new DefaultSequenceValidationOrder();
 
-	class DefaultValidationOrder implements ValidationOrder {
+	class DefaultSequenceValidationOrder implements ValidationOrder {
 
 		private final List<Sequence> defaultSequences;
 
-		private DefaultValidationOrder() {
+		private DefaultSequenceValidationOrder() {
 			defaultSequences = Collections.singletonList( Sequence.DEFAULT );
 		}
 
@@ -57,6 +63,29 @@ public interface ValidationOrder {
 		@Override
 		public Iterator<Sequence> getSequenceIterator() {
 			return defaultSequences.iterator();
+		}
+
+		@Override
+		public void assertDefaultGroupSequenceIsExpandable(List<Class<?>> defaultGroupSequence) throws GroupDefinitionException {
+		}
+	}
+
+	class DefaultGroupValidationOrder implements ValidationOrder {
+
+		private final List<Group> defaultGroups;
+
+		private DefaultGroupValidationOrder() {
+			defaultGroups = Collections.singletonList( Group.DEFAULT_GROUP );
+		}
+
+		@Override
+		public Iterator<Group> getGroupIterator() {
+			return defaultGroups.iterator();
+		}
+
+		@Override
+		public Iterator<Sequence> getSequenceIterator() {
+			return Collections.<Sequence>emptyIterator();
 		}
 
 		@Override
