@@ -358,7 +358,7 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	private PathImpl() {
-		nodeList = new ArrayList<>();
+		nodeList = new ArrayList<>( 1 );
 		hashCode = -1;
 		nodeListRequiresCopy = false;
 	}
