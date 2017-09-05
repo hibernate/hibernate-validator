@@ -207,7 +207,7 @@ public class NodeImpl
 		);
 	}
 
-	public static NodeImpl setIndex(NodeImpl node, Integer index) {
+	public static NodeImpl makeIterableAndSetIndex(NodeImpl node, Integer index) {
 		return new NodeImpl(
 				node.name,
 				node.parent,
@@ -223,7 +223,7 @@ public class NodeImpl
 		);
 	}
 
-	public static NodeImpl setMapKey(NodeImpl node, Object key) {
+	public static NodeImpl makeIterableAndSetMapKey(NodeImpl node, Object key) {
 		return new NodeImpl(
 				node.name,
 				node.parent,

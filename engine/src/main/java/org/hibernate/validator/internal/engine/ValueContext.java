@@ -159,12 +159,12 @@ public class ValueContext<T, V> {
 		propertyPath.makeLeafNodeIterable();
 	}
 
-	public final void setKey(Object key) {
-		propertyPath.setLeafNodeMapKey( key );
+	public final void markCurrentPropertyAsIterableAndSetKey(Object key) {
+		propertyPath.makeLeafNodeIterableAndSetMapKey( key );
 	}
 
-	public final void setIndex(Integer index) {
-		propertyPath.setLeafNodeIndex( index );
+	public final void markCurrentPropertyAsIterableAndSetIndex(Integer index) {
+		propertyPath.makeLeafNodeIterableAndSetIndex( index );
 	}
 
 	/**
