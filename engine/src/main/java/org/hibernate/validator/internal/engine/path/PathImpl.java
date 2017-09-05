@@ -313,6 +313,7 @@ public final class PathImpl implements Path, Serializable {
 	private PathImpl(PathImpl path) {
 		this( path.nodeList );
 		currentLeafNode = (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		hashCode = path.hashCode;
 	}
 
 	private PathImpl() {
