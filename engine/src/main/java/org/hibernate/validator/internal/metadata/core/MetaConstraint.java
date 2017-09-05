@@ -194,15 +194,13 @@ public class MetaConstraint<A extends Annotation> {
 
 		@Override
 		public void indexedValue(String nodeName, int index, Object value) {
-			valueContext.markCurrentPropertyAsIterable();
-			valueContext.setIndex( index );
+			valueContext.markCurrentPropertyAsIterableAndSetIndex( index );
 			doValidate( value, nodeName );
 		}
 
 		@Override
 		public void keyedValue(String nodeName, Object key, Object value) {
-			valueContext.markCurrentPropertyAsIterable();
-			valueContext.setKey( key );
+			valueContext.markCurrentPropertyAsIterableAndSetKey( key );
 			doValidate( value, nodeName );
 		}
 

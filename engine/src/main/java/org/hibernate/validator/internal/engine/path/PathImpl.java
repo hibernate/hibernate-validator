@@ -202,20 +202,20 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	public NodeImpl setLeafNodeIndex(Integer index) {
+	public NodeImpl makeLeafNodeIterableAndSetIndex(Integer index) {
 		requiresWriteableNodeList();
 
-		currentLeafNode = NodeImpl.setIndex( currentLeafNode, index );
+		currentLeafNode = NodeImpl.makeIterableAndSetIndex( currentLeafNode, index );
 
 		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
 	}
 
-	public NodeImpl setLeafNodeMapKey(Object key) {
+	public NodeImpl makeLeafNodeIterableAndSetMapKey(Object key) {
 		requiresWriteableNodeList();
 
-		currentLeafNode = NodeImpl.setMapKey( currentLeafNode, key );
+		currentLeafNode = NodeImpl.makeIterableAndSetMapKey( currentLeafNode, key );
 
 		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		hashCode = -1;
@@ -394,10 +394,10 @@ public final class PathImpl implements Path, Serializable {
 				if ( indexOrKey != null && indexOrKey.length() > 0 ) {
 					try {
 						Integer i = Integer.parseInt( indexOrKey );
-						path.setLeafNodeIndex( i );
+						path.makeLeafNodeIterableAndSetIndex( i );
 					}
 					catch (NumberFormatException e) {
-						path.setLeafNodeMapKey( indexOrKey );
+						path.makeLeafNodeIterableAndSetMapKey( indexOrKey );
 					}
 				}
 
