@@ -60,7 +60,6 @@ public class NodeImpl
 	private final Integer index;
 	private final Object key;
 	private final ElementKind kind;
-	private final int hashCode;
 
 	//type-specific attributes
 	private final Class<?>[] parameterTypes;
@@ -69,6 +68,7 @@ public class NodeImpl
 	private final Class<?> containerClass;
 	private final Integer typeArgumentIndex;
 
+	private int hashCode = -1;
 	private String asString;
 
 	private NodeImpl(String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
@@ -84,7 +84,6 @@ public class NodeImpl
 		this.parameterIndex = parameterIndex;
 		this.containerClass = containerClass;
 		this.typeArgumentIndex = typeArgumentIndex;
-		this.hashCode = buildHashCode();
 	}
 
 	//TODO It would be nicer if we could return PropertyNode
@@ -448,6 +447,10 @@ public class NodeImpl
 
 	@Override
 	public int hashCode() {
+		if ( hashCode == -1 ) {
+			hashCode = buildHashCode();
+		}
+
 		return hashCode;
 	}
 
