@@ -320,14 +320,14 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		@Override
 		public NodeBuilder atKey(Object key) {
-			propertyPath.setLeafNodeMapKey( key );
+			propertyPath.makeLeafNodeIterableAndSetMapKey( key );
 			addLeafNode();
 			return new NodeBuilder( messageTemplate, propertyPath );
 		}
 
 		@Override
 		public NodeBuilder atIndex(Integer index) {
-			propertyPath.setLeafNodeIndex( index );
+			propertyPath.makeLeafNodeIterableAndSetIndex( index );
 			addLeafNode();
 			return new NodeBuilder( messageTemplate, propertyPath );
 		}
