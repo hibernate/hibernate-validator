@@ -236,6 +236,6 @@ public final class ValidatorUtil {
 	}
 
 	public static HibernateConstraintValidatorContext getConstraintValidatorContext() {
-		return new ConstraintValidatorContextImpl( null, DefaultClockProvider.INSTANCE, DefaultLookupScriptEvaluatorFactory.getInstance(), null,null );
+		return new ConstraintValidatorContextImpl( null, DefaultClockProvider.INSTANCE, DefaultLookupScriptEvaluatorFactory.getInstance( null ), null, null );
 	}
 }

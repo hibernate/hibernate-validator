@@ -26,7 +26,10 @@ import org.hibernate.validator.cfg.scriptengine.impl.AbstractCacheableScriptEval
  */
 public class DefaultLookupScriptEvaluatorFactory extends AbstractCacheableScriptEvaluatorFactory {
 
-	private DefaultLookupScriptEvaluatorFactory() {
+	private final ClassLoader externalClassLoader;
+
+	private DefaultLookupScriptEvaluatorFactory(ClassLoader externalClassLoader) {
+		this.externalClassLoader = externalClassLoader;
 	}
 
 	/**
@@ -34,18 +37,22 @@ public class DefaultLookupScriptEvaluatorFactory extends AbstractCacheableScript
 	 *
 	 * @return A script evaluator factory. Never null.
 	 */
-	public static ScriptEvaluatorFactory getInstance() {
-		return new DefaultLookupScriptEvaluatorFactory();
+	public static ScriptEvaluatorFactory getInstance(ClassLoader externalClassLoader) {
+		return new DefaultLookupScriptEvaluatorFactory( externalClassLoader );
 	}
 
 	@Override
 	protected ScriptEvaluator createNewScriptEvaluator(String languageName) throws ScriptException {
-		ScriptEngine engine = new ScriptEngineManager().getEngineByName( languageName );
+		ScriptEngine engine = getScriptEngineManager().getEngineByName( languageName );
 
 		if ( engine == null ) {
 			throw new ScriptException( MESSAGES.unableToFindScriptEngine( languageName ) );
 		}
 
 		return new ScriptEvaluatorImpl( engine );
+	}
+
+	private ScriptEngineManager getScriptEngineManager() {
+		return new ScriptEngineManager( externalClassLoader == null ? Thread.currentThread().getContextClassLoader() : externalClassLoader );
 	}
 }

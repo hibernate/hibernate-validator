@@ -129,7 +129,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
-		this.defaultScriptEvaluatorFactory = DefaultLookupScriptEvaluatorFactory.getInstance();
+		this.defaultScriptEvaluatorFactory = DefaultLookupScriptEvaluatorFactory.getInstance( externalClassLoader );
 	}
 
 	@Override
