@@ -99,6 +99,13 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
+        <!-- Module names used for Java 9 modules and OSGi bundles -->
+        <hibernate-validator.module-name>org.hibernate.validator</hibernate-validator.module-name>
+        <hibernate-validator-cdi.module-name>org.hibernate.validator.cdi</hibernate-validator-cdi.module-name>
+        <!-- TODO in 6.1: make the names consistent by removing the bundle properties, see HV-1484 -->
+        <hibernate-validator.bundle-name>org.hibernate.validator.hibernate-validator</hibernate-validator.bundle-name>
+        <hibernate-validator-cdi.bundle-name>org.hibernate.validator.hibernate-validator-cdi</hibernate-validator-cdi.bundle-name>
+
         <!-- see http://maven.apache.org/general.html -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
