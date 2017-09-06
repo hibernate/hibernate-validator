@@ -173,7 +173,7 @@
                             org.hibernate.validator.internal.*;version="[${project.version},${project.version}]",
                             javax.annotation.*;version="[1.2,2.0)",
                             javax.interceptor.*;version="[1.2,2.0)",
-                            javax.enterprise.*;version="[1.2,2.0)"
+                            javax.enterprise.*;version="[1.2,3.0)"
                         </Import-Package>
                         <Export-Package>org.hibernate.validator.cdi;version="${project.version}"</Export-Package>
                         <Private-Package>org.hibernate.validator.internal.*;version="${project.version}"</Private-Package>
