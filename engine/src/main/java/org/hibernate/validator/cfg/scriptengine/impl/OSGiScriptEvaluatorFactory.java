@@ -32,22 +32,18 @@ import org.osgi.framework.BundleContext;
 
 /**
  * {@link org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory} suitable for OSGi environments. It is created
- * based on {@link BundleContext} which is used to iterate through {@link Bundle}s and find all {@link ScriptEngineFactory}
+ * based on {@code BundleContext} which is used to iterate through {@code Bundle}s and find all {@link ScriptEngineFactory}
  * candidates.
  *
  * @author Marko Bekhta
  */
 public class OSGiScriptEvaluatorFactory extends AbstractCacheableScriptEvaluatorFactory {
 
-	private final BundleContext context;
-
 	private final List<ScriptEngineManager> scriptEngineManagers;
 
 	public OSGiScriptEvaluatorFactory(BundleContext context) {
-		this.context = context;
 		this.scriptEngineManagers = CollectionHelper.toImmutableList( findManagers( context ) );
 	}
-
 
 	@Override
 	protected ScriptEvaluator createNewScriptEvaluator(final String languageName) throws ScriptException {

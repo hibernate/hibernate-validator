@@ -161,7 +161,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.traversableResolver = configurationState.getTraversableResolver();
 		this.parameterNameProvider = new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() );
 		this.clockProvider = configurationState.getClockProvider();
-		this.scriptEvaluatorFactory = ( (ConfigurationImpl) configurationState ).getScriptEvaluatorFactory();
+		this.scriptEvaluatorFactory = ( (HibernateValidatorConfiguration) configurationState ).getScriptEvaluatorFactory();
 		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
 		this.beanMetaDataManagers = new ConcurrentHashMap<>();
 		this.constraintHelper = new ConstraintHelper();
@@ -337,6 +337,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return clockProvider;
 	}
 
+	@Override
 	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
 		return scriptEvaluatorFactory;
 	}
@@ -471,7 +472,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 *
 	 * @param properties the properties used to bootstrap the factory
 	 *
-	 * @return a list with property-configured {@link ContraintMappingContributor}s; May be empty but never {@code null}
+	 * @return a list with property-configured {@link ConstraintMappingContributor}s; May be empty but never {@code null}
 	 */
 	private static List<ConstraintMappingContributor> getPropertyConfiguredConstraintMappingContributors(
 			Map<String, String> properties, ClassLoader externalClassLoader) {

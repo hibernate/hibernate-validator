@@ -32,10 +32,14 @@ public class DeclarativeScriptEvaluatorFactory extends AbstractCacheableScriptEv
 	private final Map<String, ScriptEngineFactory> factoryMap;
 
 	public DeclarativeScriptEvaluatorFactory(ScriptEngineFactory... factories) {
-		this.factoryMap = CollectionHelper.toImmutableMap(
-				Arrays.stream( factories )
-						.collect( Collectors.toMap( s -> s.getLanguageName().toLowerCase(), Function.identity() ) )
-		);
+		this.factoryMap = Arrays.stream( factories )
+				.collect(
+						Collectors.collectingAndThen(
+								Collectors.toMap( s -> s.getLanguageName().toLowerCase(), Function.identity() ),
+								CollectionHelper::toImmutableMap
+						)
+
+				);
 	}
 
 	@Override

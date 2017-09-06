@@ -9,6 +9,8 @@ package org.hibernate.validator;
 
 import javax.validation.ValidatorFactory;
 
+import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
+
 /**
  * Provides Hibernate Validator extensions to {@link ValidatorFactory}.
  *
@@ -16,6 +18,16 @@ import javax.validation.ValidatorFactory;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public interface HibernateValidatorFactory extends ValidatorFactory {
+
+	/**
+	 * Returns a factory which is used to create {@link org.hibernate.validator.cfg.scriptengine.ScriptEvaluator}s for
+	 * evaluating script expressions of {@link org.hibernate.validator.constraints.ScriptAssert} and {@link org.hibernate.validator.constraints.ParameterScriptAssert}.
+	 *
+	 * @return A {@link ScriptEvaluatorFactory} instance
+	 *
+	 * @since 6.1
+	 */
+	ScriptEvaluatorFactory getScriptEvaluatorFactory();
 
 	/**
 	 * Returns a context for validator configuration via options from the

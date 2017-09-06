@@ -23,6 +23,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * several times to evaluate different bindings against one given given script expression.
  *
  * @author Gunnar Morling
+ * @author Marko Bekhta
  */
 class ScriptAssertContext {
 
@@ -30,6 +31,7 @@ class ScriptAssertContext {
 
 	private final String script;
 	private final String languageName;
+	private ScriptEvaluator scriptEvaluator;
 
 	public ScriptAssertContext(String languageName, String script) {
 		this.script = script;
@@ -47,7 +49,6 @@ class ScriptAssertContext {
 		Object result;
 
 		try {
-			// TODO: should ScriptEvaluator be cached ?
 			result = getScriptEvaluator( context ).evaluate( script, bindings );
 		}
 		catch (ScriptException e) {
@@ -57,13 +58,16 @@ class ScriptAssertContext {
 		return handleResult( result );
 	}
 
-	private ScriptEvaluator getScriptEvaluator( ConstraintValidatorContext context) {
-		try {
-			return context.unwrap( HibernateConstraintValidatorContext.class ).getScriptEvaluatorForLanguage( languageName );
+	private synchronized ScriptEvaluator getScriptEvaluator( ConstraintValidatorContext context) {
+		if ( scriptEvaluator == null ) {
+			try {
+				scriptEvaluator = context.unwrap( HibernateConstraintValidatorContext.class ).getScriptEvaluatorForLanguage( languageName );
+			}
+			catch (ScriptException e) {
+				throw log.getCreationOfScriptExecutorFailedException( languageName, e );
+			}
 		}
-		catch (ScriptException e) {
-			throw log.getCreationOfScriptExecutorFailedException( languageName, e );
-		}
+		return scriptEvaluator;
 	}
 
 	private boolean handleResult(Object evaluationResult) {

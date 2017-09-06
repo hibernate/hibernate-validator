@@ -13,9 +13,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.BootstrapConfiguration;
 import javax.validation.executable.ExecutableType;
 
+import org.hibernate.validator.HibernateValidatorBootstrapConfiguration;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -23,7 +23,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  *
  * @author Hardy Ferentschik
  */
-public class BootstrapConfigurationImpl implements BootstrapConfiguration {
+public class BootstrapConfigurationImpl implements HibernateValidatorBootstrapConfiguration {
 
 	/**
 	 * The executable types validated by default.
@@ -49,7 +49,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 					)
 			);
 
-	private static final BootstrapConfiguration DEFAULT_BOOTSTRAP_CONFIGURATION = new BootstrapConfigurationImpl();
+	private static final HibernateValidatorBootstrapConfiguration DEFAULT_BOOTSTRAP_CONFIGURATION = new BootstrapConfigurationImpl();
 
 	private final String defaultProviderClassName;
 	private final String constraintValidatorFactoryClassName;
@@ -105,7 +105,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.properties = properties;
 	}
 
-	public static BootstrapConfiguration getDefaultBootstrapConfiguration() {
+	public static HibernateValidatorBootstrapConfiguration getDefaultBootstrapConfiguration() {
 		return DEFAULT_BOOTSTRAP_CONFIGURATION;
 	}
 
@@ -155,6 +155,11 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	}
 
 	@Override
+	public String getScriptEvaluatorFactoryClassName() {
+		return scriptEvaluatorFactoryClassName;
+	}
+
+	@Override
 	public Set<String> getValueExtractorClassNames() {
 		return new HashSet<>( valueExtractorClassNames );
 	}
@@ -191,6 +196,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		sb.append( ", traversableResolverClassName='" ).append( traversableResolverClassName ).append( '\'' );
 		sb.append( ", parameterNameProviderClassName='" ).append( parameterNameProviderClassName ).append( '\'' );
 		sb.append( ", clockProviderClassName='" ).append( clockProviderClassName ).append( '\'' );
+		sb.append( ", scriptEvaluatorFactoryClassName='" ).append( scriptEvaluatorFactoryClassName ).append( '\'' );
 		sb.append( ", validatedExecutableTypes='" ).append( validatedExecutableTypes ).append( '\'' );
 		sb.append( ", constraintMappingResourcePaths=" ).append( constraintMappingResourcePaths ).append( '\'' );
 		sb.append( ", properties=" ).append( properties );

@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.BootstrapConfiguration;
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -33,6 +32,7 @@ import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.ValidationProvider;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.HibernateValidatorBootstrapConfiguration;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
@@ -90,7 +90,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final ValidationBootstrapParameters validationBootstrapParameters;
 	private boolean ignoreXmlConfiguration = false;
 	private final Set<InputStream> configurationStreams = newHashSet();
-	private BootstrapConfiguration bootstrapConfiguration;
+	private HibernateValidatorBootstrapConfiguration bootstrapConfiguration;
 
 	// HV-specific options
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
@@ -268,13 +268,13 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
-	public HibernateValidatorConfiguration scripEngineFactory(ScriptEvaluatorFactory scripEngineFactory) {
+	public HibernateValidatorConfiguration scriptEngineFactory(ScriptEvaluatorFactory scriptEvaluatorFactory) {
 		if ( log.isDebugEnabled() ) {
-			if ( scripEngineFactory != null ) {
-				log.debug( "Setting custom ScripEngineFactory of type " + scripEngineFactory.getClass().getName() );
+			if ( scriptEvaluatorFactory != null ) {
+				log.debug( "Setting custom ScriptEvaluatorFactory of type " + scriptEvaluatorFactory.getClass().getName() );
 			}
 		}
-		this.validationBootstrapParameters.setScriptEvaluatorFactory( scripEngineFactory );
+		this.validationBootstrapParameters.setScriptEvaluatorFactory( scriptEvaluatorFactory );
 		return this;
 	}
 
@@ -405,7 +405,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
-	public BootstrapConfiguration getBootstrapConfiguration() {
+	public HibernateValidatorBootstrapConfiguration getBootstrapConfiguration() {
 		if ( bootstrapConfiguration == null ) {
 			bootstrapConfiguration = new ValidationXmlParser( externalClassLoader ).parseValidationXml();
 		}
@@ -422,6 +422,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return validationBootstrapParameters.getClockProvider();
 	}
 
+	@Override
 	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
 		return validationBootstrapParameters.getScriptEvaluatorFactory();
 	}
@@ -509,6 +510,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 			if ( validationBootstrapParameters.getClockProvider() == null ) {
 				validationBootstrapParameters.setClockProvider( defaultClockProvider );
+			}
+			if ( validationBootstrapParameters.getScriptEvaluatorFactory() == null ) {
+				validationBootstrapParameters.setScriptEvaluatorFactory( defaultScriptEvaluatorFactory );
 			}
 		}
 		else {

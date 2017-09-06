@@ -31,6 +31,7 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.MethodDescriptor;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorBootstrapConfiguration;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.SizeDef;
@@ -226,6 +227,25 @@ public class XmlMappingTest {
 				assertEquals( methodDescriptor.getParameterDescriptors().get( 0 ).getName(), "param0" );
 			}
 		}
+		);
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HV-1463")
+	public void testScriptEvaluatorFactoryConfiguration() {
+		validationXmlTestHelper.runWithCustomValidationXml(
+				"script-evaluator-factory-validation.xml", () -> {
+					//given
+					HibernateValidatorBootstrapConfiguration bootstrapConfiguration = (HibernateValidatorBootstrapConfiguration) ValidatorUtil.getConfiguration()
+							.getBootstrapConfiguration();
+
+					//then
+					assertEquals(
+							bootstrapConfiguration.getScriptEvaluatorFactoryClassName(),
+							CustomScriptEvaluatorFactory.class.getName()
+					);
+
+				}
 		);
 	}
 

@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.BootstrapConfiguration;
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -24,6 +23,7 @@ import javax.validation.ValidationException;
 import javax.validation.spi.ValidationProvider;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.HibernateValidatorBootstrapConfiguration;
 import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor.Key;
@@ -54,15 +54,14 @@ public class ValidationBootstrapParameters {
 	public ValidationBootstrapParameters() {
 	}
 
-	public ValidationBootstrapParameters(BootstrapConfiguration bootstrapConfiguration, ClassLoader externalClassLoader) {
+	public ValidationBootstrapParameters(HibernateValidatorBootstrapConfiguration bootstrapConfiguration, ClassLoader externalClassLoader) {
 		setProviderClass( bootstrapConfiguration.getDefaultProviderClassName(), externalClassLoader );
 		setMessageInterpolator( bootstrapConfiguration.getMessageInterpolatorClassName(), externalClassLoader );
 		setTraversableResolver( bootstrapConfiguration.getTraversableResolverClassName(), externalClassLoader );
 		setConstraintFactory( bootstrapConfiguration.getConstraintValidatorFactoryClassName(), externalClassLoader );
 		setParameterNameProvider( bootstrapConfiguration.getParameterNameProviderClassName(), externalClassLoader );
 		setClockProvider( bootstrapConfiguration.getClockProviderClassName(), externalClassLoader );
-		// TODO: implement
-		// setScriptEvaluatorFactory( bootstrapConfiguration.get(), externalClassLoader );
+		setScriptEvaluatorFactory( bootstrapConfiguration.getScriptEvaluatorFactoryClassName(), externalClassLoader );
 		setValueExtractors( bootstrapConfiguration.getValueExtractorClassNames(), externalClassLoader );
 		setMappingStreams( bootstrapConfiguration.getConstraintMappingResourcePaths(), externalClassLoader );
 		setConfigProperties( bootstrapConfiguration.getProperties() );

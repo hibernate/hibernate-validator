@@ -15,10 +15,10 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.BootstrapConfiguration;
 import javax.validation.executable.ExecutableType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -29,6 +29,8 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 
+import org.hibernate.validator.HibernateValidatorBootstrapConfiguration;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -77,7 +79,7 @@ public class ValidationXmlParser {
 	 *
 	 * @return The parameters parsed out of <i>validation.xml</i> wrapped in an instance of {@code ConfigurationImpl.ValidationBootstrapParameters}.
 	 */
-	public final BootstrapConfiguration parseValidationXml() {
+	public final HibernateValidatorBootstrapConfiguration parseValidationXml() {
 		InputStream in = getValidationXmlInputStream();
 		if ( in == null ) {
 			return BootstrapConfigurationImpl.getDefaultBootstrapConfiguration();
@@ -177,7 +179,7 @@ public class ValidationXmlParser {
 		}
 	}
 
-	private BootstrapConfiguration createBootstrapConfiguration(ValidationConfigType config) {
+	private HibernateValidatorBootstrapConfiguration createBootstrapConfiguration(ValidationConfigType config) {
 		Map<String, String> properties = new HashMap<>();
 		for ( PropertyType property : config.getProperty() ) {
 			if ( log.isDebugEnabled() ) {
@@ -203,13 +205,20 @@ public class ValidationXmlParser {
 				config.getTraversableResolver(),
 				config.getParameterNameProvider(),
 				config.getClockProvider(),
-				"", // TODO: need to change xml
+				getScriptEvaluatorFactoryClassProperty( config.getProperty() ),
 				getValueExtractorClassNames( config ),
 				defaultValidatedExecutableTypes,
 				executableValidationEnabled,
 				new HashSet<>( config.getConstraintMapping() ),
 				properties
 		);
+	}
+
+	private String getScriptEvaluatorFactoryClassProperty(List<PropertyType> properties) {
+		return properties.stream()
+				.filter( property -> HibernateValidatorConfiguration.SCRIPT_EVALUATOR_CLASSNAME.equals( property.getName() ) )
+				.map( PropertyType::getValue )
+				.findFirst().orElse( null );
 	}
 
 	private Set<String> getValueExtractorClassNames(ValidationConfigType config) {

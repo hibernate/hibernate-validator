@@ -73,6 +73,16 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	String ENABLE_TRAVERSABLE_RESOLVER_RESULT_CACHE = "hibernate.validator.enable_traversable_resolver_result_cache";
 
 	/**
+	 * Property for configuring script evaluator factory, allowing to set up which factory will be used to create
+	 * {@link org.hibernate.validator.cfg.scriptengine.ScriptEvaluator} for evaluation of script expressions in
+	 * {@link org.hibernate.validator.constraints.ScriptAssert} and {@link org.hibernate.validator.constraints.ParameterScriptAssert}
+	 * constraints. A fully qualified name of a class implementing  {@link ScriptEvaluatorFactory} is expected as a value.
+	 *
+	 * @since 6.1
+	 */
+	String SCRIPT_EVALUATOR_CLASSNAME = "hibernate.validator.script_evaluator_factory";
+
+	/**
 	 * <p>
 	 * Returns the {@link ResourceBundleLocator} used by the
 	 * {@link Configuration#getDefaultMessageInterpolator() default message
@@ -238,5 +248,25 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	HibernateValidatorConfiguration enableTraversableResolverResultCache(boolean enabled);
 
-	HibernateValidatorConfiguration scripEngineFactory(ScriptEvaluatorFactory scripEngineFactory);
+	/**
+	 * Allows to specify custom {@link ScriptEvaluatorFactory} which is used to create {@link org.hibernate.validator.cfg.scriptengine.ScriptEvaluator}s
+	 * used to evaluate script expressions for {@link org.hibernate.validator.constraints.ScriptAssert} and
+	 * {@link org.hibernate.validator.constraints.ParameterScriptAssert} constraints.
+	 *
+	 * @param scripEngineFactory The {@link ScriptEvaluatorFactory} to be used by validator
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.1
+	 */
+	HibernateValidatorConfiguration scriptEngineFactory(ScriptEvaluatorFactory scripEngineFactory);
+
+	/**
+	 * Returns {@link ScriptEvaluatorFactory} configured by current configuration.
+	 *
+	 * @return {@code ScriptEvaluatorFactory} configured by current configuration
+	 *
+	 * @since 6.1
+	 */
+	ScriptEvaluatorFactory getScriptEvaluatorFactory();
 }

@@ -268,27 +268,27 @@ public class OsgiIntegrationTest {
 	}
 
 	@Test
-	public void canUseScripAssertConstraint() {
-		canUseScripAssertConstraint(
+	public void canUseScriptAssertConstraint() {
+		canUseScriptAssertConstraint(
 				new MultiClassloaderScriptEvaluatorFactory(
 						GroovyScriptEngineFactory.class.getClassLoader()
 				)
 		);
-		canUseScripAssertConstraint(
+		canUseScriptAssertConstraint(
 				new DeclarativeScriptEvaluatorFactory(
 						new GroovyScriptEngineFactory()
 				)
 		);
-		canUseScripAssertConstraint(
+		canUseScriptAssertConstraint(
 				new OSGiScriptEvaluatorFactory( FrameworkUtil.getBundle( this.getClass() ).getBundleContext() )
 		);
 	}
 
-	private void canUseScripAssertConstraint(ScriptEvaluatorFactory factory) {
+	private void canUseScriptAssertConstraint(ScriptEvaluatorFactory factory) {
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
 				.externalClassLoader( getClass().getClassLoader() )
-				.scripEngineFactory( factory )
+				.scriptEngineFactory( factory )
 				.buildValidatorFactory()
 				.getValidator();
 
@@ -303,7 +303,7 @@ public class OsgiIntegrationTest {
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
 				.externalClassLoader( getClass().getClassLoader() )
-				.scripEngineFactory(
+				.scriptEngineFactory(
 						new MultiClassloaderScriptEvaluatorFactory(
 								GroovyScriptEngineFactory.class.getClassLoader(),
 								ScriptEngineFactory.class.getClassLoader() // for JS
