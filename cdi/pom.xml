@@ -169,8 +169,6 @@
                         <Bundle-SymbolicName>${hibernate-validator-cdi.bundle-name}</Bundle-SymbolicName>
                         <Fragment-Host>${hibernate-validator.bundle-name}</Fragment-Host>
                         <Import-Package>
-                            org.hibernate.validator;version="[${project.version},${project.version}]",
-                            org.hibernate.validator.internal.*;version="[${project.version},${project.version}]",
                             javax.validation.*;version="[2.0,3.0)",
                             javax.annotation.*;version="[1.2,2.0)",
                             javax.interceptor.*;version="[1.2,2.0)",
