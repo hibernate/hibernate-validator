@@ -91,7 +91,7 @@ public class ValidationContext<T> {
 	/**
 	 * The set of already processed unit of works. See {@link ProcessedUnit}.
 	 */
-	private final Set<ProcessedUnit> processedUnits;
+	private final Set<Object> processedUnits;
 
 	/**
 	 * Maps an object to a list of paths in which it has been validated. The objects are the bean instances.
@@ -573,14 +573,12 @@ public class ValidationContext<T> {
 		}
 	}
 
-	private interface ProcessedUnit {
-	}
+	private static final class BeanGroupProcessedUnit {
 
-	private static class BeanGroupProcessedUnit implements ProcessedUnit {
-
-		private final Object bean;
-		private final Class<?> group;
-		private final int hashCode;
+		// these fields are final but we don't mark them as final as an optimization
+		private Object bean;
+		private Class<?> group;
+		private int hashCode;
 
 		private BeanGroupProcessedUnit(Object bean, Class<?> group) {
 			this.bean = bean;
@@ -593,7 +591,7 @@ public class ValidationContext<T> {
 			if ( this == o ) {
 				return true;
 			}
-			if ( o == null || getClass() != o.getClass() ) {
+			if ( o == null || getClass() != BeanGroupProcessedUnit.class ) {
 				return false;
 			}
 
@@ -621,12 +619,13 @@ public class ValidationContext<T> {
 		}
 	}
 
-	private static class BeanPathMetaConstraintProcessedUnit implements ProcessedUnit {
+	private static final class BeanPathMetaConstraintProcessedUnit {
 
-		private final Object bean;
-		private final Path path;
-		private final MetaConstraint<?> metaConstraint;
-		private final int hashCode;
+		// these fields are final but we don't mark them as final as an optimization
+		private Object bean;
+		private Path path;
+		private MetaConstraint<?> metaConstraint;
+		private int hashCode;
 
 		private BeanPathMetaConstraintProcessedUnit(Object bean, Path path, MetaConstraint<?> metaConstraint) {
 			this.bean = bean;
@@ -640,7 +639,7 @@ public class ValidationContext<T> {
 			if ( this == o ) {
 				return true;
 			}
-			if ( o == null || getClass() != o.getClass() ) {
+			if ( o == null || getClass() != BeanPathMetaConstraintProcessedUnit.class ) {
 				return false;
 			}
 
