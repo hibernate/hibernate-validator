@@ -32,7 +32,7 @@ import javax.validation.ValidatorFactory;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.hibernate.validator.cdi.internal.ValidationExtension;
+import org.hibernate.validator.cdi.ValidationExtension;
 import org.hibernate.validator.cdi.internal.ValidationProviderHelper;
 import org.hibernate.validator.cdi.internal.ValidatorBean;
 import org.hibernate.validator.cdi.internal.ValidatorFactoryBean;
