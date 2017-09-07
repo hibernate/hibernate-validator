@@ -29,7 +29,7 @@ import javax.validation.Payload;
 import javax.validation.Validator;
 
 import org.hibernate.validator.testutil.TestForIssue;
-
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -46,6 +46,7 @@ public class GroupValidationTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-678")
+	@CandidateForTck
 	public void testConstraintIsOnlyValidatedOnceEvenWhenPartOfMultipleGroups() {
 		A a = new A();
 
