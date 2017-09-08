@@ -222,13 +222,16 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	public NodeImpl setLeafNodeValue(Object value) {
-		requiresWriteableNodeList();
+	public NodeImpl setLeafNodeValueIfRequired(Object value) {
+		// The value is only exposed for property and container element nodes
+		if ( currentLeafNode.getKind() == ElementKind.PROPERTY || currentLeafNode.getKind() == ElementKind.CONTAINER_ELEMENT ) {
+			requiresWriteableNodeList();
 
-		currentLeafNode = NodeImpl.setPropertyValue( currentLeafNode, value );
+			currentLeafNode = NodeImpl.setPropertyValue( currentLeafNode, value );
 
-		nodeList.set( nodeList.size() - 1, currentLeafNode );
-		hashCode = -1;
+			nodeList.set( nodeList.size() - 1, currentLeafNode );
+			hashCode = -1;
+		}
 		return currentLeafNode;
 	}
 

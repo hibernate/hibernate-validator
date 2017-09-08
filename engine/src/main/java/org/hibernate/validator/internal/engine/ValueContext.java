@@ -192,7 +192,7 @@ public class ValueContext<T, V> {
 	}
 
 	public final void setCurrentValidatedValue(V currentValue) {
-		propertyPath.setLeafNodeValue( currentValue );
+		propertyPath.setLeafNodeValueIfRequired( currentValue );
 		this.currentValue = currentValue;
 	}
 
