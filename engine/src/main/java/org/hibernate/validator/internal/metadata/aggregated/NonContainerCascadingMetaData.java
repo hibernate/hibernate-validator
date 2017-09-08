@@ -8,11 +8,17 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.reflect.TypeVariable;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
+import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
+import org.hibernate.validator.internal.engine.valueextraction.LegacyCollectionSupportValueExtractors;
+import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -93,6 +99,34 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 	@Override
 	public boolean isContainer() {
 		return false;
+	}
+
+	public ContainerCascadingMetaData getLegacyContainerCascadingMetaData(Class<?> valueClass) {
+		if ( List.class.isAssignableFrom( valueClass ) ) {
+			return new ContainerCascadingMetaData( List.class, List.class.getTypeParameters()[0], List.class, List.class.getTypeParameters()[0],
+					groupConversionHelper, LegacyCollectionSupportValueExtractors.LIST );
+		}
+		else if ( Map.class.isAssignableFrom( valueClass ) ) {
+			return new ContainerCascadingMetaData( Map.class, Map.class.getTypeParameters()[1], Map.class, Map.class.getTypeParameters()[1],
+					groupConversionHelper, LegacyCollectionSupportValueExtractors.MAP );
+		}
+		else if ( Iterable.class.isAssignableFrom( valueClass ) ) {
+			return new ContainerCascadingMetaData( Iterable.class, Iterable.class.getTypeParameters()[0], Iterable.class, Iterable.class.getTypeParameters()[0],
+					groupConversionHelper, LegacyCollectionSupportValueExtractors.ITERABLE );
+		}
+		else if ( Optional.class.isAssignableFrom( valueClass ) ) {
+			return new ContainerCascadingMetaData( Optional.class, Optional.class.getTypeParameters()[0], Optional.class, Optional.class.getTypeParameters()[0],
+					groupConversionHelper, LegacyCollectionSupportValueExtractors.OPTIONAL );
+		}
+		else if ( valueClass.isArray() ) {
+			TypeVariable<?> typeParameter = new ArrayElement( valueClass );
+
+			return new ContainerCascadingMetaData( valueClass, typeParameter,
+					TypeVariables.getContainerClass( typeParameter ), TypeVariables.getActualTypeParameter( typeParameter ),
+					groupConversionHelper, LegacyCollectionSupportValueExtractors.ARRAY );
+		}
+
+		return null;
 	}
 
 	@Override
