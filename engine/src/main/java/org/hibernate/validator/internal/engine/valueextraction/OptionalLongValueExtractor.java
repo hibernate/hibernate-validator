@@ -16,7 +16,7 @@ import javax.validation.valueextraction.ValueExtractor;
  * @author Guillaume Smet
  */
 @UnwrapByDefault
-public class OptionalLongValueExtractor implements ValueExtractor<@ExtractedValue(type = Long.class) OptionalLong> {
+class OptionalLongValueExtractor implements ValueExtractor<@ExtractedValue(type = Long.class) OptionalLong> {
 
 	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new OptionalLongValueExtractor() );
 

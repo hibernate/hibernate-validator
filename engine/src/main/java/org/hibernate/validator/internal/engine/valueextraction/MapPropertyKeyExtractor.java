@@ -25,7 +25,7 @@ import javafx.beans.value.ObservableValue;
  * @author Guillaume Smet
  */
 @SuppressWarnings("restriction")
-public class MapPropertyKeyExtractor implements ValueExtractor<MapProperty<@ExtractedValue ?, ?>> {
+class MapPropertyKeyExtractor implements ValueExtractor<MapProperty<@ExtractedValue ?, ?>> {
 
 	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new MapPropertyKeyExtractor() );
 
