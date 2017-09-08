@@ -131,6 +131,19 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		}
 	}
 
+	ContainerCascadingMetaData(Type enclosingType, TypeVariable<?> typeParameter, Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter,
+			GroupConversionHelper groupConversionHelper, Set<ValueExtractorDescriptor> valueExtractorCandidates) {
+		this.enclosingType = enclosingType;
+		this.typeParameter = typeParameter;
+		this.declaredContainerClass = declaredContainerClass;
+		this.declaredTypeParameter = declaredTypeParameter;
+		this.containerElementTypesCascadingMetaData = Collections.emptyList();
+		this.cascading = true;
+		this.groupConversionHelper = groupConversionHelper;
+		this.hasContainerElementsMarkedForCascading = false;
+		this.valueExtractorCandidates = valueExtractorCandidates;
+	}
+
 	@Override
 	public boolean isContainer() {
 		return true;
