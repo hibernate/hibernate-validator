@@ -25,7 +25,7 @@ import javafx.beans.value.ObservableValue;
  * @author Guillaume Smet
  */
 @SuppressWarnings("restriction")
-public class ListPropertyValueExtractor implements ValueExtractor<ListProperty<@ExtractedValue ?>> {
+class ListPropertyValueExtractor implements ValueExtractor<ListProperty<@ExtractedValue ?>> {
 
 	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new ListPropertyValueExtractor() );
 

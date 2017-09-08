@@ -25,7 +25,7 @@ import javafx.beans.value.ObservableValue;
  * @author Guillaume Smet
  */
 @SuppressWarnings("restriction")
-public class ReadOnlyMapPropertyKeyExtractor implements ValueExtractor<ReadOnlyMapProperty<@ExtractedValue ?, ?>> {
+class ReadOnlyMapPropertyKeyExtractor implements ValueExtractor<ReadOnlyMapProperty<@ExtractedValue ?, ?>> {
 
 	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new ReadOnlyMapPropertyKeyExtractor() );
 

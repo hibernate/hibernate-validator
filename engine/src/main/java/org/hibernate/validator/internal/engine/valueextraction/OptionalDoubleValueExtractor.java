@@ -16,7 +16,7 @@ import javax.validation.valueextraction.ValueExtractor;
  * @author Guillaume Smet
  */
 @UnwrapByDefault
-public class OptionalDoubleValueExtractor implements ValueExtractor<@ExtractedValue(type = Double.class) OptionalDouble> {
+class OptionalDoubleValueExtractor implements ValueExtractor<@ExtractedValue(type = Double.class) OptionalDouble> {
 
 	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new OptionalDoubleValueExtractor() );
 

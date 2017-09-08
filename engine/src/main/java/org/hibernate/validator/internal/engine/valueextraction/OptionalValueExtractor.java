@@ -14,7 +14,7 @@ import javax.validation.valueextraction.ValueExtractor;
 /**
  * @author Gunnar Morling
  */
-public class OptionalValueExtractor implements ValueExtractor<Optional<@ExtractedValue ?>> {
+class OptionalValueExtractor implements ValueExtractor<Optional<@ExtractedValue ?>> {
 
 	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new OptionalValueExtractor() );
 
