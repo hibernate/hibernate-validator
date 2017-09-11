@@ -26,7 +26,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  */
 public class GroupConversionHelper {
 
-	private static final GroupConversionHelper EMPTY = new GroupConversionHelper( Collections.emptyMap() );
+	static final GroupConversionHelper EMPTY = new GroupConversionHelper( Collections.emptyMap() );
 
 	@Immutable
 	private final Map<Class<?>, Class<?>> groupConversions;
@@ -79,6 +79,10 @@ public class GroupConversionHelper {
 		}
 
 		return CollectionHelper.toImmutableSet( descriptors );
+	}
+
+	boolean isEmpty() {
+		return groupConversions.isEmpty();
 	}
 
 	@Override
