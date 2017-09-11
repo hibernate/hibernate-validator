@@ -101,7 +101,21 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 		return false;
 	}
 
-	public ContainerCascadingMetaData getLegacyContainerCascadingMetaData(Class<?> valueClass) {
+	@Override
+	public CascadingMetaData addRuntimeLegacyCollectionSupport(Class<?> valueClass) {
+		if ( !cascading ) {
+			return this;
+		}
+
+		ContainerCascadingMetaData legacyContainerElementCascadingMetaData = getLegacyContainerElementCascadingMetaData( valueClass );
+		if ( legacyContainerElementCascadingMetaData == null ) {
+			return this;
+		}
+
+		return new ContainerCascadingMetaData( valueClass, Collections.singletonList( legacyContainerElementCascadingMetaData ), groupConversionHelper );
+	}
+
+	private ContainerCascadingMetaData getLegacyContainerElementCascadingMetaData(Class<?> valueClass) {
 		if ( List.class.isAssignableFrom( valueClass ) ) {
 			return new ContainerCascadingMetaData( List.class, List.class.getTypeParameters()[0], List.class, List.class.getTypeParameters()[0],
 					groupConversionHelper, LegacyCollectionSupportValueExtractors.LIST );

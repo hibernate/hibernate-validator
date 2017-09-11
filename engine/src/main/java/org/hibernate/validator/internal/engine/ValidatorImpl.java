@@ -54,7 +54,6 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ContainerCascadingMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.NonContainerCascadingMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ReturnValueMetaData;
@@ -581,28 +580,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				CascadingMetaData cascadingMetaData = cascadable.getCascadingMetaData();
 
 				if ( value != null ) {
+					CascadingMetaData effectiveCascadingMetaData = cascadingMetaData.addRuntimeLegacyCollectionSupport( value.getClass() );
+
 					// validate cascading on the annotated object
-					if ( cascadingMetaData.isCascading() ) {
-						validateCascadedAnnotatedObjectForCurrentGroup( value, validationContext, valueContext, cascadingMetaData );
-
-						if ( !cascadingMetaData.isContainer() ) {
-							// We might be in the case where the legacy @Valid support for collections and arrays has been used on a type for which
-							// it cannot be detected at bootstrap time: thus we need to check with the runtime type.
-							// Note that if it has been detected at bootstrap time, the cascading metadata has been modified to include it
-							// and we are then in the container case.
-							NonContainerCascadingMetaData nonContainerCascadingMetaData = cascadingMetaData.as( NonContainerCascadingMetaData.class );
-							ContainerCascadingMetaData legacyContainerCascadingMetaData = nonContainerCascadingMetaData
-									.getLegacyContainerCascadingMetaData( value.getClass() );
-
-							if ( legacyContainerCascadingMetaData != null ) {
-								validateCascadedContainerElementsForCurrentGroup( value, validationContext, valueContext,
-										Collections.singletonList( legacyContainerCascadingMetaData ) );
-							}
-						}
+					if ( effectiveCascadingMetaData.isCascading() ) {
+						validateCascadedAnnotatedObjectForCurrentGroup( value, validationContext, valueContext, effectiveCascadingMetaData );
 					}
 
-					if ( cascadingMetaData.isContainer() ) {
-						ContainerCascadingMetaData containerCascadingMetaData = cascadingMetaData.as( ContainerCascadingMetaData.class );
+					if ( effectiveCascadingMetaData.isContainer() ) {
+						ContainerCascadingMetaData containerCascadingMetaData = effectiveCascadingMetaData.as( ContainerCascadingMetaData.class );
 
 						if ( containerCascadingMetaData.hasContainerElementsMarkedForCascading() ) {
 							// validate cascading on the container elements
