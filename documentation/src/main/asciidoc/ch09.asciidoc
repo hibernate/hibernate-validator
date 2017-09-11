@@ -398,6 +398,86 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Bootstrapp
 Refer to <<section-fail-fast>> and <<section-programmatic-api>> to learn more about the fail fast
 mode and the constraint declaration API.
 
+[[section-script-evaluator-factory]]
+==== Configuring script evaluator factory (`ScriptEvaluatorFactory`)
+
+For constraints like `@ScriptAssert` and `@ParameterScriptAssert`, it might be useful to configure
+how script evaluators (`ScriptEvaluator`) are build, and which scripting engines are used to build
+them. This can be done by setting a custom implementation of `ScriptEvaluatorFactory`. In
+particular this is important for OSGi environments (or similar to it) where user might face issues
+with modular class loading and https://www.jcp.org/en/jsr/detail?id=223[JSR-223]. It also would
+allow to use any custom script evaluation, not necessarily based on the
+https://www.jcp.org/en/jsr/detail?id=223[JSR-223].
+
+===== XML configuration
+To specify the `ScriptEvaluatorFactory` via XML the `hibernate.validator.script_evaluator_factory`
+property can be used.
+
+[[example-script-evaluator-factory-xml]]
+.Method constraints configured via XML
+====
+[source, XML, indent=0]
+----
+include::{resourcesdir}/org/hibernate/validator/referenceguide/chapter09/script-evaluator-factory-validation.xml[]
+----
+====
+
+In this case, the specified `ScriptEvaluatorFactory` must have a no-arg constructor.
+
+===== Programmatic configuration
+To do the change programmatically an instance of `ScriptEvaluatorFactory` should be passed when building the `ValidatorFactory`.
+This gives more flexibility in configuration of the `ScriptEvaluatorFactory`. <<example-script-evaluator-factory-programmatically>>
+shows how this can be done.
+
+[[example-script-evaluator-factory-programmatically]]
+.Changing `ScriptEvaluatorFactory` by configuring `ValidatorFactory`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=scriptEvaluatorFactoryProgrammatically]
+----
+====
+
+===== Predefined `ScriptEvaluatorFactory` implementations
+Hibernate Validator provides multiple implementations of `ScriptEvaluatorFactory` that user
+can choose from:
+
+`DefaultLookupScriptEvaluatorFactory`:: A `ScriptEvaluatorFactory` that relays on traditional
+https://www.jcp.org/en/jsr/detail?id=223[JSR-223] way of retrieving `ScriptEngine` which is
+wrapped into a `ScriptEvaluator`. This factory is used by default.
+
+`DeclarativeScriptEvaluatorFactory`:: Allows user to pass a list of `ScriptEngineFactory` which
+will be used to search for script engines. This factory might be useful in cases where user
+wants to have control which `ScriptEngineFactory` are used.
+
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=scriptEvaluatorFactoryDeclarativeScriptEvaluatorFactory]
+----
+====
+
+`MultiClassloaderScriptEvaluatorFactory`:: Allows user to pass multiple `ClassLoader` instances
+which will be used to search for `ScriptEngineFactory`. Might be useful in OSGi or similar
+environments.
+
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=scriptEvaluatorFactoryMultiClassloaderScriptEvaluatorFactory]
+----
+====
+
+`OSGiScriptEvaluatorFactory`:: Is designed specifically for OSGi environments and allows user
+to pass `BundleContext` as a parameter which will be used to search for `ScriptEngineFactory`.
+
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=scriptEvaluatorFactoryOSGiScriptEvaluatorFactory]
+----
+====
+
 [[section-configuring-validator]]
 === Configuring a Validator
 

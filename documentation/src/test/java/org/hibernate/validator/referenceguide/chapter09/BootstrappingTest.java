@@ -10,7 +10,15 @@ import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.scriptengine.impl.DeclarativeScriptEvaluatorFactory;
+import org.hibernate.validator.cfg.scriptengine.impl.MultiClassloaderScriptEvaluatorFactory;
+import org.hibernate.validator.cfg.scriptengine.impl.OSGiScriptEvaluatorFactory;
+
 import org.junit.Test;
+
+import org.osgi.framework.FrameworkUtil;
+
+import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
 
 public class BootstrappingTest {
 
@@ -200,5 +208,61 @@ public class BootstrappingTest {
 				.traversableResolver( new MyTraversableResolver() )
 				.getValidator();
 		//end::usingContext[]
+	}
+
+	@Test
+	@SuppressWarnings("unused")
+	public void scriptEvaluatorFactoryProgrammatically() {
+		//tag::scriptEvaluatorFactoryProgrammatically[]
+		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.scriptEngineFactory( new CustomScriptEvaluatorFactory() )
+				.buildValidatorFactory();
+		Validator validator = validatorFactory.getValidator();
+		//end::scriptEvaluatorFactoryProgrammatically[]
+	}
+
+	@Test
+	@SuppressWarnings("unused")
+	public void scriptEvaluatorFactoryDeclarativeScriptEvaluatorFactory() {
+		//tag::scriptEvaluatorFactoryDeclarativeScriptEvaluatorFactory[]
+		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.scriptEngineFactory( new DeclarativeScriptEvaluatorFactory( new GroovyScriptEngineFactory() ) )
+				.buildValidatorFactory();
+		Validator validator = validatorFactory.getValidator();
+		//end::scriptEvaluatorFactoryDeclarativeScriptEvaluatorFactory[]
+	}
+
+	@Test
+	@SuppressWarnings("unused")
+	public void scriptEvaluatorFactoryMultiClassloaderScriptEvaluatorFactory() {
+		ClassLoader classLoader1 = this.getClass().getClassLoader();
+		ClassLoader classLoader2 = this.getClass().getClassLoader();
+		ClassLoader classLoaderN = this.getClass().getClassLoader();
+		//tag::scriptEvaluatorFactoryMultiClassloaderScriptEvaluatorFactory[]
+		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.scriptEngineFactory( new MultiClassloaderScriptEvaluatorFactory( classLoader1, classLoader2, /* ...*/ classLoaderN ) )
+				.buildValidatorFactory();
+		Validator validator = validatorFactory.getValidator();
+		//end::scriptEvaluatorFactoryMultiClassloaderScriptEvaluatorFactory[]
+	}
+
+	@Test
+	@SuppressWarnings("unused")
+	public void scriptEvaluatorFactoryOSGiScriptEvaluatorFactory() {
+		try {
+			//tag::scriptEvaluatorFactoryOSGiScriptEvaluatorFactory[]
+			ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+					.configure()
+					.scriptEngineFactory( new OSGiScriptEvaluatorFactory( FrameworkUtil.getBundle( this.getClass() ).getBundleContext() ) )
+					.buildValidatorFactory();
+			Validator validator = validatorFactory.getValidator();
+			//end::scriptEvaluatorFactoryOSGiScriptEvaluatorFactory[]
+		}
+		catch (Exception e) {
+			// just ignoring the exception as these tests run not in OSGi environment and the bundle is null.
+		}
 	}
 }
