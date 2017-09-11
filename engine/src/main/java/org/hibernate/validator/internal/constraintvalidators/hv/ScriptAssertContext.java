@@ -11,10 +11,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import java.util.Map;
 
 import javax.script.ScriptException;
-import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -30,44 +28,31 @@ class ScriptAssertContext {
 	private static final Log log = LoggerFactory.make();
 
 	private final String script;
-	private final String languageName;
-	private ScriptEvaluator scriptEvaluator;
+	private final ScriptEvaluator scriptEvaluator;
 
-	public ScriptAssertContext(String languageName, String script) {
+	public ScriptAssertContext(String script, ScriptEvaluator scriptEvaluator) {
 		this.script = script;
-		this.languageName = languageName;
+		this.scriptEvaluator = scriptEvaluator;
 	}
 
-	public boolean evaluateScriptAssertExpression(Object object, String alias, ConstraintValidatorContext context) {
+	public boolean evaluateScriptAssertExpression(Object object, String alias) {
 		Map<String, Object> bindings = newHashMap();
 		bindings.put( alias, object );
 
-		return evaluateScriptAssertExpression( bindings, context );
+		return evaluateScriptAssertExpression( bindings );
 	}
 
-	public boolean evaluateScriptAssertExpression(Map<String, Object> bindings, ConstraintValidatorContext context) {
+	public boolean evaluateScriptAssertExpression(Map<String, Object> bindings) {
 		Object result;
 
 		try {
-			result = getScriptEvaluator( context ).evaluate( script, bindings );
+			result = scriptEvaluator.evaluate( script, bindings );
 		}
 		catch (ScriptException e) {
 			throw log.getErrorDuringScriptExecutionException( script, e );
 		}
 
 		return handleResult( result );
-	}
-
-	private synchronized ScriptEvaluator getScriptEvaluator( ConstraintValidatorContext context) {
-		if ( scriptEvaluator == null ) {
-			try {
-				scriptEvaluator = context.unwrap( HibernateConstraintValidatorContext.class ).getScriptEvaluatorForLanguage( languageName );
-			}
-			catch (ScriptException e) {
-				throw log.getCreationOfScriptExecutorFailedException( languageName, e );
-			}
-		}
-		return scriptEvaluator;
 	}
 
 	private boolean handleResult(Object evaluationResult) {

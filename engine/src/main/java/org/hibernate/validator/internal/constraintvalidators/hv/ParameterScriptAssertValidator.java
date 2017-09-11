@@ -6,9 +6,12 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.util.List;
 import java.util.Map;
-import javax.validation.ConstraintValidator;
+
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
@@ -19,25 +22,21 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper;
 import org.hibernate.validator.internal.util.Contracts;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
-
 /**
  * Validator for the {@link ParameterScriptAssert} constraint annotation.
  *
  * @author Gunnar Morling
  * @author Guillaume Smet
+ * @author Marko Bekhta
  */
 @SupportedValidationTarget(ValidationTarget.PARAMETERS)
-public class ParameterScriptAssertValidator implements ConstraintValidator<ParameterScriptAssert, Object[]> {
-
-	private ScriptAssertContext scriptAssertContext;
-	private String escapedScript;
+public class ParameterScriptAssertValidator extends AbstractScriptAssertValidator<ParameterScriptAssert, Object[]> {
 
 	@Override
 	public void initialize(ParameterScriptAssert constraintAnnotation) {
 		validateParameters( constraintAnnotation );
-		this.scriptAssertContext = new ScriptAssertContext( constraintAnnotation.lang(), constraintAnnotation.script() );
+		this.languageName = constraintAnnotation.lang();
+		this.script = constraintAnnotation.script();
 		this.escapedScript = InterpolationHelper.escapeMessageParameter( constraintAnnotation.script() );
 	}
 
@@ -52,7 +51,7 @@ public class ParameterScriptAssertValidator implements ConstraintValidator<Param
 
 		Map<String, Object> bindings = getBindings( arguments, parameterNames );
 
-		return scriptAssertContext.evaluateScriptAssertExpression( bindings, constraintValidatorContext );
+		return getScriptAssertContext( constraintValidatorContext ).evaluateScriptAssertExpression( bindings );
 	}
 
 	private Map<String, Object> getBindings(Object[] arguments, List<String> parameterNames) {
