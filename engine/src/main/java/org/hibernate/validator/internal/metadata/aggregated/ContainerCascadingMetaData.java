@@ -131,6 +131,19 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		}
 	}
 
+	ContainerCascadingMetaData(Type enclosingType, List<ContainerCascadingMetaData> containerElementTypesCascadingMetaData,
+			GroupConversionHelper groupConversionHelper) {
+		this.enclosingType = enclosingType;
+		this.typeParameter = AnnotatedObject.INSTANCE;
+		this.declaredContainerClass = null;
+		this.declaredTypeParameter = null;
+		this.containerElementTypesCascadingMetaData = containerElementTypesCascadingMetaData;
+		this.cascading = true;
+		this.groupConversionHelper = groupConversionHelper;
+		this.hasContainerElementsMarkedForCascading = true;
+		this.valueExtractorCandidates = Collections.emptySet();
+	}
+
 	ContainerCascadingMetaData(Type enclosingType, TypeVariable<?> typeParameter, Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter,
 			GroupConversionHelper groupConversionHelper, Set<ValueExtractorDescriptor> valueExtractorCandidates) {
 		this.enclosingType = enclosingType;
@@ -206,6 +219,11 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		}
 
 		throw LOG.getUnableToCastException( this, clazz );
+	}
+
+	@Override
+	public CascadingMetaData addRuntimeLegacyCollectionSupport(Class<?> valueClass) {
+		return this;
 	}
 
 	@Override

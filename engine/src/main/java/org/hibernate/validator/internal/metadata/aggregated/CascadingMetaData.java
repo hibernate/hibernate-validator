@@ -41,4 +41,19 @@ public interface CascadingMetaData {
 	boolean isContainer();
 
 	<T extends CascadingMetaData> T as(Class<T> clazz);
+
+	/**
+	 * Add additional cascading metadata when:
+	 * <ul>
+	 * <li>the element is marked with {@code @Valid},</li>
+	 * <li>the runtime type of the element is collection based (e.g. collections, maps or arrays),</li>
+	 * <li>and the static type isn't collection based.</li>
+	 * </ul>
+	 * <p>
+	 * An example of this particular situation is: {@code @Valid private Object element = new ArrayList<String>()}.
+	 * <p>
+	 * Note that if the static type is collection based, the cascading information are directly included at bootstrap
+	 * time.
+	 */
+	CascadingMetaData addRuntimeLegacyCollectionSupport(Class<?> valueClass);
 }
