@@ -32,10 +32,26 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 	private static final Log LOG = LoggerFactory.make();
 
 	private static final NonContainerCascadingMetaData NON_CASCADING = new NonContainerCascadingMetaData( false,
-			GroupConversionHelper.of( Collections.emptyMap() ) );
+			GroupConversionHelper.EMPTY );
 
 	private static final NonContainerCascadingMetaData CASCADING_WITHOUT_GROUP_CONVERSIONS = new NonContainerCascadingMetaData( true,
-			GroupConversionHelper.of( Collections.emptyMap() ) );
+			GroupConversionHelper.EMPTY );
+
+	private static final ContainerCascadingMetaData LIST_CONTAINER_WITHOUT_GROUP_CONVERSIONS =
+			new ContainerCascadingMetaData( List.class, List.class.getTypeParameters()[0], List.class, List.class.getTypeParameters()[0],
+					GroupConversionHelper.EMPTY, LegacyCollectionSupportValueExtractors.LIST );
+
+	private static final ContainerCascadingMetaData MAP_CONTAINER_WITHOUT_GROUP_CONVERSIONS =
+			new ContainerCascadingMetaData( Map.class, Map.class.getTypeParameters()[1], Map.class, Map.class.getTypeParameters()[1],
+					GroupConversionHelper.EMPTY, LegacyCollectionSupportValueExtractors.MAP );
+
+	private static final ContainerCascadingMetaData ITERABLE_CONTAINER_WITHOUT_GROUP_CONVERSIONS =
+			new ContainerCascadingMetaData( Iterable.class, Iterable.class.getTypeParameters()[0], Iterable.class, Iterable.class.getTypeParameters()[0],
+					GroupConversionHelper.EMPTY, LegacyCollectionSupportValueExtractors.ITERABLE );
+
+	private static final ContainerCascadingMetaData OPTIONAL_CONTAINER_WITHOUT_GROUP_CONVERSIONS =
+			new ContainerCascadingMetaData( Optional.class, Optional.class.getTypeParameters()[0], Optional.class, Optional.class.getTypeParameters()[0],
+					GroupConversionHelper.EMPTY, LegacyCollectionSupportValueExtractors.OPTIONAL );
 
 	/**
 	 * If this type parameter is marked for cascading.
@@ -117,19 +133,27 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 
 	private ContainerCascadingMetaData getLegacyContainerElementCascadingMetaData(Class<?> valueClass) {
 		if ( List.class.isAssignableFrom( valueClass ) ) {
-			return new ContainerCascadingMetaData( List.class, List.class.getTypeParameters()[0], List.class, List.class.getTypeParameters()[0],
+			return groupConversionHelper.isEmpty() ?
+					LIST_CONTAINER_WITHOUT_GROUP_CONVERSIONS :
+					new ContainerCascadingMetaData( List.class, List.class.getTypeParameters()[0], List.class, List.class.getTypeParameters()[0],
 					groupConversionHelper, LegacyCollectionSupportValueExtractors.LIST );
 		}
 		else if ( Map.class.isAssignableFrom( valueClass ) ) {
-			return new ContainerCascadingMetaData( Map.class, Map.class.getTypeParameters()[1], Map.class, Map.class.getTypeParameters()[1],
+			return groupConversionHelper.isEmpty() ?
+					MAP_CONTAINER_WITHOUT_GROUP_CONVERSIONS :
+					new ContainerCascadingMetaData( Map.class, Map.class.getTypeParameters()[1], Map.class, Map.class.getTypeParameters()[1],
 					groupConversionHelper, LegacyCollectionSupportValueExtractors.MAP );
 		}
 		else if ( Iterable.class.isAssignableFrom( valueClass ) ) {
-			return new ContainerCascadingMetaData( Iterable.class, Iterable.class.getTypeParameters()[0], Iterable.class, Iterable.class.getTypeParameters()[0],
+			return groupConversionHelper.isEmpty() ?
+					ITERABLE_CONTAINER_WITHOUT_GROUP_CONVERSIONS :
+					new ContainerCascadingMetaData( Iterable.class, Iterable.class.getTypeParameters()[0], Iterable.class, Iterable.class.getTypeParameters()[0],
 					groupConversionHelper, LegacyCollectionSupportValueExtractors.ITERABLE );
 		}
 		else if ( Optional.class.isAssignableFrom( valueClass ) ) {
-			return new ContainerCascadingMetaData( Optional.class, Optional.class.getTypeParameters()[0], Optional.class, Optional.class.getTypeParameters()[0],
+			return groupConversionHelper.isEmpty() ?
+					OPTIONAL_CONTAINER_WITHOUT_GROUP_CONVERSIONS :
+					new ContainerCascadingMetaData( Optional.class, Optional.class.getTypeParameters()[0], Optional.class, Optional.class.getTypeParameters()[0],
 					groupConversionHelper, LegacyCollectionSupportValueExtractors.OPTIONAL );
 		}
 		else if ( valueClass.isArray() ) {
