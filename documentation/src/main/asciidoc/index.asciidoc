@@ -3,6 +3,7 @@ Hardy Ferentschik; Gunnar Morling; Guillaume Smet
 :doctype: book
 :revdate: {docdate}
 :sectanchors:
+:xrefstyle: full
 :anchor:
 :toc: left
 :toclevels: 3
