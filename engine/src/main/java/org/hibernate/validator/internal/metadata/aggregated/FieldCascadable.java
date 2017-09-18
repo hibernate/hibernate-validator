@@ -14,7 +14,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.hibernate.validator.HibernateValidatorPermission;
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -53,7 +53,7 @@ public class FieldCascadable implements Cascadable {
 	}
 
 	@Override
-	public void appendTo(PathImpl path) {
+	public void appendTo(PathBuilder path) {
 		path.addPropertyNode( field.getName() );
 	}
 

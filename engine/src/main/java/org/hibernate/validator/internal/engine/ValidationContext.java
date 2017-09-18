@@ -30,6 +30,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
@@ -285,7 +286,7 @@ public class ValidationContext<T> {
 				constraintViolationCreationContext.getExpressionVariables()
 		);
 		// at this point we make a copy of the path to avoid side effects
-		Path path = PathImpl.createCopy( constraintViolationCreationContext.getPath() );
+		Path path = constraintViolationCreationContext.getPath().build();
 		Object dynamicPayload = constraintViolationCreationContext.getDynamicPayload();
 		if ( executableParameters != null ) {
 			return ConstraintViolationImpl.forParameterValidation(
@@ -426,10 +427,10 @@ public class ValidationContext<T> {
 		return processedUnits.contains( new BeanGroupProcessedUnit( value, group ) );
 	}
 
-	private void markCurrentBeanAsProcessedForCurrentPath(Object bean, PathImpl path) {
+	private void markCurrentBeanAsProcessedForCurrentPath(Object bean, PathBuilder path) {
 		// HV-1031 The path object is mutated as we traverse the object tree, hence copy it before saving it
 		processedPathsPerBean.computeIfAbsent( bean, b -> new HashSet<>() )
-				.add( PathImpl.createCopy( path ) );
+				.add( path.build() );
 	}
 
 	private void markCurrentBeanAsProcessedForCurrentGroup(Object bean, Class<?> group) {

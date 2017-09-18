@@ -10,7 +10,7 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
@@ -52,7 +52,7 @@ public class ParameterConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
-	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path) {
+	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathBuilder path) {
 		String name = parameterNameProvider.getParameterNames( executable ).get( index );
 		path.addParameterNode( name, index );
 	}

@@ -30,6 +30,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -40,7 +41,6 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
 import org.testng.annotations.Test;
 
 /**
@@ -53,7 +53,7 @@ public class PathImplTest {
 	@Test
 	public void testParsing() {
 		String property = "orders[3].deliveryAddress.addressline[1]";
-		Path path = PathImpl.createPathFromString( property );
+		Path path = PathBuilder.createPathFromString( property ).build();
 		Iterator<Path.Node> propIter = path.iterator();
 
 		assertTrue( propIter.hasNext() );
@@ -85,7 +85,7 @@ public class PathImplTest {
 
 	@Test
 	public void testParsingPropertyWithCurrencySymbol() {
-		PathImpl path = PathImpl.createPathFromString( "€Amount" );
+		PathImpl path = PathBuilder.createPathFromString( "€Amount" ).build();
 		Iterator<Path.Node> it = path.iterator();
 
 		assertEquals( it.next().getName(), "€Amount" );
@@ -93,7 +93,7 @@ public class PathImplTest {
 
 	@Test
 	public void testParsingPropertyWithGermanCharacter() {
-		PathImpl path = PathImpl.createPathFromString( "höchstBetrag" );
+		PathImpl path = PathBuilder.createPathFromString( "höchstBetrag" ).build();
 		Iterator<Path.Node> it = path.iterator();
 
 		assertEquals( it.next().getName(), "höchstBetrag" );
@@ -101,7 +101,7 @@ public class PathImplTest {
 
 	@Test
 	public void testParsingPropertyWithUnicodeCharacter() {
-		PathImpl path = PathImpl.createPathFromString( "höchst\u00f6Betrag" );
+		PathImpl path = PathBuilder.createPathFromString( "höchst\u00f6Betrag" ).build();
 		Iterator<Path.Node> it = path.iterator();
 
 		assertEquals( it.next().getName(), "höchst\u00f6Betrag" );
@@ -109,13 +109,13 @@ public class PathImplTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testParsingInvalidJavaProperty() {
-		PathImpl.createPathFromString( "1invalid" );
+		PathBuilder.createPathFromString( "1invalid" );
 	}
 
 	@Test
 	public void testParseMapBasedProperty() {
 		String property = "order[foo].deliveryAddress";
-		Path path = PathImpl.createPathFromString( property );
+		Path path = PathBuilder.createPathFromString( property ).build();
 		Iterator<Path.Node> propIter = path.iterator();
 
 		assertTrue( propIter.hasNext() );
@@ -134,32 +134,32 @@ public class PathImplTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNull() {
-		PathImpl.createPathFromString( null );
+		PathBuilder.createPathFromString( null );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testUnbalancedBraces() {
-		PathImpl.createPathFromString( "foo[.bar" );
+		PathBuilder.createPathFromString( "foo[.bar" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testIndexInMiddleOfProperty() {
-		PathImpl.createPathFromString( "f[1]oo.bar" );
+		PathBuilder.createPathFromString( "f[1]oo.bar" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testTrailingPathSeparator() {
-		PathImpl.createPathFromString( "foo.bar." );
+		PathBuilder.createPathFromString( "foo.bar." );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testLeadingPathSeparator() {
-		PathImpl.createPathFromString( ".foo.bar" );
+		PathBuilder.createPathFromString( ".foo.bar" );
 	}
 
 	@Test
 	public void testEmptyString() {
-		Path path = PathImpl.createPathFromString( "" );
+		Path path = PathBuilder.createPathFromString( "" ).build();
 		assertTrue( path.iterator().hasNext() );
 	}
 
@@ -205,14 +205,14 @@ public class PathImplTest {
 		ExecutableMetaData executableMetaData = beanMetaDataManager.getBeanMetaData( Container.class )
 				.getMetaDataFor( executable ).get();
 
-		PathImpl methodParameterPath = PathImpl.createPathForExecutable( executableMetaData );
+		PathBuilder methodParameterPath = PathBuilder.createPathForExecutable( executableMetaData );
 
 		assertEquals( methodParameterPath.toString(), "addItem" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testCreationOfExecutablePathFailsDueToMissingExecutable() throws Exception {
-		PathImpl.createPathForExecutable( null );
+		PathBuilder.createPathForExecutable( null );
 	}
 
 	class Container {

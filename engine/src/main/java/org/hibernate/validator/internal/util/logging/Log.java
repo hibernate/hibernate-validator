@@ -31,7 +31,6 @@ import javax.validation.ElementKind;
 import javax.validation.GroupDefinitionException;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
-import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
@@ -42,6 +41,7 @@ import javax.validation.valueextraction.ValueExtractorDefinitionException;
 import javax.xml.stream.XMLStreamException;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.logging.formatter.ClassObjectFormatter;
@@ -501,7 +501,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 146,
 			value = "No parameter nodes may be added since path %s doesn't refer to a cross-parameter constraint.")
-	IllegalStateException getParameterNodeAddedForNonCrossParameterConstraintException(Path path);
+	IllegalStateException getParameterNodeAddedForNonCrossParameterConstraintException(PathBuilder path);
 
 	@Message(id = 147,
 			value = "%1$s is configured multiple times (note, <getter> and <method> nodes for the same method are not allowed)")
@@ -678,7 +678,7 @@ public interface Log extends BasicLogger {
 	ValidationException getEmptyElementOnlySupportedWhenCharSequenceIsExpectedExpection();
 
 	@Message(id = 195, value = "Unable to reach the property to validate for the bean %s and the property path %s. A property is null along the way.")
-	ValidationException getUnableToReachPropertyToValidateException(Object bean, Path path);
+	ValidationException getUnableToReachPropertyToValidateException(Object bean, PathBuilder path);
 
 	@Message(id = 196, value = "Unable to convert the Type %s to a Class.")
 	ValidationException getUnableToConvertTypeToClassException(Type type);

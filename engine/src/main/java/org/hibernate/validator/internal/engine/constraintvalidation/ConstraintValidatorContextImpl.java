@@ -27,7 +27,7 @@ import javax.validation.ElementKind;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -46,13 +46,13 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private Map<String, Object> expressionVariables;
 	private final List<String> methodParameterNames;
 	private final ClockProvider clockProvider;
-	private final PathImpl basePath;
+	private final PathBuilder basePath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private List<ConstraintViolationCreationContext> constraintViolationCreationContexts;
 	private boolean defaultDisabled;
 	private Object dynamicPayload;
 
-	public ConstraintValidatorContextImpl(List<String> methodParameterNames, ClockProvider clockProvider, PathImpl propertyPath,
+	public ConstraintValidatorContextImpl(List<String> methodParameterNames, ClockProvider clockProvider, PathBuilder propertyPath,
 			ConstraintDescriptor<?> constraintDescriptor) {
 		this.methodParameterNames = methodParameterNames;
 		this.clockProvider = clockProvider;
@@ -75,7 +75,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		return new ConstraintViolationBuilderImpl(
 				methodParameterNames,
 				messageTemplate,
-				PathImpl.createCopy( basePath )
+				basePath
 		);
 	}
 
@@ -164,9 +164,9 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 	private abstract class NodeBuilderBase {
 		protected final String messageTemplate;
-		protected PathImpl propertyPath;
+		protected PathBuilder propertyPath;
 
-		protected NodeBuilderBase(String template, PathImpl path) {
+		protected NodeBuilderBase(String template, PathBuilder path) {
 			this.messageTemplate = template;
 			this.propertyPath = path;
 		}
@@ -192,7 +192,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		private final List<String> methodParameterNames;
 
-		private ConstraintViolationBuilderImpl(List<String> methodParameterNames, String template, PathImpl path) {
+		private ConstraintViolationBuilderImpl(List<String> methodParameterNames, String template, PathBuilder path) {
 			super( template, path );
 			this.methodParameterNames = methodParameterNames;
 		}
@@ -252,7 +252,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private class NodeBuilder extends NodeBuilderBase
 			implements NodeBuilderDefinedContext, LeafNodeBuilderDefinedContext, ContainerElementNodeBuilderDefinedContext {
 
-		private NodeBuilder(String template, PathImpl path) {
+		private NodeBuilder(String template, PathBuilder path) {
 			super( template, path );
 		}
 
@@ -290,7 +290,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		private final Integer leafNodeTypeArgumentIndex;
 
-		private DeferredNodeBuilder(String template, PathImpl path, String nodeName, ElementKind leafNodeKind) {
+		private DeferredNodeBuilder(String template, PathBuilder path, String nodeName, ElementKind leafNodeKind) {
 			super( template, path );
 			this.leafNodeName = nodeName;
 			this.leafNodeKind = leafNodeKind;
@@ -298,7 +298,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 			this.leafNodeTypeArgumentIndex = null;
 		}
 
-		private DeferredNodeBuilder(String template, PathImpl path, String nodeName, Class<?> leafNodeContainerType, Integer leafNodeTypeArgumentIndex) {
+		private DeferredNodeBuilder(String template, PathBuilder path, String nodeName, Class<?> leafNodeContainerType, Integer leafNodeTypeArgumentIndex) {
 			super( template, path );
 			this.leafNodeName = nodeName;
 			this.leafNodeKind = ElementKind.CONTAINER_ELEMENT;

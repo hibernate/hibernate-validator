@@ -233,7 +233,7 @@ public class MetaConstraint<A extends Annotation> {
 			}
 
 			// reset the value context to the state before this call
-			valueContext.resetValueState( originalValueState );
+			valueContext.resetValueState( originalValueState, nodeName != null );
 		}
 
 		public boolean isSuccess() {
