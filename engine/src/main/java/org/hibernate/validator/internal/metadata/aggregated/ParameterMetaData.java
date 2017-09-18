@@ -24,6 +24,7 @@ import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
@@ -119,9 +120,10 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				ConstrainedParameter constrainedParameter,
 				ConstraintHelper constraintHelper,
 				TypeResolutionHelper typeResolutionHelper,
+				ExecutableHelper executableHelper,
 				ValueExtractorManager valueExtractorManager,
 				ExecutableParameterNameProvider parameterNameProvider) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
+			super( beanClass, constraintHelper, typeResolutionHelper, executableHelper, valueExtractorManager );
 
 			this.parameterNameProvider = parameterNameProvider;
 			this.parameterType = constrainedParameter.getType();

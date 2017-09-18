@@ -24,6 +24,7 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -44,13 +45,15 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 	private final Set<TypeConstraintMappingContextImpl<?>> typeContexts;
 	private final Set<Class<?>> definedConstraints;
 	private final Set<ConstraintDefinitionContextImpl<?>> constraintContexts;
+	private final ExecutableHelper executableHelper;
 
-	public DefaultConstraintMapping() {
+	public DefaultConstraintMapping(ExecutableHelper executableHelper) {
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 		this.configuredTypes = newHashSet();
 		this.typeContexts = newHashSet();
 		this.definedConstraints = newHashSet();
 		this.constraintContexts = newHashSet();
+		this.executableHelper = executableHelper;
 	}
 
 	@Override
@@ -61,7 +64,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 			throw log.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( type );
 		}
 
-		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<>( this, type );
+		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<>( this, type, executableHelper );
 		typeContexts.add( typeContext );
 		configuredTypes.add( type );
 

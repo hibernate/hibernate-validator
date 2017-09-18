@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.cfg.context;
 import java.lang.reflect.Constructor;
 
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 
 /**
  * Constraint mapping creational context representing a constructor.
@@ -17,8 +18,8 @@ import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
  */
 class ConstructorConstraintMappingContextImpl extends ExecutableConstraintMappingContextImpl implements ConstructorConstraintMappingContext {
 
-	<T> ConstructorConstraintMappingContextImpl(TypeConstraintMappingContextImpl<T> typeContext, Constructor<T> constructor) {
-		super( typeContext, constructor );
+	<T> ConstructorConstraintMappingContextImpl(TypeConstraintMappingContextImpl<T> typeContext, Constructor<T> constructor, ExecutableHelper executableHelper) {
+		super( typeContext, constructor, executableHelper );
 	}
 
 	@Override

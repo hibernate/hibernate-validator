@@ -6,11 +6,6 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
-import java.lang.annotation.Annotation;
-import java.util.Set;
-
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
@@ -18,7 +13,13 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+
+import java.lang.annotation.Annotation;
+import java.util.Set;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Builds {@link ConstraintMetaData} instances for the
@@ -31,6 +32,7 @@ public abstract class MetaDataBuilder {
 
 	protected final ConstraintHelper constraintHelper;
 	protected final TypeResolutionHelper typeResolutionHelper;
+	protected final ExecutableHelper executableHelper;
 	protected final ValueExtractorManager valueExtractorManager;
 
 	private final Class<?> beanClass;
@@ -38,10 +40,11 @@ public abstract class MetaDataBuilder {
 	private final Set<MetaConstraint<?>> containerElementsConstraints = newHashSet();
 	private boolean isCascading = false;
 
-	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
+	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ExecutableHelper executableHelper, ValueExtractorManager valueExtractorManager) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
+		this.executableHelper = executableHelper;
 		this.valueExtractorManager = valueExtractorManager;
 	}
 

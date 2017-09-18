@@ -6,9 +6,16 @@
  */
 package org.hibernate.validator.internal.metadata.raw;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.StringHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
+import javax.validation.metadata.ConstraintDescriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.util.Collections;
@@ -16,16 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.metadata.ConstraintDescriptor;
-
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.StringHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.stereotypes.Immutable;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Represents a method or constructor of a Java type and all its associated
@@ -52,6 +51,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	@Immutable
 	private final Set<MetaConstraint<?>> crossParameterConstraints;
 
+	private final ExecutableHelper executableHelper;
 	private final boolean isGetterMethod;
 
 	/**
@@ -67,12 +67,14 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	public ConstrainedExecutable(
 			ConfigurationSource source,
 			Executable executable,
+			ExecutableHelper executableHelper,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Set<MetaConstraint<?>> typeArgumentConstraints,
 			CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 		this(
 				source,
 				executable,
+				executableHelper,
 				Collections.<ConstrainedParameter>emptyList(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
@@ -98,6 +100,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	public ConstrainedExecutable(
 			ConfigurationSource source,
 			Executable executable,
+			ExecutableHelper executableHelper,
 			List<ConstrainedParameter> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
@@ -112,6 +115,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		);
 
 		this.executable = executable;
+		this.executableHelper = executableHelper;
 
 		if ( parameterMetaData.size() != executable.getParameterTypes().length ) {
 			throw log.getInvalidLengthOfParameterMetaDataListException(
@@ -124,7 +128,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		this.crossParameterConstraints = CollectionHelper.toImmutableSet( crossParameterConstraints );
 		this.parameterMetaData = CollectionHelper.toImmutableList( parameterMetaData );
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData ) || !crossParameterConstraints.isEmpty();
-		this.isGetterMethod = ReflectionHelper.isGetterMethod( executable );
+		this.isGetterMethod = executableHelper.isGetterMethod( executable );
 	}
 
 	/**
@@ -284,6 +288,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		return new ConstrainedExecutable(
 				mergedSource,
 				executable,
+				executableHelper,
 				mergedParameterMetaData,
 				mergedCrossParameterConstraints,
 				mergedReturnValueConstraints,

@@ -41,6 +41,8 @@ import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolv
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -51,6 +53,7 @@ import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.spi.property.PropertyAccessorSelector;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
@@ -95,6 +98,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private ClassLoader externalClassLoader;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = new HashMap<>();
+
+	private PropertyAccessorSelector selector;
+	private ExecutableHelper executableHelper;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -232,6 +238,21 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
+	@Override
+	public HibernateValidatorConfiguration propertyAccessorSelector(PropertyAccessorSelector selector) {
+		this.selector = selector;
+		this.executableHelper = null;
+		return this;
+	}
+
+	public ExecutableHelper getExecutableHelper() {
+		if ( executableHelper == null ) {
+			executableHelper = new ExecutableHelper( new TypeResolutionHelper(), selector );
+		}
+
+		return executableHelper;
+	}
+
 	public boolean isAllowOverridingMethodAlterParameterConstraint() {
 		return this.methodValidationConfigurationBuilder.isAllowOverridingMethodAlterParameterConstraint();
 	}
@@ -262,7 +283,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final DefaultConstraintMapping createConstraintMapping() {
-		return new DefaultConstraintMapping();
+		return new DefaultConstraintMapping( getExecutableHelper() );
 	}
 
 	@Override

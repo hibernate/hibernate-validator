@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
@@ -50,7 +49,6 @@ import org.hibernate.validator.cdi.internal.interceptor.ValidationEnabledAnnotat
 import org.hibernate.validator.cdi.internal.interceptor.ValidationInterceptor;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -255,7 +253,7 @@ public class ValidationExtension implements Extension {
 		for ( AnnotatedMethod<? super T> annotatedMethod : type.getMethods() ) {
 			Method method = annotatedMethod.getJavaMember();
 
-			boolean isGetter = ReflectionHelper.isGetterMethod( method );
+			boolean isGetter = executableHelper.isGetterMethod( method );
 
 			// obtain @ValidateOnExecution from the top-most method in the hierarchy
 			Method methodForExecutableTypeRetrieval = replaceWithOverriddenOrInterfaceMethod( method, overriddenAndImplementedMethods );
@@ -308,7 +306,7 @@ public class ValidationExtension implements Extension {
 	}
 
 	private boolean isGetterConstrained(Method method, BeanDescriptor beanDescriptor) {
-		String propertyName = ReflectionHelper.getPropertyName( method );
+		String propertyName = executableHelper.getPropertyName( method );
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( propertyName );
 		return propertyDescriptor != null && propertyDescriptor.findConstraints()
 				.declaredOn( ElementType.METHOD )

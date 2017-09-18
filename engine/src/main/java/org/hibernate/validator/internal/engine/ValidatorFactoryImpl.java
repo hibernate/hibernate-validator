@@ -6,9 +6,6 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
 import java.lang.annotation.Annotation;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -18,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -54,6 +50,9 @@ import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is the Hibernate Validator default
@@ -154,7 +153,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.beanMetaDataManagers = new ConcurrentHashMap<>();
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
-		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
+		this.executableHelper = executableHelper( configurationState );
 
 		boolean tmpFailFast = false;
 		boolean tmpAllowOverridingMethodAlterParameterConstraint = false;
@@ -184,13 +183,14 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 		else {
 			this.xmlMetaDataProvider = new XmlMetaDataProvider(
-					constraintHelper, typeResolutionHelper, valueExtractorManager, configurationState.getMappingStreams(), externalClassLoader
+							constraintHelper, typeResolutionHelper, executableHelper, valueExtractorManager, configurationState.getMappingStreams(), externalClassLoader
 			);
 		}
 
 		this.constraintMappings = Collections.unmodifiableSet(
 				getConstraintMappings(
 						typeResolutionHelper,
+						executableHelper,
 						configurationState,
 						externalClassLoader
 				)
@@ -236,11 +236,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
 	}
 
-	private static ClassLoader getExternalClassLoader(ConfigurationState configurationState) {
+	private static ClassLoader getExternalClassLoader( ConfigurationState configurationState ) {
 		return ( configurationState instanceof ConfigurationImpl ) ? ( (ConfigurationImpl) configurationState ).getExternalClassLoader() : null;
 	}
 
 	private static Set<DefaultConstraintMapping> getConstraintMappings(TypeResolutionHelper typeResolutionHelper,
+			ExecutableHelper executableHelper,
 			ConfigurationState configurationState, ClassLoader externalClassLoader) {
 		Set<DefaultConstraintMapping> constraintMappings = newHashSet();
 
@@ -255,18 +256,18 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 			// service loader based config
 			ConstraintMappingContributor serviceLoaderBasedContributor = new ServiceLoaderBasedConstraintMappingContributor(
-					typeResolutionHelper,
-					externalClassLoader != null ? externalClassLoader : run( GetClassLoader.fromContext() ) );
-			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
+							typeResolutionHelper,
+							externalClassLoader != null ? externalClassLoader : run( GetClassLoader.fromContext() ) );
+			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings, executableHelper );
 			serviceLoaderBasedContributor.createConstraintMappings( builder );
 		}
 
 		// XML-defined constraint mapping contributors
 		List<ConstraintMappingContributor> contributors = getPropertyConfiguredConstraintMappingContributors( configurationState.getProperties(),
-				externalClassLoader );
+						externalClassLoader );
 
 		for ( ConstraintMappingContributor contributor : contributors ) {
-			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
+			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings, executableHelper );
 			contributor.createConstraintMappings( builder );
 		}
 
@@ -352,13 +353,13 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	Validator createValidator(ConstraintValidatorFactory constraintValidatorFactory,
-			MessageInterpolator messageInterpolator,
-			TraversableResolver traversableResolver,
-			ExecutableParameterNameProvider parameterNameProvider,
-			ClockProvider clockProvider,
-			boolean failFast,
-			ValueExtractorManager valueExtractorManager,
-			MethodValidationConfiguration methodValidationConfiguration) {
+				    MessageInterpolator messageInterpolator,
+	                TraversableResolver traversableResolver,
+	                ExecutableParameterNameProvider parameterNameProvider,
+	                ClockProvider clockProvider,
+	                boolean failFast,
+	                ValueExtractorManager valueExtractorManager,
+	                MethodValidationConfiguration methodValidationConfiguration ) {
 
 		ValidationOrderGenerator validationOrderGenerator = new ValidationOrderGenerator();
 
@@ -452,8 +453,16 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return contributors;
 	}
 
+	private static ExecutableHelper executableHelper(ConfigurationState state ) {
+		ExecutableHelper helper = null;
+		if ( state instanceof ConfigurationImpl ) {
+			helper = ( (ConfigurationImpl) state ).getExecutableHelper();
+		}
+		return helper;
+	}
+
 	private static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,
-			ConstraintHelper constraintHelper) {
+														   ConstraintHelper constraintHelper) {
 		Set<Class<?>> definedConstraints = newHashSet();
 		for ( DefaultConstraintMapping constraintMapping : constraintMappings ) {
 			for ( ConstraintDefinitionContribution<?> contribution : constraintMapping.getConstraintDefinitionContributions() ) {
@@ -492,16 +501,19 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 */
 	private static class DefaultConstraintMappingBuilder
 			implements ConstraintMappingContributor.ConstraintMappingBuilder {
-		private final Set<DefaultConstraintMapping> mappings;
 
-		public DefaultConstraintMappingBuilder(Set<DefaultConstraintMapping> mappings) {
+		private final Set<DefaultConstraintMapping> mappings;
+		private final ExecutableHelper executableHelper;
+
+		public DefaultConstraintMappingBuilder(Set<DefaultConstraintMapping> mappings, ExecutableHelper executableHelper) {
 			super();
 			this.mappings = mappings;
+			this.executableHelper = executableHelper;
 		}
 
 		@Override
 		public ConstraintMapping addConstraintMapping() {
-			DefaultConstraintMapping mapping = new DefaultConstraintMapping();
+			DefaultConstraintMapping mapping = new DefaultConstraintMapping( executableHelper );
 			mappings.add( mapping );
 			return mapping;
 		}

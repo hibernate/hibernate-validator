@@ -11,6 +11,8 @@ import static org.testng.Assert.assertEquals;
 import java.lang.reflect.Method;
 
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
 
@@ -32,8 +34,9 @@ public class ConstraintLocationTest {
 	@TestForIssue(jiraKey = "HV-930")
 	public void two_constraint_locations_for_the_same_member_should_be_equal() throws Exception {
 		Method getter = Foo.class.getMethod( "getBar" );
-		ConstraintLocation location1 = ConstraintLocation.forGetter( getter );
-		ConstraintLocation location2 = ConstraintLocation.forGetter( getter );
+		ExecutableHelper helper = new ExecutableHelper( new TypeResolutionHelper() );
+		ConstraintLocation location1 = ConstraintLocation.forGetter( getter, helper );
+		ConstraintLocation location2 = ConstraintLocation.forGetter( getter, helper );
 
 		assertEquals( location1, location2, "Two constraint locations for the same type should be equal" );
 	}

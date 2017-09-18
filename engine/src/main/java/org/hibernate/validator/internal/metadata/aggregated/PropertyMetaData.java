@@ -40,6 +40,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
@@ -162,8 +163,9 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		private Method getterAccessibleMethod;
 
 		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-				ValueExtractorManager valueExtractorManager) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
+		                ExecutableHelper executableHelper,
+		                ValueExtractorManager valueExtractorManager) {
+			super( beanClass, constraintHelper, typeResolutionHelper, executableHelper, valueExtractorManager );
 
 			this.propertyName = constrainedField.getField().getName();
 			this.propertyType = ReflectionHelper.typeOf( constrainedField.getField() );
@@ -171,8 +173,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		}
 
 		public Builder(Class<?> beanClass, ConstrainedType constrainedType, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-				ValueExtractorManager valueExtractorManager) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
+				ExecutableHelper executableHelper, ValueExtractorManager valueExtractorManager) {
+			super( beanClass, constraintHelper, typeResolutionHelper, executableHelper, valueExtractorManager );
 
 			this.propertyName = null;
 			this.propertyType = null;
@@ -180,10 +182,10 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		}
 
 		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedMethod, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-				ValueExtractorManager valueExtractorManager) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
+				ExecutableHelper executableHelper, ValueExtractorManager valueExtractorManager) {
+			super( beanClass, constraintHelper, typeResolutionHelper, executableHelper, valueExtractorManager );
 
-			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getExecutable() );
+			this.propertyName = executableHelper.getPropertyName( constrainedMethod.getExecutable() );
 			this.propertyType = ReflectionHelper.typeOf( constrainedMethod.getExecutable() );
 			add( constrainedMethod );
 		}
@@ -195,7 +197,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			}
 
 			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
-					!( (ConstrainedExecutable) constrainedElement ).isGetterMethod() ) {
+							!( (ConstrainedExecutable) constrainedElement ).isGetterMethod() ) {
 				return false;
 			}
 
@@ -233,7 +235,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					Cascadable.Builder builder = cascadableBuilders.get( method );
 
 					if ( builder == null ) {
-						builder = new GetterCascadable.Builder( valueExtractorManager, getterAccessibleMethod, constrainedElement.getCascadingMetaDataBuilder() );
+						builder = new GetterCascadable.Builder( valueExtractorManager, getterAccessibleMethod, executableHelper, constrainedElement.getCascadingMetaDataBuilder() );
 						cascadableBuilders.put( method, builder );
 					}
 					else {
@@ -249,7 +251,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				return constraints;
 			}
 
-			ConstraintLocation getterConstraintLocation = ConstraintLocation.forGetter( getterAccessibleMethod );
+			ConstraintLocation getterConstraintLocation = ConstraintLocation.forGetter( getterAccessibleMethod, executableHelper );
 
 			// convert return value locations into getter locations for usage within this meta-data
 			return constraints.stream()
@@ -303,7 +305,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				return ReflectionHelper.getPropertyName( ( (ConstrainedField) constrainedElement ).getField() );
 			}
 			else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
-				return ReflectionHelper.getPropertyName( ( (ConstrainedExecutable) constrainedElement ).getExecutable() );
+				return executableHelper.getPropertyName( ( (ConstrainedExecutable) constrainedElement ).getExecutable() );
 			}
 
 			return null;

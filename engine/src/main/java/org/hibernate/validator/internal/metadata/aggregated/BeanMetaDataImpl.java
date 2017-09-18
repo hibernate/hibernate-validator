@@ -692,6 +692,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							constrainedField,
 							constraintHelper,
 							typeResolutionHelper,
+							executableHelper,
 							valueExtractorManager
 					);
 					break;
@@ -721,6 +722,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 								constrainedExecutable,
 								constraintHelper,
 								typeResolutionHelper,
+								executableHelper,
 								valueExtractorManager
 						);
 					}
@@ -732,6 +734,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							constrainedType,
 							constraintHelper,
 							typeResolutionHelper,
+							executableHelper,
 							valueExtractorManager
 					);
 					break;

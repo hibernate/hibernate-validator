@@ -28,6 +28,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
@@ -57,13 +58,16 @@ class MetaConstraintBuilder {
 	private final ClassLoadingHelper classLoadingHelper;
 	private final ConstraintHelper constraintHelper;
 	private final TypeResolutionHelper typeResolutionHelper;
+	final ExecutableHelper executableHelper;
 	private final ValueExtractorManager valueExtractorManager;
 
 	MetaConstraintBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
+			ExecutableHelper executableHelper,
 			ValueExtractorManager valueExtractorManager) {
 		this.classLoadingHelper = classLoadingHelper;
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
+		this.executableHelper = executableHelper;
 		this.valueExtractorManager = valueExtractorManager;
 	}
 

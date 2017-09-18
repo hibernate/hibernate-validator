@@ -87,6 +87,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private final ConstraintHelper constraintHelper;
 	private final TypeResolutionHelper typeResolutionHelper;
+	private final ExecutableHelper executableHelper;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 	private final ValueExtractorManager valueExtractorManager;
 
@@ -94,10 +95,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper,
+			ExecutableHelper executableHelper,
 			ValueExtractorManager valueExtractorManager,
 			AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
+		this.executableHelper = executableHelper;
 		this.valueExtractorManager = valueExtractorManager;
 		this.annotationProcessingOptions = annotationProcessingOptions;
 
@@ -332,6 +335,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return new ConstrainedExecutable(
 				ConfigurationSource.ANNOTATION,
 				executable,
+				executableHelper,
 				parameterConstraints,
 				crossParameterConstraints,
 				returnValueConstraints,

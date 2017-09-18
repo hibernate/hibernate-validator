@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
@@ -27,9 +28,9 @@ public class GetterCascadable implements Cascadable {
 	private final Type cascadableType;
 	private final CascadingMetaData cascadingMetaData;
 
-	GetterCascadable(Method method, CascadingMetaData cascadingMetaData) {
+	GetterCascadable(Method method, ExecutableHelper executableHelper, CascadingMetaData cascadingMetaData) {
 		this.method = method;
-		this.propertyName = ReflectionHelper.getPropertyName( method );
+		this.propertyName = executableHelper.getPropertyName( method );
 		this.cascadableType = ReflectionHelper.typeOf( method );
 		this.cascadingMetaData = cascadingMetaData;
 	}
@@ -63,12 +64,14 @@ public class GetterCascadable implements Cascadable {
 
 		private final ValueExtractorManager valueExtractorManager;
 		private final Method method;
+		private final ExecutableHelper executableHelper;
 		private CascadingMetaDataBuilder cascadingMetaDataBuilder;
 
 		// Note: the method passed here has to be accessible: the caller is responsible for that
-		public Builder(ValueExtractorManager valueExtractorManager, Method method, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+		public Builder(ValueExtractorManager valueExtractorManager, Method method, ExecutableHelper executableHelper, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 			this.valueExtractorManager = valueExtractorManager;
 			this.method = method;
+			this.executableHelper = executableHelper;
 			this.cascadingMetaDataBuilder = cascadingMetaDataBuilder;
 		}
 
@@ -79,7 +82,7 @@ public class GetterCascadable implements Cascadable {
 
 		@Override
 		public GetterCascadable build() {
-			return new GetterCascadable( method, cascadingMetaDataBuilder.build( valueExtractorManager, method ) );
+			return new GetterCascadable( method, executableHelper, cascadingMetaDataBuilder.build( valueExtractorManager, method ) );
 		}
 	}
 }

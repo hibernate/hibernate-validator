@@ -6,9 +6,6 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
-
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
@@ -33,16 +30,17 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Constraint mapping creational context which allows to configure the class-level constraints for one bean.
@@ -64,12 +62,15 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	private final Set<PropertyConstraintMappingContextImpl> propertyContexts = newHashSet();
 	private final Set<Member> configuredMembers = newHashSet();
 
+	private final ExecutableHelper executableHelper;
+
 	private List<Class<?>> defaultGroupSequence;
 	private Class<? extends DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass;
 
-	TypeConstraintMappingContextImpl(DefaultConstraintMapping mapping, Class<C> beanClass) {
+	TypeConstraintMappingContextImpl(DefaultConstraintMapping mapping, Class<C> beanClass, ExecutableHelper executableHelper) {
 		super( mapping );
 		this.beanClass = beanClass;
+		this.executableHelper = executableHelper;
 		mapping.getAnnotationProcessingOptions().ignoreAnnotationConstraintForClass( beanClass, Boolean.FALSE );
 	}
 
@@ -123,7 +124,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 		PropertyConstraintMappingContextImpl context = new PropertyConstraintMappingContextImpl(
 				this,
-				member
+				member, executableHelper
 		);
 
 		configuredMembers.add( member );
@@ -148,7 +149,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			);
 		}
 
-		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, method );
+		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, method, executableHelper );
 		configuredMembers.add( method );
 		executableContexts.add( context );
 
@@ -175,7 +176,8 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 		ConstructorConstraintMappingContextImpl context = new ConstructorConstraintMappingContextImpl(
 				this,
-				constructor
+				constructor,
+				executableHelper
 		);
 		configuredMembers.add( constructor );
 		executableContexts.add( context );
@@ -263,14 +265,9 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			member = run( GetDeclaredField.action( clazz, property ) );
 		}
 		else {
-			String methodName = property.substring( 0, 1 ).toUpperCase() + property.substring( 1 );
-			for ( String prefix : ReflectionHelper.PROPERTY_ACCESSOR_PREFIXES ) {
-				member = run( GetMethod.action( clazz, prefix + methodName ) );
-				if ( member != null ) {
-					break;
-				}
-			}
+			member = executableHelper.findMethod( clazz, property );
 		}
+
 		return member;
 	}
 

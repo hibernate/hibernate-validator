@@ -23,6 +23,7 @@ import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -41,13 +42,15 @@ abstract class ExecutableConstraintMappingContextImpl {
 
 	protected final TypeConstraintMappingContextImpl<?> typeContext;
 	protected final Executable executable;
+	private final ExecutableHelper executableHelper;
 	private final ParameterConstraintMappingContextImpl[] parameterContexts;
 	private ReturnValueConstraintMappingContextImpl returnValueContext;
 	private CrossParameterConstraintMappingContextImpl crossParameterContext;
 
-	protected ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Executable executable) {
+	protected ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Executable executable, ExecutableHelper executableHelper) {
 		this.typeContext = typeContext;
 		this.executable = executable;
+		this.executableHelper = executableHelper;
 		this.parameterContexts = new ParameterConstraintMappingContextImpl[executable.getParameterTypes().length];
 	}
 
@@ -108,6 +111,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 		return new ConstrainedExecutable(
 				ConfigurationSource.API,
 				executable,
+				executableHelper,
 				getParameters( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ) : Collections.<MetaConstraint<?>>emptySet(),

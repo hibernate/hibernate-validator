@@ -145,6 +145,7 @@ public class BeanMetaDataManager {
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
 					constraintHelper,
 					typeResolutionHelper,
+					executableHelper,
 					valueExtractorManager,
 					annotationProcessingOptions
 			);

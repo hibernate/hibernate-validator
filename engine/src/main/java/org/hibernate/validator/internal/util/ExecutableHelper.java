@@ -6,6 +6,19 @@
  */
 package org.hibernate.validator.internal.util;
 
+import com.fasterxml.classmate.Filter;
+import com.fasterxml.classmate.MemberResolver;
+import com.fasterxml.classmate.ResolvedType;
+import com.fasterxml.classmate.ResolvedTypeWithMembers;
+import com.fasterxml.classmate.TypeResolver;
+import com.fasterxml.classmate.members.RawMethod;
+import com.fasterxml.classmate.members.ResolvedMethod;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetResolvedMemberMethods;
+import org.hibernate.validator.spi.property.JavaBeanPropertySelector;
+import org.hibernate.validator.spi.property.PropertyAccessorSelector;
+
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -15,18 +28,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetResolvedMemberMethods;
-
-import com.fasterxml.classmate.Filter;
-import com.fasterxml.classmate.MemberResolver;
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.ResolvedTypeWithMembers;
-import com.fasterxml.classmate.TypeResolver;
-import com.fasterxml.classmate.members.RawMethod;
-import com.fasterxml.classmate.members.ResolvedMethod;
 
 /**
  * Provides shared functionality dealing with executables.
@@ -38,9 +39,15 @@ import com.fasterxml.classmate.members.ResolvedMethod;
 public final class ExecutableHelper {
 	private static final Log log = LoggerFactory.make();
 	private final TypeResolver typeResolver;
+	private final PropertyAccessorSelector selector;
 
 	public ExecutableHelper(TypeResolutionHelper typeResolutionHelper) {
+		this( typeResolutionHelper, null );
+	}
+
+	public ExecutableHelper(TypeResolutionHelper typeResolutionHelper, PropertyAccessorSelector selector) {
 		this.typeResolver = typeResolutionHelper.getTypeResolver();
+		this.selector = selector == null ? new JavaBeanPropertySelector() : selector;
 	}
 
 	/**
@@ -94,6 +101,22 @@ public final class ExecutableHelper {
 		}
 
 		return instanceMethodParametersResolveToSameTypes( subTypeMethod, superTypeMethod );
+	}
+
+	public String getPropertyName(Executable executable) {
+		if ( !( executable instanceof Method ) ) {
+			return null;
+		}
+
+		return selector.getPropertyName( (Method) executable );
+	}
+
+	public Method findMethod(Class<?> clazz, String property) {
+		return selector.findMethod( clazz, property );
+	}
+
+	public boolean isGetterMethod(Executable executable) {
+		return executable instanceof Method && selector.isGetterMethod( (Method) executable );
 	}
 
 	public static String getSimpleName(Executable executable) {

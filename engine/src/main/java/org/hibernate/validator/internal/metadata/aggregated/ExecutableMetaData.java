@@ -282,7 +282,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				ValueExtractorManager valueExtractorManager,
 				ExecutableParameterNameProvider parameterNameProvider,
 				MethodValidationConfiguration methodValidationConfiguration) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
+			super( beanClass, constraintHelper, typeResolutionHelper, executableHelper, valueExtractorManager );
 
 			this.executableHelper = executableHelper;
 			this.parameterNameProvider = parameterNameProvider;
@@ -408,6 +408,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 										oneParameter,
 										constraintHelper,
 										typeResolutionHelper,
+										executableHelper,
 										valueExtractorManager,
 										parameterNameProvider
 								)
