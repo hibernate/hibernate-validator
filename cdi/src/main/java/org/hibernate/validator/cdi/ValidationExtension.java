@@ -406,7 +406,7 @@ public class ValidationExtension implements Extension {
 		return executableTypes;
 	}
 
-	public Method replaceWithOverriddenOrInterfaceMethod(Method method, List<Method> allMethodsOfType) {
+	private Method replaceWithOverriddenOrInterfaceMethod(Method method, List<Method> allMethodsOfType) {
 		LinkedList<Method> list = new LinkedList<>( allMethodsOfType );
 		Iterator<Method> iterator = list.descendingIterator();
 		while ( iterator.hasNext() ) {
