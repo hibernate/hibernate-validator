@@ -22,7 +22,6 @@
 
     <properties>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
-        <automatic.module.name>org.hibernate.validator.cdi</automatic.module.name>
     </properties>
 
     <dependencies>
@@ -155,7 +154,7 @@
                                 <manifestEntries>
                                     <Specification-Title>Bean Validation</Specification-Title>
                                     <Specification-Version>2.0</Specification-Version>
-                                    <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+                                    <Automatic-Module-Name>${hibernate-validator-cdi.module-name}</Automatic-Module-Name>
                                 </manifestEntries>
                             </archive>
                         </configuration>
@@ -167,12 +166,14 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Fragment-Host>org.hibernate.validator</Fragment-Host>
+                        <Bundle-SymbolicName>${hibernate-validator-cdi.bundle-name}</Bundle-SymbolicName>
+                        <Fragment-Host>${hibernate-validator.bundle-name}</Fragment-Host>
                         <Import-Package>
-                            org.hibernate.validator.*;version="[${project.version},${project.version}]",
+                            javax.validation.*;version="[2.0,3.0)",
                             javax.annotation.*;version="[1.2,2.0)",
                             javax.interceptor.*;version="[1.2,2.0)",
-                            javax.enterprise.*;version="[1.2,2.0)"
+                            javax.enterprise.*;version="[1.2,3.0)",
+                            javax.inject.*
                         </Import-Package>
                         <Export-Package>org.hibernate.validator.cdi;version="${project.version}"</Export-Package>
                         <Private-Package>org.hibernate.validator.internal.*;version="${project.version}"</Private-Package>

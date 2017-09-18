@@ -22,7 +22,6 @@
 
     <properties>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
-        <automatic.module.name>org.hibernate.validator</automatic.module.name>
     </properties>
 
     <distributionManagement>
@@ -200,7 +199,7 @@
                                 <manifestEntries>
                                     <Specification-Title>Bean Validation</Specification-Title>
                                     <Specification-Version>2.0</Specification-Version>
-                                    <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+                                    <Automatic-Module-Name>${hibernate-validator.module-name}</Automatic-Module-Name>
                                 </manifestEntries>
                             </archive>
                         </configuration>
@@ -212,6 +211,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
+                        <Bundle-SymbolicName>${hibernate-validator.bundle-name}</Bundle-SymbolicName>
                         <Import-Package>
                             javax.persistence.*;version="[2.0.0,3.0.0)";resolution:=optional,
                             javax.validation.*;version="[2.0.0,3.0.0)",

@@ -25,7 +25,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
  * @author Gunnar Morling
  *
  */
-class InheritedMethodsHelper {
+public class InheritedMethodsHelper {
 
 	private InheritedMethodsHelper() {
 		// Not allowed
@@ -41,7 +41,7 @@ class InheritedMethodsHelper {
 	 *
 	 * @return set of all methods of the given class
 	 */
-	static List<Method> getAllMethods(Class<?> clazz) {
+	public static List<Method> getAllMethods(Class<?> clazz) {
 		Contracts.assertNotNull( clazz );
 
 		List<Method> methods = newArrayList();
