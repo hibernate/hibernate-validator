@@ -115,7 +115,7 @@ public final class PathImpl implements Path, Serializable {
 	public NodeImpl addPropertyNode(String nodeName) {
 		requiresWriteableNodeList();
 
-		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createPropertyNode( nodeName, parent );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -125,7 +125,7 @@ public final class PathImpl implements Path, Serializable {
 	public NodeImpl addContainerElementNode(String nodeName) {
 		requiresWriteableNodeList();
 
-		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createContainerElementNode( nodeName, parent );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -135,7 +135,7 @@ public final class PathImpl implements Path, Serializable {
 	public NodeImpl addParameterNode(String nodeName, int index) {
 		requiresWriteableNodeList();
 
-		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createParameterNode( nodeName, parent, index );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -145,7 +145,7 @@ public final class PathImpl implements Path, Serializable {
 	public NodeImpl addCrossParameterNode() {
 		requiresWriteableNodeList();
 
-		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createCrossParameterNode( parent );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -155,7 +155,7 @@ public final class PathImpl implements Path, Serializable {
 	public NodeImpl addBeanNode() {
 		requiresWriteableNodeList();
 
-		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createBeanNode( parent );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -165,7 +165,7 @@ public final class PathImpl implements Path, Serializable {
 	public NodeImpl addReturnValueNode() {
 		requiresWriteableNodeList();
 
-		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createReturnValue( parent );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -175,7 +175,7 @@ public final class PathImpl implements Path, Serializable {
 	private NodeImpl addConstructorNode(String name, Class<?>[] parameterTypes) {
 		requiresWriteableNodeList();
 
-		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createConstructorNode( name, parent, parameterTypes );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -185,7 +185,7 @@ public final class PathImpl implements Path, Serializable {
 	private NodeImpl addMethodNode(String name, Class<?>[] parameterTypes) {
 		requiresWriteableNodeList();
 
-		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createMethodNode( name, parent, parameterTypes );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
