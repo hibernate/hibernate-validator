@@ -32,9 +32,11 @@ import javax.validation.constraints.Size;
 @NotNull(message = "Cannot be null")
 public @interface ValidNumber {
 
-    String message() default "invalid number";
-    Class<?>[] groups() default {};
-    Class<? extends Payload>[] payload() default {};
+	String message() default "invalid number";
 
-    String value() default "";
+	Class<?>[] groups() default {};
+
+	Class<? extends Payload>[] payload() default {};
+
+	String value() default "";
 }
