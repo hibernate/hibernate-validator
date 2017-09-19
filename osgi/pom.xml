@@ -26,6 +26,7 @@
     </properties>
 
     <modules>
+        <module>felixtest</module>
         <module>karaf-features</module>
         <module>integrationtest</module>
     </modules>
