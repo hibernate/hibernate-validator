@@ -184,7 +184,7 @@
         <asciidoctor-maven-plugin.version>1.5.5</asciidoctor-maven-plugin.version>
         <jruby.version>9.1.8.0</jruby.version>
         <asciidoctorj.version>1.6.0-alpha.5</asciidoctorj.version>
-        <asciidoctorj-pdf.version>1.5.0-alpha.15</asciidoctorj-pdf.version>
+        <asciidoctorj-pdf.version>1.5.0-alpha.16</asciidoctorj-pdf.version>
 
         <!-- URLs used in javadoc and documentation generation -->
         <bv.spec.url>http://beanvalidation.org/2.0/spec/</bv.spec.url>
