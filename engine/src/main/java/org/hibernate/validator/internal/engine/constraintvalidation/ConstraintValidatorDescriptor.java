@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.EnumSet;
@@ -23,7 +22,7 @@ import org.hibernate.validator.cfg.context.ConstraintDefinitionContext.Validatio
  *
  * @author Gunnar Morling
  */
-public interface ConstraintValidatorDescriptor<A extends Annotation> extends Serializable {
+public interface ConstraintValidatorDescriptor<A extends Annotation> {
 
 	/**
 	 * The implementation type of the represented validator.
