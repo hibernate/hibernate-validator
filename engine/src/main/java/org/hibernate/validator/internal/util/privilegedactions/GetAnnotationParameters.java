@@ -100,5 +100,15 @@ public final class GetAnnotationParameters implements PrivilegedAction<Annotatio
 
 			return (T) parameter;
 		}
+
+		@Override
+		public String toString() {
+			final StringBuilder sb = new StringBuilder();
+			sb.append( this.getClass().getSimpleName() );
+			sb.append( '{' );
+			sb.append( "parameters=" ).append( parameters );
+			sb.append( '}' );
+			return sb.toString();
+		}
 	}
 }
