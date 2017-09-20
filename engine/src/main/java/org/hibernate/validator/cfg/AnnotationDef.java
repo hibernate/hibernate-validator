@@ -149,8 +149,9 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append( this.getClass().getName() );
-		sb.append( ", annotationType=" ).append( StringHelper.toShortString( annotationType ) );
+		sb.append( this.getClass().getSimpleName() );
+		sb.append( '{' );
+		sb.append( "annotationType=" ).append( StringHelper.toShortString( annotationType ) );
 		sb.append( ", parameters=" ).append( parameters );
 		sb.append( '}' );
 		return sb.toString();

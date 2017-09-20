@@ -60,8 +60,9 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append( this.getClass().getName() );
-		sb.append( ", constraintType=" ).append( StringHelper.toShortString( annotationType ) );
+		sb.append( this.getClass().getSimpleName() );
+		sb.append( '{' );
+		sb.append( "constraintType=" ).append( StringHelper.toShortString( annotationType ) );
 		sb.append( ", parameters=" ).append( parameters );
 		sb.append( '}' );
 		return sb.toString();
