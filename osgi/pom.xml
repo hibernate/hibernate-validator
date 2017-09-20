@@ -26,8 +26,23 @@
     </properties>
 
     <modules>
-        <module>felixtest</module>
         <module>karaf-features</module>
         <module>integrationtest</module>
     </modules>
+    
+    <profiles>
+        <profile>
+            <id>pre-jdk9</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <modules>
+                <!--
+                Only enable this test on JDK 8 as it is failing on JDK 9.
+                See https://hibernate.atlassian.net/browse/HV-1478 for more information about the failure.
+                -->
+                <module>felixtest</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
