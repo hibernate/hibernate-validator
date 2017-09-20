@@ -7,7 +7,10 @@
 package org.hibernate.validator.test.internal.engine.serialization;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,30 +22,76 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.validation.executable.ExecutableValidator;
+import javax.validation.groups.Default;
+import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.ValidateUnwrappedValue;
 
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCharSequence;
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.test.internal.engine.serialization.SerializableClass.TestPayload;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
 import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 public class ConstraintViolationSerializationTest {
 
 	@Test
-	@TestForIssue(jiraKey = "HV-245")
+	@TestForIssue(jiraKey = { "HV-245", "HV-1485" })
 	public void testSuccessfulSerialization() throws Exception {
 		Validator validator = ValidatorUtil.getValidator();
-		SerializableClass testInstance = new SerializableClass();
+		SerializableClass testInstance = new SerializableClass( "s" );
 		Set<ConstraintViolation<SerializableClass>> constraintViolations = validator.validate( testInstance );
 
 		byte[] bytes = serialize( constraintViolations );
 		Set<ConstraintViolation<?>> deserializedViolations = deserialize( bytes );
 		assertThat( deserializedViolations ).containsOnlyViolations(
-				violationOf( NotNull.class ).withProperty( "foo" )
+				violationOf( Size.class )
+						.withProperty( "foo" )
 		);
+
+		checkSerializedViolation( deserializedViolations.iterator().next(), testInstance, null, null );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1485")
+	public void testSuccessfulSerializationWithMethodParameters() throws Exception {
+		ExecutableValidator validator = ValidatorUtil.getValidator().forExecutables();
+		SerializableClass testInstance = new SerializableClass( "s" );
+		Set<ConstraintViolation<SerializableClass>> constraintViolations = validator.validateParameters( testInstance,
+				SerializableClass.class.getMethod( "fooParameter", String.class ), new Object[] { "s" } );
+
+		byte[] bytes = serialize( constraintViolations );
+		Set<ConstraintViolation<?>> deserializedViolations = deserialize( bytes );
+		assertThat( deserializedViolations ).containsOnlyViolations(
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.method( "fooParameter" )
+						.parameter( "foo", 0 ) ) );
+
+		checkSerializedViolation( deserializedViolations.iterator().next(), testInstance, new Object[] { "s" }, null );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1485")
+	public void testSuccessfulSerializationWithMethodReturnValue() throws Exception {
+		ExecutableValidator validator = ValidatorUtil.getValidator().forExecutables();
+		SerializableClass testInstance = new SerializableClass( "s" );
+		Set<ConstraintViolation<SerializableClass>> constraintViolations = validator.validateReturnValue( testInstance,
+				SerializableClass.class.getMethod( "fooReturnValue" ), "s" );
+
+		byte[] bytes = serialize( constraintViolations );
+		Set<ConstraintViolation<?>> deserializedViolations = deserialize( bytes );
+		assertThat( deserializedViolations ).containsOnlyViolations(
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.method( "fooReturnValue" )
+						.returnValue() ) );
+
+		checkSerializedViolation( deserializedViolations.iterator().next(), testInstance, null, "s" );
 	}
 
 	@TestForIssue(jiraKey = "HV-245")
@@ -74,5 +123,26 @@ public class ConstraintViolationSerializationTest {
 		in.close();
 		byteIn.close();
 		return deserializedViolations;
+	}
+
+	private void checkSerializedViolation(ConstraintViolation<?> constraintViolation, SerializableClass testInstance, Object[] executableParameters,
+			Object executableReturnValue) {
+		assertEquals( constraintViolation.getLeafBean(), testInstance );
+		assertEquals( constraintViolation.getRootBean(), testInstance );
+		assertEquals( constraintViolation.getRootBeanClass(), SerializableClass.class );
+		assertEquals( constraintViolation.getMessage(), "size must be between 5 and 2147483647" );
+		assertEquals( constraintViolation.getMessageTemplate(), "{javax.validation.constraints.Size.message}" );
+		assertEquals( constraintViolation.getInvalidValue(), "s" );
+		assertEquals( constraintViolation.getExecutableParameters(), executableParameters );
+		assertEquals( constraintViolation.getExecutableReturnValue(), executableReturnValue );
+
+		ConstraintDescriptor<?> constraintDescriptor = constraintViolation.getConstraintDescriptor();
+		assertEquals( constraintDescriptor.getAnnotation().annotationType(), Size.class );
+		assertEquals( constraintDescriptor.getGroups(), CollectionHelper.asSet( Default.class ) );
+		assertEquals( constraintDescriptor.getMessageTemplate(), "{javax.validation.constraints.Size.message}" );
+		assertEquals( constraintDescriptor.getPayload(), CollectionHelper.asSet( TestPayload.class ) );
+		assertEquals( constraintDescriptor.getValidationAppliesTo(), null );
+		assertEquals( constraintDescriptor.getValueUnwrapping(), ValidateUnwrappedValue.DEFAULT );
+		assertTrue( constraintDescriptor.getConstraintValidatorClasses().contains( SizeValidatorForCharSequence.class ) );
 	}
 }

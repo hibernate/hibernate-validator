@@ -106,8 +106,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	@Immutable
 	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorClasses;
 
+	/**
+	 * This field is transient as the implementations of  {@link ConstraintValidatorDescriptor} might not be serializable.
+	 * Typically {@code ClassBasedValidatorDescriptor} might contain a {@code ParameterizedTypeImpl}, which is not serializable.
+	 */
 	@Immutable
-	private final List<ConstraintValidatorDescriptor<T>> matchingConstraintValidatorDescriptors;
+	private final transient List<ConstraintValidatorDescriptor<T>> matchingConstraintValidatorDescriptors;
 
 	/**
 	 * The groups for which to apply this constraint.
