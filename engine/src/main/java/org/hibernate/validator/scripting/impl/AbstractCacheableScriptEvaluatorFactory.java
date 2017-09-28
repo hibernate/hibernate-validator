@@ -45,7 +45,7 @@ public abstract class AbstractCacheableScriptEvaluatorFactory implements ScriptE
 		return scriptExecutorCache.computeIfAbsent( languageName, this::createScriptEvaluator );
 	}
 
-	private ScriptEvaluator createScriptEvaluator(String languageName){
+	private ScriptEvaluator createScriptEvaluator(String languageName) {
 		try {
 			return createNewScriptEvaluator( languageName );
 		}

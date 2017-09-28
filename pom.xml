@@ -180,6 +180,8 @@
 
         <guava.version>23.0</guava.version>
 
+        <spring-expression.version>4.3.10.RELEASE</spring-expression.version>
+
         <!-- Asciidoctor -->
         <hibernate-asciidoctor-theme.version>1.0.1.Final</hibernate-asciidoctor-theme.version>
         <hibernate-asciidoctor-extensions.version>1.0.3.Final</hibernate-asciidoctor-extensions.version>
@@ -425,6 +427,11 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-expression</artifactId>
+                <version>${spring-expression.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

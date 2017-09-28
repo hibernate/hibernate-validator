@@ -20,13 +20,12 @@ import java.util.stream.Stream;
 
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.scripting.ScriptEvaluationException;
-import org.hibernate.validator.scripting.ScriptEvaluator;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluatorImpl;
+import org.hibernate.validator.scripting.ScriptEvaluationException;
+import org.hibernate.validator.scripting.ScriptEvaluator;
 import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 
 import org.osgi.framework.Bundle;
@@ -57,7 +56,6 @@ public class OSGiScriptEvaluatorFactory extends AbstractCacheableScriptEvaluator
 				.orElseThrow( () -> new ValidationException( String.format( "Wasn't able to find script evaluator for '%s'.", languageName ) ) );
 	}
 
-
 	private List<ScriptEngineManager> findManagers(BundleContext context) {
 		return findFactoryCandidates( context ).stream()
 				.map( className -> {
@@ -69,7 +67,6 @@ public class OSGiScriptEvaluatorFactory extends AbstractCacheableScriptEvaluator
 					}
 				} ).collect( Collectors.toList() );
 	}
-
 
 	/**
 	 * Iterates through all bundles to get the available {@link ScriptEngineFactory} classes

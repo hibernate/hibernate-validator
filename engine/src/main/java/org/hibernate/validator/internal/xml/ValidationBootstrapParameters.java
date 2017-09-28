@@ -63,10 +63,7 @@ public class ValidationBootstrapParameters {
 		setParameterNameProvider( bootstrapConfiguration.getParameterNameProviderClassName(), externalClassLoader );
 		setClockProvider( bootstrapConfiguration.getClockProviderClassName(), externalClassLoader );
 		setScriptEvaluatorFactory(
-				bootstrapConfiguration.getProperties().getOrDefault(
-						HibernateValidatorConfiguration.SCRIPT_EVALUATOR_CLASSNAME,
-						"org.hibernate.validator.internal.util.scriptengine.DefaultLookupScriptEvaluatorFactory"
-				),
+				bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.SCRIPT_EVALUATOR_CLASSNAME ),
 				externalClassLoader
 		);
 		setValueExtractors( bootstrapConfiguration.getValueExtractorClassNames(), externalClassLoader );
