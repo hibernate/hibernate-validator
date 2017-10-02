@@ -13,9 +13,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.validation.BootstrapConfiguration;
 import javax.validation.executable.ExecutableType;
 
-import org.hibernate.validator.HibernateValidatorBootstrapConfiguration;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -23,7 +23,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  *
  * @author Hardy Ferentschik
  */
-public class BootstrapConfigurationImpl implements HibernateValidatorBootstrapConfiguration {
+public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 
 	/**
 	 * The executable types validated by default.
@@ -49,7 +49,7 @@ public class BootstrapConfigurationImpl implements HibernateValidatorBootstrapCo
 					)
 			);
 
-	private static final HibernateValidatorBootstrapConfiguration DEFAULT_BOOTSTRAP_CONFIGURATION = new BootstrapConfigurationImpl();
+	private static final BootstrapConfiguration DEFAULT_BOOTSTRAP_CONFIGURATION = new BootstrapConfigurationImpl();
 
 	private final String defaultProviderClassName;
 	private final String constraintValidatorFactoryClassName;
@@ -105,7 +105,7 @@ public class BootstrapConfigurationImpl implements HibernateValidatorBootstrapCo
 		this.properties = properties;
 	}
 
-	public static HibernateValidatorBootstrapConfiguration getDefaultBootstrapConfiguration() {
+	public static BootstrapConfiguration getDefaultBootstrapConfiguration() {
 		return DEFAULT_BOOTSTRAP_CONFIGURATION;
 	}
 
@@ -154,7 +154,6 @@ public class BootstrapConfigurationImpl implements HibernateValidatorBootstrapCo
 		return clockProviderClassName;
 	}
 
-	@Override
 	public String getScriptEvaluatorFactoryClassName() {
 		return scriptEvaluatorFactoryClassName;
 	}

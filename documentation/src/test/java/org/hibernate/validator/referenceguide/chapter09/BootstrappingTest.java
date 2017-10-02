@@ -10,9 +10,9 @@ import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.scriptengine.impl.DeclarativeScriptEvaluatorFactory;
-import org.hibernate.validator.cfg.scriptengine.impl.MultiClassloaderScriptEvaluatorFactory;
-import org.hibernate.validator.cfg.scriptengine.impl.OSGiScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.impl.DeclarativeScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.impl.MultiClassloaderScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.impl.OSGiScriptEvaluatorFactory;
 
 import org.junit.Test;
 
@@ -216,7 +216,7 @@ public class BootstrappingTest {
 		//tag::scriptEvaluatorFactoryProgrammatically[]
 		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.scriptEngineFactory( new CustomScriptEvaluatorFactory() )
+				.scriptEvaluatorFactory( new CustomScriptEvaluatorFactory() )
 				.buildValidatorFactory();
 		Validator validator = validatorFactory.getValidator();
 		//end::scriptEvaluatorFactoryProgrammatically[]
@@ -228,7 +228,7 @@ public class BootstrappingTest {
 		//tag::scriptEvaluatorFactoryDeclarativeScriptEvaluatorFactory[]
 		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.scriptEngineFactory( new DeclarativeScriptEvaluatorFactory( new GroovyScriptEngineFactory() ) )
+				.scriptEvaluatorFactory( new DeclarativeScriptEvaluatorFactory( new GroovyScriptEngineFactory() ) )
 				.buildValidatorFactory();
 		Validator validator = validatorFactory.getValidator();
 		//end::scriptEvaluatorFactoryDeclarativeScriptEvaluatorFactory[]
@@ -243,7 +243,7 @@ public class BootstrappingTest {
 		//tag::scriptEvaluatorFactoryMultiClassloaderScriptEvaluatorFactory[]
 		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.scriptEngineFactory( new MultiClassloaderScriptEvaluatorFactory( classLoader1, classLoader2, /* ...*/ classLoaderN ) )
+				.scriptEvaluatorFactory( new MultiClassloaderScriptEvaluatorFactory( classLoader1, classLoader2, /* ...*/ classLoaderN ) )
 				.buildValidatorFactory();
 		Validator validator = validatorFactory.getValidator();
 		//end::scriptEvaluatorFactoryMultiClassloaderScriptEvaluatorFactory[]
@@ -256,7 +256,7 @@ public class BootstrappingTest {
 			//tag::scriptEvaluatorFactoryOSGiScriptEvaluatorFactory[]
 			ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
 					.configure()
-					.scriptEngineFactory( new OSGiScriptEvaluatorFactory( FrameworkUtil.getBundle( this.getClass() ).getBundleContext() ) )
+					.scriptEvaluatorFactory( new OSGiScriptEvaluatorFactory( FrameworkUtil.getBundle( this.getClass() ).getBundleContext() ) )
 					.buildValidatorFactory();
 			Validator validator = validatorFactory.getValidator();
 			//end::scriptEvaluatorFactoryOSGiScriptEvaluatorFactory[]

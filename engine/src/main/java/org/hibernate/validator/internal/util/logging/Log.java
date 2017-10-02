@@ -41,7 +41,7 @@ import javax.validation.valueextraction.ValueExtractorDeclarationException;
 import javax.validation.valueextraction.ValueExtractorDefinitionException;
 import javax.xml.stream.XMLStreamException;
 
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;

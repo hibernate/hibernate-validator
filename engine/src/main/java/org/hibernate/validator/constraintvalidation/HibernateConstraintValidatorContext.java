@@ -6,10 +6,11 @@
  */
 package org.hibernate.validator.constraintvalidation;
 
-import javax.script.ScriptException;
 import javax.validation.ConstraintValidatorContext;
 
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
+import org.hibernate.validator.scripting.ScriptEvaluator;
+import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.ScriptEvaluatorNotFoundException;
 
 /**
  * A custom {@link ConstraintValidatorContext} which allows to set additional message parameters for
@@ -110,18 +111,18 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 */
 	HibernateConstraintValidatorContext withDynamicPayload(Object payload);
 
-
 	/**
-	 * Returns a {@link ScriptEvaluator} created based on {@link org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory}
+	 * Returns a {@link ScriptEvaluator} created based on {@link ScriptEvaluatorFactory}
 	 * passed at bootstrap.
 	 *
 	 * @param languageName The name of a scripting language
+	 *
 	 * @return A script executor for the given language. Never null.
 	 *
-	 * @throws ScriptException in case when no {@link ScriptEvaluator} was
+	 * @throws ScriptEvaluatorNotFoundException in case when no {@link ScriptEvaluator} was
 	 * found for a given {@code languageName}.
 	 *
 	 * @since 6.1
 	 */
-	ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) throws ScriptException;
+	ScriptEvaluator getScriptEvaluatorForLanguage(String languageName);
 }

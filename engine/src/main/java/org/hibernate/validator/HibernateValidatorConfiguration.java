@@ -13,7 +13,10 @@ import javax.validation.TraversableResolver;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.ScriptEvaluator;
+import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
@@ -74,8 +77,8 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 
 	/**
 	 * Property for configuring script evaluator factory, allowing to set up which factory will be used to create
-	 * {@link org.hibernate.validator.cfg.scriptengine.ScriptEvaluator} for evaluation of script expressions in
-	 * {@link org.hibernate.validator.constraints.ScriptAssert} and {@link org.hibernate.validator.constraints.ParameterScriptAssert}
+	 * {@link ScriptEvaluator} for evaluation of script expressions in
+	 * {@link ScriptAssert} and {@link ParameterScriptAssert}
 	 * constraints. A fully qualified name of a class implementing  {@link ScriptEvaluatorFactory} is expected as a value.
 	 *
 	 * @since 6.1
@@ -249,17 +252,16 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	HibernateValidatorConfiguration enableTraversableResolverResultCache(boolean enabled);
 
 	/**
-	 * Allows to specify custom {@link ScriptEvaluatorFactory} which is used to create {@link org.hibernate.validator.cfg.scriptengine.ScriptEvaluator}s
-	 * used to evaluate script expressions for {@link org.hibernate.validator.constraints.ScriptAssert} and
-	 * {@link org.hibernate.validator.constraints.ParameterScriptAssert} constraints.
+	 * Allows to specify custom {@link ScriptEvaluatorFactory} which is used to create {@link ScriptEvaluator}s
+	 * used to evaluate script expressions for {@link ScriptAssert} and {@link ParameterScriptAssert} constraints.
 	 *
-	 * @param scripEngineFactory The {@link ScriptEvaluatorFactory} to be used by validator
+	 * @param scriptEvaluatorFactory The {@link ScriptEvaluatorFactory} to be used by validator
 	 *
 	 * @return {@code this} following the chaining method pattern
 	 *
 	 * @since 6.1
 	 */
-	HibernateValidatorConfiguration scriptEngineFactory(ScriptEvaluatorFactory scripEngineFactory);
+	HibernateValidatorConfiguration scriptEvaluatorFactory(ScriptEvaluatorFactory scriptEvaluatorFactory);
 
 	/**
 	 * Returns {@link ScriptEvaluatorFactory} configured by current configuration.

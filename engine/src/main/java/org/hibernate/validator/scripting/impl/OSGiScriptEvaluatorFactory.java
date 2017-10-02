@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.cfg.scriptengine.impl;
+package org.hibernate.validator.scripting.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,15 +23,17 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
+import org.hibernate.validator.scripting.ScriptEvaluationException;
+import org.hibernate.validator.scripting.ScriptEvaluator;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluatorImpl;
+import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 /**
- * {@link org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory} suitable for OSGi environments. It is created
+ * {@link ScriptEvaluatorFactory} suitable for OSGi environments. It is created
  * based on {@code BundleContext} which is used to iterate through {@code Bundle}s and find all {@link ScriptEngineFactory}
  * candidates.
  *
@@ -46,7 +48,7 @@ public class OSGiScriptEvaluatorFactory extends AbstractCacheableScriptEvaluator
 	}
 
 	@Override
-	protected ScriptEvaluator createNewScriptEvaluator(final String languageName) throws ScriptException {
+	protected ScriptEvaluator createNewScriptEvaluator(final String languageName) throws ScriptEvaluationException {
 		return scriptEngineManagers.stream()
 				.map( manager -> manager.getEngineByName( languageName ) )
 				.filter( Objects::nonNull )

@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.script.ScriptException;
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.ContainerElementNodeBuilderCustomizableContext;
@@ -27,14 +26,14 @@ import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.No
 import javax.validation.ElementKind;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.scripting.ScriptEvaluator;
+import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 
 /**
  * @author Hardy Ferentschik
@@ -129,7 +128,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	}
 
 	@Override
-	public ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) throws ScriptException {
+	public ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) {
 		return scriptEvaluatorFactory.getScriptEvaluatorByLanguageName( languageName );
 	}
 
@@ -173,6 +172,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	}
 
 	private abstract class NodeBuilderBase {
+
 		protected final String messageTemplate;
 		protected PathImpl propertyPath;
 

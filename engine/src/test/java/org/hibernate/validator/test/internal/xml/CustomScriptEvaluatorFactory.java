@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.ScriptEvaluator;
+import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 
 /**
  * @author Marko Bekhta

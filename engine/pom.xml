@@ -245,6 +245,7 @@
                             org.hibernate.validator.parameternameprovider;version="${project.version}",
                             org.hibernate.validator.path;version="${project.version}",
                             org.hibernate.validator.resourceloading;version="${project.version}",
+                            org.hibernate.validator.scripting.*;version="${project.version}",
                             org.hibernate.validator.spi.*;version="${project.version}"
                         </Export-Package>
                     </instructions>

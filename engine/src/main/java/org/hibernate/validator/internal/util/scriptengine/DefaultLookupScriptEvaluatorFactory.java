@@ -10,11 +10,12 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
-import org.hibernate.validator.cfg.scriptengine.impl.AbstractCacheableScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.ScriptEvaluationException;
+import org.hibernate.validator.scripting.ScriptEvaluator;
+import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.ScriptEvaluatorNotFoundException;
+import org.hibernate.validator.scripting.impl.AbstractCacheableScriptEvaluatorFactory;
 
 /**
  * Factory responsible for the creation of {@link ScriptEvaluatorImpl}s. This
@@ -42,11 +43,11 @@ public class DefaultLookupScriptEvaluatorFactory extends AbstractCacheableScript
 	}
 
 	@Override
-	protected ScriptEvaluator createNewScriptEvaluator(String languageName) throws ScriptException {
+	protected ScriptEvaluator createNewScriptEvaluator(String languageName) throws ScriptEvaluationException {
 		ScriptEngine engine = getScriptEngineManager().getEngineByName( languageName );
 
 		if ( engine == null ) {
-			throw new ScriptException( MESSAGES.unableToFindScriptEngine( languageName ) );
+			throw new ScriptEvaluatorNotFoundException( MESSAGES.unableToFindScriptEngine( languageName ) );
 		}
 
 		return new ScriptEvaluatorImpl( engine );

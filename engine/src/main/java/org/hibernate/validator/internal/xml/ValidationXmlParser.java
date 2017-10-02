@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.validation.BootstrapConfiguration;
 import javax.validation.executable.ExecutableType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -29,7 +30,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 
-import org.hibernate.validator.HibernateValidatorBootstrapConfiguration;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -79,7 +79,7 @@ public class ValidationXmlParser {
 	 *
 	 * @return The parameters parsed out of <i>validation.xml</i> wrapped in an instance of {@code ConfigurationImpl.ValidationBootstrapParameters}.
 	 */
-	public final HibernateValidatorBootstrapConfiguration parseValidationXml() {
+	public final BootstrapConfiguration parseValidationXml() {
 		InputStream in = getValidationXmlInputStream();
 		if ( in == null ) {
 			return BootstrapConfigurationImpl.getDefaultBootstrapConfiguration();
@@ -179,7 +179,7 @@ public class ValidationXmlParser {
 		}
 	}
 
-	private HibernateValidatorBootstrapConfiguration createBootstrapConfiguration(ValidationConfigType config) {
+	private BootstrapConfiguration createBootstrapConfiguration(ValidationConfigType config) {
 		Map<String, String> properties = new HashMap<>();
 		for ( PropertyType property : config.getProperty() ) {
 			if ( log.isDebugEnabled() ) {

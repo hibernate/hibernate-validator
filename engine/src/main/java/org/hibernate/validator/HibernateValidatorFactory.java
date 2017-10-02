@@ -9,7 +9,10 @@ package org.hibernate.validator;
 
 import javax.validation.ValidatorFactory;
 
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.ScriptEvaluator;
+import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.ScriptAssert;
 
 /**
  * Provides Hibernate Validator extensions to {@link ValidatorFactory}.
@@ -20,8 +23,8 @@ import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
 public interface HibernateValidatorFactory extends ValidatorFactory {
 
 	/**
-	 * Returns a factory which is used to create {@link org.hibernate.validator.cfg.scriptengine.ScriptEvaluator}s for
-	 * evaluating script expressions of {@link org.hibernate.validator.constraints.ScriptAssert} and {@link org.hibernate.validator.constraints.ParameterScriptAssert}.
+	 * Returns a factory which is used to create {@link ScriptEvaluator}s for
+	 * evaluating script expressions of {@link ScriptAssert} and {@link ParameterScriptAssert}.
 	 *
 	 * @return A {@link ScriptEvaluatorFactory} instance
 	 *

@@ -7,11 +7,13 @@
 package org.hibernate.validator.internal.util.scriptengine;
 
 import java.util.Map;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
+import org.hibernate.validator.scripting.ScriptEvaluationException;
+import org.hibernate.validator.scripting.ScriptEvaluator;
 
 /**
  * A wrapper around JSR 223 {@link ScriptEngine}s. This class is thread-safe.
@@ -41,10 +43,10 @@ public class ScriptEvaluatorImpl implements ScriptEvaluator {
 	 *
 	 * @return The script's result.
 	 *
-	 * @throws ScriptException In case of any errors during script execution.
+	 * @throws ScriptEvaluationException In case of any errors during script execution.
 	 */
 	@Override
-	public Object evaluate(String script, Map<String, Object> bindings) throws ScriptException {
+	public Object evaluate(String script, Map<String, Object> bindings) throws ScriptEvaluationException {
 		if ( engineAllowsParallelAccessFromMultipleThreads() ) {
 			return doEvaluate( script, bindings );
 		}
@@ -55,8 +57,13 @@ public class ScriptEvaluatorImpl implements ScriptEvaluator {
 		}
 	}
 
-	private Object doEvaluate(String script, Map<String, Object> bindings) throws ScriptException {
-		return engine.eval( script, new SimpleBindings( bindings ) );
+	private Object doEvaluate(String script, Map<String, Object> bindings) throws ScriptEvaluationException {
+		try {
+			return engine.eval( script, new SimpleBindings( bindings ) );
+		}
+		catch (ScriptException e) {
+			throw new ScriptEvaluationException( e );
+		}
 	}
 
 	/**

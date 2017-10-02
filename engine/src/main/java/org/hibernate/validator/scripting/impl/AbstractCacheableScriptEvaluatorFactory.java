@@ -4,18 +4,18 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.cfg.scriptengine.impl;
+package org.hibernate.validator.scripting.impl;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import javax.validation.ConstraintDeclarationException;
-import javax.validation.ValidationException;
 
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.ScriptEvaluationException;
+import org.hibernate.validator.scripting.ScriptEvaluator;
+import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.ScriptEvaluatorNotFoundException;
 
 /**
  * Basic cacheable factory responsible for the creation of {@link ScriptEvaluator}s. This
@@ -38,23 +38,20 @@ public abstract class AbstractCacheableScriptEvaluatorFactory implements ScriptE
 	 * @param languageName The name of a scripting language as expected by {@link ScriptEngineManager#getEngineByName(String)}.
 	 * @return A script executor for the given language. Never null.
 	 *
-	 * @throws ValidationException In case no compatible evaluator for the given language could be found.
+	 * @throws ScriptEvaluatorNotFoundException In case no compatible evaluator for the given language could be found.
 	 */
 	@Override
 	public ScriptEvaluator getScriptEvaluatorByLanguageName(String languageName) {
-		if ( !scriptExecutorCache.containsKey( languageName ) ) {
+		return scriptExecutorCache.computeIfAbsent( languageName, this::createScriptEvaluator );
+	}
 
-			ScriptEvaluator scriptExecutor = null;
-			try {
-				scriptExecutor = createNewScriptEvaluator( languageName );
-			}
-			catch (ScriptException e) {
-				throw new ConstraintDeclarationException( "Wasn't able to find a script evaluator for '" + languageName + "' language.", e );
-			}
-			scriptExecutorCache.putIfAbsent( languageName, scriptExecutor );
+	private ScriptEvaluator createScriptEvaluator(String languageName){
+		try {
+			return createNewScriptEvaluator( languageName );
 		}
-
-		return scriptExecutorCache.get( languageName );
+		catch (ScriptEvaluationException e) {
+			throw new ConstraintDeclarationException( "Wasn't able to find a script evaluator for '" + languageName + "' language.", e );
+		}
 	}
 
 	/**
@@ -63,7 +60,7 @@ public abstract class AbstractCacheableScriptEvaluatorFactory implements ScriptE
 	 * @param languageName A language name.
 	 * @return A newly created script executor for the given language.
 	 *
-	 * @throws ScriptException In case no JSR 223 compatible engine for the given language could be found.
+	 * @throws ScriptEvaluatorNotFoundException In case no JSR 223 compatible engine for the given language could be found.
 	 */
-	protected abstract ScriptEvaluator createNewScriptEvaluator(String languageName) throws ScriptException;
+	protected abstract ScriptEvaluator createNewScriptEvaluator(String languageName) throws ScriptEvaluatorNotFoundException;
 }

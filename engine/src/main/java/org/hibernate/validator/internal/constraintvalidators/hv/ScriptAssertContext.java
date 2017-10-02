@@ -10,11 +10,10 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 import java.util.Map;
 
-import javax.script.ScriptException;
-
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.scripting.ScriptEvaluationException;
+import org.hibernate.validator.scripting.ScriptEvaluator;
 
 /**
  * Context used by validator implementations dealing with script expressions. Instances are thread-safe and can be re-used
@@ -48,7 +47,7 @@ class ScriptAssertContext {
 		try {
 			result = scriptEvaluator.evaluate( script, bindings );
 		}
-		catch (ScriptException e) {
+		catch (ScriptEvaluationException e) {
 			throw log.getErrorDuringScriptExecutionException( script, e );
 		}
 

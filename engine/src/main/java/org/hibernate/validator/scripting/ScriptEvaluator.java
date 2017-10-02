@@ -4,20 +4,24 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.cfg.scriptengine;
+package org.hibernate.validator.scripting;
 
 import java.util.Map;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptException;
+
+import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluatorImpl;
 
 /**
- * Is used to evaluate script expressions for {@link org.hibernate.validator.constraints.ScriptAssert}
- * and {@link org.hibernate.validator.constraints.ParameterScriptAssert} constraints. A default implementation
- * {@link org.hibernate.validator.internal.util.scriptengine.ScriptEvaluatorImpl} is a wrapper around JSR 223
+ * Is used to evaluate script expressions for {@link ScriptAssert}
+ * and {@link ParameterScriptAssert} constraints. A default implementation
+ * {@link ScriptEvaluatorImpl} is a wrapper around JSR 223
  * {@link ScriptEngine}s. But it can also be any user specific implementation.
  *
  * @author Marko Bekhta
+ * @since 6.1
  */
 public interface ScriptEvaluator {
 
@@ -26,10 +30,11 @@ public interface ScriptEvaluator {
 	 *
 	 * @param script A script to evaluate
 	 * @param bindings The bindings to be used
+	 *
 	 * @return The result of script evaluation
 	 *
-	 * @throws ScriptException in case of any errors during script evaluation
+	 * @throws ScriptEvaluationException in case of any errors during script evaluation
 	 */
-	Object evaluate(String script, Map<String, Object> bindings) throws ScriptException;
+	Object evaluate(String script, Map<String, Object> bindings) throws ScriptEvaluationException;
 
 }

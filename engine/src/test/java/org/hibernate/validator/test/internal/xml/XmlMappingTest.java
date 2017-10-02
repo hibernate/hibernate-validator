@@ -31,7 +31,6 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.MethodDescriptor;
 
 import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.HibernateValidatorBootstrapConfiguration;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.SizeDef;
@@ -236,12 +235,12 @@ public class XmlMappingTest {
 		validationXmlTestHelper.runWithCustomValidationXml(
 				"script-evaluator-factory-validation.xml", () -> {
 					//given
-					HibernateValidatorBootstrapConfiguration bootstrapConfiguration = (HibernateValidatorBootstrapConfiguration) ValidatorUtil.getConfiguration()
+					BootstrapConfiguration bootstrapConfiguration = ValidatorUtil.getConfiguration()
 							.getBootstrapConfiguration();
 
 					//then
 					assertEquals(
-							bootstrapConfiguration.getScriptEvaluatorFactoryClassName(),
+							bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.SCRIPT_EVALUATOR_CLASSNAME ),
 							CustomScriptEvaluatorFactory.class.getName()
 					);
 

@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.validation.BootstrapConfiguration;
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -23,8 +24,8 @@ import javax.validation.ValidationException;
 import javax.validation.spi.ValidationProvider;
 import javax.validation.valueextraction.ValueExtractor;
 
-import org.hibernate.validator.HibernateValidatorBootstrapConfiguration;
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor.Key;
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -54,14 +55,20 @@ public class ValidationBootstrapParameters {
 	public ValidationBootstrapParameters() {
 	}
 
-	public ValidationBootstrapParameters(HibernateValidatorBootstrapConfiguration bootstrapConfiguration, ClassLoader externalClassLoader) {
+	public ValidationBootstrapParameters(BootstrapConfiguration bootstrapConfiguration, ClassLoader externalClassLoader) {
 		setProviderClass( bootstrapConfiguration.getDefaultProviderClassName(), externalClassLoader );
 		setMessageInterpolator( bootstrapConfiguration.getMessageInterpolatorClassName(), externalClassLoader );
 		setTraversableResolver( bootstrapConfiguration.getTraversableResolverClassName(), externalClassLoader );
 		setConstraintFactory( bootstrapConfiguration.getConstraintValidatorFactoryClassName(), externalClassLoader );
 		setParameterNameProvider( bootstrapConfiguration.getParameterNameProviderClassName(), externalClassLoader );
 		setClockProvider( bootstrapConfiguration.getClockProviderClassName(), externalClassLoader );
-		setScriptEvaluatorFactory( bootstrapConfiguration.getScriptEvaluatorFactoryClassName(), externalClassLoader );
+		setScriptEvaluatorFactory(
+				bootstrapConfiguration.getProperties().getOrDefault(
+						HibernateValidatorConfiguration.SCRIPT_EVALUATOR_CLASSNAME,
+						"org.hibernate.validator.internal.util.scriptengine.DefaultLookupScriptEvaluatorFactory"
+				),
+				externalClassLoader
+		);
 		setValueExtractors( bootstrapConfiguration.getValueExtractorClassNames(), externalClassLoader );
 		setMappingStreams( bootstrapConfiguration.getConstraintMappingResourcePaths(), externalClassLoader );
 		setConfigProperties( bootstrapConfiguration.getProperties() );

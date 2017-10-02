@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.cfg.scriptengine.impl;
+package org.hibernate.validator.scripting.impl;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -14,11 +14,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.script.ScriptEngineFactory;
-import javax.script.ScriptException;
 
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluator;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluatorImpl;
+import org.hibernate.validator.scripting.ScriptEvaluationException;
+import org.hibernate.validator.scripting.ScriptEvaluator;
 
 /**
  * Allows to pass a list of {@link ScriptEngineFactory} instances, which will be used to create {@link ScriptEvaluator}s.
@@ -43,10 +43,10 @@ public class DeclarativeScriptEvaluatorFactory extends AbstractCacheableScriptEv
 	}
 
 	@Override
-	protected ScriptEvaluator createNewScriptEvaluator(String languageName) throws ScriptException {
+	protected ScriptEvaluator createNewScriptEvaluator(String languageName) throws ScriptEvaluationException {
 		ScriptEngineFactory factory = factoryMap.get( languageName.toLowerCase() );
 		if ( factory == null ) {
-			throw new ScriptException( MESSAGES.unableToFindScriptEngine( languageName ) );
+			throw new ScriptEvaluationException( MESSAGES.unableToFindScriptEngine( languageName ) );
 		}
 		return new ScriptEvaluatorImpl( factory.getScriptEngine() );
 	}

@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.validation.BootstrapConfiguration;
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -32,10 +33,9 @@ import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.ValidationProvider;
 import javax.validation.valueextraction.ValueExtractor;
 
-import org.hibernate.validator.HibernateValidatorBootstrapConfiguration;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.scriptengine.ScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
@@ -90,7 +90,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final ValidationBootstrapParameters validationBootstrapParameters;
 	private boolean ignoreXmlConfiguration = false;
 	private final Set<InputStream> configurationStreams = newHashSet();
-	private HibernateValidatorBootstrapConfiguration bootstrapConfiguration;
+	private BootstrapConfiguration bootstrapConfiguration;
 
 	// HV-specific options
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
@@ -268,7 +268,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
-	public HibernateValidatorConfiguration scriptEngineFactory(ScriptEvaluatorFactory scriptEvaluatorFactory) {
+	public HibernateValidatorConfiguration scriptEvaluatorFactory(ScriptEvaluatorFactory scriptEvaluatorFactory) {
 		if ( log.isDebugEnabled() ) {
 			if ( scriptEvaluatorFactory != null ) {
 				log.debug( "Setting custom ScriptEvaluatorFactory of type " + scriptEvaluatorFactory.getClass().getName() );
@@ -405,7 +405,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
-	public HibernateValidatorBootstrapConfiguration getBootstrapConfiguration() {
+	public BootstrapConfiguration getBootstrapConfiguration() {
 		if ( bootstrapConfiguration == null ) {
 			bootstrapConfiguration = new ValidationXmlParser( externalClassLoader ).parseValidationXml();
 		}
