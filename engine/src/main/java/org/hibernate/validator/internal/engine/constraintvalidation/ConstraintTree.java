@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintViolation;
 
@@ -319,6 +320,9 @@ public class ConstraintTree<A extends Annotation> {
 			isValid = validator.isValid( validatedValue, constraintValidatorContext );
 		}
 		catch (RuntimeException e) {
+			if ( e instanceof ConstraintDeclarationException ) {
+				throw e;
+			}
 			throw log.getExceptionDuringIsValidCallException( e );
 		}
 		if ( !isValid ) {

@@ -20,7 +20,6 @@ import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintViolation;
-import javax.validation.ValidationException;
 import javax.validation.Validator;
 
 import org.hibernate.validator.constraints.ScriptAssert;
@@ -105,52 +104,32 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 		getInitializedValidator( "lang", "script", "" );
 	}
 
-	@Test
+	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void unknownLanguageNameRaisesException() throws Exception {
 		@ScriptAssert(lang = "foo", script = "script") class TmpType { }
 
-		try {
-			assertNoViolations( validator.validate( new TmpType() ) );
-		}
-		catch (ValidationException e) {
-			assertTrue( e.getCause() instanceof ConstraintDeclarationException );
-		}
+		assertNoViolations( validator.validate( new TmpType() ) );
 	}
 
-	@Test
+	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void illegalScriptExpressionRaisesException() throws Exception {
 		@ScriptAssert(lang = "groovy", script = "foo") class TmpType { }
 
-		try {
-			assertNoViolations( validator.validate( new TmpType() ) );
-		}
-		catch (ValidationException e) {
-			assertTrue( e.getCause() instanceof ConstraintDeclarationException );
-		}
+		assertNoViolations( validator.validate( new TmpType() ) );
 	}
 
-	@Test
+	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void scriptExpressionReturningNullRaisesException() throws Exception {
 		@ScriptAssert(lang = "groovy", script = "null") class TmpType { }
 
-		try {
-			assertNoViolations( validator.validate( new TmpType() ) );
-		}
-		catch (ValidationException e) {
-			assertTrue( e.getCause() instanceof ConstraintDeclarationException );
-		}
+		assertNoViolations( validator.validate( new TmpType() ) );
 	}
 
-	@Test
+	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void scriptExpressionReturningNoBooleanRaisesException() throws Exception {
 		@ScriptAssert(lang = "groovy", script = "new java.util.Date()") class TmpType { }
 
-		try {
-			assertNoViolations( validator.validate( new TmpType() ) );
-		}
-		catch (ValidationException e) {
-			assertTrue( e.getCause() instanceof ConstraintDeclarationException );
-		}
+		assertNoViolations( validator.validate( new TmpType() ) );
 	}
 
 	@Test

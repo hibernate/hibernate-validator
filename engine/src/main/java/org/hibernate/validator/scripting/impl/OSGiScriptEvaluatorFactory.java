@@ -103,7 +103,7 @@ public class OSGiScriptEvaluatorFactory extends AbstractCacheableScriptEvaluator
 					.collect( Collectors.toList() );
 		}
 		catch (IOException e) {
-			throw new ValidationException( "Wasn't able to read a ScripFactory candidate resource file", e );
+			throw new ValidationException( "Wasn't able to read a ScriptFactory candidate resource file", e );
 		}
 	}
 

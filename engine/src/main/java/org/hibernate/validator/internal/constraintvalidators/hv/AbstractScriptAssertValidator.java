@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.constraintvalidators.hv;
 
 import java.lang.annotation.Annotation;
 
-import javax.script.ScriptException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 

@@ -10,9 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.script.ScriptEngineManager;
-import javax.validation.ConstraintDeclarationException;
 
-import org.hibernate.validator.scripting.ScriptEvaluationException;
 import org.hibernate.validator.scripting.ScriptEvaluator;
 import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.scripting.ScriptEvaluatorNotFoundException;
@@ -46,12 +44,7 @@ public abstract class AbstractCacheableScriptEvaluatorFactory implements ScriptE
 	}
 
 	private ScriptEvaluator createScriptEvaluator(String languageName) {
-		try {
-			return createNewScriptEvaluator( languageName );
-		}
-		catch (ScriptEvaluationException e) {
-			throw new ConstraintDeclarationException( "Wasn't able to find a script evaluator for '" + languageName + "' language.", e );
-		}
+		return createNewScriptEvaluator( languageName );
 	}
 
 	/**

@@ -21,7 +21,7 @@ import org.hibernate.validator.constraints.ScriptAssert;
 public interface ScriptEvaluatorFactory {
 
 	/**
-	 * Retrieves a script executor {@link ScriptEvaluator} for the given language.
+	 * Retrieves a script evaluator {@link ScriptEvaluator} for the given language.
 	 *
 	 * @param languageName The name of a scripting language.
 	 *

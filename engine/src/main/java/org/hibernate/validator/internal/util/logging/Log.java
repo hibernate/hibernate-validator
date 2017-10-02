@@ -803,5 +803,5 @@ public interface Log extends BasicLogger {
 	void usingScriptEvaluatorFactory(@FormatWith(ClassObjectFormatter.class) Class<? extends ScriptEvaluatorFactory> scriptEvaluatorFactoryClass);
 
 	@Message(id = 231, value = "Unable to instantiate script evaluator factory class %s.")
-	ValidationException getUnableToInstantiateScriptEvaluatorFactoryClassException(String scriptEvaluatorFactoryClassName, @Cause ValidationException e);
+	ValidationException getUnableToInstantiateScriptEvaluatorFactoryClassException(String scriptEvaluatorFactoryClassName, @Cause Exception e);
 }

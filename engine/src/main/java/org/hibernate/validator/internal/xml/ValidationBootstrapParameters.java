@@ -268,7 +268,7 @@ public class ValidationBootstrapParameters {
 				scriptEvaluatorFactory = run( NewInstance.action( clazz, "script evaluator factory class" ) );
 				log.usingScriptEvaluatorFactory( clazz );
 			}
-			catch (ValidationException e) {
+			catch (Exception e) {
 				throw log.getUnableToInstantiateScriptEvaluatorFactoryClassException( scriptEvaluatorFactoryFqcn, e );
 			}
 		}

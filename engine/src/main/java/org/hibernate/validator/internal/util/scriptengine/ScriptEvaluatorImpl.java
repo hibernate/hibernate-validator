@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.util.scriptengine;
 import java.util.Map;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
 import org.hibernate.validator.scripting.ScriptEvaluationException;
@@ -61,7 +60,7 @@ public class ScriptEvaluatorImpl implements ScriptEvaluator {
 		try {
 			return engine.eval( script, new SimpleBindings( bindings ) );
 		}
-		catch (ScriptException e) {
+		catch (Exception e) {
 			throw new ScriptEvaluationException( e );
 		}
 	}
