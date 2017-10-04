@@ -46,6 +46,7 @@ import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.resolver.CachingTraversableResolverForSingleValidation;
+import org.hibernate.validator.internal.engine.resolver.TraverseAllTraversableResolver;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorHelper;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
@@ -331,7 +332,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				constraintValidatorManager,
 				messageInterpolator,
 				constraintValidatorFactory,
-				getCachingTraversableResolver(),
+				wrapTraversableResolverForCachingIfRequired( traversableResolver ),
 				clockProvider,
 				failFast
 		);
@@ -1283,12 +1284,20 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	/**
-	 * Must be called and stored for the duration of the stack call
-	 * A new instance is returned each time
+	 * Potentially wrap the {@link TraversableResolver} into a caching one.
+	 * <p>
+	 * If {@code traversableResolver} is {@code TraverseAllTraversableResolver.INSTANCE}, we don't wrap it and it is
+	 * returned directly.
+	 * <p>
+	 * If it is not, we wrap the resolver for caching. In this case, a new instance is returned each time and it should
+	 * be used only for the duration of a validation call.
 	 *
 	 * @return The resolver for the duration of a full validation.
 	 */
-	private TraversableResolver getCachingTraversableResolver() {
+	private static TraversableResolver wrapTraversableResolverForCachingIfRequired(TraversableResolver traversableResolver) {
+		if ( traversableResolver.getClass() == TraverseAllTraversableResolver.class ) {
+			return traversableResolver;
+		}
 		return new CachingTraversableResolverForSingleValidation( traversableResolver );
 	}
 
