@@ -37,7 +37,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
-import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver;
+import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.Contracts;
@@ -121,7 +121,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator(
 				ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES
 		);
-		this.defaultTraversableResolver = new DefaultTraversableResolver();
+		this.defaultTraversableResolver = TraversableResolvers.getDefault();
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;

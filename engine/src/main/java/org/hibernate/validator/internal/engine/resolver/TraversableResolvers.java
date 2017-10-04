@@ -6,12 +6,10 @@
  */
 package org.hibernate.validator.internal.engine.resolver;
 
-import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 
@@ -22,13 +20,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 
-/**
- * A JPA 2 aware {@code TraversableResolver}.
- *
- * @author Emmanuel Bernard
- * @author Hardy Ferentschik
- */
-public class DefaultTraversableResolver implements TraversableResolver {
+public class TraversableResolvers {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -47,31 +39,28 @@ public class DefaultTraversableResolver implements TraversableResolver {
 	 */
 	private static final String JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME = "org.hibernate.validator.internal.engine.resolver.JPATraversableResolver";
 
-	/**
-	 * A JPA 2 aware traversable resolver.
-	 */
-	private TraversableResolver jpaTraversableResolver;
-
-
-	public DefaultTraversableResolver() {
-		detectJPA();
+	private TraversableResolvers() {
 	}
 
 	/**
-	 * Tries to load detect and load JPA.
+	 * Initializes and returns the default {@link TraversableResolver} depending on the environment.
+	 * <p>
+	 * If JPA 2 is present in the classpath, a {@link JPATraversableResolver} instance is returned.
+	 * <p>
+	 * Otherwise, it returns an instance of the default {@link TraverseAllTraversableResolver}.
 	 */
-	private void detectJPA() {
+	public static TraversableResolver getDefault() {
 		// check whether we have Persistence on the classpath
 		Class<?> persistenceClass;
 		try {
-			persistenceClass = run( LoadClass.action( PERSISTENCE_CLASS_NAME, this.getClass().getClassLoader() ) );
+			persistenceClass = run( LoadClass.action( PERSISTENCE_CLASS_NAME, TraversableResolvers.class.getClassLoader() ) );
 		}
 		catch (ValidationException e) {
 			log.debugf(
 					"Cannot find %s on classpath. Assuming non JPA 2 environment. All properties will per default be traversable.",
 					PERSISTENCE_CLASS_NAME
 			);
-			return;
+			return getTraverseAllTraversableResolver();
 		}
 
 		// check whether Persistence contains getPersistenceUtil
@@ -82,7 +71,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 					PERSISTENCE_CLASS_NAME,
 					PERSISTENCE_UTIL_METHOD
 			);
-			return;
+			return getTraverseAllTraversableResolver();
 		}
 
 		// try to invoke the method to make sure that we are dealing with a complete JPA2 implementation
@@ -97,7 +86,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 					PERSISTENCE_CLASS_NAME,
 					PERSISTENCE_UTIL_METHOD
 			);
-			return;
+			return getTraverseAllTraversableResolver();
 		}
 
 		log.debugf(
@@ -109,32 +98,23 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		try {
 			@SuppressWarnings("unchecked")
 			Class<? extends TraversableResolver> jpaAwareResolverClass = (Class<? extends TraversableResolver>)
-					run( LoadClass.action( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass().getClassLoader() ) );
-			jpaTraversableResolver = run( NewInstance.action( jpaAwareResolverClass, "" ) );
+					run( LoadClass.action( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, TraversableResolvers.class.getClassLoader() ) );
 			log.debugf(
 					"Instantiated JPA aware TraversableResolver of type %s.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
+			return run( NewInstance.action( jpaAwareResolverClass, "" ) );
 		}
 		catch (ValidationException e) {
 			log.debugf(
 					"Unable to load or instantiate JPA aware resolver %s. All properties will per default be traversable.",
 					JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
+			return getTraverseAllTraversableResolver();
 		}
 	}
 
-	@Override
-	public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
-		return jpaTraversableResolver == null || jpaTraversableResolver.isReachable(
-				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType
-		);
-	}
-
-	@Override
-	public boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
-		return jpaTraversableResolver == null || jpaTraversableResolver.isCascadable(
-				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType
-		);
+	private static TraversableResolver getTraverseAllTraversableResolver() {
+		return new TraverseAllTraversableResolver();
 	}
 
 	/**
@@ -143,7 +123,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
 	 * privileged actions within HV's protection domain.
 	 */
-	private <T> T run(PrivilegedAction<T> action) {
+	private static <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }
