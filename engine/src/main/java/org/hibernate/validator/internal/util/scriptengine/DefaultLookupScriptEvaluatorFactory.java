@@ -15,7 +15,6 @@ import org.hibernate.validator.scripting.ScriptEvaluationException;
 import org.hibernate.validator.scripting.ScriptEvaluator;
 import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.scripting.ScriptEvaluatorNotFoundException;
-import org.hibernate.validator.scripting.impl.AbstractCacheableScriptEvaluatorFactory;
 
 /**
  * Factory responsible for the creation of {@link ScriptEvaluatorImpl}s. This

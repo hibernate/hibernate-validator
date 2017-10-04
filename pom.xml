@@ -197,7 +197,6 @@
         <javaee.api-docs.base-url>http://docs.oracle.com/javaee/7/api</javaee.api-docs.base-url>
         <javafx.docs.url>http://docs.oracle.com/javase/8/javase-clienttechnologies.htm</javafx.docs.url>
         <bv.api-docs.base-url>http://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api</bv.api-docs.base-url>
-        <osgi-docs.base-url>https://osgi.org/javadoc/r6/core</osgi-docs.base-url>
         <javamoney.api-docs.base-url>http://javamoney.github.io/apidocs</javamoney.api-docs.base-url>
 
         <!--

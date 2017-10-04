@@ -10,15 +10,10 @@ import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.scripting.impl.DeclarativeScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.impl.MultiClassloaderScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.impl.OSGiScriptEvaluatorFactory;
 
 import org.junit.Test;
 
 import org.osgi.framework.FrameworkUtil;
-
-import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
 
 public class BootstrappingTest {
 
@@ -220,18 +215,6 @@ public class BootstrappingTest {
 				.buildValidatorFactory();
 		Validator validator = validatorFactory.getValidator();
 		//end::scriptEvaluatorFactoryProgrammatically[]
-	}
-
-	@Test
-	@SuppressWarnings("unused")
-	public void scriptEvaluatorFactoryDeclarativeScriptEvaluatorFactory() {
-		//tag::scriptEvaluatorFactoryDeclarativeScriptEvaluatorFactory[]
-		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.scriptEvaluatorFactory( new DeclarativeScriptEvaluatorFactory( new GroovyScriptEngineFactory() ) )
-				.buildValidatorFactory();
-		Validator validator = validatorFactory.getValidator();
-		//end::scriptEvaluatorFactoryDeclarativeScriptEvaluatorFactory[]
 	}
 
 	@Test

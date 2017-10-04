@@ -402,9 +402,9 @@ mode and the constraint declaration API.
 ==== Configuring script evaluator factory (`ScriptEvaluatorFactory`)
 
 For constraints like `@ScriptAssert` and `@ParameterScriptAssert`, it might be useful to configure
-how script evaluators (`ScriptEvaluator`) are build, and which scripting engines are used to build
+how script evaluators (`ScriptEvaluator`) are built, and which scripting engines are used to build
 them. This can be done by setting a custom implementation of `ScriptEvaluatorFactory`. In
-particular this is important for OSGi environments (or similar to it) where user might face issues
+particular this is important for modular environments (e.g. OSGi), where user might face issues
 with modular class loading and https://www.jcp.org/en/jsr/detail?id=223[JSR-223]. It also would
 allow to use any custom script evaluation, not necessarily based on the
 https://www.jcp.org/en/jsr/detail?id=223[JSR-223].
@@ -425,7 +425,7 @@ include::{resourcesdir}/org/hibernate/validator/referenceguide/chapter09/script-
 In this case, the specified `ScriptEvaluatorFactory` must have a no-arg constructor.
 
 ===== Programmatic configuration
-To do the change programmatically an instance of `ScriptEvaluatorFactory` should be passed when building the `ValidatorFactory`.
+To configure it programmatically, an instance of `ScriptEvaluatorFactory` should be passed when building the `ValidatorFactory`.
 This gives more flexibility in configuration of the `ScriptEvaluatorFactory`. <<example-script-evaluator-factory-programmatically>>
 shows how this can be done.
 
@@ -438,29 +438,22 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Bootstrapp
 ----
 ====
 
-===== Predefined `ScriptEvaluatorFactory` implementations
-Hibernate Validator provides multiple implementations of `ScriptEvaluatorFactory` that user
-can choose from:
+===== Custom `ScriptEvaluatorFactory` implementation examples
+This section shows a couple of custom `ScriptEvaluatorFactory` implementations which can be used
+in modular environments as well as one using https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#expressions[Spring Expression Language]
+for writing constraint scripts.
 
-`DefaultLookupScriptEvaluatorFactory`:: A `ScriptEvaluatorFactory` that relays on traditional
-https://www.jcp.org/en/jsr/detail?id=223[JSR-223] way of retrieving `ScriptEngine` which is
-wrapped into a `ScriptEvaluator`. This factory is used by default.
-
-`DeclarativeScriptEvaluatorFactory`:: Allows user to pass a list of `ScriptEngineFactory` which
-will be used to search for script engines. This factory might be useful in cases where user
-wants to have control which `ScriptEngineFactory` are used.
+Problems with modular environments and https://www.jcp.org/en/jsr/detail?id=223[JSR-223] is caused by the classloading. `ScriptEngineManager`
+used to find a scripting engine might be using a different classloader from the one where the scripting engine is actually available.
+To solve this problem a `MultiClassloaderScriptEvaluatorFactory` can be introduced:
 
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=scriptEvaluatorFactoryDeclarativeScriptEvaluatorFactory]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/MultiClassloaderScriptEvaluatorFactory.java[tags=include]
 ----
 ====
-
-`MultiClassloaderScriptEvaluatorFactory`:: Allows user to pass multiple `ClassLoader` instances
-which will be used to search for `ScriptEngineFactory`. Might be useful in OSGi or similar
-environments.
-
+and then used like this:
 ====
 [source, JAVA, indent=0]
 ----
@@ -468,13 +461,39 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Bootstrapp
 ----
 ====
 
-`OSGiScriptEvaluatorFactory`:: Is designed specifically for OSGi environments and allows user
-to pass `BundleContext` as a parameter which will be used to search for `ScriptEngineFactory`.
+This way, it is possible to pass multiple `ClassLoader` instances, which will be used to search for
+the needed `ScriptEngine`.
+
+An alternative approach for OSGi environment can be usage of next `OSGiScriptEvaluatorFactory`:
 
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=scriptEvaluatorFactoryOSGiScriptEvaluatorFactory]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/OSGiScriptEvaluatorFactory.java[tags=include]
+----
+====
+
+It is designed specifically for OSGi environments and allows user to pass `BundleContext` as a
+parameter which will be used to search for `ScriptEngineFactory`.
+
+As it was already said, it is also possible to use other than https://www.jcp.org/en/jsr/detail?id=223[JSR-223]
+based script evaluation (e.g. https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#expressions[Spring Expression Language]).
+`SpringELEvaluatorFactory` can be written like:
+
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/SpringELEvaluatorFactory.java[tags=include]
+----
+====
+
+This factory would allow usage of Spring expression language in `ScriptAssert` and `ParameterScriptAssert`
+constraints:
+
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CustomScriptEvaluatorFactoryForSpringELTest.java[tags=include]
 ----
 ====
 

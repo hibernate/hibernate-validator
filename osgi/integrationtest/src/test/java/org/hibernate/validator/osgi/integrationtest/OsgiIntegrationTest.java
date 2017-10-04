@@ -39,10 +39,9 @@ import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.osgi.scripting.MultiClassloaderScriptEvaluatorFactory;
+import org.hibernate.validator.osgi.scripting.OSGiScriptEvaluatorFactory;
 import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.impl.DeclarativeScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.impl.MultiClassloaderScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.impl.OSGiScriptEvaluatorFactory;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
@@ -272,11 +271,6 @@ public class OsgiIntegrationTest {
 		canUseScriptAssertConstraint(
 				new MultiClassloaderScriptEvaluatorFactory(
 						GroovyScriptEngineFactory.class.getClassLoader()
-				)
-		);
-		canUseScriptAssertConstraint(
-				new DeclarativeScriptEvaluatorFactory(
-						new GroovyScriptEngineFactory()
 				)
 		);
 		canUseScriptAssertConstraint(

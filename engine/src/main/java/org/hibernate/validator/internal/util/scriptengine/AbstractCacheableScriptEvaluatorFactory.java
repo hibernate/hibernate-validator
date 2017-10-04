@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.scripting.impl;
+package org.hibernate.validator.internal.util.scriptengine;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -40,11 +40,7 @@ public abstract class AbstractCacheableScriptEvaluatorFactory implements ScriptE
 	 */
 	@Override
 	public ScriptEvaluator getScriptEvaluatorByLanguageName(String languageName) {
-		return scriptExecutorCache.computeIfAbsent( languageName, this::createScriptEvaluator );
-	}
-
-	private ScriptEvaluator createScriptEvaluator(String languageName) {
-		return createNewScriptEvaluator( languageName );
+		return scriptExecutorCache.computeIfAbsent( languageName, this::createNewScriptEvaluator );
 	}
 
 	/**

@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.scripting.impl;
+package org.hibernate.validator.osgi.scripting;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,10 +20,10 @@ import java.util.stream.Stream;
 
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluatorImpl;
 import org.hibernate.validator.scripting.ScriptEvaluationException;
 import org.hibernate.validator.scripting.ScriptEvaluator;
 import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
@@ -38,21 +38,27 @@ import org.osgi.framework.BundleContext;
  *
  * @author Marko Bekhta
  */
-public class OSGiScriptEvaluatorFactory extends AbstractCacheableScriptEvaluatorFactory {
+public class OSGiScriptEvaluatorFactory implements ScriptEvaluatorFactory {
 
 	private final List<ScriptEngineManager> scriptEngineManagers;
 
 	public OSGiScriptEvaluatorFactory(BundleContext context) {
-		this.scriptEngineManagers = CollectionHelper.toImmutableList( findManagers( context ) );
+		this.scriptEngineManagers = Collections.unmodifiableList( findManagers( context ) );
 	}
 
 	@Override
-	protected ScriptEvaluator createNewScriptEvaluator(final String languageName) throws ScriptEvaluationException {
+	public ScriptEvaluator getScriptEvaluatorByLanguageName(String languageName) {
 		return scriptEngineManagers.stream()
 				.map( manager -> manager.getEngineByName( languageName ) )
 				.filter( Objects::nonNull )
-				.map( engine -> new ScriptEvaluatorImpl( engine ) )
-				.findFirst()
+				.map( engine -> (ScriptEvaluator) (script, bindings) -> {
+					try {
+						return engine.eval( script, new SimpleBindings( bindings ) );
+					}
+					catch (ScriptException e) {
+						throw new ScriptEvaluationException( e );
+					}
+				} ).findFirst()
 				.orElseThrow( () -> new ValidationException( String.format( "Wasn't able to find script evaluator for '%s'.", languageName ) ) );
 	}
 
@@ -106,5 +112,4 @@ public class OSGiScriptEvaluatorFactory extends AbstractCacheableScriptEvaluator
 			throw new ValidationException( "Wasn't able to read a ScriptFactory candidate resource file", e );
 		}
 	}
-
 }
