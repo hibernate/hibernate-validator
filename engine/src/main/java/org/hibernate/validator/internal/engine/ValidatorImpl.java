@@ -138,6 +138,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final boolean failFast;
 
+	/**
+	 * Indicates if the {@code TraversableResolver} result cache is enabled.
+	 */
+	private final boolean traversableResolverResultCacheEnabled;
+
 	private final ValueExtractorManager valueExtractorManager;
 
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
@@ -149,7 +154,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ValueExtractorManager valueExtractorManager,
 			ConstraintValidatorManager constraintValidatorManager,
 			ValidationOrderGenerator validationOrderGenerator,
-			boolean failFast) {
+			boolean failFast,
+			boolean traversableResolverResultCacheEnabled) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
@@ -160,6 +166,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.validationOrderGenerator = validationOrderGenerator;
 		this.failFast = failFast;
+		this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
 	}
 
 	@Override
@@ -332,7 +339,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				constraintValidatorManager,
 				messageInterpolator,
 				constraintValidatorFactory,
-				wrapTraversableResolverForCachingIfRequired( traversableResolver ),
+				wrapWithCaching( traversableResolver, traversableResolverResultCacheEnabled ),
 				clockProvider,
 				failFast
 		);
@@ -1287,15 +1294,16 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * Potentially wrap the {@link TraversableResolver} into a caching one.
 	 * <p>
 	 * If {@code traversableResolver} is {@code TraverseAllTraversableResolver.INSTANCE}, we don't wrap it and it is
-	 * returned directly.
+	 * returned directly. Same if the caching is explicitly disabled.
 	 * <p>
-	 * If it is not, we wrap the resolver for caching. In this case, a new instance is returned each time and it should
+	 * If not, we wrap the resolver for caching. In this case, a new instance is returned each time and it should
 	 * be used only for the duration of a validation call.
 	 *
-	 * @return The resolver for the duration of a full validation.
+	 * @return The resolver for the duration of a validation call.
 	 */
-	private static TraversableResolver wrapTraversableResolverForCachingIfRequired(TraversableResolver traversableResolver) {
-		if ( traversableResolver.getClass() == TraverseAllTraversableResolver.class ) {
+	private static TraversableResolver wrapWithCaching(TraversableResolver traversableResolver,
+			boolean traversableResolverResultCacheEnabled) {
+		if ( TraverseAllTraversableResolver.class.equals( traversableResolver.getClass() ) || !traversableResolverResultCacheEnabled ) {
 			return traversableResolver;
 		}
 		return new CachingTraversableResolverForSingleValidation( traversableResolver );
