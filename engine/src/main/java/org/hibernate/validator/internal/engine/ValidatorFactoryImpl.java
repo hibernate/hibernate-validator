@@ -122,9 +122,14 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final boolean failFast;
 
 	/**
-	 * Hibernate validator specific flags to relax constraints on parameters.
+	 * Hibernate Validator specific flags to relax constraints on parameters.
 	 */
 	private final MethodValidationConfiguration methodValidationConfiguration;
+
+	/**
+	 * Hibernate Validator specific flag to disable the {@code TraversableResolver} result cache.
+	 */
+	private final boolean traversableResolverResultCacheEnabled;
 
 	/**
 	 * Metadata provider for XML configuration.
@@ -157,6 +162,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
 
 		boolean tmpFailFast = false;
+		boolean tmpTraversableResolverResultCacheEnabled = true;
 		boolean tmpAllowOverridingMethodAlterParameterConstraint = false;
 		boolean tmpAllowMultipleCascadedValidationOnReturnValues = false;
 		boolean tmpAllowParallelMethodsDefineParameterConstraints = false;
@@ -176,6 +182,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			tmpAllowParallelMethodsDefineParameterConstraints =
 					hibernateSpecificConfig.getMethodValidationConfiguration()
 							.isAllowParallelMethodsDefineParameterConstraints();
+
+			tmpTraversableResolverResultCacheEnabled = hibernateSpecificConfig.isTraversableResolverResultCacheEnabled();
 		}
 
 		// HV-302; don't load XmlMappingParser if not necessary
@@ -200,7 +208,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		Map<String, String> properties = configurationState.getProperties();
 
-		tmpFailFast = checkPropertiesForBoolean( properties, HibernateValidatorConfiguration.FAIL_FAST, tmpFailFast );
+		tmpFailFast = checkPropertiesForFailFast( properties, tmpFailFast );
 		this.failFast = tmpFailFast;
 
 		Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
@@ -232,6 +240,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				tmpAllowParallelMethodsDefineParameterConstraints
 		);
 		this.methodValidationConfiguration = methodValidationConfigurationBuilder.build();
+
+		tmpTraversableResolverResultCacheEnabled = checkPropertiesForBoolean( properties,
+				HibernateValidatorConfiguration.ENABLE_TRAVERSABLE_RESOLVER_RESULT_CACHE, tmpTraversableResolverResultCacheEnabled );
+		this.traversableResolverResultCacheEnabled = tmpTraversableResolverResultCacheEnabled;
 
 		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
 	}
@@ -283,7 +295,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				clockProvider,
 				failFast,
 				valueExtractorManager,
-				methodValidationConfiguration
+				methodValidationConfiguration,
+				traversableResolverResultCacheEnabled
 		);
 	}
 
@@ -324,6 +337,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return methodValidationConfiguration;
 	}
 
+	public boolean isTraversableResolverResultCacheEnabled() {
+		return traversableResolverResultCacheEnabled;
+	}
+
 	ValueExtractorManager getValueExtractorManager() {
 		return valueExtractorManager;
 	}
@@ -358,7 +375,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ClockProvider clockProvider,
 			boolean failFast,
 			ValueExtractorManager valueExtractorManager,
-			MethodValidationConfiguration methodValidationConfiguration) {
+			MethodValidationConfiguration methodValidationConfiguration,
+			boolean traversableResolverResultCacheEnabled) {
 
 		ValidationOrderGenerator validationOrderGenerator = new ValidationOrderGenerator();
 
@@ -386,7 +404,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				valueExtractorManager,
 				constraintValidatorManager,
 				validationOrderGenerator,
-				failFast
+				failFast,
+				traversableResolverResultCacheEnabled
 		);
 	}
 
@@ -409,9 +428,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return metaDataProviders;
 	}
 
-	private boolean checkPropertiesForBoolean(Map<String, String> properties, String propertyKey, boolean programmaticValue) {
+	private boolean checkPropertiesForFailFast(Map<String, String> properties, boolean programmaticValue) {
 		boolean value = programmaticValue;
-		String propertyStringValue = properties.get( propertyKey );
+		String propertyStringValue = properties.get( HibernateValidatorConfiguration.FAIL_FAST );
 		if ( propertyStringValue != null ) {
 			boolean configurationValue = Boolean.valueOf( propertyStringValue );
 			// throw an exception if the programmatic value is true and it overrides a false configured value
@@ -419,6 +438,15 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				throw log.getInconsistentFailFastConfigurationException();
 			}
 			value = configurationValue;
+		}
+		return value;
+	}
+
+	private boolean checkPropertiesForBoolean(Map<String, String> properties, String propertyKey, boolean programmaticValue) {
+		boolean value = programmaticValue;
+		String propertyStringValue = properties.get( propertyKey );
+		if ( propertyStringValue != null ) {
+			value = Boolean.valueOf( propertyStringValue );
 		}
 		return value;
 	}

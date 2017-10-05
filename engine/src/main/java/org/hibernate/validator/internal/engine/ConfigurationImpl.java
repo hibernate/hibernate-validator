@@ -95,6 +95,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private ClassLoader externalClassLoader;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = new HashMap<>();
+	private boolean traversableResolverResultCacheEnabled = true;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -153,6 +154,16 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		}
 		this.validationBootstrapParameters.setTraversableResolver( resolver );
 		return this;
+	}
+
+	@Override
+	public final ConfigurationImpl enableTraversableResolverResultCache(boolean enabled) {
+		this.traversableResolverResultCacheEnabled = enabled;
+		return this;
+	}
+
+	public final boolean isTraversableResolverResultCacheEnabled() {
+		return traversableResolverResultCacheEnabled;
 	}
 
 	@Override

@@ -6,25 +6,42 @@
  */
 package org.hibernate.validator.test.internal.engine.traversableresolver;
 
+import static org.testng.Assert.fail;
+
 import java.lang.annotation.ElementType;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.validation.Configuration;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.Validation;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
 
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidationXmlTestHelper;
+import org.hibernate.validator.testutils.ValidatorUtil;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
+ * @author Guillaume Smet
  */
 public class CachedTraversableResolverTest {
+
+	private static ValidationXmlTestHelper validationXmlTestHelper;
+
+	@BeforeClass
+	public static void setupValidationXmlTestHelper() {
+		validationXmlTestHelper = new ValidationXmlTestHelper( CachedTraversableResolverTest.class );
+	}
+
 	@Test
 	public void testCache() {
 		TraversableResolver resolver = new AskOnceTR();
@@ -32,35 +49,129 @@ public class CachedTraversableResolverTest {
 				.configure()
 				.traversableResolver( resolver );
 		ValidatorFactory factory = config.buildValidatorFactory();
-		Suit suit = new Suit();
-		suit.setTrousers( new Trousers() );
-		suit.setJacket( new Jacket() );
-		suit.setSize( 3333 );
-		suit.getTrousers().setLength( 32321 );
-		suit.getJacket().setWidth( 432432 );
+
+		Suit suit = createSuit();
+
 		Validator v = factory.getValidator();
 		try {
 			v.validate( suit, Default.class, Cloth.class );
 		}
-		catch (IllegalStateException e) {
-			fail( "Traversable Called several times for a given object" );
+		catch (ValidationException e) {
+			fail( "TraversableResolver called several times for a given object", e );
 		}
 
 		v = factory.usingContext().traversableResolver( new AskOnceTR() ).getValidator();
 		try {
 			v.validateProperty( suit, "size", Default.class, Cloth.class );
 		}
-		catch (IllegalStateException e) {
-			fail( "Traversable Called several times for a given object" );
+		catch (ValidationException e) {
+			fail( "TraversableResolver called several times for a given object", e );
 		}
 
 		v = factory.usingContext().traversableResolver( new AskOnceTR() ).getValidator();
 		try {
 			v.validateValue( Suit.class, "size", 2, Default.class, Cloth.class );
 		}
-		catch (IllegalStateException e) {
-			fail( "Traversable Called several times for a given object" );
+		catch (ValidationException e) {
+			fail( "TraversableResolver called several times for a given object", e );
 		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1487")
+	public void testCacheDisabled() {
+		Configuration<?> config = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.traversableResolver( new AskOnceTR() )
+				.enableTraversableResolverResultCache( false );
+		ValidatorFactory factory = config.buildValidatorFactory();
+
+		Suit suit = createSuit();
+
+		// Cache disabled at the factory level
+		Validator v = factory.getValidator();
+		try {
+			v.validate( suit, Default.class, Cloth.class );
+			fail( "TraversableResolver calls are apparently cached and shouldn't be" );
+		}
+		catch (ValidationException e) {
+		}
+
+		// Cache disabled at the factory level but enabled in the context
+		v = ((HibernateValidatorContext) factory.usingContext())
+				.traversableResolver( new AskOnceTR() )
+				.enableTraversableResolverResultCache( true )
+				.getValidator();
+		try {
+			v.validate( suit, Default.class, Cloth.class );
+		}
+		catch (ValidationException e) {
+			fail( "TraversableResolver called several times for a given object", e );
+		}
+
+		// Cache enabled at the factory level
+		config = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.traversableResolver( new AskOnceTR() );
+		factory = config.buildValidatorFactory();
+
+		v = factory.getValidator();
+		try {
+			v.validate( suit, Default.class, Cloth.class );
+		}
+		catch (ValidationException e) {
+			fail( "TraversableResolver called several times for a given object", e );
+		}
+
+		// Cache enabled at the factory level but disabled in the context
+		v = ((HibernateValidatorContext) factory.usingContext())
+				.traversableResolver( new AskOnceTR() )
+				.enableTraversableResolverResultCache( false )
+				.getValidator();
+
+		v = factory.getValidator();
+		try {
+			v.validate( suit, Default.class, Cloth.class );
+			fail( "TraversableResolver calls are apparently cached and shouldn't be" );
+		}
+		catch (ValidationException e) {
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1487")
+	public void testCacheDisabledInXmlConfiguration() {
+		validationXmlTestHelper.runWithCustomValidationXml(
+				"validation-CachedTraversableResolverTest.xml", new Runnable() {
+
+					@Override
+					public void run() {
+						Validator v = ValidatorUtil.getConfiguration()
+								.traversableResolver( new AskOnceTR() )
+								.buildValidatorFactory()
+								.getValidator();
+
+						Suit suit = createSuit();
+
+						try {
+							v.validate( suit, Default.class, Cloth.class );
+							fail( "TraversableResolver calls are apparently cached and shouldn't be" );
+						}
+						catch (ValidationException e) {
+						}
+					}
+				} );
+	}
+
+	private Suit createSuit() {
+		Suit suit = new Suit();
+		suit.setTrousers( new Trousers() );
+		suit.setJacket( new Jacket() );
+		suit.setSize( 3333 );
+		suit.getTrousers().setLength( 32321 );
+		suit.getJacket().setWidth( 432432 );
+
+		return suit;
 	}
 
 	private static class AskOnceTR implements TraversableResolver {

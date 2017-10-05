@@ -43,6 +43,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private ExecutableParameterNameProvider parameterNameProvider;
 	private ClockProvider clockProvider;
 	private boolean failFast;
+	private boolean traversableResolverResultCacheEnabled;
 	private final ValueExtractorManager valueExtractorManager;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder;
 	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors;
@@ -55,6 +56,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.parameterNameProvider = validatorFactory.getExecutableParameterNameProvider();
 		this.clockProvider = validatorFactory.getClockProvider();
 		this.failFast = validatorFactory.isFailFast();
+		this.traversableResolverResultCacheEnabled = validatorFactory.isTraversableResolverResultCacheEnabled();
 		this.methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder( validatorFactory.getMethodValidationConfiguration() );
 		this.valueExtractorManager = validatorFactory.getValueExtractorManager();
 		this.valueExtractorDescriptors = new HashMap<>();
@@ -152,6 +154,12 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
+	public HibernateValidatorContext enableTraversableResolverResultCache(boolean enabled) {
+		this.traversableResolverResultCacheEnabled = enabled;
+		return this;
+	}
+
+	@Override
 	public Validator getValidator() {
 		return validatorFactory.createValidator(
 				constraintValidatorFactory,
@@ -161,7 +169,8 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				clockProvider,
 				failFast,
 				valueExtractorDescriptors.isEmpty() ? valueExtractorManager : new ValueExtractorManager( valueExtractorManager, valueExtractorDescriptors ),
-				methodValidationConfigurationBuilder.build()
+				methodValidationConfigurationBuilder.build(),
+				traversableResolverResultCacheEnabled
 		);
 	}
 }
