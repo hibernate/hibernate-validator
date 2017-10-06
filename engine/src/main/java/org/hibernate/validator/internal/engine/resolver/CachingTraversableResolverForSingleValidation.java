@@ -20,7 +20,7 @@ import javax.validation.TraversableResolver;
  *
  * @author Emmanuel Bernard
  */
-public class CachingTraversableResolverForSingleValidation implements TraversableResolver {
+class CachingTraversableResolverForSingleValidation implements TraversableResolver {
 	private final TraversableResolver delegate;
 	private final Map<TraversableHolder, TraversableHolder> traversables = new HashMap<TraversableHolder, TraversableHolder>();
 

@@ -113,6 +113,37 @@ public class TraversableResolvers {
 		}
 	}
 
+	/**
+	 * Potentially wrap the {@link TraversableResolver} into a caching one.
+	 * <p>
+	 * If {@code traversableResolver} is {@code TraverseAllTraversableResolver.INSTANCE}, we don't wrap it and it is
+	 * returned directly. Same if the caching is explicitly disabled.
+	 * <p>
+	 * If {@code traversableResolver} is an instance of our {@code JPATraversableResolver}, we wrap it with a caching
+	 * wrapper specially tailored for the requirements of the spec. It is a very common case as it is used as soon as we
+	 * have a JPA implementation in the classpath so optimizing this case is worth it.
+	 * <p>
+	 * In all the other cases, we wrap the resolver for caching.
+	 * <p>
+	 * Note that, in the {@code TraversableResolver} is wrapped, a new instance is returned each time and it should be
+	 * used only for the duration of a validation call.
+	 *
+	 * @return The resolver for the duration of a validation call.
+	 */
+	public static TraversableResolver wrapWithCachingForSingleValidation(TraversableResolver traversableResolver,
+			boolean traversableResolverResultCacheEnabled) {
+
+		if ( TraverseAllTraversableResolver.class.equals( traversableResolver.getClass() ) || !traversableResolverResultCacheEnabled ) {
+			return traversableResolver;
+		}
+		else if ( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME.equals( traversableResolver.getClass().getName() ) ) {
+			return new CachingJPATraversableResolverForSingleValidation( traversableResolver );
+		}
+		else {
+			return new CachingTraversableResolverForSingleValidation( traversableResolver );
+		}
+	}
+
 	private static TraversableResolver getTraverseAllTraversableResolver() {
 		return new TraverseAllTraversableResolver();
 	}

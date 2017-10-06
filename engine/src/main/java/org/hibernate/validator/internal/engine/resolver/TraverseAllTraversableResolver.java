@@ -20,7 +20,7 @@ import javax.validation.TraversableResolver;
  *
  * @author Guillaume Smet
  */
-public class TraverseAllTraversableResolver implements TraversableResolver {
+class TraverseAllTraversableResolver implements TraversableResolver {
 
 	TraverseAllTraversableResolver() {
 	}

@@ -13,7 +13,6 @@ import javax.validation.TraversableResolver;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.internal.engine.resolver.JPATraversableResolver;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
@@ -226,7 +225,7 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * Define whether the per validation call caching of {@link TraversableResolver} results is enabled. The default
 	 * value is {@code true}, i.e. the caching is enabled.
 	 * <p>
-	 * This behavior was initially introduced to cache the {@link JPATraversableResolver} results but the map lookups it
+	 * This behavior was initially introduced to cache the {@code JPATraversableResolver} results but the map lookups it
 	 * introduces can be counterproductive when the {@code TraversableResolver} calls are very fast.
 	 *
 	 * @param enabled flag determining whether per validation call caching is enabled for {@code TraversableResolver}

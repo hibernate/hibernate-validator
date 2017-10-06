@@ -45,8 +45,7 @@ import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.engine.resolver.CachingTraversableResolverForSingleValidation;
-import org.hibernate.validator.internal.engine.resolver.TraverseAllTraversableResolver;
+import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorHelper;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
@@ -339,7 +338,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				constraintValidatorManager,
 				messageInterpolator,
 				constraintValidatorFactory,
-				wrapWithCaching( traversableResolver, traversableResolverResultCacheEnabled ),
+				TraversableResolvers.wrapWithCachingForSingleValidation( traversableResolver, traversableResolverResultCacheEnabled ),
 				clockProvider,
 				failFast
 		);
@@ -1288,25 +1287,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		propertyPath.removeLeafNode();
 
 		return ValueContext.getLocalExecutionContext( parameterNameProvider, clazz, beanMetaData, propertyPath );
-	}
-
-	/**
-	 * Potentially wrap the {@link TraversableResolver} into a caching one.
-	 * <p>
-	 * If {@code traversableResolver} is {@code TraverseAllTraversableResolver.INSTANCE}, we don't wrap it and it is
-	 * returned directly. Same if the caching is explicitly disabled.
-	 * <p>
-	 * If not, we wrap the resolver for caching. In this case, a new instance is returned each time and it should
-	 * be used only for the duration of a validation call.
-	 *
-	 * @return The resolver for the duration of a validation call.
-	 */
-	private static TraversableResolver wrapWithCaching(TraversableResolver traversableResolver,
-			boolean traversableResolverResultCacheEnabled) {
-		if ( TraverseAllTraversableResolver.class.equals( traversableResolver.getClass() ) || !traversableResolverResultCacheEnabled ) {
-			return traversableResolver;
-		}
-		return new CachingTraversableResolverForSingleValidation( traversableResolver );
 	}
 
 	private boolean isValidationRequired(ValidationContext<?> validationContext,
