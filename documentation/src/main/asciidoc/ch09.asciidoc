@@ -149,10 +149,10 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Bootstrapp
 
 ==== `TraversableResolver`
 
-In some cases the validation engine should not access the state of a bean property. The most obvious
-example for that is a lazily loaded property or association of a JPA entity. Validating this lazy
-property or association would mean that its state would have to be accessed, triggering a load from
-the database.
+In some cases the validation engine should not access the state of a bean property.
+The most obvious example for that is a lazily loaded property or association of a JPA entity.
+Validating this lazy property or association would mean that its state would have to be accessed,
+triggering a load from the database.
 
 Which properties can be accessed and which ones not is controlled by querying the
 `TraversableResolver` interface. <<example-using-custom-traversable-resolver>> shows how to use a
@@ -175,6 +175,34 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Bootstrapp
 If no specific traversable resolver has been configured, the default behavior is to consider all properties as reachable and cascadable.
 When using Hibernate Validator together with a JPA 2 provider such as Hibernate ORM, only those properties will be considered reachable
 which already have been loaded by the persistence provider and all properties will be considered cascadable.
+
+By default, the traversable resolver calls are cached per validation call.
+This is especially important in a JPA environment where calling `isReachable()` has a significant cost.
+
+This caching adds some overhead.
+In the case your custom traversable resolver is very fast, it might be better to consider turning off the cache.
+
+You can disable the cache either via the XML configuration:
+
+[[example-disabling-traversable-resolver-result-cache-xml-configuration]]
+.Disabling the `TraversableResolver` result cache via the XML configuration
+====
+[source, XML, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/validation-DisableTraversableResolverResultCache.xml[]
+----
+====
+
+or via the programmatic API:
+
+[[example-disabling-traversable-resolver-result-cache-programmatic-api]]
+.Disabling the `TraversableResolver` result cache via the programmatic API
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=traversableResolverDisableCache]
+----
+====
 
 ==== `ConstraintValidatorFactory`
 
