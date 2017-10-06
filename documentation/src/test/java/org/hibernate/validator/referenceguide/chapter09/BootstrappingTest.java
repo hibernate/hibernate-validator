@@ -85,6 +85,19 @@ public class BootstrappingTest {
 
 	@Test
 	@SuppressWarnings("unused")
+	public void traversableResolverDisableCache() {
+		//tag::traversableResolverDisableCache[]
+		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.traversableResolver( new MyFastTraversableResolver() )
+				.enableTraversableResolverResultCache( false )
+				.buildValidatorFactory();
+		Validator validator = validatorFactory.getValidator();
+		//end::traversableResolverDisableCache[]
+	}
+
+	@Test
+	@SuppressWarnings("unused")
 	public void clockProvider() {
 		//tag::clockProvider[]
 		ValidatorFactory validatorFactory = Validation.byDefaultProvider()
