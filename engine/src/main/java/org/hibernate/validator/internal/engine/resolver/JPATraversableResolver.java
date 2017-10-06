@@ -23,7 +23,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
-public class JPATraversableResolver implements TraversableResolver {
+class JPATraversableResolver implements TraversableResolver {
 	private static final Log log = LoggerFactory.make();
 
 	@Override
