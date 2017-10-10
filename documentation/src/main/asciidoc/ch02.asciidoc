@@ -502,7 +502,9 @@ before they are propagated to the model.
 
 [[section-constraint-violation-methods]]
 
-==== `ConstraintViolation` methods
+==== `ConstraintViolation`
+
+===== `ConstraintViolation` methods
 
 Now it is time to have a closer look at what a `ConstraintViolation` is.
 Using the different methods of `ConstraintViolation` a lot of useful information about the cause of the validation failure can be determined.
@@ -527,6 +529,17 @@ The values under "Example" column refer to <<example-validator-validate>>.
 	Example::: `null`
 `getConstraintDescriptor()`:: Constraint metadata reported to fail
 	Example::: descriptor for `@NotNull`
+
+===== Exploiting the property path
+
+To determine the element that triggered the violation, you need to exploit the result of the `getPropertyPath()`
+method.
+
+The returned `Path` is composed of ``Node``s describing the path to the element.
+
+More information about the structure of the `Path` and the various types of ``Node``s can be found in
+http://beanvalidation.org/2.0/spec/#validationapi-constraintviolation[the `ConstraintViolation` section] of the
+Bean Validation specification.
 
 [[section-builtin-constraints]]
 === Built-in constraints
