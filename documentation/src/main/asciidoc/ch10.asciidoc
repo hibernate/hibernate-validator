@@ -26,6 +26,16 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/Vehicle.ja
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/Car.java[tags=include]
 ----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/Library.java[tags=include]
+----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/Book.java[tags=include]
+----
 ====
 
 
@@ -153,13 +163,15 @@ getter's `MethodDescriptor` (e.g.
 [[validator-metadata-api-elementdescriptor]]
 === `ElementDescriptor`
 
-The {bvApiDocsUrl}?javax/validation/metadata/ElementDescriptor.html[`ElementDiscriptor`]
+The {bvApiDocsUrl}?javax/validation/metadata/ElementDescriptor.html[`ElementDescriptor`]
 interface is the common base class for the
 individual descriptor types such as `BeanDescriptor`, `PropertyDescriptor` etc. Besides
 `getConstraintDescriptors()` it provides some more methods common to all descriptors.
 
 `hasConstraints()` allows for a quick check whether an element has any direct constraints (e.g. class-
-level constraints in case of `BeanDescriptor`). `getElementClass()` returns the Java type of the element
+level constraints in case of `BeanDescriptor`).
+
+`getElementClass()` returns the Java type of the element
 represented by a given descriptor. More specifically, the method returns
 
 * the object type when invoked on `BeanDescriptor`,
@@ -209,6 +221,31 @@ You can also combine the different options as shown in the last example.
 ====
 Order is not respected by `unorderedAndMatchingGroups()`, but group inheritance and inheritance via
 sequence are.
+====
+
+=== `ContainerDescriptor` and `ContainerElementTypeDescriptor`
+
+The {bvApiDocsUrl}?javax/validation/metadata/ContainerDescriptor.html[`ContainerDescriptor`]
+interface is the common interface for all the elements that support container element constraints and cascading
+validation (`PropertyDescriptor`, `ParameterDescriptor`, `ReturnValueDescriptor`).
+
+It has a single method `getConstrainedContainerElementTypes()` that returns a set of `ContainerElementTypeDescriptor`.
+
+`ContainerElementTypeDescriptor` extends `ContainerDescriptor` to support nested container element constraints.
+
+`ContainerElementTypeDescriptor` contains the information about the container, the constraints and the cascading
+validation.
+
+<<metadata-example-using-containerelementtypedescriptor>> shows how to use `getConstrainedContainerElementTypes()`
+to retrieve the set of `ContainerElementTypeDescriptor`.
+
+[[metadata-example-using-containerelementtypedescriptor]]
+.Using `ContainerElementTypeDescriptor`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/LibraryTest.java[tags=testContainerElementTypeDescriptor]
+----
 ====
 
 [[section-group-conversion-descriptor]]
