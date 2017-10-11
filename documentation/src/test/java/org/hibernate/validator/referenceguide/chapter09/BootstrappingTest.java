@@ -10,10 +10,7 @@ import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.cfg.ConstraintMapping;
-
 import org.junit.Test;
-
-import org.osgi.framework.FrameworkUtil;
 
 public class BootstrappingTest {
 
@@ -215,37 +212,5 @@ public class BootstrappingTest {
 				.buildValidatorFactory();
 		Validator validator = validatorFactory.getValidator();
 		//end::scriptEvaluatorFactoryProgrammatically[]
-	}
-
-	@Test
-	@SuppressWarnings("unused")
-	public void scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory() {
-		ClassLoader classLoader1 = this.getClass().getClassLoader();
-		ClassLoader classLoader2 = this.getClass().getClassLoader();
-		ClassLoader classLoaderN = this.getClass().getClassLoader();
-		//tag::scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory[]
-		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.scriptEvaluatorFactory( new MultiClassLoaderScriptEvaluatorFactory( classLoader1, classLoader2, /* ...*/ classLoaderN ) )
-				.buildValidatorFactory();
-		Validator validator = validatorFactory.getValidator();
-		//end::scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory[]
-	}
-
-	@Test
-	@SuppressWarnings("unused")
-	public void scriptEvaluatorFactoryOSGiScriptEvaluatorFactory() {
-		try {
-			//tag::scriptEvaluatorFactoryOSGiScriptEvaluatorFactory[]
-			ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
-					.configure()
-					.scriptEvaluatorFactory( new OSGiScriptEvaluatorFactory( FrameworkUtil.getBundle( this.getClass() ).getBundleContext() ) )
-					.buildValidatorFactory();
-			Validator validator = validatorFactory.getValidator();
-			//end::scriptEvaluatorFactoryOSGiScriptEvaluatorFactory[]
-		}
-		catch (Exception e) {
-			// just ignoring the exception as these tests run not in OSGi environment and the bundle is null.
-		}
 	}
 }

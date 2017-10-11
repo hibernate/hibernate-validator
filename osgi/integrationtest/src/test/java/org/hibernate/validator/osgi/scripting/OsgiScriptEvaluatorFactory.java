@@ -1,7 +1,10 @@
-//tag::include[]
-package org.hibernate.validator.referenceguide.chapter09;
-
-//end::include[]
+/*
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
+package org.hibernate.validator.osgi.scripting;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,13 +34,14 @@ import org.osgi.framework.BundleContext;
  * {@link ScriptEvaluatorFactory} suitable for OSGi environments. It is created
  * based on the {@code BundleContext} which is used to iterate through {@code Bundle}s and find all {@link ScriptEngineFactory}
  * candidates.
+ *
+ * @author Marko Bekhta
  */
-//tag::include[]
-public class OSGiScriptEvaluatorFactory extends AbstractCachingScriptEvaluatorFactory {
+public class OsgiScriptEvaluatorFactory extends AbstractCachingScriptEvaluatorFactory {
 
 	private final List<ScriptEngineManager> scriptEngineManagers;
 
-	public OSGiScriptEvaluatorFactory(BundleContext context) {
+	public OsgiScriptEvaluatorFactory(BundleContext context) {
 		this.scriptEngineManagers = Collections.unmodifiableList( findManagers( context ) );
 	}
 
@@ -102,4 +106,3 @@ public class OSGiScriptEvaluatorFactory extends AbstractCachingScriptEvaluatorFa
 		}
 	}
 }
-//end::include[]

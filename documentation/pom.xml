@@ -28,6 +28,7 @@
         <asciidoctor.examples-source-dir>${basedir}/src/test/java</asciidoctor.examples-source-dir>
         <asciidoctor.examples-resources-dir>${basedir}/src/test/resources</asciidoctor.examples-resources-dir>
         <asciidoctor.engine-source-dir>${basedir}/../engine/src/main/java</asciidoctor.engine-source-dir>
+        <asciidoctor.osgi-integrationtest-source-dir>${basedir}/../osgi/integrationtest/src/test/java</asciidoctor.osgi-integrationtest-source-dir>
 
         <html.meta.description>Hibernate Validator, Annotation based constraints for your domain model - Reference Documentation</html.meta.description>
         <html.meta.keywords>hibernate, validator, hibernate validator, validation, bean validation</html.meta.keywords>
@@ -246,6 +247,7 @@
                         <sourcedir>${asciidoctor.examples-source-dir}</sourcedir>
                         <resourcesdir>${asciidoctor.examples-resources-dir}</resourcesdir>
                         <engine-sourcedir>${asciidoctor.engine-source-dir}</engine-sourcedir>
+                        <osgi-integrationtest-sourcedir>${asciidoctor.osgi-integrationtest-source-dir}</osgi-integrationtest-sourcedir>
 
                         <hvVersion>${project.version}</hvVersion>
                         <bvVersion>${bv.api.version}</bvVersion>

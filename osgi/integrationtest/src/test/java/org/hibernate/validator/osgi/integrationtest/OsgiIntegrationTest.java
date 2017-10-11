@@ -37,29 +37,25 @@ import javax.validation.ValidationProviderResolver;
 import javax.validation.Validator;
 import javax.validation.spi.ValidationProvider;
 
+import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.osgi.scripting.MultiClassLoaderScriptEvaluatorFactory;
-import org.hibernate.validator.osgi.scripting.OSGiScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.osgi.scripting.MultiClassLoaderScriptEvaluatorFactory;
+import org.hibernate.validator.osgi.scripting.OsgiScriptEvaluatorFactory;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
-
-import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
 import org.javamoney.moneta.Money;
 import org.javamoney.moneta.spi.MonetaryConfig;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.framework.FrameworkUtil;
-
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.options.MavenUrlReference;
+import org.osgi.framework.FrameworkUtil;
 
 import com.example.Customer;
 import com.example.Event;
@@ -267,25 +263,36 @@ public class OsgiIntegrationTest {
 	}
 
 	@Test
-	public void canUseScriptAssertConstraint() {
-		canUseScriptAssertConstraint(
-				new MultiClassLoaderScriptEvaluatorFactory(
-						GroovyScriptEngineFactory.class.getClassLoader()
-				)
-		);
-		canUseScriptAssertConstraint(
-				new OSGiScriptEvaluatorFactory( FrameworkUtil.getBundle( this.getClass() ).getBundleContext() )
-		);
-	}
-
-	private void canUseScriptAssertConstraint(ScriptEvaluatorFactory factory) {
+	public void canUseScriptAssertConstraintWithMultiClassLoaderScriptEvaluatorFactory() {
+		//tag::scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory[]
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.externalClassLoader( getClass().getClassLoader() )
-				.scriptEvaluatorFactory( factory )
+				.scriptEvaluatorFactory(
+						new MultiClassLoaderScriptEvaluatorFactory( GroovyScriptEngineFactory.class.getClassLoader() )
+				)
 				.buildValidatorFactory()
 				.getValidator();
+		//end::scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory[]
 
+		canUseScriptAssertConstraint( validator );
+	}
+
+	@Test
+	public void canUseScriptAssertConstraintWithOsgiScriptEvaluatorFactory() {
+		//tag::scriptEvaluatorFactoryOsgiScriptEvaluatorFactory[]
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.scriptEvaluatorFactory(
+						new OsgiScriptEvaluatorFactory( FrameworkUtil.getBundle( this.getClass() ).getBundleContext() )
+				)
+				.buildValidatorFactory()
+				.getValidator();
+		//end::scriptEvaluatorFactoryOsgiScriptEvaluatorFactory[]
+
+		canUseScriptAssertConstraint( validator );
+	}
+
+	private void canUseScriptAssertConstraint(Validator validator) {
 		Set<ConstraintViolation<Event>> constraintViolations = validator.validate( new Event( LocalDate.of( 2017, 8, 8 ), LocalDate.of( 2016, 8, 8 ) ) );
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals( "start of event cannot be after the end", constraintViolations.iterator().next().getMessage() );
