@@ -216,7 +216,7 @@ public class ValidationXmlParser {
 
 	private String getScriptEvaluatorFactoryClassProperty(List<PropertyType> properties) {
 		return properties.stream()
-				.filter( property -> HibernateValidatorConfiguration.SCRIPT_EVALUATOR_CLASSNAME.equals( property.getName() ) )
+				.filter( property -> HibernateValidatorConfiguration.SCRIPT_EVALUATOR_FACTORY_CLASSNAME.equals( property.getName() ) )
 				.map( PropertyType::getValue )
 				.findFirst().orElse( null );
 	}

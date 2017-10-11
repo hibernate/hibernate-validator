@@ -38,7 +38,6 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
-import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.Contracts;
@@ -84,7 +83,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
 	private final ParameterNameProvider defaultParameterNameProvider;
 	private final ClockProvider defaultClockProvider;
-	private final ScriptEvaluatorFactory defaultScriptEvaluatorFactory;
 
 	private ValidationProviderResolver providerResolver;
 	private final ValidationBootstrapParameters validationBootstrapParameters;
@@ -92,13 +90,15 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final Set<InputStream> configurationStreams = newHashSet();
 	private BootstrapConfiguration bootstrapConfiguration;
 
+	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = new HashMap<>();
+
 	// HV-specific options
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
 	private boolean failFast;
 	private ClassLoader externalClassLoader;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
-	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = new HashMap<>();
 	private boolean traversableResolverResultCacheEnabled = true;
+	private ScriptEvaluatorFactory scriptEvaluatorFactory;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -129,7 +129,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
-		this.defaultScriptEvaluatorFactory = new DefaultScriptEvaluatorFactory( externalClassLoader );
 	}
 
 	@Override
@@ -269,12 +268,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public HibernateValidatorConfiguration scriptEvaluatorFactory(ScriptEvaluatorFactory scriptEvaluatorFactory) {
-		if ( log.isDebugEnabled() ) {
-			if ( scriptEvaluatorFactory != null ) {
-				log.debug( "Setting custom ScriptEvaluatorFactory of type " + scriptEvaluatorFactory.getClass().getName() );
-			}
-		}
-		this.validationBootstrapParameters.setScriptEvaluatorFactory( scriptEvaluatorFactory );
+		Contracts.assertNotNull( scriptEvaluatorFactory, MESSAGES.parameterMustNotBeNull( "scriptEvaluatorFactory" ) );
+
+		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		return this;
 	}
 
@@ -422,9 +418,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return validationBootstrapParameters.getClockProvider();
 	}
 
-	@Override
 	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
-		return validationBootstrapParameters.getScriptEvaluatorFactory();
+		return scriptEvaluatorFactory;
 	}
 
 	@Override
@@ -511,9 +506,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			if ( validationBootstrapParameters.getClockProvider() == null ) {
 				validationBootstrapParameters.setClockProvider( defaultClockProvider );
 			}
-			if ( validationBootstrapParameters.getScriptEvaluatorFactory() == null ) {
-				validationBootstrapParameters.setScriptEvaluatorFactory( defaultScriptEvaluatorFactory );
-			}
 		}
 		else {
 			ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters(
@@ -579,15 +571,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 			else {
 				validationBootstrapParameters.setClockProvider( defaultClockProvider );
-			}
-		}
-
-		if ( validationBootstrapParameters.getScriptEvaluatorFactory() == null ) {
-			if ( xmlParameters.getScriptEvaluatorFactory() != null ) {
-				validationBootstrapParameters.setScriptEvaluatorFactory( xmlParameters.getScriptEvaluatorFactory() );
-			}
-			else {
-				validationBootstrapParameters.setScriptEvaluatorFactory( defaultScriptEvaluatorFactory );
 			}
 		}
 

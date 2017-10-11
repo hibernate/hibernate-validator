@@ -240,7 +240,7 @@ public class XmlMappingTest {
 
 					//then
 					assertEquals(
-							bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.SCRIPT_EVALUATOR_CLASSNAME ),
+							bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.SCRIPT_EVALUATOR_FACTORY_CLASSNAME ),
 							CustomScriptEvaluatorFactory.class.getName()
 					);
 

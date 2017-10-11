@@ -31,12 +31,12 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration.Builder;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
+import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -54,6 +54,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
+import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 
 /**
@@ -65,6 +66,7 @@ import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Chris Beckey &lt;cbeckey@paypal.com&gt;
+ * @author Guillaume Smet
  */
 public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
@@ -161,7 +163,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.traversableResolver = configurationState.getTraversableResolver();
 		this.parameterNameProvider = new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() );
 		this.clockProvider = configurationState.getClockProvider();
-		this.scriptEvaluatorFactory = ( (HibernateValidatorConfiguration) configurationState ).getScriptEvaluatorFactory();
 		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
 		this.beanMetaDataManagers = new ConcurrentHashMap<>();
 		this.constraintHelper = new ConstraintHelper();
@@ -253,6 +254,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.traversableResolverResultCacheEnabled = tmpTraversableResolverResultCacheEnabled;
 
 		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
+
+		this.scriptEvaluatorFactory = getScriptEvaluatorFactory( configurationState, properties, externalClassLoader );
 	}
 
 	private static ClassLoader getExternalClassLoader(ConfigurationState configurationState) {
@@ -493,6 +496,36 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 
 		return contributors;
+	}
+
+	private static ScriptEvaluatorFactory getScriptEvaluatorFactory(ConfigurationState configurationState, Map<String, String> properties,
+			ClassLoader externalClassLoader) {
+		if ( configurationState instanceof ConfigurationImpl ) {
+			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
+			if ( hibernateSpecificConfig.getScriptEvaluatorFactory() != null ) {
+				log.usingScriptEvaluatorFactory( hibernateSpecificConfig.getScriptEvaluatorFactory().getClass() );
+				return hibernateSpecificConfig.getScriptEvaluatorFactory();
+			}
+		}
+
+		String scriptEvaluatorFactoryFqcn = properties.get( HibernateValidatorConfiguration.SCRIPT_EVALUATOR_FACTORY_CLASSNAME );
+		if ( scriptEvaluatorFactoryFqcn != null ) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<? extends ScriptEvaluatorFactory> clazz = (Class<? extends ScriptEvaluatorFactory>) run(
+						LoadClass.action( scriptEvaluatorFactoryFqcn, externalClassLoader )
+				);
+				ScriptEvaluatorFactory scriptEvaluatorFactory = run( NewInstance.action( clazz, "script evaluator factory class" ) );
+				log.usingScriptEvaluatorFactory( clazz );
+
+				return scriptEvaluatorFactory;
+			}
+			catch (Exception e) {
+				throw log.getUnableToInstantiateScriptEvaluatorFactoryClassException( scriptEvaluatorFactoryFqcn, e );
+			}
+		}
+
+		return new DefaultScriptEvaluatorFactory( externalClassLoader );
 	}
 
 	private static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,

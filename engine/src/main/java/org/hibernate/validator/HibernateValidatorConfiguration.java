@@ -83,7 +83,7 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 *
 	 * @since 6.1
 	 */
-	String SCRIPT_EVALUATOR_CLASSNAME = "hibernate.validator.script_evaluator_factory";
+	String SCRIPT_EVALUATOR_FACTORY_CLASSNAME = "hibernate.validator.script_evaluator_factory";
 
 	/**
 	 * <p>
@@ -262,13 +262,4 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @since 6.1
 	 */
 	HibernateValidatorConfiguration scriptEvaluatorFactory(ScriptEvaluatorFactory scriptEvaluatorFactory);
-
-	/**
-	 * Returns {@link ScriptEvaluatorFactory} configured by current configuration.
-	 *
-	 * @return {@code ScriptEvaluatorFactory} configured by current configuration
-	 *
-	 * @since 6.1
-	 */
-	ScriptEvaluatorFactory getScriptEvaluatorFactory();
 }
