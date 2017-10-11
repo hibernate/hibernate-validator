@@ -9,7 +9,10 @@ package org.hibernate.validator.scripting;
 import javax.validation.ValidationException;
 
 /**
+ * Exception raised when an error occurs during the evaluation of a script.
+ *
  * @author Marko Bekhta
+ * @since 6.1
  */
 public class ScriptEvaluationException extends ValidationException {
 
@@ -27,5 +30,4 @@ public class ScriptEvaluationException extends ValidationException {
 	public ScriptEvaluationException(String message, Throwable cause) {
 		super( message, cause );
 	}
-
 }

@@ -4,15 +4,15 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.util.scriptengine;
+package org.hibernate.validator.scripting;
 
 import java.util.Map;
 
 import javax.script.ScriptEngine;
 import javax.script.SimpleBindings;
 
-import org.hibernate.validator.scripting.ScriptEvaluationException;
-import org.hibernate.validator.scripting.ScriptEvaluator;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * A wrapper around JSR 223 {@link ScriptEngine}s. This class is thread-safe.
@@ -20,7 +20,9 @@ import org.hibernate.validator.scripting.ScriptEvaluator;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-public class ScriptEvaluatorImpl implements ScriptEvaluator {
+public class ScriptEngineScriptEvaluator implements ScriptEvaluator {
+
+	private static final Log LOG = LoggerFactory.make();
 
 	private final ScriptEngine engine;
 
@@ -29,7 +31,7 @@ public class ScriptEvaluatorImpl implements ScriptEvaluator {
 	 *
 	 * @param engine The engine to be wrapped.
 	 */
-	public ScriptEvaluatorImpl(ScriptEngine engine) {
+	public ScriptEngineScriptEvaluator(ScriptEngine engine) {
 		this.engine = engine;
 	}
 
@@ -61,7 +63,7 @@ public class ScriptEvaluatorImpl implements ScriptEvaluator {
 			return engine.eval( script, new SimpleBindings( bindings ) );
 		}
 		catch (Exception e) {
-			throw new ScriptEvaluationException( e );
+			throw LOG.getErrorExecutingScriptException( script, e );
 		}
 	}
 

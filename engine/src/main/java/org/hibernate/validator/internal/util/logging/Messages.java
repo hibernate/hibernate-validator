@@ -62,9 +62,6 @@ public interface Messages {
 	@Message(value = "Class is null.", format = Message.Format.NO_FORMAT)
 	String classIsNull();
 
-	@Message(value = "No JSR 223 script engine found for language \"%s\".")
-	String unableToFindScriptEngine(String languageName);
-
 	@Message(value = "The constructor to be validated must not be null.", format = Message.Format.NO_FORMAT)
 	String validatedConstructorMustNotBeNull();
 

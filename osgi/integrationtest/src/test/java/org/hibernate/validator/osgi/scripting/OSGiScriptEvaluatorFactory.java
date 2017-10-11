@@ -20,25 +20,24 @@ import java.util.stream.Stream;
 
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.scripting.ScriptEvaluationException;
+import org.hibernate.validator.scripting.AbstractCachingScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.ScriptEngineScriptEvaluator;
 import org.hibernate.validator.scripting.ScriptEvaluator;
 import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
-
+import org.hibernate.validator.scripting.ScriptEvaluatorNotFoundException;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 /**
  * {@link ScriptEvaluatorFactory} suitable for OSGi environments. It is created
- * based on {@code BundleContext} which is used to iterate through {@code Bundle}s and find all {@link ScriptEngineFactory}
+ * based on the {@code BundleContext} which is used to iterate through {@code Bundle}s and find all {@link ScriptEngineFactory}
  * candidates.
  *
  * @author Marko Bekhta
  */
-public class OSGiScriptEvaluatorFactory implements ScriptEvaluatorFactory {
+public class OSGiScriptEvaluatorFactory extends AbstractCachingScriptEvaluatorFactory {
 
 	private final List<ScriptEngineManager> scriptEngineManagers;
 
@@ -47,19 +46,13 @@ public class OSGiScriptEvaluatorFactory implements ScriptEvaluatorFactory {
 	}
 
 	@Override
-	public ScriptEvaluator getScriptEvaluatorByLanguageName(String languageName) {
+	protected ScriptEvaluator createNewScriptEvaluator(String languageName) throws ScriptEvaluatorNotFoundException {
 		return scriptEngineManagers.stream()
 				.map( manager -> manager.getEngineByName( languageName ) )
 				.filter( Objects::nonNull )
-				.map( engine -> (ScriptEvaluator) (script, bindings) -> {
-					try {
-						return engine.eval( script, new SimpleBindings( bindings ) );
-					}
-					catch (ScriptException e) {
-						throw new ScriptEvaluationException( e );
-					}
-				} ).findFirst()
-				.orElseThrow( () -> new ValidationException( String.format( "Wasn't able to find script evaluator for '%s'.", languageName ) ) );
+				.map( engine -> new ScriptEngineScriptEvaluator( engine ) )
+				.findFirst()
+				.orElseThrow( () -> new ValidationException( String.format( "Unable to find script evaluator for '%s'.", languageName ) ) );
 	}
 
 	private List<ScriptEngineManager> findManagers(BundleContext context) {
@@ -69,7 +62,7 @@ public class OSGiScriptEvaluatorFactory implements ScriptEvaluatorFactory {
 						return new ScriptEngineManager( Class.forName( className ).getClassLoader() );
 					}
 					catch (ClassNotFoundException e) {
-						throw new ValidationException( "Wasn't able to instantiate '" + className + "' based engine factory manager.", e );
+						throw new ValidationException( "Unable to instantiate '" + className + "' based engine factory manager.", e );
 					}
 				} ).collect( Collectors.toList() );
 	}
@@ -109,7 +102,7 @@ public class OSGiScriptEvaluatorFactory implements ScriptEvaluatorFactory {
 					.collect( Collectors.toList() );
 		}
 		catch (IOException e) {
-			throw new ValidationException( "Wasn't able to read a ScriptFactory candidate resource file", e );
+			throw new ValidationException( "Unable to read the ScriptEngineFactory resource file", e );
 		}
 	}
 }

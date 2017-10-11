@@ -39,7 +39,7 @@ import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.osgi.scripting.MultiClassloaderScriptEvaluatorFactory;
+import org.hibernate.validator.osgi.scripting.MultiClassLoaderScriptEvaluatorFactory;
 import org.hibernate.validator.osgi.scripting.OSGiScriptEvaluatorFactory;
 import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.constraints.ScriptAssert;
@@ -269,7 +269,7 @@ public class OsgiIntegrationTest {
 	@Test
 	public void canUseScriptAssertConstraint() {
 		canUseScriptAssertConstraint(
-				new MultiClassloaderScriptEvaluatorFactory(
+				new MultiClassLoaderScriptEvaluatorFactory(
 						GroovyScriptEngineFactory.class.getClassLoader()
 				)
 		);
@@ -298,7 +298,7 @@ public class OsgiIntegrationTest {
 				.configure()
 				.externalClassLoader( getClass().getClassLoader() )
 				.scriptEvaluatorFactory(
-						new MultiClassloaderScriptEvaluatorFactory(
+						new MultiClassLoaderScriptEvaluatorFactory(
 								GroovyScriptEngineFactory.class.getClassLoader(),
 								ScriptEngineFactory.class.getClassLoader() // for JS
 						)

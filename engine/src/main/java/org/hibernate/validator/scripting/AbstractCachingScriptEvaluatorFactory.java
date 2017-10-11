@@ -4,16 +4,12 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.util.scriptengine;
+package org.hibernate.validator.scripting;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.script.ScriptEngineManager;
-
-import org.hibernate.validator.scripting.ScriptEvaluator;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.ScriptEvaluatorNotFoundException;
 
 /**
  * Basic cacheable factory responsible for the creation of {@link ScriptEvaluator}s. This
@@ -23,12 +19,12 @@ import org.hibernate.validator.scripting.ScriptEvaluatorNotFoundException;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Marko Bekhta
  */
-public abstract class AbstractCacheableScriptEvaluatorFactory implements ScriptEvaluatorFactory {
+public abstract class AbstractCachingScriptEvaluatorFactory implements ScriptEvaluatorFactory {
 
 	/**
-	 * A cache of script executors (keyed by language name).
+	 * A cache of script evaluators (keyed by language name).
 	 */
-	private final ConcurrentMap<String, ScriptEvaluator> scriptExecutorCache = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, ScriptEvaluator> scriptEvaluatorCache = new ConcurrentHashMap<>();
 
 	/**
 	 * Retrieves a script executor for the given language.
@@ -40,16 +36,16 @@ public abstract class AbstractCacheableScriptEvaluatorFactory implements ScriptE
 	 */
 	@Override
 	public ScriptEvaluator getScriptEvaluatorByLanguageName(String languageName) {
-		return scriptExecutorCache.computeIfAbsent( languageName, this::createNewScriptEvaluator );
+		return scriptEvaluatorCache.computeIfAbsent( languageName, this::createNewScriptEvaluator );
 	}
 
 	/**
-	 * Creates a new script executor for the given language.
+	 * Creates a new script evaluator for the given language.
 	 *
 	 * @param languageName A language name.
-	 * @return A newly created script executor for the given language.
+	 * @return A newly created script evaluator for the given language.
 	 *
-	 * @throws ScriptEvaluatorNotFoundException In case no JSR 223 compatible engine for the given language could be found.
+	 * @throws ScriptEvaluatorNotFoundException In case no compatible engine for the given language could be found.
 	 */
 	protected abstract ScriptEvaluator createNewScriptEvaluator(String languageName) throws ScriptEvaluatorNotFoundException;
 }

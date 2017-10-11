@@ -17,15 +17,16 @@ public class CustomScriptEvaluatorFactoryForSpringELTest {
 	public void testCreateNewScriptEvaluator() throws Exception {
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.scriptEvaluatorFactory( new SpringELEvaluatorFactory() )
+				.scriptEvaluatorFactory( new SpringELScriptEvaluatorFactory() )
 				.buildValidatorFactory()
 				.getValidator();
 		assertTrue( validator.validate( new Foo( 1 ) ).isEmpty() );
 		assertEquals( 1, validator.validate( new Foo( -1 ) ).size() );
 	}
+
 	//tag::include[]
 	@ScriptAssert(script = "value > 0", lang = "spring")
-	private static class Foo {
+	public class Foo {
 
 		private final int value;
 

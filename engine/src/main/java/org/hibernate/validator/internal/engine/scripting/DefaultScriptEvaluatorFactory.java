@@ -4,41 +4,34 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.util.scriptengine;
-
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+package org.hibernate.validator.internal.engine.scripting;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.scripting.AbstractCachingScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.ScriptEngineScriptEvaluator;
 import org.hibernate.validator.scripting.ScriptEvaluationException;
 import org.hibernate.validator.scripting.ScriptEvaluator;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.ScriptEvaluatorNotFoundException;
 
 /**
- * Factory responsible for the creation of {@link ScriptEvaluatorImpl}s. This
+ * Factory responsible for the creation of JSR 223 based {@link ScriptEngineScriptEvaluator}s. This
  * class is thread-safe.
  *
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Marko Bekhta
  */
-public class DefaultLookupScriptEvaluatorFactory extends AbstractCacheableScriptEvaluatorFactory {
+public class DefaultScriptEvaluatorFactory extends AbstractCachingScriptEvaluatorFactory {
+
+	private static final Log LOG = LoggerFactory.make();
 
 	private final ClassLoader externalClassLoader;
 
-	private DefaultLookupScriptEvaluatorFactory(ClassLoader externalClassLoader) {
+	public DefaultScriptEvaluatorFactory(ClassLoader externalClassLoader) {
 		this.externalClassLoader = externalClassLoader;
-	}
-
-	/**
-	 * Retrieves an instance of this factory.
-	 *
-	 * @return A script evaluator factory. Never null.
-	 */
-	public static ScriptEvaluatorFactory getInstance(ClassLoader externalClassLoader) {
-		return new DefaultLookupScriptEvaluatorFactory( externalClassLoader );
 	}
 
 	@Override
@@ -46,10 +39,10 @@ public class DefaultLookupScriptEvaluatorFactory extends AbstractCacheableScript
 		ScriptEngine engine = getScriptEngineManager().getEngineByName( languageName );
 
 		if ( engine == null ) {
-			throw new ScriptEvaluatorNotFoundException( MESSAGES.unableToFindScriptEngine( languageName ) );
+			throw LOG.getUnableToFindScriptEngineException( languageName );
 		}
 
-		return new ScriptEvaluatorImpl( engine );
+		return new ScriptEngineScriptEvaluator( engine );
 	}
 
 	private ScriptEngineManager getScriptEngineManager() {

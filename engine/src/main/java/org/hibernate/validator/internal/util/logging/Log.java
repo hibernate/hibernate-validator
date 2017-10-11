@@ -41,7 +41,9 @@ import javax.validation.valueextraction.ValueExtractorDeclarationException;
 import javax.validation.valueextraction.ValueExtractorDefinitionException;
 import javax.xml.stream.XMLStreamException;
 
+import org.hibernate.validator.scripting.ScriptEvaluationException;
 import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.scripting.ScriptEvaluatorNotFoundException;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -804,4 +806,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 231, value = "Unable to instantiate script evaluator factory class %s.")
 	ValidationException getUnableToInstantiateScriptEvaluatorFactoryClassException(String scriptEvaluatorFactoryClassName, @Cause Exception e);
+
+	@Message(id = 232, value = "No JSR 223 script engine found for language \"%s\".")
+	ScriptEvaluatorNotFoundException getUnableToFindScriptEngineException(String languageName);
+
+	@Message(id = 233, value = "An error occurred while executing the script: \"%s\".")
+	ScriptEvaluationException getErrorExecutingScriptException(String script, @Cause Exception e);
 }

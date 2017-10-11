@@ -35,10 +35,10 @@ import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
+import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.Contracts;
@@ -48,11 +48,11 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.GetInstancesFromServiceLoader;
 import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
-import org.hibernate.validator.internal.util.scriptengine.DefaultLookupScriptEvaluatorFactory;
 import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
@@ -129,7 +129,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
-		this.defaultScriptEvaluatorFactory = DefaultLookupScriptEvaluatorFactory.getInstance( externalClassLoader );
+		this.defaultScriptEvaluatorFactory = new DefaultScriptEvaluatorFactory( externalClassLoader );
 	}
 
 	@Override

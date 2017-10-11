@@ -28,7 +28,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.DefaultClockProvider;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.hibernate.validator.internal.util.scriptengine.DefaultLookupScriptEvaluatorFactory;
+import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.testutil.DummyTraversableResolver;
 import org.hibernate.validator.testutil.ValidationInvocationHandler;
 
@@ -236,6 +236,6 @@ public final class ValidatorUtil {
 	}
 
 	public static HibernateConstraintValidatorContext getConstraintValidatorContext() {
-		return new ConstraintValidatorContextImpl( null, DefaultClockProvider.INSTANCE, DefaultLookupScriptEvaluatorFactory.getInstance( null ), null, null );
+		return new ConstraintValidatorContextImpl( null, DefaultClockProvider.INSTANCE, new DefaultScriptEvaluatorFactory( null ), null, null );
 	}
 }

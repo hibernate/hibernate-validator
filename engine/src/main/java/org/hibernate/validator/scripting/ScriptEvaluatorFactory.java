@@ -10,10 +10,8 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
 
 /**
- * An interface which should be implemented by factories that create {@link ScriptEvaluator}s
- * used to evaluate script expressions for {@link ScriptAssert}
- * and {@link ParameterScriptAssert} constraints. An instance of
- * such factory should be passed during bootstrapping a validator.
+ * Factory used to initialize the {@link ScriptEvaluator}s required to evaluate script expressions defined in
+ * {@link ScriptAssert} and {@link ParameterScriptAssert} constraints.
  *
  * @author Marko Bekhta
  * @since 6.1

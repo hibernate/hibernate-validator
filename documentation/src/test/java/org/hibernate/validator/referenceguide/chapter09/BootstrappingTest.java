@@ -219,17 +219,17 @@ public class BootstrappingTest {
 
 	@Test
 	@SuppressWarnings("unused")
-	public void scriptEvaluatorFactoryMultiClassloaderScriptEvaluatorFactory() {
+	public void scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory() {
 		ClassLoader classLoader1 = this.getClass().getClassLoader();
 		ClassLoader classLoader2 = this.getClass().getClassLoader();
 		ClassLoader classLoaderN = this.getClass().getClassLoader();
-		//tag::scriptEvaluatorFactoryMultiClassloaderScriptEvaluatorFactory[]
+		//tag::scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory[]
 		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.scriptEvaluatorFactory( new MultiClassloaderScriptEvaluatorFactory( classLoader1, classLoader2, /* ...*/ classLoaderN ) )
+				.scriptEvaluatorFactory( new MultiClassLoaderScriptEvaluatorFactory( classLoader1, classLoader2, /* ...*/ classLoaderN ) )
 				.buildValidatorFactory();
 		Validator validator = validatorFactory.getValidator();
-		//end::scriptEvaluatorFactoryMultiClassloaderScriptEvaluatorFactory[]
+		//end::scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory[]
 	}
 
 	@Test

@@ -9,7 +9,10 @@ package org.hibernate.validator.scripting;
 import javax.validation.ValidationException;
 
 /**
+ * Exception raised when a script evaluator cannot be found for a given language.
+ *
  * @author Marko Bekhta
+ * @since 6.1
  */
 public class ScriptEvaluatorNotFoundException extends ValidationException {
 
@@ -27,5 +30,4 @@ public class ScriptEvaluatorNotFoundException extends ValidationException {
 	public ScriptEvaluatorNotFoundException(String message, Throwable cause) {
 		super( message, cause );
 	}
-
 }
