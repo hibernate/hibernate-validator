@@ -39,6 +39,11 @@ public abstract class AbstractCachingScriptEvaluatorFactory implements ScriptEva
 		return scriptEvaluatorCache.computeIfAbsent( languageName, this::createNewScriptEvaluator );
 	}
 
+	@Override
+	public void clear() {
+		scriptEvaluatorCache.clear();
+	}
+
 	/**
 	 * Creates a new script evaluator for the given language.
 	 *

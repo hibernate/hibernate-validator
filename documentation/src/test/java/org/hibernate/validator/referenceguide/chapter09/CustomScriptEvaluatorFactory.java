@@ -12,4 +12,9 @@ public class CustomScriptEvaluatorFactory implements ScriptEvaluatorFactory {
 	public ScriptEvaluator getScriptEvaluatorByLanguageName(String languageName) {
 		return (script, bindings) -> true;
 	}
+
+	@Override
+	public void clear() {
+		// Nothing to do
+	}
 }

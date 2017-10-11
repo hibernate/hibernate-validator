@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.scripting;
 
+import javax.validation.ValidatorFactory;
+
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
 
@@ -29,4 +31,12 @@ public interface ScriptEvaluatorFactory {
 	 * found for a given {@code languageName}.
 	 */
 	ScriptEvaluator getScriptEvaluatorByLanguageName(String languageName);
+
+
+	/**
+	 * Clear the state of the factory.
+	 * <p>
+	 * Called when the {@link ValidatorFactory} is closed.
+	 */
+	void clear();
 }

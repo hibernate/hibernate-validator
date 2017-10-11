@@ -382,6 +382,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		for ( BeanMetaDataManager beanMetaDataManager : beanMetaDataManagers.values() ) {
 			beanMetaDataManager.clear();
 		}
+		scriptEvaluatorFactory.clear();
 	}
 
 	Validator createValidator(ConstraintValidatorFactory constraintValidatorFactory,
