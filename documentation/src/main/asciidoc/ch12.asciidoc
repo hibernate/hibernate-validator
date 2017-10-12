@@ -106,7 +106,7 @@ fail fast mode when bootstrapping a validator.
 
 The Bean Validation specification defines a set of preconditions which apply when defining
 constraints on methods within class hierarchies. These preconditions are defined in
-http://beanvalidation.org/2.0/spec/index.html#constraintdeclarationvalidationprocess-methodlevelconstraints-inheritance[section 5.6.5]
+{bvSpecUrl}#constraintdeclarationvalidationprocess-methodlevelconstraints-inheritance[section 5.6.5]
 of the Bean Validation 2.0 specification. See also <<section-method-constraints-inheritance-hierarchies>>
 in this guide.
 

@@ -60,7 +60,7 @@ Unified EL in error messages.
 [TIP]
 ====
 You can find the formal definition of the interpolation algorithm in section
-http://beanvalidation.org/2.0/spec/#validationapi-message-defaultmessageinterpolation-resolutionalgorithm[6.3.1.1]
+{bvSpecUrl}#validationapi-message-defaultmessageinterpolation-resolutionalgorithm[6.3.1.1]
 of the Bean Validation specification.
 ====
 
@@ -206,4 +206,3 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter04/resourcebu
 Note that the bundles are processed in the order as passed to the constructor. That means if several
 bundles contain an entry for a given message key, the value will be taken from the first bundle in
 the list containing the key.
-

@@ -538,7 +538,7 @@ method.
 The returned `Path` is composed of ``Node``s describing the path to the element.
 
 More information about the structure of the `Path` and the various types of ``Node``s can be found in
-http://beanvalidation.org/2.0/spec/#validationapi-constraintviolation[the `ConstraintViolation` section] of the
+{bvSpecUrl}#validationapi-constraintviolation[the `ConstraintViolation` section] of the
 Bean Validation specification.
 
 [[section-builtin-constraints]]
