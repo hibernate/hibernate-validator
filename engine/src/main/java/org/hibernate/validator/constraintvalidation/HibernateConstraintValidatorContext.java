@@ -113,15 +113,15 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	HibernateConstraintValidatorContext withDynamicPayload(Object payload);
 
 	/**
-	 * Returns a {@link ScriptEvaluator} created based on {@link ScriptEvaluatorFactory}
+	 * Returns a {@link ScriptEvaluator} created based on the {@link ScriptEvaluatorFactory}
 	 * passed at bootstrap.
 	 *
-	 * @param languageName The name of a scripting language
+	 * @param languageName the name of the scripting language
 	 *
-	 * @return A script executor for the given language. Never null.
+	 * @return a script executor for the given language. Never null.
 	 *
-	 * @throws ScriptEvaluatorNotFoundException in case when no {@link ScriptEvaluator} was
-	 * found for a given {@code languageName}.
+	 * @throws ScriptEvaluatorNotFoundException in case no {@link ScriptEvaluator} was
+	 * found for a given {@code languageName}
 	 *
 	 * @since 6.0.3
 	 */

@@ -31,10 +31,10 @@ public abstract class AbstractCachingScriptEvaluatorFactory implements ScriptEva
 	/**
 	 * Retrieves a script executor for the given language.
 	 *
-	 * @param languageName The name of a scripting language.
-	 * @return A script executor for the given language. Never null.
+	 * @param languageName the name of a scripting language
+	 * @return a script executor for the given language. Never null.
 	 *
-	 * @throws ScriptEvaluatorNotFoundException In case no compatible evaluator for the given language could be found.
+	 * @throws ScriptEvaluatorNotFoundException in case no compatible evaluator for the given language has been found
 	 */
 	@Override
 	public ScriptEvaluator getScriptEvaluatorByLanguageName(String languageName) {
@@ -49,10 +49,10 @@ public abstract class AbstractCachingScriptEvaluatorFactory implements ScriptEva
 	/**
 	 * Creates a new script evaluator for the given language.
 	 *
-	 * @param languageName A language name.
-	 * @return A newly created script evaluator for the given language.
+	 * @param languageName the name of a scripting language
+	 * @return a newly created script evaluator for the given language
 	 *
-	 * @throws ScriptEvaluatorNotFoundException In case no compatible engine for the given language could be found.
+	 * @throws ScriptEvaluatorNotFoundException in case no compatible engine for the given language has been found
 	 */
 	protected abstract ScriptEvaluator createNewScriptEvaluator(String languageName) throws ScriptEvaluatorNotFoundException;
 }

@@ -6,7 +6,7 @@
  */
 
 /**
- * <p>This package provides support for customization of script evaluation in {@code ScriptAssert}
+ * <p>This package provides support for customization of the script evaluation for {@code ScriptAssert}
  * and {@code ParameterScriptAssert} constraints.</p>
  * <p>This package is part of the public Hibernate Validator SPI.</p>
  *

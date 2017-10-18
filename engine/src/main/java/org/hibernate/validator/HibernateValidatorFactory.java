@@ -23,10 +23,11 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 public interface HibernateValidatorFactory extends ValidatorFactory {
 
 	/**
-	 * Returns a factory which is used to create {@link ScriptEvaluator}s for
-	 * evaluating script expressions of {@link ScriptAssert} and {@link ParameterScriptAssert}.
+	 * Returns the factory responsible for creating {@link ScriptEvaluator}s used to
+	 * evaluate script expressions of {@link ScriptAssert} and {@link ParameterScriptAssert}
+	 * constraints.
 	 *
-	 * @return A {@link ScriptEvaluatorFactory} instance
+	 * @return a {@link ScriptEvaluatorFactory} instance
 	 *
 	 * @since 6.0.3
 	 */

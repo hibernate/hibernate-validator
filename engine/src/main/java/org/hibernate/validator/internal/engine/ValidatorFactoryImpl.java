@@ -93,7 +93,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final ClockProvider clockProvider;
 
 	/**
-	 * Used to get {@code ScriptEvaluatorFactory} when validating {@code @ScriptAssert} and {@code @ParameterScriptAssert}.
+	 * Used to get the {@code ScriptEvaluatorFactory} when validating {@code @ScriptAssert} and
+	 * {@code @ParameterScriptAssert} constraints.
 	 */
 	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
 

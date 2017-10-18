@@ -25,11 +25,11 @@ public interface ScriptEvaluatorFactory {
 	/**
 	 * Retrieves a script evaluator {@link ScriptEvaluator} for the given language.
 	 *
-	 * @param languageName The name of a scripting language.
+	 * @param languageName the name of a scripting language
 	 *
-	 * @return A script executor for the given language. Never null.
+	 * @return a script executor for the given language. Never null.
 	 *
-	 * @throws ScriptEvaluatorNotFoundException in case when no {@link ScriptEvaluator} was
+	 * @throws ScriptEvaluatorNotFoundException in case no {@link ScriptEvaluator} was
 	 * found for a given {@code languageName}.
 	 */
 	ScriptEvaluator getScriptEvaluatorByLanguageName(String languageName);

@@ -32,7 +32,7 @@ public class ScriptEngineScriptEvaluator implements ScriptEvaluator {
 	/**
 	 * Creates a new script executor.
 	 *
-	 * @param engine The engine to be wrapped.
+	 * @param engine the engine to be wrapped
 	 */
 	public ScriptEngineScriptEvaluator(ScriptEngine engine) {
 		this.engine = engine;
@@ -42,12 +42,12 @@ public class ScriptEngineScriptEvaluator implements ScriptEvaluator {
 	 * Executes the given script, using the given variable bindings. The execution of the script happens either synchronized or
 	 * unsynchronized, depending on the engine's threading abilities.
 	 *
-	 * @param script The script to be executed.
-	 * @param bindings The bindings to be used.
+	 * @param script the script to be executed
+	 * @param bindings the bindings to be used
 	 *
-	 * @return The script's result.
+	 * @return the script's result
 	 *
-	 * @throws ScriptEvaluationException In case of any errors during script execution.
+	 * @throws ScriptEvaluationException in case an error occurred during the script evaluation
 	 */
 	@Override
 	public Object evaluate(String script, Map<String, Object> bindings) throws ScriptEvaluationException {
@@ -71,9 +71,9 @@ public class ScriptEngineScriptEvaluator implements ScriptEvaluator {
 	}
 
 	/**
-	 * Checks, whether the given engine is thread-safe or not.
+	 * Checks whether the given engine is thread-safe or not.
 	 *
-	 * @return True, if the given engine is thread-safe, false otherwise.
+	 * @return true if the given engine is thread-safe, false otherwise.
 	 */
 	private boolean engineAllowsParallelAccessFromMultipleThreads() {
 		String threadingType = (String) engine.getFactory().getParameter( "THREADING" );

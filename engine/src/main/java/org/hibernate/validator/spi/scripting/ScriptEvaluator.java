@@ -30,10 +30,10 @@ public interface ScriptEvaluator {
 	/**
 	 * Evaluates a {@code script} expression and returns the result of this evaluation.
 	 *
-	 * @param script A script to evaluate
-	 * @param bindings The bindings to be used
+	 * @param script a script to evaluate
+	 * @param bindings the bindings to be used
 	 *
-	 * @return The result of script evaluation
+	 * @return the result of script evaluation
 	 *
 	 * @throws ScriptEvaluationException in case an error occurred during the script evaluation
 	 */

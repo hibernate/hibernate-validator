@@ -76,10 +76,10 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	String ENABLE_TRAVERSABLE_RESOLVER_RESULT_CACHE = "hibernate.validator.enable_traversable_resolver_result_cache";
 
 	/**
-	 * Property for configuring script evaluator factory, allowing to set up which factory will be used to create
-	 * {@link ScriptEvaluator} for evaluation of script expressions in
+	 * Property for configuring the script evaluator factory, allowing to set up which factory will be used to create
+	 * {@link ScriptEvaluator}s for evaluation of script expressions in
 	 * {@link ScriptAssert} and {@link ParameterScriptAssert}
-	 * constraints. A fully qualified name of a class implementing  {@link ScriptEvaluatorFactory} is expected as a value.
+	 * constraints. A fully qualified name of a class implementing {@link ScriptEvaluatorFactory} is expected as a value.
 	 *
 	 * @since 6.0.3
 	 */
@@ -253,10 +253,10 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	HibernateValidatorConfiguration enableTraversableResolverResultCache(boolean enabled);
 
 	/**
-	 * Allows to specify custom {@link ScriptEvaluatorFactory} which is used to create {@link ScriptEvaluator}s
+	 * Allows to specify a custom {@link ScriptEvaluatorFactory} responsible for creating {@link ScriptEvaluator}s
 	 * used to evaluate script expressions for {@link ScriptAssert} and {@link ParameterScriptAssert} constraints.
 	 *
-	 * @param scriptEvaluatorFactory The {@link ScriptEvaluatorFactory} to be used by validator
+	 * @param scriptEvaluatorFactory the {@link ScriptEvaluatorFactory} to be used
 	 *
 	 * @return {@code this} following the chaining method pattern
 	 *
