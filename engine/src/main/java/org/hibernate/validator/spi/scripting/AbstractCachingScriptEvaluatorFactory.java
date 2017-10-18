@@ -9,8 +9,6 @@ package org.hibernate.validator.spi.scripting;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.script.ScriptEngineManager;
-
 import org.hibernate.validator.Incubating;
 
 /**
@@ -33,7 +31,7 @@ public abstract class AbstractCachingScriptEvaluatorFactory implements ScriptEva
 	/**
 	 * Retrieves a script executor for the given language.
 	 *
-	 * @param languageName The name of a scripting language as expected by {@link ScriptEngineManager#getEngineByName(String)}.
+	 * @param languageName The name of a scripting language.
 	 * @return A script executor for the given language. Never null.
 	 *
 	 * @throws ScriptEvaluatorNotFoundException In case no compatible evaluator for the given language could be found.
