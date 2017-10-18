@@ -21,7 +21,9 @@ import javax.validation.TraversableResolver;
  * @author Emmanuel Bernard
  */
 class CachingTraversableResolverForSingleValidation implements TraversableResolver {
+
 	private final TraversableResolver delegate;
+
 	private final Map<TraversableHolder, TraversableHolder> traversables = new HashMap<TraversableHolder, TraversableHolder>();
 
 	public CachingTraversableResolverForSingleValidation(TraversableResolver delegate) {
@@ -83,53 +85,12 @@ class CachingTraversableResolverForSingleValidation implements TraversableResolv
 		return cachedLH.isCascadable;
 	}
 
-	private static final class TraversableHolder {
-		private final Object traversableObject;
-		private final Path.Node traversableProperty;
-		private final int hashCode;
-
+	private static final class TraversableHolder extends AbstractTraversableHolder {
 		private Boolean isReachable;
 		private Boolean isCascadable;
 
-
 		private TraversableHolder(Object traversableObject, Path.Node traversableProperty) {
-			this.traversableObject = traversableObject;
-			this.traversableProperty = traversableProperty;
-			this.hashCode = buildHashCode();
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if ( this == o ) {
-				return true;
-			}
-			if ( o == null || getClass() != o.getClass() ) {
-				return false;
-			}
-
-			TraversableHolder that = (TraversableHolder) o;
-
-			if ( traversableObject != null ? !traversableObject.equals( that.traversableObject ) : that.traversableObject != null ) {
-				return false;
-			}
-			if ( !traversableProperty.equals( that.traversableProperty ) ) {
-				return false;
-			}
-
-			return true;
-		}
-
-		@Override
-		public int hashCode() {
-			return hashCode;
-		}
-
-		public int buildHashCode() {
-			// HV-1013 Using identity hash code in order to avoid calling hashCode() of objects which may
-			// be handling null properties not correctly
-			int result = traversableObject != null ? System.identityHashCode( traversableObject ) : 0;
-			result = 31 * result + traversableProperty.hashCode();
-			return result;
+			super( traversableObject, traversableProperty );
 		}
 	}
 }
