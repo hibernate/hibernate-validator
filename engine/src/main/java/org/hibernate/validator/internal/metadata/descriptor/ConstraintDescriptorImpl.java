@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
@@ -227,7 +228,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				type,
 				!genericValidatorDescriptors.isEmpty(),
 				!crossParameterValidatorDescriptors.isEmpty(),
-				externalConstraintType
+				externalConstraintType,
+				constraintHelper
 		);
 		this.composingConstraints = parseComposingConstraints( member, constraintHelper, constraintType );
 		this.compositionType = parseCompositionType( constraintHelper );
@@ -401,6 +403,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * specify the target explicitly).</li>
 	 * </ul>
 	 *
+	 * @param constraintAnnotationType The type representing constraint annotation
 	 * @param member The annotated member
 	 * @param elementType The type of the annotated element
 	 * @param hasGenericValidators Whether the constraint has at least one generic validator or
@@ -408,6 +411,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * @param hasCrossParameterValidator Whether the constraint has a cross-parameter validator
 	 * @param externalConstraintType constraint type as derived from external context, e.g. for
 	 * constraints declared in XML via {@code &lt;return-value/gt;}
+	 * @param constraintHelper An instance of {@link ConstraintHelper}
 	 *
 	 * @return The type of this constraint
 	 */
@@ -416,7 +420,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			ElementType elementType,
 			boolean hasGenericValidators,
 			boolean hasCrossParameterValidator,
-			ConstraintType externalConstraintType) {
+			ConstraintType externalConstraintType,
+		    ConstraintHelper constraintHelper) {
 		ConstraintTarget constraintTarget = validationAppliesTo;
 		ConstraintType constraintType = null;
 		boolean isExecutable = isExecutable( elementType );
@@ -478,9 +483,31 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			}
 		}
 
-		// Now we are out of luck
 		if ( constraintType == null ) {
-			throw LOG.getImplicitConstraintTargetInAmbiguousConfigurationException( annotationType );
+			// check if it's a composite constraint and is built with constraints for which a type can be detected
+			Set<ConstraintType> constraintTypes = findComposingConstraints( constraintHelper )
+					.map( element -> determineConstraintType(
+							element.annotationType(),
+							member,
+							elementType,
+							!constraintHelper.findValidatorDescriptors(
+									element.annotationType(),
+									ValidationTarget.ANNOTATED_ELEMENT
+							).isEmpty(),
+							!constraintHelper.findValidatorDescriptors(
+									element.annotationType(),
+									ValidationTarget.PARAMETERS
+							).isEmpty(),
+							externalConstraintType,
+							constraintHelper
+					) ).collect( Collectors.toSet() );
+			if ( constraintTypes.size() == 1 ) {
+				constraintType = constraintTypes.iterator().next();
+			}
+			else {
+				// Now we are out of luck
+				throw LOG.getImplicitConstraintTargetInAmbiguousConfigurationException( annotationType );
+			}
 		}
 
 		if ( constraintType == ConstraintType.CROSS_PARAMETER ) {
@@ -488,6 +515,22 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 
 		return constraintType;
+	}
+
+	private Stream<Annotation> findComposingConstraints(ConstraintHelper constraintHelper) {
+		return Arrays.stream( annotationType.getDeclaredAnnotations() )
+				.filter( element -> !NON_COMPOSING_CONSTRAINT_ANNOTATIONS.contains( element.annotationType().getName() ) )
+				.flatMap( element -> {
+					if ( constraintHelper.isConstraintAnnotation( element.annotationType() ) ) {
+						return Stream.of( element );
+					}
+					else if ( constraintHelper.isMultiValueConstraint( element.annotationType() ) ) {
+						return constraintHelper.getConstraintsFromMultiValueConstraint( element ).stream();
+					}
+					else {
+						return Stream.empty();
+					}
+				} );
 	}
 
 	private static ValidateUnwrappedValue determineValueUnwrapping(Set<Class<? extends Payload>> payloads, Member member, Class<? extends Annotation> annotationType) {
