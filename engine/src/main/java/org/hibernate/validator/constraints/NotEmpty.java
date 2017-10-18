@@ -24,6 +24,8 @@ import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.constraintvalidation.SupportedValidationTarget;
+import javax.validation.constraintvalidation.ValidationTarget;
 
 import org.hibernate.validator.constraints.NotEmpty.List;
 
@@ -37,6 +39,7 @@ import org.hibernate.validator.constraints.NotEmpty.List;
  */
 @Documented
 @Constraint(validatedBy = { })
+@SupportedValidationTarget(ValidationTarget.ANNOTATED_ELEMENT)
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
