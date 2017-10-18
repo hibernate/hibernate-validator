@@ -4,6 +4,7 @@ package org.hibernate.validator.referenceguide.chapter09;
 //end::include[]
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.hibernate.validator.spi.scripting.AbstractCachingScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
@@ -37,6 +38,9 @@ public class SpringELScriptEvaluatorFactory extends AbstractCachingScriptEvaluat
 			try {
 				Expression expression = expressionParser.parseExpression( script );
 				EvaluationContext context = new StandardEvaluationContext( bindings.values().iterator().next() );
+				for ( Entry<String, Object> binding : bindings.entrySet() ) {
+					context.setVariable( binding.getKey(), binding.getValue() );
+				}
 				return expression.getValue( context );
 			}
 			catch (ParseException | EvaluationException e) {
