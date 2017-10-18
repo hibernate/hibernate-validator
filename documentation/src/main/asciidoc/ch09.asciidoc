@@ -406,8 +406,8 @@ how the script engines are initialized and how the script evaluators are built.
 This can be done by setting a custom implementation of `ScriptEvaluatorFactory`.
 
 In particular, this is important for modular environments (e.g. OSGi), where user might face issues
-with modular class loading and https://www.jcp.org/en/jsr/detail?id=223[JSR 223]. It also
-allows to use any custom script engine, not necessarily based on the
+with modular class loading and https://www.jcp.org/en/jsr/detail?id=223[JSR 223].
+It also allows to use any custom script engine, not necessarily based on the
 https://www.jcp.org/en/jsr/detail?id=223[JSR 223] (e.g. Spring Expression Language).
 
 ===== XML configuration
@@ -447,9 +447,9 @@ This section shows a couple of custom `ScriptEvaluatorFactory` implementations t
 in modular environments as well as one using the https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#expressions[Spring Expression Language]
 for writing constraint scripts.
 
-Problems with modular environments and https://www.jcp.org/en/jsr/detail?id=223[JSR 223] come from the class loading. The class loader
-where the script engine is available might be different from the one of Hibernate Validator. Thus the script engine
-wouldn't be found using the default strategy.
+Problems with modular environments and https://www.jcp.org/en/jsr/detail?id=223[JSR 223] come from the class loading.
+The class loader where the script engine is available might be different from the one of Hibernate Validator.
+Thus the script engine wouldn't be found using the default strategy.
 
 To solve this issue, the `MultiClassLoaderScriptEvaluatorFactory` class below can be introduced:
 
@@ -494,7 +494,7 @@ for `ScriptEngineFactory` as a parameter.
 
 As already mentioned, you can also use script engines that are not based on https://www.jcp.org/en/jsr/detail?id=223[JSR 223].
 
-For instance, to use the https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#expressions[Spring Expression Language]),
+For instance, to use the https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#expressions[Spring Expression Language],
 you can define a `SpringELScriptEvaluatorFactory` as:
 
 ====
