@@ -194,6 +194,18 @@ These are the module names as declared using the `Automatic-Module-Name` header:
 
 These module names are preliminary and may be changed when providing real module descriptors in a future release.
 
+When using Bean Validation XML descriptors (_META-INF/validation.xml_ and/or constraint mapping files), the `java.xml.bind` module must be enabled.
+Do so by appending the following parameter to your _java_ invocation:
+
+.Enabling JAXB support on Java 9
+====
+[source]
+[subs="verbatim,attributes"]
+----
+--add-modules java.xml.bind
+----
+====
+
 [[validator-gettingstarted-createmodel]]
 === Applying constraints
 
