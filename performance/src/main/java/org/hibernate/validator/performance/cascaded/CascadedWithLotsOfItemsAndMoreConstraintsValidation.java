@@ -8,7 +8,8 @@ package org.hibernate.validator.performance.cascaded;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +18,7 @@ import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -32,57 +34,81 @@ import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
 /**
- * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
-public class CascadedValidation {
+public class CascadedWithLotsOfItemsAndMoreConstraintsValidation {
+
+	private static final int NUMBER_OF_ARTICLES_PER_SHOP = 2000;
 
 	@State(Scope.Benchmark)
-	public static class CascadedValidationState {
+	public static class CascadedWithLotsOfItemsValidationState {
 		public volatile Validator validator;
 
-		public CascadedValidationState() {
+		public volatile Shop shop;
+
+		public CascadedWithLotsOfItemsValidationState() {
 			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 			validator = factory.getValidator();
+
+			shop = createShop();
+		}
+
+		private Shop createShop() {
+			Shop shop = new Shop( 1, "Shop" );
+
+			for ( int i = 0; i < NUMBER_OF_ARTICLES_PER_SHOP; i++ ) {
+				shop.addArticle( new Article( i, "Article " + i ) );
+			}
+
+			return shop;
 		}
 	}
 
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
-	@OutputTimeUnit(TimeUnit.MILLISECONDS)
+	@OutputTimeUnit(TimeUnit.SECONDS)
 	@Fork(value = 1)
-	@Threads(50)
+	@Threads(20)
 	@Warmup(iterations = 10)
 	@Measurement(iterations = 20)
-	public void testCascadedValidation(CascadedValidationState state, Blackhole bh) {
-		// TODO graphs needs to be generated and deeper
-		Person kermit = new Person( "kermit" );
-		Person piggy = new Person( "miss piggy" );
-		Person gonzo = new Person( "gonzo" );
-
-		kermit.addFriend( piggy ).addFriend( gonzo );
-		piggy.addFriend( kermit ).addFriend( gonzo );
-		gonzo.addFriend( kermit ).addFriend( piggy );
-
-		Set<ConstraintViolation<Person>> violations = state.validator.validate( kermit );
+	public void testCascadedValidationWithLotsOfItems(CascadedWithLotsOfItemsValidationState state, Blackhole bh) {
+		Set<ConstraintViolation<Shop>> violations = state.validator.validate( state.shop );
 		assertThat( violations ).hasSize( 0 );
 
 		bh.consume( violations );
 	}
 
-	public class Person {
+	public static class Shop {
 		@NotNull
-		String name;
+		private Integer id;
 
+		@NotEmpty
+		private String name;
+
+		@NotNull
 		@Valid
-		Set<Person> friends = new HashSet<>();
+		private List<Article> articles = new ArrayList<>();
 
-		public Person(String name) {
+		public Shop(Integer id, String name) {
+			this.id = id;
 			this.name = name;
 		}
 
-		public Person addFriend(Person friend) {
-			friends.add( friend );
-			return this;
+		public void addArticle(Article article) {
+			articles.add( article );
+		}
+	}
+
+	public static class Article {
+		@NotNull
+		private Integer id;
+
+		@NotEmpty
+		private String name;
+
+		public Article(Integer id, String name) {
+			this.id = id;
+			this.name = name;
 		}
 	}
 }

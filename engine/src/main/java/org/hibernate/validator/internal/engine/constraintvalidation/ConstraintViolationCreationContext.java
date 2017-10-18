@@ -11,7 +11,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.toImmutable
 import java.util.Collections;
 import java.util.Map;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -21,18 +21,18 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  */
 public class ConstraintViolationCreationContext {
 	private final String message;
-	private final PathImpl propertyPath;
+	private final PathBuilder propertyPath;
 	@Immutable
 	private final Map<String, Object> messageParameters;
 	@Immutable
 	private final Map<String, Object> expressionVariables;
 	private final Object dynamicPayload;
 
-	public ConstraintViolationCreationContext(String message, PathImpl property) {
+	public ConstraintViolationCreationContext(String message, PathBuilder property) {
 		this( message, property, Collections.<String, Object>emptyMap(), Collections.<String, Object>emptyMap(), null );
 	}
 
-	public ConstraintViolationCreationContext(String message, PathImpl property, Map<String, Object> messageParameters, Map<String, Object> expressionVariables,
+	public ConstraintViolationCreationContext(String message, PathBuilder property, Map<String, Object> messageParameters, Map<String, Object> expressionVariables,
 			Object dynamicPayload) {
 		this.message = message;
 		this.propertyPath = property;
@@ -45,7 +45,7 @@ public class ConstraintViolationCreationContext {
 		return message;
 	}
 
-	public final PathImpl getPath() {
+	public final PathBuilder getPath() {
 		return propertyPath;
 	}
 

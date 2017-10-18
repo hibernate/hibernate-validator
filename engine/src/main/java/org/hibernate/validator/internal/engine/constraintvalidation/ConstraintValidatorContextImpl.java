@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +27,8 @@ import javax.validation.ElementKind;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -47,13 +46,13 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private Map<String, Object> expressionVariables;
 	private final List<String> methodParameterNames;
 	private final ClockProvider clockProvider;
-	private final List<ConstraintViolationCreationContext> constraintViolationCreationContexts = newArrayList( 3 );
-	private final PathImpl basePath;
+	private final PathBuilder basePath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
+	private List<ConstraintViolationCreationContext> constraintViolationCreationContexts;
 	private boolean defaultDisabled;
 	private Object dynamicPayload;
 
-	public ConstraintValidatorContextImpl(List<String> methodParameterNames, ClockProvider clockProvider, PathImpl propertyPath,
+	public ConstraintValidatorContextImpl(List<String> methodParameterNames, ClockProvider clockProvider, PathBuilder propertyPath,
 			ConstraintDescriptor<?> constraintDescriptor) {
 		this.methodParameterNames = methodParameterNames;
 		this.clockProvider = clockProvider;
@@ -76,7 +75,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		return new ConstraintViolationBuilderImpl(
 				methodParameterNames,
 				messageTemplate,
-				PathImpl.createCopy( basePath )
+				basePath
 		);
 	}
 
@@ -129,25 +128,34 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	}
 
 	public final List<ConstraintViolationCreationContext> getConstraintViolationCreationContexts() {
-		if ( defaultDisabled && constraintViolationCreationContexts.size() == 0 ) {
-			throw log.getAtLeastOneCustomMessageMustBeCreatedException();
+		if ( defaultDisabled ) {
+			if ( constraintViolationCreationContexts == null || constraintViolationCreationContexts.size() == 0 ) {
+				throw log.getAtLeastOneCustomMessageMustBeCreatedException();
+			}
+
+			return CollectionHelper.toImmutableList( constraintViolationCreationContexts );
 		}
 
-		List<ConstraintViolationCreationContext> returnedConstraintViolationCreationContexts = new ArrayList<>(
-				constraintViolationCreationContexts
-		);
-		if ( !defaultDisabled ) {
-			returnedConstraintViolationCreationContexts.add(
-					new ConstraintViolationCreationContext(
-							getDefaultConstraintMessageTemplate(),
-							basePath,
-							messageParameters != null ? new HashMap<>( messageParameters ) : Collections.emptyMap(),
-							expressionVariables != null ? new HashMap<>( expressionVariables ) : Collections.emptyMap(),
-							dynamicPayload
-					)
-			);
+		if ( constraintViolationCreationContexts == null || constraintViolationCreationContexts.size() == 0 ) {
+			return Collections.singletonList( getDefaultConstraintViolationCreationContext() );
 		}
-		return returnedConstraintViolationCreationContexts;
+
+		List<ConstraintViolationCreationContext> returnedConstraintViolationCreationContexts =
+				new ArrayList<>( constraintViolationCreationContexts.size() + 1 );
+		returnedConstraintViolationCreationContexts.addAll( constraintViolationCreationContexts );
+		returnedConstraintViolationCreationContexts.add( getDefaultConstraintViolationCreationContext() );
+
+		return CollectionHelper.toImmutableList( returnedConstraintViolationCreationContexts );
+	}
+
+	private ConstraintViolationCreationContext getDefaultConstraintViolationCreationContext() {
+		return new ConstraintViolationCreationContext(
+				getDefaultConstraintMessageTemplate(),
+				basePath,
+				messageParameters != null ? new HashMap<>( messageParameters ) : Collections.emptyMap(),
+				expressionVariables != null ? new HashMap<>( expressionVariables ) : Collections.emptyMap(),
+				dynamicPayload
+		);
 	}
 
 	public List<String> getMethodParameterNames() {
@@ -156,14 +164,17 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 	private abstract class NodeBuilderBase {
 		protected final String messageTemplate;
-		protected PathImpl propertyPath;
+		protected PathBuilder propertyPath;
 
-		protected NodeBuilderBase(String template, PathImpl path) {
+		protected NodeBuilderBase(String template, PathBuilder path) {
 			this.messageTemplate = template;
 			this.propertyPath = path;
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
+			if ( constraintViolationCreationContexts == null ) {
+				constraintViolationCreationContexts = CollectionHelper.newArrayList( 3 );
+			}
 			constraintViolationCreationContexts.add(
 					new ConstraintViolationCreationContext(
 							messageTemplate,
@@ -181,7 +192,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		private final List<String> methodParameterNames;
 
-		private ConstraintViolationBuilderImpl(List<String> methodParameterNames, String template, PathImpl path) {
+		private ConstraintViolationBuilderImpl(List<String> methodParameterNames, String template, PathBuilder path) {
 			super( template, path );
 			this.methodParameterNames = methodParameterNames;
 		}
@@ -241,7 +252,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private class NodeBuilder extends NodeBuilderBase
 			implements NodeBuilderDefinedContext, LeafNodeBuilderDefinedContext, ContainerElementNodeBuilderDefinedContext {
 
-		private NodeBuilder(String template, PathImpl path) {
+		private NodeBuilder(String template, PathBuilder path) {
 			super( template, path );
 		}
 
@@ -279,7 +290,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		private final Integer leafNodeTypeArgumentIndex;
 
-		private DeferredNodeBuilder(String template, PathImpl path, String nodeName, ElementKind leafNodeKind) {
+		private DeferredNodeBuilder(String template, PathBuilder path, String nodeName, ElementKind leafNodeKind) {
 			super( template, path );
 			this.leafNodeName = nodeName;
 			this.leafNodeKind = leafNodeKind;
@@ -287,7 +298,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 			this.leafNodeTypeArgumentIndex = null;
 		}
 
-		private DeferredNodeBuilder(String template, PathImpl path, String nodeName, Class<?> leafNodeContainerType, Integer leafNodeTypeArgumentIndex) {
+		private DeferredNodeBuilder(String template, PathBuilder path, String nodeName, Class<?> leafNodeContainerType, Integer leafNodeTypeArgumentIndex) {
 			super( template, path );
 			this.leafNodeName = nodeName;
 			this.leafNodeKind = ElementKind.CONTAINER_ELEMENT;
@@ -309,14 +320,14 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		@Override
 		public NodeBuilder atKey(Object key) {
-			propertyPath.setLeafNodeMapKey( key );
+			propertyPath.makeLeafNodeIterableAndSetMapKey( key );
 			addLeafNode();
 			return new NodeBuilder( messageTemplate, propertyPath );
 		}
 
 		@Override
 		public NodeBuilder atIndex(Integer index) {
-			propertyPath.setLeafNodeIndex( index );
+			propertyPath.makeLeafNodeIterableAndSetIndex( index );
 			addLeafNode();
 			return new NodeBuilder( messageTemplate, propertyPath );
 		}

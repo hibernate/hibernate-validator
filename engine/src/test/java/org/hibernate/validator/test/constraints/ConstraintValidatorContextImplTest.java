@@ -20,7 +20,7 @@ import javax.validation.ValidationException;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
 import org.hibernate.validator.testutil.ConstraintViolationAssert.PathExpectation;
 import org.testng.annotations.Test;
 
@@ -223,7 +223,7 @@ public class ConstraintValidatorContextImplTest {
 	}
 
 	private ConstraintValidatorContextImpl createEmptyConstraintValidatorContextImpl() {
-		PathImpl path = PathImpl.createRootPath();
+		PathBuilder path = PathBuilder.createRootPath();
 		path.addBeanNode();
 
 		ConstraintValidatorContextImpl context = new ConstraintValidatorContextImpl( null, null, path, null );
@@ -232,7 +232,7 @@ public class ConstraintValidatorContextImplTest {
 	}
 
 	private void assertMessageAndPath(ConstraintViolationCreationContext constraintViolationCreationContext, String expectedMessage, PathExpectation expectedPath) {
-		assertPathEquals( constraintViolationCreationContext.getPath(), expectedPath );
+		assertPathEquals( constraintViolationCreationContext.getPath().build(), expectedPath );
 		assertEquals( constraintViolationCreationContext.getMessage(), expectedMessage, "Wrong message" );
 	}
 }

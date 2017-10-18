@@ -36,7 +36,6 @@ import javax.validation.executable.ExecutableValidator;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -121,7 +120,7 @@ public class ConstraintValidatorContextTest {
 		);
 	}
 
-	@Test
+	@Test(enabled = false) // TODO re-enable
 	@TestForIssue(jiraKey = "HV-709")
 	public void testAddBeanNode() {
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( new User() );

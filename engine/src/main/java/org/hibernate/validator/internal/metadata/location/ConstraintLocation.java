@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
@@ -87,7 +87,7 @@ public interface ConstraintLocation {
 	/**
 	 * Appends a node representing this location to the given property path.
 	 */
-	void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path);
+	void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathBuilder path);
 
 	/**
 	 * Obtains the value of this location from the parent. The type of the passed parent depends on the location type,

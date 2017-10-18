@@ -60,7 +60,6 @@ public class NodeImpl
 	private final Integer index;
 	private final Object key;
 	private final ElementKind kind;
-	private final int hashCode;
 
 	//type-specific attributes
 	private final Class<?>[] parameterTypes;
@@ -69,6 +68,7 @@ public class NodeImpl
 	private final Class<?> containerClass;
 	private final Integer typeArgumentIndex;
 
+	private int hashCode = -1;
 	private String asString;
 
 	private NodeImpl(String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
@@ -84,7 +84,6 @@ public class NodeImpl
 		this.parameterIndex = parameterIndex;
 		this.containerClass = containerClass;
 		this.typeArgumentIndex = typeArgumentIndex;
-		this.hashCode = buildHashCode();
 	}
 
 	//TODO It would be nicer if we could return PropertyNode
@@ -208,7 +207,7 @@ public class NodeImpl
 		);
 	}
 
-	public static NodeImpl setIndex(NodeImpl node, Integer index) {
+	public static NodeImpl makeIterableAndSetIndex(NodeImpl node, Integer index) {
 		return new NodeImpl(
 				node.name,
 				node.parent,
@@ -224,7 +223,7 @@ public class NodeImpl
 		);
 	}
 
-	public static NodeImpl setMapKey(NodeImpl node, Object key) {
+	public static NodeImpl makeIterableAndSetMapKey(NodeImpl node, Object key) {
 		return new NodeImpl(
 				node.name,
 				node.parent,
@@ -440,7 +439,6 @@ public class NodeImpl
 		result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
 		result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
 		result = prime * result + ( ( parameterTypes == null ) ? 0 : Arrays.hashCode( parameterTypes ) );
-		result = prime * result + ( ( parent == null ) ? 0 : parent.hashCode() );
 		result = prime * result + ( ( containerClass == null ) ? 0 : containerClass.hashCode() );
 		result = prime * result + ( ( typeArgumentIndex == null ) ? 0 : typeArgumentIndex.hashCode() );
 		return result;
@@ -448,6 +446,10 @@ public class NodeImpl
 
 	@Override
 	public int hashCode() {
+		if ( hashCode == -1 ) {
+			hashCode = buildHashCode();
+		}
+
 		return hashCode;
 	}
 
@@ -523,14 +525,6 @@ public class NodeImpl
 			}
 		}
 		else if ( !Arrays.equals( parameterTypes, other.parameterTypes ) ) {
-			return false;
-		}
-		if ( parent == null ) {
-			if ( other.parent != null ) {
-				return false;
-			}
-		}
-		else if ( !parent.equals( other.parent ) ) {
 			return false;
 		}
 		return true;

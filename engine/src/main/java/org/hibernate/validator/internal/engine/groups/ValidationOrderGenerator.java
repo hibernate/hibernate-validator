@@ -31,13 +31,6 @@ public class ValidationOrderGenerator {
 
 	private final ConcurrentMap<Class<?>, Sequence> resolvedSequences = new ConcurrentHashMap<Class<?>, Sequence>();
 
-	private final DefaultValidationOrder validationOrderForDefaultGroup;
-
-	public ValidationOrderGenerator() {
-		validationOrderForDefaultGroup = new DefaultValidationOrder();
-		validationOrderForDefaultGroup.insertGroup( Group.DEFAULT_GROUP );
-	}
-
 	/**
 	 * Creates a {@link ValidationOrder} for the given validation group.
 	 *
@@ -49,6 +42,10 @@ public class ValidationOrderGenerator {
 	 * @return a {@link ValidationOrder} for the given validation group
 	 */
 	public ValidationOrder getValidationOrder(Class<?> group, boolean expand) {
+		if ( Default.class.equals( group ) ) {
+			return ValidationOrder.DEFAULT_GROUP;
+		}
+
 		if ( expand ) {
 			return getValidationOrder( Arrays.<Class<?>>asList( group ) );
 		}
@@ -74,7 +71,7 @@ public class ValidationOrderGenerator {
 		// HV-621 - if we deal with the Default group we return the default ValidationOrder. No need to
 		// process Default as other groups which saves several reflection calls (HF)
 		if ( groups.size() == 1 && groups.contains( Default.class ) ) {
-			return validationOrderForDefaultGroup;
+			return ValidationOrder.DEFAULT_GROUP;
 		}
 
 		for ( Class<?> clazz : groups ) {

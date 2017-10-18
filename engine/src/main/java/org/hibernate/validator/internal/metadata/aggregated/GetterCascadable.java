@@ -10,7 +10,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -50,7 +50,7 @@ public class GetterCascadable implements Cascadable {
 	}
 
 	@Override
-	public void appendTo(PathImpl path) {
+	public void appendTo(PathBuilder path) {
 		path.addPropertyNode( propertyName );
 	}
 

@@ -85,6 +85,14 @@ a shared _ValidatorFactory_ and once the factory is recreated on each invocation
 
 Simple bean with cascaded validation which gets executed over and over.
 
+### [CascadedWithLotsOfItemsValidation](https://github.com/hibernate/hibernate-validator/blob/master/performance/src/main/java/org/hibernate/validator/performance/cascaded/CascadedWithLotsOfItemsValidation.java)
+
+Validation of a bean containing a lot of beans to cascade to.
+
+### [CascadedWithLotsOfItemsAndMoreConstraintsValidation](https://github.com/hibernate/hibernate-validator/blob/master/performance/src/main/java/org/hibernate/validator/performance/cascaded/CascadedWithLotsOfItemsAndMoreConstraintsValidation.java)
+
+This test has a few more constraints than the previous one, allowing to test our hypothesis in more realistic situation.
+
 ### [StatisticalValidation](https://github.com/hibernate/hibernate-validator/blob/master/performance/src/main/java/org/hibernate/validator/performance/statistical/StatisticalValidation.java)
 
 A number of _TestEntity_s is created where each entity contains a property for each built-in constraint type and also a reference

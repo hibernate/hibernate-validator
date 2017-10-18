@@ -15,7 +15,7 @@ import java.util.Set;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -94,7 +94,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	}
 
 	@Override
-	public void appendTo(PathImpl path) {
+	public void appendTo(PathBuilder path) {
 		path.addParameterNode( getName(), getIndex() );
 	}
 

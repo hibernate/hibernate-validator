@@ -15,7 +15,7 @@ import java.util.Set;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ReturnValueDescriptor;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
@@ -90,7 +90,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	}
 
 	@Override
-	public void appendTo(PathImpl path) {
+	public void appendTo(PathBuilder path) {
 		path.addReturnValueNode();
 	}
 

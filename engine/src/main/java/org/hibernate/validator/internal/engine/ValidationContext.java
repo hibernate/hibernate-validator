@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.reflect.Executable;
@@ -31,12 +30,12 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.IdentitySet;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -91,20 +90,14 @@ public class ValidationContext<T> {
 	private final Object executableReturnValue;
 
 	/**
-	 * Maps a group to an identity set to keep track of already validated objects. We have to make sure
-	 * that each object gets only validated once per group and property path.
+	 * The set of already processed unit of works. See {@link ProcessedUnit}.
 	 */
-	private final Map<Class<?>, IdentitySet> processedBeansPerGroup;
+	private final Set<Object> processedUnits;
 
 	/**
 	 * Maps an object to a list of paths in which it has been validated. The objects are the bean instances.
 	 */
 	private final Map<Object, Set<PathImpl>> processedPathsPerBean;
-
-	/**
-	 * Maps processed constraints to the bean and path for which they have been processed.
-	 */
-	private final Map<BeanAndPath, IdentitySet> processedMetaConstraints;
 
 	/**
 	 * Contains all failing constraints so far.
@@ -174,9 +167,8 @@ public class ValidationContext<T> {
 		this.executableParameters = executableParameters;
 		this.executableReturnValue = executableReturnValue;
 
-		this.processedBeansPerGroup = newHashMap();
+		this.processedUnits = new HashSet<>();
 		this.processedPathsPerBean = new IdentityHashMap<>();
-		this.processedMetaConstraints = newHashMap();
 		this.failingConstraintViolations = newHashSet();
 	}
 
@@ -294,7 +286,7 @@ public class ValidationContext<T> {
 				constraintViolationCreationContext.getExpressionVariables()
 		);
 		// at this point we make a copy of the path to avoid side effects
-		Path path = PathImpl.createCopy( constraintViolationCreationContext.getPath() );
+		Path path = constraintViolationCreationContext.getPath().build();
 		Object dynamicPayload = constraintViolationCreationContext.getDynamicPayload();
 		if ( executableParameters != null ) {
 			return ConstraintViolationImpl.forParameterValidation(
@@ -349,22 +341,11 @@ public class ValidationContext<T> {
 	}
 
 	public boolean hasMetaConstraintBeenProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint) {
-		// TODO switch to proper multi key map (HF)
-		IdentitySet processedConstraints = processedMetaConstraints.get( new BeanAndPath( bean, path ) );
-		return processedConstraints != null && processedConstraints.contains( metaConstraint );
+		return processedUnits.contains( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
 	}
 
 	public void markConstraintProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint) {
-		// TODO switch to proper multi key map (HF)
-		BeanAndPath beanAndPath = new BeanAndPath( bean, path );
-		if ( processedMetaConstraints.containsKey( beanAndPath ) ) {
-			processedMetaConstraints.get( beanAndPath ).add( metaConstraint );
-		}
-		else {
-			IdentitySet set = new IdentitySet();
-			set.add( metaConstraint );
-			processedMetaConstraints.put( beanAndPath, set );
-		}
+		processedUnits.add( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
 	}
 
 	public String getValidatedProperty() {
@@ -443,33 +424,17 @@ public class ValidationContext<T> {
 	}
 
 	private boolean isAlreadyValidatedForCurrentGroup(Object value, Class<?> group) {
-		IdentitySet objectsProcessedInCurrentGroups = processedBeansPerGroup.get( group );
-		return objectsProcessedInCurrentGroups != null && objectsProcessedInCurrentGroups.contains( value );
+		return processedUnits.contains( new BeanGroupProcessedUnit( value, group ) );
 	}
 
-	private void markCurrentBeanAsProcessedForCurrentPath(Object value, PathImpl path) {
+	private void markCurrentBeanAsProcessedForCurrentPath(Object bean, PathBuilder path) {
 		// HV-1031 The path object is mutated as we traverse the object tree, hence copy it before saving it
-		path = PathImpl.createCopy( path );
-
-		if ( processedPathsPerBean.containsKey( value ) ) {
-			processedPathsPerBean.get( value ).add( path );
-		}
-		else {
-			Set<PathImpl> set = new HashSet<>();
-			set.add( path );
-			processedPathsPerBean.put( value, set );
-		}
+		processedPathsPerBean.computeIfAbsent( bean, b -> new HashSet<>() )
+				.add( path.build() );
 	}
 
-	private void markCurrentBeanAsProcessedForCurrentGroup(Object value, Class<?> group) {
-		if ( processedBeansPerGroup.containsKey( group ) ) {
-			processedBeansPerGroup.get( group ).add( value );
-		}
-		else {
-			IdentitySet set = new IdentitySet();
-			set.add( value );
-			processedBeansPerGroup.put( group, set );
-		}
+	private void markCurrentBeanAsProcessedForCurrentGroup(Object bean, Class<?> group) {
+		processedUnits.add( new BeanGroupProcessedUnit( bean, group ) );
 	}
 
 	/**
@@ -609,15 +574,16 @@ public class ValidationContext<T> {
 		}
 	}
 
-	private static final class BeanAndPath {
-		private final Object bean;
-		private final Path path;
-		private final int hashCode;
+	private static final class BeanGroupProcessedUnit {
 
-		private BeanAndPath(Object bean, Path path) {
+		// these fields are final but we don't mark them as final as an optimization
+		private Object bean;
+		private Class<?> group;
+		private int hashCode;
+
+		private BeanGroupProcessedUnit(Object bean, Class<?> group) {
 			this.bean = bean;
-			this.path = path;
-			// pre-calculate hash code, the class is immutable and hashCode is needed often
+			this.group = group;
 			this.hashCode = createHashCode();
 		}
 
@@ -626,16 +592,67 @@ public class ValidationContext<T> {
 			if ( this == o ) {
 				return true;
 			}
-			if ( o == null || getClass() != o.getClass() ) {
+			if ( o == null || getClass() != BeanGroupProcessedUnit.class ) {
 				return false;
 			}
 
-			BeanAndPath that = (BeanAndPath) o;
+			BeanGroupProcessedUnit that = (BeanGroupProcessedUnit) o;
+
+			if ( bean != that.bean ) {  // instance equality
+				return false;
+			}
+			if ( !group.equals( that.group ) ) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			return hashCode;
+		}
+
+		private int createHashCode() {
+			int result = System.identityHashCode( bean );
+			result = 31 * result + group.hashCode();
+			return result;
+		}
+	}
+
+	private static final class BeanPathMetaConstraintProcessedUnit {
+
+		// these fields are final but we don't mark them as final as an optimization
+		private Object bean;
+		private Path path;
+		private MetaConstraint<?> metaConstraint;
+		private int hashCode;
+
+		private BeanPathMetaConstraintProcessedUnit(Object bean, Path path, MetaConstraint<?> metaConstraint) {
+			this.bean = bean;
+			this.path = path;
+			this.metaConstraint = metaConstraint;
+			this.hashCode = createHashCode();
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || getClass() != BeanPathMetaConstraintProcessedUnit.class ) {
+				return false;
+			}
+
+			BeanPathMetaConstraintProcessedUnit that = (BeanPathMetaConstraintProcessedUnit) o;
 
 			if ( bean != that.bean ) {  // instance equality
 				return false;
 			}
 			if ( !path.equals( that.path ) ) {
+				return false;
+			}
+			if ( metaConstraint != that.metaConstraint ) {
 				return false;
 			}
 
@@ -650,6 +667,7 @@ public class ValidationContext<T> {
 		private int createHashCode() {
 			int result = System.identityHashCode( bean );
 			result = 31 * result + path.hashCode();
+			result = 31 * result + System.identityHashCode( metaConstraint );
 			return result;
 		}
 	}

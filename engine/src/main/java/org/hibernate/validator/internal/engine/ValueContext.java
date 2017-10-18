@@ -11,7 +11,7 @@ import java.lang.reflect.TypeVariable;
 
 import javax.validation.groups.Default;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.PathBuilder;
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -52,7 +52,7 @@ public class ValueContext<T, V> {
 	/**
 	 * The current property path we are validating.
 	 */
-	private PathImpl propertyPath;
+	private final PathBuilder propertyPath;
 
 	/**
 	 * The current group we are validating.
@@ -72,7 +72,7 @@ public class ValueContext<T, V> {
 	private ElementType elementType;
 
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(BeanMetaDataManager beanMetaDataManager,
-			ExecutableParameterNameProvider parameterNameProvider, T value, Validatable validatable, PathImpl propertyPath) {
+			ExecutableParameterNameProvider parameterNameProvider, T value, Validatable validatable, PathBuilder propertyPath) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanType = (Class<T>) value.getClass();
 		return new ValueContext<>( parameterNameProvider, value, rootBeanType, beanMetaDataManager.getBeanMetaData( rootBeanType ), validatable, propertyPath );
@@ -80,24 +80,24 @@ public class ValueContext<T, V> {
 
 	@SuppressWarnings("unchecked")
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider, T value,
-			BeanMetaData<?> currentBeanMetaData, PathImpl propertyPath) {
+			BeanMetaData<?> currentBeanMetaData, PathBuilder propertyPath) {
 		Class<T> rootBeanType = (Class<T>) value.getClass();
 		return new ValueContext<>( parameterNameProvider, value, rootBeanType, (BeanMetaData<T>) currentBeanMetaData, currentBeanMetaData, propertyPath );
 	}
 
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(BeanMetaDataManager beanMetaDataManager,
-			ExecutableParameterNameProvider parameterNameProvider, Class<T> rootBeanType, Validatable validatable, PathImpl propertyPath) {
+			ExecutableParameterNameProvider parameterNameProvider, Class<T> rootBeanType, Validatable validatable, PathBuilder propertyPath) {
 		BeanMetaData<T> rootBeanMetaData = rootBeanType != null ? beanMetaDataManager.getBeanMetaData( rootBeanType ) : null;
 		return new ValueContext<>( parameterNameProvider, null, rootBeanType, rootBeanMetaData, validatable, propertyPath );
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider, Class<T> currentBeanType,
-			BeanMetaData<?> currentBeanMetaData, PathImpl propertyPath) {
+			BeanMetaData<?> currentBeanMetaData, PathBuilder propertyPath) {
 		return new ValueContext<>( parameterNameProvider, null, currentBeanType, (BeanMetaData<T>) currentBeanMetaData, currentBeanMetaData, propertyPath );
 	}
 
-	private ValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, Class<T> currentBeanType, BeanMetaData<T> currentBeanMetaData, Validatable validatable, PathImpl propertyPath) {
+	private ValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, Class<T> currentBeanType, BeanMetaData<T> currentBeanMetaData, Validatable validatable, PathBuilder propertyPath) {
 		this.parameterNameProvider = parameterNameProvider;
 		this.currentBean = currentBean;
 		this.currentBeanType = currentBeanType;
@@ -106,7 +106,7 @@ public class ValueContext<T, V> {
 		this.propertyPath = propertyPath;
 	}
 
-	public final PathImpl getPropertyPath() {
+	public final PathBuilder getPropertyPath() {
 		return propertyPath;
 	}
 
@@ -138,33 +138,27 @@ public class ValueContext<T, V> {
 	}
 
 	public final void appendNode(Cascadable node) {
-		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		node.appendTo( newPath );
-		propertyPath = newPath;
+		node.appendTo( propertyPath );
 	}
 
 	public final void appendNode(ConstraintLocation location) {
-		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		location.appendTo( parameterNameProvider, newPath );
-		propertyPath = newPath;
+		location.appendTo( parameterNameProvider, propertyPath );
 	}
 
 	public final void appendTypeParameterNode(String nodeName) {
-		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		newPath.addContainerElementNode( nodeName );
-		propertyPath = newPath;
+		propertyPath.addContainerElementNode( nodeName );
 	}
 
 	public final void markCurrentPropertyAsIterable() {
 		propertyPath.makeLeafNodeIterable();
 	}
 
-	public final void setKey(Object key) {
-		propertyPath.setLeafNodeMapKey( key );
+	public final void markCurrentPropertyAsIterableAndSetKey(Object key) {
+		propertyPath.makeLeafNodeIterableAndSetMapKey( key );
 	}
 
-	public final void setIndex(Integer index) {
-		propertyPath.setLeafNodeIndex( index );
+	public final void markCurrentPropertyAsIterableAndSetIndex(Integer index) {
+		propertyPath.makeLeafNodeIterableAndSetIndex( index );
 	}
 
 	/**
@@ -192,7 +186,7 @@ public class ValueContext<T, V> {
 	}
 
 	public final void setCurrentValidatedValue(V currentValue) {
-		propertyPath.setLeafNodeValue( currentValue );
+		propertyPath.setLeafNodeValueIfRequired( currentValue );
 		this.currentValue = currentValue;
 	}
 
@@ -209,11 +203,13 @@ public class ValueContext<T, V> {
 	}
 
 	public final ValueState<V> getCurrentValueState() {
-		return new ValueState<V>( propertyPath, currentValue );
+		return new ValueState<>( currentValue );
 	}
 
-	public final void resetValueState(ValueState<V> valueState) {
-		this.propertyPath = valueState.propertyPath;
+	public final void resetValueState(ValueState<V> valueState, boolean resetPath) {
+		if ( resetPath ) {
+			this.propertyPath.removeLeafNode();
+		}
 		this.currentValue = valueState.currentValue;
 	}
 
@@ -238,12 +234,9 @@ public class ValueContext<T, V> {
 
 	public static class ValueState<V> {
 
-		private final PathImpl propertyPath;
-
 		private final V currentValue;
 
-		private ValueState(PathImpl propertyPath, V currentValue) {
-			this.propertyPath = propertyPath;
+		private ValueState(V currentValue) {
 			this.currentValue = currentValue;
 		}
 	}
