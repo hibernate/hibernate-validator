@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.script.ScriptEngine;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
 
@@ -21,8 +22,9 @@ import org.hibernate.validator.constraints.ScriptAssert;
  * {@link ScriptEngine}s. It can also be any user specific implementation.
  *
  * @author Marko Bekhta
- * @since 6.1
+ * @since 6.0.3
  */
+@Incubating
 public interface ScriptEvaluator {
 
 	/**

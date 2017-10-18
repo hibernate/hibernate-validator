@@ -11,6 +11,8 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.script.ScriptEngineManager;
 
+import org.hibernate.validator.Incubating;
+
 /**
  * Basic cacheable factory responsible for the creation of {@link ScriptEvaluator}s. This
  * class is thread-safe. Caches {@code ScriptEvaluator} when they are requested.
@@ -18,7 +20,9 @@ import javax.script.ScriptEngineManager;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Marko Bekhta
+ * @since 6.0.3
  */
+@Incubating
 public abstract class AbstractCachingScriptEvaluatorFactory implements ScriptEvaluatorFactory {
 
 	/**

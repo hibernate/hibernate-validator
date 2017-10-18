@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.script.ScriptEngine;
 import javax.script.SimpleBindings;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -19,7 +20,9 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  *
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
+ * @since 6.0.3
  */
+@Incubating
 public class ScriptEngineScriptEvaluator implements ScriptEvaluator {
 
 	private static final Log LOG = LoggerFactory.make();

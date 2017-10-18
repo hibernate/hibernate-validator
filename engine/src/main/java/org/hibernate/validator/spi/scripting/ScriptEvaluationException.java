@@ -8,12 +8,15 @@ package org.hibernate.validator.spi.scripting;
 
 import javax.validation.ValidationException;
 
+import org.hibernate.validator.Incubating;
+
 /**
  * Exception raised when an error occurs during the evaluation of a script.
  *
  * @author Marko Bekhta
- * @since 6.1
+ * @since 6.0.3
  */
+@Incubating
 public class ScriptEvaluationException extends ValidationException {
 
 	public ScriptEvaluationException() {

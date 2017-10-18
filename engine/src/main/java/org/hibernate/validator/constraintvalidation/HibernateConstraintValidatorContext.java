@@ -8,6 +8,7 @@ package org.hibernate.validator.constraintvalidation;
 
 import javax.validation.ConstraintValidatorContext;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
@@ -122,7 +123,8 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 * @throws ScriptEvaluatorNotFoundException in case when no {@link ScriptEvaluator} was
 	 * found for a given {@code languageName}.
 	 *
-	 * @since 6.1
+	 * @since 6.0.3
 	 */
+	@Incubating
 	ScriptEvaluator getScriptEvaluatorForLanguage(String languageName);
 }

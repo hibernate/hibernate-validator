@@ -81,8 +81,9 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * {@link ScriptAssert} and {@link ParameterScriptAssert}
 	 * constraints. A fully qualified name of a class implementing  {@link ScriptEvaluatorFactory} is expected as a value.
 	 *
-	 * @since 6.1
+	 * @since 6.0.3
 	 */
+	@Incubating
 	String SCRIPT_EVALUATOR_FACTORY_CLASSNAME = "hibernate.validator.script_evaluator_factory";
 
 	/**
@@ -259,7 +260,8 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 *
 	 * @return {@code this} following the chaining method pattern
 	 *
-	 * @since 6.1
+	 * @since 6.0.3
 	 */
+	@Incubating
 	HibernateValidatorConfiguration scriptEvaluatorFactory(ScriptEvaluatorFactory scriptEvaluatorFactory);
 }

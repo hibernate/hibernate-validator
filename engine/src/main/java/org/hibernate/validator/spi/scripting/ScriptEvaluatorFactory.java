@@ -8,6 +8,7 @@ package org.hibernate.validator.spi.scripting;
 
 import javax.validation.ValidatorFactory;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
 
@@ -16,8 +17,9 @@ import org.hibernate.validator.constraints.ScriptAssert;
  * {@link ScriptAssert} and {@link ParameterScriptAssert} constraints.
  *
  * @author Marko Bekhta
- * @since 6.1
+ * @since 6.0.3
  */
+@Incubating
 public interface ScriptEvaluatorFactory {
 
 	/**

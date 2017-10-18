@@ -28,8 +28,9 @@ public interface HibernateValidatorFactory extends ValidatorFactory {
 	 *
 	 * @return A {@link ScriptEvaluatorFactory} instance
 	 *
-	 * @since 6.1
+	 * @since 6.0.3
 	 */
+	@Incubating
 	ScriptEvaluatorFactory getScriptEvaluatorFactory();
 
 	/**

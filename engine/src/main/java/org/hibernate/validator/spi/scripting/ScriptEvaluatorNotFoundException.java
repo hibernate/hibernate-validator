@@ -8,12 +8,15 @@ package org.hibernate.validator.spi.scripting;
 
 import javax.validation.ValidationException;
 
+import org.hibernate.validator.Incubating;
+
 /**
  * Exception raised when a script evaluator cannot be found for a given language.
  *
  * @author Marko Bekhta
- * @since 6.1
+ * @since 6.0.3
  */
+@Incubating
 public class ScriptEvaluatorNotFoundException extends ValidationException {
 
 	public ScriptEvaluatorNotFoundException() {
