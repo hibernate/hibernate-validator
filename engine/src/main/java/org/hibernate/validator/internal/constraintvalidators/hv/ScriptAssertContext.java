@@ -12,8 +12,8 @@ import java.util.Map;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.scripting.ScriptEvaluationException;
-import org.hibernate.validator.scripting.ScriptEvaluator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
+import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 
 /**
  * Context used by validator implementations dealing with script expressions. Instances are thread-safe and can be re-used

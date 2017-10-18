@@ -41,9 +41,6 @@ import javax.validation.valueextraction.ValueExtractorDeclarationException;
 import javax.validation.valueextraction.ValueExtractorDefinitionException;
 import javax.xml.stream.XMLStreamException;
 
-import org.hibernate.validator.scripting.ScriptEvaluationException;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.ScriptEvaluatorNotFoundException;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -53,6 +50,9 @@ import org.hibernate.validator.internal.util.logging.formatter.CollectionOfObjec
 import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
 import org.hibernate.validator.internal.xml.ContainerElementTypePath;
+import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;

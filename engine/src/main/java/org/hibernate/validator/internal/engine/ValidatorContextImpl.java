@@ -18,12 +18,12 @@ import javax.validation.Validator;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorContext;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * @author Emmanuel Bernard

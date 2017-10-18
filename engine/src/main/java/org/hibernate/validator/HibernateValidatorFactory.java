@@ -9,10 +9,10 @@ package org.hibernate.validator;
 
 import javax.validation.ValidatorFactory;
 
-import org.hibernate.validator.scripting.ScriptEvaluator;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.spi.scripting.ScriptEvaluator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * Provides Hibernate Validator extensions to {@link ValidatorFactory}.

@@ -13,11 +13,11 @@ import javax.validation.TraversableResolver;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.scripting.ScriptEvaluator;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * Uniquely identifies Hibernate Validator in the Bean Validation bootstrap

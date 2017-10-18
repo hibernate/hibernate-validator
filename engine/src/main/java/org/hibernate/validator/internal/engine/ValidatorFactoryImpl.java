@@ -54,8 +54,8 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is the Hibernate Validator default

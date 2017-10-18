@@ -22,11 +22,11 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.scripting.AbstractCachingScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.ScriptEngineScriptEvaluator;
-import org.hibernate.validator.scripting.ScriptEvaluator;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.ScriptEvaluatorNotFoundException;
+import org.hibernate.validator.spi.scripting.AbstractCachingScriptEvaluatorFactory;
+import org.hibernate.validator.spi.scripting.ScriptEngineScriptEvaluator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 

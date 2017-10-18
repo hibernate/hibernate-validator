@@ -5,9 +5,9 @@ package org.hibernate.validator.referenceguide.chapter09;
 
 import java.util.Map;
 
-import org.hibernate.validator.scripting.AbstractCachingScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.ScriptEvaluationException;
-import org.hibernate.validator.scripting.ScriptEvaluator;
+import org.hibernate.validator.spi.scripting.AbstractCachingScriptEvaluatorFactory;
+import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
+import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.EvaluationException;
 import org.springframework.expression.Expression;

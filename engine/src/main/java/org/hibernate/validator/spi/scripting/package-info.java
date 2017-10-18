@@ -8,8 +8,8 @@
 /**
  * <p>This package provides support for customization of script evaluation in {@code ScriptAssert}
  * and {@code ParameterScriptAssert} constraints.</p>
- * <p>This package is part of the public Hibernate Validator API.</p>
+ * <p>This package is part of the public Hibernate Validator SPI.</p>
  *
  * @author Marko Bekhta
  */
-package org.hibernate.validator.scripting;
+package org.hibernate.validator.spi.scripting;

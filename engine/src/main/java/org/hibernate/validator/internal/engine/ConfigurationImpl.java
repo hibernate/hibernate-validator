@@ -51,8 +51,8 @@ import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * Hibernate specific {@code Configuration} implementation.

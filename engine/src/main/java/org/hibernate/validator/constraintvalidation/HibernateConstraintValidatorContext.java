@@ -8,9 +8,9 @@ package org.hibernate.validator.constraintvalidation;
 
 import javax.validation.ConstraintValidatorContext;
 
-import org.hibernate.validator.scripting.ScriptEvaluator;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.ScriptEvaluatorNotFoundException;
+import org.hibernate.validator.spi.scripting.ScriptEvaluator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
 
 /**
  * A custom {@link ConstraintValidatorContext} which allows to set additional message parameters for

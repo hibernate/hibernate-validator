@@ -1,7 +1,7 @@
 package org.hibernate.validator.referenceguide.chapter09;
 
-import org.hibernate.validator.scripting.ScriptEvaluator;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.spi.scripting.ScriptEvaluator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * @author Marko Bekhta

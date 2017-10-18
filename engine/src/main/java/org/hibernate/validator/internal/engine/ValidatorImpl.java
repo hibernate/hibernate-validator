@@ -36,7 +36,6 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.valueextraction.ValueExtractor;
 
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.Group;
@@ -72,6 +71,7 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * The main Bean Validation class. This is the core processing class of Hibernate Validator.

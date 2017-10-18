@@ -27,7 +27,6 @@ import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
@@ -38,6 +37,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * Context object keeping track of all required data for a validation call.

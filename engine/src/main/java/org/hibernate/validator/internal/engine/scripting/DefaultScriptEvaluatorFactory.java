@@ -15,10 +15,10 @@ import javax.script.ScriptEngineManager;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.scripting.AbstractCachingScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.ScriptEngineScriptEvaluator;
-import org.hibernate.validator.scripting.ScriptEvaluationException;
-import org.hibernate.validator.scripting.ScriptEvaluator;
+import org.hibernate.validator.spi.scripting.AbstractCachingScriptEvaluatorFactory;
+import org.hibernate.validator.spi.scripting.ScriptEngineScriptEvaluator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
+import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 
 /**
  * Factory responsible for the creation of JSR 223 based {@link ScriptEngineScriptEvaluator}s. This

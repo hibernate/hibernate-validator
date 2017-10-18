@@ -9,11 +9,11 @@ package org.hibernate.validator.osgi.scripting;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import org.hibernate.validator.scripting.AbstractCachingScriptEvaluatorFactory;
-import org.hibernate.validator.scripting.ScriptEngineScriptEvaluator;
-import org.hibernate.validator.scripting.ScriptEvaluationException;
-import org.hibernate.validator.scripting.ScriptEvaluator;
-import org.hibernate.validator.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.spi.scripting.AbstractCachingScriptEvaluatorFactory;
+import org.hibernate.validator.spi.scripting.ScriptEngineScriptEvaluator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
+import org.hibernate.validator.spi.scripting.ScriptEvaluator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * {@link ScriptEvaluatorFactory} that allows you to pass multiple {@link ClassLoader}s that will be used
