@@ -25,11 +25,13 @@ public class CodePointLengthValidator implements ConstraintValidator<CodePointLe
 
 	private int min;
 	private int max;
+	private CodePointLength.NormalizationStrategy normalizationStrategy;
 
 	@Override
 	public void initialize(CodePointLength parameters) {
 		min = parameters.min();
 		max = parameters.max();
+		normalizationStrategy = parameters.normalizationStrategy();
 		validateParameters();
 	}
 
@@ -38,7 +40,7 @@ public class CodePointLengthValidator implements ConstraintValidator<CodePointLe
 		if ( value == null ) {
 			return true;
 		}
-		String stringValue = value.toString();
+		String stringValue = normalizationStrategy.normalize( value ).toString();
 		int length = stringValue.codePointCount( 0, stringValue.length() );
 		return length >= min && length <= max;
 	}

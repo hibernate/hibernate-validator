@@ -31,4 +31,10 @@ public class CodePointLengthDef extends ConstraintDef<CodePointLengthDef, CodePo
 		addParameter( "max", max );
 		return this;
 	}
+
+	public CodePointLengthDef normalizationStrategy(CodePointLength.NormalizationStrategy strategy) {
+		addParameter( "normalizationStrategy", strategy );
+		return this;
+	}
+
 }
