@@ -147,6 +147,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Bootstrapp
 ----
 ====
 
+[[section-validator-factory-traversable-resolver]]
 ==== `TraversableResolver`
 
 In some cases the validation engine should not access the state of a bean property.
