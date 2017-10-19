@@ -1,6 +1,21 @@
 Hibernate Validator Changelog
 =============================
 
+5.4.2.Final (19-10-2017)
+-------------------------
+
+** Bug
+    * HV-1498 - engine               - Privilege escalation when running under the security manager
+    * HV-1494 - validators           - Hibernate Validator specific @NotEmpty used on return type throws an exception
+    * HV-1429 - integration          - Incorrect URL in Paranamer Karaf feature
+    * HV-1377 - annotation-processor - StackOverflowError during compilation with annotation-processor enabled
+    * HV-1352 - engine               - Incorrect value handler on trace logging
+    * HV-1293 - validators           - @Size validator is not declared for short[]
+
+** Improvement
+    * HV-1454 - build                - Support JDK 9 build 180
+    * HV-1294 - build                - hibernate-validator-cdi artefact is not OSGI'ed
+
 5.4.1.Final (16-03-2017)
 -------------------------
 
