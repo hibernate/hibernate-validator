@@ -1,6 +1,41 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.3.Final (19-10-2017)
+-------------------------
+
+** Bug
+    * HV-1494 - validators         - Hibernate Validator specific @NotEmpty used on return type throws an exception
+    * HV-1492 - engine             - Parameters passed in wrong order to log method
+    * HV-1490 - engine             - Feature detection in ConstraintHelper not consistent with what is required by HV
+    * HV-1485 - engine             - ConstraintViolationImpl is not serializable if the constraint can target a generic type (typically Collection)
+    * HV-1481 - engine             - @Valid ignores Iterables/Arrays returned by methods with a generic return type
+    * HV-1478 - build, integration - hibernate-validator-cdi has invalid OSGi manifest
+    * HV-1474 - engine             - Incorrect NodeImpl hashCode()/equals() contract
+    * HV-1184 - engine             - JaCoCo code coverage fails since ConstraintDescriptorImpl#buildAnnotationParameterMap() does not filter out synthetic methods
+
+** Improvement
+    * HV-1499 - documentation      - Update the getting started guide with the latest additions to the policy file
+    * HV-1487 - engine             - Add an option to disable the TraversableResolver result cache
+    * HV-1486 - engine             - Add a toString() to AnnotationParameters
+    * HV-1482 - engine             - Reduce visibility of some of the value extractors
+    * HV-1480 - engine             - Performance and memory allocation improvements
+    * HV-1479 - validators         - Document requirement of java.xml.bind module on Java 9 when using XML descriptors
+    * HV-1476 - build              - Update checkstyle to latest
+    * HV-1475 - build              - Update Maven dependencies
+    * HV-1469 - engine             - ScriptEvaluatorFactory should be scoped to the validator factory
+    * HV-1417 - documentation      - Documentation - Discuss ContainerElementTypeDescriptor and al.
+    * HV-1415 - documentation      - Documentation - Discuss the Path API
+    * HV-937 - documentation      - Make use of custom asciidoctor template to change numbering of examples and cross referencing in documentation
+
+** New Feature
+    * HV-1496 - engine             - Add @CodePointLength constraint that validates code point length
+    * HV-1463 - engine             - Make bootstrapping of script evaluators for @ScriptAssert more flexible
+
+** Task
+    * HV-1488 - integration        - Upgrade WildFly to 11.0.0.CR1
+    * HV-1464 - documentation      - Remove requirement for CLA
+
 6.0.2.Final (22-08-2017)
 -------------------------
 
