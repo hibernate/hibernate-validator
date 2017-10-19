@@ -195,15 +195,19 @@ These are the module names as declared using the `Automatic-Module-Name` header:
 These module names are preliminary and may be changed when providing real module descriptors in a future release.
 
 When using Bean Validation XML descriptors (_META-INF/validation.xml_ and/or constraint mapping files), the `java.xml.bind` module must be enabled.
-Do so by appending the following parameter to your _java_ invocation:
+Do so by appending `--add-modules java.xml.bind` to your _java_ invocation.
 
-.Enabling JAXB support on Java 9
+[WARNING]
 ====
-[source]
-[subs="verbatim,attributes"]
-----
---add-modules java.xml.bind
-----
+When using Hibernate Validator with CDI, be careful to not enable the `java.xml.ws.annotation` module of the JDK.
+This module contains a subset of the JSR 250 API ("Commons Annotations"), but some annotations such as `javax.annotation.Priority` are missing.
+This causes the method validation interceptor of Hibernate Validator to not be registered, i.e. method validation won't work.
+
+Instead, add the full JSR 250 API to the unnamed module (i.e. the classpath), e.g. by pulling in the _javax.annotation:javax.annotation-api_ dependency
+(there already is a transitive dependency to the JSR 250 API when depending on _org.hibernate.validator:hibernate-validator-cdi_).
+
+If you need to enable the `java.xml.ws.annotation` module for some reason, you should patch it with the contents of the full API
+by appending `--patch-module java.xml.ws.annotation=/path/to/complete-jsr250-api.jar` to your _java_ invocation.
 ====
 
 [[validator-gettingstarted-createmodel]]
