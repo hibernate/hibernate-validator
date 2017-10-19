@@ -35,6 +35,7 @@ import javax.validation.executable.ExecutableValidator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
+import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.Group;
@@ -1733,6 +1734,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		if ( member != null ) {
 			return member;
+		}
+
+		SecurityManager sm = System.getSecurityManager();
+		if ( sm != null ) {
+			sm.checkPermission( HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS );
 		}
 
 		Class<?> clazz = original.getDeclaringClass();
