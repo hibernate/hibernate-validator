@@ -31,7 +31,6 @@ public final class GetDeclaredField implements PrivilegedAction<Field> {
 	public Field run() {
 		try {
 			final Field field = clazz.getDeclaredField( fieldName );
-			field.setAccessible( true );
 			return field;
 		}
 		catch (NoSuchFieldException e) {
