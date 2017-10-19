@@ -26,9 +26,10 @@ import org.hibernate.validator.constraints.CodePointLength.List;
 
 
 /**
- * Validate that the code point count of character sequence is between min and max included.
+ * Validate that the code point length of a character sequence is between min and max included.
  *
  * @author Kazuki Shimizu
+ * @version 6.0.3
  */
 @Documented
 @Constraint(validatedBy = { })

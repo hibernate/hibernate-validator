@@ -14,13 +14,14 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 /**
- * Check that the code point length of character sequence is between min and max.
+ * Check that the code point length of a character sequence is between min and max.
  *
  * @author Kazuki Shimizu
+ * @version 6.0.3
  */
 public class CodePointLengthValidator implements ConstraintValidator<CodePointLength, CharSequence> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make();
 
 	private int min;
 	private int max;
@@ -44,13 +45,13 @@ public class CodePointLengthValidator implements ConstraintValidator<CodePointLe
 
 	private void validateParameters() {
 		if ( min < 0 ) {
-			throw log.getMinCannotBeNegativeException();
+			throw LOG.getMinCannotBeNegativeException();
 		}
 		if ( max < 0 ) {
-			throw log.getMaxCannotBeNegativeException();
+			throw LOG.getMaxCannotBeNegativeException();
 		}
 		if ( max < min ) {
-			throw log.getLengthCannotBeNegativeException();
+			throw LOG.getLengthCannotBeNegativeException();
 		}
 	}
 }
