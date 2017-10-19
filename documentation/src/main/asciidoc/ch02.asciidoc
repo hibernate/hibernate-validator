@@ -687,6 +687,10 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: Column length will be set to max
 
+`@CodePointLength(min=, max=, normalizationStrategy=)`:: Validates that code point length of the annotated character sequence is between `min` and `max` included. Validates normalized value if `normalizationStrategy` is set.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@LuhnCheck(startIndex= , endIndex=, checkDigitIndex=, ignoreNonDigitCharacters=)`:: Checks that the digits within the annotated character sequence pass the Luhn checksum algorithm (see also http://en.wikipedia.org/wiki/Luhn_algorithm[Luhn algorithm]). `startIndex` and `endIndex` allow to only run the algorithm on the specified sub-string. `checkDigitIndex` allows to use an arbitrary digit within the character sequence as the check digit. If not specified it is assumed that the check digit is part of the specified range. Last but not least, `ignoreNonDigitCharacters` allows to ignore non digit characters.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None

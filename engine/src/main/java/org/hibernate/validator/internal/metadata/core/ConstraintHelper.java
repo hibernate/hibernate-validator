@@ -52,6 +52,7 @@ import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import javax.validation.constraintvalidation.ValidationTarget;
 
+import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.EAN;
@@ -249,6 +250,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorprese
 import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForYear;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForYearMonth;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForZonedDateTime;
+import org.hibernate.validator.internal.constraintvalidators.hv.CodePointLengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
@@ -652,6 +654,7 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, EAN.class, EANValidator.class );
 		putConstraint( tmpConstraints, org.hibernate.validator.constraints.Email.class, org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator.class );
 		putConstraint( tmpConstraints, Length.class, LengthValidator.class );
+		putConstraint( tmpConstraints, CodePointLength.class, CodePointLengthValidator.class );
 		putConstraint( tmpConstraints, ModCheck.class, ModCheckValidator.class );
 		putConstraint( tmpConstraints, LuhnCheck.class, LuhnCheckValidator.class );
 		putConstraint( tmpConstraints, Mod10Check.class, Mod10CheckValidator.class );
