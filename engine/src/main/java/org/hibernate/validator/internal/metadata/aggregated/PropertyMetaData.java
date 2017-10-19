@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 
+import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -117,6 +118,11 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 	private static Member getAccessible(Member original) {
 		if ( ( (AccessibleObject) original ).isAccessible() ) {
 			return original;
+		}
+
+		SecurityManager sm = System.getSecurityManager();
+		if ( sm != null ) {
+			sm.checkPermission( HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS );
 		}
 
 		Class<?> clazz = original.getDeclaringClass();

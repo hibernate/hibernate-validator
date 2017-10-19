@@ -106,6 +106,8 @@ grant codeBase "file:path/to/hibernate-validator-{hvVersion}.jar" {
     permission java.lang.RuntimePermission "accessDeclaredMembers";
     permission java.lang.RuntimePermission "setContextClassLoader";
 
+    permission org.hibernate.validator.HibernateValidatorPermission "accessPrivateMembers";
+
     // Only needed when working with XML descriptors (validation.xml or XML constraint mappings)
     permission java.util.PropertyPermission "mapAnyUriToUri", "read";
 };
