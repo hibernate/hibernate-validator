@@ -327,9 +327,9 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	private int createHashCode() {
 		int result = interpolatedMessage != null ? interpolatedMessage.hashCode() : 0;
 		result = 31 * result + ( propertyPath != null ? propertyPath.hashCode() : 0 );
-		result = 31 * result + ( rootBean != null ? rootBean.hashCode() : 0 );
-		result = 31 * result + ( leafBeanInstance != null ? leafBeanInstance.hashCode() : 0 );
-		result = 31 * result + ( value != null ? value.hashCode() : 0 );
+		result = 31 * result + System.identityHashCode( rootBean );
+		result = 31 * result + System.identityHashCode( leafBeanInstance );
+		result = 31 * result + System.identityHashCode( value );
 		result = 31 * result + ( constraintDescriptor != null ? constraintDescriptor.hashCode() : 0 );
 		result = 31 * result + ( messageTemplate != null ? messageTemplate.hashCode() : 0 );
 		result = 31 * result + ( rootBeanClass != null ? rootBeanClass.hashCode() : 0 );
