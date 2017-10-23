@@ -18,7 +18,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeTest;

@@ -17,7 +17,7 @@ import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
+import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttribute;
 import org.testng.annotations.Test;
 
 /**
@@ -53,14 +53,14 @@ public class GetAnnotationsParameterTest {
 				return this.getClass();
 			}
 		};
-		String message = GetAnnotationParameter.action( testAnnotation, "message", String.class ).run();
+		String message = GetAnnotationAttribute.action( testAnnotation, "message", String.class ).run();
 		assertEquals( "test", message, "Wrong message" );
 
-		Class<?>[] group = GetAnnotationParameter.action( testAnnotation, "groups", Class[].class ).run();
+		Class<?>[] group = GetAnnotationAttribute.action( testAnnotation, "groups", Class[].class ).run();
 		assertEquals( group[0], Default.class, "Wrong message" );
 
 		try {
-			GetAnnotationParameter.action( testAnnotation, "message", Integer.class ).run();
+			GetAnnotationAttribute.action( testAnnotation, "message", Integer.class ).run();
 			fail();
 		}
 		catch (ValidationException e) {
@@ -68,7 +68,7 @@ public class GetAnnotationsParameterTest {
 		}
 
 		try {
-			GetAnnotationParameter.action( testAnnotation, "foo", Integer.class ).run();
+			GetAnnotationAttribute.action( testAnnotation, "foo", Integer.class ).run();
 			fail();
 		}
 		catch (ValidationException e) {

@@ -11,7 +11,7 @@ import static org.testng.Assert.assertEquals;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.testng.annotations.Test;
 
 
@@ -23,8 +23,8 @@ public class AnnotationFactoryTest {
 	@Test
 	public void createAnnotationProxy() {
 		AnnotationDescriptor.Builder<Size> descriptorBuilder = new AnnotationDescriptor.Builder<>( Size.class );
-		descriptorBuilder.setValue( "min", 5 );
-		descriptorBuilder.setValue( "max", 10 );
+		descriptorBuilder.setAttribute( "min", 5 );
+		descriptorBuilder.setAttribute( "max", 10 );
 
 		Size size = descriptorBuilder.build().annotation();
 
@@ -41,7 +41,7 @@ public class AnnotationFactoryTest {
 	@Test
 	public void createAnnotationProxyWithRequiredParameter() {
 		AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
-		descriptorBuilder.setValue( "regexp", ".*" );
+		descriptorBuilder.setAttribute( "regexp", ".*" );
 
 		Pattern pattern = descriptorBuilder.build().annotation();
 

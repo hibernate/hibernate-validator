@@ -14,7 +14,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.constraints.Positive;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.money.PositiveValidatorForMonetaryAmount;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.javamoney.moneta.Money;
 import org.testng.annotations.Test;
 

@@ -11,7 +11,7 @@ import static org.testng.Assert.assertTrue;
 
 import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidator;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.testng.annotations.Test;
 
@@ -115,12 +115,12 @@ public class ModCheckValidatorTest {
 
 	private ModCheck createModCheckAnnotation(ModCheck.ModType modType, int multiplier, int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {
 		AnnotationDescriptor.Builder<ModCheck> descriptorBuilder = new AnnotationDescriptor.Builder<>( ModCheck.class );
-		descriptorBuilder.setValue( "modType", modType );
-		descriptorBuilder.setValue( "multiplier", multiplier );
-		descriptorBuilder.setValue( "startIndex", start );
-		descriptorBuilder.setValue( "endIndex", end );
-		descriptorBuilder.setValue( "checkDigitPosition", checkDigitIndex );
-		descriptorBuilder.setValue( "ignoreNonDigitCharacters", ignoreNonDigits );
+		descriptorBuilder.setAttribute( "modType", modType );
+		descriptorBuilder.setAttribute( "multiplier", multiplier );
+		descriptorBuilder.setAttribute( "startIndex", start );
+		descriptorBuilder.setAttribute( "endIndex", end );
+		descriptorBuilder.setAttribute( "checkDigitPosition", checkDigitIndex );
+		descriptorBuilder.setAttribute( "ignoreNonDigitCharacters", ignoreNonDigits );
 
 		return descriptorBuilder.build().annotation();
 	}

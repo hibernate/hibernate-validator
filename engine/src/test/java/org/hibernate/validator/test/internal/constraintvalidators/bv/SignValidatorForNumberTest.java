@@ -55,7 +55,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.Posi
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForLong;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForShort;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.testng.annotations.Test;
 
 /**

@@ -27,7 +27,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -206,8 +206,8 @@ public class ResourceBundleMessageInterpolatorTest {
 	@TestForIssue(jiraKey = "HV-102")
 	public void testRecursiveMessageInterpolation() {
 		AnnotationDescriptor.Builder<Max> descriptorBuilder = new AnnotationDescriptor.Builder<>( Max.class );
-		descriptorBuilder.setValue( "message", "{replace.in.user.bundle1}" );
-		descriptorBuilder.setValue( "value", 10L );
+		descriptorBuilder.setAttribute( "message", "{replace.in.user.bundle1}" );
+		descriptorBuilder.setAttribute( "value", 10L );
 
 		AnnotationDescriptor<Max> descriptor = descriptorBuilder.build();
 
@@ -235,8 +235,8 @@ public class ResourceBundleMessageInterpolatorTest {
 	public void testCorrectMessageInterpolationIfParameterCannotBeReplaced() {
 		AnnotationDescriptor.Builder<Max> descriptorBuilder = new AnnotationDescriptor.Builder<>( Max.class );
 		String message = "Message should stay unchanged since {fubar} is not replaceable";
-		descriptorBuilder.setValue( "message", message );
-		descriptorBuilder.setValue( "value", 10L );
+		descriptorBuilder.setAttribute( "message", message );
+		descriptorBuilder.setAttribute( "value", 10L );
 
 		AnnotationDescriptor<Max> maxDescriptor = descriptorBuilder.build();
 

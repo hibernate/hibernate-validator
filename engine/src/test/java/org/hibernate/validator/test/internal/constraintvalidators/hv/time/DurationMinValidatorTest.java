@@ -26,7 +26,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.DurationMinDef;
 import org.hibernate.validator.constraints.time.DurationMin;
 import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMinValidator;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -121,8 +121,8 @@ public class DurationMinValidatorTest {
 
 	private void doTesting(boolean inclusive) {
 		AnnotationDescriptor.Builder<DurationMin> descriptorBuilder = new AnnotationDescriptor.Builder<>( DurationMin.class );
-		descriptorBuilder.setValue( "nanos", 100L );
-		descriptorBuilder.setValue( "inclusive", inclusive );
+		descriptorBuilder.setAttribute( "nanos", 100L );
+		descriptorBuilder.setAttribute( "inclusive", inclusive );
 		DurationMin annotation = descriptorBuilder.build().annotation();
 
 		DurationMinValidator validator = new DurationMinValidator();

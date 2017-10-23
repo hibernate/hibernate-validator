@@ -32,7 +32,7 @@ import org.hibernate.validator.cfg.defs.URLDef;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraintvalidators.RegexpURLValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
@@ -83,7 +83,7 @@ public class URLValidatorTest {
 
 	@Test
 	public void http_protocol_can_be_verified_explicitly() {
-		descriptorBuilder.setValue( "protocol", "http" );
+		descriptorBuilder.setAttribute( "protocol", "http" );
 		URL url = descriptorBuilder.build().annotation();
 
 		urlValidator.initialize( url );
@@ -95,7 +95,7 @@ public class URLValidatorTest {
 
 	@Test
 	public void file_protocol_can_be_verified_explicitly() {
-		descriptorBuilder.setValue( "protocol", "file" );
+		descriptorBuilder.setAttribute( "protocol", "file" );
 		URL url = descriptorBuilder.build().annotation();
 
 		urlValidator.initialize( url );
@@ -107,7 +107,7 @@ public class URLValidatorTest {
 
 	@Test
 	public void port_can_be_verified_explicitly() {
-		descriptorBuilder.setValue( "port", 21 );
+		descriptorBuilder.setAttribute( "port", 21 );
 		URL url = descriptorBuilder.build().annotation();
 
 		urlValidator.initialize( url );
@@ -119,7 +119,7 @@ public class URLValidatorTest {
 
 	@Test
 	public void host_can_be_verified_explicitly() {
-		descriptorBuilder.setValue( "host", "foobar.com" );
+		descriptorBuilder.setAttribute( "host", "foobar.com" );
 		URL url = descriptorBuilder.build().annotation();
 
 		urlValidator.initialize( url );
@@ -131,9 +131,9 @@ public class URLValidatorTest {
 
 	@Test
 	public void protocol_host_and_port_can_be_verified_explicitly() {
-		descriptorBuilder.setValue( "protocol", "http" );
-		descriptorBuilder.setValue( "host", "www.hibernate.org" );
-		descriptorBuilder.setValue( "port", 80 );
+		descriptorBuilder.setAttribute( "protocol", "http" );
+		descriptorBuilder.setAttribute( "host", "www.hibernate.org" );
+		descriptorBuilder.setAttribute( "port", 80 );
 		URL url = descriptorBuilder.build().annotation();
 
 		URLValidator validator = new URLValidator();

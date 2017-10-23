@@ -14,31 +14,31 @@ import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
 import java.util.Map;
 
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationParameters;
+import org.hibernate.validator.internal.util.annotation.AnnotationAttributes;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * @author Guillaume Smet
  */
-public final class GetAnnotationParameters implements PrivilegedAction<AnnotationParameters> {
+public final class GetAnnotationAttributes implements PrivilegedAction<AnnotationAttributes> {
 
 	private static final Log LOG = LoggerFactory.make();
 
 	private final Annotation annotation;
 
-	public static GetAnnotationParameters action(Annotation annotation) {
-		return new GetAnnotationParameters( annotation );
+	public static GetAnnotationAttributes action(Annotation annotation) {
+		return new GetAnnotationAttributes( annotation );
 	}
 
-	private GetAnnotationParameters(Annotation annotation) {
+	private GetAnnotationAttributes(Annotation annotation) {
 		this.annotation = annotation;
 	}
 
 	@Override
-	public AnnotationParameters run() {
+	public AnnotationAttributes run() {
 		final Method[] declaredMethods = annotation.annotationType().getDeclaredMethods();
-		Map<String, Object> parameters = newHashMap( declaredMethods.length );
+		Map<String, Object> attributes = newHashMap( declaredMethods.length );
 
 		for ( Method m : declaredMethods ) {
 			// HV-1184 Exclude synthetic methods potentially introduced by jacoco
@@ -48,15 +48,15 @@ public final class GetAnnotationParameters implements PrivilegedAction<Annotatio
 
 			m.setAccessible( true );
 
-			String parameterName = m.getName();
+			String attributeName = m.getName();
 
 			try {
-				parameters.put( m.getName(), m.invoke( annotation ) );
+				attributes.put( m.getName(), m.invoke( annotation ) );
 			}
 			catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw LOG.getUnableToGetAnnotationParameterException( parameterName, annotation.getClass(), e );
+				throw LOG.getUnableToGetAnnotationParameterException( attributeName, annotation.getClass(), e );
 			}
 		}
-		return new AnnotationParameters( parameters );
+		return new AnnotationAttributes( attributes );
 	}
 }

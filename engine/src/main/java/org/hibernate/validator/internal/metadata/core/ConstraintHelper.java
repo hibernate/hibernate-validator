@@ -273,7 +273,7 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
+import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttribute;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
@@ -812,7 +812,7 @@ public class ConstraintHelper {
 	 */
 	public <A extends Annotation> List<Annotation> getConstraintsFromMultiValueConstraint(A multiValueConstraint) {
 		Annotation[] annotations = run(
-				GetAnnotationParameter.action(
+				GetAnnotationAttribute.action(
 						multiValueConstraint,
 						"value",
 						Annotation[].class

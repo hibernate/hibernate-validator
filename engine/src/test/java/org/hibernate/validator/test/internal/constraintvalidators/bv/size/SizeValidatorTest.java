@@ -36,7 +36,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidat
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCollection;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForMap;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
@@ -172,9 +172,9 @@ public class SizeValidatorTest {
 
 	private <T> ConstraintValidator<Size, T> getValidatorMin1Max2(Class<?> validatorClass) throws Exception {
 		AnnotationDescriptor.Builder<Size> descriptorBuilder = new AnnotationDescriptor.Builder<>( Size.class );
-		descriptorBuilder.setValue( "min", 1 );
-		descriptorBuilder.setValue( "max", 2 );
-		descriptorBuilder.setValue( "message", "{validator.max}" );
+		descriptorBuilder.setAttribute( "min", 1 );
+		descriptorBuilder.setAttribute( "max", 2 );
+		descriptorBuilder.setAttribute( "message", "{validator.max}" );
 		Size m = descriptorBuilder.build().annotation();
 		@SuppressWarnings("unchecked")
 		ConstraintValidator<Size, T> validator = (ConstraintValidator<Size, T>) validatorClass.newInstance();

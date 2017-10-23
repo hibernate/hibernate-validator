@@ -24,7 +24,7 @@ import org.hibernate.validator.cfg.defs.Mod11CheckDef;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Mod11Check.ProcessingDirection;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
@@ -293,13 +293,13 @@ public class Mod11CheckValidatorTest {
 			char treatCheck11As,
 			ProcessingDirection processingDirection) {
 		AnnotationDescriptor.Builder<Mod11Check> descriptorBuilder = new AnnotationDescriptor.Builder<>( Mod11Check.class );
-		descriptorBuilder.setValue( "startIndex", start );
-		descriptorBuilder.setValue( "endIndex", end );
-		descriptorBuilder.setValue( "checkDigitIndex", checkDigitIndex );
-		descriptorBuilder.setValue( "ignoreNonDigitCharacters", ignoreNonDigits );
-		descriptorBuilder.setValue( "treatCheck10As", treatCheck10As );
-		descriptorBuilder.setValue( "treatCheck11As", treatCheck11As );
-		descriptorBuilder.setValue( "processingDirection", processingDirection );
+		descriptorBuilder.setAttribute( "startIndex", start );
+		descriptorBuilder.setAttribute( "endIndex", end );
+		descriptorBuilder.setAttribute( "checkDigitIndex", checkDigitIndex );
+		descriptorBuilder.setAttribute( "ignoreNonDigitCharacters", ignoreNonDigits );
+		descriptorBuilder.setAttribute( "treatCheck10As", treatCheck10As );
+		descriptorBuilder.setAttribute( "treatCheck11As", treatCheck11As );
+		descriptorBuilder.setAttribute( "processingDirection", processingDirection );
 
 		return descriptorBuilder.build().annotation();
 	}

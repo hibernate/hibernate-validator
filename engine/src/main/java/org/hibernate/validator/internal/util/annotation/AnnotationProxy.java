@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.util.annotationfactory;
+package org.hibernate.validator.internal.util.annotation;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameters;
+import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttributes;
 
 /**
  * A concrete implementation of {@code Annotation} that pretends it is a
@@ -164,7 +164,7 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 			}
 		}
 
-		AnnotationParameters annotationAttributes = run( GetAnnotationParameters.action( annotation ) );
+		AnnotationAttributes annotationAttributes = run( GetAnnotationAttributes.action( annotation ) );
 		return annotationAttributes.toMap();
 	}
 
