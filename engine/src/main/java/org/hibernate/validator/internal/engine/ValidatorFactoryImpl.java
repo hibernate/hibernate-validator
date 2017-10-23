@@ -99,7 +99,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
 
 	/**
-	 * The default constraint validator factory for this factory.
+	 * The constraint validator manager for this factory.
 	 */
 	private final ConstraintValidatorManager constraintValidatorManager;
 
