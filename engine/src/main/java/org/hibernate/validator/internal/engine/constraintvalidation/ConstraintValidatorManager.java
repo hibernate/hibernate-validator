@@ -26,6 +26,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeHelper;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -100,7 +101,7 @@ public class ConstraintValidatorManager {
 		Contracts.assertNotNull( descriptor );
 		Contracts.assertNotNull( constraintFactory );
 
-		CacheKey key = new CacheKey( descriptor.getAnnotation(), validatedValueType, constraintFactory );
+		CacheKey key = new CacheKey( descriptor.getAnnotationDescriptor(), validatedValueType, constraintFactory );
 
 		@SuppressWarnings("unchecked")
 		ConstraintValidator<A, ?> constraintValidator = (ConstraintValidator<A, ?>) constraintValidatorCache.get( key );
@@ -257,13 +258,13 @@ public class ConstraintValidatorManager {
 	}
 
 	private static final class CacheKey {
-		private final Annotation annotation;
+		private final AnnotationDescriptor<?> annotationDescriptor;
 		private final Type validatedType;
 		private final ConstraintValidatorFactory constraintFactory;
 		private final int hashCode;
 
-		private CacheKey(Annotation annotation, Type validatorType, ConstraintValidatorFactory constraintFactory) {
-			this.annotation = annotation;
+		private CacheKey(AnnotationDescriptor<?> annotationDescriptor, Type validatorType, ConstraintValidatorFactory constraintFactory) {
+			this.annotationDescriptor = annotationDescriptor;
 			this.validatedType = validatorType;
 			this.constraintFactory = constraintFactory;
 			this.hashCode = createHashCode();
@@ -284,7 +285,7 @@ public class ConstraintValidatorManager {
 
 			CacheKey cacheKey = (CacheKey) o;
 
-			if ( annotation != null ? !annotation.equals( cacheKey.annotation ) : cacheKey.annotation != null ) {
+			if ( annotationDescriptor != null ? !annotationDescriptor.equals( cacheKey.annotationDescriptor ) : cacheKey.annotationDescriptor != null ) {
 				return false;
 			}
 			if ( constraintFactory != null ? !constraintFactory.equals( cacheKey.constraintFactory ) : cacheKey.constraintFactory != null ) {
@@ -303,7 +304,7 @@ public class ConstraintValidatorManager {
 		}
 
 		private int createHashCode() {
-			int result = annotation != null ? annotation.hashCode() : 0;
+			int result = annotationDescriptor != null ? annotationDescriptor.hashCode() : 0;
 			result = 31 * result + ( validatedType != null ? validatedType.hashCode() : 0 );
 			result = 31 * result + ( constraintFactory != null ? constraintFactory.hashCode() : 0 );
 			return result;
