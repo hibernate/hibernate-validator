@@ -6,6 +6,6 @@
  */
 
 /**
- * Annotation proxy helper.
+ * Annotation proxy and descriptor.
  */
-package org.hibernate.validator.internal.util.annotationfactory;
+package org.hibernate.validator.internal.util.annotation;

@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.util.annotationfactory;
+package org.hibernate.validator.internal.util.annotation;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -15,14 +15,14 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
-public class AnnotationParameters implements Serializable {
+public class AnnotationAttributes implements Serializable {
 
 	private static final Log LOG = LoggerFactory.make();
 
 	@Immutable
 	private final Map<String, Object> parameters;
 
-	public AnnotationParameters(Map<String, Object> parameters) {
+	public AnnotationAttributes(Map<String, Object> parameters) {
 		this.parameters = CollectionHelper.toImmutableMap( parameters );
 	}
 

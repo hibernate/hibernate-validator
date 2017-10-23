@@ -24,7 +24,7 @@ import javax.validation.Validator;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
@@ -220,13 +220,13 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 	private ScriptAssert getScriptAssert(String lang, String script, String alias, String reportOn) {
 		AnnotationDescriptor.Builder<ScriptAssert> descriptorBuilder = new AnnotationDescriptor.Builder<>( ScriptAssert.class );
 
-		descriptorBuilder.setValue( "lang", lang );
-		descriptorBuilder.setValue( "script", script );
+		descriptorBuilder.setAttribute( "lang", lang );
+		descriptorBuilder.setAttribute( "script", script );
 		if ( alias != null ) {
-			descriptorBuilder.setValue( "alias", alias );
+			descriptorBuilder.setAttribute( "alias", alias );
 		}
 		if ( reportOn != null ) {
-			descriptorBuilder.setValue( "reportOn", reportOn );
+			descriptorBuilder.setAttribute( "reportOn", reportOn );
 		}
 
 		return descriptorBuilder.build().annotation();

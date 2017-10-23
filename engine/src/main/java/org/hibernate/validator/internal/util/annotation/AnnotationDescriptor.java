@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.util.annotationfactory;
+package org.hibernate.validator.internal.util.annotation;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
@@ -23,7 +23,7 @@ import java.util.TreeSet;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameters;
+import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttributes;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 
 /**
@@ -46,7 +46,7 @@ public class AnnotationDescriptor<T extends Annotation> implements Serializable 
 
 	private final Class<T> type;
 
-	private final AnnotationParameters attributes;
+	private final AnnotationAttributes attributes;
 
 	private final int hashCode;
 
@@ -55,12 +55,12 @@ public class AnnotationDescriptor<T extends Annotation> implements Serializable 
 	@SuppressWarnings("unchecked")
 	public AnnotationDescriptor(T annotation) {
 		this.type = (Class<T>) annotation.annotationType();
-		this.attributes = run( GetAnnotationParameters.action( annotation ) );
+		this.attributes = run( GetAnnotationAttributes.action( annotation ) );
 		this.annotation = annotation;
 		this.hashCode = buildHashCode();
 	}
 
-	private AnnotationDescriptor(Class<T> annotationType, AnnotationParameters parameters) {
+	private AnnotationDescriptor(Class<T> annotationType, AnnotationAttributes parameters) {
 		this.type = annotationType;
 		this.attributes = parameters;
 		this.hashCode = buildHashCode();
@@ -71,7 +71,7 @@ public class AnnotationDescriptor<T extends Annotation> implements Serializable 
 		return type;
 	}
 
-	public AnnotationParameters getAttributes() {
+	public AnnotationAttributes getAttributes() {
 		return attributes;
 	}
 
@@ -211,42 +211,42 @@ public class AnnotationDescriptor<T extends Annotation> implements Serializable 
 
 		private final Class<S> type;
 
-		private final Map<String, Object> elements;
+		private final Map<String, Object> attributes;
 
 		public Builder(Class<S> type) {
 			this.type = type;
-			this.elements = new HashMap<String, Object>();
+			this.attributes = new HashMap<String, Object>();
 		}
 
-		public Builder(Class<S> type, Map<String, Object> elements) {
+		public Builder(Class<S> type, Map<String, Object> attributes) {
 			this.type = type;
-			this.elements = new HashMap<String, Object>( elements );
+			this.attributes = new HashMap<String, Object>( attributes );
 		}
 
 		@SuppressWarnings("unchecked")
 		public Builder(S annotation) {
 			this.type = (Class<S>) annotation.annotationType();
-			this.elements = new HashMap<String, Object>( run( GetAnnotationParameters.action( annotation ) ).toMap() );
+			this.attributes = new HashMap<String, Object>( run( GetAnnotationAttributes.action( annotation ) ).toMap() );
 		}
 
-		public void setValue(String elementName, Object value) {
-			elements.put( elementName, value );
+		public void setAttribute(String attributeName, Object value) {
+			attributes.put( attributeName, value );
 		}
 
-		public boolean containsKey(String key) {
-			return elements.containsKey( key );
+		public boolean hasAttribute(String key) {
+			return attributes.containsKey( key );
 		}
 
 		public AnnotationDescriptor<S> build() {
-			return new AnnotationDescriptor<S>( type, getAnnotationParameters() );
+			return new AnnotationDescriptor<S>( type, getAnnotationAttributes() );
 		}
 
-		private AnnotationParameters getAnnotationParameters() {
-			Map<String, Object> result = newHashMap( elements.size() );
+		private AnnotationAttributes getAnnotationAttributes() {
+			Map<String, Object> result = newHashMap( attributes.size() );
 			int processedValuesFromDescriptor = 0;
 			final Method[] declaredMethods = run( GetDeclaredMethods.action( type ) );
 			for ( Method m : declaredMethods ) {
-				Object elementValue = elements.get( m.getName() );
+				Object elementValue = attributes.get( m.getName() );
 				if ( elementValue != null ) {
 					result.put( m.getName(), elementValue );
 					processedValuesFromDescriptor++;
@@ -261,16 +261,16 @@ public class AnnotationDescriptor<T extends Annotation> implements Serializable 
 					);
 				}
 			}
-			if ( processedValuesFromDescriptor != elements.size() ) {
-				Set<String> unknownParameters = elements.keySet();
-				unknownParameters.removeAll( result.keySet() );
+			if ( processedValuesFromDescriptor != attributes.size() ) {
+				Set<String> unknownAttributes = attributes.keySet();
+				unknownAttributes.removeAll( result.keySet() );
 
 				throw LOG.getTryingToInstantiateAnnotationWithUnknownParametersException(
 						type,
-						unknownParameters
+						unknownAttributes
 				);
 			}
-			return new AnnotationParameters( result );
+			return new AnnotationAttributes( result );
 		}
 	}
 

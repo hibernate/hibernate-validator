@@ -12,7 +12,7 @@ import static org.testng.Assert.assertTrue;
 import javax.validation.constraints.Digits;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForCharSequence;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeClass;
@@ -29,9 +29,9 @@ public class DigitsValidatorForCharSequenceTest {
 	public static void init() {
 
 		AnnotationDescriptor.Builder<Digits> descriptorBuilder = new AnnotationDescriptor.Builder<>( Digits.class );
-		descriptorBuilder.setValue( "integer", 5 );
-		descriptorBuilder.setValue( "fraction", 2 );
-		descriptorBuilder.setValue( "message", "{validator.digits}" );
+		descriptorBuilder.setAttribute( "integer", 5 );
+		descriptorBuilder.setAttribute( "fraction", 2 );
+		descriptorBuilder.setAttribute( "message", "{validator.digits}" );
 		Digits p = descriptorBuilder.build().annotation();
 
 		constraint = new DigitsValidatorForCharSequence();
@@ -56,9 +56,9 @@ public class DigitsValidatorForCharSequenceTest {
 	public void testNegativeIntegerLength() {
 
 		AnnotationDescriptor.Builder<Digits> descriptorBuilder = new AnnotationDescriptor.Builder<>( Digits.class );
-		descriptorBuilder.setValue( "integer", -1 );
-		descriptorBuilder.setValue( "fraction", 1 );
-		descriptorBuilder.setValue( "message", "{validator.digits}" );
+		descriptorBuilder.setAttribute( "integer", -1 );
+		descriptorBuilder.setAttribute( "fraction", 1 );
+		descriptorBuilder.setAttribute( "message", "{validator.digits}" );
 		Digits p = descriptorBuilder.build().annotation();
 
 		DigitsValidatorForCharSequence constraint = new DigitsValidatorForCharSequence();
@@ -69,9 +69,9 @@ public class DigitsValidatorForCharSequenceTest {
 	public void testNegativeFractionLength() {
 
 		AnnotationDescriptor.Builder<Digits> descriptorBuilder = new AnnotationDescriptor.Builder<>( Digits.class );
-		descriptorBuilder.setValue( "integer", 1 );
-		descriptorBuilder.setValue( "fraction", -1 );
-		descriptorBuilder.setValue( "message", "{validator.digits}" );
+		descriptorBuilder.setAttribute( "integer", 1 );
+		descriptorBuilder.setAttribute( "fraction", -1 );
+		descriptorBuilder.setAttribute( "message", "{validator.digits}" );
 		Digits p = descriptorBuilder.build().annotation();
 
 		DigitsValidatorForCharSequence constraint = new DigitsValidatorForCharSequence();

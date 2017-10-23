@@ -29,7 +29,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
@@ -82,17 +82,17 @@ class MetaConstraintBuilder {
 		AnnotationDescriptor.Builder<A> annotationDescriptorBuilder = new AnnotationDescriptor.Builder<>( annotationClass );
 
 		if ( constraint.getMessage() != null ) {
-			annotationDescriptorBuilder.setValue( MESSAGE_PARAM, constraint.getMessage() );
+			annotationDescriptorBuilder.setAttribute( MESSAGE_PARAM, constraint.getMessage() );
 		}
-		annotationDescriptorBuilder.setValue( GROUPS_PARAM, getGroups( constraint.getGroups(), defaultPackage ) );
-		annotationDescriptorBuilder.setValue( PAYLOAD_PARAM, getPayload( constraint.getPayload(), defaultPackage ) );
+		annotationDescriptorBuilder.setAttribute( GROUPS_PARAM, getGroups( constraint.getGroups(), defaultPackage ) );
+		annotationDescriptorBuilder.setAttribute( PAYLOAD_PARAM, getPayload( constraint.getPayload(), defaultPackage ) );
 
 		for ( ElementType elementType : constraint.getElement() ) {
 			String name = elementType.getName();
 			checkNameIsValid( name );
 			Class<?> returnType = getAnnotationParameterType( annotationClass, name );
 			Object elementValue = getElementValue( elementType, returnType, defaultPackage );
-			annotationDescriptorBuilder.setValue( name, elementValue );
+			annotationDescriptorBuilder.setAttribute( name, elementValue );
 		}
 
 		AnnotationDescriptor<A> annotationDescriptor;
@@ -118,7 +118,7 @@ class MetaConstraintBuilder {
 			String name = elementType.getName();
 			Class<?> parameterType = getAnnotationParameterType( returnType, name );
 			Object elementValue = getElementValue( elementType, parameterType, defaultPackage );
-			annotationDescriptorBuilder.setValue( name, elementValue );
+			annotationDescriptorBuilder.setAttribute( name, elementValue );
 		}
 		return annotationDescriptorBuilder.build().annotation();
 	}

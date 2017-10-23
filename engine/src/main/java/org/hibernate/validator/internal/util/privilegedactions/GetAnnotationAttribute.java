@@ -18,28 +18,28 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public final class GetAnnotationParameter<T> implements PrivilegedAction<T> {
+public final class GetAnnotationAttribute<T> implements PrivilegedAction<T> {
 
 	private static final Log log = LoggerFactory.make();
 
 	private final Annotation annotation;
-	private final String parameterName;
+	private final String attributeName;
 	private final Class<T> type;
 
-	public static <T> GetAnnotationParameter<T> action(Annotation annotation, String parameterName, Class<T> type) {
-		return new GetAnnotationParameter<T>( annotation, parameterName, type );
+	public static <T> GetAnnotationAttribute<T> action(Annotation annotation, String attributeName, Class<T> type) {
+		return new GetAnnotationAttribute<T>( annotation, attributeName, type );
 	}
 
-	private GetAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
+	private GetAnnotationAttribute(Annotation annotation, String attributeName, Class<T> type) {
 		this.annotation = annotation;
-		this.parameterName = parameterName;
+		this.attributeName = attributeName;
 		this.type = type;
 	}
 
 	@Override
 	public T run() {
 		try {
-			Method m = annotation.getClass().getMethod( parameterName );
+			Method m = annotation.getClass().getMethod( attributeName );
 			m.setAccessible( true );
 			Object o = m.invoke( annotation );
 			if ( type.isAssignableFrom( o.getClass() ) ) {
@@ -50,10 +50,10 @@ public final class GetAnnotationParameter<T> implements PrivilegedAction<T> {
 			}
 		}
 		catch (NoSuchMethodException e) {
-			throw log.getUnableToFindAnnotationParameterException( parameterName, e );
+			throw log.getUnableToFindAnnotationParameterException( attributeName, e );
 		}
 		catch (IllegalAccessException | InvocationTargetException e) {
-			throw log.getUnableToGetAnnotationParameterException( parameterName, annotation.getClass(), e );
+			throw log.getUnableToGetAnnotationParameterException( attributeName, annotation.getClass(), e );
 		}
 	}
 }

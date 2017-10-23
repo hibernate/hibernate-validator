@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -112,11 +112,11 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 	protected AnnotationDescriptor<A> createAnnotationDescriptor() {
 		AnnotationDescriptor.Builder<A> annotationDescriptorBuilder = new AnnotationDescriptor.Builder<>( annotationType );
 		for ( Map.Entry<String, Object> parameter : parameters.entrySet() ) {
-			annotationDescriptorBuilder.setValue( parameter.getKey(), parameter.getValue() );
+			annotationDescriptorBuilder.setAttribute( parameter.getKey(), parameter.getValue() );
 		}
 
 		for ( Map.Entry<String, List<AnnotationDef<?, ?>>> annotationAsParameter : annotationsAsParameters.entrySet() ) {
-			annotationDescriptorBuilder.setValue(
+			annotationDescriptorBuilder.setAttribute(
 					annotationAsParameter.getKey(),
 							toAnnotationParameterArray(
 									annotationAsParameter.getValue(),

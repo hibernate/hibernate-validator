@@ -50,11 +50,11 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationParameters;
+import org.hibernate.validator.internal.util.annotation.AnnotationAttributes;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameters;
+import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttributes;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
@@ -494,7 +494,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return ValidateUnwrappedValue.DEFAULT;
 	}
 
-	private static ConstraintTarget determineValidationAppliesTo(AnnotationParameters attributes) {
+	private static ConstraintTarget determineValidationAppliesTo(AnnotationAttributes attributes) {
 		return attributes.getParameter( ConstraintHelper.VALIDATION_APPLIES_TO, ConstraintTarget.class );
 	}
 
@@ -567,7 +567,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Set<Class<? extends Payload>> buildPayloadSet(AnnotationParameters attributes) {
+	private static Set<Class<? extends Payload>> buildPayloadSet(AnnotationAttributes attributes) {
 		Set<Class<? extends Payload>> payloadSet = newHashSet();
 
 		Class<Payload>[] payloadFromAnnotation = attributes.getParameter( ConstraintHelper.PAYLOAD, Class[].class );
@@ -578,7 +578,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return CollectionHelper.toImmutableSet( payloadSet );
 	}
 
-	private static Set<Class<?>> buildGroupSet(AnnotationParameters attributes, Class<?> implicitGroup) {
+	private static Set<Class<?>> buildGroupSet(AnnotationAttributes attributes, Class<?> implicitGroup) {
 		Set<Class<?>> groupSet = newHashSet();
 		final Class<?>[] groupsFromAnnotation = attributes.getMandatoryParameter( ConstraintHelper.GROUPS, Class[].class );
 		if ( groupsFromAnnotation.length == 0 ) {
@@ -595,8 +595,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return CollectionHelper.toImmutableSet( groupSet );
 	}
 
-	private static AnnotationParameters buildAnnotationParameters(Annotation annotation) {
-		return run( GetAnnotationParameters.action( annotation ) );
+	private static AnnotationAttributes buildAnnotationAttributes(Annotation annotation) {
+		return run( GetAnnotationAttributes.action( annotation ) );
 	}
 
 	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
@@ -742,7 +742,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 		// use a annotation proxy
 		AnnotationDescriptor.Builder<U> annotationDescriptorBuilder = new AnnotationDescriptor.Builder<>(
-				annotationType, buildAnnotationParameters( constraintAnnotation ).toMap()
+				annotationType, buildAnnotationAttributes( constraintAnnotation ).toMap()
 		);
 
 		// get the right override parameters
@@ -753,14 +753,14 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		);
 		if ( overrides != null ) {
 			for ( Map.Entry<String, Object> entry : overrides.entrySet() ) {
-				annotationDescriptorBuilder.setValue( entry.getKey(), entry.getValue() );
+				annotationDescriptorBuilder.setAttribute( entry.getKey(), entry.getValue() );
 			}
 		}
 
 		//propagate inherited attributes to composing constraints
-		annotationDescriptorBuilder.setValue( ConstraintHelper.GROUPS, groups.toArray( new Class<?>[groups.size()] ) );
-		annotationDescriptorBuilder.setValue( ConstraintHelper.PAYLOAD, payloads.toArray( new Class<?>[payloads.size()] ) );
-		if ( annotationDescriptorBuilder.containsKey( ConstraintHelper.VALIDATION_APPLIES_TO ) ) {
+		annotationDescriptorBuilder.setAttribute( ConstraintHelper.GROUPS, groups.toArray( new Class<?>[groups.size()] ) );
+		annotationDescriptorBuilder.setAttribute( ConstraintHelper.PAYLOAD, payloads.toArray( new Class<?>[payloads.size()] ) );
+		if ( annotationDescriptorBuilder.hasAttribute( ConstraintHelper.VALIDATION_APPLIES_TO ) ) {
 			ConstraintTarget validationAppliesTo = getValidationAppliesTo();
 
 			// composed constraint does not declare validationAppliesTo() itself
@@ -773,7 +773,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				}
 			}
 
-			annotationDescriptorBuilder.setValue( ConstraintHelper.VALIDATION_APPLIES_TO, validationAppliesTo );
+			annotationDescriptorBuilder.setAttribute( ConstraintHelper.VALIDATION_APPLIES_TO, validationAppliesTo );
 		}
 
 		return new ConstraintDescriptorImpl<>(

@@ -11,7 +11,7 @@ import static org.testng.Assert.assertTrue;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
@@ -26,9 +26,9 @@ public class LengthValidatorTest {
 	@Test
 	public void testIsValid() {
 		AnnotationDescriptor.Builder<Length> descriptorBuilder = new AnnotationDescriptor.Builder<>( Length.class );
-		descriptorBuilder.setValue( "min", 1 );
-		descriptorBuilder.setValue( "max", 3 );
-		descriptorBuilder.setValue( "message", "{validator.length}" );
+		descriptorBuilder.setAttribute( "min", 1 );
+		descriptorBuilder.setAttribute( "max", 3 );
+		descriptorBuilder.setAttribute( "message", "{validator.length}" );
 		Length l = descriptorBuilder.build().annotation();
 		LengthValidator constraint = new LengthValidator();
 		constraint.initialize( l );
@@ -44,8 +44,8 @@ public class LengthValidatorTest {
 	@TestForIssue(jiraKey = "HV-502")
 	public void testIsValidCharSequence() {
 		AnnotationDescriptor.Builder<Length> descriptorBuilder = new AnnotationDescriptor.Builder<>( Length.class );
-		descriptorBuilder.setValue( "min", 1 );
-		descriptorBuilder.setValue( "max", 3 );
+		descriptorBuilder.setAttribute( "min", 1 );
+		descriptorBuilder.setAttribute( "max", 3 );
 		Length l = descriptorBuilder.build().annotation();
 		LengthValidator constraint = new LengthValidator();
 		constraint.initialize( l );
@@ -56,9 +56,9 @@ public class LengthValidatorTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNegativeMinValue() {
 		AnnotationDescriptor.Builder<Length> descriptorBuilder = new AnnotationDescriptor.Builder<>( Length.class );
-		descriptorBuilder.setValue( "min", -1 );
-		descriptorBuilder.setValue( "max", 1 );
-		descriptorBuilder.setValue( "message", "{validator.length}" );
+		descriptorBuilder.setAttribute( "min", -1 );
+		descriptorBuilder.setAttribute( "max", 1 );
+		descriptorBuilder.setAttribute( "message", "{validator.length}" );
 		Length p = descriptorBuilder.build().annotation();
 
 		LengthValidator constraint = new LengthValidator();
@@ -68,9 +68,9 @@ public class LengthValidatorTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNegativeMaxValue() {
 		AnnotationDescriptor.Builder<Length> descriptorBuilder = new AnnotationDescriptor.Builder<>( Length.class );
-		descriptorBuilder.setValue( "min", 1 );
-		descriptorBuilder.setValue( "max", -1 );
-		descriptorBuilder.setValue( "message", "{validator.length}" );
+		descriptorBuilder.setAttribute( "min", 1 );
+		descriptorBuilder.setAttribute( "max", -1 );
+		descriptorBuilder.setAttribute( "message", "{validator.length}" );
 		Length p = descriptorBuilder.build().annotation();
 
 		LengthValidator constraint = new LengthValidator();
@@ -80,9 +80,9 @@ public class LengthValidatorTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNegativeLength() {
 		AnnotationDescriptor.Builder<Length> descriptorBuilder = new AnnotationDescriptor.Builder<>( Length.class );
-		descriptorBuilder.setValue( "min", 5 );
-		descriptorBuilder.setValue( "max", 4 );
-		descriptorBuilder.setValue( "message", "{validator.length}" );
+		descriptorBuilder.setAttribute( "min", 5 );
+		descriptorBuilder.setAttribute( "max", 4 );
+		descriptorBuilder.setAttribute( "message", "{validator.length}" );
 		Length p = descriptorBuilder.build().annotation();
 
 		LengthValidator constraint = new LengthValidator();

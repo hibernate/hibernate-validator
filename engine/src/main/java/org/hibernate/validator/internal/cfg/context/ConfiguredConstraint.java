@@ -18,7 +18,7 @@ import java.lang.reflect.TypeVariable;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 
 /**
  * Represents a programmatically configured constraint and meta-data
