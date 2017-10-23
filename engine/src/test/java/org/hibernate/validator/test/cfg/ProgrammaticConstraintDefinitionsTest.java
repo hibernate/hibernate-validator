@@ -45,9 +45,7 @@ import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
-
 import org.testng.annotations.Test;
 
 /**
@@ -149,22 +147,22 @@ public class ProgrammaticConstraintDefinitionsTest {
 		);
 
 		// Deprecated, kept to ensure backwards compatibility (or at least ensure we are aware we break something if we decide to do so)
-		AnnotationDescriptor<SafeHtml.Tag> tagDescriptor = new AnnotationDescriptor( SafeHtml.Tag.class );
-		tagDescriptor.setValue( "name", "td" );
-		tagDescriptor.setValue( "attributes", new String[]{ "class", "id" } );
+		AnnotationDescriptor.Builder<SafeHtml.Tag> tagDescriptorBuilder = new AnnotationDescriptor.Builder<>( SafeHtml.Tag.class );
+		tagDescriptorBuilder.setValue( "name", "td" );
+		tagDescriptorBuilder.setValue( "attributes", new String[]{ "class", "id" } );
 		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-				.additionalTagsWithAttributes( AnnotationFactory.create( tagDescriptor ) ), "<td class='class' id='tableId'>1234qwer</td>", 0 );
+				.additionalTagsWithAttributes( tagDescriptorBuilder.build().annotation() ), "<td class='class' id='tableId'>1234qwer</td>", 0 );
 
-		AnnotationDescriptor<SafeHtml.Attribute> attributeDescriptor = new AnnotationDescriptor( SafeHtml.Attribute.class );
-		attributeDescriptor.setValue( "name", "src" );
-		attributeDescriptor.setValue( "protocols", new String[]{ "data" } );
+		AnnotationDescriptor.Builder<SafeHtml.Attribute> attributeDescriptorBuilder = new AnnotationDescriptor.Builder<>( SafeHtml.Attribute.class );
+		attributeDescriptorBuilder.setValue( "name", "src" );
+		attributeDescriptorBuilder.setValue( "protocols", new String[]{ "data" } );
 
-		tagDescriptor = new AnnotationDescriptor( SafeHtml.Tag.class );
-		tagDescriptor.setValue( "name", "img" );
-		tagDescriptor.setValue( "attributesWithProtocols", new SafeHtml.Attribute[]{ AnnotationFactory.create( attributeDescriptor ) } );
+		tagDescriptorBuilder = new AnnotationDescriptor.Builder<>( SafeHtml.Tag.class );
+		tagDescriptorBuilder.setValue( "name", "img" );
+		tagDescriptorBuilder.setValue( "attributesWithProtocols", new SafeHtml.Attribute[]{ attributeDescriptorBuilder.build().annotation() } );
 
 		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-				.additionalTagsWithAttributes( AnnotationFactory.create( tagDescriptor ) ), "<img src='data:image/png;base64,100101' />", 0 );
+				.additionalTagsWithAttributes( tagDescriptorBuilder.build().annotation() ), "<img src='data:image/png;base64,100101' />", 0 );
 	}
 
 	@Test

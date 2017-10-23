@@ -16,7 +16,6 @@ import java.util.Map;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -110,14 +109,14 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 		return getThis();
 	}
 
-	protected A createAnnotationProxy() {
-		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<>( annotationType );
+	protected AnnotationDescriptor<A> createAnnotationDescriptor() {
+		AnnotationDescriptor.Builder<A> annotationDescriptorBuilder = new AnnotationDescriptor.Builder<>( annotationType );
 		for ( Map.Entry<String, Object> parameter : parameters.entrySet() ) {
-			annotationDescriptor.setValue( parameter.getKey(), parameter.getValue() );
+			annotationDescriptorBuilder.setValue( parameter.getKey(), parameter.getValue() );
 		}
 
 		for ( Map.Entry<String, List<AnnotationDef<?, ?>>> annotationAsParameter : annotationsAsParameters.entrySet() ) {
-			annotationDescriptor.setValue(
+			annotationDescriptorBuilder.setValue(
 					annotationAsParameter.getKey(),
 							toAnnotationParameterArray(
 									annotationAsParameter.getValue(),
@@ -127,11 +126,15 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 		}
 
 		try {
-			return AnnotationFactory.create( annotationDescriptor );
+			return annotationDescriptorBuilder.build();
 		}
 		catch (RuntimeException e) {
 			throw LOG.getUnableToCreateAnnotationForConfiguredConstraintException( e );
 		}
+	}
+
+	private A createAnnotationProxy() {
+		return createAnnotationDescriptor().annotation();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -139,11 +142,6 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 		return list.stream()
 				.map( AnnotationDef::createAnnotationProxy )
 				.toArray( n -> (T[]) Array.newInstance( aClass, n ) );
-	}
-
-	@SuppressWarnings("unchecked")
-	protected <T> T toAnnotationParameter(AnnotationDef<?, ?> annotationDef, Class<T> aClass) {
-		return (T) annotationDef.createAnnotationProxy();
 	}
 
 	@Override

@@ -15,7 +15,6 @@ import javax.validation.constraints.Positive;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.money.PositiveValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.javamoney.moneta.Money;
 import org.testng.annotations.Test;
 
@@ -56,7 +55,7 @@ public class PositiveValidatorForMonetaryAmountTest {
 	}
 
 	private Positive positive(final boolean strict) {
-		AnnotationDescriptor<Positive> descriptor = new AnnotationDescriptor<>( Positive.class );
-		return AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<Positive> descriptorBuilder = new AnnotationDescriptor.Builder<>( Positive.class );
+		return descriptorBuilder.build().annotation();
 	}
 }

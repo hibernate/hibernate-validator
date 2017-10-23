@@ -22,9 +22,7 @@ import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
 import org.hibernate.validator.internal.constraintvalidators.hv.SafeHtmlValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.TestForIssue;
-
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -37,44 +35,44 @@ import org.testng.annotations.Test;
  */
 public class SafeHtmlValidatorTest {
 
-	private AnnotationDescriptor<SafeHtml> descriptor;
+	private AnnotationDescriptor.Builder<SafeHtml> descriptorBuilder;
 
 	@BeforeMethod
 	public void setUp() {
-		descriptor = new AnnotationDescriptor<>( SafeHtml.class );
+		descriptorBuilder = new AnnotationDescriptor.Builder<>( SafeHtml.class );
 	}
 
 	@Test
 	public void testNullValue() throws Exception {
-		descriptor.setValue( "whitelistType", WhiteListType.BASIC );
+		descriptorBuilder.setValue( "whitelistType", WhiteListType.BASIC );
 
 		assertTrue( getSafeHtmlValidator().isValid( null, null ) );
 	}
 
 	@Test
 	public void testInvalidScriptTagIncluded() throws Exception {
-		descriptor.setValue( "whitelistType", WhiteListType.BASIC );
+		descriptorBuilder.setValue( "whitelistType", WhiteListType.BASIC );
 
 		assertFalse( getSafeHtmlValidator().isValid( "Hello<script>alert('Doh')</script>World !", null ) );
 	}
 
 	@Test
 	public void testInvalidIncompleteImgTagWithScriptIncluded() {
-		descriptor.setValue( "whitelistType", WhiteListType.BASIC );
+		descriptorBuilder.setValue( "whitelistType", WhiteListType.BASIC );
 
 		assertFalse( getSafeHtmlValidator().isValid( "<img src=asdf onerror=\"alert(1)\" x=", null ) );
 	}
 
 	@Test
 	public void testValid() throws Exception {
-		descriptor.setValue( "whitelistType", WhiteListType.BASIC );
+		descriptorBuilder.setValue( "whitelistType", WhiteListType.BASIC );
 
 		assertTrue( getSafeHtmlValidator().isValid( "<p><a href='http://example.com/'>Link</a></p>", null ) );
 	}
 
 	@Test
 	public void testAdditionalTags() throws Exception {
-		descriptor.setValue( "additionalTags", new String[] { "script" } );
+		descriptorBuilder.setValue( "additionalTags", new String[] { "script" } );
 
 		assertTrue( getSafeHtmlValidator().isValid( "Hello<script>alert('Doh')</script>World !", null ) );
 	}
@@ -82,7 +80,7 @@ public class SafeHtmlValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-817")
 	public void testDivNotAllowedInBasicWhiteList() throws Exception {
-		descriptor.setValue( "whitelistType", WhiteListType.BASIC );
+		descriptorBuilder.setValue( "whitelistType", WhiteListType.BASIC );
 
 		SafeHtmlValidator validator = getSafeHtmlValidator();
 		assertFalse( validator.isValid( "<div>test</div>", null ) );
@@ -91,7 +89,7 @@ public class SafeHtmlValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-817")
 	public void testDivAllowedInRelaxedWhiteList() throws Exception {
-		descriptor.setValue( "whitelistType", WhiteListType.RELAXED );
+		descriptorBuilder.setValue( "whitelistType", WhiteListType.RELAXED );
 
 		assertTrue( getSafeHtmlValidator().isValid( "<div>test</div>", null ) );
 	}
@@ -99,13 +97,13 @@ public class SafeHtmlValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-817")
 	public void testDivWithWhiteListedClassAttribute() throws Exception {
-		descriptor.setValue( "whitelistType", WhiteListType.RELAXED );
+		descriptorBuilder.setValue( "whitelistType", WhiteListType.RELAXED );
 
-		AnnotationDescriptor<SafeHtml.Tag> tagDescriptor = new AnnotationDescriptor<>( SafeHtml.Tag.class );
-		tagDescriptor.setValue( "name", "div" );
-		tagDescriptor.setValue( "attributes", new String[] { "class" } );
-		SafeHtml.Tag tag = AnnotationFactory.create( tagDescriptor );
-		descriptor.setValue( "additionalTagsWithAttributes", new SafeHtml.Tag[] { tag } );
+		AnnotationDescriptor.Builder<SafeHtml.Tag> tagDescriptorBuilder = new AnnotationDescriptor.Builder<>( SafeHtml.Tag.class );
+		tagDescriptorBuilder.setValue( "name", "div" );
+		tagDescriptorBuilder.setValue( "attributes", new String[] { "class" } );
+		SafeHtml.Tag tag = tagDescriptorBuilder.build().annotation();
+		descriptorBuilder.setValue( "additionalTagsWithAttributes", new SafeHtml.Tag[] { tag } );
 
 		assertTrue(
 				getSafeHtmlValidator().isValid( "<div class='foo'>test</div>", null ),
@@ -137,7 +135,7 @@ public class SafeHtmlValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-873")
 	public void testValidationOfInvalidFragment() throws Exception {
-		descriptor.setValue( "whitelistType", WhiteListType.NONE );
+		descriptorBuilder.setValue( "whitelistType", WhiteListType.NONE );
 
 		assertFalse( getSafeHtmlValidator().isValid( "<td>1234qwer</td>", null ) );
 	}
@@ -145,7 +143,7 @@ public class SafeHtmlValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-873")
 	public void testValidationOfValidFragment() throws Exception {
-		descriptor.setValue( "whitelistType", WhiteListType.RELAXED );
+		descriptorBuilder.setValue( "whitelistType", WhiteListType.RELAXED );
 
 		assertTrue( getSafeHtmlValidator().isValid( "<td>1234qwer</td>", null ) );
 	}
@@ -153,7 +151,7 @@ public class SafeHtmlValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-873")
 	public void testValidationOfTextFragment() throws Exception {
-		descriptor.setValue( "whitelistType", WhiteListType.NONE );
+		descriptorBuilder.setValue( "whitelistType", WhiteListType.NONE );
 
 		assertTrue( getSafeHtmlValidator().isValid( "Foobar", null ) );
 	}
@@ -203,19 +201,19 @@ public class SafeHtmlValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-1303")
 	public void testPreserveRelativeLinks() throws Exception {
-		descriptor.setValue( "whitelistType", WhiteListType.RELAXED );
-		descriptor.setValue( "baseURI", "http://127.0.0.1" );
+		descriptorBuilder.setValue( "whitelistType", WhiteListType.RELAXED );
+		descriptorBuilder.setValue( "baseURI", "http://127.0.0.1" );
 
 		assertTrue( getSafeHtmlValidator().isValid( "<img src='/some/relative/url/image.png' />", null ) );
 
-		descriptor.setValue( "whitelistType", WhiteListType.RELAXED );
-		descriptor.setValue( "baseURI", "" );
+		descriptorBuilder.setValue( "whitelistType", WhiteListType.RELAXED );
+		descriptorBuilder.setValue( "baseURI", "" );
 
 		assertFalse( getSafeHtmlValidator().isValid( "<img src='/some/relative/url/image.png' />", null ) );
 	}
 
 	private SafeHtmlValidator getSafeHtmlValidator() {
-		SafeHtml p = AnnotationFactory.create( descriptor );
+		SafeHtml p = descriptorBuilder.build().annotation();
 		SafeHtmlValidator validator = new SafeHtmlValidator();
 		validator.initialize( p );
 		return validator;

@@ -6,23 +6,21 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
 
 /**
  * @author Alaa Nassef
@@ -32,10 +30,10 @@ public class MinValidatorForStringTest {
 
 	@Test
 	public void testIsValidMinValidator() {
-		AnnotationDescriptor<Min> descriptor = new AnnotationDescriptor<Min>( Min.class );
-		descriptor.setValue( "value", 15L );
-		descriptor.setValue( "message", "{validator.min}" );
-		Min m = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<Min> descriptorBuilder = new AnnotationDescriptor.Builder<>( Min.class );
+		descriptorBuilder.setValue( "value", 15L );
+		descriptorBuilder.setValue( "message", "{validator.min}" );
+		Min m = descriptorBuilder.build().annotation();
 
 		MinValidatorForCharSequence constraint = new MinValidatorForCharSequence();
 		constraint.initialize( m );
@@ -44,10 +42,10 @@ public class MinValidatorForStringTest {
 
 	@Test
 	public void testIsValidDecimalMinValidator() {
-		AnnotationDescriptor<DecimalMin> descriptor = new AnnotationDescriptor<DecimalMin>( DecimalMin.class );
-		descriptor.setValue( "value", "1500E-2" );
-		descriptor.setValue( "message", "{validator.min}" );
-		DecimalMin m = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMin.class );
+		descriptorBuilder.setValue( "value", "1500E-2" );
+		descriptorBuilder.setValue( "message", "{validator.min}" );
+		DecimalMin m = descriptorBuilder.build().annotation();
 
 		DecimalMinValidatorForCharSequence constraint = new DecimalMinValidatorForCharSequence();
 		constraint.initialize( m );
@@ -57,10 +55,10 @@ public class MinValidatorForStringTest {
 	@Test
 	public void testInitializeDecimalMaxWithInvalidValue() {
 
-		AnnotationDescriptor<DecimalMin> descriptor = new AnnotationDescriptor<DecimalMin>( DecimalMin.class );
-		descriptor.setValue( "value", "foobar" );
-		descriptor.setValue( "message", "{validator.min}" );
-		DecimalMin m = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMin.class );
+		descriptorBuilder.setValue( "value", "foobar" );
+		descriptorBuilder.setValue( "message", "{validator.min}" );
+		DecimalMin m = descriptorBuilder.build().annotation();
 
 		DecimalMinValidatorForNumber constraint = new DecimalMinValidatorForNumber();
 		try {
@@ -76,11 +74,11 @@ public class MinValidatorForStringTest {
 	@TestForIssue(jiraKey = "HV-256")
 	public void testIsValidDecimalMinExclusive() {
 		boolean inclusive = false;
-		AnnotationDescriptor<DecimalMin> descriptor = new AnnotationDescriptor<DecimalMin>( DecimalMin.class );
-		descriptor.setValue( "value", "1500E-2" );
-		descriptor.setValue( "inclusive", inclusive );
-		descriptor.setValue( "message", "{validator.min}" );
-		DecimalMin m = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMin.class );
+		descriptorBuilder.setValue( "value", "1500E-2" );
+		descriptorBuilder.setValue( "inclusive", inclusive );
+		descriptorBuilder.setValue( "message", "{validator.min}" );
+		DecimalMin m = descriptorBuilder.build().annotation();
 
 		DecimalMinValidatorForCharSequence constraint = new DecimalMinValidatorForCharSequence();
 		constraint.initialize( m );

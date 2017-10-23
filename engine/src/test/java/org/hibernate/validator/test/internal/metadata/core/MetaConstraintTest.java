@@ -21,6 +21,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -33,7 +34,7 @@ public class MetaConstraintTest {
 	private TypeResolutionHelper typeResolutionHelper;
 	private ValueExtractorManager valueExtractorManager;
 	private Method barMethod;
-	private NotNull constraintAnnotation;
+	private AnnotationDescriptor<NotNull> constraintAnnotationDescriptor;
 
 	@BeforeClass
 	public void setUp() throws Exception {
@@ -41,21 +42,21 @@ public class MetaConstraintTest {
 		typeResolutionHelper = new TypeResolutionHelper();
 		valueExtractorManager = new ValueExtractorManager( Collections.emptySet() );
 		barMethod = Foo.class.getMethod( "getBar" );
-		constraintAnnotation = barMethod.getAnnotation( NotNull.class );
+		constraintAnnotationDescriptor = new AnnotationDescriptor.Builder<>( barMethod.getAnnotation( NotNull.class ) ).build();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-930")
 	public void two_meta_constraints_for_the_same_constraint_should_be_equal() throws Exception {
 		ConstraintDescriptorImpl<NotNull> constraintDescriptor1 = new ConstraintDescriptorImpl<>(
-				constraintHelper, barMethod, constraintAnnotation, METHOD
+				constraintHelper, barMethod, constraintAnnotationDescriptor, METHOD
 		);
 		ConstraintLocation location1 = ConstraintLocation.forClass( Foo.class );
 		MetaConstraint<NotNull> metaConstraint1 = MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor1, location1 );
 
 
 		ConstraintDescriptorImpl<NotNull> constraintDescriptor2 = new ConstraintDescriptorImpl<>(
-				constraintHelper, barMethod, constraintAnnotation, METHOD
+				constraintHelper, barMethod, constraintAnnotationDescriptor, METHOD
 		);
 		ConstraintLocation location2 = ConstraintLocation.forClass( Foo.class );
 		MetaConstraint<NotNull> metaConstraint2 = MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor2, location2 );

@@ -18,6 +18,7 @@ import java.lang.reflect.TypeVariable;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 
 /**
  * Represents a programmatically configured constraint and meta-data
@@ -92,8 +93,8 @@ class ConfiguredConstraint<A extends Annotation> {
 		return location;
 	}
 
-	public A createAnnotationProxy() {
-		return constraint.createAnnotationProxy();
+	public AnnotationDescriptor<A> createAnnotationDescriptor() {
+		return constraint.createAnnotationDescriptor();
 	}
 
 	@Override
@@ -112,8 +113,8 @@ class ConfiguredConstraint<A extends Annotation> {
 		}
 
 		@Override
-		protected A createAnnotationProxy() {
-			return super.createAnnotationProxy();
+		protected AnnotationDescriptor<A> createAnnotationDescriptor() {
+			return super.createAnnotationDescriptor();
 		}
 	}
 

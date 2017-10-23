@@ -15,7 +15,6 @@ import javax.validation.constraints.Negative;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.money.NegativeValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.javamoney.moneta.Money;
 import org.testng.annotations.Test;
 
@@ -56,8 +55,8 @@ public class NegativeValidatorForMonetaryAmountTest {
 	}
 
 	private Negative negative() {
-		AnnotationDescriptor<Negative> descriptor = new AnnotationDescriptor<>( Negative.class );
-		return AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<Negative> descriptorBuilder = new AnnotationDescriptor.Builder<>( Negative.class );
+		return descriptorBuilder.build().annotation();
 	}
 
 }

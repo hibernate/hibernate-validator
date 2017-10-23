@@ -235,7 +235,7 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<>(
 				constraintHelper,
 				config.getLocation().getMember(),
-				config.createAnnotationProxy(),
+				config.createAnnotationDescriptor(),
 				config.getElementType(),
 				getConstraintType()
 		);

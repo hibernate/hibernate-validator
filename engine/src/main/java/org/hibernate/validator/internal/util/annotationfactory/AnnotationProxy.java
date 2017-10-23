@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.internal.util.annotationfactory;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
@@ -16,18 +14,10 @@ import java.lang.reflect.Proxy;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameters;
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameters.AnnotationParameters;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 
 /**
  * A concrete implementation of {@code Annotation} that pretends it is a
@@ -51,29 +41,25 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
 class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 
 	private static final long serialVersionUID = 6907601010599429454L;
-	private static final Log log = LoggerFactory.make();
 
-	private final Class<? extends Annotation> annotationType;
-	private final Map<String, Object> values;
-	private final int hashCode;
+	private final AnnotationDescriptor<? extends Annotation> descriptor;
 
-	AnnotationProxy(AnnotationDescriptor<?> descriptor) {
-		this.annotationType = descriptor.type();
-		values = Collections.unmodifiableMap( getAnnotationValues( descriptor ) );
-		this.hashCode = calculateHashCode();
+	AnnotationProxy(AnnotationDescriptor<? extends Annotation> descriptor) {
+		this.descriptor = descriptor;
 	}
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		if ( values.containsKey( method.getName() ) ) {
-			return values.get( method.getName() );
+		Object value = descriptor.getAttributes().getParameter( method.getName() );
+		if ( value != null ) {
+			return value;
 		}
 		return method.invoke( this, args );
 	}
 
 	@Override
 	public Class<? extends Annotation> annotationType() {
-		return annotationType;
+		return descriptor.type();
 	}
 
 	/**
@@ -93,22 +79,22 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 		if ( obj == null ) {
 			return false;
 		}
-		if ( !annotationType.isInstance( obj ) ) {
+		if ( !descriptor.type().isInstance( obj ) ) {
 			return false;
 		}
 
-		Annotation other = annotationType.cast( obj );
+		Annotation other = descriptor.type().cast( obj );
 
-		Map<String, Object> otherValues = getAnnotationValues( other );
+		Map<String, Object> otherAttributes = getAnnotationAttributes( other );
 
-		if ( values.size() != otherValues.size() ) {
+		if ( descriptor.getAttributes().size() != otherAttributes.size() ) {
 			return false;
 		}
 
 		// compare annotation member values
-		for ( Entry<String, Object> member : values.entrySet() ) {
+		for ( Entry<String, Object> member : descriptor.getAttributes().entrySet() ) {
 			Object value = member.getValue();
-			Object otherValue = otherValues.get( member.getKey() );
+			Object otherValue = otherAttributes.get( member.getKey() );
 
 			if ( !areEqual( value, otherValue ) ) {
 				return false;
@@ -128,107 +114,12 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		return hashCode;
+		return descriptor.hashCode();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder result = new StringBuilder();
-		result.append( '@' ).append( annotationType.getName() ).append( '(' );
-		for ( String s : getRegisteredMethodsInAlphabeticalOrder() ) {
-			result.append( s ).append( '=' ).append( values.get( s ) ).append( ", " );
-		}
-		// remove last separator:
-		if ( values.size() > 0 ) {
-			result.delete( result.length() - 2, result.length() );
-			result.append( ")" );
-		}
-		else {
-			result.delete( result.length() - 1, result.length() );
-		}
-
-		return result.toString();
-	}
-
-	private Map<String, Object> getAnnotationValues(AnnotationDescriptor<?> descriptor) {
-		Map<String, Object> result = newHashMap();
-		int processedValuesFromDescriptor = 0;
-		final Method[] declaredMethods = run( GetDeclaredMethods.action( annotationType ) );
-		for ( Method m : declaredMethods ) {
-			if ( descriptor.containsElement( m.getName() ) ) {
-				result.put( m.getName(), descriptor.valueOf( m.getName() ) );
-				processedValuesFromDescriptor++;
-			}
-			else if ( m.getDefaultValue() != null ) {
-				result.put( m.getName(), m.getDefaultValue() );
-			}
-			else {
-				throw log.getNoValueProvidedForAnnotationParameterException(
-						m.getName(),
-						annotationType
-				);
-			}
-		}
-		if ( processedValuesFromDescriptor != descriptor.numberOfElements() ) {
-
-			Set<String> unknownParameters = descriptor.getElements().keySet();
-			unknownParameters.removeAll( result.keySet() );
-
-			throw log.getTryingToInstantiateAnnotationWithUnknownParametersException(
-					annotationType,
-					unknownParameters
-			);
-		}
-		return result;
-	}
-
-	private Map<String, Object> getAnnotationValues(Annotation annotation) {
-		// We only enable this optimization if the security manager is not enabled. Otherwise,
-		// we would have to add every package containing constraints to the security policy.
-		if ( Proxy.isProxyClass( annotation.getClass() ) && System.getSecurityManager() == null ) {
-			InvocationHandler invocationHandler = Proxy.getInvocationHandler( annotation );
-			if ( invocationHandler instanceof AnnotationProxy ) {
-				return ( (AnnotationProxy) invocationHandler ).values;
-			}
-		}
-
-		AnnotationParameters annotationParameters = run( GetAnnotationParameters.action( annotation ) );
-		return annotationParameters.getParameters();
-	}
-
-	private int calculateHashCode() {
-		int hashCode = 0;
-
-		for ( Entry<String, Object> member : values.entrySet() ) {
-			Object value = member.getValue();
-
-			int nameHashCode = member.getKey().hashCode();
-
-			int valueHashCode =
-					!value.getClass().isArray() ? value.hashCode() :
-							value.getClass() == boolean[].class ? Arrays.hashCode( (boolean[]) value ) :
-									value.getClass() == byte[].class ? Arrays.hashCode( (byte[]) value ) :
-											value.getClass() == char[].class ? Arrays.hashCode( (char[]) value ) :
-													value.getClass() == double[].class ? Arrays.hashCode( (double[]) value ) :
-															value.getClass() == float[].class ? Arrays.hashCode( (float[]) value ) :
-																	value.getClass() == int[].class ? Arrays.hashCode( (int[]) value ) :
-																			value.getClass() == long[].class ? Arrays.hashCode(
-																					(long[]) value
-																			) :
-																					value.getClass() == short[].class ? Arrays
-																							.hashCode( (short[]) value ) :
-																							Arrays.hashCode( (Object[]) value );
-
-			hashCode += 127 * nameHashCode ^ valueHashCode;
-		}
-
-		return hashCode;
-	}
-
-	private SortedSet<String> getRegisteredMethodsInAlphabeticalOrder() {
-		SortedSet<String> result = new TreeSet<String>();
-		result.addAll( values.keySet() );
-		return result;
+		return descriptor.toString();
 	}
 
 	private boolean areEqual(Object o1, Object o2) {
@@ -261,6 +152,20 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 																								(Object[]) o1,
 																								(Object[]) o2
 																						);
+	}
+
+	private Map<String, Object> getAnnotationAttributes(Annotation annotation) {
+		// We only enable this optimization if the security manager is not enabled. Otherwise,
+		// we would have to add every package containing constraints to the security policy.
+		if ( Proxy.isProxyClass( annotation.getClass() ) && System.getSecurityManager() == null ) {
+			InvocationHandler invocationHandler = Proxy.getInvocationHandler( annotation );
+			if ( invocationHandler instanceof AnnotationProxy ) {
+				return ( (AnnotationProxy) invocationHandler ).descriptor.getAttributes().toMap();
+			}
+		}
+
+		AnnotationParameters annotationAttributes = run( GetAnnotationParameters.action( annotation ) );
+		return annotationAttributes.toMap();
 	}
 
 	/**
