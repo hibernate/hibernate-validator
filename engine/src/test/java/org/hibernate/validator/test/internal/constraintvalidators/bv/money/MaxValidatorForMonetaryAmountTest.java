@@ -6,19 +6,17 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.money;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import javax.money.MonetaryAmount;
 import javax.validation.ConstraintValidator;
 import javax.validation.constraints.Max;
 
-import org.javamoney.moneta.Money;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MaxValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import org.javamoney.moneta.Money;
+import org.testng.annotations.Test;
 
 /**
  * @author Lukas Niemeier
@@ -57,9 +55,9 @@ public class MaxValidatorForMonetaryAmountTest {
 	}
 
 	private Max max(final long value) {
-		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<>( Max.class );
-		descriptor.setValue( "value", value );
-		return AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<Max> descriptorBuilder = new AnnotationDescriptor.Builder<>( Max.class );
+		descriptorBuilder.setValue( "value", value );
+		return descriptorBuilder.build().annotation();
 	}
 
 }

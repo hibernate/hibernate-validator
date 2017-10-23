@@ -6,16 +6,14 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * Tests for the {@code LuhnCheckValidator}.
@@ -108,12 +106,12 @@ public class LuhnCheckValidatorTest {
 	}
 
 	private LuhnCheck createLuhnCheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {
-		AnnotationDescriptor<LuhnCheck> descriptor = new AnnotationDescriptor<LuhnCheck>( LuhnCheck.class );
-		descriptor.setValue( "startIndex", start );
-		descriptor.setValue( "endIndex", end );
-		descriptor.setValue( "checkDigitIndex", checkDigitIndex );
-		descriptor.setValue( "ignoreNonDigitCharacters", ignoreNonDigits );
+		AnnotationDescriptor.Builder<LuhnCheck> descriptorBuilder = new AnnotationDescriptor.Builder<>( LuhnCheck.class );
+		descriptorBuilder.setValue( "startIndex", start );
+		descriptorBuilder.setValue( "endIndex", end );
+		descriptorBuilder.setValue( "checkDigitIndex", checkDigitIndex );
+		descriptorBuilder.setValue( "ignoreNonDigitCharacters", ignoreNonDigits );
 
-		return AnnotationFactory.create( descriptor );
+		return descriptorBuilder.build().annotation();
 	}
 }

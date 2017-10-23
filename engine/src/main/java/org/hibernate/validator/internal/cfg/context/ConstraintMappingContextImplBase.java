@@ -74,7 +74,7 @@ abstract class ConstraintMappingContextImplBase extends ConstraintContextImplBas
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
 				constraintHelper,
 				config.getLocation().getMember(),
-				config.createAnnotationProxy(),
+				config.createAnnotationDescriptor(),
 				config.getElementType(),
 				getConstraintType()
 		);

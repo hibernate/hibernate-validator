@@ -27,9 +27,7 @@ import org.hibernate.validator.cfg.defs.DurationMaxDef;
 import org.hibernate.validator.constraints.time.DurationMax;
 import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMaxValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.TestForIssue;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -120,10 +118,10 @@ public class DurationMaxValidatorTest {
 	}
 
 	private void doTesting(boolean inclusive) {
-		AnnotationDescriptor<DurationMax> descriptor = new AnnotationDescriptor<>( DurationMax.class );
-		descriptor.setValue( "nanos", 100L );
-		descriptor.setValue( "inclusive", inclusive );
-		DurationMax annotation = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<DurationMax> descriptorBuilder = new AnnotationDescriptor.Builder<>( DurationMax.class );
+		descriptorBuilder.setValue( "nanos", 100L );
+		descriptorBuilder.setValue( "inclusive", inclusive );
+		DurationMax annotation = descriptorBuilder.build().annotation();
 
 		DurationMaxValidator validator = new DurationMaxValidator();
 		validator.initialize( annotation );

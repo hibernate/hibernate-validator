@@ -30,7 +30,6 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
@@ -80,25 +79,25 @@ class MetaConstraintBuilder {
 		catch (ValidationException e) {
 			throw log.getUnableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
 		}
-		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( annotationClass );
+		AnnotationDescriptor.Builder<A> annotationDescriptorBuilder = new AnnotationDescriptor.Builder<>( annotationClass );
 
 		if ( constraint.getMessage() != null ) {
-			annotationDescriptor.setValue( MESSAGE_PARAM, constraint.getMessage() );
+			annotationDescriptorBuilder.setValue( MESSAGE_PARAM, constraint.getMessage() );
 		}
-		annotationDescriptor.setValue( GROUPS_PARAM, getGroups( constraint.getGroups(), defaultPackage ) );
-		annotationDescriptor.setValue( PAYLOAD_PARAM, getPayload( constraint.getPayload(), defaultPackage ) );
+		annotationDescriptorBuilder.setValue( GROUPS_PARAM, getGroups( constraint.getGroups(), defaultPackage ) );
+		annotationDescriptorBuilder.setValue( PAYLOAD_PARAM, getPayload( constraint.getPayload(), defaultPackage ) );
 
 		for ( ElementType elementType : constraint.getElement() ) {
 			String name = elementType.getName();
 			checkNameIsValid( name );
 			Class<?> returnType = getAnnotationParameterType( annotationClass, name );
 			Object elementValue = getElementValue( elementType, returnType, defaultPackage );
-			annotationDescriptor.setValue( name, elementValue );
+			annotationDescriptorBuilder.setValue( name, elementValue );
 		}
 
-		A annotation;
+		AnnotationDescriptor<A> annotationDescriptor;
 		try {
-			annotation = AnnotationFactory.create( annotationDescriptor );
+			annotationDescriptor = annotationDescriptorBuilder.build();
 		}
 		catch (RuntimeException e) {
 			throw log.getUnableToCreateAnnotationForConfiguredConstraintException( e );
@@ -107,21 +106,21 @@ class MetaConstraintBuilder {
 		// we set initially ConstraintOrigin.DEFINED_LOCALLY for all xml configured constraints
 		// later we will make copies of this constraint descriptor when needed and adjust the ConstraintOrigin
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				constraintHelper, constraintLocation.getMember(), annotation, type, constraintType
+				constraintHelper, constraintLocation.getMember(), annotationDescriptor, type, constraintType
 		);
 
 		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor, constraintLocation );
 	}
 
 	private <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType, String defaultPackage) {
-		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( returnType );
+		AnnotationDescriptor.Builder<A> annotationDescriptorBuilder = new AnnotationDescriptor.Builder<>( returnType );
 		for ( ElementType elementType : annotationType.getElement() ) {
 			String name = elementType.getName();
 			Class<?> parameterType = getAnnotationParameterType( returnType, name );
 			Object elementValue = getElementValue( elementType, parameterType, defaultPackage );
-			annotationDescriptor.setValue( name, elementValue );
+			annotationDescriptorBuilder.setValue( name, elementValue );
 		}
-		return AnnotationFactory.create( annotationDescriptor );
+		return annotationDescriptorBuilder.build().annotation();
 	}
 
 	private static void checkNameIsValid(String name) {

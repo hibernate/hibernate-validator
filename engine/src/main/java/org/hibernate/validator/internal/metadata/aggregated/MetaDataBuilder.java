@@ -130,7 +130,7 @@ public abstract class MetaDataBuilder {
 		ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<>(
 				constraintHelper,
 				constraint.getLocation().getMember(),
-				constraint.getDescriptor().getAnnotation(),
+				constraint.getDescriptor().getAnnotationDescriptor(),
 				constraint.getElementType(),
 				constraintClass.isInterface() ? constraintClass : null,
 				definedIn,

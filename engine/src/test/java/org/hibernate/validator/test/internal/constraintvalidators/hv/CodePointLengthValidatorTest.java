@@ -6,17 +6,16 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import org.hibernate.validator.constraints.CodePointLength;
-import org.hibernate.validator.internal.constraintvalidators.hv.CodePointLengthValidator;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
-import org.hibernate.validator.testutil.MyCustomStringImpl;
-import org.testng.annotations.Test;
-
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
+
+import org.hibernate.validator.constraints.CodePointLength;
+import org.hibernate.validator.internal.constraintvalidators.hv.CodePointLengthValidator;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.testutil.MyCustomStringImpl;
+import org.testng.annotations.Test;
 
 /**
  * Tests the {@link CodePointLength} constraint.
@@ -27,11 +26,11 @@ public class CodePointLengthValidatorTest {
 
 	@Test
 	public void testIsValid() {
-		AnnotationDescriptor<CodePointLength> descriptor = new AnnotationDescriptor<CodePointLength>( CodePointLength.class );
-		descriptor.setValue( "min", 1 );
-		descriptor.setValue( "max", 3 );
-		descriptor.setValue( "message", "{validator.codePointLength}" );
-		CodePointLength l = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<CodePointLength> descriptorBuilder = new AnnotationDescriptor.Builder<>( CodePointLength.class );
+		descriptorBuilder.setValue( "min", 1 );
+		descriptorBuilder.setValue( "max", 3 );
+		descriptorBuilder.setValue( "message", "{validator.codePointLength}" );
+		CodePointLength l = descriptorBuilder.build().annotation();
 		CodePointLengthValidator constraint = new CodePointLengthValidator();
 		constraint.initialize( l );
 		assertTrue( constraint.isValid( null, null ) );
@@ -46,10 +45,10 @@ public class CodePointLengthValidatorTest {
 
 	@Test
 	public void testIsValidCharSequence() {
-		AnnotationDescriptor<CodePointLength> descriptor = new AnnotationDescriptor<CodePointLength>( CodePointLength.class );
-		descriptor.setValue( "min", 1 );
-		descriptor.setValue( "max", 3 );
-		CodePointLength l = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<CodePointLength> descriptorBuilder = new AnnotationDescriptor.Builder<>( CodePointLength.class );
+		descriptorBuilder.setValue( "min", 1 );
+		descriptorBuilder.setValue( "max", 3 );
+		CodePointLength l = descriptorBuilder.build().annotation();
 		CodePointLengthValidator constraint = new CodePointLengthValidator();
 		constraint.initialize( l );
 		assertTrue( constraint.isValid( new MyCustomStringImpl( "foo" ), null ) );
@@ -61,20 +60,20 @@ public class CodePointLengthValidatorTest {
 	@Test
 	public void testIsValidNormalizationStrategyIsNONE() {
 		{
-			AnnotationDescriptor<CodePointLength> descriptor = new AnnotationDescriptor<CodePointLength>( CodePointLength.class );
-			descriptor.setValue( "min", 3 );
-			descriptor.setValue( "max", 3 );
-			descriptor.setValue( "normalizationStrategy", CodePointLength.NormalizationStrategy.NONE );
-			CodePointLength l = AnnotationFactory.create( descriptor );
+			AnnotationDescriptor.Builder<CodePointLength> descriptorBuilder = new AnnotationDescriptor.Builder<>( CodePointLength.class );
+			descriptorBuilder.setValue( "min", 3 );
+			descriptorBuilder.setValue( "max", 3 );
+			descriptorBuilder.setValue( "normalizationStrategy", CodePointLength.NormalizationStrategy.NONE );
+			CodePointLength l = descriptorBuilder.build().annotation();
 			CodePointLengthValidator constraint = new CodePointLengthValidator();
 			constraint.initialize( l );
 			assertTrue( constraint.isValid( "があ", null ) );
 		}
 		{
-			AnnotationDescriptor<CodePointLength> descriptor = new AnnotationDescriptor<CodePointLength>( CodePointLength.class );
-			descriptor.setValue( "min", 2 );
-			descriptor.setValue( "max", 2 );
-			CodePointLength l = AnnotationFactory.create( descriptor );
+			AnnotationDescriptor.Builder<CodePointLength> descriptorBuilder = new AnnotationDescriptor.Builder<>( CodePointLength.class );
+			descriptorBuilder.setValue( "min", 2 );
+			descriptorBuilder.setValue( "max", 2 );
+			CodePointLength l = descriptorBuilder.build().annotation();
 			CodePointLengthValidator constraint = new CodePointLengthValidator();
 			constraint.initialize( l );
 			assertTrue( constraint.isValid( "があ", null ) );
@@ -83,11 +82,11 @@ public class CodePointLengthValidatorTest {
 
 	@Test
 	public void testIsValidNormalizationStrategyIsNfc() {
-		AnnotationDescriptor<CodePointLength> descriptor = new AnnotationDescriptor<CodePointLength>( CodePointLength.class );
-		descriptor.setValue( "min", 3 );
-		descriptor.setValue( "max", 3 );
-		descriptor.setValue( "normalizationStrategy", CodePointLength.NormalizationStrategy.NFC );
-		CodePointLength l = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<CodePointLength> descriptorBuilder = new AnnotationDescriptor.Builder<>( CodePointLength.class );
+		descriptorBuilder.setValue( "min", 3 );
+		descriptorBuilder.setValue( "max", 3 );
+		descriptorBuilder.setValue( "normalizationStrategy", CodePointLength.NormalizationStrategy.NFC );
+		CodePointLength l = descriptorBuilder.build().annotation();
 		CodePointLengthValidator constraint = new CodePointLengthValidator();
 		constraint.initialize( l );
 		assertTrue( constraint.isValid( "ががあ", null ) );
@@ -95,11 +94,11 @@ public class CodePointLengthValidatorTest {
 
 	@Test
 	public void testIsValidNormalizationStrategyIsNfkc() {
-		AnnotationDescriptor<CodePointLength> descriptor = new AnnotationDescriptor<CodePointLength>( CodePointLength.class );
-		descriptor.setValue( "min", 1 );
-		descriptor.setValue( "max", 1 );
-		descriptor.setValue( "normalizationStrategy", CodePointLength.NormalizationStrategy.NFKC );
-		CodePointLength l = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<CodePointLength> descriptorBuilder = new AnnotationDescriptor.Builder<>( CodePointLength.class );
+		descriptorBuilder.setValue( "min", 1 );
+		descriptorBuilder.setValue( "max", 1 );
+		descriptorBuilder.setValue( "normalizationStrategy", CodePointLength.NormalizationStrategy.NFKC );
+		CodePointLength l = descriptorBuilder.build().annotation();
 		CodePointLengthValidator constraint = new CodePointLengthValidator();
 		constraint.initialize( l );
 		assertTrue( constraint.isValid( "\u3131\u314F\u3133", null ) );
@@ -107,11 +106,11 @@ public class CodePointLengthValidatorTest {
 
 	@Test
 	public void testIsValidNormalizationStrategyIsNfd() {
-		AnnotationDescriptor<CodePointLength> descriptor = new AnnotationDescriptor<CodePointLength>( CodePointLength.class );
-		descriptor.setValue( "min", 5 );
-		descriptor.setValue( "max", 5 );
-		descriptor.setValue( "normalizationStrategy", CodePointLength.NormalizationStrategy.NFD );
-		CodePointLength l = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<CodePointLength> descriptorBuilder = new AnnotationDescriptor.Builder<>( CodePointLength.class );
+		descriptorBuilder.setValue( "min", 5 );
+		descriptorBuilder.setValue( "max", 5 );
+		descriptorBuilder.setValue( "normalizationStrategy", CodePointLength.NormalizationStrategy.NFD );
+		CodePointLength l = descriptorBuilder.build().annotation();
 		CodePointLengthValidator constraint = new CodePointLengthValidator();
 		constraint.initialize( l );
 		assertTrue( constraint.isValid( "ががあ", null ) );
@@ -119,11 +118,11 @@ public class CodePointLengthValidatorTest {
 
 	@Test
 	public void testIsValidNormalizationStrategyIsNfkd() {
-		AnnotationDescriptor<CodePointLength> descriptor = new AnnotationDescriptor<CodePointLength>( CodePointLength.class );
-		descriptor.setValue( "min", 4 );
-		descriptor.setValue( "max", 4 );
-		descriptor.setValue( "normalizationStrategy", CodePointLength.NormalizationStrategy.NFKD );
-		CodePointLength l = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<CodePointLength> descriptorBuilder = new AnnotationDescriptor.Builder<>( CodePointLength.class );
+		descriptorBuilder.setValue( "min", 4 );
+		descriptorBuilder.setValue( "max", 4 );
+		descriptorBuilder.setValue( "normalizationStrategy", CodePointLength.NormalizationStrategy.NFKD );
+		CodePointLength l = descriptorBuilder.build().annotation();
 		CodePointLengthValidator constraint = new CodePointLengthValidator();
 		constraint.initialize( l );
 		assertTrue( constraint.isValid( "1㌦", null ) );
@@ -138,11 +137,11 @@ public class CodePointLengthValidatorTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNegativeMinValue() {
-		AnnotationDescriptor<CodePointLength> descriptor = new AnnotationDescriptor<CodePointLength>( CodePointLength.class );
-		descriptor.setValue( "min", -1 );
-		descriptor.setValue( "max", 1 );
-		descriptor.setValue( "message", "{validator.codePointLength}" );
-		CodePointLength l = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<CodePointLength> descriptorBuilder = new AnnotationDescriptor.Builder<>( CodePointLength.class );
+		descriptorBuilder.setValue( "min", -1 );
+		descriptorBuilder.setValue( "max", 1 );
+		descriptorBuilder.setValue( "message", "{validator.codePointLength}" );
+		CodePointLength l = descriptorBuilder.build().annotation();
 
 		CodePointLengthValidator constraint = new CodePointLengthValidator();
 		constraint.initialize( l );
@@ -150,11 +149,11 @@ public class CodePointLengthValidatorTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNegativeMaxValue() {
-		AnnotationDescriptor<CodePointLength> descriptor = new AnnotationDescriptor<CodePointLength>( CodePointLength.class );
-		descriptor.setValue( "min", 1 );
-		descriptor.setValue( "max", -1 );
-		descriptor.setValue( "message", "{validator.codePointLength}" );
-		CodePointLength l = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<CodePointLength> descriptorBuilder = new AnnotationDescriptor.Builder<>( CodePointLength.class );
+		descriptorBuilder.setValue( "min", 1 );
+		descriptorBuilder.setValue( "max", -1 );
+		descriptorBuilder.setValue( "message", "{validator.codePointLength}" );
+		CodePointLength l = descriptorBuilder.build().annotation();
 
 		CodePointLengthValidator constraint = new CodePointLengthValidator();
 		constraint.initialize( l );
@@ -162,11 +161,11 @@ public class CodePointLengthValidatorTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNegativeLength() {
-		AnnotationDescriptor<CodePointLength> descriptor = new AnnotationDescriptor<CodePointLength>( CodePointLength.class );
-		descriptor.setValue( "min", 5 );
-		descriptor.setValue( "max", 4 );
-		descriptor.setValue( "message", "{validator.codePointLength}" );
-		CodePointLength l = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<CodePointLength> descriptorBuilder = new AnnotationDescriptor.Builder<>( CodePointLength.class );
+		descriptorBuilder.setValue( "min", 5 );
+		descriptorBuilder.setValue( "max", 4 );
+		descriptorBuilder.setValue( "message", "{validator.codePointLength}" );
+		CodePointLength l = descriptorBuilder.build().annotation();
 
 		CodePointLengthValidator constraint = new CodePointLengthValidator();
 		constraint.initialize( l );
