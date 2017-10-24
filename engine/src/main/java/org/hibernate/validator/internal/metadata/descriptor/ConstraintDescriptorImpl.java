@@ -50,7 +50,6 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
-import org.hibernate.validator.internal.util.annotation.AnnotationAttributes;
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -179,12 +178,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 		// HV-181 - To avoid any thread visibility issues we are building the different data structures in tmp variables and
 		// then assign them to the final variables
-		this.groups = buildGroupSet( annotationDescriptor.getAttributes(), implicitGroup );
-		this.payloads = buildPayloadSet( annotationDescriptor.getAttributes() );
+		this.groups = buildGroupSet( annotationDescriptor, implicitGroup );
+		this.payloads = buildPayloadSet( annotationDescriptor );
 
 		this.valueUnwrapping = determineValueUnwrapping( this.payloads, member, annotationDescriptor.type() );
 
-		this.validationAppliesTo = determineValidationAppliesTo( annotationDescriptor.getAttributes() );
+		this.validationAppliesTo = determineValidationAppliesTo( annotationDescriptor );
 
 		this.constraintValidatorClasses = constraintHelper.getAllValidatorDescriptors( annotationDescriptor.type() )
 				.stream()
@@ -296,7 +295,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@Override
 	public Map<String, Object> getAttributes() {
-		return annotationDescriptor.getAttributes().toMap();
+		return annotationDescriptor.getAttributes();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -494,8 +493,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return ValidateUnwrappedValue.DEFAULT;
 	}
 
-	private static ConstraintTarget determineValidationAppliesTo(AnnotationAttributes attributes) {
-		return attributes.getParameter( ConstraintHelper.VALIDATION_APPLIES_TO, ConstraintTarget.class );
+	private static ConstraintTarget determineValidationAppliesTo(AnnotationDescriptor<?> annotationDescriptor) {
+		return annotationDescriptor.getAttribute( ConstraintHelper.VALIDATION_APPLIES_TO, ConstraintTarget.class );
 	}
 
 	private void validateCrossParameterConstraintType(Member member, boolean hasCrossParameterValidator) {
@@ -567,10 +566,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Set<Class<? extends Payload>> buildPayloadSet(AnnotationAttributes attributes) {
+	private static Set<Class<? extends Payload>> buildPayloadSet(AnnotationDescriptor<?> annotationDescriptor) {
 		Set<Class<? extends Payload>> payloadSet = newHashSet();
 
-		Class<Payload>[] payloadFromAnnotation = attributes.getParameter( ConstraintHelper.PAYLOAD, Class[].class );
+		Class<Payload>[] payloadFromAnnotation = annotationDescriptor.getAttribute( ConstraintHelper.PAYLOAD, Class[].class );
 
 		if ( payloadFromAnnotation != null ) {
 			payloadSet.addAll( Arrays.asList( payloadFromAnnotation ) );
@@ -578,9 +577,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return CollectionHelper.toImmutableSet( payloadSet );
 	}
 
-	private static Set<Class<?>> buildGroupSet(AnnotationAttributes attributes, Class<?> implicitGroup) {
+	private static Set<Class<?>> buildGroupSet(AnnotationDescriptor<?> annotationDescriptor, Class<?> implicitGroup) {
 		Set<Class<?>> groupSet = newHashSet();
-		final Class<?>[] groupsFromAnnotation = attributes.getMandatoryParameter( ConstraintHelper.GROUPS, Class[].class );
+		final Class<?>[] groupsFromAnnotation = annotationDescriptor.getMandatoryAttribute( ConstraintHelper.GROUPS, Class[].class );
 		if ( groupsFromAnnotation.length == 0 ) {
 			groupSet.add( Default.class );
 		}
@@ -593,10 +592,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			groupSet.add( implicitGroup );
 		}
 		return CollectionHelper.toImmutableSet( groupSet );
-	}
-
-	private static AnnotationAttributes buildAnnotationAttributes(Annotation annotation) {
-		return run( GetAnnotationAttributes.action( annotation ) );
 	}
 
 	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
@@ -620,7 +615,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private void addOverrideAttributes(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, Method m, OverridesAttribute... attributes) {
-		Object value = annotationDescriptor.getAttributes().getParameter( m.getName() );
+		Object value = annotationDescriptor.getAttribute( m.getName() );
 		for ( OverridesAttribute overridesAttribute : attributes ) {
 			String overridesAttributeName = overridesAttribute.name().length() > 0 ? overridesAttribute.name() : m.getName();
 
@@ -742,7 +737,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 		// use a annotation proxy
 		AnnotationDescriptor.Builder<U> annotationDescriptorBuilder = new AnnotationDescriptor.Builder<>(
-				annotationType, buildAnnotationAttributes( constraintAnnotation ).toMap()
+				annotationType, run( GetAnnotationAttributes.action( constraintAnnotation ) )
 		);
 
 		// get the right override parameters

@@ -46,14 +46,14 @@ public final class GetAnnotationAttribute<T> implements PrivilegedAction<T> {
 				return (T) o;
 			}
 			else {
-				throw log.getWrongParameterTypeException( type, o.getClass() );
+				throw log.getWrongParameterTypeException( annotation.annotationType(), attributeName, type, o.getClass() );
 			}
 		}
 		catch (NoSuchMethodException e) {
-			throw log.getUnableToFindAnnotationParameterException( attributeName, e );
+			throw log.getUnableToFindAnnotationParameterException( annotation.annotationType(), attributeName, e );
 		}
 		catch (IllegalAccessException | InvocationTargetException e) {
-			throw log.getUnableToGetAnnotationParameterException( attributeName, annotation.getClass(), e );
+			throw log.getUnableToGetAnnotationParameterException( annotation.annotationType(), attributeName, e );
 		}
 	}
 }

@@ -306,16 +306,18 @@ public interface Log extends BasicLogger {
 	ConstraintDefinitionException getWrongAttributeTypeForOverriddenConstraintException(@FormatWith(ClassObjectFormatter.class) Class<?> expectedReturnType,
 			@FormatWith(ClassObjectFormatter.class) Class<?> currentReturnType);
 
-	@Message(id = 82, value = "Wrong parameter type. Expected: %1$s Actual: %2$s.")
-	ValidationException getWrongParameterTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> expectedType,
+	@Message(id = 82, value = "Wrong type for attribute '%2$s' of '%1$s'. Expected: %3$s Actual: %4$s.")
+	ValidationException getWrongParameterTypeException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass,
+			String attributeName, @FormatWith(ClassObjectFormatter.class) Class<?> expectedType,
 			@FormatWith(ClassObjectFormatter.class) Class<?> currentType);
 
-	@Message(id = 83, value = "The specified annotation defines no parameter '%s'.")
-	ValidationException getUnableToFindAnnotationParameterException(String parameterName, @Cause NoSuchMethodException e);
+	@Message(id = 83, value = "The specified annotation '%1$s' defines no parameter '%2$s'.")
+	ValidationException getUnableToFindAnnotationParameterException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass,
+			String parameterName, @Cause NoSuchMethodException e);
 
-	@Message(id = 84, value = "Unable to get '%1$s' from %2$s.")
-	ValidationException getUnableToGetAnnotationParameterException(String parameterName,
-			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass, @Cause Exception e);
+	@Message(id = 84, value = "Unable to get '%2$s' from %1$s.")
+	ValidationException getUnableToGetAnnotationParameterException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass,
+			String parameterName, @Cause Exception e);
 
 	@Message(id = 85, value = "No value provided for parameter '%1$s' of annotation @%2$s.")
 	IllegalArgumentException getNoValueProvidedForAnnotationParameterException(String parameterName,
