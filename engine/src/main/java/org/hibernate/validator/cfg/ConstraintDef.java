@@ -10,8 +10,6 @@ import java.lang.annotation.Annotation;
 
 import javax.validation.Payload;
 
-import org.hibernate.validator.internal.util.StringHelper;
-
 /**
  * Base class for all constraint definition types. Each sub type represents a
  * single constraint annotation type and allows to add this constraint to a bean
@@ -55,16 +53,5 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 	public C payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
 		return getThis();
-	}
-
-	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( this.getClass().getSimpleName() );
-		sb.append( '{' );
-		sb.append( "constraintType=" ).append( StringHelper.toShortString( annotationType ) );
-		sb.append( ", parameters=" ).append( parameters );
-		sb.append( '}' );
-		return sb.toString();
 	}
 }

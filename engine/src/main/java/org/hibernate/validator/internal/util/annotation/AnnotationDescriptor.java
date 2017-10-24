@@ -22,6 +22,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttributes;
@@ -161,7 +162,7 @@ public class AnnotationDescriptor<A extends Annotation> implements Serializable 
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		result.append( '@' ).append( type.getName() ).append( '(' );
+		result.append( '@' ).append( StringHelper.toShortString( type ) ).append( '(' );
 		for ( String s : getRegisteredAttributesInAlphabeticalOrder() ) {
 			result.append( s ).append( '=' ).append( attributes.get( s ) ).append( ", " );
 		}
@@ -272,6 +273,10 @@ public class AnnotationDescriptor<A extends Annotation> implements Serializable 
 			return attributes.containsKey( key );
 		}
 
+		public Class<S> getType() {
+			return type;
+		}
+
 		public AnnotationDescriptor<S> build() {
 			return new AnnotationDescriptor<S>( type, getAnnotationAttributes() );
 		}
@@ -306,6 +311,29 @@ public class AnnotationDescriptor<A extends Annotation> implements Serializable 
 				);
 			}
 			return result;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder result = new StringBuilder();
+			result.append( '@' ).append( StringHelper.toShortString( type ) ).append( '(' );
+			for ( String s : getRegisteredAttributesInAlphabeticalOrder() ) {
+				result.append( s ).append( '=' ).append( attributes.get( s ) ).append( ", " );
+			}
+			// remove last separator:
+			if ( attributes.size() > 0 ) {
+				result.delete( result.length() - 2, result.length() );
+				result.append( ")" );
+			}
+			else {
+				result.delete( result.length() - 1, result.length() );
+			}
+
+			return result.toString();
+		}
+
+		private SortedSet<String> getRegisteredAttributesInAlphabeticalOrder() {
+			return new TreeSet<String>( attributes.keySet() );
 		}
 	}
 
