@@ -463,7 +463,7 @@ public class BeanDescriptorTest {
 		}
 	}
 
-	@ScriptAssert(lang = "", script = "")
+	@ScriptAssert(lang = "some lang", script = "some script")
 	private static class ClassLevelConstrainedType {
 	}
 

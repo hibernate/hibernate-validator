@@ -107,7 +107,7 @@ public class ConstraintDescriptorTest {
 	}
 
 	@SupportedValidationTarget(value = { ValidationTarget.PARAMETERS, ValidationTarget.ANNOTATED_ELEMENT })
-	public class VersatileConstraintValidator implements ConstraintValidator<VersatileConstraint, Object[]> {
+	public static class VersatileConstraintValidator implements ConstraintValidator<VersatileConstraint, Object[]> {
 
 		@Override
 		public boolean isValid(Object[] value, ConstraintValidatorContext context) {
