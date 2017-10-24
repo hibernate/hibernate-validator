@@ -48,9 +48,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  */
 public class ConstraintTree<A extends Annotation> {
 
-	private static final Log log = LoggerFactory.make();
-
-	private final ConstraintTree<?> parent;
+	private static final Log LOG = LoggerFactory.make();
 
 	@Immutable
 	private final List<ConstraintTree<?>> children;
@@ -67,11 +65,6 @@ public class ConstraintTree<A extends Annotation> {
 	private volatile ConcurrentMap<ConstraintValidatorFactory, Optional<ConstraintValidator<A, ?>>> constraintValidatorPerConstraintValidatorFactory;
 
 	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
-		this( descriptor, validatedValueType, null );
-	}
-
-	private ConstraintTree(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType, ConstraintTree<?> parent) {
-		this.parent = parent;
 		this.descriptor = descriptor;
 		this.validatedValueType = validatedValueType;
 		this.children = descriptor.getComposingConstraintImpls().stream()
@@ -80,7 +73,7 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintDescriptorImpl<U> composingDescriptor) {
-		return new ConstraintTree<>( composingDescriptor, this.validatedValueType, this );
+		return new ConstraintTree<>( composingDescriptor, this.validatedValueType );
 	}
 
 	public final ConstraintDescriptorImpl<A> getDescriptor() {
@@ -110,8 +103,8 @@ public class ConstraintTree<A extends Annotation> {
 		// After all children are validated the actual ConstraintValidator of the constraint itself is executed
 		if ( mainConstraintNeedsEvaluation( validationContext, constraintViolations ) ) {
 
-			if ( log.isTraceEnabled() ) {
-				log.tracef(
+			if ( LOG.isTraceEnabled() ) {
+				LOG.tracef(
 						"Validating value %s against constraint defined by %s.",
 						valueContext.getCurrentValidatedValue(),
 						descriptor
@@ -160,7 +153,7 @@ public class ConstraintTree<A extends Annotation> {
 
 	private ValidationException getExceptionForNullValidator(Type validatedValueType, String path) {
 		if ( descriptor.getConstraintType() == ConstraintDescriptorImpl.ConstraintType.CROSS_PARAMETER ) {
-			return log.getValidatorForCrossParameterConstraintMustEitherValidateObjectOrObjectArrayException(
+			return LOG.getValidatorForCrossParameterConstraintMustEitherValidateObjectOrObjectArrayException(
 					descriptor.getAnnotationType()
 			);
 		}
@@ -175,7 +168,7 @@ public class ConstraintTree<A extends Annotation> {
 					className = clazz.getName();
 				}
 			}
-			return log.getNoValidatorFoundForTypeException( descriptor.getAnnotationType(), className, path );
+			return LOG.getNoValidatorFoundForTypeException( descriptor.getAnnotationType(), className, path );
 		}
 	}
 
@@ -369,7 +362,7 @@ public class ConstraintTree<A extends Annotation> {
 			if ( e instanceof ConstraintDeclarationException ) {
 				throw e;
 			}
-			throw log.getExceptionDuringIsValidCallException( e );
+			throw LOG.getExceptionDuringIsValidCallException( e );
 		}
 		if ( !isValid ) {
 			//We do not add these violations yet, since we don't know how they are
@@ -396,7 +389,6 @@ public class ConstraintTree<A extends Annotation> {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "ConstraintTree" );
 		sb.append( "{ descriptor=" ).append( descriptor );
-		sb.append( ", isRoot=" ).append( parent == null );
 		sb.append( '}' );
 		return sb.toString();
 	}
