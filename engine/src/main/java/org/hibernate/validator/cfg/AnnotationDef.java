@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -32,6 +31,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
 public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Annotation> {
 
@@ -42,16 +42,9 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 	// public getters as they would pollute the fluent definition API.
 
 	/**
-	 * The constraint annotation type of this definition.
+	 * The annotation descriptor builder.
 	 */
-	protected final Class<A> annotationType;
-
-	/**
-	 * A map with the annotation parameters of this definition. Contains only parameters
-	 * of non annotation types. Keys are property names of this definition's annotation
-	 * type, values are annotation parameter values of the appropriate types.
-	 */
-	protected final Map<String, Object> parameters;
+	protected final AnnotationDescriptor.Builder<A> annotationDescriptorBuilder;
 
 	/**
 	 * A map with annotation parameters of this definition which are annotations
@@ -71,15 +64,13 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 	private final Map<String, Class<?>> annotationsAsParametersTypes;
 
 	protected AnnotationDef(Class<A> annotationType) {
-		this.annotationType = annotationType;
-		this.parameters = new HashMap<>();
+		this.annotationDescriptorBuilder = new AnnotationDescriptor.Builder<>( annotationType );
 		this.annotationsAsParameters = new HashMap<>();
 		this.annotationsAsParametersTypes = new HashMap<>();
 	}
 
 	protected AnnotationDef(AnnotationDef<?, A> original) {
-		this.annotationType = original.annotationType;
-		this.parameters = original.parameters;
+		this.annotationDescriptorBuilder = original.annotationDescriptorBuilder;
 		this.annotationsAsParameters = original.annotationsAsParameters;
 		this.annotationsAsParametersTypes = original.annotationsAsParametersTypes;
 	}
@@ -90,7 +81,7 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 	}
 
 	protected C addParameter(String key, Object value) {
-		parameters.put( key, value );
+		annotationDescriptorBuilder.setAttribute( key, value );
 		return getThis();
 	}
 
@@ -105,16 +96,11 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 				return resultingList;
 			}
 		} );
-		annotationsAsParametersTypes.putIfAbsent( key, value.annotationType );
+		annotationsAsParametersTypes.putIfAbsent( key, value.annotationDescriptorBuilder.getType() );
 		return getThis();
 	}
 
 	protected AnnotationDescriptor<A> createAnnotationDescriptor() {
-		AnnotationDescriptor.Builder<A> annotationDescriptorBuilder = new AnnotationDescriptor.Builder<>( annotationType );
-		for ( Map.Entry<String, Object> parameter : parameters.entrySet() ) {
-			annotationDescriptorBuilder.setAttribute( parameter.getKey(), parameter.getValue() );
-		}
-
 		for ( Map.Entry<String, List<AnnotationDef<?, ?>>> annotationAsParameter : annotationsAsParameters.entrySet() ) {
 			annotationDescriptorBuilder.setAttribute(
 					annotationAsParameter.getKey(),
@@ -149,8 +135,7 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 		final StringBuilder sb = new StringBuilder();
 		sb.append( this.getClass().getSimpleName() );
 		sb.append( '{' );
-		sb.append( "annotationType=" ).append( StringHelper.toShortString( annotationType ) );
-		sb.append( ", parameters=" ).append( parameters );
+		sb.append( annotationDescriptorBuilder );
 		sb.append( '}' );
 		return sb.toString();
 	}
