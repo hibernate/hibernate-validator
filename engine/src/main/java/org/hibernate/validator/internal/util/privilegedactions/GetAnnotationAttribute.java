@@ -20,7 +20,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public final class GetAnnotationAttribute<T> implements PrivilegedAction<T> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make();
 
 	private final Annotation annotation;
 	private final String attributeName;
@@ -46,14 +46,14 @@ public final class GetAnnotationAttribute<T> implements PrivilegedAction<T> {
 				return (T) o;
 			}
 			else {
-				throw log.getWrongParameterTypeException( annotation.annotationType(), attributeName, type, o.getClass() );
+				throw LOG.getWrongAnnotationAttributeTypeException( annotation.annotationType(), attributeName, type, o.getClass() );
 			}
 		}
 		catch (NoSuchMethodException e) {
-			throw log.getUnableToFindAnnotationParameterException( annotation.annotationType(), attributeName, e );
+			throw LOG.getUnableToFindAnnotationAttributeException( annotation.annotationType(), attributeName, e );
 		}
 		catch (IllegalAccessException | InvocationTargetException e) {
-			throw log.getUnableToGetAnnotationParameterException( annotation.annotationType(), attributeName, e );
+			throw LOG.getUnableToGetAnnotationAttributeException( annotation.annotationType(), attributeName, e );
 		}
 	}
 }
