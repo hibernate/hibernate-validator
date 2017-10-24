@@ -125,7 +125,7 @@ public class IgnoreCrossParameterConstraintTest {
 	}
 
 	@SupportedValidationTarget(value = ValidationTarget.PARAMETERS)
-	public class CrossParameterConstraintValidator implements ConstraintValidator<CrossParameterConstraint, Object[]> {
+	public static class CrossParameterConstraintValidator implements ConstraintValidator<CrossParameterConstraint, Object[]> {
 
 		@Override
 		public boolean isValid(Object[] value, ConstraintValidatorContext context) {
