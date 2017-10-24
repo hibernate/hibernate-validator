@@ -112,6 +112,6 @@ public class LuhnCheckValidatorTest {
 		descriptorBuilder.setAttribute( "checkDigitIndex", checkDigitIndex );
 		descriptorBuilder.setAttribute( "ignoreNonDigitCharacters", ignoreNonDigits );
 
-		return descriptorBuilder.build().annotation();
+		return descriptorBuilder.build().getAnnotation();
 	}
 }

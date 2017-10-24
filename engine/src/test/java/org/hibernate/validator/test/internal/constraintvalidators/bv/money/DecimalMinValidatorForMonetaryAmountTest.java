@@ -72,7 +72,7 @@ public class DecimalMinValidatorForMonetaryAmountTest {
 		AnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMin.class );
 		descriptorBuilder.setAttribute( "value", value );
 		descriptorBuilder.setAttribute( "inclusive", inclusive );
-		return descriptorBuilder.build().annotation();
+		return descriptorBuilder.build().getAnnotation();
 	}
 
 }

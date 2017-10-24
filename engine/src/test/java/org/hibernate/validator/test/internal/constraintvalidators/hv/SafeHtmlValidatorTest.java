@@ -102,7 +102,7 @@ public class SafeHtmlValidatorTest {
 		AnnotationDescriptor.Builder<SafeHtml.Tag> tagDescriptorBuilder = new AnnotationDescriptor.Builder<>( SafeHtml.Tag.class );
 		tagDescriptorBuilder.setAttribute( "name", "div" );
 		tagDescriptorBuilder.setAttribute( "attributes", new String[] { "class" } );
-		SafeHtml.Tag tag = tagDescriptorBuilder.build().annotation();
+		SafeHtml.Tag tag = tagDescriptorBuilder.build().getAnnotation();
 		descriptorBuilder.setAttribute( "additionalTagsWithAttributes", new SafeHtml.Tag[] { tag } );
 
 		assertTrue(
@@ -213,7 +213,7 @@ public class SafeHtmlValidatorTest {
 	}
 
 	private SafeHtmlValidator getSafeHtmlValidator() {
-		SafeHtml p = descriptorBuilder.build().annotation();
+		SafeHtml p = descriptorBuilder.build().getAnnotation();
 		SafeHtmlValidator validator = new SafeHtmlValidator();
 		validator.initialize( p );
 		return validator;

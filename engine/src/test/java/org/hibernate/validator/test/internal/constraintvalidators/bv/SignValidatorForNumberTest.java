@@ -66,22 +66,22 @@ public class SignValidatorForNumberTest {
 
 	@Test
 	public void testPositiveValidator() {
-		testPositive( new AnnotationDescriptor.Builder<>( Positive.class ).build().annotation() );
+		testPositive( new AnnotationDescriptor.Builder<>( Positive.class ).build().getAnnotation() );
 	}
 
 	@Test
 	public void testPositiveOrZeroValidator() {
-		testPositiveOrZero( new AnnotationDescriptor.Builder<>( PositiveOrZero.class ).build().annotation() );
+		testPositiveOrZero( new AnnotationDescriptor.Builder<>( PositiveOrZero.class ).build().getAnnotation() );
 	}
 
 	@Test
 	public void testNegativeValidator() {
-		testNegative( new AnnotationDescriptor.Builder<>( Negative.class ).build().annotation() );
+		testNegative( new AnnotationDescriptor.Builder<>( Negative.class ).build().getAnnotation() );
 	}
 
 	@Test
 	public void testNegativeOrZeroValidator() {
-		testNegativeOrZero( new AnnotationDescriptor.Builder<>( NegativeOrZero.class ).build().annotation() );
+		testNegativeOrZero( new AnnotationDescriptor.Builder<>( NegativeOrZero.class ).build().getAnnotation() );
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

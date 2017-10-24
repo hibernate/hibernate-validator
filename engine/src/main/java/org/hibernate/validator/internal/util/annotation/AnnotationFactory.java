@@ -34,8 +34,8 @@ public class AnnotationFactory {
 	public static <T extends Annotation> T create(AnnotationDescriptor<T> descriptor) {
 		@SuppressWarnings("unchecked")
 		Class<T> proxyClass = (Class<T>) Proxy.getProxyClass(
-				run( GetClassLoader.fromClass( descriptor.type() ) ),
-				descriptor.type()
+				run( GetClassLoader.fromClass( descriptor.getType() ) ),
+				descriptor.getType()
 		);
 		InvocationHandler handler = new AnnotationProxy( descriptor );
 		try {

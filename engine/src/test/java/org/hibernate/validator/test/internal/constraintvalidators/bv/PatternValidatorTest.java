@@ -27,7 +27,7 @@ public class PatternValidatorTest {
 		AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", "foobar" );
 		descriptorBuilder.setAttribute( "message", "pattern does not match" );
-		Pattern p = descriptorBuilder.build().annotation();
+		Pattern p = descriptorBuilder.build().getAnnotation();
 
 		PatternValidator constraint = new PatternValidator();
 		constraint.initialize( p );
@@ -43,7 +43,7 @@ public class PatternValidatorTest {
 	public void testIsValidForCharSequence() {
 		AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", "char sequence" );
-		Pattern p = descriptorBuilder.build().annotation();
+		Pattern p = descriptorBuilder.build().getAnnotation();
 
 		PatternValidator constraint = new PatternValidator();
 		constraint.initialize( p );
@@ -56,7 +56,7 @@ public class PatternValidatorTest {
 		AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", "|^.*foo$" );
 		descriptorBuilder.setAttribute( "message", "pattern does not match" );
-		Pattern p = descriptorBuilder.build().annotation();
+		Pattern p = descriptorBuilder.build().getAnnotation();
 
 		PatternValidator constraint = new PatternValidator();
 		constraint.initialize( p );
@@ -73,7 +73,7 @@ public class PatternValidatorTest {
 		AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", "(unbalanced parentheses" );
 		descriptorBuilder.setAttribute( "message", "pattern does not match" );
-		Pattern p = descriptorBuilder.build().annotation();
+		Pattern p = descriptorBuilder.build().getAnnotation();
 
 		PatternValidator constraint = new PatternValidator();
 		constraint.initialize( p );

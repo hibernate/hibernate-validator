@@ -224,7 +224,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		MessageInterpolator.Context messageInterpolatorContext = createMessageInterpolatorContext( constraintDescriptor );
 
 		String expected = "{replace.in.default.bundle2}";
-		String actual = interpolator.interpolate( descriptor.annotation().message(), messageInterpolatorContext );
+		String actual = interpolator.interpolate( descriptor.getAnnotation().message(), messageInterpolatorContext );
 		assertEquals(
 				actual, expected, "Within default bundle replacement parameter evaluation should not be recursive!"
 		);
@@ -253,7 +253,7 @@ public class ResourceBundleMessageInterpolatorTest {
 
 		MessageInterpolator.Context messageInterpolatorContext = createMessageInterpolatorContext( constraintDescriptor );
 
-		String actual = interpolator.interpolate( maxDescriptor.annotation().message(), messageInterpolatorContext );
+		String actual = interpolator.interpolate( maxDescriptor.getAnnotation().message(), messageInterpolatorContext );
 		assertEquals(
 				actual, message, "The message should not have changed."
 		);

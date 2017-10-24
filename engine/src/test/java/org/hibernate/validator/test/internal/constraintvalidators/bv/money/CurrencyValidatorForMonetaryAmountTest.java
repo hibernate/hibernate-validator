@@ -90,7 +90,7 @@ public class CurrencyValidatorForMonetaryAmountTest {
 	private Currency currency(String... acceptedCurrencies) {
 		AnnotationDescriptor.Builder<Currency> descriptorBuilder = new AnnotationDescriptor.Builder<>( Currency.class );
 		descriptorBuilder.setAttribute( "value", acceptedCurrencies );
-		return descriptorBuilder.build().annotation();
+		return descriptorBuilder.build().getAnnotation();
 	}
 
 	private static class Order {

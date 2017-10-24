@@ -229,7 +229,7 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 			descriptorBuilder.setAttribute( "reportOn", reportOn );
 		}
 
-		return descriptorBuilder.build().annotation();
+		return descriptorBuilder.build().getAnnotation();
 	}
 
 	/**

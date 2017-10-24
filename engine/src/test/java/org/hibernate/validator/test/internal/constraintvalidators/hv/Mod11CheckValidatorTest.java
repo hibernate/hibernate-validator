@@ -301,7 +301,7 @@ public class Mod11CheckValidatorTest {
 		descriptorBuilder.setAttribute( "treatCheck11As", treatCheck11As );
 		descriptorBuilder.setAttribute( "processingDirection", processingDirection );
 
-		return descriptorBuilder.build().annotation();
+		return descriptorBuilder.build().getAnnotation();
 	}
 
 	private static class Product {

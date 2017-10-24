@@ -72,7 +72,7 @@ public class DecimalMaxValidatorForMonetaryAmountTest {
 		AnnotationDescriptor.Builder<DecimalMax> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMax.class );
 		descriptorBuilder.setAttribute( "value", value );
 		descriptorBuilder.setAttribute( "inclusive", inclusive );
-		return descriptorBuilder.build().annotation();
+		return descriptorBuilder.build().getAnnotation();
 	}
 
 }

@@ -57,7 +57,7 @@ public class MaxValidatorForMonetaryAmountTest {
 	private Max max(final long value) {
 		AnnotationDescriptor.Builder<Max> descriptorBuilder = new AnnotationDescriptor.Builder<>( Max.class );
 		descriptorBuilder.setAttribute( "value", value );
-		return descriptorBuilder.build().annotation();
+		return descriptorBuilder.build().getAnnotation();
 	}
 
 }

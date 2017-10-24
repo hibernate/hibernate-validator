@@ -59,7 +59,7 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 
 	@Override
 	public Class<? extends Annotation> annotationType() {
-		return descriptor.type();
+		return descriptor.getType();
 	}
 
 	/**
@@ -79,11 +79,11 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 		if ( obj == null ) {
 			return false;
 		}
-		if ( !descriptor.type().isInstance( obj ) ) {
+		if ( !descriptor.getType().isInstance( obj ) ) {
 			return false;
 		}
 
-		Annotation other = descriptor.type().cast( obj );
+		Annotation other = descriptor.getType().cast( obj );
 
 		Map<String, Object> otherAttributes = getAnnotationAttributes( other );
 

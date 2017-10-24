@@ -26,7 +26,7 @@ public class AnnotationFactoryTest {
 		descriptorBuilder.setAttribute( "min", 5 );
 		descriptorBuilder.setAttribute( "max", 10 );
 
-		Size size = descriptorBuilder.build().annotation();
+		Size size = descriptorBuilder.build().getAnnotation();
 
 		assertEquals( size.min(), 5, "Wrong parameter value" );
 		assertEquals( size.max(), 10, "Wrong parameter value" );
@@ -35,7 +35,7 @@ public class AnnotationFactoryTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void createAnnotationProxyMissingRequiredParameter() {
 		AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
-		descriptorBuilder.build().annotation();
+		descriptorBuilder.build().getAnnotation();
 	}
 
 	@Test
@@ -43,7 +43,7 @@ public class AnnotationFactoryTest {
 		AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", ".*" );
 
-		Pattern pattern = descriptorBuilder.build().annotation();
+		Pattern pattern = descriptorBuilder.build().getAnnotation();
 
 		assertEquals( ".*", pattern.regexp(), "Wrong parameter value" );
 	}

@@ -33,7 +33,7 @@ public class MinValidatorForStringTest {
 		AnnotationDescriptor.Builder<Min> descriptorBuilder = new AnnotationDescriptor.Builder<>( Min.class );
 		descriptorBuilder.setAttribute( "value", 15L );
 		descriptorBuilder.setAttribute( "message", "{validator.min}" );
-		Min m = descriptorBuilder.build().annotation();
+		Min m = descriptorBuilder.build().getAnnotation();
 
 		MinValidatorForCharSequence constraint = new MinValidatorForCharSequence();
 		constraint.initialize( m );
@@ -45,7 +45,7 @@ public class MinValidatorForStringTest {
 		AnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMin.class );
 		descriptorBuilder.setAttribute( "value", "1500E-2" );
 		descriptorBuilder.setAttribute( "message", "{validator.min}" );
-		DecimalMin m = descriptorBuilder.build().annotation();
+		DecimalMin m = descriptorBuilder.build().getAnnotation();
 
 		DecimalMinValidatorForCharSequence constraint = new DecimalMinValidatorForCharSequence();
 		constraint.initialize( m );
@@ -58,7 +58,7 @@ public class MinValidatorForStringTest {
 		AnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMin.class );
 		descriptorBuilder.setAttribute( "value", "foobar" );
 		descriptorBuilder.setAttribute( "message", "{validator.min}" );
-		DecimalMin m = descriptorBuilder.build().annotation();
+		DecimalMin m = descriptorBuilder.build().getAnnotation();
 
 		DecimalMinValidatorForNumber constraint = new DecimalMinValidatorForNumber();
 		try {
@@ -78,7 +78,7 @@ public class MinValidatorForStringTest {
 		descriptorBuilder.setAttribute( "value", "1500E-2" );
 		descriptorBuilder.setAttribute( "inclusive", inclusive );
 		descriptorBuilder.setAttribute( "message", "{validator.min}" );
-		DecimalMin m = descriptorBuilder.build().annotation();
+		DecimalMin m = descriptorBuilder.build().getAnnotation();
 
 		DecimalMinValidatorForCharSequence constraint = new DecimalMinValidatorForCharSequence();
 		constraint.initialize( m );

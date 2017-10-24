@@ -121,7 +121,7 @@ public class DurationMaxValidatorTest {
 		AnnotationDescriptor.Builder<DurationMax> descriptorBuilder = new AnnotationDescriptor.Builder<>( DurationMax.class );
 		descriptorBuilder.setAttribute( "nanos", 100L );
 		descriptorBuilder.setAttribute( "inclusive", inclusive );
-		DurationMax annotation = descriptorBuilder.build().annotation();
+		DurationMax annotation = descriptorBuilder.build().getAnnotation();
 
 		DurationMaxValidator validator = new DurationMaxValidator();
 		validator.initialize( annotation );

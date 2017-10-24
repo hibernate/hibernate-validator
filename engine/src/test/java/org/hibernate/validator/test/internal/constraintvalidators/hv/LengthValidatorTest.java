@@ -29,7 +29,7 @@ public class LengthValidatorTest {
 		descriptorBuilder.setAttribute( "min", 1 );
 		descriptorBuilder.setAttribute( "max", 3 );
 		descriptorBuilder.setAttribute( "message", "{validator.length}" );
-		Length l = descriptorBuilder.build().annotation();
+		Length l = descriptorBuilder.build().getAnnotation();
 		LengthValidator constraint = new LengthValidator();
 		constraint.initialize( l );
 		assertTrue( constraint.isValid( null, null ) );
@@ -46,7 +46,7 @@ public class LengthValidatorTest {
 		AnnotationDescriptor.Builder<Length> descriptorBuilder = new AnnotationDescriptor.Builder<>( Length.class );
 		descriptorBuilder.setAttribute( "min", 1 );
 		descriptorBuilder.setAttribute( "max", 3 );
-		Length l = descriptorBuilder.build().annotation();
+		Length l = descriptorBuilder.build().getAnnotation();
 		LengthValidator constraint = new LengthValidator();
 		constraint.initialize( l );
 		assertTrue( constraint.isValid( new MyCustomStringImpl( "foo" ), null ) );
@@ -59,7 +59,7 @@ public class LengthValidatorTest {
 		descriptorBuilder.setAttribute( "min", -1 );
 		descriptorBuilder.setAttribute( "max", 1 );
 		descriptorBuilder.setAttribute( "message", "{validator.length}" );
-		Length p = descriptorBuilder.build().annotation();
+		Length p = descriptorBuilder.build().getAnnotation();
 
 		LengthValidator constraint = new LengthValidator();
 		constraint.initialize( p );
@@ -71,7 +71,7 @@ public class LengthValidatorTest {
 		descriptorBuilder.setAttribute( "min", 1 );
 		descriptorBuilder.setAttribute( "max", -1 );
 		descriptorBuilder.setAttribute( "message", "{validator.length}" );
-		Length p = descriptorBuilder.build().annotation();
+		Length p = descriptorBuilder.build().getAnnotation();
 
 		LengthValidator constraint = new LengthValidator();
 		constraint.initialize( p );
@@ -83,7 +83,7 @@ public class LengthValidatorTest {
 		descriptorBuilder.setAttribute( "min", 5 );
 		descriptorBuilder.setAttribute( "max", 4 );
 		descriptorBuilder.setAttribute( "message", "{validator.length}" );
-		Length p = descriptorBuilder.build().annotation();
+		Length p = descriptorBuilder.build().getAnnotation();
 
 		LengthValidator constraint = new LengthValidator();
 		constraint.initialize( p );
