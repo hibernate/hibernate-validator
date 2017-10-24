@@ -14,14 +14,14 @@ import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
 import java.util.Map;
 
-import org.hibernate.validator.internal.util.annotation.AnnotationAttributes;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * @author Guillaume Smet
  */
-public final class GetAnnotationAttributes implements PrivilegedAction<AnnotationAttributes> {
+public final class GetAnnotationAttributes implements PrivilegedAction<Map<String, Object>> {
 
 	private static final Log LOG = LoggerFactory.make();
 
@@ -36,7 +36,7 @@ public final class GetAnnotationAttributes implements PrivilegedAction<Annotatio
 	}
 
 	@Override
-	public AnnotationAttributes run() {
+	public Map<String, Object> run() {
 		final Method[] declaredMethods = annotation.annotationType().getDeclaredMethods();
 		Map<String, Object> attributes = newHashMap( declaredMethods.length );
 
@@ -54,9 +54,9 @@ public final class GetAnnotationAttributes implements PrivilegedAction<Annotatio
 				attributes.put( m.getName(), m.invoke( annotation ) );
 			}
 			catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw LOG.getUnableToGetAnnotationParameterException( attributeName, annotation.getClass(), e );
+				throw LOG.getUnableToGetAnnotationParameterException( annotation.getClass(), attributeName, e );
 			}
 		}
-		return new AnnotationAttributes( attributes );
+		return CollectionHelper.toImmutableMap( attributes );
 	}
 }

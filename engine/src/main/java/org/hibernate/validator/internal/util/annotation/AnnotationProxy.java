@@ -50,7 +50,7 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		Object value = descriptor.getAttributes().getParameter( method.getName() );
+		Object value = descriptor.getAttribute( method.getName() );
 		if ( value != null ) {
 			return value;
 		}
@@ -160,12 +160,11 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 		if ( Proxy.isProxyClass( annotation.getClass() ) && System.getSecurityManager() == null ) {
 			InvocationHandler invocationHandler = Proxy.getInvocationHandler( annotation );
 			if ( invocationHandler instanceof AnnotationProxy ) {
-				return ( (AnnotationProxy) invocationHandler ).descriptor.getAttributes().toMap();
+				return ( (AnnotationProxy) invocationHandler ).descriptor.getAttributes();
 			}
 		}
 
-		AnnotationAttributes annotationAttributes = run( GetAnnotationAttributes.action( annotation ) );
-		return annotationAttributes.toMap();
+		return run( GetAnnotationAttributes.action( annotation ) );
 	}
 
 	/**

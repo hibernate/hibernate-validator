@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttributes;
@@ -40,42 +41,76 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
  * @author Gunnar Morling
  * @author Guillaume Smet
  */
-public class AnnotationDescriptor<T extends Annotation> implements Serializable {
+public class AnnotationDescriptor<A extends Annotation> implements Serializable {
 
 	private static final Log LOG = LoggerFactory.make();
 
-	private final Class<T> type;
+	private final Class<A> type;
 
-	private final AnnotationAttributes attributes;
+	private final Map<String, Object> attributes;
 
 	private final int hashCode;
 
-	private final T annotation;
+	private final A annotation;
 
 	@SuppressWarnings("unchecked")
-	public AnnotationDescriptor(T annotation) {
-		this.type = (Class<T>) annotation.annotationType();
+	public AnnotationDescriptor(A annotation) {
+		this.type = (Class<A>) annotation.annotationType();
 		this.attributes = run( GetAnnotationAttributes.action( annotation ) );
 		this.annotation = annotation;
 		this.hashCode = buildHashCode();
 	}
 
-	private AnnotationDescriptor(Class<T> annotationType, AnnotationAttributes parameters) {
+	private AnnotationDescriptor(Class<A> annotationType, Map<String, Object> attributes) {
 		this.type = annotationType;
-		this.attributes = parameters;
+		this.attributes = CollectionHelper.toImmutableMap( attributes );
 		this.hashCode = buildHashCode();
 		this.annotation = AnnotationFactory.create( this );
 	}
 
-	public Class<T> type() {
+	public Class<A> type() {
 		return type;
 	}
 
-	public AnnotationAttributes getAttributes() {
+	public Map<String, Object> getAttributes() {
 		return attributes;
 	}
 
-	public T annotation() {
+	@SuppressWarnings("unchecked")
+	public <T> T getMandatoryAttribute(String attributeName, Class<T> attributeType) {
+		Object attribute = attributes.get( attributeName );
+
+		if ( attribute == null ) {
+			throw LOG.getUnableToFindAnnotationParameterException( type, attributeName, null );
+		}
+
+		if ( !attributeType.isAssignableFrom( attribute.getClass() ) ) {
+			throw LOG.getWrongParameterTypeException( type, attributeName, attributeType, attribute.getClass() );
+		}
+
+		return (T) attribute;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T getAttribute(String attributeName, Class<T> attributeType) {
+		Object attribute = attributes.get( attributeName );
+
+		if ( attribute == null ) {
+			return null;
+		}
+
+		if ( !attributeType.isAssignableFrom( attribute.getClass() ) ) {
+			throw LOG.getWrongParameterTypeException( type, attributeName, attributeType, attribute.getClass() );
+		}
+
+		return (T) attribute;
+	}
+
+	public Object getAttribute(String attributeName) {
+		return attributes.get( attributeName );
+	}
+
+	public A annotation() {
 		return annotation;
 	}
 
@@ -100,7 +135,7 @@ public class AnnotationDescriptor<T extends Annotation> implements Serializable 
 
 		for ( Entry<String, Object> member : attributes.entrySet() ) {
 			Object value = member.getValue();
-			Object otherValue = other.attributes.getParameter( member.getKey() );
+			Object otherValue = other.attributes.get( member.getKey() );
 
 			if ( !areEqual( value, otherValue ) ) {
 				return false;
@@ -128,7 +163,7 @@ public class AnnotationDescriptor<T extends Annotation> implements Serializable 
 		StringBuilder result = new StringBuilder();
 		result.append( '@' ).append( type.getName() ).append( '(' );
 		for ( String s : getRegisteredAttributesInAlphabeticalOrder() ) {
-			result.append( s ).append( '=' ).append( attributes.getParameter( s ) ).append( ", " );
+			result.append( s ).append( '=' ).append( attributes.get( s ) ).append( ", " );
 		}
 		// remove last separator:
 		if ( attributes.size() > 0 ) {
@@ -226,7 +261,7 @@ public class AnnotationDescriptor<T extends Annotation> implements Serializable 
 		@SuppressWarnings("unchecked")
 		public Builder(S annotation) {
 			this.type = (Class<S>) annotation.annotationType();
-			this.attributes = new HashMap<String, Object>( run( GetAnnotationAttributes.action( annotation ) ).toMap() );
+			this.attributes = new HashMap<String, Object>( run( GetAnnotationAttributes.action( annotation ) ) );
 		}
 
 		public void setAttribute(String attributeName, Object value) {
@@ -241,7 +276,7 @@ public class AnnotationDescriptor<T extends Annotation> implements Serializable 
 			return new AnnotationDescriptor<S>( type, getAnnotationAttributes() );
 		}
 
-		private AnnotationAttributes getAnnotationAttributes() {
+		private Map<String, Object> getAnnotationAttributes() {
 			Map<String, Object> result = newHashMap( attributes.size() );
 			int processedValuesFromDescriptor = 0;
 			final Method[] declaredMethods = run( GetDeclaredMethods.action( type ) );
@@ -270,7 +305,7 @@ public class AnnotationDescriptor<T extends Annotation> implements Serializable 
 						unknownAttributes
 				);
 			}
-			return new AnnotationAttributes( result );
+			return result;
 		}
 	}
 
