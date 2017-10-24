@@ -15,12 +15,17 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
+import javax.validation.ValidationException;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.internal.engine.ValidationContext;
@@ -39,6 +44,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Federico Mancini
  * @author Dag Hovland
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2012 SERLI
+ * @author Guillaume Smet
  */
 public class ConstraintTree<A extends Annotation> {
 
@@ -55,6 +61,10 @@ public class ConstraintTree<A extends Annotation> {
 	private final ConstraintDescriptorImpl<A> descriptor;
 
 	private final Type validatedValueType;
+
+	private volatile Optional<ConstraintValidator<A, ?>> constraintValidatorForDefaultConstraintValidatorFactory;
+
+	private volatile ConcurrentMap<ConstraintValidatorFactory, Optional<ConstraintValidator<A, ?>>> constraintValidatorPerConstraintValidatorFactory;
 
 	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
 		this( descriptor, validatedValueType, null );
@@ -148,9 +158,9 @@ public class ConstraintTree<A extends Annotation> {
 		}
 	}
 
-	private void throwExceptionForNullValidator(Type validatedValueType, String path) {
+	private ValidationException getExceptionForNullValidator(Type validatedValueType, String path) {
 		if ( descriptor.getConstraintType() == ConstraintDescriptorImpl.ConstraintType.CROSS_PARAMETER ) {
-			throw log.getValidatorForCrossParameterConstraintMustEitherValidateObjectOrObjectArrayException(
+			return log.getValidatorForCrossParameterConstraintMustEitherValidateObjectOrObjectArrayException(
 					descriptor.getAnnotationType()
 			);
 		}
@@ -165,32 +175,68 @@ public class ConstraintTree<A extends Annotation> {
 					className = clazz.getName();
 				}
 			}
-			throw log.getNoValidatorFoundForTypeException( descriptor.getAnnotationType(), className, path );
+			return log.getNoValidatorFoundForTypeException( descriptor.getAnnotationType(), className, path );
 		}
 	}
 
-
 	private <T> ConstraintValidator<A, ?> getInitializedConstraintValidator(ValidationContext<T> validationContext,
 			ValueContext<?, ?> valueContext) {
-		ConstraintValidator<A, ?> validator = validationContext.getConstraintValidatorManager()
-				.getInitializedValidator(
-						validatedValueType,
-						descriptor,
-						validationContext.getConstraintValidatorFactory()
-				);
+		Optional<ConstraintValidator<A, ?>> validator;
 
-		if ( validator == null ) {
-			throwExceptionForNullValidator( validatedValueType, valueContext.getPropertyPath().asString() );
+		if ( validationContext.getConstraintValidatorFactory() == validationContext.getConstraintValidatorManager().getDefaultConstraintValidatorFactory() ) {
+			validator = constraintValidatorForDefaultConstraintValidatorFactory;
+
+			if ( validator == null ) {
+				synchronized ( this ) {
+					validator = constraintValidatorForDefaultConstraintValidatorFactory;
+					if ( validator == null ) {
+						validator = getInitializedConstraintValidator( validationContext.getConstraintValidatorManager(),
+								validationContext.getConstraintValidatorFactory() );
+						constraintValidatorForDefaultConstraintValidatorFactory = validator;
+					}
+				}
+			}
+		}
+		else {
+			ConcurrentMap<ConstraintValidatorFactory, Optional<ConstraintValidator<A, ?>>> localConstraintValidatorPerConstraintValidatorFactory =
+					constraintValidatorPerConstraintValidatorFactory;
+
+			if ( localConstraintValidatorPerConstraintValidatorFactory == null ) {
+				synchronized ( this ) {
+					localConstraintValidatorPerConstraintValidatorFactory = constraintValidatorPerConstraintValidatorFactory;
+
+					if ( localConstraintValidatorPerConstraintValidatorFactory == null ) {
+						localConstraintValidatorPerConstraintValidatorFactory = new ConcurrentHashMap<>();
+						constraintValidatorPerConstraintValidatorFactory = localConstraintValidatorPerConstraintValidatorFactory;
+					}
+				}
+			}
+
+			validator = localConstraintValidatorPerConstraintValidatorFactory.computeIfAbsent( validationContext.getConstraintValidatorFactory(),
+					cvf -> getInitializedConstraintValidator( validationContext.getConstraintValidatorManager(), cvf ) );
 		}
 
-		return validator;
+		if ( !validator.isPresent() ) {
+			throw getExceptionForNullValidator( validatedValueType, valueContext.getPropertyPath().asString() );
+		}
+
+		return validator.get();
+	}
+
+	private Optional<ConstraintValidator<A, ?>> getInitializedConstraintValidator(ConstraintValidatorManager constraintValidatorManager,
+			ConstraintValidatorFactory constraintValidatorFactory) {
+		ConstraintValidator<A, ?> validator = constraintValidatorManager.getInitializedValidator(
+				validatedValueType,
+				descriptor,
+				constraintValidatorFactory );
+
+		return Optional.ofNullable( validator );
 	}
 
 	private <T> boolean mainConstraintNeedsEvaluation(ValidationContext<T> executionContext,
 			Set<ConstraintViolation<T>> constraintViolations) {
 		// we are dealing with a composing constraint with no validator for the main constraint
-		if ( !descriptor.getComposingConstraints().isEmpty() && descriptor.getMatchingConstraintValidatorDescriptors()
-				.isEmpty() ) {
+		if ( !descriptor.getComposingConstraints().isEmpty() && descriptor.getMatchingConstraintValidatorDescriptors().isEmpty() ) {
 			return false;
 		}
 
