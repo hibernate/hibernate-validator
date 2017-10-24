@@ -175,7 +175,7 @@ public class SizeValidatorTest {
 		descriptorBuilder.setAttribute( "min", 1 );
 		descriptorBuilder.setAttribute( "max", 2 );
 		descriptorBuilder.setAttribute( "message", "{validator.max}" );
-		Size m = descriptorBuilder.build().annotation();
+		Size m = descriptorBuilder.build().getAnnotation();
 		@SuppressWarnings("unchecked")
 		ConstraintValidator<Size, T> validator = (ConstraintValidator<Size, T>) validatorClass.newInstance();
 		validator.initialize( m );

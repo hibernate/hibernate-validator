@@ -57,7 +57,7 @@ public class MinValidatorForMonetaryAmountTest {
 	private Min min(final long value) {
 		AnnotationDescriptor.Builder<Min> descriptorBuilder = new AnnotationDescriptor.Builder<>( Min.class );
 		descriptorBuilder.setAttribute( "value", value );
-		return descriptorBuilder.build().annotation();
+		return descriptorBuilder.build().getAnnotation();
 	}
 
 }

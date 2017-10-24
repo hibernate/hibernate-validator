@@ -40,7 +40,7 @@ public class MinValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		AnnotationDescriptor.Builder<Min> descriptorBuilder = new AnnotationDescriptor.Builder<>( Min.class );
 		descriptorBuilder.setAttribute( "value", 15L );
 		descriptorBuilder.setAttribute( "message", "{validator.min}" );
-		Min m = descriptorBuilder.build().annotation();
+		Min m = descriptorBuilder.build().getAnnotation();
 
 		testMin( m, true );
 	}
@@ -50,7 +50,7 @@ public class MinValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		AnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMin.class );
 		descriptorBuilder.setAttribute( "value", "1500E-2" );
 		descriptorBuilder.setAttribute( "message", "{validator.min}" );
-		DecimalMin m = descriptorBuilder.build().annotation();
+		DecimalMin m = descriptorBuilder.build().getAnnotation();
 
 		testDecimalMin( m, true );
 	}
@@ -60,7 +60,7 @@ public class MinValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		AnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMin.class );
 		descriptorBuilder.setAttribute( "value", "foobar" );
 		descriptorBuilder.setAttribute( "message", "{validator.min}" );
-		DecimalMin m = descriptorBuilder.build().annotation();
+		DecimalMin m = descriptorBuilder.build().getAnnotation();
 
 		DecimalMinValidatorForNumber constraint = new DecimalMinValidatorForNumber();
 		constraint.initialize( m );
@@ -74,7 +74,7 @@ public class MinValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		descriptorBuilder.setAttribute( "value", "1500E-2" );
 		descriptorBuilder.setAttribute( "inclusive", inclusive );
 		descriptorBuilder.setAttribute( "message", "{validator.min}" );
-		DecimalMin m = descriptorBuilder.build().annotation();
+		DecimalMin m = descriptorBuilder.build().getAnnotation();
 
 		testDecimalMin( m, inclusive );
 	}

@@ -69,7 +69,7 @@ public class AnnotationDescriptor<A extends Annotation> implements Serializable 
 		this.annotation = AnnotationFactory.create( this );
 	}
 
-	public Class<A> type() {
+	public Class<A> getType() {
 		return type;
 	}
 
@@ -111,7 +111,7 @@ public class AnnotationDescriptor<A extends Annotation> implements Serializable 
 		return attributes.get( attributeName );
 	}
 
-	public A annotation() {
+	public A getAnnotation() {
 		return annotation;
 	}
 

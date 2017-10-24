@@ -122,6 +122,6 @@ public class ModCheckValidatorTest {
 		descriptorBuilder.setAttribute( "checkDigitPosition", checkDigitIndex );
 		descriptorBuilder.setAttribute( "ignoreNonDigitCharacters", ignoreNonDigits );
 
-		return descriptorBuilder.build().annotation();
+		return descriptorBuilder.build().getAnnotation();
 	}
 }

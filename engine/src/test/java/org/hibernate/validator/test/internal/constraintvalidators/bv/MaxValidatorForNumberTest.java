@@ -40,7 +40,7 @@ public class MaxValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		AnnotationDescriptor.Builder<Max> descriptorBuilder = new AnnotationDescriptor.Builder<>( Max.class );
 		descriptorBuilder.setAttribute( "value", 15L );
 		descriptorBuilder.setAttribute( "message", "{validator.max}" );
-		Max m = descriptorBuilder.build().annotation();
+		Max m = descriptorBuilder.build().getAnnotation();
 
 		testMax( m, true );
 	}
@@ -50,7 +50,7 @@ public class MaxValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		AnnotationDescriptor.Builder<DecimalMax> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMax.class );
 		descriptorBuilder.setAttribute( "value", "15.0E0" );
 		descriptorBuilder.setAttribute( "message", "{validator.max}" );
-		DecimalMax m = descriptorBuilder.build().annotation();
+		DecimalMax m = descriptorBuilder.build().getAnnotation();
 
 		testDecimalMax( m, true );
 	}
@@ -60,7 +60,7 @@ public class MaxValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		AnnotationDescriptor.Builder<DecimalMax> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMax.class );
 		descriptorBuilder.setAttribute( "value", "foobar" );
 		descriptorBuilder.setAttribute( "message", "{validator.max}" );
-		DecimalMax m = descriptorBuilder.build().annotation();
+		DecimalMax m = descriptorBuilder.build().getAnnotation();
 
 		DecimalMaxValidatorForNumber constraint = new DecimalMaxValidatorForNumber();
 		constraint.initialize( m );
@@ -74,7 +74,7 @@ public class MaxValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		descriptorBuilder.setAttribute( "value", "15.0E0" );
 		descriptorBuilder.setAttribute( "inclusive", inclusive );
 		descriptorBuilder.setAttribute( "message", "{validator.max}" );
-		DecimalMax m = descriptorBuilder.build().annotation();
+		DecimalMax m = descriptorBuilder.build().getAnnotation();
 		testDecimalMax( m, false );
 
 	}

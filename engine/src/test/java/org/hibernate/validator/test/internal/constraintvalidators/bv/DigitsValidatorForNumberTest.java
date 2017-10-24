@@ -30,7 +30,7 @@ public class DigitsValidatorForNumberTest {
 		descriptorBuilder.setAttribute( "integer", 5 );
 		descriptorBuilder.setAttribute( "fraction", 2 );
 		descriptorBuilder.setAttribute( "message", "{validator.digits}" );
-		Digits p = descriptorBuilder.build().annotation();
+		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
 		constraint.initialize( p );
@@ -58,7 +58,7 @@ public class DigitsValidatorForNumberTest {
 		descriptorBuilder.setAttribute( "integer", 0 );
 		descriptorBuilder.setAttribute( "fraction", 0 );
 		descriptorBuilder.setAttribute( "message", "{validator.digits}" );
-		Digits p = descriptorBuilder.build().annotation();
+		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
 		constraint.initialize( p );
@@ -76,7 +76,7 @@ public class DigitsValidatorForNumberTest {
 		descriptorBuilder.setAttribute( "integer", -1 );
 		descriptorBuilder.setAttribute( "fraction", 1 );
 		descriptorBuilder.setAttribute( "message", "{validator.digits}" );
-		Digits p = descriptorBuilder.build().annotation();
+		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
 		constraint.initialize( p );
@@ -89,7 +89,7 @@ public class DigitsValidatorForNumberTest {
 		descriptorBuilder.setAttribute( "integer", 1 );
 		descriptorBuilder.setAttribute( "fraction", -1 );
 		descriptorBuilder.setAttribute( "message", "{validator.digits}" );
-		Digits p = descriptorBuilder.build().annotation();
+		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
 		constraint.initialize( p );
@@ -101,7 +101,7 @@ public class DigitsValidatorForNumberTest {
 		descriptorBuilder.setAttribute( "integer", 12 );
 		descriptorBuilder.setAttribute( "fraction", 3 );
 		descriptorBuilder.setAttribute( "message", "{validator.digits}" );
-		Digits p = descriptorBuilder.build().annotation();
+		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
 		constraint.initialize( p );

@@ -61,7 +61,7 @@ public class URLValidatorTest {
 
 	@Test
 	public void valid_urls_pass_validation() {
-		URL url = descriptorBuilder.build().annotation();
+		URL url = descriptorBuilder.build().getAnnotation();
 		urlValidator.initialize( url );
 		assertValidUrls( urlValidator );
 
@@ -72,7 +72,7 @@ public class URLValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-502")
 	public void url_validators_can_handle_character_sequences() {
-		URL url = descriptorBuilder.build().annotation();
+		URL url = descriptorBuilder.build().getAnnotation();
 
 		urlValidator.initialize( url );
 		assertValidCharSequenceUrls( urlValidator );
@@ -84,7 +84,7 @@ public class URLValidatorTest {
 	@Test
 	public void http_protocol_can_be_verified_explicitly() {
 		descriptorBuilder.setAttribute( "protocol", "http" );
-		URL url = descriptorBuilder.build().annotation();
+		URL url = descriptorBuilder.build().getAnnotation();
 
 		urlValidator.initialize( url );
 		assertHttpProtocolMatch( urlValidator );
@@ -96,7 +96,7 @@ public class URLValidatorTest {
 	@Test
 	public void file_protocol_can_be_verified_explicitly() {
 		descriptorBuilder.setAttribute( "protocol", "file" );
-		URL url = descriptorBuilder.build().annotation();
+		URL url = descriptorBuilder.build().getAnnotation();
 
 		urlValidator.initialize( url );
 		assertFileProtocolMatch( urlValidator );
@@ -108,7 +108,7 @@ public class URLValidatorTest {
 	@Test
 	public void port_can_be_verified_explicitly() {
 		descriptorBuilder.setAttribute( "port", 21 );
-		URL url = descriptorBuilder.build().annotation();
+		URL url = descriptorBuilder.build().getAnnotation();
 
 		urlValidator.initialize( url );
 		assertPortMatch( urlValidator );
@@ -120,7 +120,7 @@ public class URLValidatorTest {
 	@Test
 	public void host_can_be_verified_explicitly() {
 		descriptorBuilder.setAttribute( "host", "foobar.com" );
-		URL url = descriptorBuilder.build().annotation();
+		URL url = descriptorBuilder.build().getAnnotation();
 
 		urlValidator.initialize( url );
 		assertHostMatch( urlValidator );
@@ -134,7 +134,7 @@ public class URLValidatorTest {
 		descriptorBuilder.setAttribute( "protocol", "http" );
 		descriptorBuilder.setAttribute( "host", "www.hibernate.org" );
 		descriptorBuilder.setAttribute( "port", 80 );
-		URL url = descriptorBuilder.build().annotation();
+		URL url = descriptorBuilder.build().getAnnotation();
 
 		URLValidator validator = new URLValidator();
 		validator.initialize( url );
@@ -149,7 +149,7 @@ public class URLValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-323")
 	public void the_empty_string_is_considered_a_valid_url() {
-		URL url = descriptorBuilder.build().annotation();
+		URL url = descriptorBuilder.build().getAnnotation();
 		urlValidator.initialize( url );
 		assertTrue( urlValidator.isValid( "", null ) );
 

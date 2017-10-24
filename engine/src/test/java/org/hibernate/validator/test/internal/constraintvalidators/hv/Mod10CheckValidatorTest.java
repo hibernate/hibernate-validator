@@ -213,7 +213,7 @@ public class Mod10CheckValidatorTest {
 		descriptorBuilder.setAttribute( "multiplier", multiplier );
 		descriptorBuilder.setAttribute( "weight", weight );
 
-		return descriptorBuilder.build().annotation();
+		return descriptorBuilder.build().getAnnotation();
 	}
 
 	private Mod10Check createMod10CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {

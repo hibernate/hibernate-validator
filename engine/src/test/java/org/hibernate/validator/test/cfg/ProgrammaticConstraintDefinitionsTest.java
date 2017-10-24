@@ -151,7 +151,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 		tagDescriptorBuilder.setAttribute( "name", "td" );
 		tagDescriptorBuilder.setAttribute( "attributes", new String[]{ "class", "id" } );
 		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-				.additionalTagsWithAttributes( tagDescriptorBuilder.build().annotation() ), "<td class='class' id='tableId'>1234qwer</td>", 0 );
+				.additionalTagsWithAttributes( tagDescriptorBuilder.build().getAnnotation() ), "<td class='class' id='tableId'>1234qwer</td>", 0 );
 
 		AnnotationDescriptor.Builder<SafeHtml.Attribute> attributeDescriptorBuilder = new AnnotationDescriptor.Builder<>( SafeHtml.Attribute.class );
 		attributeDescriptorBuilder.setAttribute( "name", "src" );
@@ -159,10 +159,10 @@ public class ProgrammaticConstraintDefinitionsTest {
 
 		tagDescriptorBuilder = new AnnotationDescriptor.Builder<>( SafeHtml.Tag.class );
 		tagDescriptorBuilder.setAttribute( "name", "img" );
-		tagDescriptorBuilder.setAttribute( "attributesWithProtocols", new SafeHtml.Attribute[]{ attributeDescriptorBuilder.build().annotation() } );
+		tagDescriptorBuilder.setAttribute( "attributesWithProtocols", new SafeHtml.Attribute[]{ attributeDescriptorBuilder.build().getAnnotation() } );
 
 		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-				.additionalTagsWithAttributes( tagDescriptorBuilder.build().annotation() ), "<img src='data:image/png;base64,100101' />", 0 );
+				.additionalTagsWithAttributes( tagDescriptorBuilder.build().getAnnotation() ), "<img src='data:image/png;base64,100101' />", 0 );
 	}
 
 	@Test

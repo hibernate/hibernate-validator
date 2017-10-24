@@ -56,7 +56,7 @@ public class NegativeOrZeroValidatorForMonetaryAmountTest {
 
 	private NegativeOrZero negativeOrZero() {
 		AnnotationDescriptor.Builder<NegativeOrZero> descriptorBuilder = new AnnotationDescriptor.Builder<>( NegativeOrZero.class );
-		return descriptorBuilder.build().annotation();
+		return descriptorBuilder.build().getAnnotation();
 	}
 
 }

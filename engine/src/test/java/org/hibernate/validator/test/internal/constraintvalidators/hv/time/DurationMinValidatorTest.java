@@ -123,7 +123,7 @@ public class DurationMinValidatorTest {
 		AnnotationDescriptor.Builder<DurationMin> descriptorBuilder = new AnnotationDescriptor.Builder<>( DurationMin.class );
 		descriptorBuilder.setAttribute( "nanos", 100L );
 		descriptorBuilder.setAttribute( "inclusive", inclusive );
-		DurationMin annotation = descriptorBuilder.build().annotation();
+		DurationMin annotation = descriptorBuilder.build().getAnnotation();
 
 		DurationMinValidator validator = new DurationMinValidator();
 		validator.initialize( annotation );

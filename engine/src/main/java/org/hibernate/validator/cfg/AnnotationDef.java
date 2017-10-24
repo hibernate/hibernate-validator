@@ -120,7 +120,7 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 	}
 
 	private A createAnnotationProxy() {
-		return createAnnotationDescriptor().annotation();
+		return createAnnotationDescriptor().getAnnotation();
 	}
 
 	@SuppressWarnings("unchecked")

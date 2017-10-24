@@ -120,7 +120,7 @@ class MetaConstraintBuilder {
 			Object elementValue = getElementValue( elementType, parameterType, defaultPackage );
 			annotationDescriptorBuilder.setAttribute( name, elementValue );
 		}
-		return annotationDescriptorBuilder.build().annotation();
+		return annotationDescriptorBuilder.build().getAnnotation();
 	}
 
 	private static void checkNameIsValid(String name) {

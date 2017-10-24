@@ -33,7 +33,7 @@ public class MaxValidatorForStringTest {
 		AnnotationDescriptor.Builder<Max> descriptorBuilder = new AnnotationDescriptor.Builder<>( Max.class );
 		descriptorBuilder.setAttribute( "value", 15L );
 		descriptorBuilder.setAttribute( "message", "{validator.max}" );
-		Max m = descriptorBuilder.build().annotation();
+		Max m = descriptorBuilder.build().getAnnotation();
 
 		MaxValidatorForCharSequence constraint = new MaxValidatorForCharSequence();
 		constraint.initialize( m );
@@ -46,7 +46,7 @@ public class MaxValidatorForStringTest {
 		AnnotationDescriptor.Builder<DecimalMax> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMax.class );
 		descriptorBuilder.setAttribute( "value", "15.0E0" );
 		descriptorBuilder.setAttribute( "message", "{validator.max}" );
-		DecimalMax m = descriptorBuilder.build().annotation();
+		DecimalMax m = descriptorBuilder.build().getAnnotation();
 
 		DecimalMaxValidatorForCharSequence constraint = new DecimalMaxValidatorForCharSequence();
 		constraint.initialize( m );
@@ -59,7 +59,7 @@ public class MaxValidatorForStringTest {
 		AnnotationDescriptor.Builder<DecimalMax> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMax.class );
 		descriptorBuilder.setAttribute( "value", "foobar" );
 		descriptorBuilder.setAttribute( "message", "{validator.max}" );
-		DecimalMax m = descriptorBuilder.build().annotation();
+		DecimalMax m = descriptorBuilder.build().getAnnotation();
 
 		DecimalMaxValidatorForNumber constraint = new DecimalMaxValidatorForNumber();
 		try {
@@ -79,7 +79,7 @@ public class MaxValidatorForStringTest {
 		descriptorBuilder.setAttribute( "value", "15.0E0" );
 		descriptorBuilder.setAttribute( "inclusive", inclusive );
 		descriptorBuilder.setAttribute( "message", "{validator.max}" );
-		DecimalMax m = descriptorBuilder.build().annotation();
+		DecimalMax m = descriptorBuilder.build().getAnnotation();
 
 		DecimalMaxValidatorForCharSequence constraint = new DecimalMaxValidatorForCharSequence();
 		constraint.initialize( m );

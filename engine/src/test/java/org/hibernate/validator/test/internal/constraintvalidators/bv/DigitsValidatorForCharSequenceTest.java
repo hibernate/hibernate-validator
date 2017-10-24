@@ -32,7 +32,7 @@ public class DigitsValidatorForCharSequenceTest {
 		descriptorBuilder.setAttribute( "integer", 5 );
 		descriptorBuilder.setAttribute( "fraction", 2 );
 		descriptorBuilder.setAttribute( "message", "{validator.digits}" );
-		Digits p = descriptorBuilder.build().annotation();
+		Digits p = descriptorBuilder.build().getAnnotation();
 
 		constraint = new DigitsValidatorForCharSequence();
 		constraint.initialize( p );
@@ -59,7 +59,7 @@ public class DigitsValidatorForCharSequenceTest {
 		descriptorBuilder.setAttribute( "integer", -1 );
 		descriptorBuilder.setAttribute( "fraction", 1 );
 		descriptorBuilder.setAttribute( "message", "{validator.digits}" );
-		Digits p = descriptorBuilder.build().annotation();
+		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForCharSequence constraint = new DigitsValidatorForCharSequence();
 		constraint.initialize( p );
@@ -72,7 +72,7 @@ public class DigitsValidatorForCharSequenceTest {
 		descriptorBuilder.setAttribute( "integer", 1 );
 		descriptorBuilder.setAttribute( "fraction", -1 );
 		descriptorBuilder.setAttribute( "message", "{validator.digits}" );
-		Digits p = descriptorBuilder.build().annotation();
+		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForCharSequence constraint = new DigitsValidatorForCharSequence();
 		constraint.initialize( p );

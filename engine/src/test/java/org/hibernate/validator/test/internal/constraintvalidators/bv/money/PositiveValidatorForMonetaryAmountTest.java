@@ -56,6 +56,6 @@ public class PositiveValidatorForMonetaryAmountTest {
 
 	private Positive positive(final boolean strict) {
 		AnnotationDescriptor.Builder<Positive> descriptorBuilder = new AnnotationDescriptor.Builder<>( Positive.class );
-		return descriptorBuilder.build().annotation();
+		return descriptorBuilder.build().getAnnotation();
 	}
 }
