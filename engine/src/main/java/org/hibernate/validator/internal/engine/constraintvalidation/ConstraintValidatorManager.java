@@ -42,7 +42,7 @@ public class ConstraintValidatorManager {
 	 * Dummy {@code ConstraintValidator} used as placeholder for the case that for a given context there exists
 	 * no matching constraint validator instance
 	 */
-	private static ConstraintValidator<?, ?> DUMMY_CONSTRAINT_VALIDATOR = new ConstraintValidator<Null, Object>() {
+	static ConstraintValidator<?, ?> DUMMY_CONSTRAINT_VALIDATOR = new ConstraintValidator<Null, Object>() {
 
 		@Override
 		public boolean isValid(Object value, ConstraintValidatorContext context) {

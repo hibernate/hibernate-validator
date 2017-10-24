@@ -9,13 +9,13 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 import static org.hibernate.validator.constraints.CompositionType.AND;
 import static org.hibernate.validator.constraints.CompositionType.OR;
+import static org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager.DUMMY_CONSTRAINT_VALIDATOR;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -60,9 +60,17 @@ public class ConstraintTree<A extends Annotation> {
 
 	private final Type validatedValueType;
 
-	private volatile Optional<ConstraintValidator<A, ?>> constraintValidatorForDefaultConstraintValidatorFactory;
+	/**
+	 * Either the initialized constraint validator for the default constraint validator factory or
+	 * {@link #DUMMY_CONSTRAINT_VALIDATOR}.
+	 */
+	private volatile ConstraintValidator<A, ?> constraintValidatorForDefaultConstraintValidatorFactory;
 
-	private volatile ConcurrentMap<ConstraintValidatorFactory, Optional<ConstraintValidator<A, ?>>> constraintValidatorPerConstraintValidatorFactory;
+	/**
+	 * Map containing the constraint validators for each constraint validator factory (except the default). Contains
+	 * {@link #DUMMY_CONSTRAINT_VALIDATOR} if no validator was found.
+	 */
+	private volatile ConcurrentMap<ConstraintValidatorFactory, ConstraintValidator<A, ?>> constraintValidatorPerConstraintValidatorFactory;
 
 	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
 		this.descriptor = descriptor;
@@ -174,7 +182,7 @@ public class ConstraintTree<A extends Annotation> {
 
 	private <T> ConstraintValidator<A, ?> getInitializedConstraintValidator(ValidationContext<T> validationContext,
 			ValueContext<?, ?> valueContext) {
-		Optional<ConstraintValidator<A, ?>> validator;
+		ConstraintValidator<A, ?> validator;
 
 		if ( validationContext.getConstraintValidatorFactory() == validationContext.getConstraintValidatorManager().getDefaultConstraintValidatorFactory() ) {
 			validator = constraintValidatorForDefaultConstraintValidatorFactory;
@@ -191,7 +199,7 @@ public class ConstraintTree<A extends Annotation> {
 			}
 		}
 		else {
-			ConcurrentMap<ConstraintValidatorFactory, Optional<ConstraintValidator<A, ?>>> localConstraintValidatorPerConstraintValidatorFactory =
+			ConcurrentMap<ConstraintValidatorFactory, ConstraintValidator<A, ?>> localConstraintValidatorPerConstraintValidatorFactory =
 					constraintValidatorPerConstraintValidatorFactory;
 
 			if ( localConstraintValidatorPerConstraintValidatorFactory == null ) {
@@ -209,21 +217,27 @@ public class ConstraintTree<A extends Annotation> {
 					cvf -> getInitializedConstraintValidator( validationContext.getConstraintValidatorManager(), cvf ) );
 		}
 
-		if ( !validator.isPresent() ) {
+		if ( validator == DUMMY_CONSTRAINT_VALIDATOR ) {
 			throw getExceptionForNullValidator( validatedValueType, valueContext.getPropertyPath().asString() );
 		}
 
-		return validator.get();
+		return validator;
 	}
 
-	private Optional<ConstraintValidator<A, ?>> getInitializedConstraintValidator(ConstraintValidatorManager constraintValidatorManager,
+	@SuppressWarnings("unchecked")
+	private ConstraintValidator<A, ?> getInitializedConstraintValidator(ConstraintValidatorManager constraintValidatorManager,
 			ConstraintValidatorFactory constraintValidatorFactory) {
 		ConstraintValidator<A, ?> validator = constraintValidatorManager.getInitializedValidator(
 				validatedValueType,
 				descriptor,
 				constraintValidatorFactory );
 
-		return Optional.ofNullable( validator );
+		if ( validator != null ) {
+			return validator;
+		}
+		else {
+			return (ConstraintValidator<A, ?>) DUMMY_CONSTRAINT_VALIDATOR;
+		}
 	}
 
 	private <T> boolean mainConstraintNeedsEvaluation(ValidationContext<T> executionContext,
