@@ -54,7 +54,7 @@ public final class GetAnnotationAttributes implements PrivilegedAction<Map<Strin
 				attributes.put( m.getName(), m.invoke( annotation ) );
 			}
 			catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw LOG.getUnableToGetAnnotationParameterException( annotation.getClass(), attributeName, e );
+				throw LOG.getUnableToGetAnnotationAttributeException( annotation.getClass(), attributeName, e );
 			}
 		}
 		return CollectionHelper.toImmutableMap( attributes );

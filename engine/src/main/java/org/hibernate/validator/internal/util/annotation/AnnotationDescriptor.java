@@ -81,11 +81,11 @@ public class AnnotationDescriptor<A extends Annotation> implements Serializable 
 		Object attribute = attributes.get( attributeName );
 
 		if ( attribute == null ) {
-			throw LOG.getUnableToFindAnnotationParameterException( type, attributeName, null );
+			throw LOG.getUnableToFindAnnotationAttributeException( type, attributeName, null );
 		}
 
 		if ( !attributeType.isAssignableFrom( attribute.getClass() ) ) {
-			throw LOG.getWrongParameterTypeException( type, attributeName, attributeType, attribute.getClass() );
+			throw LOG.getWrongAnnotationAttributeTypeException( type, attributeName, attributeType, attribute.getClass() );
 		}
 
 		return (T) attribute;
@@ -100,7 +100,7 @@ public class AnnotationDescriptor<A extends Annotation> implements Serializable 
 		}
 
 		if ( !attributeType.isAssignableFrom( attribute.getClass() ) ) {
-			throw LOG.getWrongParameterTypeException( type, attributeName, attributeType, attribute.getClass() );
+			throw LOG.getWrongAnnotationAttributeTypeException( type, attributeName, attributeType, attribute.getClass() );
 		}
 
 		return (T) attribute;
@@ -290,7 +290,7 @@ public class AnnotationDescriptor<A extends Annotation> implements Serializable 
 					result.put( m.getName(), m.getDefaultValue() );
 				}
 				else {
-					throw LOG.getNoValueProvidedForAnnotationParameterException(
+					throw LOG.getNoValueProvidedForAnnotationAttributeException(
 							m.getName(),
 							type
 					);
@@ -300,7 +300,7 @@ public class AnnotationDescriptor<A extends Annotation> implements Serializable 
 				Set<String> unknownAttributes = attributes.keySet();
 				unknownAttributes.removeAll( result.keySet() );
 
-				throw LOG.getTryingToInstantiateAnnotationWithUnknownParametersException(
+				throw LOG.getTryingToInstantiateAnnotationWithUnknownAttributesException(
 						type,
 						unknownAttributes
 				);

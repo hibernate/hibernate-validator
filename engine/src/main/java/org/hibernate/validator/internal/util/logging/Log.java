@@ -306,25 +306,25 @@ public interface Log extends BasicLogger {
 	ConstraintDefinitionException getWrongAttributeTypeForOverriddenConstraintException(@FormatWith(ClassObjectFormatter.class) Class<?> expectedReturnType,
 			@FormatWith(ClassObjectFormatter.class) Class<?> currentReturnType);
 
-	@Message(id = 82, value = "Wrong type for attribute '%2$s' of '%1$s'. Expected: %3$s Actual: %4$s.")
-	ValidationException getWrongParameterTypeException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass,
+	@Message(id = 82, value = "Wrong type for attribute '%2$s' of annotation %1$s. Expected: %3$s. Actual: %4$s.")
+	ValidationException getWrongAnnotationAttributeTypeException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass,
 			String attributeName, @FormatWith(ClassObjectFormatter.class) Class<?> expectedType,
 			@FormatWith(ClassObjectFormatter.class) Class<?> currentType);
 
-	@Message(id = 83, value = "The specified annotation '%1$s' defines no parameter '%2$s'.")
-	ValidationException getUnableToFindAnnotationParameterException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass,
+	@Message(id = 83, value = "The specified annotation %1$s defines no attribute '%2$s'.")
+	ValidationException getUnableToFindAnnotationAttributeException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass,
 			String parameterName, @Cause NoSuchMethodException e);
 
-	@Message(id = 84, value = "Unable to get '%2$s' from %1$s.")
-	ValidationException getUnableToGetAnnotationParameterException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass,
+	@Message(id = 84, value = "Unable to get attribute '%2$s' from annotation %1$s.")
+	ValidationException getUnableToGetAnnotationAttributeException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass,
 			String parameterName, @Cause Exception e);
 
-	@Message(id = 85, value = "No value provided for parameter '%1$s' of annotation @%2$s.")
-	IllegalArgumentException getNoValueProvidedForAnnotationParameterException(String parameterName,
+	@Message(id = 85, value = "No value provided for attribute '%1$s' of annotation @%2$s.")
+	IllegalArgumentException getNoValueProvidedForAnnotationAttributeException(String parameterName,
 			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotation);
 
-	@Message(id = 86, value = "Trying to instantiate %1$s with unknown parameter(s): %2$s.")
-	RuntimeException getTryingToInstantiateAnnotationWithUnknownParametersException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationType,
+	@Message(id = 86, value = "Trying to instantiate annotation %1$s with unknown attribute(s): %2$s.")
+	RuntimeException getTryingToInstantiateAnnotationWithUnknownAttributesException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationType,
 			Set<String> unknownParameters);
 
 	@Message(id = 87, value = "Property name cannot be null or empty.")
