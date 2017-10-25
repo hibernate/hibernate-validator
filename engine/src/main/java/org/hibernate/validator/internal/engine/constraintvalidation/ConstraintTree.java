@@ -17,8 +17,6 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 import javax.validation.ConstraintDeclarationException;
@@ -65,12 +63,6 @@ public class ConstraintTree<A extends Annotation> {
 	 * {@link #DUMMY_CONSTRAINT_VALIDATOR}.
 	 */
 	private volatile ConstraintValidator<A, ?> constraintValidatorForDefaultConstraintValidatorFactory;
-
-	/**
-	 * Map containing the constraint validators for each constraint validator factory (except the default). Contains
-	 * {@link #DUMMY_CONSTRAINT_VALIDATOR} if no validator was found.
-	 */
-	private volatile ConcurrentMap<ConstraintValidatorFactory, ConstraintValidator<A, ?>> constraintValidatorPerConstraintValidatorFactory;
 
 	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
 		this.descriptor = descriptor;
@@ -199,22 +191,12 @@ public class ConstraintTree<A extends Annotation> {
 			}
 		}
 		else {
-			ConcurrentMap<ConstraintValidatorFactory, ConstraintValidator<A, ?>> localConstraintValidatorPerConstraintValidatorFactory =
-					constraintValidatorPerConstraintValidatorFactory;
-
-			if ( localConstraintValidatorPerConstraintValidatorFactory == null ) {
-				synchronized ( this ) {
-					localConstraintValidatorPerConstraintValidatorFactory = constraintValidatorPerConstraintValidatorFactory;
-
-					if ( localConstraintValidatorPerConstraintValidatorFactory == null ) {
-						localConstraintValidatorPerConstraintValidatorFactory = new ConcurrentHashMap<>();
-						constraintValidatorPerConstraintValidatorFactory = localConstraintValidatorPerConstraintValidatorFactory;
-					}
-				}
-			}
-
-			validator = localConstraintValidatorPerConstraintValidatorFactory.computeIfAbsent( validationContext.getConstraintValidatorFactory(),
-					cvf -> getInitializedConstraintValidator( validationContext.getConstraintValidatorManager(), cvf ) );
+			// For now, we don't cache the result in the ConstraintTree if we don't use the default constraint validator
+			// factory. Creating a lot of CHM for that cache might not be a good idea and we prefer being conservative
+			// for now. Note that we have the ConstraintValidatorManager cache that mitigates the situation.
+			// If you come up with a use case where it makes sense, please reach out to us.
+			validator = getInitializedConstraintValidator( validationContext.getConstraintValidatorManager(),
+					validationContext.getConstraintValidatorFactory() );
 		}
 
 		if ( validator == DUMMY_CONSTRAINT_VALIDATOR ) {
