@@ -230,7 +230,8 @@ public final class PathImpl implements Path, Serializable {
 			currentLeafNode = NodeImpl.setPropertyValue( currentLeafNode, value );
 
 			nodeList.set( nodeList.size() - 1, currentLeafNode );
-			resetHashCode();
+
+			// the property value is not part of the NodeImpl hashCode so we don't need to reset the PathImpl hashCode
 		}
 		return currentLeafNode;
 	}
