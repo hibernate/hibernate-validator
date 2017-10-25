@@ -356,8 +356,10 @@ public final class PathImpl implements Path, Serializable {
 	 * @param path the path to make a copy of.
 	 */
 	private PathImpl(PathImpl path) {
-		this( path.nodeList );
+		nodeList = path.nodeList;
+		currentLeafNode = path.currentLeafNode;
 		hashCode = path.hashCode;
+		nodeListRequiresCopy = true;
 	}
 
 	private PathImpl() {
