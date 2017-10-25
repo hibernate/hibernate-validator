@@ -252,6 +252,7 @@ public final class PathImpl implements Path, Serializable {
 
 			nodeList.remove( nodeList.size() - 1 );
 			currentLeafNode = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+			resetHashCode();
 		}
 	}
 
