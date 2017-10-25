@@ -657,12 +657,8 @@ public interface Log extends BasicLogger {
 	ValidationException getUnableToInitializeELExpressionFactoryException(@Cause Throwable e);
 
 	@LogMessage(level = WARN)
-	@Message(id = 184, value = "ParameterMessageInterpolator has been chosen, EL interpolation will not be supported")
-	void creationOfParameterMessageInterpolation();
-
-	@LogMessage(level = WARN)
-	@Message(id = 185, value = "Message contains EL expression: %1s, which is unsupported with chosen Interpolator")
-	void getElUnsupported(String expression);
+	@Message(id = 185, value = "Message contains EL expression: %1s, which is not supported by the selected message interpolator")
+	void warnElIsUnsupported(String expression);
 
 	@Message(id = 189,
 			value = "The configuration of value unwrapping for property '%s' of bean '%s' is inconsistent between the field and its getter.")
