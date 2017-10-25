@@ -22,16 +22,12 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class ParameterMessageInterpolator extends AbstractMessageInterpolator {
 
-	private static final Log log = LoggerFactory.make();
-
-	public ParameterMessageInterpolator() {
-		log.creationOfParameterMessageInterpolation();
-	}
+	private static final Log LOG = LoggerFactory.make();
 
 	@Override
 	public String interpolate(Context context, Locale locale, String term) {
 		if ( InterpolationTerm.isElExpression( term ) ) {
-			log.getElUnsupported( term );
+			LOG.warnElIsUnsupported( term );
 			return term;
 		}
 		else {
@@ -39,5 +35,4 @@ public class ParameterMessageInterpolator extends AbstractMessageInterpolator {
 			return parameterTermResolver.interpolate( context, term );
 		}
 	}
-
 }
