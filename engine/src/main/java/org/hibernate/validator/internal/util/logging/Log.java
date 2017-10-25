@@ -82,8 +82,8 @@ public interface Log extends BasicLogger {
 	void ignoringXmlConfiguration();
 
 	@LogMessage(level = INFO)
-	@Message(id = 3, value = "Using %s as constraint factory.")
-	void usingConstraintFactory(@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidatorFactory> constraintFactoryClass);
+	@Message(id = 3, value = "Using %s as constraint validator factory.")
+	void usingConstraintValidatorFactory(@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidatorFactory> constraintValidatorFactoryClass);
 
 	@LogMessage(level = INFO)
 	@Message(id = 4, value = "Using %s as message interpolator.")
@@ -159,7 +159,7 @@ public interface Log extends BasicLogger {
 	ValidationException getExceptionDuringIsValidCallException(@Cause RuntimeException e);
 
 	@Message(id = 29, value = "Constraint factory returned null when trying to create instance of %s.")
-	ValidationException getConstraintFactoryMustNotReturnNullException(@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidator<?, ?>> validatorClass);
+	ValidationException getConstraintValidatorFactoryMustNotReturnNullException(@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidator<?, ?>> validatorClass);
 
 	@Message(id = 30,
 			value = "No validator could be found for constraint '%s' validating type '%s'. Check configuration for '%s'")
@@ -349,7 +349,7 @@ public interface Log extends BasicLogger {
 	IllegalArgumentException getMissingActualTypeArgumentForTypeParameterException(TypeVariable<?> typeParameter);
 
 	@Message(id = 95, value = "Unable to instantiate constraint factory class %s.")
-	ValidationException getUnableToInstantiateConstraintFactoryClassException(String constraintFactoryClassName, @Cause ValidationException e);
+	ValidationException getUnableToInstantiateConstraintValidatorFactoryClassException(String constraintValidatorFactoryClassName, @Cause ValidationException e);
 
 	@Message(id = 96, value = "Unable to open input stream for mapping file %s.")
 	ValidationException getUnableToOpenInputStreamForMappingFileException(String mappingFileName);

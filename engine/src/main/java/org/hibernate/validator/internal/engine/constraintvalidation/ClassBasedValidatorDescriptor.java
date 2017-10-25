@@ -60,11 +60,11 @@ class ClassBasedValidatorDescriptor<A extends Annotation> implements ConstraintV
 	}
 
 	@Override
-	public ConstraintValidator<A, ?> newInstance(ConstraintValidatorFactory constraintFactory) {
-		ConstraintValidator<A, ?> constraintValidator = constraintFactory.getInstance( validatorClass );
+	public ConstraintValidator<A, ?> newInstance(ConstraintValidatorFactory constraintValidatorFactory) {
+		ConstraintValidator<A, ?> constraintValidator = constraintValidatorFactory.getInstance( validatorClass );
 
 		if ( constraintValidator == null ) {
-			throw LOG.getConstraintFactoryMustNotReturnNullException( validatorClass );
+			throw LOG.getConstraintValidatorFactoryMustNotReturnNullException( validatorClass );
 		}
 
 		return constraintValidator;

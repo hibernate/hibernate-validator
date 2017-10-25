@@ -52,7 +52,7 @@ class LambdaBasedValidatorDescriptor<A extends Annotation> implements Constraint
 	}
 
 	@Override
-	public ConstraintValidator<A, ?> newInstance(ConstraintValidatorFactory constraintFactory) {
+	public ConstraintValidator<A, ?> newInstance(ConstraintValidatorFactory constraintValidatorFactory) {
 		return new LambdaExecutor<>( lambda );
 	}
 
