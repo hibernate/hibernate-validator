@@ -118,7 +118,7 @@ public final class PathImpl implements Path, Serializable {
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createPropertyNode( nodeName, parent );
 		nodeList.add( currentLeafNode );
-		hashCode = -1;
+		resetHashCode();
 		return currentLeafNode;
 	}
 
@@ -128,7 +128,7 @@ public final class PathImpl implements Path, Serializable {
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createContainerElementNode( nodeName, parent );
 		nodeList.add( currentLeafNode );
-		hashCode = -1;
+		resetHashCode();
 		return currentLeafNode;
 	}
 
@@ -138,7 +138,7 @@ public final class PathImpl implements Path, Serializable {
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createParameterNode( nodeName, parent, index );
 		nodeList.add( currentLeafNode );
-		hashCode = -1;
+		resetHashCode();
 		return currentLeafNode;
 	}
 
@@ -148,7 +148,7 @@ public final class PathImpl implements Path, Serializable {
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createCrossParameterNode( parent );
 		nodeList.add( currentLeafNode );
-		hashCode = -1;
+		resetHashCode();
 		return currentLeafNode;
 	}
 
@@ -158,7 +158,7 @@ public final class PathImpl implements Path, Serializable {
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createBeanNode( parent );
 		nodeList.add( currentLeafNode );
-		hashCode = -1;
+		resetHashCode();
 		return currentLeafNode;
 	}
 
@@ -168,7 +168,7 @@ public final class PathImpl implements Path, Serializable {
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createReturnValue( parent );
 		nodeList.add( currentLeafNode );
-		hashCode = -1;
+		resetHashCode();
 		return currentLeafNode;
 	}
 
@@ -178,7 +178,7 @@ public final class PathImpl implements Path, Serializable {
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createConstructorNode( name, parent, parameterTypes );
 		nodeList.add( currentLeafNode );
-		hashCode = -1;
+		resetHashCode();
 		return currentLeafNode;
 	}
 
@@ -188,7 +188,7 @@ public final class PathImpl implements Path, Serializable {
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createMethodNode( name, parent, parameterTypes );
 		nodeList.add( currentLeafNode );
-		hashCode = -1;
+		resetHashCode();
 		return currentLeafNode;
 	}
 
@@ -198,7 +198,7 @@ public final class PathImpl implements Path, Serializable {
 		currentLeafNode = NodeImpl.makeIterable( currentLeafNode );
 
 		nodeList.set( nodeList.size() - 1, currentLeafNode );
-		hashCode = -1;
+		resetHashCode();
 		return currentLeafNode;
 	}
 
@@ -208,7 +208,7 @@ public final class PathImpl implements Path, Serializable {
 		currentLeafNode = NodeImpl.makeIterableAndSetIndex( currentLeafNode, index );
 
 		nodeList.set( nodeList.size() - 1, currentLeafNode );
-		hashCode = -1;
+		resetHashCode();
 		return currentLeafNode;
 	}
 
@@ -218,7 +218,7 @@ public final class PathImpl implements Path, Serializable {
 		currentLeafNode = NodeImpl.makeIterableAndSetMapKey( currentLeafNode, key );
 
 		nodeList.set( nodeList.size() - 1, currentLeafNode );
-		hashCode = -1;
+		resetHashCode();
 		return currentLeafNode;
 	}
 
@@ -230,7 +230,7 @@ public final class PathImpl implements Path, Serializable {
 			currentLeafNode = NodeImpl.setPropertyValue( currentLeafNode, value );
 
 			nodeList.set( nodeList.size() - 1, currentLeafNode );
-			hashCode = -1;
+			resetHashCode();
 		}
 		return currentLeafNode;
 	}
@@ -241,7 +241,7 @@ public final class PathImpl implements Path, Serializable {
 		currentLeafNode = NodeImpl.setTypeParameter( currentLeafNode, containerClass, typeArgumentIndex );
 
 		nodeList.set( nodeList.size() - 1, currentLeafNode );
-		hashCode = -1;
+		resetHashCode();
 		return currentLeafNode;
 	}
 
@@ -370,6 +370,10 @@ public final class PathImpl implements Path, Serializable {
 		currentLeafNode = (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		hashCode = -1;
 		nodeListRequiresCopy = true;
+	}
+
+	private void resetHashCode() {
+		hashCode = -1;
 	}
 
 	private static PathImpl parseProperty(String propertyName) {
