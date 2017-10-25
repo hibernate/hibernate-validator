@@ -42,7 +42,7 @@ public interface ConstraintValidatorDescriptor<A extends Annotation> {
 	/**
 	 * Creates a new instance of the represented implementation type.
 	 */
-	ConstraintValidator<A, ?> newInstance(ConstraintValidatorFactory constraintFactory);
+	ConstraintValidator<A, ?> newInstance(ConstraintValidatorFactory constraintValidatorFactory);
 
 	static <A extends Annotation> ConstraintValidatorDescriptor<A> forClass(Class<? extends ConstraintValidator<A, ?>> validatorClass) {
 		return new ClassBasedValidatorDescriptor<>( validatorClass );

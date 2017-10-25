@@ -56,7 +56,7 @@ public class ValidationBootstrapParameters {
 		setProviderClass( bootstrapConfiguration.getDefaultProviderClassName(), externalClassLoader );
 		setMessageInterpolator( bootstrapConfiguration.getMessageInterpolatorClassName(), externalClassLoader );
 		setTraversableResolver( bootstrapConfiguration.getTraversableResolverClassName(), externalClassLoader );
-		setConstraintFactory( bootstrapConfiguration.getConstraintValidatorFactoryClassName(), externalClassLoader );
+		setConstraintValidatorFactory( bootstrapConfiguration.getConstraintValidatorFactoryClassName(), externalClassLoader );
 		setParameterNameProvider( bootstrapConfiguration.getParameterNameProviderClassName(), externalClassLoader );
 		setClockProvider( bootstrapConfiguration.getClockProviderClassName(), externalClassLoader );
 		setValueExtractors( bootstrapConfiguration.getValueExtractorClassNames(), externalClassLoader );
@@ -195,18 +195,18 @@ public class ValidationBootstrapParameters {
 		}
 	}
 
-	private void setConstraintFactory(String constraintFactoryFqcn, ClassLoader externalClassLoader) {
-		if ( constraintFactoryFqcn != null ) {
+	private void setConstraintValidatorFactory(String constraintValidatorFactoryFqcn, ClassLoader externalClassLoader) {
+		if ( constraintValidatorFactoryFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<? extends ConstraintValidatorFactory> clazz = (Class<? extends ConstraintValidatorFactory>) run(
-						LoadClass.action( constraintFactoryFqcn, externalClassLoader )
+						LoadClass.action( constraintValidatorFactoryFqcn, externalClassLoader )
 				);
-				constraintValidatorFactory = run( NewInstance.action( clazz, "constraint factory class" ) );
-				log.usingConstraintFactory( clazz );
+				constraintValidatorFactory = run( NewInstance.action( clazz, "constraint validator factory class" ) );
+				log.usingConstraintValidatorFactory( clazz );
 			}
 			catch (ValidationException e) {
-				throw log.getUnableToInstantiateConstraintFactoryClassException( constraintFactoryFqcn, e );
+				throw log.getUnableToInstantiateConstraintValidatorFactoryClassException( constraintValidatorFactoryFqcn, e );
 			}
 		}
 	}
