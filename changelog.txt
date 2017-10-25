@@ -1,6 +1,25 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.4.Final (25-10-2017)
+-------------------------
+
+** Bug
+    * HV-1508 - engine      - Reset the hashCode of PathImpl when we remove the leaf node
+    * HV-1373 - engine      - Validator calls objects hashCode() after failed @NotNull validation
+
+** Improvement
+    * HV-1509 - engine      - Reference constraint validator factory consistently
+    * HV-1507 - engine      - Avoid resetting the PathImpl.hashCode() when setting the property value
+    * HV-1503 - engine      - Store the initialized ConstraintValidator in ConstraintTree
+    * HV-1502 - engine      - Use AnnotationDescriptor to access annotations information
+    * HV-1323 - engine      - Drop WARN log message in ParameterMessageInterpolator instantiation
+    * HV-1040 - engine      - Field-level constraint performance impairment
+
+** Task
+    * HV-1501 - build       - Update the base versions for API comparison and performance tests
+    * HV-1472 - integration - Provide patch file for WildFly 11 Final
+
 6.0.3.Final (19-10-2017)
 -------------------------
 
