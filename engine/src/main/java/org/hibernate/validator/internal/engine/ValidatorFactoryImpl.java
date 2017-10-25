@@ -70,7 +70,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
  */
 public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make();
 
 	/**
 	 * The default message interpolator for this factory.
@@ -368,7 +368,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if ( type.isAssignableFrom( HibernateValidatorFactory.class ) ) {
 			return type.cast( this );
 		}
-		throw log.getTypeNotSupportedForUnwrappingException( type );
+		throw LOG.getTypeNotSupportedForUnwrappingException( type );
 	}
 
 	@Override
@@ -455,7 +455,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			boolean configurationValue = Boolean.valueOf( propertyStringValue );
 			// throw an exception if the programmatic value is true and it overrides a false configured value
 			if ( programmaticValue && !configurationValue ) {
-				throw log.getInconsistentFailFastConfigurationException();
+				throw LOG.getInconsistentFailFastConfigurationException();
 			}
 			value = configurationValue;
 		}
@@ -505,7 +505,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 			if ( hibernateSpecificConfig.getScriptEvaluatorFactory() != null ) {
-				log.usingScriptEvaluatorFactory( hibernateSpecificConfig.getScriptEvaluatorFactory().getClass() );
+				LOG.usingScriptEvaluatorFactory( hibernateSpecificConfig.getScriptEvaluatorFactory().getClass() );
 				return hibernateSpecificConfig.getScriptEvaluatorFactory();
 			}
 		}
@@ -518,12 +518,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						LoadClass.action( scriptEvaluatorFactoryFqcn, externalClassLoader )
 				);
 				ScriptEvaluatorFactory scriptEvaluatorFactory = run( NewInstance.action( clazz, "script evaluator factory class" ) );
-				log.usingScriptEvaluatorFactory( clazz );
+				LOG.usingScriptEvaluatorFactory( clazz );
 
 				return scriptEvaluatorFactory;
 			}
 			catch (Exception e) {
-				throw log.getUnableToInstantiateScriptEvaluatorFactoryClassException( scriptEvaluatorFactoryFqcn, e );
+				throw LOG.getUnableToInstantiateScriptEvaluatorFactoryClassException( scriptEvaluatorFactoryFqcn, e );
 			}
 		}
 
@@ -545,7 +545,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			Set<Class<?>> definedConstraints) {
 		Class<A> constraintType = constraintDefinitionContribution.getConstraintType();
 		if ( definedConstraints.contains( constraintType ) ) {
-			throw log.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( constraintType );
+			throw LOG.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( constraintType );
 		}
 		definedConstraints.add( constraintType );
 		constraintHelper.putValidatorDescriptors(
