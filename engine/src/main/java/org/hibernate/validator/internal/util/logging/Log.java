@@ -5,6 +5,8 @@
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.internal.util.logging;
+
+import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 
@@ -810,4 +812,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 233, value = "An error occurred while executing the script: \"%s\".")
 	ScriptEvaluationException getErrorExecutingScriptException(String script, @Cause Exception e);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = 234, value = "Using %1$s as ValidatorFactory-scoped %2$s.")
+	void logValidatorFactoryScopedConfiguration(@FormatWith(ClassObjectFormatter.class) Class<?> configuredClass, String configuredElement);
 }

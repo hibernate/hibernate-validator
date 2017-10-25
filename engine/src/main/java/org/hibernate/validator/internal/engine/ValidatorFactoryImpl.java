@@ -257,6 +257,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
 
 		this.scriptEvaluatorFactory = getScriptEvaluatorFactory( configurationState, properties, externalClassLoader );
+
+		if ( LOG.isDebugEnabled() ) {
+			logValidatorFactoryScopedConfiguration( configurationState, this.scriptEvaluatorFactory.getClass() );
+		}
 	}
 
 	private static ClassLoader getExternalClassLoader(ConfigurationState configurationState) {
@@ -553,6 +557,15 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				constraintDefinitionContribution.getValidatorDescriptors(),
 				constraintDefinitionContribution.includeExisting()
 		);
+	}
+
+	private static void logValidatorFactoryScopedConfiguration(ConfigurationState configurationState,
+			Class<? extends ScriptEvaluatorFactory> scriptEvaluatorFactoryClass) {
+		LOG.logValidatorFactoryScopedConfiguration( configurationState.getMessageInterpolator().getClass(), "message interpolator" );
+		LOG.logValidatorFactoryScopedConfiguration( configurationState.getTraversableResolver().getClass(), "traversable resolver" );
+		LOG.logValidatorFactoryScopedConfiguration( configurationState.getParameterNameProvider().getClass(), "parameter name provider" );
+		LOG.logValidatorFactoryScopedConfiguration( configurationState.getClockProvider().getClass(), "clock provider" );
+		LOG.logValidatorFactoryScopedConfiguration( scriptEvaluatorFactoryClass, "script evaluator factory" );
 	}
 
 	/**
