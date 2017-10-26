@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.util;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
@@ -46,7 +47,7 @@ public final class ReflectionHelper {
 			PROPERTY_ACCESSOR_PREFIX_HAS
 	};
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPES;
 

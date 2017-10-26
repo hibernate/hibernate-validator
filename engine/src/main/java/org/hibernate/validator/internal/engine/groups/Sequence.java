@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.groups;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,7 +32,7 @@ public class Sequence implements Iterable<GroupWithInheritance> {
 	 */
 	public static Sequence DEFAULT = new Sequence();
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Class<?> sequence;
 	private List<Group> groups;

@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,7 +37,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class ConstraintValidatorManager {
-	private static final Log LOG = LoggerFactory.make();
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Dummy {@code ConstraintValidator} used as placeholder for the case that for a given context there exists

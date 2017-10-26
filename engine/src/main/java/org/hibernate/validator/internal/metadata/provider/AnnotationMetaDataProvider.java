@@ -13,6 +13,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedArrayType;
 import java.lang.reflect.AnnotatedElement;
@@ -84,7 +85,8 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  * @author Guillaume Smet
  */
 public class AnnotationMetaDataProvider implements MetaDataProvider {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ConstraintHelper constraintHelper;
 	private final TypeResolutionHelper typeResolutionHelper;

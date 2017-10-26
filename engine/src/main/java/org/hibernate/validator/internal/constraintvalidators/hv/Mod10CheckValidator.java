@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import javax.validation.ConstraintValidator;
 
@@ -27,7 +28,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class Mod10CheckValidator extends ModCheckBase
 		implements ConstraintValidator<Mod10Check, CharSequence> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Multiplier to be used by odd digits on Mod10 algorithm

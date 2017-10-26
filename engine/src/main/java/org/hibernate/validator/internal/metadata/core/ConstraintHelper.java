@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.core;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -295,7 +296,7 @@ public class ConstraintHelper {
 
 	private static final List<String> SUPPORTED_VALID_METHODS = Arrays.asList( VALIDATION_APPLIES_TO );
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
 	private static final String JAVA_MONEY_CLASS_NAME = "javax.money.MonetaryAmount";
 

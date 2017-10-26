@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv;
 
+import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -22,7 +23,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class DecimalMinValidatorForCharSequence implements ConstraintValidator<DecimalMin, CharSequence> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private BigDecimal minValue;
 	private boolean inclusive;

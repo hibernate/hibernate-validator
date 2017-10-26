@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Collections;
@@ -33,8 +34,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  */
 public class ContainerCascadingMetaData implements CascadingMetaData {
 
-
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The enclosing type that defines this type parameter.

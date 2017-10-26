@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.cfg.context;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Executable;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +38,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 abstract class ExecutableConstraintMappingContextImpl {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected final TypeConstraintMappingContextImpl<?> typeContext;
 	protected final Executable executable;

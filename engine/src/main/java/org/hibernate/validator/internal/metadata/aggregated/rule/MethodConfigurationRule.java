@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated.rule;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -17,7 +19,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public abstract class MethodConfigurationRule {
 
-	protected static final Log log = LoggerFactory.make();
+	protected static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Applies this rule. Invoked for each pair of methods collected by a given

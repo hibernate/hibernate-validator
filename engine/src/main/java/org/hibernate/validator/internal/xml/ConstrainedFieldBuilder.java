@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.xml;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -38,7 +39,7 @@ import org.hibernate.validator.internal.xml.binding.FieldType;
  * @author Guillaume Smet
  */
 class ConstrainedFieldBuilder {
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final GroupConversionBuilder groupConversionBuilder;
 	private final MetaConstraintBuilder metaConstraintBuilder;

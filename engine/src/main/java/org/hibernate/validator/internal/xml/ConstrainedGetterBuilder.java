@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.xml;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -41,7 +42,8 @@ import org.hibernate.validator.internal.xml.binding.GetterType;
  * @author Guillaume Smet
  */
 class ConstrainedGetterBuilder {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final GroupConversionBuilder groupConversionBuilder;
 	private final MetaConstraintBuilder metaConstraintBuilder;

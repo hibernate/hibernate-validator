@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
@@ -70,7 +71,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
  */
 public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The default message interpolator for this factory.

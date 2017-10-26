@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.util;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -23,7 +24,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class TypeVariables {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private TypeVariables() {
 	}

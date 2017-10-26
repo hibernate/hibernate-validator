@@ -13,6 +13,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWit
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +39,7 @@ import org.testng.annotations.Test;
  */
 public abstract class AbstractGroupConversionTest {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected Validator validator;
 

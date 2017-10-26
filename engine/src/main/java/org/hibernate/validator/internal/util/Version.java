@@ -6,7 +6,8 @@
  */
 package org.hibernate.validator.internal.util;
 
-import org.hibernate.validator.internal.util.logging.Log;
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
@@ -15,10 +16,9 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public final class Version {
 
-	private static Log LOG = LoggerFactory.make();
-
 	static {
-		LOG.version( getVersionString() );
+		LoggerFactory.make( MethodHandles.lookup() )
+			.version( getVersionString() );
 	}
 
 	public static String getVersionString() {

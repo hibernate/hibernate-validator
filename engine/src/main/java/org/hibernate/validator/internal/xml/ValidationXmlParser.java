@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
@@ -53,7 +54,7 @@ import org.xml.sax.SAXException;
  */
 public class ValidationXmlParser {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String VALIDATION_XML_FILE = "META-INF/validation.xml";
 	private static final Map<String, String> SCHEMAS_BY_VERSION = Collections.unmodifiableMap( getSchemasByVersion() );

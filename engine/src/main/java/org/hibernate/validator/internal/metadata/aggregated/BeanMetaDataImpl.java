@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
@@ -70,7 +71,7 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  */
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Represents the "sequence" of just Default.class.

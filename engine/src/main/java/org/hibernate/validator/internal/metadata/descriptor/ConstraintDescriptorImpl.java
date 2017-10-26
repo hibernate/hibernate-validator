@@ -16,6 +16,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
@@ -70,7 +71,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
 public class ConstraintDescriptorImpl<T extends Annotation> implements ConstraintDescriptor<T>, Serializable {
 
 	private static final long serialVersionUID = -2563102960314069246L;
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
 
 	/**

@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.util;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 
 import org.hibernate.validator.internal.util.logging.Log;
@@ -20,7 +21,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public final class Contracts {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private Contracts() {
 	}

@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.scripting;
 
+import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -31,7 +32,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluator;
  */
 public class DefaultScriptEvaluatorFactory extends AbstractCachingScriptEvaluatorFactory {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private ClassLoader classLoader;
 

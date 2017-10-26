@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.xml;
 
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
@@ -36,7 +37,8 @@ import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
  * @author Hardy Ferentschik
  */
 public class ValidationBootstrapParameters {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private MessageInterpolator messageInterpolator;

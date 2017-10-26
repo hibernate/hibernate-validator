@@ -13,6 +13,7 @@ import static org.hibernate.validator.internal.engine.constraintvalidation.Const
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
@@ -46,7 +47,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  */
 public class ConstraintTree<A extends Annotation> {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Immutable
 	private final List<ConstraintTree<?>> children;

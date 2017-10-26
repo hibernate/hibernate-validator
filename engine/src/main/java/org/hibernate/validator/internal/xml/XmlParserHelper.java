@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.xml;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -45,7 +46,7 @@ import org.hibernate.validator.internal.util.privilegedactions.NewSchema;
  */
 public class XmlParserHelper {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The expected number of XML schemas managed by this class. Used to set the

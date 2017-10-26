@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -52,7 +53,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class ContainerElementConstraintMappingContextImpl extends CascadableConstraintMappingContextImplBase<ContainerElementConstraintMappingContext> implements ContainerElementConstraintMappingContext {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final TypeConstraintMappingContextImpl<?> typeContext;
 	private final ContainerElementTarget parentContainerElementTarget;

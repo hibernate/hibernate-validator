@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.time;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.time.Clock;
 import java.time.Instant;
 
@@ -25,7 +26,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public abstract class AbstractInstantBasedTimeValidator<C extends Annotation, T> implements ConstraintValidator<C, T> {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
 	public boolean isValid(T value, ConstraintValidatorContext context) {

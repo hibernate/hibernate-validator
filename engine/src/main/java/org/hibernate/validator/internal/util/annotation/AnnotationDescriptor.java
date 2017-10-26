@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -44,7 +45,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
  */
 public class AnnotationDescriptor<A extends Annotation> implements Serializable {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Class<A> type;
 

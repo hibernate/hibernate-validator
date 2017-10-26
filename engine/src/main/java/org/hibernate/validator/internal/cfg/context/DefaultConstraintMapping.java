@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
 import javax.validation.Constraint;
@@ -37,7 +38,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class DefaultConstraintMapping implements ConstraintMapping {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 	private final Set<Class<?>> configuredTypes;

@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
@@ -84,7 +85,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
  */
 public class ValidatorImpl implements Validator, ExecutableValidator {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The default group array used in case any of the validate methods is called without a group.

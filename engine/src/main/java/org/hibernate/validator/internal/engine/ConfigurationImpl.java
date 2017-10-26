@@ -12,6 +12,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
@@ -69,7 +70,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		Version.touch();
 	}
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ResourceBundleLocator defaultResourceBundleLocator;
 

@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.List;
 import javax.validation.ConstraintValidator;
@@ -28,7 +29,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class Mod11CheckValidator extends ModCheckBase
 		implements ConstraintValidator<Mod11Check, CharSequence> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private boolean reverseOrder;
 

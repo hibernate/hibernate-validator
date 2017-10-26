@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -25,7 +26,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public abstract class ModCheckBase {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final Pattern NUMBERS_ONLY_REGEXP = Pattern.compile( "[^0-9]" );
 

@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.engine.path;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class NodeImpl
 	private static final long serialVersionUID = 2075466571633860499L;
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[]{};
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String INDEX_OPEN = "[";
 	private static final String INDEX_CLOSE = "]";

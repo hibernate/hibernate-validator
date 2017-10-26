@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.resolver;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -22,7 +23,7 @@ import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 
 public class TraversableResolvers {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Class to load to check whether JPA is on the classpath.

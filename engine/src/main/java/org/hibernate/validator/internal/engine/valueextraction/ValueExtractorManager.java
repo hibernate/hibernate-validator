@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.valueextraction;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
@@ -39,7 +40,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  */
 public class ValueExtractorManager {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Immutable
 	public static final Set<ValueExtractorDescriptor> SPEC_DEFINED_EXTRACTORS;

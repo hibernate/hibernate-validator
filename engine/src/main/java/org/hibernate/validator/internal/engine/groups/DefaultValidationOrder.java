@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.groups;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -25,7 +26,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Guillaume Smet
  */
 public final class DefaultValidationOrder implements ValidationOrder {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The list of single groups to be used this validation.

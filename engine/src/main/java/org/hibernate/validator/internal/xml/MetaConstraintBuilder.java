@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -45,7 +46,8 @@ import org.hibernate.validator.internal.xml.binding.PayloadType;
  * @author Hardy Ferentschik
  */
 class MetaConstraintBuilder {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final Pattern IS_ONLY_WHITESPACE = Pattern.compile( "\\s*" );
 

@@ -7,6 +7,7 @@
 package org.hibernate.validator.cfg;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Annotation> {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	// Note on visibility of members: These members are intentionally made
 	// protected and published by a sub-class for internal use. There aren't

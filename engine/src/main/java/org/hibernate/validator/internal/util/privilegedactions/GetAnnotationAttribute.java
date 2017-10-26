@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.util.privilegedactions;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
@@ -20,7 +21,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public final class GetAnnotationAttribute<T> implements PrivilegedAction<T> {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Annotation annotation;
 	private final String attributeName;

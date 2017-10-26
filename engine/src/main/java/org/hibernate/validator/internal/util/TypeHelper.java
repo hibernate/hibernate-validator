@@ -22,6 +22,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.MalformedParameterizedTypeException;
@@ -49,9 +50,10 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public final class TypeHelper {
+
 	private static final Map<Class<?>, Set<Class<?>>> SUBTYPES_BY_PRIMITIVE;
 	private static final int VALIDATOR_TYPE_INDEX = 1;
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	static {
 		Map<Class<?>, Set<Class<?>>> subtypesByPrimitive = newHashMap();

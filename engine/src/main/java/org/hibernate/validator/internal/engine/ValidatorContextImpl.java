@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
  */
 public class ValidatorContextImpl implements HibernateValidatorContext {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ValidatorFactoryImpl validatorFactory;
 

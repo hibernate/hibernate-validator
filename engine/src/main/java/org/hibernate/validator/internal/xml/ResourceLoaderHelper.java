@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.xml;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -21,7 +22,8 @@ import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
  * @author Hardy Ferentschik
  */
 final class ResourceLoaderHelper {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private ResourceLoaderHelper() {
 		// Not allowed
