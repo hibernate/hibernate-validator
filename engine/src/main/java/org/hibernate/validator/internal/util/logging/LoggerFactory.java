@@ -6,17 +6,20 @@
  */
 package org.hibernate.validator.internal.util.logging;
 
+import java.lang.invoke.MethodHandles.Lookup;
+
 import org.jboss.logging.Logger;
 
 /**
  * @author Hardy Ferentschik
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2012 SERLI
+ * @author Sanne Grinovero
  */
 public final class LoggerFactory {
-	public static Log make() {
-		Throwable t = new Throwable();
-		StackTraceElement directCaller = t.getStackTrace()[1];
-		return Logger.getMessageLogger( Log.class, directCaller.getClassName() );
+
+	public static Log make(final Lookup creationContext) {
+		final String className = creationContext.lookupClass().getName();
+		return Logger.getMessageLogger( Log.class, className );
 	}
 
 	// private constructor to avoid instantiation

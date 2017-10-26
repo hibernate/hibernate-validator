@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv;
 
+import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -23,7 +24,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class DigitsValidatorForNumber implements ConstraintValidator<Digits, Number> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private int maxIntegerLength;
 	private int maxFractionLength;

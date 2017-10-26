@@ -10,6 +10,8 @@ import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -21,7 +23,7 @@ import javax.validation.ConstraintValidatorContext;
  */
 public class CodePointLengthValidator implements ConstraintValidator<CodePointLength, CharSequence> {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private int min;
 	private int max;

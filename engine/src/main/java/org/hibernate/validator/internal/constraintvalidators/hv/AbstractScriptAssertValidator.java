@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -22,7 +23,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
  */
 public abstract class AbstractScriptAssertValidator<A extends Annotation, T> implements ConstraintValidator<A, T> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected String languageName;
 	protected String script;

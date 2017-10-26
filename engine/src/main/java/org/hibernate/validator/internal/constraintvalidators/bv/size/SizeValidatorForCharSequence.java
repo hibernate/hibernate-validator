@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.size;
 
+import java.lang.invoke.MethodHandles;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Size;
@@ -22,7 +24,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class SizeValidatorForCharSequence implements ConstraintValidator<Size, CharSequence> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private int min;
 	private int max;

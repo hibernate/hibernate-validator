@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
+import java.lang.invoke.MethodHandles;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -21,7 +23,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class LengthValidator implements ConstraintValidator<Length, CharSequence> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private int min;
 	private int max;

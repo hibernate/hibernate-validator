@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.valueextraction;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedArrayType;
 import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.AnnotatedType;
@@ -34,7 +35,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class ValueExtractorDescriptor {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup()  );
 
 	private final Key key;
 	private final ValueExtractor<?> valueExtractor;

@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv;
 
+import java.lang.invoke.MethodHandles;
 import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
 
@@ -24,7 +25,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class EmailValidator extends AbstractEmailValidator<Email> {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private java.util.regex.Pattern pattern;
 

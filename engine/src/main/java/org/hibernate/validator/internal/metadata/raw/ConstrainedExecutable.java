@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.raw;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.util.Collections;
@@ -37,7 +38,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  */
 public class ConstrainedExecutable extends AbstractConstrainedElement {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Executable executable;
 

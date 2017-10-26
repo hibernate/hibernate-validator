@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +30,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class NonContainerCascadingMetaData implements CascadingMetaData {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final NonContainerCascadingMetaData NON_CASCADING = new NonContainerCascadingMetaData( false,
 			GroupConversionHelper.EMPTY );

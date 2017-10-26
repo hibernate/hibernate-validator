@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.engine.path;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -33,7 +34,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public final class PathImpl implements Path, Serializable {
 	private static final long serialVersionUID = 7564511574909882392L;
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String PROPERTY_PATH_SEPARATOR = ".";
 

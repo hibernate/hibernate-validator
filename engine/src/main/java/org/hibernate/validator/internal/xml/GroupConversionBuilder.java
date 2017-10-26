@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.xml;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ import org.hibernate.validator.internal.xml.binding.GroupConversionType;
  */
 class GroupConversionBuilder {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ClassLoadingHelper classLoadingHelper;
 

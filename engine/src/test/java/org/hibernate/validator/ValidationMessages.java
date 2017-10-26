@@ -8,6 +8,7 @@ package org.hibernate.validator;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class ValidationMessages extends ResourceBundle {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String DEFAULT_PROPERTIES_FILE_NAME = "/org/hibernate/validator/ValidationMessages.properties";
 

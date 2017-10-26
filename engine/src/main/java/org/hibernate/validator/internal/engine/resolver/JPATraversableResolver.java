@@ -7,6 +7,8 @@
 package org.hibernate.validator.internal.engine.resolver;
 
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
+
 import javax.persistence.Persistence;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
@@ -24,7 +26,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Emmanuel Bernard
  */
 class JPATraversableResolver implements TraversableResolver {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
 	public final boolean isReachable(Object traversableObject,

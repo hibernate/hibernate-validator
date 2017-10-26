@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.metadata.provider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +33,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  */
 public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	// cached against the fqcn of a class. not a class instance itself (HV-479)
 	@Immutable

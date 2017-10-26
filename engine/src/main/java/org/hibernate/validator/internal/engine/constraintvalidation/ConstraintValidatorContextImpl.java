@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,7 +43,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
  */
 public class ConstraintValidatorContextImpl implements HibernateConstraintValidatorContext {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private Map<String, Object> messageParameters;
 	private Map<String, Object> expressionVariables;

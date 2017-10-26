@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.groups;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,7 +28,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class ValidationOrderGenerator {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ConcurrentMap<Class<?>, Sequence> resolvedSequences = new ConcurrentHashMap<Class<?>, Sequence>();
 

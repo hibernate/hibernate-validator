@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.metadata.core;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ import com.fasterxml.classmate.ResolvedType;
  */
 public class MetaConstraints {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private MetaConstraints() {
 	}

@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -56,7 +57,7 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 public final class TypeConstraintMappingContextImpl<C> extends ConstraintMappingContextImplBase
 		implements TypeConstraintMappingContext<C> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Class<C> beanClass;
 

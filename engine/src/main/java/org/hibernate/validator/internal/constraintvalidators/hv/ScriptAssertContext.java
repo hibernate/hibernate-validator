@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.constraintvalidators.hv;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.validator.internal.util.logging.Log;
@@ -24,7 +25,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluator;
  */
 class ScriptAssertContext {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final String script;
 	private final ScriptEvaluator scriptEvaluator;

@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
+import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Locale;
@@ -32,7 +33,7 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  */
 public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolator {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ExpressionFactory expressionFactory;
 

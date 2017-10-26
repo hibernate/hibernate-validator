@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.spi.scripting;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import javax.script.ScriptEngine;
@@ -25,7 +26,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 @Incubating
 public class ScriptEngineScriptEvaluator implements ScriptEvaluator {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ScriptEngine engine;
 

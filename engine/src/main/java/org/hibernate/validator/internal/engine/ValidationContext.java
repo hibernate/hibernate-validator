@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.engine;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Executable;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -52,7 +53,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
  */
 public class ValidationContext<T> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Caches and manages life cycle of constraint validator instances.

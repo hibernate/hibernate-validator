@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
+import java.lang.invoke.MethodHandles;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -42,7 +43,8 @@ import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.R
  * @since 5.2
  */
 public abstract class AbstractMessageInterpolator implements MessageInterpolator {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The default initial capacity for this cache.

@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.engine;
 
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import javax.validation.ConstraintViolation;
@@ -24,7 +25,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<T>, Serializable {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private static final long serialVersionUID = -4970067626703103139L;
 
 	private final String interpolatedMessage;

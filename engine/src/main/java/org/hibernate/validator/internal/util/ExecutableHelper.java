@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.util;
 
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
@@ -36,7 +37,8 @@ import com.fasterxml.classmate.members.ResolvedMethod;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public final class ExecutableHelper {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private final TypeResolver typeResolver;
 
 	public ExecutableHelper(TypeResolutionHelper typeResolutionHelper) {

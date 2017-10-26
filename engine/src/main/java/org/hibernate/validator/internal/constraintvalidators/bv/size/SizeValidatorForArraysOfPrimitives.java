@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.size;
 
+import java.lang.invoke.MethodHandles;
+
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.internal.util.logging.Log;
@@ -18,7 +20,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public abstract class SizeValidatorForArraysOfPrimitives {
 
-	private  static final Log log = LoggerFactory.make();
+	private  static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected int min;
 	protected int max;

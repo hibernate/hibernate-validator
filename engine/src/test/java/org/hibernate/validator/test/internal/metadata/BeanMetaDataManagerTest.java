@@ -15,6 +15,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +41,8 @@ import org.testng.annotations.Test;
  * @author Hardy Ferentschik
  */
 public class BeanMetaDataManagerTest {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private static final int LOOP_COUNT = 100000;
 	private static final int ARRAY_ALLOCATION_SIZE = 100000;
 

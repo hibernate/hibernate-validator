@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.engine;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.toImmutableMap;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import javax.validation.metadata.ConstraintDescriptor;
@@ -27,7 +28,7 @@ import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolator
  */
 public class MessageInterpolatorContext implements HibernateMessageInterpolatorContext {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private final Object validatedValue;
