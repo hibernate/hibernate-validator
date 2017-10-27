@@ -53,7 +53,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
  */
 public class ValidationContext<T> {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Caches and manages life cycle of constraint validator instances.
@@ -402,7 +402,7 @@ public class ValidationContext<T> {
 			throw ve;
 		}
 		catch (Exception e) {
-			throw log.getExceptionOccurredDuringMessageInterpolationException( e );
+			throw LOG.getExceptionOccurredDuringMessageInterpolationException( e );
 		}
 	}
 

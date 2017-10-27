@@ -30,7 +30,7 @@ import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolator
  */
 public class ElTermResolver implements TermResolver {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Name under which the currently validate value is bound to the EL context.
@@ -67,13 +67,13 @@ public class ElTermResolver implements TermResolver {
 			resolvedExpression = (String) valueExpression.getValue( elContext );
 		}
 		catch (PropertyNotFoundException pnfe) {
-			log.unknownPropertyInExpressionLanguage( expression, pnfe );
+			LOG.unknownPropertyInExpressionLanguage( expression, pnfe );
 		}
 		catch (ELException e) {
-			log.errorInExpressionLanguage( expression, e );
+			LOG.errorInExpressionLanguage( expression, e );
 		}
 		catch (Exception e) {
-			log.evaluatingExpressionLanguageExpressionCausedException( expression, e );
+			LOG.evaluatingExpressionLanguageExpressionCausedException( expression, e );
 		}
 
 		return resolvedExpression;

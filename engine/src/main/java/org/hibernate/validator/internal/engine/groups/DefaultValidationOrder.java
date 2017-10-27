@@ -27,7 +27,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public final class DefaultValidationOrder implements ValidationOrder {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The list of single groups to be used this validation.
@@ -128,7 +128,7 @@ public final class DefaultValidationOrder implements ValidationOrder {
 				// since we basically have two groups
 				continue;
 			}
-			throw log.getUnableToExpandDefaultGroupListException( defaultGroupList, groupList );
+			throw LOG.getUnableToExpandDefaultGroupListException( defaultGroupList, groupList );
 		}
 	}
 

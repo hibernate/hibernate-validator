@@ -25,7 +25,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class DecimalMaxValidatorForMonetaryAmount implements ConstraintValidator<DecimalMax, MonetaryAmount> {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private BigDecimal maxValue;
 	private boolean inclusive;
@@ -36,7 +36,7 @@ public class DecimalMaxValidatorForMonetaryAmount implements ConstraintValidator
 			this.maxValue = new BigDecimal( maxValue.value() );
 		}
 		catch (NumberFormatException nfe) {
-			throw log.getInvalidBigDecimalFormatException( maxValue.value(), nfe );
+			throw LOG.getInvalidBigDecimalFormatException( maxValue.value(), nfe );
 		}
 		this.inclusive = maxValue.inclusive();
 	}

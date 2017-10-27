@@ -41,7 +41,7 @@ public class NodeImpl
 	private static final long serialVersionUID = 2075466571633860499L;
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[]{};
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String INDEX_OPEN = "[";
 	private static final String INDEX_CLOSE = "]";
@@ -353,7 +353,7 @@ public class NodeImpl
 			return nodeType.cast( this );
 		}
 
-		throw log.getUnableToNarrowNodeTypeException( this.getClass(), kind, nodeType );
+		throw LOG.getUnableToNarrowNodeTypeException( this.getClass(), kind, nodeType );
 	}
 
 	@Override

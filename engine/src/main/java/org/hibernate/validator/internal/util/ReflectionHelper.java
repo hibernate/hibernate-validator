@@ -47,7 +47,7 @@ public final class ReflectionHelper {
 			PROPERTY_ACCESSOR_PREFIX_HAS
 	};
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPES;
 
@@ -196,7 +196,7 @@ public final class ReflectionHelper {
 		}
 		//TODO HV-571 change log method name
 		else {
-			throw log.getMemberIsNeitherAFieldNorAMethodException( member );
+			throw LOG.getMemberIsNeitherAFieldNorAMethodException( member );
 		}
 		if ( type instanceof TypeVariable ) {
 			type = TypeHelper.getErasedType( type );
@@ -233,7 +233,7 @@ public final class ReflectionHelper {
 			return field.get( object );
 		}
 		catch (IllegalAccessException e) {
-			throw log.getUnableToAccessMemberException( field.getName(), e );
+			throw LOG.getUnableToAccessMemberException( field.getName(), e );
 		}
 	}
 
@@ -242,7 +242,7 @@ public final class ReflectionHelper {
 			return method.invoke( object );
 		}
 		catch (IllegalAccessException | InvocationTargetException e) {
-			throw log.getUnableToAccessMemberException( method.getName(), e );
+			throw LOG.getUnableToAccessMemberException( method.getName(), e );
 		}
 	}
 
@@ -306,7 +306,7 @@ public final class ReflectionHelper {
 		if ( type instanceof GenericArrayType ) {
 			return Object[].class;
 		}
-		throw log.getUnableToConvertTypeToClassException( type );
+		throw LOG.getUnableToConvertTypeToClassException( type );
 	}
 
 	/**
@@ -438,7 +438,7 @@ public final class ReflectionHelper {
 		Class<?> wrapperType = PRIMITIVE_TO_WRAPPER_TYPES.get( primitiveType );
 
 		if ( wrapperType == null ) {
-			throw log.getHasToBeAPrimitiveTypeException( primitiveType.getClass() );
+			throw LOG.getHasToBeAPrimitiveTypeException( primitiveType.getClass() );
 		}
 
 		return wrapperType;
@@ -484,7 +484,7 @@ public final class ReflectionHelper {
 		Class<?> wrapperType = WRAPPER_TO_PRIMITIVE_TYPES.get( type );
 
 		if ( wrapperType == null ) {
-			throw log.getHasToBeABoxedTypeException( type.getClass() );
+			throw LOG.getHasToBeABoxedTypeException( type.getClass() );
 		}
 
 		return wrapperType;

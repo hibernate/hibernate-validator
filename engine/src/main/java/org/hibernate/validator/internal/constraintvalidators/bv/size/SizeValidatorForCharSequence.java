@@ -24,7 +24,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class SizeValidatorForCharSequence implements ConstraintValidator<Size, CharSequence> {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private int min;
 	private int max;
@@ -56,13 +56,13 @@ public class SizeValidatorForCharSequence implements ConstraintValidator<Size, C
 
 	private void validateParameters() {
 		if ( min < 0 ) {
-			throw log.getMinCannotBeNegativeException();
+			throw LOG.getMinCannotBeNegativeException();
 		}
 		if ( max < 0 ) {
-			throw log.getMaxCannotBeNegativeException();
+			throw LOG.getMaxCannotBeNegativeException();
 		}
 		if ( max < min ) {
-			throw log.getLengthCannotBeNegativeException();
+			throw LOG.getLengthCannotBeNegativeException();
 		}
 	}
 }

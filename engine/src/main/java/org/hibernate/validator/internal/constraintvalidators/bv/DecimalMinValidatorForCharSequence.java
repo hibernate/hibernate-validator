@@ -23,7 +23,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class DecimalMinValidatorForCharSequence implements ConstraintValidator<DecimalMin, CharSequence> {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private BigDecimal minValue;
 	private boolean inclusive;
@@ -34,7 +34,7 @@ public class DecimalMinValidatorForCharSequence implements ConstraintValidator<D
 			this.minValue = new BigDecimal( minValue.value() );
 		}
 		catch (NumberFormatException nfe) {
-			throw log.getInvalidBigDecimalFormatException( minValue.value(), nfe );
+			throw LOG.getInvalidBigDecimalFormatException( minValue.value(), nfe );
 		}
 		this.inclusive = minValue.inclusive();
 	}

@@ -86,7 +86,7 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  */
 public class AnnotationMetaDataProvider implements MetaDataProvider {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ConstraintHelper constraintHelper;
 	private final TypeResolutionHelper typeResolutionHelper;
@@ -186,7 +186,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			}
 		}
 
-		throw log.getWrongDefaultGroupSequenceProviderTypeException( beanClass );
+		throw LOG.getWrongDefaultGroupSequenceProviderTypeException( beanClass );
 	}
 
 	private Set<MetaConstraint<?>> getClassLevelConstraints(Class<?> clazz) {
@@ -386,7 +386,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				parameterAnnotations = parameter.getAnnotations();
 			}
 			catch (ArrayIndexOutOfBoundsException ex) {
-				log.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
+				LOG.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
 				parameterAnnotations = new Annotation[0];
 			}
 
@@ -532,7 +532,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		if ( groupConversionList != null ) {
 			for ( ConvertGroup conversion : groupConversionList.value() ) {
 				if ( groupConversions.containsKey( conversion.from() ) ) {
-					throw log.getMultipleGroupConversionsForSameSourceException(
+					throw LOG.getMultipleGroupConversionsForSameSourceException(
 							conversion.from(),
 							CollectionHelper.<Class<?>>asSet(
 									groupConversions.get( conversion.from() ),
@@ -603,7 +603,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 					parameter, containerElementTypesCascadingMetaData );
 		}
 		catch (ArrayIndexOutOfBoundsException ex) {
-			log.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
+			LOG.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
 			return CascadingMetaDataBuilder.nonCascading();
 		}
 	}
@@ -715,7 +715,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			);
 		}
 		catch (ArrayIndexOutOfBoundsException ex) {
-			log.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
+			LOG.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
 			return Collections.emptySet();
 		}
 	}

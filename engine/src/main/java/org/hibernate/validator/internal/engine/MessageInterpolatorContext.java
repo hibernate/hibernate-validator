@@ -28,7 +28,7 @@ import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolator
  */
 public class MessageInterpolatorContext implements HibernateMessageInterpolatorContext {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private final Object validatedValue;
@@ -81,7 +81,7 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 		if ( type.isAssignableFrom( HibernateMessageInterpolatorContext.class ) ) {
 			return type.cast( this );
 		}
-		throw log.getTypeNotSupportedForUnwrappingException( type );
+		throw LOG.getTypeNotSupportedForUnwrappingException( type );
 	}
 
 	@Override

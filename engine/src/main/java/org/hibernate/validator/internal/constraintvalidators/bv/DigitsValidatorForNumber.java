@@ -24,7 +24,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class DigitsValidatorForNumber implements ConstraintValidator<Digits, Number> {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private int maxIntegerLength;
 	private int maxFractionLength;
@@ -59,10 +59,10 @@ public class DigitsValidatorForNumber implements ConstraintValidator<Digits, Num
 
 	private void validateParameters() {
 		if ( maxIntegerLength < 0 ) {
-			throw log.getInvalidLengthForIntegerPartException();
+			throw LOG.getInvalidLengthForIntegerPartException();
 		}
 		if ( maxFractionLength < 0 ) {
-			throw log.getInvalidLengthForFractionPartException();
+			throw LOG.getInvalidLengthForFractionPartException();
 		}
 	}
 }

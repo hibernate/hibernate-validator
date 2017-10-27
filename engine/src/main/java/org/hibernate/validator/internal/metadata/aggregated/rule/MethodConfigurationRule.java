@@ -19,7 +19,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public abstract class MethodConfigurationRule {
 
-	protected static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	protected static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Applies this rule. Invoked for each pair of methods collected by a given

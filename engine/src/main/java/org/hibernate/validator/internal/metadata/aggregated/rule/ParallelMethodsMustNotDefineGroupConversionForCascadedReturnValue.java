@@ -24,7 +24,7 @@ public class ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue e
 				otherMethod.getCascadingMetaDataBuilder().hasGroupConversionsOnAnnotatedObjectOrContainerElements();
 
 		if ( isDefinedOnParallelType( method, otherMethod ) && isCascaded && hasGroupConversions ) {
-			throw log.getMethodsFromParallelTypesMustNotDefineGroupConversionsForCascadedReturnValueException(
+			throw LOG.getMethodsFromParallelTypesMustNotDefineGroupConversionsForCascadedReturnValueException(
 					method.getExecutable(),
 					otherMethod.getExecutable()
 			);

@@ -43,7 +43,7 @@ import org.hibernate.validator.internal.xml.binding.GetterType;
  */
 class ConstrainedGetterBuilder {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final GroupConversionBuilder groupConversionBuilder;
 	private final MetaConstraintBuilder metaConstraintBuilder;
@@ -120,7 +120,7 @@ class ConstrainedGetterBuilder {
 
 	private static Method findGetter(Class<?> beanClass, String getterName, List<String> alreadyProcessedGetterNames) {
 		if ( alreadyProcessedGetterNames.contains( getterName ) ) {
-			throw log.getIsDefinedTwiceInMappingXmlForBeanException( getterName, beanClass );
+			throw LOG.getIsDefinedTwiceInMappingXmlForBeanException( getterName, beanClass );
 		}
 		else {
 			alreadyProcessedGetterNames.add( getterName );
@@ -128,7 +128,7 @@ class ConstrainedGetterBuilder {
 
 		final Method method = run( GetMethodFromPropertyName.action( beanClass, getterName ) );
 		if ( method == null ) {
-			throw log.getBeanDoesNotContainThePropertyException( beanClass, getterName );
+			throw LOG.getBeanDoesNotContainThePropertyException( beanClass, getterName );
 		}
 
 		return method;

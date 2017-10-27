@@ -29,7 +29,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class Mod11CheckValidator extends ModCheckBase
 		implements ConstraintValidator<Mod11Check, CharSequence> {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private boolean reverseOrder;
 
@@ -96,11 +96,11 @@ public class Mod11CheckValidator extends ModCheckBase
 		this.customWeights = customWeights;
 
 		if ( !Character.isLetterOrDigit( this.treatCheck10As ) ) {
-			throw log.getTreatCheckAsIsNotADigitNorALetterException( this.treatCheck10As );
+			throw LOG.getTreatCheckAsIsNotADigitNorALetterException( this.treatCheck10As );
 		}
 
 		if ( !Character.isLetterOrDigit( this.treatCheck11As ) ) {
-			throw log.getTreatCheckAsIsNotADigitNorALetterException( this.treatCheck11As );
+			throw LOG.getTreatCheckAsIsNotADigitNorALetterException( this.treatCheck11As );
 		}
 	}
 

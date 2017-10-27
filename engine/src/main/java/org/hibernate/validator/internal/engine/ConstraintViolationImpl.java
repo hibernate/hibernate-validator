@@ -26,7 +26,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<T>, Serializable {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 	private static final long serialVersionUID = -4970067626703103139L;
 
 	private final String interpolatedMessage;
@@ -232,7 +232,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		if ( type.isAssignableFrom( HibernateConstraintViolation.class ) ) {
 			return type.cast( this );
 		}
-		throw log.getTypeNotSupportedForUnwrappingException( type );
+		throw LOG.getTypeNotSupportedForUnwrappingException( type );
 	}
 
 	@Override

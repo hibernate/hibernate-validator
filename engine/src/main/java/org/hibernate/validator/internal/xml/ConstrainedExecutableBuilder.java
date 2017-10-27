@@ -54,7 +54,7 @@ import org.hibernate.validator.internal.xml.binding.ReturnValueType;
  */
 class ConstrainedExecutableBuilder {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ClassLoadingHelper classLoadingHelper;
 	private final MetaConstraintBuilder metaConstraintBuilder;
@@ -99,7 +99,7 @@ class ConstrainedExecutableBuilder {
 			);
 
 			if ( method == null ) {
-				throw log.getBeanDoesNotContainMethodException(
+				throw LOG.getBeanDoesNotContainMethodException(
 						beanClass,
 						methodName,
 						parameterTypes
@@ -107,7 +107,7 @@ class ConstrainedExecutableBuilder {
 			}
 
 			if ( alreadyProcessedMethods.contains( method ) ) {
-				throw log.getMethodIsDefinedTwiceInMappingXmlForBeanException( method, beanClass );
+				throw LOG.getMethodIsDefinedTwiceInMappingXmlForBeanException( method, beanClass );
 			}
 			else {
 				alreadyProcessedMethods.add( method );
@@ -155,13 +155,13 @@ class ConstrainedExecutableBuilder {
 			);
 
 			if ( constructor == null ) {
-				throw log.getBeanDoesNotContainConstructorException(
+				throw LOG.getBeanDoesNotContainConstructorException(
 						beanClass,
 						constructorParameterTypes
 				);
 			}
 			if ( alreadyProcessedConstructors.contains( constructor ) ) {
-				throw log.getConstructorIsDefinedTwiceInMappingXmlForBeanException(
+				throw LOG.getConstructorIsDefinedTwiceInMappingXmlForBeanException(
 						constructor,
 						beanClass
 				);
@@ -314,7 +314,7 @@ class ConstrainedExecutableBuilder {
 				parameterTypes.add( parameterClass );
 			}
 			catch (ValidationException e) {
-				throw log.getInvalidParameterTypeException( type, beanClass );
+				throw LOG.getInvalidParameterTypeException( type, beanClass );
 			}
 		}
 

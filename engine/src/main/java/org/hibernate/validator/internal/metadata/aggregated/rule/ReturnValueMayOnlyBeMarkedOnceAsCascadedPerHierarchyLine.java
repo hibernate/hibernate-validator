@@ -21,7 +21,7 @@ public class ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine extends Me
 		if ( method.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements() &&
 				otherMethod.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements() &&
 				( isDefinedOnSubType( method, otherMethod ) || isDefinedOnSubType( otherMethod, method ) ) ) {
-			throw log.getMethodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidationException(
+			throw LOG.getMethodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidationException(
 					method.getExecutable(),
 					otherMethod.getExecutable()
 			);

@@ -70,7 +70,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		Version.touch();
 	}
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ResourceBundleLocator defaultResourceBundleLocator;
 
@@ -114,7 +114,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public ConfigurationImpl(ValidationProvider<?> provider) {
 		this();
 		if ( provider == null ) {
-			throw log.getInconsistentConfigurationException();
+			throw LOG.getInconsistentConfigurationException();
 		}
 		this.providerResolver = null;
 		validationBootstrapParameters.setProvider( provider );
@@ -140,9 +140,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final ConfigurationImpl messageInterpolator(MessageInterpolator interpolator) {
-		if ( log.isDebugEnabled() ) {
+		if ( LOG.isDebugEnabled() ) {
 			if ( interpolator != null ) {
-				log.debug( "Setting custom MessageInterpolator of type " + interpolator.getClass().getName() );
+				LOG.debug( "Setting custom MessageInterpolator of type " + interpolator.getClass().getName() );
 			}
 		}
 		this.validationBootstrapParameters.setMessageInterpolator( interpolator );
@@ -151,9 +151,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final ConfigurationImpl traversableResolver(TraversableResolver resolver) {
-		if ( log.isDebugEnabled() ) {
+		if ( LOG.isDebugEnabled() ) {
 			if ( resolver != null ) {
-				log.debug( "Setting custom TraversableResolver of type " + resolver.getClass().getName() );
+				LOG.debug( "Setting custom TraversableResolver of type " + resolver.getClass().getName() );
 			}
 		}
 		this.validationBootstrapParameters.setTraversableResolver( resolver );
@@ -172,9 +172,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final ConfigurationImpl constraintValidatorFactory(ConstraintValidatorFactory constraintValidatorFactory) {
-		if ( log.isDebugEnabled() ) {
+		if ( LOG.isDebugEnabled() ) {
 			if ( constraintValidatorFactory != null ) {
-				log.debug(
+				LOG.debug(
 						"Setting custom ConstraintValidatorFactory of type " + constraintValidatorFactory.getClass()
 								.getName()
 				);
@@ -186,9 +186,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public HibernateValidatorConfiguration parameterNameProvider(ParameterNameProvider parameterNameProvider) {
-		if ( log.isDebugEnabled() ) {
+		if ( LOG.isDebugEnabled() ) {
 			if ( parameterNameProvider != null ) {
-				log.debug(
+				LOG.debug(
 						"Setting custom ParameterNameProvider of type " + parameterNameProvider.getClass()
 								.getName()
 				);
@@ -200,9 +200,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public HibernateValidatorConfiguration clockProvider(ClockProvider clockProvider) {
-		if ( log.isDebugEnabled() ) {
+		if ( LOG.isDebugEnabled() ) {
 			if ( clockProvider != null ) {
-				log.debug( "Setting custom ClockProvider of type " + clockProvider.getClass().getName() );
+				LOG.debug( "Setting custom ClockProvider of type " + clockProvider.getClass().getName() );
 			}
 		}
 		this.validationBootstrapParameters.setClockProvider( clockProvider );
@@ -217,11 +217,11 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		ValueExtractorDescriptor previous = valueExtractorDescriptors.put( descriptor.getKey(), descriptor );
 
 		if ( previous != null ) {
-			throw log.getValueExtractorForTypeAndTypeUseAlreadyPresentException( extractor, previous.getValueExtractor() );
+			throw LOG.getValueExtractorForTypeAndTypeUseAlreadyPresentException( extractor, previous.getValueExtractor() );
 		}
 
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Adding value extractor " + extractor );
+		if ( LOG.isDebugEnabled() ) {
+			LOG.debug( "Adding value extractor " + extractor );
 		}
 
 		return this;
@@ -336,7 +336,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 						}
 					}
 					if ( factory == null ) {
-						throw log.getUnableToFindProviderException( providerClass );
+						throw LOG.getUnableToFindProviderException( providerClass );
 					}
 				}
 				else {
@@ -353,7 +353,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 					in.close();
 				}
 				catch (IOException io) {
-					log.unableToCloseInputStream();
+					LOG.unableToCloseInputStream();
 				}
 			}
 		}
@@ -493,7 +493,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	 */
 	private void parseValidationXml() {
 		if ( ignoreXmlConfiguration ) {
-			log.ignoringXmlConfiguration();
+			LOG.ignoringXmlConfiguration();
 
 			if ( validationBootstrapParameters.getTraversableResolver() == null ) {
 				validationBootstrapParameters.setTraversableResolver( defaultTraversableResolver );

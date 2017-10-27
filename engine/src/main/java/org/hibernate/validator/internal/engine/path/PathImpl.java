@@ -34,7 +34,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public final class PathImpl implements Path, Serializable {
 	private static final long serialVersionUID = 7564511574909882392L;
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String PROPERTY_PATH_SEPARATOR = ".";
 
@@ -390,7 +390,7 @@ public final class PathImpl implements Path, Serializable {
 
 				String value = matcher.group( PROPERTY_NAME_GROUP );
 				if ( !isValidJavaIdentifier( value ) ) {
-					throw log.getInvalidJavaIdentifierException( value );
+					throw LOG.getInvalidJavaIdentifierException( value );
 				}
 
 				// create the node
@@ -417,7 +417,7 @@ public final class PathImpl implements Path, Serializable {
 				tmp = matcher.group( REMAINING_STRING_GROUP );
 			}
 			else {
-				throw log.getUnableToParsePropertyPathException( propertyName );
+				throw LOG.getUnableToParsePropertyPathException( propertyName );
 			}
 		} while ( tmp != null );
 

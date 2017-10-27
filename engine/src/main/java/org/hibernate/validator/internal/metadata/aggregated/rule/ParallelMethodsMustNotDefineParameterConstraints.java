@@ -20,7 +20,7 @@ public class ParallelMethodsMustNotDefineParameterConstraints extends MethodConf
 	public void apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
 		if ( isDefinedOnParallelType( method, otherMethod ) &&
 				( method.hasParameterConstraints() || otherMethod.hasParameterConstraints() ) ) {
-			throw log.getParameterConstraintsDefinedInMethodsFromParallelTypesException(
+			throw LOG.getParameterConstraintsDefinedInMethodsFromParallelTypesException(
 					method.getExecutable(),
 					otherMethod.getExecutable()
 			);

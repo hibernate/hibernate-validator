@@ -71,7 +71,7 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  */
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Represents the "sequence" of just Default.class.
@@ -290,7 +290,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		PropertyMetaData propertyMetaData = propertyMetaDataMap.get( propertyName );
 
 		if ( propertyMetaData == null ) {
-			throw log.getPropertyNotDefinedByValidatedTypeException( beanClass, propertyName );
+			throw LOG.getPropertyNotDefinedByValidatedTypeException( beanClass, propertyName );
 		}
 
 		return propertyMetaData;
@@ -318,7 +318,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		if ( executableMetaData == null ) {
 			// there is no executable metadata - specified object and method do not match
-			throw log.getMethodOrConstructorNotDefinedByValidatedTypeException(
+			throw LOG.getMethodOrConstructorNotDefinedByValidatedTypeException(
 					beanClass,
 					executable
 			);
@@ -431,7 +431,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private static <T> DefaultGroupSequenceContext<T> getDefaultGroupSequenceData(Class<?> beanClass, List<Class<?>> defaultGroupSequence, DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider, ValidationOrderGenerator validationOrderGenerator) {
 		if ( defaultGroupSequence != null && defaultGroupSequenceProvider != null ) {
-			throw log.getInvalidDefaultGroupSequenceDefinitionException();
+			throw LOG.getInvalidDefaultGroupSequenceDefinitionException();
 		}
 
 		DefaultGroupSequenceContext<T> context = new DefaultGroupSequenceContext<>();
@@ -498,7 +498,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					groupSequenceContainsDefault = true;
 				}
 				else if ( group.getName().equals( Default.class.getName() ) ) {
-					throw log.getNoDefaultGroupInGroupSequenceException();
+					throw LOG.getNoDefaultGroupInGroupSequenceException();
 				}
 				else {
 					validDefaultGroupSequence.add( group );
@@ -506,10 +506,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 		if ( !groupSequenceContainsDefault ) {
-			throw log.getBeanClassMustBePartOfRedefinedDefaultGroupSequenceException( beanClass );
+			throw LOG.getBeanClassMustBePartOfRedefinedDefaultGroupSequenceException( beanClass );
 		}
-		if ( log.isTraceEnabled() ) {
-			log.tracef(
+		if ( LOG.isTraceEnabled() ) {
+			LOG.tracef(
 					"Members of the default group sequence for bean %s are: %s.",
 					beanClass.getName(),
 					validDefaultGroupSequence

@@ -38,7 +38,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class DefaultConstraintMapping implements ConstraintMapping {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 	private final Set<Class<?>> configuredTypes;
@@ -59,7 +59,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 		Contracts.assertNotNull( type, MESSAGES.beanTypeMustNotBeNull() );
 
 		if ( configuredTypes.contains( type ) ) {
-			throw log.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( type );
+			throw LOG.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( type );
 		}
 
 		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<>( this, type );
@@ -105,7 +105,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 
 		if ( definedConstraints.contains( annotationClass ) ) {
 			// Fail fast for easy-to-detect definition conflicts; other conflicts are handled in ValidatorFactoryImpl
-			throw log.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( annotationClass );
+			throw LOG.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( annotationClass );
 		}
 
 		ConstraintDefinitionContextImpl<A> constraintContext = new ConstraintDefinitionContextImpl<>( this, annotationClass );

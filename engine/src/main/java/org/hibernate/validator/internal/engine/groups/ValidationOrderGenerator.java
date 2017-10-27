@@ -28,7 +28,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class ValidationOrderGenerator {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ConcurrentMap<Class<?>, Sequence> resolvedSequences = new ConcurrentHashMap<Class<?>, Sequence>();
 
@@ -66,7 +66,7 @@ public class ValidationOrderGenerator {
 	 */
 	public ValidationOrder getValidationOrder(Collection<Class<?>> groups) {
 		if ( groups == null || groups.size() == 0 ) {
-			throw log.getAtLeastOneGroupHasToBeSpecifiedException();
+			throw LOG.getAtLeastOneGroupHasToBeSpecifiedException();
 		}
 
 		// HV-621 - if we deal with the Default group we return the default ValidationOrder. No need to
@@ -77,7 +77,7 @@ public class ValidationOrderGenerator {
 
 		for ( Class<?> clazz : groups ) {
 			if ( !clazz.isInterface() ) {
-				throw log.getGroupHasToBeAnInterfaceException( clazz );
+				throw LOG.getGroupHasToBeAnInterfaceException( clazz );
 			}
 		}
 
@@ -143,7 +143,7 @@ public class ValidationOrderGenerator {
 
 	private Sequence resolveSequence(Class<?> sequenceClass, Class<?>[] sequenceElements, List<Class<?>> processedSequences) {
 		if ( processedSequences.contains( sequenceClass ) ) {
-			throw log.getCyclicDependencyInGroupsDefinitionException();
+			throw LOG.getCyclicDependencyInGroupsDefinitionException();
 		}
 		else {
 			processedSequences.add( sequenceClass );
@@ -167,7 +167,7 @@ public class ValidationOrderGenerator {
 		for ( Group tmpGroup : groups ) {
 			if ( resolvedGroupSequence.contains( tmpGroup ) && resolvedGroupSequence.indexOf( tmpGroup ) < resolvedGroupSequence
 					.size() - 1 ) {
-				throw log.getUnableToExpandGroupSequenceException();
+				throw LOG.getUnableToExpandGroupSequenceException();
 			}
 			resolvedGroupSequence.add( tmpGroup );
 		}

@@ -38,7 +38,7 @@ import com.fasterxml.classmate.members.ResolvedMethod;
  */
 public final class ExecutableHelper {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 	private final TypeResolver typeResolver;
 
 	public ExecutableHelper(TypeResolutionHelper typeResolutionHelper) {
@@ -179,7 +179,7 @@ public final class ExecutableHelper {
 		// Putting this in as a safe guard for HV-861. In case the issue occurs again we will have some
 		// better information
 		catch (ArrayIndexOutOfBoundsException e) {
-			log.debug(
+			LOG.debug(
 					"Error in ExecutableHelper#instanceMethodParametersResolveToSameTypes comparing "
 							+ subTypeMethod
 							+ " with "

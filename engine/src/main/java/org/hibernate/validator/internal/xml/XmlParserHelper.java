@@ -46,7 +46,7 @@ import org.hibernate.validator.internal.util.privilegedactions.NewSchema;
  */
 public class XmlParserHelper {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The expected number of XML schemas managed by this class. Used to set the
@@ -99,7 +99,7 @@ public class XmlParserHelper {
 			return getVersionValue( rootElement );
 		}
 		catch (XMLStreamException e) {
-			throw log.getUnableToDetermineSchemaVersionException( resourceName, e );
+			throw LOG.getUnableToDetermineSchemaVersionException( resourceName, e );
 		}
 	}
 
@@ -112,7 +112,7 @@ public class XmlParserHelper {
 			);
 		}
 		catch (Exception e) {
-			throw log.getUnableToCreateXMLEventReader( resourceName, e );
+			throw LOG.getUnableToCreateXMLEventReader( resourceName, e );
 		}
 	}
 
@@ -171,7 +171,7 @@ public class XmlParserHelper {
 			schema = run( NewSchema.action( sf, schemaUrl ) );
 		}
 		catch (Exception e) {
-			log.unableToCreateSchema( schemaResource, e.getMessage() );
+			LOG.unableToCreateSchema( schemaResource, e.getMessage() );
 		}
 		return schema;
 	}

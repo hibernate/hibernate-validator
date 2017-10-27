@@ -32,7 +32,7 @@ public class Sequence implements Iterable<GroupWithInheritance> {
 	 */
 	public static Sequence DEFAULT = new Sequence();
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Class<?> sequence;
 	private List<Group> groups;
@@ -132,7 +132,7 @@ public class Sequence implements Iterable<GroupWithInheritance> {
 	private void addInheritedGroups(Group group, Set<Group> expandedGroups) {
 		for ( Class<?> inheritedGroup : group.getDefiningClass().getInterfaces() ) {
 			if ( isGroupSequence( inheritedGroup ) ) {
-				throw log.getSequenceDefinitionsNotAllowedException();
+				throw LOG.getSequenceDefinitionsNotAllowedException();
 			}
 			Group g = new Group( inheritedGroup );
 			expandedGroups.add( g );

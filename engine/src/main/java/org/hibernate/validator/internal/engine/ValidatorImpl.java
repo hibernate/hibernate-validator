@@ -85,7 +85,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
  */
 public class ValidatorImpl implements Validator, ExecutableValidator {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The default group array used in case any of the validate methods is called without a group.
@@ -216,7 +216,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		ValueContext<?, Object> valueContext = getValueContextForPropertyValidation( validationContext, propertyPath );
 
 		if ( valueContext.getCurrentBean() == null ) {
-			throw log.getUnableToReachPropertyToValidateException( validationContext.getRootBean(), propertyPath );
+			throw LOG.getUnableToReachPropertyToValidateException( validationContext.getRootBean(), propertyPath );
 		}
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
@@ -334,7 +334,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			return type.cast( this );
 		}
 
-		throw log.getTypeNotSupportedForUnwrappingException( type );
+		throw LOG.getTypeNotSupportedForUnwrappingException( type );
 	}
 
 	@Override
@@ -357,7 +357,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private void sanityCheckPropertyPath(String propertyName) {
 		if ( propertyName == null || propertyName.length() == 0 ) {
-			throw log.getInvalidPropertyPathException();
+			throw LOG.getInvalidPropertyPathException();
 		}
 	}
 
@@ -655,7 +655,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			);
 
 			if ( extractor == null ) {
-				throw log.getNoValueExtractorFoundForTypeException( cascadingMetaData.getEnclosingType(), cascadingMetaData.getTypeParameter(), value.getClass() );
+				throw LOG.getNoValueExtractorFoundForTypeException( cascadingMetaData.getEnclosingType(), cascadingMetaData.getTypeParameter(), value.getClass() );
 			}
 
 			CascadingValueReceiver receiver = new CascadingValueReceiver( validationContext, valueContext, cascadingMetaData );
@@ -856,7 +856,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		ExecutableMetaData executableMetaData = executableMetaDataOptional.get();
 
 		if ( parameterValues.length != executableMetaData.getParameterTypes().length ) {
-			throw log.getInvalidParameterCountForExecutableException(
+			throw LOG.getInvalidParameterCountForExecutableException(
 					ExecutableHelper.getExecutableAsString(
 							executableMetaData.getType().toString() + "#" + executableMetaData.getName(),
 							executableMetaData.getParameterTypes()
@@ -997,7 +997,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						TypeHelper.getErasedType( parameterMetaData.getType() ),
 						valueType
 				) ) {
-					throw log.getParameterTypesDoNotMatchException(
+					throw LOG.getParameterTypesDoNotMatchException(
 							valueType,
 							parameterMetaData.getType(),
 							i,
@@ -1195,13 +1195,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			// if the property is not the leaf property, we set up the context for the next iteration
 			if ( propertyPathIter.hasNext() ) {
 				if ( !propertyMetaData.isCascading() ) {
-					throw log.getInvalidPropertyPathException( validationContext.getRootBeanClass(), propertyPath.asString() );
+					throw LOG.getInvalidPropertyPathException( validationContext.getRootBeanClass(), propertyPath.asString() );
 				}
 
 				// TODO which cascadable???
 				value = getCascadableValue( validationContext, value, propertyMetaData.getCascadables().iterator().next() );
 				if ( value == null ) {
-					throw log.getUnableToReachPropertyToValidateException( validationContext.getRootBean(), propertyPath );
+					throw LOG.getUnableToReachPropertyToValidateException( validationContext.getRootBean(), propertyPath );
 				}
 				clazz = value.getClass();
 
@@ -1217,11 +1217,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						value = ReflectionHelper.getMappedValue( value, propertyPathNode.getKey() );
 					}
 					else {
-						throw log.getPropertyPathMustProvideIndexOrMapKeyException();
+						throw LOG.getPropertyPathMustProvideIndexOrMapKeyException();
 					}
 
 					if ( value == null ) {
-						throw log.getUnableToReachPropertyToValidateException( validationContext.getRootBean(), propertyPath );
+						throw LOG.getUnableToReachPropertyToValidateException( validationContext.getRootBean(), propertyPath );
 					}
 
 					clazz = value.getClass();
@@ -1236,7 +1236,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		if ( propertyMetaData == null ) {
 			// should only happen if the property path is empty, which should never happen
-			throw log.getInvalidPropertyPathException( clazz, propertyPath.asString() );
+			throw LOG.getInvalidPropertyPathException( clazz, propertyPath.asString() );
 		}
 
 		validationContext.setValidatedProperty( propertyMetaData.getName() );
@@ -1289,7 +1289,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		if ( propertyMetaData == null ) {
 			// should only happen if the property path is empty, which should never happen
-			throw log.getInvalidPropertyPathException( clazz, propertyPath.asString() );
+			throw LOG.getInvalidPropertyPathException( clazz, propertyPath.asString() );
 		}
 
 		validationContext.setValidatedProperty( propertyMetaData.getName() );
@@ -1341,7 +1341,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			);
 		}
 		catch (RuntimeException e) {
-			throw log.getErrorDuringCallOfTraversableResolverIsReachableException( e );
+			throw LOG.getErrorDuringCallOfTraversableResolverIsReachableException( e );
 		}
 	}
 
@@ -1377,7 +1377,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			);
 		}
 		catch (RuntimeException e) {
-			throw log.getErrorDuringCallOfTraversableResolverIsCascadableException( e );
+			throw LOG.getErrorDuringCallOfTraversableResolverIsCascadableException( e );
 		}
 	}
 
@@ -1403,7 +1403,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private PropertyMetaData getBeanPropertyMetaData(BeanMetaData<?> beanMetaData, Path.Node propertyNode ) {
 		if ( !ElementKind.PROPERTY.equals( propertyNode.getKind() ) ) {
-			throw log.getInvalidPropertyPathException( beanMetaData.getBeanClass(), propertyNode.getName() );
+			throw LOG.getInvalidPropertyPathException( beanMetaData.getBeanClass(), propertyNode.getName() );
 		}
 
 		return beanMetaData.getMetaDataFor( propertyNode.getName() );

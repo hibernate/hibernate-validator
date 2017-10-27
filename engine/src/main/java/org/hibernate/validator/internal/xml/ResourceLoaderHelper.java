@@ -23,7 +23,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
  */
 final class ResourceLoaderHelper {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private ResourceLoaderHelper() {
 		// Not allowed
@@ -50,20 +50,20 @@ final class ResourceLoaderHelper {
 		InputStream inputStream = null;
 
 		if ( externalClassLoader != null ) {
-			log.debug( "Trying to load " + path + " via user class loader" );
+			LOG.debug( "Trying to load " + path + " via user class loader" );
 			inputStream = externalClassLoader.getResourceAsStream( inputPath );
 		}
 
 		if ( inputStream == null ) {
 			ClassLoader loader = run( GetClassLoader.fromContext() );
 			if ( loader != null ) {
-				log.debug( "Trying to load " + path + " via TCCL" );
+				LOG.debug( "Trying to load " + path + " via TCCL" );
 				inputStream = loader.getResourceAsStream( inputPath );
 			}
 		}
 
 		if ( inputStream == null ) {
-			log.debug( "Trying to load " + path + " via Hibernate Validator's class loader" );
+			LOG.debug( "Trying to load " + path + " via Hibernate Validator's class loader" );
 			ClassLoader loader = ResourceLoaderHelper.class.getClassLoader();
 			inputStream = loader.getResourceAsStream( inputPath );
 		}

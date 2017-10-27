@@ -296,7 +296,7 @@ public class ConstraintHelper {
 
 	private static final List<String> SUPPORTED_VALID_METHODS = Arrays.asList( VALIDATION_APPLIES_TO );
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
 	private static final String JAVA_MONEY_CLASS_NAME = "javax.money.MonetaryAmount";
 
@@ -862,7 +862,7 @@ public class ConstraintHelper {
 		final Method[] methods = run( GetDeclaredMethods.action( annotationType ) );
 		for ( Method m : methods ) {
 			if ( m.getName().startsWith( "valid" ) && !SUPPORTED_VALID_METHODS.contains( m.getName() ) ) {
-				throw log.getConstraintParametersCannotStartWithValidException();
+				throw LOG.getConstraintParametersCannotStartWithValidException();
 			}
 		}
 	}
@@ -871,15 +871,15 @@ public class ConstraintHelper {
 		try {
 			final Method method = run( GetMethod.action( annotationType, PAYLOAD ) );
 			if ( method == null ) {
-				throw log.getConstraintWithoutMandatoryParameterException( PAYLOAD, annotationType.getName() );
+				throw LOG.getConstraintWithoutMandatoryParameterException( PAYLOAD, annotationType.getName() );
 			}
 			Class<?>[] defaultPayload = (Class<?>[]) method.getDefaultValue();
 			if ( defaultPayload.length != 0 ) {
-				throw log.getWrongDefaultValueForPayloadParameterException( annotationType.getName() );
+				throw LOG.getWrongDefaultValueForPayloadParameterException( annotationType.getName() );
 			}
 		}
 		catch (ClassCastException e) {
-			throw log.getWrongTypeForPayloadParameterException( annotationType.getName(), e );
+			throw LOG.getWrongTypeForPayloadParameterException( annotationType.getName(), e );
 		}
 	}
 
@@ -887,25 +887,25 @@ public class ConstraintHelper {
 		try {
 			final Method method = run( GetMethod.action( annotationType, GROUPS ) );
 			if ( method == null ) {
-				throw log.getConstraintWithoutMandatoryParameterException( GROUPS, annotationType.getName() );
+				throw LOG.getConstraintWithoutMandatoryParameterException( GROUPS, annotationType.getName() );
 			}
 			Class<?>[] defaultGroups = (Class<?>[]) method.getDefaultValue();
 			if ( defaultGroups.length != 0 ) {
-				throw log.getWrongDefaultValueForGroupsParameterException( annotationType.getName() );
+				throw LOG.getWrongDefaultValueForGroupsParameterException( annotationType.getName() );
 			}
 		}
 		catch (ClassCastException e) {
-			throw log.getWrongTypeForGroupsParameterException( annotationType.getName(), e );
+			throw LOG.getWrongTypeForGroupsParameterException( annotationType.getName(), e );
 		}
 	}
 
 	private void assertMessageParameterExists(Class<? extends Annotation> annotationType) {
 		final Method method = run( GetMethod.action( annotationType, MESSAGE ) );
 		if ( method == null ) {
-			throw log.getConstraintWithoutMandatoryParameterException( MESSAGE, annotationType.getName() );
+			throw LOG.getConstraintWithoutMandatoryParameterException( MESSAGE, annotationType.getName() );
 		}
 		if ( method.getReturnType() != String.class ) {
-			throw log.getWrongTypeForMessageParameterException( annotationType.getName() );
+			throw LOG.getWrongTypeForMessageParameterException( annotationType.getName() );
 		}
 	}
 
@@ -922,20 +922,20 @@ public class ConstraintHelper {
 
 		if ( hasGenericValidators && hasCrossParameterValidator ) {
 			if ( method == null ) {
-				throw log.getGenericAndCrossParameterConstraintDoesNotDefineValidationAppliesToParameterException(
+				throw LOG.getGenericAndCrossParameterConstraintDoesNotDefineValidationAppliesToParameterException(
 						annotationType
 				);
 			}
 			if ( method.getReturnType() != ConstraintTarget.class ) {
-				throw log.getValidationAppliesToParameterMustHaveReturnTypeConstraintTargetException( annotationType );
+				throw LOG.getValidationAppliesToParameterMustHaveReturnTypeConstraintTargetException( annotationType );
 			}
 			ConstraintTarget defaultValue = (ConstraintTarget) method.getDefaultValue();
 			if ( defaultValue != ConstraintTarget.IMPLICIT ) {
-				throw log.getValidationAppliesToParameterMustHaveDefaultValueImplicitException( annotationType );
+				throw LOG.getValidationAppliesToParameterMustHaveDefaultValueImplicitException( annotationType );
 			}
 		}
 		else if ( method != null ) {
-			throw log.getValidationAppliesToParameterMustNotBeDefinedForNonGenericAndCrossParameterConstraintException(
+			throw LOG.getValidationAppliesToParameterMustNotBeDefinedForNonGenericAndCrossParameterConstraintException(
 					annotationType
 			);
 		}

@@ -25,7 +25,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluator;
  */
 class ScriptAssertContext {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final String script;
 	private final ScriptEvaluator scriptEvaluator;
@@ -49,7 +49,7 @@ class ScriptAssertContext {
 			result = scriptEvaluator.evaluate( script, bindings );
 		}
 		catch (ScriptEvaluationException e) {
-			throw log.getErrorDuringScriptExecutionException( script, e );
+			throw LOG.getErrorDuringScriptExecutionException( script, e );
 		}
 
 		return handleResult( result );
@@ -57,11 +57,11 @@ class ScriptAssertContext {
 
 	private boolean handleResult(Object evaluationResult) {
 		if ( evaluationResult == null ) {
-			throw log.getScriptMustReturnTrueOrFalseException( script );
+			throw LOG.getScriptMustReturnTrueOrFalseException( script );
 		}
 
 		if ( !( evaluationResult instanceof Boolean ) ) {
-			throw log.getScriptMustReturnTrueOrFalseException(
+			throw LOG.getScriptMustReturnTrueOrFalseException(
 					script,
 					evaluationResult,
 					evaluationResult.getClass().getCanonicalName()

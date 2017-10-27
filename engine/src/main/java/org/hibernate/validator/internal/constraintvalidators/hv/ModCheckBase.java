@@ -26,7 +26,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public abstract class ModCheckBase {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final Pattern NUMBERS_ONLY_REGEXP = Pattern.compile( "[^0-9]" );
 
@@ -102,7 +102,7 @@ public abstract class ModCheckBase {
 			return Character.digit( value, DEC_RADIX );
 		}
 		else {
-			throw log.getCharacterIsNotADigitException( value );
+			throw LOG.getCharacterIsNotADigitException( value );
 		}
 	}
 
@@ -126,19 +126,19 @@ public abstract class ModCheckBase {
 
 	private boolean validateOptions() {
 		if ( this.startIndex < 0 ) {
-			throw log.getStartIndexCannotBeNegativeException( this.startIndex );
+			throw LOG.getStartIndexCannotBeNegativeException( this.startIndex );
 		}
 
 		if ( this.endIndex < 0 ) {
-			throw log.getEndIndexCannotBeNegativeException( this.endIndex );
+			throw LOG.getEndIndexCannotBeNegativeException( this.endIndex );
 		}
 
 		if ( this.startIndex > this.endIndex ) {
-			throw log.getInvalidRangeException( this.startIndex, this.endIndex );
+			throw LOG.getInvalidRangeException( this.startIndex, this.endIndex );
 		}
 
 		if ( this.checkDigitIndex > 0 && this.startIndex <= this.checkDigitIndex && this.endIndex > this.checkDigitIndex ) {
-			throw log.getInvalidCheckDigitException( this.startIndex, this.endIndex );
+			throw LOG.getInvalidCheckDigitException( this.startIndex, this.endIndex );
 		}
 
 		return true;

@@ -39,7 +39,7 @@ import org.hibernate.validator.internal.xml.binding.FieldType;
  * @author Guillaume Smet
  */
 class ConstrainedFieldBuilder {
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final GroupConversionBuilder groupConversionBuilder;
 	private final MetaConstraintBuilder metaConstraintBuilder;
@@ -113,7 +113,7 @@ class ConstrainedFieldBuilder {
 
 	private static Field findField(Class<?> beanClass, String fieldName, List<String> alreadyProcessedFieldNames) {
 		if ( alreadyProcessedFieldNames.contains( fieldName ) ) {
-			throw log.getIsDefinedTwiceInMappingXmlForBeanException( fieldName, beanClass );
+			throw LOG.getIsDefinedTwiceInMappingXmlForBeanException( fieldName, beanClass );
 		}
 		else {
 			alreadyProcessedFieldNames.add( fieldName );
@@ -121,7 +121,7 @@ class ConstrainedFieldBuilder {
 
 		final Field field = run( GetDeclaredField.action( beanClass, fieldName ) );
 		if ( field == null ) {
-			throw log.getBeanDoesNotContainTheFieldException( beanClass, fieldName );
+			throw LOG.getBeanDoesNotContainTheFieldException( beanClass, fieldName );
 		}
 		return field;
 	}

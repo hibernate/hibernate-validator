@@ -27,7 +27,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 class JPATraversableResolver implements TraversableResolver {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
 	public final boolean isReachable(Object traversableObject,
@@ -35,8 +35,8 @@ class JPATraversableResolver implements TraversableResolver {
 									 Class<?> rootBeanType,
 									 Path pathToTraversableObject,
 									 ElementType elementType) {
-		if ( log.isTraceEnabled() ) {
-			log.tracef(
+		if ( LOG.isTraceEnabled() ) {
+			LOG.tracef(
 					"Calling isReachable on object %s with node name %s.",
 					traversableObject,
 					traversableProperty.getName()

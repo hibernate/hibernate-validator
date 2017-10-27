@@ -22,7 +22,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class SizeValidatorForMap implements ConstraintValidator<Size, Map<?, ?>> {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private int min;
 	private int max;
@@ -55,13 +55,13 @@ public class SizeValidatorForMap implements ConstraintValidator<Size, Map<?, ?>>
 
 	private void validateParameters() {
 		if ( min < 0 ) {
-			throw log.getMaxCannotBeNegativeException();
+			throw LOG.getMaxCannotBeNegativeException();
 		}
 		if ( max < 0 ) {
-			throw log.getMaxCannotBeNegativeException();
+			throw LOG.getMaxCannotBeNegativeException();
 		}
 		if ( max < min ) {
-			throw log.getLengthCannotBeNegativeException();
+			throw LOG.getLengthCannotBeNegativeException();
 		}
 	}
 }

@@ -28,7 +28,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class Mod10CheckValidator extends ModCheckBase
 		implements ConstraintValidator<Mod10Check, CharSequence> {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Multiplier to be used by odd digits on Mod10 algorithm
@@ -52,10 +52,10 @@ public class Mod10CheckValidator extends ModCheckBase
 		this.weight = constraintAnnotation.weight();
 
 		if ( this.multiplier < 0 ) {
-			throw log.getMultiplierCannotBeNegativeException( this.multiplier );
+			throw LOG.getMultiplierCannotBeNegativeException( this.multiplier );
 		}
 		if ( this.weight < 0 ) {
-			throw log.getWeightCannotBeNegativeException( this.weight );
+			throw LOG.getWeightCannotBeNegativeException( this.weight );
 		}
 	}
 

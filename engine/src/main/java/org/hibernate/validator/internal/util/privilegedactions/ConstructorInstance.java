@@ -24,7 +24,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public final class ConstructorInstance<T> implements PrivilegedAction<T> {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Constructor<T> constructor;
 	private final Object[] initArgs;
@@ -44,7 +44,7 @@ public final class ConstructorInstance<T> implements PrivilegedAction<T> {
 			return constructor.newInstance( initArgs );
 		}
 		catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw log.getUnableToInstantiateException( constructor.getDeclaringClass(), e );
+			throw LOG.getUnableToInstantiateException( constructor.getDeclaringClass(), e );
 		}
 	}
 }

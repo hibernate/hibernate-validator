@@ -44,7 +44,7 @@ import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.R
  */
 public abstract class AbstractMessageInterpolator implements MessageInterpolator {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The default initial capacity for this cache.
@@ -219,7 +219,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			interpolatedMessage = interpolateMessage( message, context, defaultLocale );
 		}
 		catch (MessageDescriptorFormatException e) {
-			log.warn( e.getMessage() );
+			LOG.warn( e.getMessage() );
 		}
 		return interpolatedMessage;
 	}
@@ -231,7 +231,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			interpolatedMessage = interpolateMessage( message, context, locale );
 		}
 		catch (ValidationException e) {
-			log.warn( e.getMessage() );
+			LOG.warn( e.getMessage() );
 		}
 		return interpolatedMessage;
 	}

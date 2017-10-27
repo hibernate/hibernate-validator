@@ -38,7 +38,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  */
 public class ConstrainedExecutable extends AbstractConstrainedElement {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Executable executable;
 
@@ -115,7 +115,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		this.executable = executable;
 
 		if ( parameterMetaData.size() != executable.getParameterTypes().length ) {
-			throw log.getInvalidLengthOfParameterMetaDataListException(
+			throw LOG.getInvalidLengthOfParameterMetaDataListException(
 					executable,
 					executable.getParameterTypes().length,
 					parameterMetaData.size()
@@ -141,7 +141,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	public ConstrainedParameter getParameterMetaData(int parameterIndex) {
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
-			throw log.getInvalidExecutableParameterIndexException(
+			throw LOG.getInvalidExecutableParameterIndexException(
 					executable,
 					parameterIndex
 			);

@@ -23,7 +23,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
  */
 public abstract class AbstractScriptAssertValidator<A extends Annotation, T> implements ConstraintValidator<A, T> {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected String languageName;
 	protected String script;
@@ -41,7 +41,7 @@ public abstract class AbstractScriptAssertValidator<A extends Annotation, T> imp
 									.getScriptEvaluatorForLanguage( languageName );
 						}
 						catch (ScriptEvaluatorNotFoundException e) {
-							throw log.getCreationOfScriptExecutorFailedException( languageName, e );
+							throw LOG.getCreationOfScriptExecutorFailedException( languageName, e );
 						}
 					}
 					scriptAssertContext = new ScriptAssertContext( script, scriptEvaluator );

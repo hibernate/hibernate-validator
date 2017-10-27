@@ -43,7 +43,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
  */
 public class ConstraintValidatorContextImpl implements HibernateConstraintValidatorContext {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private Map<String, Object> messageParameters;
 	private Map<String, Object> expressionVariables;
@@ -90,7 +90,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		if ( type.isAssignableFrom( HibernateConstraintValidatorContext.class ) ) {
 			return type.cast( this );
 		}
-		throw log.getTypeNotSupportedForUnwrappingException( type );
+		throw LOG.getTypeNotSupportedForUnwrappingException( type );
 	}
 
 	@Override
@@ -140,7 +140,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	public final List<ConstraintViolationCreationContext> getConstraintViolationCreationContexts() {
 		if ( defaultDisabled ) {
 			if ( constraintViolationCreationContexts == null || constraintViolationCreationContexts.size() == 0 ) {
-				throw log.getAtLeastOneCustomMessageMustBeCreatedException();
+				throw LOG.getAtLeastOneCustomMessageMustBeCreatedException();
 			}
 
 			return CollectionHelper.toImmutableList( constraintViolationCreationContexts );
@@ -231,7 +231,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		@Override
 		public NodeBuilderDefinedContext addParameterNode(int index) {
 			if ( propertyPath.getLeafNode().getKind() != ElementKind.CROSS_PARAMETER ) {
-				throw log.getParameterNodeAddedForNonCrossParameterConstraintException( propertyPath );
+				throw LOG.getParameterNodeAddedForNonCrossParameterConstraintException( propertyPath );
 			}
 
 			dropLeafNodeIfRequired();

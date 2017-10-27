@@ -47,7 +47,7 @@ import org.hibernate.validator.internal.xml.binding.PayloadType;
  */
 class MetaConstraintBuilder {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final Pattern IS_ONLY_WHITESPACE = Pattern.compile( "\\s*" );
 
@@ -79,7 +79,7 @@ class MetaConstraintBuilder {
 			annotationClass = (Class<A>) classLoadingHelper.loadClass( constraint.getAnnotation(), defaultPackage );
 		}
 		catch (ValidationException e) {
-			throw log.getUnableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
+			throw LOG.getUnableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
 		}
 		AnnotationDescriptor.Builder<A> annotationDescriptorBuilder = new AnnotationDescriptor.Builder<>( annotationClass );
 
@@ -102,7 +102,7 @@ class MetaConstraintBuilder {
 			annotationDescriptor = annotationDescriptorBuilder.build();
 		}
 		catch (RuntimeException e) {
-			throw log.getUnableToCreateAnnotationForConfiguredConstraintException( e );
+			throw LOG.getUnableToCreateAnnotationForConfiguredConstraintException( e );
 		}
 
 		// we set initially ConstraintOrigin.DEFINED_LOCALLY for all xml configured constraints
@@ -127,14 +127,14 @@ class MetaConstraintBuilder {
 
 	private static void checkNameIsValid(String name) {
 		if ( MESSAGE_PARAM.equals( name ) || GROUPS_PARAM.equals( name ) ) {
-			throw log.getReservedParameterNamesException( MESSAGE_PARAM, GROUPS_PARAM, PAYLOAD_PARAM );
+			throw LOG.getReservedParameterNamesException( MESSAGE_PARAM, GROUPS_PARAM, PAYLOAD_PARAM );
 		}
 	}
 
 	private static <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
 		Method m = run( GetMethod.action( annotationClass, name ) );
 		if ( m == null ) {
-			throw log.getAnnotationDoesNotContainAParameterException( annotationClass, name );
+			throw LOG.getAnnotationDoesNotContainAParameterException( annotationClass, name );
 		}
 		return m.getReturnType();
 	}
@@ -149,11 +149,11 @@ class MetaConstraintBuilder {
 					return "";
 				}
 				else {
-					throw log.getEmptyElementOnlySupportedWhenCharSequenceIsExpectedExpection();
+					throw LOG.getEmptyElementOnlySupportedWhenCharSequenceIsExpectedExpection();
 				}
 			}
 			else if ( elementType.getContent().size() > 1 ) {
-				throw log.getAttemptToSpecifyAnArrayWhereSingleValueIsExpectedException();
+				throw LOG.getAttemptToSpecifyAnArrayWhereSingleValueIsExpectedException();
 			}
 			return getSingleValue( elementType.getContent().get( 0 ), returnType, defaultPackage );
 		}
@@ -198,11 +198,11 @@ class MetaConstraintBuilder {
 				returnValue = buildAnnotation( annotationType, annotationClass, defaultPackage );
 			}
 			catch (ClassCastException e) {
-				throw log.getUnexpectedParameterValueException( e );
+				throw LOG.getUnexpectedParameterValueException( e );
 			}
 		}
 		else {
-			throw log.getUnexpectedParameterValueException();
+			throw LOG.getUnexpectedParameterValueException();
 		}
 		return returnValue;
 
@@ -215,7 +215,7 @@ class MetaConstraintBuilder {
 				returnValue = Byte.parseByte( value );
 			}
 			catch (NumberFormatException e) {
-				throw log.getInvalidNumberFormatException( "byte", e );
+				throw LOG.getInvalidNumberFormatException( "byte", e );
 			}
 		}
 		else if ( returnType == short.class ) {
@@ -223,7 +223,7 @@ class MetaConstraintBuilder {
 				returnValue = Short.parseShort( value );
 			}
 			catch (NumberFormatException e) {
-				throw log.getInvalidNumberFormatException( "short", e );
+				throw LOG.getInvalidNumberFormatException( "short", e );
 			}
 		}
 		else if ( returnType == int.class ) {
@@ -231,7 +231,7 @@ class MetaConstraintBuilder {
 				returnValue = Integer.parseInt( value );
 			}
 			catch (NumberFormatException e) {
-				throw log.getInvalidNumberFormatException( "int", e );
+				throw LOG.getInvalidNumberFormatException( "int", e );
 			}
 		}
 		else if ( returnType == long.class ) {
@@ -239,7 +239,7 @@ class MetaConstraintBuilder {
 				returnValue = Long.parseLong( value );
 			}
 			catch (NumberFormatException e) {
-				throw log.getInvalidNumberFormatException( "long", e );
+				throw LOG.getInvalidNumberFormatException( "long", e );
 			}
 		}
 		else if ( returnType == float.class ) {
@@ -247,7 +247,7 @@ class MetaConstraintBuilder {
 				returnValue = Float.parseFloat( value );
 			}
 			catch (NumberFormatException e) {
-				throw log.getInvalidNumberFormatException( "float", e );
+				throw LOG.getInvalidNumberFormatException( "float", e );
 			}
 		}
 		else if ( returnType == double.class ) {
@@ -255,7 +255,7 @@ class MetaConstraintBuilder {
 				returnValue = Double.parseDouble( value );
 			}
 			catch (NumberFormatException e) {
-				throw log.getInvalidNumberFormatException( "double", e );
+				throw LOG.getInvalidNumberFormatException( "double", e );
 			}
 		}
 		else if ( returnType == boolean.class ) {
@@ -263,7 +263,7 @@ class MetaConstraintBuilder {
 		}
 		else if ( returnType == char.class ) {
 			if ( value.length() != 1 ) {
-				throw log.getInvalidCharValueException( value );
+				throw LOG.getInvalidCharValueException( value );
 			}
 			returnValue = value.charAt( 0 );
 		}
@@ -280,7 +280,7 @@ class MetaConstraintBuilder {
 				returnValue = Enum.valueOf( enumClass, value );
 			}
 			catch (ClassCastException e) {
-				throw log.getInvalidReturnTypeException( returnType, e );
+				throw LOG.getInvalidReturnTypeException( returnType, e );
 			}
 		}
 		return returnValue;
@@ -308,7 +308,7 @@ class MetaConstraintBuilder {
 		for ( String groupClass : payloadType.getValue() ) {
 			Class<?> payload = classLoadingHelper.loadClass( groupClass, defaultPackage );
 			if ( !Payload.class.isAssignableFrom( payload ) ) {
-				throw log.getWrongPayloadClassException( payload );
+				throw LOG.getWrongPayloadClassException( payload );
 			}
 			else {
 				payloadList.add( (Class<? extends Payload>) payload );
