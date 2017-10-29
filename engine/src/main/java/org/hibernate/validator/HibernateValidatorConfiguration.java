@@ -6,10 +6,15 @@
  */
 package org.hibernate.validator;
 
+import java.time.Duration;
 import java.util.Set;
 
 import javax.validation.Configuration;
 import javax.validation.TraversableResolver;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.PastOrPresent;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -85,6 +90,15 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	@Incubating
 	String SCRIPT_EVALUATOR_FACTORY_CLASSNAME = "hibernate.validator.script_evaluator_factory";
+
+	/**
+	 * Property for configuring clock skew tolerance, allowing to set a margin of error in milliseconds, which is allowed
+	 * when comparing date/time in time related constraints.
+	 *
+	 * @since 6.1
+	 */
+	@Incubating
+	String CLOCK_SKEW_TOLERANCE_DURATION = "hibernate.validator.clock_skew_tolerance_duration";
 
 	/**
 	 * <p>
@@ -264,4 +278,17 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	@Incubating
 	HibernateValidatorConfiguration scriptEvaluatorFactory(ScriptEvaluatorFactory scriptEvaluatorFactory);
+
+	/**
+	 * Allows to set a margin error in milliseconds, which is allowed when comparing date/time in time related constraints
+	 * like {@link Past}/{@link PastOrPresent} and {@link Future}/{@link FutureOrPresent}.
+	 *
+	 * @param clockSkewTolerance the acceptable tolerance as {@link Duration}
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.1
+	 */
+	@Incubating
+	HibernateValidatorConfiguration clockSkewTolerance(Duration clockSkewTolerance);
 }

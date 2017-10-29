@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Executable;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -131,6 +132,12 @@ public class ValidationContext<T> {
 	private final ClockProvider clockProvider;
 
 	/**
+	 * Defines allowed margin of error when comparing date/time during validation of {@code @Future} or {@code @Past}
+	 * constraints.
+	 */
+	private final Duration clockSkewTolerance;
+
+	/**
 	 * Script evaluator factory which should be used in this context.
 	 */
 	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
@@ -153,6 +160,7 @@ public class ValidationContext<T> {
 			ClockProvider clockProvider,
 			ScriptEvaluatorFactory scriptEvaluatorFactory,
 			boolean failFast,
+			Duration clockSkewTolerance,
 			T rootBean,
 			Class<T> rootBeanClass,
 			BeanMetaData<T> rootBeanMetaData,
@@ -167,6 +175,7 @@ public class ValidationContext<T> {
 		this.clockProvider = clockProvider;
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.failFast = failFast;
+		this.clockSkewTolerance = clockSkewTolerance;
 
 		this.rootBean = rootBean;
 		this.rootBeanClass = rootBeanClass;
@@ -188,7 +197,8 @@ public class ValidationContext<T> {
 			TraversableResolver traversableResolver,
 			ClockProvider clockProvider,
 			ScriptEvaluatorFactory scriptEvaluatorFactory,
-			boolean failFast) {
+			boolean failFast,
+			Duration clockSkewTolerance) {
 
 		return new ValidationContextBuilder(
 				beanMetaDataManager,
@@ -198,7 +208,8 @@ public class ValidationContext<T> {
 				traversableResolver,
 				clockProvider,
 				scriptEvaluatorFactory,
-				failFast
+				failFast,
+				clockSkewTolerance
 		);
 	}
 
@@ -251,6 +262,10 @@ public class ValidationContext<T> {
 
 	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
 		return scriptEvaluatorFactory;
+	}
+
+	public Duration getClockSkewTolerance() {
+		return clockSkewTolerance;
 	}
 
 	public Set<ConstraintViolation<T>> createConstraintViolations(ValueContext<?, ?> localContext,
@@ -465,6 +480,7 @@ public class ValidationContext<T> {
 		private final ClockProvider clockProvider;
 		private final ScriptEvaluatorFactory scriptEvaluatorFactory;
 		private final boolean failFast;
+		private final Duration clockSkewTolerance;
 
 		private ValidationContextBuilder(
 				BeanMetaDataManager beanMetaDataManager,
@@ -474,7 +490,8 @@ public class ValidationContext<T> {
 				TraversableResolver traversableResolver,
 				ClockProvider clockProvider,
 				ScriptEvaluatorFactory scriptEvaluatorFactory,
-				boolean failFast) {
+				boolean failFast,
+				Duration clockSkewTolerance) {
 			this.beanMetaDataManager = beanMetaDataManager;
 			this.constraintValidatorManager = constraintValidatorManager;
 			this.messageInterpolator = messageInterpolator;
@@ -483,6 +500,7 @@ public class ValidationContext<T> {
 			this.clockProvider = clockProvider;
 			this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 			this.failFast = failFast;
+			this.clockSkewTolerance = clockSkewTolerance;
 		}
 
 		public <T> ValidationContext<T> forValidate(T rootBean) {
@@ -497,6 +515,7 @@ public class ValidationContext<T> {
 					clockProvider,
 					scriptEvaluatorFactory,
 					failFast,
+					clockSkewTolerance,
 					rootBean,
 					rootBeanClass,
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
@@ -518,6 +537,7 @@ public class ValidationContext<T> {
 					clockProvider,
 					scriptEvaluatorFactory,
 					failFast,
+					clockSkewTolerance,
 					rootBean,
 					rootBeanClass,
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
@@ -537,6 +557,7 @@ public class ValidationContext<T> {
 					clockProvider,
 					scriptEvaluatorFactory,
 					failFast,
+					clockSkewTolerance,
 					null,
 					rootBeanClass, //root bean
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
@@ -562,6 +583,7 @@ public class ValidationContext<T> {
 					clockProvider,
 					scriptEvaluatorFactory,
 					failFast,
+					clockSkewTolerance,
 					rootBean,
 					rootBeanClass,
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
@@ -586,6 +608,7 @@ public class ValidationContext<T> {
 					clockProvider,
 					scriptEvaluatorFactory,
 					failFast,
+					clockSkewTolerance,
 					rootBean,
 					rootBeanClass,
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),

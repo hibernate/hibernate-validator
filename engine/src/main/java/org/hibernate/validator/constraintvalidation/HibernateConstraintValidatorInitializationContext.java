@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.constraintvalidation;
 
+import java.time.Duration;
+
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -33,4 +35,13 @@ public interface HibernateConstraintValidatorInitializationContext {
 	 */
 
 	ScriptEvaluator getScriptEvaluatorForLanguage(String languageName);
+
+	/**
+	 * Returns clock skew tolerance as {@link Duration} which is used to determine
+	 * acceptable margin of error in milliseconds, which is allowed
+	 * when comparing date/time in time related constraints.
+	 *
+	 * @return a tolerance as  {@link Duration}
+	 */
+	Duration getClockSkewTolerance();
 }
