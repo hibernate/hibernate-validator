@@ -564,7 +564,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if ( clockSkewToleranceProperty != null ) {
 			try {
 				Duration tolerance = Duration.ofMillis( Long.parseLong( clockSkewToleranceProperty ) );
-				LOG.logClockSkewTolerance(  tolerance ) ;
+				LOG.logClockSkewTolerance( tolerance );
 				return tolerance;
 			}
 			catch (Exception e) {

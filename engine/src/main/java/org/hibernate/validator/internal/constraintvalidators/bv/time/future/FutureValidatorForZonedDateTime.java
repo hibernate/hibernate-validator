@@ -15,7 +15,7 @@ import java.time.ZonedDateTime;
  * @author Khalid Alqinyah
  * @author Guillaume Smet
  */
-public class FutureValidatorForZonedDateTime extends AbstractFutureJavaTimeValidator<ZonedDateTime> {
+public class FutureValidatorForZonedDateTime extends AbstractFutureJavaTimeTemporalValidator<ZonedDateTime> {
 
 	@Override
 	protected ZonedDateTime getReferenceValue(Clock reference) {

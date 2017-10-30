@@ -15,7 +15,7 @@ import java.time.Instant;
  * @author Khalid Alqinyah
  * @author Guillaume Smet
  */
-public class FutureOrPresentValidatorForInstant extends AbstractFutureOrPresentJavaTimeValidator<Instant> {
+public class FutureOrPresentValidatorForInstant extends AbstractFutureOrPresentJavaTimeTemporalValidator<Instant> {
 
 	@Override
 	protected Instant getReferenceValue(Clock reference) {

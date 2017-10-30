@@ -25,4 +25,8 @@ public abstract class AbstractFutureOrPresentInstantBasedValidator<T> extends Ab
 		return result >= 0;
 	}
 
+	@Override
+	protected Instant adjustedReferenceValue(Instant value) {
+		return value.minus( tolerance );
+	}
 }

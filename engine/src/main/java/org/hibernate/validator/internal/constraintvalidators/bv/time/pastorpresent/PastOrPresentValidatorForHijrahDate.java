@@ -14,7 +14,7 @@ import java.time.chrono.HijrahDate;
  *
  * @author Guillaume Smet
  */
-public class PastOrPresentValidatorForHijrahDate extends AbstractPastOrPresentJavaTimeValidator<HijrahDate> {
+public class PastOrPresentValidatorForHijrahDate extends AbstractPastOrPresentJavaTimeTemporalValidator<HijrahDate> {
 
 	@Override
 	protected HijrahDate getReferenceValue(Clock reference) {

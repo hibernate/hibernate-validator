@@ -14,7 +14,7 @@ import java.time.OffsetTime;
  *
  * @author Guillaume Smet
  */
-public class PastOrPresentValidatorForOffsetTime extends AbstractPastOrPresentJavaTimeValidator<OffsetTime> {
+public class PastOrPresentValidatorForOffsetTime extends AbstractPastOrPresentJavaTimeTemporalValidator<OffsetTime> {
 
 	@Override
 	protected OffsetTime getReferenceValue(Clock reference) {

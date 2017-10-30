@@ -14,7 +14,7 @@ import java.time.chrono.ThaiBuddhistDate;
  *
  * @author Guillaume Smet
  */
-public class FutureValidatorForThaiBuddhistDate extends AbstractFutureJavaTimeValidator<ThaiBuddhistDate> {
+public class FutureValidatorForThaiBuddhistDate extends AbstractFutureJavaTimeTemporalValidator<ThaiBuddhistDate> {
 
 	@Override
 	protected ThaiBuddhistDate getReferenceValue(Clock reference) {

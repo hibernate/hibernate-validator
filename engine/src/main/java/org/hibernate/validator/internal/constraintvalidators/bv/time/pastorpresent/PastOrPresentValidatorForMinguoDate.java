@@ -14,7 +14,7 @@ import java.time.chrono.MinguoDate;
  *
  * @author Guillaume Smet
  */
-public class PastOrPresentValidatorForMinguoDate extends AbstractPastOrPresentJavaTimeValidator<MinguoDate> {
+public class PastOrPresentValidatorForMinguoDate extends AbstractPastOrPresentJavaTimeTemporalValidator<MinguoDate> {
 
 	@Override
 	protected MinguoDate getReferenceValue(Clock reference) {

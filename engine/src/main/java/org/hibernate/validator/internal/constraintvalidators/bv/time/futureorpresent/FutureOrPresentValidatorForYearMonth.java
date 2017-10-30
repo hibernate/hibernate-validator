@@ -14,7 +14,7 @@ import java.time.YearMonth;
  *
  * @author Guillaume Smet
  */
-public class FutureOrPresentValidatorForYearMonth extends AbstractFutureOrPresentJavaTimeValidator<YearMonth> {
+public class FutureOrPresentValidatorForYearMonth extends AbstractFutureOrPresentJavaTimeTemporalValidator<YearMonth> {
 
 	@Override
 	protected YearMonth getReferenceValue(Clock reference) {

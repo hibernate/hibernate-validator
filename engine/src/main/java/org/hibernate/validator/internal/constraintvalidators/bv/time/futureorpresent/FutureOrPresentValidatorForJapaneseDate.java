@@ -14,7 +14,7 @@ import java.time.chrono.JapaneseDate;
  *
  * @author Guillaume Smet
  */
-public class FutureOrPresentValidatorForJapaneseDate extends AbstractFutureOrPresentJavaTimeValidator<JapaneseDate> {
+public class FutureOrPresentValidatorForJapaneseDate extends AbstractFutureOrPresentJavaTimeTemporalValidator<JapaneseDate> {
 
 	@Override
 	protected JapaneseDate getReferenceValue(Clock reference) {

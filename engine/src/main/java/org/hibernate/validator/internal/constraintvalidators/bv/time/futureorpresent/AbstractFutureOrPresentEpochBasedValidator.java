@@ -23,4 +23,8 @@ public abstract class AbstractFutureOrPresentEpochBasedValidator<T> extends Abst
 		return result >= 0;
 	}
 
+	@Override
+	protected long adjustedReferenceValue(long value) {
+		return value - tolerance.toMillis();
+	}
 }

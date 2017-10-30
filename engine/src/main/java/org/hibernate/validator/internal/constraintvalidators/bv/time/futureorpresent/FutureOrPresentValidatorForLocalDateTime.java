@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  *
  * @author Guillaume Smet
  */
-public class FutureOrPresentValidatorForLocalDateTime extends AbstractFutureOrPresentJavaTimeValidator<LocalDateTime> {
+public class FutureOrPresentValidatorForLocalDateTime extends AbstractFutureOrPresentJavaTimeTemporalValidator<LocalDateTime> {
 
 	@Override
 	protected LocalDateTime getReferenceValue(Clock reference) {

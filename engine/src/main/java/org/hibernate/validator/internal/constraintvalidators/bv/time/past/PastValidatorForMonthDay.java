@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.time.past;
 
 import java.time.Clock;
+import java.time.LocalDateTime;
 import java.time.MonthDay;
 
 /**
@@ -18,7 +19,14 @@ public class PastValidatorForMonthDay extends AbstractPastJavaTimeValidator<Mont
 
 	@Override
 	protected MonthDay getReferenceValue(Clock reference) {
-		return MonthDay.now( reference );
+		LocalDateTime now = LocalDateTime.now( reference ).plus( tolerance );
+		return MonthDay.of( now.getMonth(), now.getDayOfMonth() );
+	}
+
+	@Override
+	protected MonthDay adjustedReferenceValue(MonthDay value) {
+		// value is already adjusted in the reference method
+		return value;
 	}
 
 }

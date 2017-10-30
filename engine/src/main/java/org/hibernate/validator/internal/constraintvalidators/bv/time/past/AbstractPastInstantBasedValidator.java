@@ -25,4 +25,8 @@ public abstract class AbstractPastInstantBasedValidator<T> extends AbstractInsta
 		return result < 0;
 	}
 
+	@Override
+	protected Instant adjustedReferenceValue(Instant value) {
+		return value.plus( tolerance );
+	}
 }

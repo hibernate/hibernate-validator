@@ -6,19 +6,15 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.time.past;
 
-import java.time.Clock;
-import java.time.Year;
+import java.time.temporal.Temporal;
 
 /**
- * Check that the {@code java.time.Year} passed is in the past.
- *
- * @author Guillaume Smet
+ * @author Marko Bekhta
  */
-public class PastValidatorForYear extends AbstractPastJavaTimeTemporalValidator<Year> {
+public abstract class AbstractPastJavaTimeTemporalValidator<T extends Temporal & Comparable<? super T>> extends AbstractPastJavaTimeValidator<T> {
 
 	@Override
-	protected Year getReferenceValue(Clock reference) {
-		return Year.now( reference );
+	protected T adjustedReferenceValue(T value) {
+		return (T) value.plus( tolerance );
 	}
-
 }

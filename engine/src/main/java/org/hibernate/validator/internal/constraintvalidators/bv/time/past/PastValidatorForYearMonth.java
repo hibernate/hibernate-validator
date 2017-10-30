@@ -14,7 +14,7 @@ import java.time.YearMonth;
  *
  * @author Guillaume Smet
  */
-public class PastValidatorForYearMonth extends AbstractPastJavaTimeValidator<YearMonth> {
+public class PastValidatorForYearMonth extends AbstractPastJavaTimeTemporalValidator<YearMonth> {
 
 	@Override
 	protected YearMonth getReferenceValue(Clock reference) {

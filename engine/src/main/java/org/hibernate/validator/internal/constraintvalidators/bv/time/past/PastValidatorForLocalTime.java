@@ -14,7 +14,7 @@ import java.time.LocalTime;
  *
  * @author Guillaume Smet
  */
-public class PastValidatorForLocalTime extends AbstractPastJavaTimeValidator<LocalTime> {
+public class PastValidatorForLocalTime extends AbstractPastJavaTimeTemporalValidator<LocalTime> {
 
 	@Override
 	protected LocalTime getReferenceValue(Clock reference) {

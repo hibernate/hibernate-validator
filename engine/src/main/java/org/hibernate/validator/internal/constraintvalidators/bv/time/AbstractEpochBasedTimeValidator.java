@@ -9,11 +9,14 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.time.Clock;
+import java.time.Duration;
 
 import javax.validation.ClockProvider;
-import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -23,9 +26,16 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Alaa Nassef
  * @author Guillaume Smet
  */
-public abstract class AbstractEpochBasedTimeValidator<C extends Annotation, T> implements ConstraintValidator<C, T> {
+public abstract class AbstractEpochBasedTimeValidator<C extends Annotation, T> implements HibernateConstraintValidator<C, T> {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+
+	protected Duration tolerance;
+
+	@Override
+	public void initialize(ConstraintDescriptor<C> constraintDescriptor, HibernateConstraintValidatorInitializationContext initializationContext) {
+		this.tolerance = initializationContext.getClockSkewTolerance();
+	}
 
 	@Override
 	public boolean isValid(T value, ConstraintValidatorContext context) {
@@ -44,7 +54,7 @@ public abstract class AbstractEpochBasedTimeValidator<C extends Annotation, T> i
 			throw LOG.getUnableToGetCurrentTimeFromClockProvider( e );
 		}
 
-		int result = Long.compare( getEpochMillis( value, reference ), reference.millis() );
+		int result = Long.compare( getEpochMillis( value, reference ), adjustedReferenceValue( reference.millis() ) );
 
 		return isValid( result );
 	}
@@ -54,6 +64,12 @@ public abstract class AbstractEpochBasedTimeValidator<C extends Annotation, T> i
 	 * use the {@link Clock} provided by the {@link ClockProvider}.
 	 */
 	protected abstract long getEpochMillis(T value, Clock reference);
+
+	/**
+	 * @param value a value to adjust
+	 * @return an adjusted value based on {@link #tolerance} and constraint type
+	 */
+	protected abstract long adjustedReferenceValue(long value);
 
 	/**
 	 * Returns whether the result of the comparison between the validated value and the time reference is considered
