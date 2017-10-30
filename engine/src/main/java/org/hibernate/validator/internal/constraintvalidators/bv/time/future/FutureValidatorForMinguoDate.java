@@ -9,12 +9,16 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.future;
 import java.time.Clock;
 import java.time.chrono.MinguoDate;
 
+import javax.validation.constraints.Future;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.chrono.MinguoDate} passed is in the future.
  *
  * @author Guillaume Smet
  */
-public class FutureValidatorForMinguoDate extends AbstractFutureJavaTimeValidator<MinguoDate> {
+public class FutureValidatorForMinguoDate extends AbstractTemporalValidator<Future, MinguoDate> {
 
 	@Override
 	protected MinguoDate getReferenceValue(Clock reference) {

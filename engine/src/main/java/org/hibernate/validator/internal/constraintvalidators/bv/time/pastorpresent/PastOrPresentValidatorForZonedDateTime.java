@@ -9,13 +9,17 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpres
 import java.time.Clock;
 import java.time.ZonedDateTime;
 
+import javax.validation.constraints.PastOrPresent;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.ZonedDateTime} passed is in the past.
  *
  * @author Khalid Alqinyah
  * @author Guillaume Smet
  */
-public class PastOrPresentValidatorForZonedDateTime extends AbstractPastOrPresentJavaTimeValidator<ZonedDateTime> {
+public class PastOrPresentValidatorForZonedDateTime extends AbstractTemporalValidator<PastOrPresent, ZonedDateTime> {
 
 	@Override
 	protected ZonedDateTime getReferenceValue(Clock reference) {

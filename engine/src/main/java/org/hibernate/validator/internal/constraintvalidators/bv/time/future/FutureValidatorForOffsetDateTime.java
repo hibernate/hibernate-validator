@@ -9,13 +9,17 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.future;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 
+import javax.validation.constraints.Future;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.OffsetDateTime} passed is in the future.
  *
  * @author Khalid Alqinyah
  * @author Guillaume Smet
  */
-public class FutureValidatorForOffsetDateTime extends AbstractFutureJavaTimeValidator<OffsetDateTime> {
+public class FutureValidatorForOffsetDateTime extends AbstractTemporalValidator<Future, OffsetDateTime> {
 
 	@Override
 	protected OffsetDateTime getReferenceValue(Clock reference) {

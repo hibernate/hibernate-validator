@@ -13,6 +13,7 @@ import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +93,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * Provider for the current time when validating {@code @Future} or {@code @Past}
 	 */
 	private final ClockProvider clockProvider;
+
+	/**
+	 * Defines allowed margin of error when comparing date/time during validation of {@code @Future} or {@code @Past}
+	 * constraints.
+	 */
+	private final Duration clockSkewTolerance;
 
 	/**
 	 * Used to get the {@code ScriptEvaluatorFactory} when validating {@code @ScriptAssert} and
@@ -259,6 +266,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		this.scriptEvaluatorFactory = getScriptEvaluatorFactory( configurationState, properties, externalClassLoader );
 
+		this.clockSkewTolerance = getClockSkewTolerance( configurationState, properties );
+
 		if ( LOG.isDebugEnabled() ) {
 			logValidatorFactoryScopedConfiguration( configurationState, this.scriptEvaluatorFactory.getClass() );
 		}
@@ -311,6 +320,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				clockProvider,
 				scriptEvaluatorFactory,
 				failFast,
+				clockSkewTolerance,
 				valueExtractorManager,
 				methodValidationConfiguration,
 				traversableResolverResultCacheEnabled
@@ -349,6 +359,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	@Override
 	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
 		return scriptEvaluatorFactory;
+	}
+
+	@Override
+	public Duration getClockSkewTolerance() {
+		return clockSkewTolerance;
 	}
 
 	public boolean isFailFast() {
@@ -398,6 +413,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ClockProvider clockProvider,
 			ScriptEvaluatorFactory scriptEvaluatorFactory,
 			boolean failFast,
+			Duration clockSkewTolerance,
 			ValueExtractorManager valueExtractorManager,
 			MethodValidationConfiguration methodValidationConfiguration,
 			boolean traversableResolverResultCacheEnabled) {
@@ -430,7 +446,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				constraintValidatorManager,
 				validationOrderGenerator,
 				failFast,
-				traversableResolverResultCacheEnabled
+				traversableResolverResultCacheEnabled,
+				clockSkewTolerance
 		);
 	}
 
@@ -533,6 +550,30 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 
 		return new DefaultScriptEvaluatorFactory( externalClassLoader );
+	}
+
+	private Duration getClockSkewTolerance(ConfigurationState configurationState, Map<String, String> properties) {
+		if ( configurationState instanceof ConfigurationImpl ) {
+			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
+			if ( hibernateSpecificConfig.getClockSkewTolerance() != null ) {
+				LOG.logClockSkewTolerance( hibernateSpecificConfig.getClockSkewTolerance() );
+				return hibernateSpecificConfig.getClockSkewTolerance();
+			}
+		}
+		String clockSkewToleranceProperty = properties.get( HibernateValidatorConfiguration.CLOCK_SKEW_TOLERANCE_DURATION );
+		if ( clockSkewToleranceProperty != null ) {
+			try {
+				Duration tolerance = Duration.ofMillis( Long.parseLong( clockSkewToleranceProperty ) );
+				LOG.logClockSkewTolerance( tolerance );
+				return tolerance;
+			}
+			catch (Exception e) {
+				throw LOG.getUnableToParseClockSkewToleranceException( clockSkewToleranceProperty, e );
+			}
+		}
+
+		LOG.logClockSkewTolerance(  Duration.ZERO  );
+		return Duration.ZERO;
 	}
 
 	private static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,

@@ -9,6 +9,10 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpres
 import java.time.Instant;
 import java.util.Calendar;
 
+import javax.validation.constraints.PastOrPresent;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractInstantBasedValidator;
+
 /**
  * Check that the {@code java.util.Calendar} passed to be validated is in
  * the past.
@@ -16,7 +20,7 @@ import java.util.Calendar;
  * @author Alaa Nassef
  * @author Guillaume Smet
  */
-public class PastOrPresentValidatorForCalendar extends AbstractPastOrPresentInstantBasedValidator<Calendar> {
+public class PastOrPresentValidatorForCalendar extends AbstractInstantBasedValidator<PastOrPresent, Calendar> {
 
 	@Override
 	protected Instant getInstant(Calendar value) {

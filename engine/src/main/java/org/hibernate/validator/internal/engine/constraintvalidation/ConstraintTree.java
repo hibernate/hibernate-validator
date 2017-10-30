@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 
@@ -61,7 +60,7 @@ public class ConstraintTree<A extends Annotation> {
 
 	/**
 	 * Either the initialized constraint validator for the default constraint validator factory or
-	 * {@link #DUMMY_CONSTRAINT_VALIDATOR}.
+	 * {@link ConstraintValidatorManager#DUMMY_CONSTRAINT_VALIDATOR}.
 	 */
 	private volatile ConstraintValidator<A, ?> constraintValidatorForDefaultConstraintValidatorFactory;
 
@@ -119,7 +118,6 @@ public class ConstraintTree<A extends Annotation> {
 			ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
 					validationContext.getParameterNames(),
 					validationContext.getClockProvider(),
-					validationContext.getScriptEvaluatorFactory(),
 					valueContext.getPropertyPath(),
 					descriptor
 			);
@@ -184,8 +182,7 @@ public class ConstraintTree<A extends Annotation> {
 				synchronized ( this ) {
 					validator = constraintValidatorForDefaultConstraintValidatorFactory;
 					if ( validator == null ) {
-						validator = getInitializedConstraintValidator( validationContext.getConstraintValidatorManager(),
-								validationContext.getConstraintValidatorFactory() );
+						validator = getInitializedConstraintValidator( validationContext );
 						constraintValidatorForDefaultConstraintValidatorFactory = validator;
 					}
 				}
@@ -196,8 +193,7 @@ public class ConstraintTree<A extends Annotation> {
 			// factory. Creating a lot of CHM for that cache might not be a good idea and we prefer being conservative
 			// for now. Note that we have the ConstraintValidatorManager cache that mitigates the situation.
 			// If you come up with a use case where it makes sense, please reach out to us.
-			validator = getInitializedConstraintValidator( validationContext.getConstraintValidatorManager(),
-					validationContext.getConstraintValidatorFactory() );
+			validator = getInitializedConstraintValidator( validationContext );
 		}
 
 		if ( validator == DUMMY_CONSTRAINT_VALIDATOR ) {
@@ -208,12 +204,13 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private ConstraintValidator<A, ?> getInitializedConstraintValidator(ConstraintValidatorManager constraintValidatorManager,
-			ConstraintValidatorFactory constraintValidatorFactory) {
-		ConstraintValidator<A, ?> validator = constraintValidatorManager.getInitializedValidator(
+	private ConstraintValidator<A, ?> getInitializedConstraintValidator(ValidationContext<?> validationContext) {
+		ConstraintValidator<A, ?> validator = validationContext.getConstraintValidatorManager().getInitializedValidator(
 				validatedValueType,
 				descriptor,
-				constraintValidatorFactory );
+				validationContext.getConstraintValidatorFactory(),
+				HibernateConstraintValidatorInitializationContextImpl.from( validationContext )
+		);
 
 		if ( validator != null ) {
 			return validator;

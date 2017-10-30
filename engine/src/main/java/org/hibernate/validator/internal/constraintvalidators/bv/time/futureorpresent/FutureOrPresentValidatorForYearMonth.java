@@ -9,12 +9,16 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpr
 import java.time.Clock;
 import java.time.YearMonth;
 
+import javax.validation.constraints.FutureOrPresent;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.YearMonth} passed is in the future.
  *
  * @author Guillaume Smet
  */
-public class FutureOrPresentValidatorForYearMonth extends AbstractFutureOrPresentJavaTimeValidator<YearMonth> {
+public class FutureOrPresentValidatorForYearMonth extends AbstractTemporalValidator<FutureOrPresent, YearMonth> {
 
 	@Override
 	protected YearMonth getReferenceValue(Clock reference) {

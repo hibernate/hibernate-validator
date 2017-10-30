@@ -9,9 +9,11 @@ package org.hibernate.validator.internal.constraintvalidators.hv;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper;
 import org.hibernate.validator.internal.util.Contracts;
 
@@ -32,7 +34,8 @@ public class ScriptAssertValidator extends AbstractScriptAssertValidator<ScriptA
 	private String message;
 
 	@Override
-	public void initialize(ScriptAssert constraintAnnotation) {
+	public void initialize(ConstraintDescriptor<ScriptAssert> constraintDescriptor, HibernateConstraintValidatorInitializationContext initializationContext) {
+		ScriptAssert constraintAnnotation = constraintDescriptor.getAnnotation();
 		validateParameters( constraintAnnotation );
 
 		this.alias = constraintAnnotation.alias();
@@ -41,6 +44,8 @@ public class ScriptAssertValidator extends AbstractScriptAssertValidator<ScriptA
 		this.languageName = constraintAnnotation.lang();
 		this.script = constraintAnnotation.script();
 		this.escapedScript = InterpolationHelper.escapeMessageParameter( constraintAnnotation.script() );
+
+		initializeScriptContext( initializationContext );
 	}
 
 	@Override
@@ -49,7 +54,7 @@ public class ScriptAssertValidator extends AbstractScriptAssertValidator<ScriptA
 			constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class ).addMessageParameter( "script", escapedScript );
 		}
 
-		boolean validationResult = getScriptAssertContext( constraintValidatorContext ).evaluateScriptAssertExpression( value, alias );
+		boolean validationResult = scriptAssertContext.evaluateScriptAssertExpression( value, alias );
 
 		if ( !validationResult && !reportOn.isEmpty() ) {
 			constraintValidatorContext.disableDefaultConstraintViolation();

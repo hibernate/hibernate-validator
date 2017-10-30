@@ -9,12 +9,16 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpres
 import java.time.Clock;
 import java.time.LocalDate;
 
+import javax.validation.constraints.PastOrPresent;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.LocalDate} passed is in the past.
  *
  * @author Guillaume Smet
  */
-public class PastOrPresentValidatorForLocalDate extends AbstractPastOrPresentJavaTimeValidator<LocalDate> {
+public class PastOrPresentValidatorForLocalDate extends AbstractTemporalValidator<PastOrPresent, LocalDate> {
 
 	@Override
 	protected LocalDate getReferenceValue(Clock reference) {

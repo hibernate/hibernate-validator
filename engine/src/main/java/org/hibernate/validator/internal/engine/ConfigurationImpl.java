@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +101,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 	private boolean traversableResolverResultCacheEnabled = true;
 	private ScriptEvaluatorFactory scriptEvaluatorFactory;
+	private Duration clockSkewTolerance;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -275,6 +277,14 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
+	@Override
+	public HibernateValidatorConfiguration clockSkewTolerance(Duration clockSkewTolerance) {
+		Contracts.assertNotNull( clockSkewTolerance, MESSAGES.parameterMustNotBeNull( "clockSkewTolerance" ) );
+
+		this.clockSkewTolerance = clockSkewTolerance;
+		return this;
+	}
+
 	public boolean isAllowParallelMethodsDefineParameterConstraints() {
 		return this.methodValidationConfigurationBuilder.isAllowParallelMethodsDefineParameterConstraints();
 	}
@@ -421,6 +431,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
 		return scriptEvaluatorFactory;
+	}
+
+	public Duration getClockSkewTolerance() {
+		return clockSkewTolerance;
 	}
 
 	@Override

@@ -9,12 +9,16 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.past;
 import java.time.Clock;
 import java.time.chrono.MinguoDate;
 
+import javax.validation.constraints.Past;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.chrono.MinguoDate} passed is in the past.
  *
  * @author Guillaume Smet
  */
-public class PastValidatorForMinguoDate extends AbstractPastJavaTimeValidator<MinguoDate> {
+public class PastValidatorForMinguoDate extends AbstractTemporalValidator<Past, MinguoDate> {
 
 	@Override
 	protected MinguoDate getReferenceValue(Clock reference) {

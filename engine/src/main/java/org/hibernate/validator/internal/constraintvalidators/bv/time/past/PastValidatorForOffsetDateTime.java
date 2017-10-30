@@ -9,13 +9,17 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.past;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 
+import javax.validation.constraints.Past;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.OffsetDateTime} passed is in the past.
  *
  * @author Khalid Alqinyah
  * @author Guillaume Smet
  */
-public class PastValidatorForOffsetDateTime extends AbstractPastJavaTimeValidator<OffsetDateTime> {
+public class PastValidatorForOffsetDateTime extends AbstractTemporalValidator<Past, OffsetDateTime> {
 
 	@Override
 	protected OffsetDateTime getReferenceValue(Clock reference) {

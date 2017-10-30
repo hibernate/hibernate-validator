@@ -6,19 +6,22 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.time.future;
 
-import java.time.Clock;
+import java.time.Instant;
 import java.time.MonthDay;
+
+import javax.validation.constraints.Future;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractInstantBasedValidator;
 
 /**
  * Check that the {@code java.time.MonthDay} passed is in the future.
  *
  * @author Guillaume Smet
  */
-public class FutureValidatorForMonthDay extends AbstractFutureJavaTimeValidator<MonthDay> {
+public class FutureValidatorForMonthDay extends AbstractInstantBasedValidator<Future, MonthDay> {
 
 	@Override
-	protected MonthDay getReferenceValue(Clock reference) {
-		return MonthDay.now( reference );
+	protected Instant getInstant(MonthDay value) {
+		return (Instant) value.adjustInto( Instant.now( clockProvider.getClock() ) );
 	}
-
 }

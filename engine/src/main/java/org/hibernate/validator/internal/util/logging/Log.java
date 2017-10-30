@@ -18,6 +18,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -49,6 +50,7 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.logging.formatter.ClassObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfObjectsToStringFormatter;
+import org.hibernate.validator.internal.util.logging.formatter.DurationFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
 import org.hibernate.validator.internal.xml.ContainerElementTypePath;
@@ -816,4 +818,11 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = DEBUG)
 	@Message(id = 234, value = "Using %1$s as ValidatorFactory-scoped %2$s.")
 	void logValidatorFactoryScopedConfiguration(@FormatWith(ClassObjectFormatter.class) Class<?> configuredClass, String configuredElement);
+
+	@LogMessage(level = INFO)
+	@Message(id = 235, value = "Compare operations for date/time constraints will accept tolerance of %1$s")
+	void logClockSkewTolerance(@FormatWith(DurationFormatter.class) Duration tolerance);
+
+	@Message(id = 236, value = "Unable to parse clock skew tolerance property %s. It should be a duration represented in milliseconds.")
+	ValidationException getUnableToParseClockSkewToleranceException(String toleranceProperty, @Cause Exception e);
 }

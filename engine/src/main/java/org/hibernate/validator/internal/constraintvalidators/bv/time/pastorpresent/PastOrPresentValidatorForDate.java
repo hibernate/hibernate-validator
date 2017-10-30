@@ -9,6 +9,10 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpres
 import java.time.Instant;
 import java.util.Date;
 
+import javax.validation.constraints.PastOrPresent;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractInstantBasedValidator;
+
 /**
  * Check that the {@code java.util.Date} passed to be validated is in the
  * past.
@@ -16,7 +20,7 @@ import java.util.Date;
  * @author Alaa Nassef
  * @author Guillaume Smet
  */
-public class PastOrPresentValidatorForDate extends AbstractPastOrPresentInstantBasedValidator<Date> {
+public class PastOrPresentValidatorForDate extends AbstractInstantBasedValidator<PastOrPresent, Date> {
 
 	@Override
 	protected Instant getInstant(Date value) {
