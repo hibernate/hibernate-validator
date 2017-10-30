@@ -28,6 +28,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
@@ -38,7 +39,6 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * Context object keeping track of all required data for a validation call.
@@ -131,14 +131,14 @@ public class ValidationContext<T> {
 	private final ClockProvider clockProvider;
 
 	/**
-	 * Script evaluator factory which should be used in this context.
-	 */
-	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
-
-	/**
 	 * Whether or not validation should fail on the first constraint violation.
 	 */
 	private final boolean failFast;
+
+	/**
+	 * A reference to constraint initialization context stored in {@link ValidatorImpl}
+	 */
+	private final HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext;
 
 	/**
 	 * The name of the validated (leaf) property in case of a validateProperty()/validateValue() call.
@@ -151,7 +151,7 @@ public class ValidationContext<T> {
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ClockProvider clockProvider,
-			ScriptEvaluatorFactory scriptEvaluatorFactory,
+			HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext,
 			boolean failFast,
 			T rootBean,
 			Class<T> rootBeanClass,
@@ -165,7 +165,7 @@ public class ValidationContext<T> {
 		this.traversableResolver = traversableResolver;
 		this.parameterNameProvider = parameterNameProvider;
 		this.clockProvider = clockProvider;
-		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
+		this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
 		this.failFast = failFast;
 
 		this.rootBean = rootBean;
@@ -187,7 +187,7 @@ public class ValidationContext<T> {
 			ConstraintValidatorFactory constraintValidatorFactory,
 			TraversableResolver traversableResolver,
 			ClockProvider clockProvider,
-			ScriptEvaluatorFactory scriptEvaluatorFactory,
+			HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext,
 			boolean failFast) {
 
 		return new ValidationContextBuilder(
@@ -197,7 +197,7 @@ public class ValidationContext<T> {
 				constraintValidatorFactory,
 				traversableResolver,
 				clockProvider,
-				scriptEvaluatorFactory,
+				constraintValidatorInitializationContext,
 				failFast
 		);
 	}
@@ -249,8 +249,8 @@ public class ValidationContext<T> {
 		return clockProvider;
 	}
 
-	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
-		return scriptEvaluatorFactory;
+	public HibernateConstraintValidatorInitializationContext getConstraintValidatorInitializationContext() {
+		return constraintValidatorInitializationContext;
 	}
 
 	public Set<ConstraintViolation<T>> createConstraintViolations(ValueContext<?, ?> localContext,
@@ -463,7 +463,7 @@ public class ValidationContext<T> {
 		private final ConstraintValidatorFactory constraintValidatorFactory;
 		private final TraversableResolver traversableResolver;
 		private final ClockProvider clockProvider;
-		private final ScriptEvaluatorFactory scriptEvaluatorFactory;
+		private final HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext;
 		private final boolean failFast;
 
 		private ValidationContextBuilder(
@@ -473,7 +473,7 @@ public class ValidationContext<T> {
 				ConstraintValidatorFactory constraintValidatorFactory,
 				TraversableResolver traversableResolver,
 				ClockProvider clockProvider,
-				ScriptEvaluatorFactory scriptEvaluatorFactory,
+				HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext,
 				boolean failFast) {
 			this.beanMetaDataManager = beanMetaDataManager;
 			this.constraintValidatorManager = constraintValidatorManager;
@@ -481,7 +481,7 @@ public class ValidationContext<T> {
 			this.constraintValidatorFactory = constraintValidatorFactory;
 			this.traversableResolver = traversableResolver;
 			this.clockProvider = clockProvider;
-			this.scriptEvaluatorFactory = scriptEvaluatorFactory;
+			this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
 			this.failFast = failFast;
 		}
 
@@ -495,7 +495,7 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider
 					clockProvider,
-					scriptEvaluatorFactory,
+					constraintValidatorInitializationContext,
 					failFast,
 					rootBean,
 					rootBeanClass,
@@ -516,7 +516,7 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider
 					clockProvider,
-					scriptEvaluatorFactory,
+					constraintValidatorInitializationContext,
 					failFast,
 					rootBean,
 					rootBeanClass,
@@ -535,7 +535,7 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider
 					clockProvider,
-					scriptEvaluatorFactory,
+					constraintValidatorInitializationContext,
 					failFast,
 					null,
 					rootBeanClass, //root bean
@@ -560,7 +560,7 @@ public class ValidationContext<T> {
 					traversableResolver,
 					parameterNameProvider,
 					clockProvider,
-					scriptEvaluatorFactory,
+					constraintValidatorInitializationContext,
 					failFast,
 					rootBean,
 					rootBeanClass,
@@ -584,7 +584,7 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider
 					clockProvider,
-					scriptEvaluatorFactory,
+					constraintValidatorInitializationContext,
 					failFast,
 					rootBean,
 					rootBeanClass,

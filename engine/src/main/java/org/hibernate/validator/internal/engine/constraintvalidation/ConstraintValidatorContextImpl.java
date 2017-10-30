@@ -33,8 +33,6 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.spi.scripting.ScriptEvaluator;
-import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * @author Hardy Ferentschik
@@ -49,18 +47,16 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private Map<String, Object> expressionVariables;
 	private final List<String> methodParameterNames;
 	private final ClockProvider clockProvider;
-	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
 	private final PathImpl basePath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private List<ConstraintViolationCreationContext> constraintViolationCreationContexts;
 	private boolean defaultDisabled;
 	private Object dynamicPayload;
 
-	public ConstraintValidatorContextImpl(List<String> methodParameterNames, ClockProvider clockProvider, ScriptEvaluatorFactory scriptEvaluatorFactory,
+	public ConstraintValidatorContextImpl(List<String> methodParameterNames, ClockProvider clockProvider,
 			PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor) {
 		this.methodParameterNames = methodParameterNames;
 		this.clockProvider = clockProvider;
-		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.basePath = propertyPath;
 		this.constraintDescriptor = constraintDescriptor;
 	}
@@ -126,11 +122,6 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	public HibernateConstraintValidatorContext withDynamicPayload(Object violationContext) {
 		this.dynamicPayload = violationContext;
 		return this;
-	}
-
-	@Override
-	public ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) {
-		return scriptEvaluatorFactory.getScriptEvaluatorByLanguageName( languageName );
 	}
 
 	public final ConstraintDescriptor<?> getConstraintDescriptor() {

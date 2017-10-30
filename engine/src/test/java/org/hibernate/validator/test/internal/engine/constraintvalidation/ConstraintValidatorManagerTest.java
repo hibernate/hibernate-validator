@@ -7,6 +7,7 @@
 package org.hibernate.validator.test.internal.engine.constraintvalidation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyValidatorInitContext;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertEquals;
@@ -64,7 +65,8 @@ public class ConstraintValidatorManagerTest {
 		ConstraintValidator<?, ?> constraintValidator = constraintValidatorManager.getInitializedValidator(
 				String.class,
 				constraintDescriptor,
-				constraintValidatorFactory
+				constraintValidatorFactory,
+				getDummyValidatorInitContext()
 		);
 
 		assertTrue( constraintValidator instanceof NotNullValidator, "Unexpected validator type" );
@@ -77,7 +79,8 @@ public class ConstraintValidatorManagerTest {
 		constraintValidatorManager.getInitializedValidator(
 				null,
 				constraintDescriptor,
-				constraintValidatorFactory
+				constraintValidatorFactory,
+				getDummyValidatorInitContext()
 		);
 	}
 
@@ -86,7 +89,8 @@ public class ConstraintValidatorManagerTest {
 		constraintValidatorManager.getInitializedValidator(
 				String.class,
 				null,
-				constraintValidatorFactory
+				constraintValidatorFactory,
+				getDummyValidatorInitContext()
 		);
 	}
 
@@ -97,7 +101,8 @@ public class ConstraintValidatorManagerTest {
 		constraintValidatorManager.getInitializedValidator(
 				String.class,
 				constraintDescriptor,
-				null
+				null,
+				getDummyValidatorInitContext()
 		);
 	}
 
@@ -108,7 +113,8 @@ public class ConstraintValidatorManagerTest {
 		ConstraintValidator<?, ?> constraintValidator = constraintValidatorManager.getInitializedValidator(
 				Object.class,
 				constraintDescriptor,
-				constraintValidatorFactory
+				constraintValidatorFactory,
+				getDummyValidatorInitContext()
 		);
 		assertNull( constraintValidator, "there should be no matching constraint validator" );
 	}
@@ -120,7 +126,8 @@ public class ConstraintValidatorManagerTest {
 		ConstraintValidator<?, ?> constraintValidator1 = constraintValidatorManager.getInitializedValidator(
 				String.class,
 				constraintDescriptor,
-				constraintValidatorFactory
+				constraintValidatorFactory,
+				getDummyValidatorInitContext()
 		);
 
 		assertTrue(
@@ -131,7 +138,8 @@ public class ConstraintValidatorManagerTest {
 		ConstraintValidator<?, ?> constraintValidator2 = constraintValidatorManager.getInitializedValidator(
 				String.class,
 				constraintDescriptor,
-				new MyCustomValidatorFactory()
+				new MyCustomValidatorFactory(),
+				getDummyValidatorInitContext()
 		);
 
 		assertTrue(
@@ -154,7 +162,8 @@ public class ConstraintValidatorManagerTest {
 			constraintValidatorManager.getInitializedValidator(
 					String.class,
 					constraintDescriptor,
-					new MyCustomValidatorFactory()
+					new MyCustomValidatorFactory(),
+					getDummyValidatorInitContext()
 			);
 
 			assertEquals(
@@ -193,17 +202,20 @@ public class ConstraintValidatorManagerTest {
 		ConstraintValidator<?, ?> notNullValidatorForFirstName1 = constraintValidatorManager.getInitializedValidator(
 				String.class,
 				notNullOnFirstNameDescriptor,
-				constraintValidatorFactory
+				constraintValidatorFactory,
+				getDummyValidatorInitContext()
 		);
 		ConstraintValidator<?, ?> notNullValidatorForFirstName2 = constraintValidatorManager.getInitializedValidator(
 				String.class,
 				notNullOnFirstNameDescriptor,
-				constraintValidatorFactory
+				constraintValidatorFactory,
+				getDummyValidatorInitContext()
 		);
 		ConstraintValidator<?, ?> notNullValidatorForLastName = constraintValidatorManager.getInitializedValidator(
 				String.class,
 				notNullOnLastNameDescriptor,
-				constraintValidatorFactory
+				constraintValidatorFactory,
+				getDummyValidatorInitContext()
 		);
 
 		assertThat( notNullValidatorForFirstName1 ).isSameAs( notNullValidatorForFirstName2 );
@@ -233,13 +245,13 @@ public class ConstraintValidatorManagerTest {
 		);
 
 		ConstraintValidator<?, ?> sizeValidatorForMiddleName = constraintValidatorManager.getInitializedValidator(
-				String.class, sizeOnMiddleNameDescriptor, constraintValidatorFactory
+				String.class, sizeOnMiddleNameDescriptor, constraintValidatorFactory, getDummyValidatorInitContext()
 		);
 		ConstraintValidator<?, ?> sizeValidatorForAddress1 = constraintValidatorManager.getInitializedValidator(
-				String.class, sizeOnAddress1Descriptor, constraintValidatorFactory
+				String.class, sizeOnAddress1Descriptor, constraintValidatorFactory, getDummyValidatorInitContext()
 		);
 		ConstraintValidator<?, ?> sizeValidatorForAddress2 = constraintValidatorManager.getInitializedValidator(
-				String.class, sizeOnAddress2Descriptor, constraintValidatorFactory
+				String.class, sizeOnAddress2Descriptor, constraintValidatorFactory, getDummyValidatorInitContext()
 		);
 
 		assertThat( sizeValidatorForMiddleName ).isNotSameAs( sizeValidatorForAddress1 );

@@ -37,8 +37,10 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
+import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.GroupWithInheritance;
 import org.hibernate.validator.internal.engine.groups.Sequence;
@@ -152,6 +154,12 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private final ValueExtractorManager valueExtractorManager;
 
+	/**
+	 * Constraint initialization context is stored at this level to prevent creating it each time when initializing
+	 * a new constraint validator, as for now it only stores {@code ScriptEvaluatorFactory}.
+	 */
+	private final HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext;
+
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
 			MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
@@ -176,6 +184,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.validationOrderGenerator = validationOrderGenerator;
 		this.failFast = failFast;
 		this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
+		this.constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory );
 	}
 
 	@Override
@@ -350,7 +359,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				constraintValidatorFactory,
 				TraversableResolvers.wrapWithCachingForSingleValidation( traversableResolver, traversableResolverResultCacheEnabled ),
 				clockProvider,
-				scriptEvaluatorFactory,
+				constraintValidatorInitializationContext,
 				failFast
 		);
 	}

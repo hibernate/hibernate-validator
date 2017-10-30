@@ -9,10 +9,9 @@ package org.hibernate.validator.internal.constraintvalidators.hv;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
+import org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
@@ -21,33 +20,28 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
 /**
  * @author Marko Bekhta
  */
-public abstract class AbstractScriptAssertValidator<A extends Annotation, T> implements ConstraintValidator<A, T> {
+public abstract class AbstractScriptAssertValidator<A extends Annotation, T> implements HibernateConstraintValidator<A, T> {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected String languageName;
 	protected String script;
 	protected String escapedScript;
-	protected volatile ScriptAssertContext scriptAssertContext;
+	protected ScriptAssertContext scriptAssertContext;
 
-	protected ScriptAssertContext getScriptAssertContext(ConstraintValidatorContext constraintValidatorContext) {
-		if ( scriptAssertContext == null ) {
-			synchronized ( this ) {
-				if ( scriptAssertContext == null ) {
-					ScriptEvaluator scriptEvaluator = null;
-					if ( constraintValidatorContext instanceof HibernateConstraintValidatorContext ) {
-						try {
-							scriptEvaluator = constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class )
-									.getScriptEvaluatorForLanguage( languageName );
-						}
-						catch (ScriptEvaluatorNotFoundException e) {
-							throw LOG.getCreationOfScriptExecutorFailedException( languageName, e );
-						}
-					}
-					scriptAssertContext = new ScriptAssertContext( script, scriptEvaluator );
-				}
-			}
+	protected void initialize(
+			String languageName, String script,
+			HibernateConstraintValidatorInitializationContext initializationContext) {
+		this.script = script;
+		this.languageName = languageName;
+		this.escapedScript = InterpolationHelper.escapeMessageParameter( script );
+
+		try {
+			ScriptEvaluator scriptEvaluator = initializationContext.getScriptEvaluatorForLanguage( languageName );
+			scriptAssertContext = new ScriptAssertContext( script, scriptEvaluator );
 		}
-		return scriptAssertContext;
+		catch (ScriptEvaluatorNotFoundException e) {
+			throw LOG.getCreationOfScriptExecutorFailedException( languageName, e );
+		}
 	}
 }
