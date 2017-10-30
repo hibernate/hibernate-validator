@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
+import java.time.Duration;
+
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -17,12 +19,20 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 
 	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
 
-	public HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory) {
+	private final Duration temporalValidationTolerance;
+
+	public HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory, Duration temporalValidationTolerance) {
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
+		this.temporalValidationTolerance = temporalValidationTolerance;
 	}
 
 	@Override
 	public ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) {
 		return scriptEvaluatorFactory.getScriptEvaluatorByLanguageName( languageName );
+	}
+
+	@Override
+	public Duration getTemporalValidationTolerance() {
+		return temporalValidationTolerance;
 	}
 }

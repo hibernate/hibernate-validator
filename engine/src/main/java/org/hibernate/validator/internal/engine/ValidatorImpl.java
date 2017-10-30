@@ -14,6 +14,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -165,7 +166,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ConstraintValidatorManager constraintValidatorManager,
 			ValidationOrderGenerator validationOrderGenerator,
 			boolean failFast,
-			boolean traversableResolverResultCacheEnabled) {
+			boolean traversableResolverResultCacheEnabled,
+			Duration temporalValidationTolerance) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
@@ -177,7 +179,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.validationOrderGenerator = validationOrderGenerator;
 		this.failFast = failFast;
 		this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
-		this.constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory );
+		this.constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, temporalValidationTolerance );
 	}
 
 	@Override

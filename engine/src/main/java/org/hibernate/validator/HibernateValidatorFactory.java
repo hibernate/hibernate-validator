@@ -7,6 +7,8 @@
 
 package org.hibernate.validator;
 
+import java.time.Duration;
+
 import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
@@ -33,6 +35,17 @@ public interface HibernateValidatorFactory extends ValidatorFactory {
 	 */
 	@Incubating
 	ScriptEvaluatorFactory getScriptEvaluatorFactory();
+
+	/**
+	 * Returns the temporal validation tolerance i.e. the acceptable margin of error when comparing date/time in
+	 * temporal constraints.
+	 *
+	 * @return the tolerance
+	 *
+	 * @since 6.0.5
+	 */
+	@Incubating
+	Duration getTemporalValidationTolerance();
 
 	/**
 	 * Returns a context for validator configuration via options from the
