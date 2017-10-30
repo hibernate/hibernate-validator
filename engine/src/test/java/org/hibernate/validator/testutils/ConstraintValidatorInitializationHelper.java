@@ -7,6 +7,7 @@
 package org.hibernate.validator.testutils;
 
 import java.lang.annotation.Annotation;
+import java.time.Duration;
 
 import javax.validation.metadata.ConstraintDescriptor;
 
@@ -34,6 +35,11 @@ public class ConstraintValidatorInitializationHelper {
 		@Override
 		public ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) {
 			return scriptEvaluatorFactory.getScriptEvaluatorByLanguageName( languageName );
+		}
+
+		@Override
+		public Duration getTemporalValidationTolerance() {
+			return Duration.ZERO;
 		}
 	};
 

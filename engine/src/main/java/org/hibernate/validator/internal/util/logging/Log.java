@@ -19,6 +19,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -50,6 +51,7 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.logging.formatter.ClassObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfObjectsToStringFormatter;
+import org.hibernate.validator.internal.util.logging.formatter.DurationFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ObjectArrayFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
@@ -828,4 +830,11 @@ public interface Log extends BasicLogger {
 	@Message(id = 237, value = "Unable to access method %3$s of class %2$s with parameters %4$s using lookup %1$s.")
 	ValidationException getUnableToAccessMethodException(Lookup lookup, @FormatWith(ClassObjectFormatter.class) Class<?> clazz, String methodName,
 			@FormatWith(ObjectArrayFormatter.class) Object[] parameterTypes, @Cause Throwable e);
+
+	@LogMessage(level = INFO)
+	@Message(id = 238, value = "Temporal validation tolerance set to %1$s.")
+	void logTemporalValidationTolerance(@FormatWith(DurationFormatter.class) Duration tolerance);
+
+	@Message(id = 239, value = "Unable to parse the temporal validation tolerance property %s. It should be a duration represented in milliseconds.")
+	ValidationException getUnableToParseTemporalValidationToleranceException(String toleranceProperty, @Cause Exception e);
 }

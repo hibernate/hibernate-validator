@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.constraintvalidation;
 
+import java.time.Duration;
+
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -32,4 +34,12 @@ public interface HibernateConstraintValidatorInitializationContext {
 	 * found for a given {@code languageName}
 	 */
 	ScriptEvaluator getScriptEvaluatorForLanguage(String languageName);
+
+	/**
+	 * Returns the temporal validation tolerance i.e. the acceptable margin of error when comparing date/time in
+	 * temporal constraints.
+	 *
+	 * @return the tolerance
+	 */
+	Duration getTemporalValidationTolerance();
 }

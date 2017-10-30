@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.engine;
 
 import java.lang.invoke.MethodHandles;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +46,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private ExecutableParameterNameProvider parameterNameProvider;
 	private ClockProvider clockProvider;
 	private ScriptEvaluatorFactory scriptEvaluatorFactory;
+	private Duration temporalValidationTolerance;
 	private boolean failFast;
 	private boolean traversableResolverResultCacheEnabled;
 	private final ValueExtractorManager valueExtractorManager;
@@ -59,6 +61,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.parameterNameProvider = validatorFactory.getExecutableParameterNameProvider();
 		this.clockProvider = validatorFactory.getClockProvider();
 		this.scriptEvaluatorFactory = validatorFactory.getScriptEvaluatorFactory();
+		this.temporalValidationTolerance = validatorFactory.getTemporalValidationTolerance();
 		this.failFast = validatorFactory.isFailFast();
 		this.traversableResolverResultCacheEnabled = validatorFactory.isTraversableResolverResultCacheEnabled();
 		this.methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder( validatorFactory.getMethodValidationConfiguration() );
@@ -173,6 +176,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				clockProvider,
 				scriptEvaluatorFactory,
 				failFast,
+				temporalValidationTolerance,
 				valueExtractorDescriptors.isEmpty() ? valueExtractorManager : new ValueExtractorManager( valueExtractorManager, valueExtractorDescriptors ),
 				methodValidationConfigurationBuilder.build(),
 				traversableResolverResultCacheEnabled
