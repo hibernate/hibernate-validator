@@ -249,6 +249,25 @@ public class XmlMappingTest {
 	}
 
 	@Test
+	@TestForIssue( jiraKey = "HV-1463")
+	public void testClockSkewToleranceConfiguration() {
+		validationXmlTestHelper.runWithCustomValidationXml(
+				"clock-skew-tolerance-duration-validation.xml", () -> {
+					//given
+					BootstrapConfiguration bootstrapConfiguration = ValidatorUtil.getConfiguration()
+							.getBootstrapConfiguration();
+
+					//then
+					assertEquals(
+							bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.CLOCK_SKEW_TOLERANCE ),
+							"123456"
+					);
+
+				}
+		);
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HV-707")
 	public void shouldReturnDefaultExecutableTypesForValidationXmlWithoutTypesGiven() {
 		validationXmlTestHelper.runWithCustomValidationXml(

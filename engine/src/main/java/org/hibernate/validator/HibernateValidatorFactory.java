@@ -7,6 +7,8 @@
 
 package org.hibernate.validator;
 
+import java.time.Duration;
+
 import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
@@ -33,6 +35,17 @@ public interface HibernateValidatorFactory extends ValidatorFactory {
 	 */
 	@Incubating
 	ScriptEvaluatorFactory getScriptEvaluatorFactory();
+
+	/**
+	 * Returns clock skew tolerance as {@link Duration} i.e. the acceptable margin of error
+	 * when comparing date/time in time related constraints.
+	 *
+	 * @return a tolerance as {@link Duration}
+	 *
+	 * @since 6.0.5
+	 */
+	@Incubating
+	Duration getClockSkewTolerance();
 
 	/**
 	 * Returns a context for validator configuration via options from the

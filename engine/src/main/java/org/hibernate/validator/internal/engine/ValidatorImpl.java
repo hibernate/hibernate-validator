@@ -14,6 +14,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -141,6 +142,12 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
 
 	/**
+	 * Defines allowed margin of error when comparing date/time during validation of {@code @Future} or {@code @Past}
+	 * constraints.
+	 */
+	private final Duration clockSkewTolerance;
+
+	/**
 	 * Indicates if validation has to be stopped on first constraint violation.
 	 */
 	private final boolean failFast;
@@ -163,7 +170,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ConstraintValidatorManager constraintValidatorManager,
 			ValidationOrderGenerator validationOrderGenerator,
 			boolean failFast,
-			boolean traversableResolverResultCacheEnabled) {
+			boolean traversableResolverResultCacheEnabled,
+			Duration clockSkewTolerance) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
@@ -176,6 +184,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.validationOrderGenerator = validationOrderGenerator;
 		this.failFast = failFast;
 		this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
+		this.clockSkewTolerance = clockSkewTolerance;
 	}
 
 	@Override
@@ -351,7 +360,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				TraversableResolvers.wrapWithCachingForSingleValidation( traversableResolver, traversableResolverResultCacheEnabled ),
 				clockProvider,
 				scriptEvaluatorFactory,
-				failFast
+				failFast,
+				clockSkewTolerance
 		);
 	}
 

@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
+import java.time.Duration;
+
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
@@ -22,16 +24,26 @@ public class HibernateConstraintValidatorInitializationContextImpl implements
 		public ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) {
 			return null;
 		}
+
+		@Override public Duration getClockSkewTolerance() {
+			return null;
+		}
 	};
 
 	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
 
-	private HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory) {
+	private final Duration clockSkewTolerance;
+
+	private HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory, Duration clockSkewTolerance) {
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
+		this.clockSkewTolerance = clockSkewTolerance;
 	}
 
 	public static HibernateConstraintValidatorInitializationContext from(ValidationContext<?> validationContext) {
-		return new HibernateConstraintValidatorInitializationContextImpl( validationContext.getScriptEvaluatorFactory() );
+		return new HibernateConstraintValidatorInitializationContextImpl(
+				validationContext.getScriptEvaluatorFactory(),
+				validationContext.getClockSkewTolerance()
+		);
 	}
 
 	public static HibernateConstraintValidatorInitializationContext dummyContext() {
@@ -41,6 +53,11 @@ public class HibernateConstraintValidatorInitializationContextImpl implements
 	@Override
 	public ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) {
 		return scriptEvaluatorFactory.getScriptEvaluatorByLanguageName( languageName );
+	}
+
+	@Override
+	public Duration getClockSkewTolerance() {
+		return clockSkewTolerance;
 	}
 
 }
