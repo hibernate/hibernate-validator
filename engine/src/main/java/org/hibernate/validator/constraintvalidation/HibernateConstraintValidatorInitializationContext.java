@@ -6,7 +6,10 @@
  */
 package org.hibernate.validator.constraintvalidation;
 
+import java.time.Clock;
 import java.time.Duration;
+
+import javax.validation.ClockProvider;
 
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
@@ -44,4 +47,15 @@ public interface HibernateConstraintValidatorInitializationContext {
 	 * @return a tolerance as  {@link Duration}
 	 */
 	Duration getClockSkewTolerance();
+
+	/**
+	 * Returns the provider for obtaining the current time in the form of a {@link Clock},
+	 * e.g. when validating the {@code Future} and {@code Past} constraints.
+	 *
+	 * @return the provider for obtaining the current time, never {@code null}. If no
+	 * specific provider has been configured during bootstrap, a default implementation using
+	 * the current system time and the current default time zone as returned by
+	 * {@link Clock#systemDefaultZone()} will be returned.
+	 */
+	ClockProvider getClockProvider();
 }

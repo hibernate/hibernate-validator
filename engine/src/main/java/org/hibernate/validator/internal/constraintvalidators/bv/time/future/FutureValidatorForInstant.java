@@ -9,13 +9,17 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.future;
 import java.time.Clock;
 import java.time.Instant;
 
+import javax.validation.constraints.Future;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.Instant} passed is in the future.
  *
  * @author Khalid Alqinyah
  * @author Guillaume Smet
  */
-public class FutureValidatorForInstant extends AbstractFutureJavaTimeValidator<Instant> {
+public class FutureValidatorForInstant extends AbstractTemporalValidator<Future, Instant> {
 
 	@Override
 	protected Instant getReferenceValue(Clock reference) {

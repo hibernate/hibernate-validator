@@ -9,12 +9,16 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.past;
 import java.time.Clock;
 import java.time.chrono.ThaiBuddhistDate;
 
+import javax.validation.constraints.Past;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.chrono.ThaiBuddhistDate} passed is in the past.
  *
  * @author Guillaume Smet
  */
-public class PastValidatorForThaiBuddhistDate extends AbstractPastJavaTimeValidator<ThaiBuddhistDate> {
+public class PastValidatorForThaiBuddhistDate extends AbstractTemporalValidator<Past, ThaiBuddhistDate> {
 
 	@Override
 	protected ThaiBuddhistDate getReferenceValue(Clock reference) {

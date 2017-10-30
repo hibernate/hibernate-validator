@@ -9,13 +9,17 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.future;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 
+import javax.validation.constraints.Future;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.ZonedDateTime} passed is in the future.
  *
  * @author Khalid Alqinyah
  * @author Guillaume Smet
  */
-public class FutureValidatorForZonedDateTime extends AbstractFutureJavaTimeValidator<ZonedDateTime> {
+public class FutureValidatorForZonedDateTime extends AbstractTemporalValidator<Future, ZonedDateTime> {
 
 	@Override
 	protected ZonedDateTime getReferenceValue(Clock reference) {

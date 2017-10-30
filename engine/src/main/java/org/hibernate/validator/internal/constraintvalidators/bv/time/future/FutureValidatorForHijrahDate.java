@@ -9,12 +9,16 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.future;
 import java.time.Clock;
 import java.time.chrono.HijrahDate;
 
+import javax.validation.constraints.Future;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.chrono.HijrahDate} passed is in the future.
  *
  * @author Guillaume Smet
  */
-public class FutureValidatorForHijrahDate extends AbstractFutureJavaTimeValidator<HijrahDate> {
+public class FutureValidatorForHijrahDate extends AbstractTemporalValidator<Future, HijrahDate> {
 
 	@Override
 	protected HijrahDate getReferenceValue(Clock reference) {

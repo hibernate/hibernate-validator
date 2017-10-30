@@ -9,12 +9,16 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.past;
 import java.time.Clock;
 import java.time.LocalDateTime;
 
+import javax.validation.constraints.Past;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.LocalDateTime} passed is in the past.
  *
  * @author Guillaume Smet
  */
-public class PastValidatorForLocalDateTime extends AbstractPastJavaTimeValidator<LocalDateTime> {
+public class PastValidatorForLocalDateTime extends AbstractTemporalValidator<Past, LocalDateTime> {
 
 	@Override
 	protected LocalDateTime getReferenceValue(Clock reference) {

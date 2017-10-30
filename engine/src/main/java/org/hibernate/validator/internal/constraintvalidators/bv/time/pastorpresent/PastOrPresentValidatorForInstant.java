@@ -9,13 +9,17 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpres
 import java.time.Clock;
 import java.time.Instant;
 
+import javax.validation.constraints.PastOrPresent;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.Instant} passed is in the past.
  *
  * @author Khalid Alqinyah
  * @author Guillaume Smet
  */
-public class PastOrPresentValidatorForInstant extends AbstractPastOrPresentJavaTimeValidator<Instant> {
+public class PastOrPresentValidatorForInstant extends AbstractTemporalValidator<PastOrPresent, Instant> {
 
 	@Override
 	protected Instant getReferenceValue(Clock reference) {

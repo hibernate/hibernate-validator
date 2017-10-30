@@ -9,6 +9,10 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpr
 import java.time.Instant;
 import java.util.Calendar;
 
+import javax.validation.constraints.FutureOrPresent;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractInstantBasedValidator;
+
 /**
  * Check that the {@code java.util.Calendar} passed to be validated is in
  * the future.
@@ -16,7 +20,7 @@ import java.util.Calendar;
  * @author Alaa Nassef
  * @author Guillaume Smet
  */
-public class FutureOrPresentValidatorForCalendar extends AbstractFutureOrPresentInstantBasedValidator<Calendar> {
+public class FutureOrPresentValidatorForCalendar extends AbstractInstantBasedValidator<FutureOrPresent, Calendar> {
 
 	@Override
 	protected Instant getInstant(Calendar value) {

@@ -6,19 +6,23 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent;
 
-import java.time.Clock;
+import java.time.Instant;
 import java.time.MonthDay;
+
+import javax.validation.constraints.PastOrPresent;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractInstantBasedValidator;
 
 /**
  * Check that the {@code java.time.MonthDay} passed is in the past.
  *
  * @author Guillaume Smet
  */
-public class PastOrPresentValidatorForMonthDay extends AbstractPastOrPresentJavaTimeValidator<MonthDay> {
+public class PastOrPresentValidatorForMonthDay extends AbstractInstantBasedValidator<PastOrPresent, MonthDay> {
 
 	@Override
-	protected MonthDay getReferenceValue(Clock reference) {
-		return MonthDay.now( reference );
+	protected Instant getInstant(MonthDay value) {
+		return (Instant) value.adjustInto( Instant.now( clockProvider.getClock() ) );
 	}
 
 }

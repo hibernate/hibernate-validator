@@ -51,7 +51,6 @@ import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.logging.formatter.DurationFormatter;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
@@ -565,7 +564,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if ( clockSkewToleranceProperty != null ) {
 			try {
 				Duration tolerance = Duration.ofMillis( Long.parseLong( clockSkewToleranceProperty ) );
-				LOG.logClockSkewTolerance(  tolerance ) ;
+				LOG.logClockSkewTolerance( tolerance );
 				return tolerance;
 			}
 			catch (Exception e) {

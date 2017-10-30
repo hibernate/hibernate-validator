@@ -9,6 +9,10 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpr
 import java.time.Instant;
 import java.util.Date;
 
+import javax.validation.constraints.FutureOrPresent;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractInstantBasedValidator;
+
 /**
  * Check that the {@code java.util.Date} passed to be validated is in the
  * future.
@@ -16,7 +20,7 @@ import java.util.Date;
  * @author Alaa Nassef
  * @author Guillaume Smet
  */
-public class FutureOrPresentValidatorForDate extends AbstractFutureOrPresentInstantBasedValidator<Date> {
+public class FutureOrPresentValidatorForDate extends AbstractInstantBasedValidator<FutureOrPresent, Date> {
 
 	@Override
 	protected Instant getInstant(Date value) {

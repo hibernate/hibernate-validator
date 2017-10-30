@@ -9,12 +9,16 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpr
 import java.time.Clock;
 import java.time.LocalDate;
 
+import javax.validation.constraints.FutureOrPresent;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.LocalDate} passed is in the future.
  *
  * @author Guillaume Smet
  */
-public class FutureOrPresentValidatorForLocalDate extends AbstractFutureOrPresentJavaTimeValidator<LocalDate> {
+public class FutureOrPresentValidatorForLocalDate extends AbstractTemporalValidator<FutureOrPresent, LocalDate> {
 
 	@Override
 	protected LocalDate getReferenceValue(Clock reference) {

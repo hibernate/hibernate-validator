@@ -9,12 +9,16 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.future;
 import java.time.Clock;
 import java.time.chrono.JapaneseDate;
 
+import javax.validation.constraints.Future;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.chrono.JapaneseDate} passed is in the future.
  *
  * @author Guillaume Smet
  */
-public class FutureValidatorForJapaneseDate extends AbstractFutureJavaTimeValidator<JapaneseDate> {
+public class FutureValidatorForJapaneseDate extends AbstractTemporalValidator<Future, JapaneseDate> {
 
 	@Override
 	protected JapaneseDate getReferenceValue(Clock reference) {

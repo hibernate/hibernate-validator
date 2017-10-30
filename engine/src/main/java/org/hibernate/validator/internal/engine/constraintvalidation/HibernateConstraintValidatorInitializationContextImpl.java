@@ -8,6 +8,8 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import java.time.Duration;
 
+import javax.validation.ClockProvider;
+
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
@@ -20,12 +22,19 @@ public class HibernateConstraintValidatorInitializationContextImpl implements
 		HibernateConstraintValidatorInitializationContext {
 
 	private static final HibernateConstraintValidatorInitializationContext DUMMY_VALIDATOR_INIT_CONTEXT = new HibernateConstraintValidatorInitializationContext() {
+
 		@Override
 		public ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) {
 			return null;
 		}
 
-		@Override public Duration getClockSkewTolerance() {
+		@Override
+		public Duration getClockSkewTolerance() {
+			return null;
+		}
+
+		@Override
+		public ClockProvider getClockProvider() {
 			return null;
 		}
 	};
@@ -34,15 +43,22 @@ public class HibernateConstraintValidatorInitializationContextImpl implements
 
 	private final Duration clockSkewTolerance;
 
-	private HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory, Duration clockSkewTolerance) {
+	private final ClockProvider clockProvider;
+
+	private HibernateConstraintValidatorInitializationContextImpl(
+			ScriptEvaluatorFactory scriptEvaluatorFactory,
+			Duration clockSkewTolerance,
+			ClockProvider clockProvider) {
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.clockSkewTolerance = clockSkewTolerance;
+		this.clockProvider = clockProvider;
 	}
 
 	public static HibernateConstraintValidatorInitializationContext from(ValidationContext<?> validationContext) {
 		return new HibernateConstraintValidatorInitializationContextImpl(
 				validationContext.getScriptEvaluatorFactory(),
-				validationContext.getClockSkewTolerance()
+				validationContext.getClockSkewTolerance(),
+				validationContext.getClockProvider()
 		);
 	}
 
@@ -58,6 +74,11 @@ public class HibernateConstraintValidatorInitializationContextImpl implements
 	@Override
 	public Duration getClockSkewTolerance() {
 		return clockSkewTolerance;
+	}
+
+	@Override
+	public ClockProvider getClockProvider() {
+		return clockProvider;
 	}
 
 }

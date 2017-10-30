@@ -9,12 +9,16 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpres
 import java.time.Clock;
 import java.time.Year;
 
+import javax.validation.constraints.PastOrPresent;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractTemporalValidator;
+
 /**
  * Check that the {@code java.time.Year} passed is in the past.
  *
  * @author Guillaume Smet
  */
-public class PastOrPresentValidatorForYear extends AbstractPastOrPresentJavaTimeValidator<Year> {
+public class PastOrPresentValidatorForYear extends AbstractTemporalValidator<PastOrPresent, Year> {
 
 	@Override
 	protected Year getReferenceValue(Clock reference) {
