@@ -9,10 +9,11 @@ package org.hibernate.validator.internal.constraintvalidators.hv;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.util.Contracts;
 
 /**
@@ -23,7 +24,6 @@ import org.hibernate.validator.internal.util.Contracts;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Marko Bekhta
  * @author Guillaume Smet
- * @author Marko Bekhta
  */
 public class ScriptAssertValidator extends AbstractScriptAssertValidator<ScriptAssert, Object> {
 
@@ -32,15 +32,14 @@ public class ScriptAssertValidator extends AbstractScriptAssertValidator<ScriptA
 	private String message;
 
 	@Override
-	public void initialize(ScriptAssert constraintAnnotation) {
+	public void initialize(ConstraintDescriptor<ScriptAssert> constraintDescriptor, HibernateConstraintValidatorInitializationContext initializationContext) {
+		ScriptAssert constraintAnnotation = constraintDescriptor.getAnnotation();
 		validateParameters( constraintAnnotation );
+		initialize( constraintAnnotation.lang(), constraintAnnotation.script(), initializationContext );
 
 		this.alias = constraintAnnotation.alias();
 		this.reportOn = constraintAnnotation.reportOn();
 		this.message = constraintAnnotation.message();
-		this.languageName = constraintAnnotation.lang();
-		this.script = constraintAnnotation.script();
-		this.escapedScript = InterpolationHelper.escapeMessageParameter( constraintAnnotation.script() );
 	}
 
 	@Override
@@ -49,7 +48,7 @@ public class ScriptAssertValidator extends AbstractScriptAssertValidator<ScriptA
 			constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class ).addMessageParameter( "script", escapedScript );
 		}
 
-		boolean validationResult = getScriptAssertContext( constraintValidatorContext ).evaluateScriptAssertExpression( value, alias );
+		boolean validationResult = scriptAssertContext.evaluateScriptAssertExpression( value, alias );
 
 		if ( !validationResult && !reportOn.isEmpty() ) {
 			constraintValidatorContext.disableDefaultConstraintViolation();

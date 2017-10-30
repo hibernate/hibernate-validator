@@ -10,6 +10,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.initialize;
 import static org.testng.Assert.assertTrue;
 
 import java.time.Instant;
@@ -23,6 +24,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
@@ -203,8 +205,8 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 	 */
 	private ConstraintValidator<ScriptAssert, Object> getInitializedValidator(String lang, String script, String alias, String reportOn) {
 
-		ConstraintValidator<ScriptAssert, Object> validator = new ScriptAssertValidator();
-		validator.initialize( getScriptAssert( lang, script, alias, reportOn ) );
+		HibernateConstraintValidator<ScriptAssert, Object> validator = new ScriptAssertValidator();
+		initialize( validator, getScriptAssert( lang, script, alias, reportOn ) );
 
 		return validator;
 	}
@@ -217,7 +219,7 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 	 *
 	 * @return a {@link ScriptAssert} initialized with the given values.
 	 */
-	private ScriptAssert getScriptAssert(String lang, String script, String alias, String reportOn) {
+	private AnnotationDescriptor<ScriptAssert> getScriptAssert(String lang, String script, String alias, String reportOn) {
 		AnnotationDescriptor.Builder<ScriptAssert> descriptorBuilder = new AnnotationDescriptor.Builder<>( ScriptAssert.class );
 
 		descriptorBuilder.setAttribute( "lang", lang );
@@ -229,7 +231,7 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 			descriptorBuilder.setAttribute( "reportOn", reportOn );
 		}
 
-		return descriptorBuilder.build().getAnnotation();
+		return descriptorBuilder.build();
 	}
 
 	/**

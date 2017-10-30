@@ -15,11 +15,12 @@ import java.util.Map;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
+import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper;
 import org.hibernate.validator.internal.util.Contracts;
 
 /**
@@ -33,11 +34,10 @@ import org.hibernate.validator.internal.util.Contracts;
 public class ParameterScriptAssertValidator extends AbstractScriptAssertValidator<ParameterScriptAssert, Object[]> {
 
 	@Override
-	public void initialize(ParameterScriptAssert constraintAnnotation) {
+	public void initialize(ConstraintDescriptor<ParameterScriptAssert> constraintDescriptor, HibernateConstraintValidatorInitializationContext initializationContext) {
+		ParameterScriptAssert constraintAnnotation = constraintDescriptor.getAnnotation();
 		validateParameters( constraintAnnotation );
-		this.languageName = constraintAnnotation.lang();
-		this.script = constraintAnnotation.script();
-		this.escapedScript = InterpolationHelper.escapeMessageParameter( constraintAnnotation.script() );
+		initialize( constraintAnnotation.lang(), constraintAnnotation.script(), initializationContext );
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class ParameterScriptAssertValidator extends AbstractScriptAssertValidato
 
 		Map<String, Object> bindings = getBindings( arguments, parameterNames );
 
-		return getScriptAssertContext( constraintValidatorContext ).evaluateScriptAssertExpression( bindings );
+		return scriptAssertContext.evaluateScriptAssertExpression( bindings );
 	}
 
 	private Map<String, Object> getBindings(Object[] arguments, List<String> parameterNames) {
