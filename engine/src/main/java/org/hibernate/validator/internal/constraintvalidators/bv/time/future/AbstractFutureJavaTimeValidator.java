@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.time.future;
 
+import java.time.Duration;
 import java.time.temporal.TemporalAccessor;
 
 import javax.validation.constraints.Future;
@@ -25,4 +26,8 @@ public abstract class AbstractFutureJavaTimeValidator<T extends TemporalAccessor
 		return result > 0;
 	}
 
+	@Override
+	protected Duration getEffectiveTemporalValidationTolerance(Duration absoluteTemporalValidationTolerance) {
+		return absoluteTemporalValidationTolerance.negated();
+	}
 }

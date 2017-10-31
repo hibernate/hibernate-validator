@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent;
 
+import java.time.Duration;
 import java.time.temporal.TemporalAccessor;
 
 import javax.validation.constraints.PastOrPresent;
@@ -26,4 +27,8 @@ public abstract class AbstractPastOrPresentJavaTimeValidator<T extends TemporalA
 		return result <= 0;
 	}
 
+	@Override
+	protected Duration getEffectiveTemporalValidationTolerance(Duration absoluteTemporalValidationTolerance) {
+		return absoluteTemporalValidationTolerance;
+	}
 }
