@@ -9,11 +9,14 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.time.Clock;
+import java.time.Duration;
 
 import javax.validation.ClockProvider;
-import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -23,9 +26,24 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Alaa Nassef
  * @author Guillaume Smet
  */
-public abstract class AbstractEpochBasedTimeValidator<C extends Annotation, T> implements ConstraintValidator<C, T> {
+public abstract class AbstractEpochBasedTimeValidator<C extends Annotation, T> implements HibernateConstraintValidator<C, T> {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+
+	protected Clock referenceClock;
+
+	@Override
+	public void initialize(ConstraintDescriptor<C> constraintDescriptor, HibernateConstraintValidatorInitializationContext initializationContext) {
+		try {
+			this.referenceClock  = Clock.offset(
+					initializationContext.getClockProvider().getClock(),
+					getEffectiveTemporalValidationTolerance( initializationContext.getTemporalValidationTolerance() )
+			);
+		}
+		catch (Exception e) {
+			throw LOG.getUnableToGetCurrentTimeFromClockProvider( e );
+		}
+	}
 
 	@Override
 	public boolean isValid(T value, ConstraintValidatorContext context) {
@@ -34,20 +52,15 @@ public abstract class AbstractEpochBasedTimeValidator<C extends Annotation, T> i
 			return true;
 		}
 
-		Clock reference;
-
-		try {
-			ClockProvider clockProvider = context.getClockProvider();
-			reference = clockProvider.getClock();
-		}
-		catch (Exception e) {
-			throw LOG.getUnableToGetCurrentTimeFromClockProvider( e );
-		}
-
-		int result = Long.compare( getEpochMillis( value, reference ), reference.millis() );
+		int result = Long.compare( getEpochMillis( value, referenceClock ), referenceClock.millis() );
 
 		return isValid( result );
 	}
+
+	/**
+	 * Returns the temporal validation tolerance to apply.
+	 */
+	protected abstract Duration getEffectiveTemporalValidationTolerance(Duration absoluteTemporalValidationTolerance);
 
 	/**
 	 * Returns the millisecond based instant measured from Epoch. In the case of partials requiring a time reference, we
