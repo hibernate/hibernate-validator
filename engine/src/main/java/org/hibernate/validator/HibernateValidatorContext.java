@@ -7,6 +7,8 @@
 
 package org.hibernate.validator;
 
+import java.time.Duration;
+
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -138,4 +140,17 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 * @since 6.0.3
 	 */
 	HibernateValidatorContext enableTraversableResolverResultCache(boolean enabled);
+
+	/**
+	 * Define the temporal validation tolerance i.e. the acceptable margin of error
+	 * when comparing date/time in temporal constraints.
+	 *
+	 * @param temporalValidationTolerance the tolerance
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.0.5
+	 */
+	@Incubating
+	HibernateValidatorContext temporalValidationTolerance(Duration temporalValidationTolerance);
 }
