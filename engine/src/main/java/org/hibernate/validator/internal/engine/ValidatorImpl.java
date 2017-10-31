@@ -179,7 +179,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.validationOrderGenerator = validationOrderGenerator;
 		this.failFast = failFast;
 		this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
-		this.constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, temporalValidationTolerance );
+		this.constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
+				temporalValidationTolerance );
 	}
 
 	@Override
