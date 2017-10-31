@@ -137,12 +137,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private final ClockProvider clockProvider;
 
 	/**
-	 * Used to get the {@code ScriptEvaluatorFactory} when validating {@code @ScriptAssert} and
-	 * {@code @ParameterScriptAssert} constraints.
-	 */
-	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
-
-	/**
 	 * Indicates if validation has to be stopped on first constraint violation.
 	 */
 	private final boolean failFast;
@@ -155,8 +149,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private final ValueExtractorManager valueExtractorManager;
 
 	/**
-	 * Constraint initialization context is stored at this level to prevent creating it each time when initializing
-	 * a new constraint validator, as for now it only stores {@code ScriptEvaluatorFactory}.
+	 * The constraint initialization context is stored at this level to prevent creating a new instance each time we
+	 * initialize a new constraint validator as, for now, it only contains Validator scoped objects.
 	 */
 	private final HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext;
 
@@ -178,7 +172,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.parameterNameProvider = parameterNameProvider;
 		this.clockProvider = clockProvider;
-		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.valueExtractorManager = valueExtractorManager;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.validationOrderGenerator = validationOrderGenerator;

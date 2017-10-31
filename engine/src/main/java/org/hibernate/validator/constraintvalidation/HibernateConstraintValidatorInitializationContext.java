@@ -26,7 +26,7 @@ public interface HibernateConstraintValidatorInitializationContext {
 	 *
 	 * @param languageName the name of the scripting language
 	 *
-	 * @return a script executor for the given language. Never null.
+	 * @return a script evaluator for the given language. Never null.
 	 *
 	 * @throws ScriptEvaluatorNotFoundException in case no {@link ScriptEvaluator} was
 	 * found for a given {@code languageName}

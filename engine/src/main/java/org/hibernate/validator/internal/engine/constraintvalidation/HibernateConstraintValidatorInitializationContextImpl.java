@@ -25,5 +25,4 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 	public ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) {
 		return scriptEvaluatorFactory.getScriptEvaluatorByLanguageName( languageName );
 	}
-
 }
