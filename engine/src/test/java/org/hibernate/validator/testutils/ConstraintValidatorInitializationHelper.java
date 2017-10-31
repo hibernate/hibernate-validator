@@ -9,10 +9,12 @@ package org.hibernate.validator.testutils;
 import java.lang.annotation.Annotation;
 import java.time.Duration;
 
+import javax.validation.ClockProvider;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
+import org.hibernate.validator.internal.engine.DefaultClockProvider;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -35,6 +37,11 @@ public class ConstraintValidatorInitializationHelper {
 		@Override
 		public ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) {
 			return scriptEvaluatorFactory.getScriptEvaluatorByLanguageName( languageName );
+		}
+
+		@Override
+		public ClockProvider getClockProvider() {
+			return DefaultClockProvider.INSTANCE;
 		}
 
 		@Override

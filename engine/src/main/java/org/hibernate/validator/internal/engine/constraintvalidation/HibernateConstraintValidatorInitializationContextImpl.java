@@ -8,6 +8,8 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import java.time.Duration;
 
+import javax.validation.ClockProvider;
+
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -19,16 +21,25 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 
 	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
 
+	private final ClockProvider clockProvider;
+
 	private final Duration temporalValidationTolerance;
 
-	public HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory, Duration temporalValidationTolerance) {
+	public HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider,
+			Duration temporalValidationTolerance) {
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
+		this.clockProvider = clockProvider;
 		this.temporalValidationTolerance = temporalValidationTolerance;
 	}
 
 	@Override
 	public ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) {
 		return scriptEvaluatorFactory.getScriptEvaluatorByLanguageName( languageName );
+	}
+
+	@Override
+	public ClockProvider getClockProvider() {
+		return clockProvider;
 	}
 
 	@Override
