@@ -20,7 +20,7 @@ defined profiles are:
 * hv-4.3 (Hibernate Validator 4.3.0.Final)
 * hv-4.2 (Hibernate Validator 4.2.0.Final)
 * hv-4.1 (Hibernate Validator 4.1.0.Final)
-* bval-1.1.2 (Apache BVal 1.1.2)
+* bval-1.1 (Apache BVal 1.1.2)
 
 ## Executing the performance tests
 

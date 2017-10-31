@@ -18,8 +18,8 @@ import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -82,7 +82,7 @@ public class CascadedWithLotsOfItemsAndMoreConstraintsValidation {
 		@NotNull
 		private Integer id;
 
-		@NotEmpty
+		@Size(min = 1)
 		private String name;
 
 		@NotNull
@@ -103,7 +103,7 @@ public class CascadedWithLotsOfItemsAndMoreConstraintsValidation {
 		@NotNull
 		private Integer id;
 
-		@NotEmpty
+		@Size(min = 1)
 		private String name;
 
 		public Article(Integer id, String name) {

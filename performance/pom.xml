@@ -202,7 +202,7 @@
             </activation>
             <properties>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>6.0.3.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>6.0.4.Final</beanvalidation-impl.version>
             </properties>
             <dependencies>
                 <dependency>
@@ -524,11 +524,11 @@
             </dependencies>
         </profile>
         <profile>
-            <id>bval-1.1.2</id>
+            <id>bval-1.1</id>
             <activation>
                 <property>
                     <name>validator</name>
-                    <value>bval-1.1.2</value>
+                    <value>bval-1.1</value>
                 </property>
             </activation>
             <properties>
