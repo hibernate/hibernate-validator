@@ -94,9 +94,8 @@ public class ConstraintValidatorManager {
 	 * @param validatedValueType the type of the value to be validated. Cannot be {@code null}.
 	 * @param descriptor the constraint descriptor for which to get an initialized constraint validator. Cannot be {@code null}
 	 * @param constraintValidatorFactory constraint factory used to instantiate the constraint validator. Cannot be {@code null}.
+	 * @param initializationContext context used on constraint validator initialization
 	 * @param <A> the annotation type
-	 * @param initializationContext {@link HibernateConstraintValidatorInitializationContext} to be used in
-	 * {@link HibernateConstraintValidator#initialize(ConstraintDescriptor, HibernateConstraintValidatorInitializationContext)}
 	 *
 	 * @return an initialized constraint validator for the given type and annotation of the value to be validated.
 	 * {@code null} is returned if no matching constraint validator could be found.
@@ -239,7 +238,7 @@ public class ConstraintValidatorManager {
 			HibernateConstraintValidatorInitializationContext initializationContext) {
 		try {
 			if ( constraintValidator instanceof HibernateConstraintValidator ) {
-				( (HibernateConstraintValidator) constraintValidator ).initialize( descriptor, initializationContext );
+				( (HibernateConstraintValidator<A, ?>) constraintValidator ).initialize( descriptor, initializationContext );
 			}
 			else {
 				constraintValidator.initialize( descriptor.getAnnotation() );

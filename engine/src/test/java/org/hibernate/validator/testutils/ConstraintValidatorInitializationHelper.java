@@ -26,7 +26,8 @@ public class ConstraintValidatorInitializationHelper {
 
 	private static final ConstraintHelper CONSTRAINT_HELPER = new ConstraintHelper();
 
-	private static final HibernateConstraintValidatorInitializationContext DUMMY_VALIDATOR_INIT_CONTEXT = new HibernateConstraintValidatorInitializationContext() {
+	private static final HibernateConstraintValidatorInitializationContext DUMMY_CONSTRAINT_VALIDATOR_INITIALIZATION_CONTEXT
+			= new HibernateConstraintValidatorInitializationContext() {
 
 		private ScriptEvaluatorFactory scriptEvaluatorFactory = new DefaultScriptEvaluatorFactory( null );
 
@@ -52,7 +53,7 @@ public class ConstraintValidatorInitializationHelper {
 			HibernateConstraintValidator<A, T> constraintValidator,
 			AnnotationDescriptor<A> annotationDescriptor
 	) {
-		initialize( constraintValidator, annotationDescriptor, getDummyValidatorInitContext() );
+		initialize( constraintValidator, annotationDescriptor, getDummyConstraintValidatorInitializationContext() );
 	}
 
 	public static <A extends Annotation, T> void initialize(
@@ -63,7 +64,7 @@ public class ConstraintValidatorInitializationHelper {
 		constraintValidator.initialize( descriptorFrom( annotationDescriptor ), initializationContext );
 	}
 
-	public static HibernateConstraintValidatorInitializationContext getDummyValidatorInitContext() {
-		return DUMMY_VALIDATOR_INIT_CONTEXT;
+	public static HibernateConstraintValidatorInitializationContext getDummyConstraintValidatorInitializationContext() {
+		return DUMMY_CONSTRAINT_VALIDATOR_INITIALIZATION_CONTEXT;
 	}
 }

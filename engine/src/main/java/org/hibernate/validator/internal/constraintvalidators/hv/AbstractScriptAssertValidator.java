@@ -29,9 +29,7 @@ public abstract class AbstractScriptAssertValidator<A extends Annotation, T> imp
 	protected String escapedScript;
 	protected ScriptAssertContext scriptAssertContext;
 
-	protected void initialize(
-			String languageName, String script,
-			HibernateConstraintValidatorInitializationContext initializationContext) {
+	protected void initialize(String languageName, String script, HibernateConstraintValidatorInitializationContext initializationContext) {
 		this.script = script;
 		this.languageName = languageName;
 		this.escapedScript = InterpolationHelper.escapeMessageParameter( script );

@@ -136,7 +136,7 @@ public class ValidationContext<T> {
 	private final boolean failFast;
 
 	/**
-	 * A reference to constraint initialization context stored in {@link ValidatorImpl}
+	 * The constraint validator initialization context.
 	 */
 	private final HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext;
 
