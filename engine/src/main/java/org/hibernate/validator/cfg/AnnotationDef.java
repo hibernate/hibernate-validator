@@ -101,7 +101,7 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 		return getThis();
 	}
 
-	protected AnnotationDescriptor<A> createAnnotationDescriptor() {
+	private AnnotationDescriptor<A> createAnnotationDescriptor() {
 		for ( Map.Entry<String, List<AnnotationDef<?, ?>>> annotationAsParameter : annotationsAsParameters.entrySet() ) {
 			annotationDescriptorBuilder.setAttribute(
 					annotationAsParameter.getKey(),

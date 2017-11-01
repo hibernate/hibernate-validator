@@ -816,4 +816,10 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = DEBUG)
 	@Message(id = 234, value = "Using %1$s as ValidatorFactory-scoped %2$s.")
 	void logValidatorFactoryScopedConfiguration(@FormatWith(ClassObjectFormatter.class) Class<?> configuredClass, String configuredElement);
+
+	@Message(id = 235, value = "Unable to create an annotation descriptor for %1$s.")
+	ValidationException getUnableToCreateAnnotationDescriptor(@FormatWith(ClassObjectFormatter.class) Class<?> configuredClass, @Cause Throwable e);
+
+	@Message(id = 236, value = "Unable to find the method required to create the constraint annotation descriptor.")
+	ValidationException getUnableToFindAnnotationDefDeclaredMethods(@Cause Exception e);
 }

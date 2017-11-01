@@ -254,7 +254,7 @@ public class ResourceBundleMessageInterpolatorTest {
 
 		MessageInterpolator.Context messageInterpolatorContext = createMessageInterpolatorContext( constraintDescriptor );
 
-		String actual = interpolator.interpolate( maxDescriptor.message(), messageInterpolatorContext );
+		String actual = interpolator.interpolate( maxDescriptor.getMessage(), messageInterpolatorContext );
 		assertEquals(
 				actual, message, "The message should not have changed."
 		);
