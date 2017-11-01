@@ -30,7 +30,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeHelper;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -280,12 +280,12 @@ public class ConstraintValidatorManager {
 	}
 
 	private static final class CacheKey {
-		private final AnnotationDescriptor<?> annotationDescriptor;
+		private final ConstraintAnnotationDescriptor<?> annotationDescriptor;
 		private final Type validatedType;
 		private final ConstraintValidatorFactory constraintValidatorFactory;
 		private final int hashCode;
 
-		private CacheKey(AnnotationDescriptor<?> annotationDescriptor, Type validatorType, ConstraintValidatorFactory constraintValidatorFactory) {
+		private CacheKey(ConstraintAnnotationDescriptor<?> annotationDescriptor, Type validatorType, ConstraintValidatorFactory constraintValidatorFactory) {
 			this.annotationDescriptor = annotationDescriptor;
 			this.validatedType = validatorType;
 			this.constraintValidatorFactory = constraintValidatorFactory;

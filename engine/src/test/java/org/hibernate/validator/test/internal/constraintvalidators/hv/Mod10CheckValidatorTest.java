@@ -23,9 +23,10 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.Mod10CheckDef;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValidator;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 /**
@@ -205,7 +206,7 @@ public class Mod10CheckValidatorTest {
 	}
 
 	private Mod10Check createMod10CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits, int multiplier, int weight) {
-		AnnotationDescriptor.Builder<Mod10Check> descriptorBuilder = new AnnotationDescriptor.Builder<>( Mod10Check.class );
+		ConstraintAnnotationDescriptor.Builder<Mod10Check> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Mod10Check.class );
 		descriptorBuilder.setAttribute( "startIndex", start );
 		descriptorBuilder.setAttribute( "endIndex", end );
 		descriptorBuilder.setAttribute( "checkDigitIndex", checkDigitIndex );

@@ -21,7 +21,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -34,7 +34,7 @@ public class MetaConstraintTest {
 	private TypeResolutionHelper typeResolutionHelper;
 	private ValueExtractorManager valueExtractorManager;
 	private Method barMethod;
-	private AnnotationDescriptor<NotNull> constraintAnnotationDescriptor;
+	private ConstraintAnnotationDescriptor<NotNull> constraintAnnotationDescriptor;
 
 	@BeforeClass
 	public void setUp() throws Exception {
@@ -42,7 +42,7 @@ public class MetaConstraintTest {
 		typeResolutionHelper = new TypeResolutionHelper();
 		valueExtractorManager = new ValueExtractorManager( Collections.emptySet() );
 		barMethod = Foo.class.getMethod( "getBar" );
-		constraintAnnotationDescriptor = new AnnotationDescriptor.Builder<>( barMethod.getAnnotation( NotNull.class ) ).build();
+		constraintAnnotationDescriptor = new ConstraintAnnotationDescriptor.Builder<>( barMethod.getAnnotation( NotNull.class ) ).build();
 	}
 
 	@Test

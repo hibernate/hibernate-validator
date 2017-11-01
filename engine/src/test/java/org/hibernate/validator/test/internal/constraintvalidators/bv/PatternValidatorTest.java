@@ -12,7 +12,7 @@ import static org.testng.Assert.assertTrue;
 import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.PatternValidator;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
@@ -24,9 +24,9 @@ public class PatternValidatorTest {
 
 	@Test
 	public void testIsValid() {
-		AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
+		ConstraintAnnotationDescriptor.Builder<Pattern> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", "foobar" );
-		descriptorBuilder.setAttribute( "message", "pattern does not match" );
+		descriptorBuilder.setMessage( "pattern does not match" );
 		Pattern p = descriptorBuilder.build().getAnnotation();
 
 		PatternValidator constraint = new PatternValidator();
@@ -41,7 +41,7 @@ public class PatternValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-502")
 	public void testIsValidForCharSequence() {
-		AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
+		ConstraintAnnotationDescriptor.Builder<Pattern> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", "char sequence" );
 		Pattern p = descriptorBuilder.build().getAnnotation();
 
@@ -53,9 +53,9 @@ public class PatternValidatorTest {
 
 	@Test
 	public void testIsValidForEmptyStringRegexp() {
-		AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
+		ConstraintAnnotationDescriptor.Builder<Pattern> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", "|^.*foo$" );
-		descriptorBuilder.setAttribute( "message", "pattern does not match" );
+		descriptorBuilder.setMessage( "pattern does not match" );
 		Pattern p = descriptorBuilder.build().getAnnotation();
 
 		PatternValidator constraint = new PatternValidator();
@@ -70,9 +70,9 @@ public class PatternValidatorTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testInvalidRegularExpression() {
-		AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
+		ConstraintAnnotationDescriptor.Builder<Pattern> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", "(unbalanced parentheses" );
-		descriptorBuilder.setAttribute( "message", "pattern does not match" );
+		descriptorBuilder.setMessage( "pattern does not match" );
 		Pattern p = descriptorBuilder.build().getAnnotation();
 
 		PatternValidator constraint = new PatternValidator();

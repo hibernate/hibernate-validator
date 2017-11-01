@@ -31,6 +31,7 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
@@ -50,10 +51,6 @@ class MetaConstraintBuilder {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final Pattern IS_ONLY_WHITESPACE = Pattern.compile( "\\s*" );
-
-	private static final String MESSAGE_PARAM = "message";
-	private static final String GROUPS_PARAM = "groups";
-	private static final String PAYLOAD_PARAM = "payload";
 
 	private final ClassLoadingHelper classLoadingHelper;
 	private final ConstraintHelper constraintHelper;
@@ -81,13 +78,13 @@ class MetaConstraintBuilder {
 		catch (ValidationException e) {
 			throw LOG.getUnableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
 		}
-		AnnotationDescriptor.Builder<A> annotationDescriptorBuilder = new AnnotationDescriptor.Builder<>( annotationClass );
+		ConstraintAnnotationDescriptor.Builder<A> annotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( annotationClass );
 
 		if ( constraint.getMessage() != null ) {
-			annotationDescriptorBuilder.setAttribute( MESSAGE_PARAM, constraint.getMessage() );
+			annotationDescriptorBuilder.setMessage( constraint.getMessage() );
 		}
-		annotationDescriptorBuilder.setAttribute( GROUPS_PARAM, getGroups( constraint.getGroups(), defaultPackage ) );
-		annotationDescriptorBuilder.setAttribute( PAYLOAD_PARAM, getPayload( constraint.getPayload(), defaultPackage ) );
+		annotationDescriptorBuilder.setGroups( getGroups( constraint.getGroups(), defaultPackage ) )
+				.setPayload( getPayload( constraint.getPayload(), defaultPackage ) );
 
 		for ( ElementType elementType : constraint.getElement() ) {
 			String name = elementType.getName();
@@ -97,7 +94,7 @@ class MetaConstraintBuilder {
 			annotationDescriptorBuilder.setAttribute( name, elementValue );
 		}
 
-		AnnotationDescriptor<A> annotationDescriptor;
+		ConstraintAnnotationDescriptor<A> annotationDescriptor;
 		try {
 			annotationDescriptor = annotationDescriptorBuilder.build();
 		}
@@ -126,8 +123,8 @@ class MetaConstraintBuilder {
 	}
 
 	private static void checkNameIsValid(String name) {
-		if ( MESSAGE_PARAM.equals( name ) || GROUPS_PARAM.equals( name ) ) {
-			throw LOG.getReservedParameterNamesException( MESSAGE_PARAM, GROUPS_PARAM, PAYLOAD_PARAM );
+		if ( ConstraintHelper.MESSAGE.equals( name ) || ConstraintHelper.GROUPS.equals( name ) ) {
+			throw LOG.getReservedParameterNamesException( ConstraintHelper.MESSAGE, ConstraintHelper.GROUPS, ConstraintHelper.PAYLOAD );
 		}
 	}
 

@@ -67,7 +67,7 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructors;
@@ -366,7 +366,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * executable.
 	 *
 	 * @param executable The executable of interest.
-	 * @param parameters The parameters of the executable.
 	 *
 	 * @return A list with parameter meta data for the given executable.
 	 */
@@ -554,7 +553,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return new ConstraintDescriptorImpl<>(
 				constraintHelper,
 				member,
-				new AnnotationDescriptor<>( annotation ),
+				new ConstraintAnnotationDescriptor<>( annotation ),
 				type
 		);
 	}

@@ -11,8 +11,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidator;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
+
 import org.testng.annotations.Test;
 
 /**
@@ -114,7 +115,7 @@ public class ModCheckValidatorTest {
 	}
 
 	private ModCheck createModCheckAnnotation(ModCheck.ModType modType, int multiplier, int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {
-		AnnotationDescriptor.Builder<ModCheck> descriptorBuilder = new AnnotationDescriptor.Builder<>( ModCheck.class );
+		ConstraintAnnotationDescriptor.Builder<ModCheck> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( ModCheck.class );
 		descriptorBuilder.setAttribute( "modType", modType );
 		descriptorBuilder.setAttribute( "multiplier", multiplier );
 		descriptorBuilder.setAttribute( "startIndex", start );

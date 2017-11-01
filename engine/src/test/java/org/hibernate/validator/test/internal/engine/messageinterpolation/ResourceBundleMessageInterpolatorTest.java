@@ -27,10 +27,11 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -48,16 +49,16 @@ public class ResourceBundleMessageInterpolatorTest {
 	@BeforeTest
 	public void setUp() {
 		// Create some annotations for testing using AnnotationProxies
-		AnnotationDescriptor.Builder<NotNull> descriptorBuilder = new AnnotationDescriptor.Builder<>( NotNull.class );
-		notNullDescriptor = new ConstraintDescriptorImpl<NotNull>(
+		ConstraintAnnotationDescriptor.Builder<NotNull> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( NotNull.class );
+		notNullDescriptor = new ConstraintDescriptorImpl<>(
 				new ConstraintHelper(),
 				null,
 				descriptorBuilder.build(),
 				java.lang.annotation.ElementType.FIELD
 		);
 
-		AnnotationDescriptor.Builder<Size> sizeAnnotationDescriptorBuilder = new AnnotationDescriptor.Builder<Size>( Size.class );
-		sizeDescriptor = new ConstraintDescriptorImpl<Size>(
+		ConstraintAnnotationDescriptor.Builder<Size> sizeAnnotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<Size>( Size.class );
+		sizeDescriptor = new ConstraintDescriptorImpl<>(
 				new ConstraintHelper(),
 				null,
 				sizeAnnotationDescriptorBuilder.build(),
@@ -205,11 +206,11 @@ public class ResourceBundleMessageInterpolatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-102")
 	public void testRecursiveMessageInterpolation() {
-		AnnotationDescriptor.Builder<Max> descriptorBuilder = new AnnotationDescriptor.Builder<>( Max.class );
-		descriptorBuilder.setAttribute( "message", "{replace.in.user.bundle1}" );
+		ConstraintAnnotationDescriptor.Builder<Max> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Max.class );
+		descriptorBuilder.setMessage( "{replace.in.user.bundle1}" );
 		descriptorBuilder.setAttribute( "value", 10L );
 
-		AnnotationDescriptor<Max> descriptor = descriptorBuilder.build();
+		ConstraintAnnotationDescriptor<Max> descriptor = descriptorBuilder.build();
 
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
 				new ConstraintHelper(),
@@ -233,12 +234,12 @@ public class ResourceBundleMessageInterpolatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-182")
 	public void testCorrectMessageInterpolationIfParameterCannotBeReplaced() {
-		AnnotationDescriptor.Builder<Max> descriptorBuilder = new AnnotationDescriptor.Builder<>( Max.class );
+		ConstraintAnnotationDescriptor.Builder<Max> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Max.class );
 		String message = "Message should stay unchanged since {fubar} is not replaceable";
-		descriptorBuilder.setAttribute( "message", message );
+		descriptorBuilder.setMessage( message );
 		descriptorBuilder.setAttribute( "value", 10L );
 
-		AnnotationDescriptor<Max> maxDescriptor = descriptorBuilder.build();
+		ConstraintAnnotationDescriptor<Max> maxDescriptor = descriptorBuilder.build();
 
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
 				new ConstraintHelper(),
@@ -253,7 +254,7 @@ public class ResourceBundleMessageInterpolatorTest {
 
 		MessageInterpolator.Context messageInterpolatorContext = createMessageInterpolatorContext( constraintDescriptor );
 
-		String actual = interpolator.interpolate( maxDescriptor.getAnnotation().message(), messageInterpolatorContext );
+		String actual = interpolator.interpolate( maxDescriptor.message(), messageInterpolatorContext );
 		assertEquals(
 				actual, message, "The message should not have changed."
 		);

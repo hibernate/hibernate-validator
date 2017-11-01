@@ -26,7 +26,8 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.CurrencyDef;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.CurrencyValidatorForMonetaryAmount;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+
 import org.javamoney.moneta.Money;
 import org.testng.annotations.Test;
 
@@ -88,7 +89,7 @@ public class CurrencyValidatorForMonetaryAmountTest {
 	}
 
 	private Currency currency(String... acceptedCurrencies) {
-		AnnotationDescriptor.Builder<Currency> descriptorBuilder = new AnnotationDescriptor.Builder<>( Currency.class );
+		ConstraintAnnotationDescriptor.Builder<Currency> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Currency.class );
 		descriptorBuilder.setAttribute( "value", acceptedCurrencies );
 		return descriptorBuilder.build().getAnnotation();
 	}

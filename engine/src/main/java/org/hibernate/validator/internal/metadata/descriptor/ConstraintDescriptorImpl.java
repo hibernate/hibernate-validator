@@ -51,7 +51,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttributes;
@@ -90,7 +90,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	/**
 	 * The annotation descriptor - accessing the annotation information has a cost so we do it only once.
 	 */
-	private final AnnotationDescriptor<T> annotationDescriptor;
+	private final ConstraintAnnotationDescriptor<T> annotationDescriptor;
 
 	/**
 	 * The set of classes implementing the validation for this constraint. See also
@@ -165,7 +165,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	public ConstraintDescriptorImpl(ConstraintHelper constraintHelper,
 			Member member,
-			AnnotationDescriptor<T> annotationDescriptor,
+			ConstraintAnnotationDescriptor<T> annotationDescriptor,
 			ElementType type,
 			Class<?> implicitGroup,
 			ConstraintOrigin definedOn,
@@ -228,20 +228,20 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	public ConstraintDescriptorImpl(ConstraintHelper constraintHelper,
 			Member member,
-			AnnotationDescriptor<T> annotationDescriptor,
+			ConstraintAnnotationDescriptor<T> annotationDescriptor,
 			ElementType type) {
 		this( constraintHelper, member, annotationDescriptor, type, null, ConstraintOrigin.DEFINED_LOCALLY, null );
 	}
 
 	public ConstraintDescriptorImpl(ConstraintHelper constraintHelper,
 			Member member,
-			AnnotationDescriptor<T> annotationDescriptor,
+			ConstraintAnnotationDescriptor<T> annotationDescriptor,
 			ElementType type,
 			ConstraintType constraintType) {
 		this( constraintHelper, member, annotationDescriptor, type, null, ConstraintOrigin.DEFINED_LOCALLY, constraintType );
 	}
 
-	public AnnotationDescriptor<T> getAnnotationDescriptor() {
+	public ConstraintAnnotationDescriptor<T> getAnnotationDescriptor() {
 		return annotationDescriptor;
 	}
 
@@ -256,7 +256,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@Override
 	public String getMessageTemplate() {
-		return (String) getAttributes().get( ConstraintHelper.MESSAGE );
+		return annotationDescriptor.getMessage();
 	}
 
 	@Override
@@ -494,8 +494,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return ValidateUnwrappedValue.DEFAULT;
 	}
 
-	private static ConstraintTarget determineValidationAppliesTo(AnnotationDescriptor<?> annotationDescriptor) {
-		return annotationDescriptor.getAttribute( ConstraintHelper.VALIDATION_APPLIES_TO, ConstraintTarget.class );
+	private static ConstraintTarget determineValidationAppliesTo(ConstraintAnnotationDescriptor<?> annotationDescriptor) {
+		return annotationDescriptor.validationAppliesTo();
 	}
 
 	private void validateCrossParameterConstraintType(Member member, boolean hasCrossParameterValidator) {
@@ -567,10 +567,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Set<Class<? extends Payload>> buildPayloadSet(AnnotationDescriptor<?> annotationDescriptor) {
+	private static Set<Class<? extends Payload>> buildPayloadSet(ConstraintAnnotationDescriptor<?> annotationDescriptor) {
 		Set<Class<? extends Payload>> payloadSet = newHashSet();
 
-		Class<Payload>[] payloadFromAnnotation = annotationDescriptor.getAttribute( ConstraintHelper.PAYLOAD, Class[].class );
+		Class<? extends Payload>[] payloadFromAnnotation = annotationDescriptor.getPayload();
 
 		if ( payloadFromAnnotation != null ) {
 			payloadSet.addAll( Arrays.asList( payloadFromAnnotation ) );
@@ -578,9 +578,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return CollectionHelper.toImmutableSet( payloadSet );
 	}
 
-	private static Set<Class<?>> buildGroupSet(AnnotationDescriptor<?> annotationDescriptor, Class<?> implicitGroup) {
+	private static Set<Class<?>> buildGroupSet(ConstraintAnnotationDescriptor<?> annotationDescriptor, Class<?> implicitGroup) {
 		Set<Class<?>> groupSet = newHashSet();
-		final Class<?>[] groupsFromAnnotation = annotationDescriptor.getMandatoryAttribute( ConstraintHelper.GROUPS, Class[].class );
+		final Class<?>[] groupsFromAnnotation = annotationDescriptor.getGroups();
 		if ( groupsFromAnnotation.length == 0 ) {
 			groupSet.add( Default.class );
 		}
@@ -737,7 +737,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		final Class<U> annotationType = (Class<U>) constraintAnnotation.annotationType();
 
 		// use a annotation proxy
-		AnnotationDescriptor.Builder<U> annotationDescriptorBuilder = new AnnotationDescriptor.Builder<>(
+		ConstraintAnnotationDescriptor.Builder<U> annotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>(
 				annotationType, run( GetAnnotationAttributes.action( constraintAnnotation ) )
 		);
 
@@ -754,8 +754,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 
 		//propagate inherited attributes to composing constraints
-		annotationDescriptorBuilder.setAttribute( ConstraintHelper.GROUPS, groups.toArray( new Class<?>[groups.size()] ) );
-		annotationDescriptorBuilder.setAttribute( ConstraintHelper.PAYLOAD, payloads.toArray( new Class<?>[payloads.size()] ) );
+		annotationDescriptorBuilder.setGroups( groups.toArray( new Class<?>[groups.size()] ) );
+		annotationDescriptorBuilder.setPayload( payloads.toArray( new Class<?>[payloads.size()] ) );
 		if ( annotationDescriptorBuilder.hasAttribute( ConstraintHelper.VALIDATION_APPLIES_TO ) ) {
 			ConstraintTarget validationAppliesTo = getValidationAppliesTo();
 

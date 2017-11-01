@@ -12,10 +12,11 @@ import static org.testng.Assert.assertTrue;
 import javax.validation.constraints.Digits;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForCharSequence;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -24,23 +25,27 @@ import org.testng.annotations.Test;
 public class DigitsValidatorForCharSequenceTest {
 
 	private static DigitsValidatorForCharSequence constraint;
+	private ConstraintAnnotationDescriptor.Builder<Digits> descriptorBuilder;
 
 	@BeforeClass
 	public static void init() {
-
-		AnnotationDescriptor.Builder<Digits> descriptorBuilder = new AnnotationDescriptor.Builder<>( Digits.class );
+		ConstraintAnnotationDescriptor.Builder<Digits> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Digits.class );
 		descriptorBuilder.setAttribute( "integer", 5 );
 		descriptorBuilder.setAttribute( "fraction", 2 );
-		descriptorBuilder.setAttribute( "message", "{validator.digits}" );
+		descriptorBuilder.setMessage( "{validator.digits}" );
 		Digits p = descriptorBuilder.build().getAnnotation();
 
 		constraint = new DigitsValidatorForCharSequence();
 		constraint.initialize( p );
 	}
 
+	@BeforeMethod
+	public void setUp() throws Exception {
+		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Digits.class );
+	}
+
 	@Test
 	public void testIsValid() {
-
 		assertTrue( constraint.isValid( null, null ) );
 		assertTrue( constraint.isValid( "0", null ) );
 		assertTrue( constraint.isValid( "500.2", null ) );
@@ -54,11 +59,8 @@ public class DigitsValidatorForCharSequenceTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNegativeIntegerLength() {
-
-		AnnotationDescriptor.Builder<Digits> descriptorBuilder = new AnnotationDescriptor.Builder<>( Digits.class );
 		descriptorBuilder.setAttribute( "integer", -1 );
 		descriptorBuilder.setAttribute( "fraction", 1 );
-		descriptorBuilder.setAttribute( "message", "{validator.digits}" );
 		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForCharSequence constraint = new DigitsValidatorForCharSequence();
@@ -67,11 +69,8 @@ public class DigitsValidatorForCharSequenceTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNegativeFractionLength() {
-
-		AnnotationDescriptor.Builder<Digits> descriptorBuilder = new AnnotationDescriptor.Builder<>( Digits.class );
 		descriptorBuilder.setAttribute( "integer", 1 );
 		descriptorBuilder.setAttribute( "fraction", -1 );
-		descriptorBuilder.setAttribute( "message", "{validator.digits}" );
 		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForCharSequence constraint = new DigitsValidatorForCharSequence();

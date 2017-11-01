@@ -18,7 +18,7 @@ import java.lang.reflect.TypeVariable;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
 /**
  * Represents a programmatically configured constraint and meta-data
@@ -93,7 +93,7 @@ class ConfiguredConstraint<A extends Annotation> {
 		return location;
 	}
 
-	public AnnotationDescriptor<A> createAnnotationDescriptor() {
+	public ConstraintAnnotationDescriptor<A> createAnnotationDescriptor() {
 		return constraint.createAnnotationDescriptor();
 	}
 
@@ -113,7 +113,7 @@ class ConfiguredConstraint<A extends Annotation> {
 		}
 
 		@Override
-		protected AnnotationDescriptor<A> createAnnotationDescriptor() {
+		protected ConstraintAnnotationDescriptor<A> createAnnotationDescriptor() {
 			return super.createAnnotationDescriptor();
 		}
 	}

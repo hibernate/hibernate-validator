@@ -22,6 +22,7 @@ import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
 import org.hibernate.validator.internal.constraintvalidators.hv.SafeHtmlValidator;
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -35,11 +36,11 @@ import org.testng.annotations.Test;
  */
 public class SafeHtmlValidatorTest {
 
-	private AnnotationDescriptor.Builder<SafeHtml> descriptorBuilder;
+	private ConstraintAnnotationDescriptor.Builder<SafeHtml> descriptorBuilder;
 
 	@BeforeMethod
 	public void setUp() {
-		descriptorBuilder = new AnnotationDescriptor.Builder<>( SafeHtml.class );
+		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( SafeHtml.class );
 	}
 
 	@Test

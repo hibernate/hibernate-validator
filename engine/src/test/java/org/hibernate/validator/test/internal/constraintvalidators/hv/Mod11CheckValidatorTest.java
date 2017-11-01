@@ -24,9 +24,10 @@ import org.hibernate.validator.cfg.defs.Mod11CheckDef;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Mod11Check.ProcessingDirection;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 /**
@@ -292,7 +293,7 @@ public class Mod11CheckValidatorTest {
 			char treatCheck10As,
 			char treatCheck11As,
 			ProcessingDirection processingDirection) {
-		AnnotationDescriptor.Builder<Mod11Check> descriptorBuilder = new AnnotationDescriptor.Builder<>( Mod11Check.class );
+		ConstraintAnnotationDescriptor.Builder<Mod11Check> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Mod11Check.class );
 		descriptorBuilder.setAttribute( "startIndex", start );
 		descriptorBuilder.setAttribute( "endIndex", end );
 		descriptorBuilder.setAttribute( "checkDigitIndex", checkDigitIndex );

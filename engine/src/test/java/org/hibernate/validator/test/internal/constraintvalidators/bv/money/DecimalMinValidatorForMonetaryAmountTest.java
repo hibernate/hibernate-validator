@@ -14,7 +14,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.constraints.DecimalMin;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMinValidatorForMonetaryAmount;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+
 import org.javamoney.moneta.Money;
 import org.testng.annotations.Test;
 
@@ -69,7 +70,7 @@ public class DecimalMinValidatorForMonetaryAmountTest {
 	}
 
 	private DecimalMin decimalMin(final String value, final boolean inclusive) {
-		AnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMin.class );
+		ConstraintAnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( DecimalMin.class );
 		descriptorBuilder.setAttribute( "value", value );
 		descriptorBuilder.setAttribute( "inclusive", inclusive );
 		return descriptorBuilder.build().getAnnotation();

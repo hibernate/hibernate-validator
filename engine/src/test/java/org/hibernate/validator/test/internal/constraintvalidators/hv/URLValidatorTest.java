@@ -32,7 +32,7 @@ import org.hibernate.validator.cfg.defs.URLDef;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraintvalidators.RegexpURLValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
@@ -50,11 +50,11 @@ public class URLValidatorTest {
 	private URLValidator urlValidator;
 	private RegexpURLValidator regexpURLValidator;
 
-	private AnnotationDescriptor.Builder<URL> descriptorBuilder;
+	private ConstraintAnnotationDescriptor.Builder<URL> descriptorBuilder;
 
 	@BeforeMethod
 	public void setUp() {
-		descriptorBuilder = new AnnotationDescriptor.Builder<URL>( URL.class );
+		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<URL>( URL.class );
 		urlValidator = new URLValidator();
 		regexpURLValidator = new RegexpURLValidator();
 	}

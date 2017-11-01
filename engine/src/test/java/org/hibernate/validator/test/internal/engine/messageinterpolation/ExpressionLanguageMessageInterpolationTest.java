@@ -18,9 +18,10 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -38,16 +39,16 @@ public class ExpressionLanguageMessageInterpolationTest {
 	@BeforeTest
 	public void setUp() {
 		// Create some annotations for testing using AnnotationProxies
-		AnnotationDescriptor.Builder<NotNull> notNullAnnotationDescriptorBuilder = new AnnotationDescriptor.Builder<>( NotNull.class );
-		notNullDescriptor = new ConstraintDescriptorImpl<NotNull>(
+		ConstraintAnnotationDescriptor.Builder<NotNull> notNullAnnotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( NotNull.class );
+		notNullDescriptor = new ConstraintDescriptorImpl<>(
 				new ConstraintHelper(),
 				null,
 				notNullAnnotationDescriptorBuilder.build(),
 				java.lang.annotation.ElementType.FIELD
 		);
 
-		AnnotationDescriptor.Builder<Size> sizeAnnotationDescriptorBuilder = new AnnotationDescriptor.Builder<>( Size.class );
-		sizeDescriptor = new ConstraintDescriptorImpl<Size>(
+		ConstraintAnnotationDescriptor.Builder<Size> sizeAnnotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Size.class );
+		sizeDescriptor = new ConstraintDescriptorImpl<>(
 				new ConstraintHelper(),
 				null,
 				sizeAnnotationDescriptorBuilder.build(),

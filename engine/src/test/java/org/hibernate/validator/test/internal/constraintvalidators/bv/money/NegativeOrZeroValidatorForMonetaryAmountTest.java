@@ -14,7 +14,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.constraints.NegativeOrZero;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.money.NegativeOrZeroValidatorForMonetaryAmount;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.javamoney.moneta.Money;
 import org.testng.annotations.Test;
 
@@ -55,7 +55,7 @@ public class NegativeOrZeroValidatorForMonetaryAmountTest {
 	}
 
 	private NegativeOrZero negativeOrZero() {
-		AnnotationDescriptor.Builder<NegativeOrZero> descriptorBuilder = new AnnotationDescriptor.Builder<>( NegativeOrZero.class );
+		ConstraintAnnotationDescriptor.Builder<NegativeOrZero> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( NegativeOrZero.class );
 		return descriptorBuilder.build().getAnnotation();
 	}
 

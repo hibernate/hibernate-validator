@@ -14,7 +14,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.constraints.Min;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MinValidatorForMonetaryAmount;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+
 import org.javamoney.moneta.Money;
 import org.testng.annotations.Test;
 
@@ -55,7 +56,7 @@ public class MinValidatorForMonetaryAmountTest {
 	}
 
 	private Min min(final long value) {
-		AnnotationDescriptor.Builder<Min> descriptorBuilder = new AnnotationDescriptor.Builder<>( Min.class );
+		ConstraintAnnotationDescriptor.Builder<Min> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Min.class );
 		descriptorBuilder.setAttribute( "value", value );
 		return descriptorBuilder.build().getAnnotation();
 	}

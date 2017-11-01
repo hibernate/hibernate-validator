@@ -15,7 +15,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -40,7 +40,7 @@ public class ConstraintValidatorInitializationHelper {
 	private ConstraintValidatorInitializationHelper() {
 	}
 
-	public static <T extends Annotation> ConstraintDescriptor<T> descriptorFrom(AnnotationDescriptor<T> annotationDescriptor) {
+	public static <T extends Annotation> ConstraintDescriptor<T> descriptorFrom(ConstraintAnnotationDescriptor<T> annotationDescriptor) {
 		return new ConstraintDescriptorImpl<>(
 				CONSTRAINT_HELPER,
 				null,
@@ -51,14 +51,14 @@ public class ConstraintValidatorInitializationHelper {
 
 	public static <A extends Annotation, T> void initialize(
 			HibernateConstraintValidator<A, T> constraintValidator,
-			AnnotationDescriptor<A> annotationDescriptor
+			ConstraintAnnotationDescriptor<A> annotationDescriptor
 	) {
 		initialize( constraintValidator, annotationDescriptor, getDummyConstraintValidatorInitializationContext() );
 	}
 
 	public static <A extends Annotation, T> void initialize(
 			HibernateConstraintValidator<A, T> constraintValidator,
-			AnnotationDescriptor<A> annotationDescriptor,
+			ConstraintAnnotationDescriptor<A> annotationDescriptor,
 			HibernateConstraintValidatorInitializationContext initializationContext
 	) {
 		constraintValidator.initialize( descriptorFrom( annotationDescriptor ), initializationContext );

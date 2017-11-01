@@ -14,7 +14,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.constraints.DecimalMax;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMaxValidatorForMonetaryAmount;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+
 import org.javamoney.moneta.Money;
 import org.testng.annotations.Test;
 
@@ -69,7 +70,7 @@ public class DecimalMaxValidatorForMonetaryAmountTest {
 	}
 
 	private DecimalMax decimalMax(final String value, final boolean inclusive) {
-		AnnotationDescriptor.Builder<DecimalMax> descriptorBuilder = new AnnotationDescriptor.Builder<>( DecimalMax.class );
+		ConstraintAnnotationDescriptor.Builder<DecimalMax> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( DecimalMax.class );
 		descriptorBuilder.setAttribute( "value", value );
 		descriptorBuilder.setAttribute( "inclusive", inclusive );
 		return descriptorBuilder.build().getAnnotation();

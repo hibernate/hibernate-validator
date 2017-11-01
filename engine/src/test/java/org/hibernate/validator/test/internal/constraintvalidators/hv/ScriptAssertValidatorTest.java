@@ -26,10 +26,11 @@ import javax.validation.Validator;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.Test;
 
 /**
@@ -219,8 +220,8 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 	 *
 	 * @return a {@link ScriptAssert} initialized with the given values.
 	 */
-	private AnnotationDescriptor<ScriptAssert> getScriptAssert(String lang, String script, String alias, String reportOn) {
-		AnnotationDescriptor.Builder<ScriptAssert> descriptorBuilder = new AnnotationDescriptor.Builder<>( ScriptAssert.class );
+	private ConstraintAnnotationDescriptor<ScriptAssert> getScriptAssert(String lang, String script, String alias, String reportOn) {
+		ConstraintAnnotationDescriptor.Builder<ScriptAssert> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( ScriptAssert.class );
 
 		descriptorBuilder.setAttribute( "lang", lang );
 		descriptorBuilder.setAttribute( "script", script );

@@ -14,7 +14,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.constraints.Max;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MaxValidatorForMonetaryAmount;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+
 import org.javamoney.moneta.Money;
 import org.testng.annotations.Test;
 
@@ -55,7 +56,7 @@ public class MaxValidatorForMonetaryAmountTest {
 	}
 
 	private Max max(final long value) {
-		AnnotationDescriptor.Builder<Max> descriptorBuilder = new AnnotationDescriptor.Builder<>( Max.class );
+		ConstraintAnnotationDescriptor.Builder<Max> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Max.class );
 		descriptorBuilder.setAttribute( "value", value );
 		return descriptorBuilder.build().getAnnotation();
 	}

@@ -11,8 +11,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
+
 import org.testng.annotations.Test;
 
 /**
@@ -106,7 +107,7 @@ public class LuhnCheckValidatorTest {
 	}
 
 	private LuhnCheck createLuhnCheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {
-		AnnotationDescriptor.Builder<LuhnCheck> descriptorBuilder = new AnnotationDescriptor.Builder<>( LuhnCheck.class );
+		ConstraintAnnotationDescriptor.Builder<LuhnCheck> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( LuhnCheck.class );
 		descriptorBuilder.setAttribute( "startIndex", start );
 		descriptorBuilder.setAttribute( "endIndex", end );
 		descriptorBuilder.setAttribute( "checkDigitIndex", checkDigitIndex );
