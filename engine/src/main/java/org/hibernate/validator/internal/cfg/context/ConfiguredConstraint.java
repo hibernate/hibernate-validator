@@ -8,6 +8,8 @@ package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -17,12 +19,17 @@ import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import org.hibernate.validator.HibernateValidatorPermission;
+import javax.validation.ValidationException;
+
+import org.hibernate.validator.cfg.AnnotationDef;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
-import org.hibernate.validator.internal.util.privilegedactions.CreateConstraintAnnotationDescriptor;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethodHandle;
 
 /**
  * Represents a programmatically configured constraint and meta-data
@@ -31,6 +38,11 @@ import org.hibernate.validator.internal.util.privilegedactions.CreateConstraintA
  * @author Gunnar Morling
  */
 class ConfiguredConstraint<A extends Annotation> {
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+
+	private static final MethodHandle CREATE_ANNOTATION_DESCRIPTOR_METHOD_HANDLE =
+			run( GetDeclaredMethodHandle.andMakeAccessible( MethodHandles.lookup(), AnnotationDef.class, "createAnnotationDescriptor" ) );
 
 	private final ConstraintDef<?, A> constraint;
 	private final ConstraintLocation location;
@@ -98,11 +110,16 @@ class ConfiguredConstraint<A extends Annotation> {
 	}
 
 	public ConstraintAnnotationDescriptor<A> createAnnotationDescriptor() {
-		SecurityManager sm = System.getSecurityManager();
-		if ( sm != null ) {
-			sm.checkPermission( HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS );
+		try {
+			AnnotationDescriptor<A> annotationDescriptor = (AnnotationDescriptor<A>) CREATE_ANNOTATION_DESCRIPTOR_METHOD_HANDLE.invoke( constraint );
+			return new ConstraintAnnotationDescriptor<>( annotationDescriptor );
 		}
-		return run( CreateConstraintAnnotationDescriptor.action( constraint ) );
+		catch (Throwable e) {
+			if ( e instanceof ValidationException ) {
+				throw (ValidationException) e;
+			}
+			throw LOG.getUnableToCreateAnnotationDescriptor( constraint.getClass(), e );
+		}
 	}
 
 	@Override

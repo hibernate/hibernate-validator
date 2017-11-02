@@ -12,6 +12,7 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
@@ -50,6 +51,7 @@ import org.hibernate.validator.internal.util.logging.formatter.ClassObjectFormat
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfObjectsToStringFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatter;
+import org.hibernate.validator.internal.util.logging.formatter.ObjectArrayFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
 import org.hibernate.validator.internal.xml.ContainerElementTypePath;
 import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
@@ -822,4 +824,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 236, value = "Unable to find the method required to create the constraint annotation descriptor.")
 	ValidationException getUnableToFindAnnotationDefDeclaredMethods(@Cause Exception e);
+
+	@Message(id = 237, value = "Unable to access method %3$s of class %2$s with parameters %4$s using lookup %1$s.")
+	ValidationException getUnableToAccessMethodException(Lookup lookup, @FormatWith(ClassObjectFormatter.class) Class<?> clazz, String methodName,
+			@FormatWith(ObjectArrayFormatter.class) Object[] parameterTypes, @Cause Throwable e);
 }
