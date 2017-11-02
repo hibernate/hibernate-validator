@@ -35,11 +35,12 @@ public class ConstraintAnnotationDescriptor<A extends Annotation> extends Annota
 		return getMandatoryAttribute( ConstraintHelper.GROUPS, Class[].class );
 	}
 
+	@SuppressWarnings("unchecked")
 	public Class<? extends Payload>[] getPayload() {
 		return getMandatoryAttribute( ConstraintHelper.PAYLOAD, Class[].class );
 	}
 
-	public ConstraintTarget validationAppliesTo() {
+	public ConstraintTarget getValidationAppliesTo() {
 		return getAttribute( ConstraintHelper.VALIDATION_APPLIES_TO, ConstraintTarget.class );
 	}
 
@@ -57,18 +58,23 @@ public class ConstraintAnnotationDescriptor<A extends Annotation> extends Annota
 			super( annotation );
 		}
 
-		public Builder setMessage(String message) {
+		public Builder<S> setMessage(String message) {
 			setAttribute( ConstraintHelper.MESSAGE, message );
 			return this;
 		}
 
-		public Builder setGroups(Class<?>[] groups) {
+		public Builder<S> setGroups(Class<?>[] groups) {
 			setAttribute( ConstraintHelper.GROUPS, groups );
 			return this;
 		}
 
-		public Builder setPayload(Class<?>[] payload) {
+		public Builder<S> setPayload(Class<?>[] payload) {
 			setAttribute( ConstraintHelper.PAYLOAD, payload );
+			return this;
+		}
+
+		public Builder<S> setValidationAppliesTo(ConstraintTarget validationAppliesTo) {
+			setAttribute( ConstraintHelper.VALIDATION_APPLIES_TO, validationAppliesTo );
 			return this;
 		}
 

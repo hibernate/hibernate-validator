@@ -495,7 +495,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private static ConstraintTarget determineValidationAppliesTo(ConstraintAnnotationDescriptor<?> annotationDescriptor) {
-		return annotationDescriptor.validationAppliesTo();
+		return annotationDescriptor.getValidationAppliesTo();
 	}
 
 	private void validateCrossParameterConstraintType(Member member, boolean hasCrossParameterValidator) {
