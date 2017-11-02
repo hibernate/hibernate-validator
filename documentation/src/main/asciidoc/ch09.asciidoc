@@ -287,7 +287,7 @@ to learn more about this specific implementation.
 ====
 
 [[section-clock-provider]]
-==== `ClockProvider`
+==== `ClockProvider` and temporal validation tolerance
 
 For time related validation (`@Past` and `@Future` constraints for instance), it might be useful to define what is
 considered `now`.
@@ -324,6 +324,35 @@ You can obtain the `ClockProvider` in your validators by calling the
 
 For instance, this might be useful if you want to replace the default message of the `@Future`
 constraint with a more explicit one.
+====
+
+When dealing with distributed architectures, you might need some tolerance when applying temporal constraints
+such as `@Past` or `@Future`.
+
+You can set a temporal validation tolerance by bootstrapping your `ValidatorFactory` as below:
+
+[[example-using-temporal-validation-tolerance]]
+.Using temporal validation tolerance
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=temporalValidationTolerance]
+----
+====
+
+Alternatively, you can define it in the XML configuration by setting the `hibernate.validator.temporal_validation_tolerance` property
+in your _META-INF/validation.xml_.
+
+The value of this property must be a `long` defining the tolerance in milliseconds.
+
+[NOTE]
+====
+When implementing your own temporal constraints, you might need to have access to the temporal validation tolerance.
+
+It can be obtained by calling the `HibernateConstraintValidatorInitializationContext#getTemporalValidationTolerance()` method.
+
+Note that to get access to this context at initialization, your constraint validator has to implement the `HibernateConstraintValidator` contract.
+This contract is currently marked as incubating: it might be subject to change in the future.
 ====
 
 [[section-bootstrapping-valueextractors]]

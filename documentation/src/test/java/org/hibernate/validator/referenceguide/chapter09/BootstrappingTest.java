@@ -1,6 +1,7 @@
 package org.hibernate.validator.referenceguide.chapter09;
 
 import java.io.InputStream;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -106,6 +107,18 @@ public class BootstrappingTest {
 				.buildValidatorFactory();
 		Validator validator = validatorFactory.getValidator();
 		//end::clockProvider[]
+	}
+
+	@Test
+	@SuppressWarnings("unused")
+	public void temporalValidationTolerance() {
+		//tag::temporalValidationTolerance[]
+		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.temporalValidationTolerance( Duration.ofMillis( 10 ) )
+				.buildValidatorFactory();
+		Validator validator = validatorFactory.getValidator();
+		//end::temporalValidationTolerance[]
 	}
 
 	@Test
