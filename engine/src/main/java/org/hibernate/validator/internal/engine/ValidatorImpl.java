@@ -559,14 +559,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		boolean success = true;
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
-			Object valueToValidate = null;
 
 			if ( parent != null ) {
-				valueToValidate = valueContext.getValue( parent, metaConstraint.getLocation() );
-				valueContext.setCurrentValidatedValue( valueToValidate );
-			}
-			else {
-				valueToValidate = valueContext.getCurrentValidatedValue();
+				valueContext.setCurrentValidatedValue( valueContext.getValue( parent, metaConstraint.getLocation() ) );
 			}
 
 			success = metaConstraint.validateConstraint( validationContext, valueContext );

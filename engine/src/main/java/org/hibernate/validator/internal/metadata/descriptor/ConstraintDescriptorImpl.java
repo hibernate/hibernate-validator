@@ -797,7 +797,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	/**
 	 * A wrapper class to keep track for which composing constraints (class and index) a given attribute override applies to.
 	 */
-	private class ClassIndexWrapper {
+	private static class ClassIndexWrapper {
 		final Class<?> clazz;
 		final int index;
 

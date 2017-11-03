@@ -88,6 +88,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
+	private static final Annotation[] EMPTY_PARAMETER_ANNOTATIONS = new Annotation[0];
+
 	private final ConstraintHelper constraintHelper;
 	private final TypeResolutionHelper typeResolutionHelper;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
@@ -386,7 +388,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			}
 			catch (ArrayIndexOutOfBoundsException ex) {
 				LOG.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
-				parameterAnnotations = new Annotation[0];
+				parameterAnnotations = EMPTY_PARAMETER_ANNOTATIONS;
 			}
 
 			Set<MetaConstraint<?>> parameterConstraints = newHashSet();

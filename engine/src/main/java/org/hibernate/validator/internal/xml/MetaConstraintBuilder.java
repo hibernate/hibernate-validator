@@ -51,6 +51,7 @@ class MetaConstraintBuilder {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final Pattern IS_ONLY_WHITESPACE = Pattern.compile( "\\s*" );
+	private static final Class[] EMPTY_CLASSES_ARRAY = new Class[0];
 
 	private final ClassLoadingHelper classLoadingHelper;
 	private final ConstraintHelper constraintHelper;
@@ -285,7 +286,7 @@ class MetaConstraintBuilder {
 
 	private Class<?>[] getGroups(GroupsType groupsType, String defaultPackage) {
 		if ( groupsType == null ) {
-			return new Class[] { };
+			return EMPTY_CLASSES_ARRAY;
 		}
 
 		List<Class<?>> groupList = newArrayList();
@@ -298,7 +299,7 @@ class MetaConstraintBuilder {
 	@SuppressWarnings("unchecked")
 	private Class<? extends Payload>[] getPayload(PayloadType payloadType, String defaultPackage) {
 		if ( payloadType == null ) {
-			return new Class[] { };
+			return EMPTY_CLASSES_ARRAY;
 		}
 
 		List<Class<? extends Payload>> payloadList = newArrayList();

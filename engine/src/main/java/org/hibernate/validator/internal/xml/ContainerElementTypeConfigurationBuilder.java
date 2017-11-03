@@ -164,7 +164,7 @@ class ContainerElementTypeConfigurationBuilder {
 		return containerElementType;
 	}
 
-	class ContainerElementTypeConfiguration {
+	static class ContainerElementTypeConfiguration {
 
 		private final Set<MetaConstraint<?>> metaConstraints;
 

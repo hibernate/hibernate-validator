@@ -8,8 +8,8 @@ package org.hibernate.validator.internal.engine.groups;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -48,7 +48,7 @@ public class ValidationOrderGenerator {
 		}
 
 		if ( expand ) {
-			return getValidationOrder( Arrays.<Class<?>>asList( group ) );
+			return getValidationOrder( Collections.<Class<?>>singletonList( group ) );
 		}
 		else {
 			DefaultValidationOrder validationOrder = new DefaultValidationOrder();
@@ -101,7 +101,7 @@ public class ValidationOrderGenerator {
 
 	public ValidationOrder getDefaultValidationOrder(Class<?> clazz, List<Class<?>> defaultGroupSequence) {
 		DefaultValidationOrder validationOrder = new DefaultValidationOrder();
-		insertSequence( clazz, defaultGroupSequence.toArray( new Class<?>[0] ), false, validationOrder );
+		insertSequence( clazz, defaultGroupSequence.toArray( new Class<?>[defaultGroupSequence.size()] ), false, validationOrder );
 		return validationOrder;
 	}
 

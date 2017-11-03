@@ -294,7 +294,7 @@ public class ConstraintHelper {
 	public static final String MESSAGE = "message";
 	public static final String VALIDATION_APPLIES_TO = "validationAppliesTo";
 
-	private static final List<String> SUPPORTED_VALID_METHODS = Arrays.asList( VALIDATION_APPLIES_TO );
+	private static final List<String> SUPPORTED_VALID_METHODS = Collections.singletonList( VALIDATION_APPLIES_TO );
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";

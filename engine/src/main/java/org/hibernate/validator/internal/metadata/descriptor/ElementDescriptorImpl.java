@@ -7,13 +7,13 @@
 package org.hibernate.validator.internal.metadata.descriptor;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -84,23 +84,18 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 
 	private class ConstraintFinderImpl implements ConstraintFinder {
 		private List<Class<?>> groups;
-		private final Set<ConstraintOrigin> definedInSet;
-		private final Set<ElementType> elementTypes;
+		private final EnumSet<ConstraintOrigin> definedInSet;
+		private final EnumSet<ElementType> elementTypes;
 
 		ConstraintFinderImpl() {
-			elementTypes = new HashSet<ElementType>();
-			elementTypes.add( ElementType.TYPE );
-			elementTypes.add( ElementType.METHOD );
-			elementTypes.add( ElementType.CONSTRUCTOR );
-			elementTypes.add( ElementType.FIELD );
-			elementTypes.add( ElementType.TYPE_USE );
+			elementTypes = EnumSet.of(
+					ElementType.TYPE, ElementType.METHOD, ElementType.CONSTRUCTOR,
+					ElementType.FIELD, ElementType.TYPE_USE ,
+					//for a bean descriptor there will be no parameter constraints, so we can safely add this element type here
+					ElementType.PARAMETER
+			);
 
-			//for a bean descriptor there will be no parameter constraints, so we can safely add this element type here
-			elementTypes.add( ElementType.PARAMETER );
-
-			definedInSet = newHashSet();
-			definedInSet.add( ConstraintOrigin.DEFINED_LOCALLY );
-			definedInSet.add( ConstraintOrigin.DEFINED_IN_HIERARCHY );
+			definedInSet = EnumSet.allOf( ConstraintOrigin.class );
 			groups = Collections.emptyList();
 		}
 

@@ -551,7 +551,7 @@ public class ConstraintHelper {
 
 		if ( crossParameterValidator != null ) {
 
-			// Cross-parameter contraints must accept Object or Object[] as validated type
+			// Cross-parameter constraints must accept Object or Object[] as validated type
 			final TypeMirror objectMirror = annotationApiHelper.getMirrorForType( Object.class );
 
 			TypeMirror type = determineSupportedType( crossParameterValidator );

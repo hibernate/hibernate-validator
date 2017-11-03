@@ -9,7 +9,7 @@ package org.hibernate.validator.cfg;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +89,7 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 	protected C addAnnotationAsParameter(String key, AnnotationDef<?, ?> value) {
 		annotationsAsParameters.compute( key, ( k, oldValue ) -> {
 			if ( oldValue == null ) {
-				return Arrays.asList( value );
+				return Collections.singletonList( value );
 			}
 			else {
 				List<AnnotationDef<?, ?>> resultingList = CollectionHelper.newArrayList( oldValue );
