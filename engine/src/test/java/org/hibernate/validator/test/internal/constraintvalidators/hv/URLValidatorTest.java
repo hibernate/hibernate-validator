@@ -336,6 +336,9 @@ public class URLValidatorTest {
 		assertTrue( validator.isValid( "http://a.b-c.de", null ) );
 		assertTrue( validator.isValid( "http://223.255.255.254", null ) );
 		assertTrue( validator.isValid( "http://[2001:0db8:0a0b:12f0:0000:0000:0000:0001]", null ) );
+		assertTrue( validator.isValid( "http://xn--80ahgue5b.xn--p-8sbkgc5ag7bhce.xn--ba-lmcq", null ) );
+		assertTrue( validator.isValid( "http://xn--fken-gra.no", null ) );
+		assertTrue( validator.isValid( "http://a.b--c.de/", null ) );
 
 		// invalid urls:
 		assertFalse( validator.isValid( "http", null ) );
@@ -371,7 +374,6 @@ public class URLValidatorTest {
 			assertFalse( validator.isValid( "http:// shouldfail.com", null ) );
 			assertFalse( validator.isValid( "http://foo.bar/foo(bar)baz quux", null ) );
 			assertFalse( validator.isValid( "http://-error-.invalid/", null ) );
-			assertFalse( validator.isValid( "http://a.b--c.de/", null ) );
 			assertFalse( validator.isValid( "http://-a.b.co", null ) );
 			assertFalse( validator.isValid( "http://a.b-.co", null ) );
 //			assertFalse( validator.isValid( "http://123.123.123", null ) );
