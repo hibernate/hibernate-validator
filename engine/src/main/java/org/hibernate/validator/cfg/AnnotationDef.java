@@ -45,7 +45,7 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 	/**
 	 * The annotation descriptor builder.
 	 */
-	protected final AnnotationDescriptor.Builder<A> annotationDescriptorBuilder;
+	private final AnnotationDescriptor.Builder<A> annotationDescriptorBuilder;
 
 	/**
 	 * A map with annotation parameters of this definition which are annotations
@@ -55,7 +55,7 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 	 * needed it should be represented via {@link java.util.List} of corresponding
 	 * {@link AnnotationDef}s.
 	 */
-	protected final Map<String, List<AnnotationDef<?, ?>>> annotationsAsParameters;
+	private final Map<String, List<AnnotationDef<?, ?>>> annotationsAsParameters;
 
 	/**
 	 * A map of annotation types that are added to {@link AnnotationDef#annotationsAsParameters}.
