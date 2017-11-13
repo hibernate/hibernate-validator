@@ -716,6 +716,10 @@ In addition, `baseURI` allows to specify the base URI used to resolve relative U
 	Supported data types::: Any type
 	Hibernate metadata impact::: None
 
+`@UniqueElements`:: Checks that the annotated collection only contains unique elements. The equality is determined using the `equals()` method.
+	Supported data types::: `Collection`
+	Hibernate metadata impact::: None
+
 `@URL(protocol=, host=, port=, regexp=, flags=)`:: Checks if the annotated character sequence is a valid URL according to RFC2396. If any of the optional parameters `protocol`, `host` or `port` are specified, the corresponding URL fragments must match the specified values. The optional parameters `regexp` and `flags` allow to specify an additional regular expression (including regular expression flags) which the URL must match. Per default this constraint used the `java.net.URL` constructor to verify whether a given string represents a valid URL. A regular expression based version is also available - `RegexpURLValidator` - which can be configured via XML (see <<section-mapping-xml-constraints>>) or the programmatic API (see <<section-programmatic-constraint-definition>>).
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
