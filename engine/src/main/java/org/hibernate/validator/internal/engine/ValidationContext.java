@@ -614,7 +614,7 @@ public class ValidationContext<T> {
 			if ( this == o ) {
 				return true;
 			}
-			if ( o == null || getClass() != BeanGroupProcessedUnit.class ) {
+			if ( o == null || o.getClass() != BeanGroupProcessedUnit.class ) {
 				return false;
 			}
 
@@ -662,7 +662,7 @@ public class ValidationContext<T> {
 			if ( this == o ) {
 				return true;
 			}
-			if ( o == null || getClass() != BeanPathMetaConstraintProcessedUnit.class ) {
+			if ( o == null || o.getClass() != BeanPathMetaConstraintProcessedUnit.class ) {
 				return false;
 			}
 
