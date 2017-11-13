@@ -11,17 +11,20 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Collection;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
 import org.hibernate.validator.internal.constraintvalidators.hv.UniqueElementsValidator;
 
 /**
- * Validates that every object in the provided Collection is unique, that no two elements in the provided collection are equal to one another.
+ * Validates that every object in the provided {@link Collection} is unique, i.e. that we can't find 2 equal elements in
+ * the collection.
  * <p>
- * This can be useful with JAX-RS, which always deserializes collections to a list. Thus, duplicates would implicitly
- * and silently removed when converting it to a set. This annotation will allow you to check for duplicates in the list
- * and raise an error instead.
+ * For instance, this can be useful with JAX-RS, which always deserializes collections to a list. Thus, duplicates would
+ * implicitly and silently be removed when converting it to a set. This constraint allows you to check for duplicates in
+ * the list and to raise an error instead.
  *
  * @author Tadhg Pearson
  * @since 6.0.5

@@ -6,21 +6,26 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.testng.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
 
+import org.assertj.core.api.Assertions;
 import org.hibernate.validator.constraints.UniqueElements;
-
-import com.google.common.base.Objects;
+import org.hibernate.validator.engine.HibernateConstraintViolation;
+import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertTrue;
+import com.google.common.base.Objects;
 
 /**
  * Tests the {@link UniqueElements} constraint
@@ -29,14 +34,12 @@ import static org.testng.Assert.assertTrue;
  */
 public class UniqueElementsValidatorTest {
 
-	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-
 	private static class AnnotationContainer {
 
 		@UniqueElements
 		private final List<Object> validateMe;
 
-		AnnotationContainer(List<Object> validateMe) {
+		private AnnotationContainer(List<Object> validateMe) {
 			this.validateMe = validateMe;
 		}
 	}
@@ -62,8 +65,8 @@ public class UniqueElementsValidatorTest {
 		) );
 
 		for ( List<Object> value : input ) {
-			Set<ConstraintViolation<AnnotationContainer>> results = validator.validate( new AnnotationContainer( value ) );
-			assertTrue( results.isEmpty(), "Validation should have passed for " + value + ", " + results );
+			Set<ConstraintViolation<AnnotationContainer>> violations = ValidatorUtil.getValidator().validate( new AnnotationContainer( value ) );
+			assertNoViolations( violations, "Validation should have passed for " + value );
 		}
 	}
 
@@ -81,8 +84,10 @@ public class UniqueElementsValidatorTest {
 		input.add( Arrays.asList( new TestObject( 0 ), new TestObject( 0 ) ) );
 
 		for ( List<Object> value : input ) {
-			Set<ConstraintViolation<AnnotationContainer>> results = validator.validate( new AnnotationContainer( value ) );
-			assertTrue( results.size() > 0, "Validation should have failed for " + value + ", " + results );
+			Set<ConstraintViolation<AnnotationContainer>> violations = ValidatorUtil.getValidator().validate( new AnnotationContainer( value ) );
+			assertThat( violations )
+					.describedAs( "Validation should have failed for " + value )
+					.containsOnlyViolations( violationOf( UniqueElements.class ) );
 		}
 	}
 
@@ -90,15 +95,32 @@ public class UniqueElementsValidatorTest {
 	public void testMessageContainsDuplicatedValue() {
 		String duplicate = "seeme";
 		List<Object> fails = Arrays.asList( duplicate, duplicate );
-		Set<ConstraintViolation<AnnotationContainer>> results = validator.validate( new AnnotationContainer( fails ) );
-		assertTrue( results.stream().anyMatch( cv -> cv.getMessage().contains( duplicate ) ) );
+		Set<ConstraintViolation<AnnotationContainer>> violations = ValidatorUtil.getValidator().validate( new AnnotationContainer( fails ) );
+
+		assertThat( violations ).containsOnlyViolations( violationOf( UniqueElements.class ) );
+
+		assertTrue( violations.stream().anyMatch( cv -> cv.getMessage().contains( duplicate ) ) );
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testDymanicPayloadContainsDuplicatedValue() {
+		String duplicate = "seeme";
+		List<Object> fails = Arrays.asList( duplicate, duplicate );
+		Set<ConstraintViolation<AnnotationContainer>> violations = ValidatorUtil.getValidator().validate( new AnnotationContainer( fails ) );
+
+		assertThat( violations ).containsOnlyViolations( violationOf( UniqueElements.class ) );
+
+		ConstraintViolation<?> violation = violations.iterator().next();
+		Assertions.assertThat( ((HibernateConstraintViolation<UniqueElements>) violation.unwrap( HibernateConstraintViolation.class )).getDynamicPayload( List.class ) )
+				.containsOnly( duplicate );
 	}
 
 	private static class TestObject {
 
-		final int value;
+		private final int value;
 
-		TestObject(Integer value) {
+		private TestObject(Integer value) {
 			this.value = value;
 		}
 
@@ -123,7 +145,7 @@ public class UniqueElementsValidatorTest {
 
 	private static class TestExtendedObject extends TestObject {
 
-		TestExtendedObject(Integer value) {
+		private TestExtendedObject(Integer value) {
 			super( value );
 		}
 
