@@ -182,15 +182,6 @@ public class ValueExtractorManager {
 		}
 	}
 
-	public Set<ValueExtractorDescriptor> getValueExtractorCandidatesForCascadedValidation(Type declaredType, TypeVariable<?> typeParameter) {
-		Set<ValueExtractorDescriptor> valueExtractorDescriptors = new HashSet<>();
-
-		valueExtractorDescriptors.addAll( getTypeCompliantAndContainerElementCompliantValueExtractors( declaredType, typeParameter ) );
-		valueExtractorDescriptors.addAll( getPotentiallyRuntimeTypeCompliantAndContainerElementCompliantValueExtractors( declaredType, typeParameter ) );
-
-		return valueExtractorDescriptors;
-	}
-
 	/**
 	 * Returns the set of type-compliant and container-element-compliant value extractors or an empty set if none was found.
 	 */
@@ -220,45 +211,6 @@ public class ValueExtractorManager {
 			}
 
 			if ( Objects.equals( extractorDescriptor.getExtractedTypeParameter(), typeParameterBoundToExtractorType ) ) {
-				containerElementCompliantExtractors.add( extractorDescriptor );
-			}
-		}
-
-		return containerElementCompliantExtractors;
-	}
-
-	/**
-	 * Returns the set of potentially type-compliant and container-element-compliant value extractors or an empty set if none was found.
-	 * <p>
-	 * A value extractor is potentially runtime type compliant if it might be compliant for any runtime type that matches the declared type.
-	 */
-	private Set<ValueExtractorDescriptor> getPotentiallyRuntimeTypeCompliantAndContainerElementCompliantValueExtractors(Type declaredType,
-			TypeVariable<?> typeParameter) {
-		boolean isInternal = TypeVariables.isInternal( typeParameter );
-		Type erasedDeclaredType = TypeHelper.getErasedReferenceType( declaredType );
-
-		Set<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
-				.stream()
-				.filter( e -> TypeHelper.isAssignable( erasedDeclaredType, e.getContainerType() ) )
-				.collect( Collectors.toSet() );
-
-		Set<ValueExtractorDescriptor> containerElementCompliantExtractors = new HashSet<>();
-
-		for ( ValueExtractorDescriptor extractorDescriptor : typeCompatibleExtractors ) {
-			TypeVariable<?> typeParameterBoundToExtractorType;
-
-			if ( !isInternal ) {
-				Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings =
-						TypeVariableBindings.getTypeVariableBindings( extractorDescriptor.getContainerType() );
-
-				Map<TypeVariable<?>, TypeVariable<?>> bindingsForExtractorType = allBindings.get( erasedDeclaredType );
-				typeParameterBoundToExtractorType = bind( extractorDescriptor.getExtractedTypeParameter(), bindingsForExtractorType );
-			}
-			else {
-				typeParameterBoundToExtractorType = typeParameter;
-			}
-
-			if ( Objects.equals( typeParameter, typeParameterBoundToExtractorType ) ) {
 				containerElementCompliantExtractors.add( extractorDescriptor );
 			}
 		}

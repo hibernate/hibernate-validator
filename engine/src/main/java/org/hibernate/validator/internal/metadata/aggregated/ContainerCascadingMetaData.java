@@ -21,7 +21,6 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDes
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
-import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
@@ -77,13 +76,6 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	 */
 	private final boolean hasContainerElementsMarkedForCascading;
 
-	/**
-	 * The set of value extractors which are type compliant and container element compliant with the element where
-	 * the cascaded validation was declared. The final value extractor is chosen among these ones, based on the
-	 * runtime type.
-	 */
-	private final Set<ValueExtractorDescriptor> valueExtractorCandidates;
-
 	public static ContainerCascadingMetaData of(ValueExtractorManager valueExtractorManager, CascadingMetaDataBuilder cascadingMetaDataBuilder,
 			Object context) {
 		return new ContainerCascadingMetaData( valueExtractorManager, cascadingMetaDataBuilder );
@@ -91,7 +83,6 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 
 	private ContainerCascadingMetaData(ValueExtractorManager valueExtractorManager, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 		this(
-				valueExtractorManager,
 				cascadingMetaDataBuilder.getEnclosingType(),
 				cascadingMetaDataBuilder.getTypeParameter(),
 				cascadingMetaDataBuilder.getDeclaredContainerClass(),
@@ -105,7 +96,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		);
 	}
 
-	private ContainerCascadingMetaData(ValueExtractorManager valueExtractorManager, Type enclosingType, TypeVariable<?> typeParameter,
+	private ContainerCascadingMetaData(Type enclosingType, TypeVariable<?> typeParameter,
 			Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter, List<ContainerCascadingMetaData> containerElementTypesCascadingMetaData,
 			boolean cascading, GroupConversionHelper groupConversionHelper, boolean markedForCascadingOnContainerElements) {
 		this.enclosingType = enclosingType;
@@ -116,19 +107,6 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		this.cascading = cascading;
 		this.groupConversionHelper = groupConversionHelper;
 		this.hasContainerElementsMarkedForCascading = markedForCascadingOnContainerElements;
-
-		if ( TypeVariables.isAnnotatedObject( this.typeParameter ) || !markedForCascadingOnContainerElements ) {
-			this.valueExtractorCandidates = Collections.emptySet();
-		}
-		else {
-			this.valueExtractorCandidates = CollectionHelper.toImmutableSet(
-					valueExtractorManager.getValueExtractorCandidatesForCascadedValidation( this.enclosingType, this.typeParameter )
-			);
-
-			if ( this.valueExtractorCandidates.size() == 0 ) {
-				throw LOG.getNoValueExtractorFoundForTypeException( this.declaredContainerClass, this.declaredTypeParameter );
-			}
-		}
 	}
 
 	ContainerCascadingMetaData(Type enclosingType, List<ContainerCascadingMetaData> containerElementTypesCascadingMetaData,
@@ -141,7 +119,6 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		this.cascading = true;
 		this.groupConversionHelper = groupConversionHelper;
 		this.hasContainerElementsMarkedForCascading = true;
-		this.valueExtractorCandidates = Collections.emptySet();
 	}
 
 	ContainerCascadingMetaData(Type enclosingType, TypeVariable<?> typeParameter, Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter,
@@ -154,7 +131,6 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		this.cascading = true;
 		this.groupConversionHelper = groupConversionHelper;
 		this.hasContainerElementsMarkedForCascading = false;
-		this.valueExtractorCandidates = valueExtractorCandidates;
 	}
 
 	@Override
@@ -205,10 +181,6 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	@Override
 	public Set<GroupConversionDescriptor> getGroupConversionDescriptors() {
 		return groupConversionHelper.asDescriptors();
-	}
-
-	public Set<ValueExtractorDescriptor> getValueExtractorCandidates() {
-		return valueExtractorCandidates;
 	}
 
 	@Override
