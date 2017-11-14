@@ -80,6 +80,7 @@ public class TypeNames {
 		public static final String NOT_EMPTY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotEmpty";
 		public static final String SAFE_HTML = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".SafeHtml";
 		public static final String SCRIPT_ASSERT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ScriptAssert";
+		public static final String UNIQUE_ELEMENTS = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".UniqueElements";
 		public static final String URL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".URL";
 		public static final String DURATION_MIN = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".time.DurationMin";
 		public static final String DURATION_MAX = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".time.DurationMax";

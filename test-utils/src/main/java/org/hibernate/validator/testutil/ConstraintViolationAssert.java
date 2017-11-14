@@ -97,6 +97,15 @@ public final class ConstraintViolationAssert {
 		Assertions.assertThat( violations ).isEmpty();
 	}
 
+	/**
+	 * Asserts that the given violation list has no violations (is empty).
+	 *
+	 * @param violations The violation list to verify.
+	 */
+	public static void assertNoViolations(Set<? extends ConstraintViolation<?>> violations, String message) {
+		Assertions.assertThat( violations ).describedAs( message ).isEmpty();
+	}
+
 	public static void assertConstraintTypes(Set<? extends ConstraintDescriptor<?>> descriptors,
 			Class<?>... expectedConstraintTypes) {
 		List<Class<? extends Annotation>> actualConstraintTypes = new ArrayList<>();
@@ -243,6 +252,11 @@ public final class ConstraintViolationAssert {
 
 		protected ConstraintViolationSetAssert(Set<? extends ConstraintViolation<?>> actualViolations) {
 			super( actualViolations );
+		}
+
+		@Override
+		public ConstraintViolationSetAssert describedAs(String description, Object... args) {
+			return (ConstraintViolationSetAssert) super.describedAs( description, args );
 		}
 
 		public void containsOnlyViolations(ViolationExpectation... expectedViolations) {
