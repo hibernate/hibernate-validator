@@ -24,6 +24,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithJava8DateTime;
 import org.hibernate.validator.ap.testmodel.ModelWithJavaMoneyTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
+import org.hibernate.validator.ap.testmodel.ModelWithUniqueElementsConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithoutConstraints;
 import org.hibernate.validator.ap.testmodel.MultipleConstraintsOfSameType;
 import org.hibernate.validator.ap.testmodel.ValidationUsingAtValidAnnotation;
@@ -683,6 +684,23 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 45 ),
 				new DiagnosticExpectation( Kind.ERROR, 48 ),
 				new DiagnosticExpectation( Kind.WARNING, 54 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1466")
+	public void uniqueElementsConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithUniqueElementsConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 26 )
 		);
 	}
 }
