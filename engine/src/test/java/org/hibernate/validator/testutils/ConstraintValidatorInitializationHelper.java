@@ -61,7 +61,9 @@ public class ConstraintValidatorInitializationHelper {
 			ConstraintAnnotationDescriptor<A> annotationDescriptor,
 			HibernateConstraintValidatorInitializationContext initializationContext
 	) {
-		constraintValidator.initialize( descriptorFrom( annotationDescriptor ), initializationContext );
+		ConstraintDescriptor<A> constraintDescriptor = descriptorFrom( annotationDescriptor );
+		constraintValidator.initialize( constraintDescriptor, initializationContext );
+		constraintValidator.initialize( constraintDescriptor.getAnnotation() );
 	}
 
 	public static HibernateConstraintValidatorInitializationContext getDummyConstraintValidatorInitializationContext() {

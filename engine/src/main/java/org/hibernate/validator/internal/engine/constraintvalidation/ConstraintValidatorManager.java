@@ -240,9 +240,7 @@ public class ConstraintValidatorManager {
 			if ( constraintValidator instanceof HibernateConstraintValidator ) {
 				( (HibernateConstraintValidator<A, ?>) constraintValidator ).initialize( descriptor, initializationContext );
 			}
-			else {
-				constraintValidator.initialize( descriptor.getAnnotation() );
-			}
+			constraintValidator.initialize( descriptor.getAnnotation() );
 		}
 		catch (RuntimeException e) {
 			if ( e instanceof ConstraintDeclarationException ) {

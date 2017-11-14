@@ -29,14 +29,13 @@ public interface HibernateConstraintValidator<A extends Annotation, T> extends C
 	 * It is an alternative to {@link #initialize(Annotation)} method. Should be used if any additional information
 	 * except annotation is needed to initialize a validator.
 	 * Note, when using {@link HibernateConstraintValidator} user should only override one of the methods, either
-	 * {@link #initialize(Annotation)} or {@link #initialize(ConstraintDescriptor, HibernateConstraintValidatorInitializationContext)}.
-	 * It is guaranteed that in the case of a {@link HibernateConstraintValidator}, only
-	 * {@link #initialize(ConstraintDescriptor, HibernateConstraintValidatorInitializationContext)} is called during initialization.
+	 * {@link #initialize(ConstraintDescriptor, HibernateConstraintValidatorInitializationContext)} or {@link #initialize(Annotation)}.
+	 * Both methods will be called during initialization, starting with
+	 * {@link #initialize(ConstraintDescriptor, HibernateConstraintValidatorInitializationContext)}.
 	 *
 	 * @param constraintDescriptor a constraint descriptor for a given constraint declaration
 	 * @param initializationContext an initialization context for a current {@link ConstraintValidatorFactory}
 	 */
 	default void initialize(ConstraintDescriptor<A> constraintDescriptor, HibernateConstraintValidatorInitializationContext initializationContext) {
-		initialize( constraintDescriptor.getAnnotation() );
 	}
 }
