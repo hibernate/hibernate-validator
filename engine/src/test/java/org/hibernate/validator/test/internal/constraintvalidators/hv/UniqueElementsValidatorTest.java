@@ -15,17 +15,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.MessageInterpolator;
+import javax.validation.Validator;
 
 import org.assertj.core.api.Assertions;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.hibernate.validator.engine.HibernateConstraintViolation;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.resourceloading.AggregateResourceBundleLocator;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
-
-import com.google.common.base.Objects;
 
 /**
  * Tests the {@link UniqueElements} constraint
@@ -93,9 +97,23 @@ public class UniqueElementsValidatorTest {
 
 	@Test
 	public void testMessageContainsDuplicatedValue() {
+		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
+
+		MessageInterpolator messageInterpolator = new ResourceBundleMessageInterpolator(
+				new AggregateResourceBundleLocator(
+						Arrays.asList( "org/hibernate/validator/test/internal/constraintvalidators/hv/UniqueElementsMessages" ),
+						configuration.getDefaultResourceBundleLocator(),
+						getClass().getClassLoader()
+				)
+		);
+
+		Validator validator = configuration
+				.messageInterpolator( messageInterpolator )
+				.buildValidatorFactory().getValidator();
+
 		String duplicate = "seeme";
 		List<Object> fails = Arrays.asList( duplicate, duplicate );
-		Set<ConstraintViolation<AnnotationContainer>> violations = ValidatorUtil.getValidator().validate( new AnnotationContainer( fails ) );
+		Set<ConstraintViolation<AnnotationContainer>> violations = validator.validate( new AnnotationContainer( fails ) );
 
 		assertThat( violations ).containsOnlyViolations( violationOf( UniqueElements.class ) );
 
@@ -138,7 +156,7 @@ public class UniqueElementsValidatorTest {
 
 		@Override
 		public int hashCode() {
-			return Objects.hashCode( value );
+			return Objects.hash( value );
 		}
 	}
 
@@ -156,7 +174,7 @@ public class UniqueElementsValidatorTest {
 
 		@Override
 		public int hashCode() {
-			return java.util.Objects.hash( super.hashCode() );
+			return Objects.hash( super.hashCode() );
 		}
 	}
 }
