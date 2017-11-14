@@ -139,7 +139,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	}
 
 	ContainerCascadingMetaData(Type enclosingType, List<ContainerCascadingMetaData> containerElementTypesCascadingMetaData,
-			GroupConversionHelper groupConversionHelper) {
+			GroupConversionHelper groupConversionHelper, Set<ValueExtractorDescriptor> valueExtractorCandidates) {
 		this.enclosingType = enclosingType;
 		this.typeParameter = AnnotatedObject.INSTANCE;
 		this.declaredContainerClass = null;
@@ -149,11 +149,11 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		this.cascading = true;
 		this.groupConversionHelper = groupConversionHelper;
 		this.hasContainerElementsMarkedForCascading = true;
-		this.valueExtractorCandidates = Collections.emptySet();
+		this.valueExtractorCandidates = valueExtractorCandidates;
 	}
 
 	ContainerCascadingMetaData(Type enclosingType, TypeVariable<?> typeParameter, Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter,
-			GroupConversionHelper groupConversionHelper, Set<ValueExtractorDescriptor> valueExtractorCandidates) {
+			GroupConversionHelper groupConversionHelper) {
 		this.enclosingType = enclosingType;
 		this.typeParameter = typeParameter;
 		this.declaredContainerClass = declaredContainerClass;
@@ -163,7 +163,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		this.cascading = true;
 		this.groupConversionHelper = groupConversionHelper;
 		this.hasContainerElementsMarkedForCascading = false;
-		this.valueExtractorCandidates = valueExtractorCandidates;
+		this.valueExtractorCandidates = Collections.emptySet();
 	}
 
 	@Override
@@ -220,10 +220,6 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		return groupConversionHelper.asDescriptors();
 	}
 
-	public Set<ValueExtractorDescriptor> getValueExtractorCandidates() {
-		return valueExtractorCandidates;
-	}
-
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T extends CascadingMetaData> T as(Class<T> clazz) {
@@ -235,8 +231,12 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	}
 
 	@Override
-	public CascadingMetaData addRuntimeLegacyCollectionSupport(Class<?> valueClass) {
+	public CascadingMetaData addRuntimeContainerSupport(ValueExtractorManager valueExtractorManager, Class<?> valueClass) {
 		return this;
+	}
+
+	public Set<ValueExtractorDescriptor> getValueExtractorCandidates() {
+		return valueExtractorCandidates;
 	}
 
 	@Override

@@ -6,41 +6,33 @@
  */
 package org.hibernate.validator.internal.engine.valueextraction;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.ValidationException;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.TypeHelper;
-import org.hibernate.validator.internal.util.TypeVariableBindings;
-import org.hibernate.validator.internal.util.TypeVariables;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * @author Gunnar Morling
  * @author Guillaume Smet
+ * @author Marko Bekhta
  */
 public class ValueExtractorManager {
-
-	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Immutable
 	public static final Set<ValueExtractorDescriptor> SPEC_DEFINED_EXTRACTORS;
@@ -88,6 +80,8 @@ public class ValueExtractorManager {
 	@Immutable
 	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractors;
 
+	private final ValueExtractorResolver valueExtractorResolver;
+
 	public ValueExtractorManager(Set<ValueExtractor<?>> externalExtractors) {
 		LinkedHashMap<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> tmpValueExtractors = new LinkedHashMap<>();
 
@@ -103,13 +97,16 @@ public class ValueExtractorManager {
 		}
 
 		valueExtractors = Collections.unmodifiableMap( tmpValueExtractors );
+		valueExtractorResolver = new ValueExtractorResolver( getValueExtractorDescriptorsAsList() );
 	}
 
-	public ValueExtractorManager(ValueExtractorManager template, Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> externalValueExtractorDescriptors) {
+	public ValueExtractorManager(ValueExtractorManager template,
+			Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> externalValueExtractorDescriptors) {
 		LinkedHashMap<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> tmpValueExtractors = new LinkedHashMap<>( template.valueExtractors );
 		tmpValueExtractors.putAll( externalValueExtractorDescriptors );
 
 		valueExtractors = Collections.unmodifiableMap( tmpValueExtractors );
+		valueExtractorResolver = new ValueExtractorResolver( getValueExtractorDescriptorsAsList() );
 	}
 
 	public static Set<ValueExtractor<?>> getDefaultValueExtractors() {
@@ -119,190 +116,76 @@ public class ValueExtractorManager {
 	}
 
 	/**
-	 * Returns the maximally specific type compliant value extractors or an empty set if none was found.
+	 * Should be used to find a most specific {@link ValueExtractor} based on a declared type, when creating
+	 * {@link MetaConstraint} and there's a need to determine a {@link ValueExtractorDescriptor} for a wrapped value.
+	 *
+	 * @see ValueExtractorResolver#getMaximallySpecificValueExtractors(Class)
 	 */
 	public Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> valueType) {
-		Set<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
-				.stream()
-				.filter( e -> TypeHelper.isAssignable( TypeHelper.getErasedReferenceType( e.getContainerType() ), valueType ) )
-				.collect( Collectors.toSet() );
-
-		return getMaximallySpecificValueExtractors( valueType, typeCompatibleExtractors );
+		return valueExtractorResolver.getMaximallySpecificValueExtractors( valueType );
 	}
 
 	/**
-	 * Returns the maximally specific type-compliant and container-element-compliant value extractor or
-	 * {@code null} if none was found.
-	 * <p>
-	 * Throws an exception if more than 2 maximally specific container-element-compliant value extractors are found.
+	 * Should be used to find a most specific {@link ValueExtractor} based on a declared type, when creating
+	 * {@link MetaConstraint} and there's a need to determine a {@link ValueExtractorDescriptor} for a type argument.
+	 *
+	 * @see ValueExtractorResolver#getMaximallySpecificAndContainerElementCompliantValueExtractor(Class, TypeVariable)
 	 */
 	public ValueExtractorDescriptor getMaximallySpecificAndContainerElementCompliantValueExtractor(Class<?> declaredType, TypeVariable<?> typeParameter) {
-		Set<ValueExtractorDescriptor> maximallySpecificContainerElementCompliantValueExtractors = getMaximallySpecificValueExtractors( declaredType,
-				getTypeCompliantAndContainerElementCompliantValueExtractors( declaredType, typeParameter ) );
+		return valueExtractorResolver.getMaximallySpecificAndContainerElementCompliantValueExtractor( declaredType, typeParameter );
+	}
 
-		if ( maximallySpecificContainerElementCompliantValueExtractors.isEmpty() ) {
-			return null;
+	/**
+	 * Should be used to find a most specific {@link ValueExtractor} based on a runtime type, when the actual
+	 * cascading container validation should perform extraction. Most specific one is determined from candidates
+	 * passed to this method.
+	 *
+	 * @see ValueExtractorResolver#getMaximallySpecificAndRuntimeContainerElementCompliantValueExtractor(Type, TypeVariable, Class, Collection)
+	 */
+	public ValueExtractorDescriptor getMaximallySpecificAndRuntimeContainerElementCompliantValueExtractor(Type declaredType, TypeVariable<?> typeParameter,
+			Class<?> runtimeType, Collection<ValueExtractorDescriptor> valueExtractorCandidates) {
+
+		if ( valueExtractorCandidates.size() == 1 ) {
+			return valueExtractorCandidates.iterator().next();
 		}
-		else if ( maximallySpecificContainerElementCompliantValueExtractors.size() == 1 ) {
-			return maximallySpecificContainerElementCompliantValueExtractors.iterator().next();
+		else if ( !valueExtractorCandidates.isEmpty() ) {
+			return valueExtractorResolver.getMaximallySpecificAndRuntimeContainerElementCompliantValueExtractor(
+					declaredType,
+					typeParameter,
+					runtimeType,
+					valueExtractorCandidates
+			);
 		}
 		else {
-			throw LOG.getUnableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclaredException( declaredType,
-					ValueExtractorHelper.toValueExtractorClasses( maximallySpecificContainerElementCompliantValueExtractors ) );
+			return valueExtractorResolver.getMaximallySpecificAndRuntimeContainerElementCompliantValueExtractor(
+					declaredType,
+					typeParameter,
+					runtimeType,
+					valueExtractors.values()
+			);
 		}
 	}
 
 	/**
-	 * Returns the maximally specific type-compliant and container-element-compliant value extractor
-	 * from a set of preselected value extractors or {@code null} if none was found.
+	 * Should be used to determine if passed runtime type is a container and if so return a corresponding
+	 * maximally specific {@link ValueExtractor} for it.
 	 * <p>
-	 * The preselected value extractors are chosen based on the declared type whereas the maximally specific value extractor here
-	 * is elected based on the runtime type.
-	 * <p>
-	 * Throws an exception if more than 2 maximally specific container-element-compliant value extractors are found.
+	 * The special case is when passed type is assignable to {@link Map} to support legacy container validation.
+	 * In such case {@link MapValueExtractor} will be returned.
+	 *
+	 * @see ValueExtractorResolver#getMaximallySpecificValueExtractorForAllContainerElements(Class)
 	 */
-	public ValueExtractorDescriptor getMaximallySpecificAndContainerElementCompliantValueExtractor(Set<ValueExtractorDescriptor> valueExtractorCandidates,
-			Class<?> valueType) {
-		// we throw an exception when building the metadata so the set shouldn't be empty here
-		Contracts.assertNotEmpty( valueExtractorCandidates, "The value extractor candidate set may not be empty for type: %1$s.", valueType );
-
-		Set<ValueExtractorDescriptor> maximallySpecificContainerElementCompliantValueExtractors = getMaximallySpecificValueExtractors( valueType,
-				valueExtractorCandidates );
-
-		if ( maximallySpecificContainerElementCompliantValueExtractors.isEmpty() ) {
-			return null;
-		}
-		else if ( maximallySpecificContainerElementCompliantValueExtractors.size() == 1 ) {
-			return maximallySpecificContainerElementCompliantValueExtractors.iterator().next();
-		}
-		else {
-			throw LOG.getUnableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclaredException( valueType,
-					ValueExtractorHelper.toValueExtractorClasses( maximallySpecificContainerElementCompliantValueExtractors ) );
-		}
-	}
-
-	public Set<ValueExtractorDescriptor> getValueExtractorCandidatesForCascadedValidation(Type declaredType, TypeVariable<?> typeParameter) {
-		Set<ValueExtractorDescriptor> valueExtractorDescriptors = new HashSet<>();
-
-		valueExtractorDescriptors.addAll( getTypeCompliantAndContainerElementCompliantValueExtractors( declaredType, typeParameter ) );
-		valueExtractorDescriptors.addAll( getPotentiallyRuntimeTypeCompliantAndContainerElementCompliantValueExtractors( declaredType, typeParameter ) );
-
-		return valueExtractorDescriptors;
+	public ValueExtractorDescriptor getMaximallySpecificValueExtractorForAllContainerElements(Class<?> runtimeType) {
+		return valueExtractorResolver.getMaximallySpecificValueExtractorForAllContainerElements( runtimeType );
 	}
 
 	/**
-	 * Returns the set of type-compliant and container-element-compliant value extractors or an empty set if none was found.
+	 * Should be used to find possible {@link ValueExtractor} candidates based on declared type and type variable.
+	 *
+	 * @see ValueExtractorResolver#getValueExtractorCandidatesForCascadedValidation(Type, TypeVariable)
 	 */
-	private Set<ValueExtractorDescriptor> getTypeCompliantAndContainerElementCompliantValueExtractors(Type declaredType, TypeVariable<?> typeParameter) {
-		boolean isInternal = TypeVariables.isInternal( typeParameter );
-		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings = null;
-		if ( !isInternal ) {
-			allBindings = TypeVariableBindings.getTypeVariableBindings( (Class<?>) typeParameter.getGenericDeclaration() );
-		}
-
-		Set<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
-				.stream()
-				.filter( e -> TypeHelper.isAssignable( e.getContainerType(), declaredType ) )
-				.collect( Collectors.toSet() );
-
-		Set<ValueExtractorDescriptor> containerElementCompliantExtractors = new HashSet<>();
-
-		for ( ValueExtractorDescriptor extractorDescriptor : typeCompatibleExtractors ) {
-			TypeVariable<?> typeParameterBoundToExtractorType;
-
-			if ( !isInternal ) {
-				Map<TypeVariable<?>, TypeVariable<?>> bindingsForExtractorType = allBindings.get( extractorDescriptor.getContainerType() );
-				typeParameterBoundToExtractorType = bind( typeParameter, bindingsForExtractorType );
-			}
-			else {
-				typeParameterBoundToExtractorType = typeParameter;
-			}
-
-			if ( Objects.equals( extractorDescriptor.getExtractedTypeParameter(), typeParameterBoundToExtractorType ) ) {
-				containerElementCompliantExtractors.add( extractorDescriptor );
-			}
-		}
-
-		return containerElementCompliantExtractors;
-	}
-
-	/**
-	 * Returns the set of potentially type-compliant and container-element-compliant value extractors or an empty set if none was found.
-	 * <p>
-	 * A value extractor is potentially runtime type compliant if it might be compliant for any runtime type that matches the declared type.
-	 */
-	private Set<ValueExtractorDescriptor> getPotentiallyRuntimeTypeCompliantAndContainerElementCompliantValueExtractors(Type declaredType,
-			TypeVariable<?> typeParameter) {
-		boolean isInternal = TypeVariables.isInternal( typeParameter );
-		Type erasedDeclaredType = TypeHelper.getErasedReferenceType( declaredType );
-
-		Set<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
-				.stream()
-				.filter( e -> TypeHelper.isAssignable( erasedDeclaredType, e.getContainerType() ) )
-				.collect( Collectors.toSet() );
-
-		Set<ValueExtractorDescriptor> containerElementCompliantExtractors = new HashSet<>();
-
-		for ( ValueExtractorDescriptor extractorDescriptor : typeCompatibleExtractors ) {
-			TypeVariable<?> typeParameterBoundToExtractorType;
-
-			if ( !isInternal ) {
-				Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings =
-						TypeVariableBindings.getTypeVariableBindings( extractorDescriptor.getContainerType() );
-
-				Map<TypeVariable<?>, TypeVariable<?>> bindingsForExtractorType = allBindings.get( erasedDeclaredType );
-				typeParameterBoundToExtractorType = bind( extractorDescriptor.getExtractedTypeParameter(), bindingsForExtractorType );
-			}
-			else {
-				typeParameterBoundToExtractorType = typeParameter;
-			}
-
-			if ( Objects.equals( typeParameter, typeParameterBoundToExtractorType ) ) {
-				containerElementCompliantExtractors.add( extractorDescriptor );
-			}
-		}
-
-		return containerElementCompliantExtractors;
-	}
-
-	private Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> valueType, Set<ValueExtractorDescriptor> extractors) {
-		Set<ValueExtractorDescriptor> candidates = CollectionHelper.newHashSet( extractors.size() );
-
-		for ( ValueExtractorDescriptor descriptor : extractors ) {
-			// in the case of cascaded validation, some of the proposed value extractors
-			// might not be compatible with the runtime type we have in the end so we need
-			// to skip them
-			if ( !TypeHelper.isAssignable( descriptor.getContainerType(), valueType ) ) {
-				continue;
-			}
-			if ( candidates.isEmpty() ) {
-				candidates.add( descriptor );
-				continue;
-			}
-			Iterator<ValueExtractorDescriptor> candidatesIterator = candidates.iterator();
-			boolean isNewRoot = true;
-			while ( candidatesIterator.hasNext() ) {
-				ValueExtractorDescriptor candidate = candidatesIterator.next();
-
-				// we consider the strictly more specific value extractor so 2 value extractors for the same container
-				// type should throw an error in the end if no other more specific value extractor is found.
-				if ( candidate.getContainerType().equals( descriptor.getContainerType() ) ) {
-					continue;
-				}
-
-				if ( TypeHelper.isAssignable( candidate.getContainerType(), descriptor.getContainerType() ) ) {
-					candidatesIterator.remove();
-				}
-				else if ( TypeHelper.isAssignable( descriptor.getContainerType(), candidate.getContainerType() ) ) {
-					isNewRoot = false;
-				}
-			}
-			if ( isNewRoot ) {
-				candidates.add( descriptor );
-			}
-		}
-
-		return candidates;
+	public Set<ValueExtractorDescriptor> getValueExtractorCandidatesForCascadedValidation(Type enclosingType, TypeVariable<?> typeParameter) {
+		return valueExtractorResolver.getValueExtractorCandidatesForCascadedValidation( enclosingType, typeParameter );
 	}
 
 	@Override
@@ -329,10 +212,6 @@ public class ValueExtractorManager {
 		return valueExtractors.equals( other.valueExtractors );
 	}
 
-	private TypeVariable<?> bind(TypeVariable<?> typeParameter, Map<TypeVariable<?>, TypeVariable<?>> bindings) {
-		return bindings != null ? bindings.get( typeParameter ) : null;
-	}
-
 	private static boolean isJavaFxInClasspath() {
 		return isClassPresent( "javafx.application.Application", false );
 	}
@@ -345,6 +224,11 @@ public class ValueExtractorManager {
 		catch (ValidationException e) {
 			return false;
 		}
+	}
+
+	private List<ValueExtractorDescriptor> getValueExtractorDescriptorsAsList() {
+		return valueExtractors.values().stream().collect(
+				Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) );
 	}
 
 	/**

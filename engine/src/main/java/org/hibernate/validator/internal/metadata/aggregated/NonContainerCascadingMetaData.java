@@ -9,17 +9,13 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.TypeVariable;
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
-import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
-import org.hibernate.validator.internal.engine.valueextraction.LegacyCollectionSupportValueExtractors;
-import org.hibernate.validator.internal.util.TypeVariables;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -27,6 +23,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * A simplified view of the cascading validation metadata for a non container element.
  *
  * @author Guillaume Smet
+ * @author Marko Bekhta
  */
 public class NonContainerCascadingMetaData implements CascadingMetaData {
 
@@ -37,22 +34,6 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 
 	private static final NonContainerCascadingMetaData CASCADING_WITHOUT_GROUP_CONVERSIONS = new NonContainerCascadingMetaData( true,
 			GroupConversionHelper.EMPTY );
-
-	private static final ContainerCascadingMetaData LIST_CONTAINER_WITHOUT_GROUP_CONVERSIONS =
-			new ContainerCascadingMetaData( List.class, List.class.getTypeParameters()[0], List.class, List.class.getTypeParameters()[0],
-					GroupConversionHelper.EMPTY, LegacyCollectionSupportValueExtractors.LIST );
-
-	private static final ContainerCascadingMetaData MAP_CONTAINER_WITHOUT_GROUP_CONVERSIONS =
-			new ContainerCascadingMetaData( Map.class, Map.class.getTypeParameters()[1], Map.class, Map.class.getTypeParameters()[1],
-					GroupConversionHelper.EMPTY, LegacyCollectionSupportValueExtractors.MAP );
-
-	private static final ContainerCascadingMetaData ITERABLE_CONTAINER_WITHOUT_GROUP_CONVERSIONS =
-			new ContainerCascadingMetaData( Iterable.class, Iterable.class.getTypeParameters()[0], Iterable.class, Iterable.class.getTypeParameters()[0],
-					GroupConversionHelper.EMPTY, LegacyCollectionSupportValueExtractors.ITERABLE );
-
-	private static final ContainerCascadingMetaData OPTIONAL_CONTAINER_WITHOUT_GROUP_CONVERSIONS =
-			new ContainerCascadingMetaData( Optional.class, Optional.class.getTypeParameters()[0], Optional.class, Optional.class.getTypeParameters()[0],
-					GroupConversionHelper.EMPTY, LegacyCollectionSupportValueExtractors.OPTIONAL );
 
 	/**
 	 * If this type parameter is marked for cascading.
@@ -119,53 +100,31 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 	}
 
 	@Override
-	public CascadingMetaData addRuntimeLegacyCollectionSupport(Class<?> valueClass) {
+	public CascadingMetaData addRuntimeContainerSupport(ValueExtractorManager valueExtractorManager, Class<?> valueClass) {
 		if ( !cascading ) {
 			return this;
 		}
 
-		ContainerCascadingMetaData legacyContainerElementCascadingMetaData = getLegacyContainerElementCascadingMetaData( valueClass );
-		if ( legacyContainerElementCascadingMetaData == null ) {
+		ValueExtractorDescriptor compliantValueExtractor = valueExtractorManager
+				.getMaximallySpecificValueExtractorForAllContainerElements( valueClass );
+		if ( compliantValueExtractor == null ) {
 			return this;
 		}
 
-		return new ContainerCascadingMetaData( valueClass, Collections.singletonList( legacyContainerElementCascadingMetaData ), groupConversionHelper );
-	}
-
-	private ContainerCascadingMetaData getLegacyContainerElementCascadingMetaData(Class<?> valueClass) {
-		if ( List.class.isAssignableFrom( valueClass ) ) {
-			return groupConversionHelper.isEmpty() ?
-					LIST_CONTAINER_WITHOUT_GROUP_CONVERSIONS :
-					new ContainerCascadingMetaData( List.class, List.class.getTypeParameters()[0], List.class, List.class.getTypeParameters()[0],
-					groupConversionHelper, LegacyCollectionSupportValueExtractors.LIST );
-		}
-		else if ( Map.class.isAssignableFrom( valueClass ) ) {
-			return groupConversionHelper.isEmpty() ?
-					MAP_CONTAINER_WITHOUT_GROUP_CONVERSIONS :
-					new ContainerCascadingMetaData( Map.class, Map.class.getTypeParameters()[1], Map.class, Map.class.getTypeParameters()[1],
-					groupConversionHelper, LegacyCollectionSupportValueExtractors.MAP );
-		}
-		else if ( Iterable.class.isAssignableFrom( valueClass ) ) {
-			return groupConversionHelper.isEmpty() ?
-					ITERABLE_CONTAINER_WITHOUT_GROUP_CONVERSIONS :
-					new ContainerCascadingMetaData( Iterable.class, Iterable.class.getTypeParameters()[0], Iterable.class, Iterable.class.getTypeParameters()[0],
-					groupConversionHelper, LegacyCollectionSupportValueExtractors.ITERABLE );
-		}
-		else if ( Optional.class.isAssignableFrom( valueClass ) ) {
-			return groupConversionHelper.isEmpty() ?
-					OPTIONAL_CONTAINER_WITHOUT_GROUP_CONVERSIONS :
-					new ContainerCascadingMetaData( Optional.class, Optional.class.getTypeParameters()[0], Optional.class, Optional.class.getTypeParameters()[0],
-					groupConversionHelper, LegacyCollectionSupportValueExtractors.OPTIONAL );
-		}
-		else if ( valueClass.isArray() ) {
-			TypeVariable<?> typeParameter = new ArrayElement( valueClass );
-
-			return new ContainerCascadingMetaData( valueClass, typeParameter,
-					TypeVariables.getContainerClass( typeParameter ), TypeVariables.getActualTypeParameter( typeParameter ),
-					groupConversionHelper, LegacyCollectionSupportValueExtractors.ARRAY );
-		}
-
-		return null;
+		return new ContainerCascadingMetaData(
+				valueClass,
+				Collections.singletonList(
+						new ContainerCascadingMetaData(
+								compliantValueExtractor.getContainerType(),
+								compliantValueExtractor.getExtractedTypeParameter(),
+								compliantValueExtractor.getContainerType(),
+								compliantValueExtractor.getExtractedTypeParameter(),
+								groupConversionHelper.isEmpty() ? GroupConversionHelper.EMPTY : groupConversionHelper
+						)
+				),
+				groupConversionHelper,
+				Collections.singleton( compliantValueExtractor )
+		);
 	}
 
 	@Override
