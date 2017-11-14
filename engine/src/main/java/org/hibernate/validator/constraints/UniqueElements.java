@@ -11,18 +11,20 @@ import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.ElementType.TYPE_USE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Collection;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
-import org.hibernate.validator.internal.constraintvalidators.hv.UniqueElementsValidator;
+import org.hibernate.validator.constraints.UniqueElements.List;
 
 /**
  * Validates that every object in the provided {@link Collection} is unique, i.e. that we can't find 2 equal elements in
@@ -36,9 +38,10 @@ import org.hibernate.validator.internal.constraintvalidators.hv.UniqueElementsVa
  * @since 6.0.5
  */
 @Documented
+@Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
-@Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = UniqueElementsValidator.class)
+@Retention(RUNTIME)
+@Repeatable(List.class)
 public @interface UniqueElements {
 
 	String message() default "{org.hibernate.validator.constraints.UniqueElements.message}";
@@ -46,4 +49,14 @@ public @interface UniqueElements {
 	Class<?>[] groups() default {};
 
 	Class<? extends Payload>[] payload() default {};
+
+	/**
+	 * Defines several {@code @UniqueElements} annotations on the same element.
+	 */
+	@Target({ TYPE })
+	@Retention(RUNTIME)
+	@Documented
+	public @interface List {
+		UniqueElements[] value();
+	}
 }
