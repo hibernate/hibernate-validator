@@ -716,7 +716,7 @@ In addition, `baseURI` allows to specify the base URI used to resolve relative U
 	Supported data types::: Any type
 	Hibernate metadata impact::: None
 
-`@UniqueElements`:: Checks that the annotated collection only contains unique elements. The equality is determined using the `equals()` method.
+`@UniqueElements`:: Checks that the annotated collection only contains unique elements. The equality is determined using the `equals()` method. The default message does not include the list of duplicate elements but you can include it by overriding the message and using the `{duplicates}` message parameter. The list of duplicate elements is also included in the dynamic payload of the constraint violation.
 	Supported data types::: `Collection`
 	Hibernate metadata impact::: None
 
