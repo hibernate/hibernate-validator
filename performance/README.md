@@ -12,6 +12,7 @@ Choosing a profile executes the tests against the specified Hibernate Validator 
 defined profiles are:
 
 * hv-current (Hibernate Validator 6.0.0-SNAPSHOT)
+* hv-6.0 (Hibernate Validator 6.0.5.Final)
 * hv-5.4 (Hibernate Validator 5.4.1.Final)
 * hv-5.3 (Hibernate Validator 5.3.4.Final)
 * hv-5.2 (Hibernate Validator 5.2.4.Final)

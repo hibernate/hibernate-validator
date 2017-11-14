@@ -7,13 +7,24 @@
 package org.hibernate.validator.performance.multilevel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validation;
@@ -50,6 +61,12 @@ public class MultiLevelContainerValidation {
 				RandomDataGenerator.prepareTestData( MAX_MAP_ENTRIES, MAX_LIST_ENTRIES )
 		);
 
+		volatile MultiMapContainer multiMapContainer = new MultiMapContainer(
+				IntStream.range( 0, 3 ).mapToObj( e -> RandomDataGenerator.prepareTestDataRandomRuntime( MAX_MAP_ENTRIES, MAX_LIST_ENTRIES ) )
+						.map( MapContainer::new )
+						.collect( Collectors.toList() )
+		);
+
 		public MultiLevelContainerState() {
 			try ( ValidatorFactory factory = Validation.buildDefaultValidatorFactory() ) {
 				validator = factory.getValidator();
@@ -69,9 +86,29 @@ public class MultiLevelContainerValidation {
 		bh.consume( violations );
 	}
 
+	@Benchmark
+	@BenchmarkMode(Mode.Throughput)
+	@OutputTimeUnit(TimeUnit.MILLISECONDS)
+	@Fork(value = 1)
+	@Threads(50)
+	@Warmup(iterations = 10)
+	@Measurement(iterations = 50)
+	public void testMultiLevelPreGeneratedWithRandomRuntimeContainersValidation(MultiLevelContainerState state, Blackhole bh) {
+		Set<ConstraintViolation<MultiMapContainer>> violations = state.validator.validate( state.multiMapContainer );
+		bh.consume( violations );
+	}
+
 	/**
 	 * Model classes.
 	 */
+
+	private static class MultiMapContainer {
+		private final Collection<@Valid MapContainer> mapContainers;
+
+		private MultiMapContainer(Collection<MapContainer> mapContainers) {
+			this.mapContainers = mapContainers;
+		}
+	}
 
 	private static class MapContainer {
 
@@ -156,15 +193,18 @@ public class MultiLevelContainerValidation {
 			);
 		}
 
-		public static List<EmailAddress> generateList(int numOfEntries) {
+		public static List<EmailAddress> generateList(int numOfEntries, List<EmailAddress> addresses) {
 			if ( numOfEntries < 0 ) {
 				throw new IllegalArgumentException( "numOfEntries should be a positive number" );
 			}
-			List<EmailAddress> addresses = new ArrayList<>( numOfEntries );
 			for ( int i = 0; i < numOfEntries; i++ ) {
 				addresses.add( generate() );
 			}
 			return addresses;
+		}
+
+		public static List<EmailAddress> generateList(int numOfEntries) {
+			return generateList( numOfEntries, new ArrayList<>() );
 		}
 	}
 
@@ -186,6 +226,14 @@ public class MultiLevelContainerValidation {
 			return map;
 		}
 
+		public static Map<Optional<Cinema>, List<EmailAddress>> prepareTestDataRandomRuntime(int maxEntries, int maxListEntries) {
+			Map<Optional<Cinema>, List<EmailAddress>> map = MAP_SUPPLIERS.get( RANDOM.nextInt( MAP_SUPPLIERS.size() ) ).get();
+			for ( int i = 0; i < maxEntries; i++ ) {
+				map.put( Optional.of( Cinema.generate() ), EmailAddress.generateList( maxListEntries, LIST_SUPPLIERS.get( RANDOM.nextInt( LIST_SUPPLIERS.size() ) ).get() ) );
+			}
+			return map;
+		}
+
 		public static String randomString() {
 			char[] chars = new char[RANDOM.nextInt( 10 ) + 1];
 			for ( int i = 0; i < chars.length; i++ ) {
@@ -193,5 +241,27 @@ public class MultiLevelContainerValidation {
 			}
 			return String.valueOf( chars );
 		}
+
+		private static final List<Supplier<Map<Optional<Cinema>, List<EmailAddress>>>> MAP_SUPPLIERS = Arrays.asList(
+				LinkedHashMap::new,
+				HashMap::new,
+				() -> new TreeMap<>( (a, b) -> 0 ),
+				ConcurrentHashMap::new,
+				CopyOfMap::new
+		);
+
+		private static final List<Supplier<List<EmailAddress>>> LIST_SUPPLIERS = Arrays.asList(
+				LinkedList::new,
+				ArrayList::new,
+				CopyOnWriteArrayList::new,
+				OwnList::new
+		);
+
+		private static class CopyOfMap<K, V> extends HashMap<K, V> {
+		}
+
+		private static class OwnList<E> extends ArrayList<E> {
+		}
+
 	}
 }
