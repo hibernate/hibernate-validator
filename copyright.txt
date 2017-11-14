@@ -57,6 +57,7 @@ Shane Bryzak
 Shelly McGowan
 Steve Ebersole
 Strong Liu
+Tadhg Pearson
 Tomaz Cerar
 Tommy Johansen
 Victor Rezende dos Santos
