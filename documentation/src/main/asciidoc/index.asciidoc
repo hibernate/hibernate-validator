@@ -7,6 +7,7 @@ Hardy Ferentschik; Gunnar Morling; Guillaume Smet
 :anchor:
 :toc: left
 :toclevels: 3
+:sectnumlevels: 5
 :docinfodir: {docinfodir}
 :docinfo:
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
