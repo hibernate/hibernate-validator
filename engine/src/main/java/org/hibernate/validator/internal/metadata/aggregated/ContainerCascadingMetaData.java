@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
@@ -122,7 +121,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	}
 
 	ContainerCascadingMetaData(Type enclosingType, TypeVariable<?> typeParameter, Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter,
-			GroupConversionHelper groupConversionHelper, Set<ValueExtractorDescriptor> valueExtractorCandidates) {
+			GroupConversionHelper groupConversionHelper) {
 		this.enclosingType = enclosingType;
 		this.typeParameter = typeParameter;
 		this.declaredContainerClass = declaredContainerClass;
@@ -194,7 +193,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	}
 
 	@Override
-	public CascadingMetaData addRuntimeLegacyCollectionSupport(Class<?> valueClass) {
+	public CascadingMetaData addRuntimeContainerSupport(Class<?> valueClass, ValueExtractorManager valueExtractorManager) {
 		return this;
 	}
 

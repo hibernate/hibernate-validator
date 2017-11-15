@@ -598,7 +598,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				CascadingMetaData cascadingMetaData = cascadable.getCascadingMetaData();
 
 				if ( value != null ) {
-					CascadingMetaData effectiveCascadingMetaData = cascadingMetaData.addRuntimeLegacyCollectionSupport( value.getClass() );
+					CascadingMetaData effectiveCascadingMetaData = cascadingMetaData.addRuntimeContainerSupport( value.getClass(), valueExtractorManager );
 
 					// validate cascading on the annotated object
 					if ( effectiveCascadingMetaData.isCascading() ) {

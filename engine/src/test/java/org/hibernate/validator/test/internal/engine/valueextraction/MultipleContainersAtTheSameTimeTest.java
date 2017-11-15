@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.valueextraction;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
@@ -95,10 +97,10 @@ public class MultipleContainersAtTheSameTimeTest {
 	}
 
 	/**
-	 * TODO: needs work
+	 * Test that container is determined at runtime and that maximally specific VE is used for that container.
 	 */
 	@Test
-	public void testCascadingWhenUsingObjectReference() throws Exception {
+	public void testCascadingWhenUsingObjectReferenceUsesMostSpecificValueExtractor() throws Exception {
 		class Bar {
 			@Valid
 			private final Object container;
@@ -107,8 +109,11 @@ public class MultipleContainersAtTheSameTimeTest {
 				this.container = container;
 			}
 		}
-		Set<ConstraintViolation<Bar>> constraintViolations = validator.validate( new Bar( new ImprovedCustomContainerImpl<>( "" )  ) );
-		assertNoViolations( constraintViolations );
+
+		assertThatThrownBy( () -> validator.validate( new Bar( new ImprovedCustomContainerImpl<>( "" ) ) ) )
+				.isInstanceOf( ValidationException.class )
+				.hasCauseInstanceOf( IllegalStateException.class )
+				.hasStackTraceContaining( "this extractor shouldn't be selected" );
 	}
 
 	/**
