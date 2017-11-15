@@ -1,6 +1,30 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.5.Final (15-11-2017)
+-------------------------
+
+** Bug
+    * HV-1520 - engine              - Fix *ProcessedUnit equals() implementations
+    * HV-1516 - validators          - E-mail validator does not allow IDN ascii domain labels
+
+** Improvement
+    * HV-1519 - build               - Fix the jqassistant build
+    * HV-1518 - engine              - Various minor cleanups
+    * HV-1515 - translations        - Add missing strings to the simplified Chinese translation
+    * HV-1514 - performance         - Update the versions used in the benchmarks and make the latest benchmark compatible with BV 1.1
+    * HV-1512 - engine, performance - Improve initialization cost of all logger classes
+    * HV-1511 - engine              - Don't expose AnnotationDescriptor in AnnotationDef
+    * HV-1505 - engine              - Create ConstraintAnnotationDescriptor for typed access to groups() etc.
+    * HV-1497 - engine              - Extend the ConstraintValidator#initialize() contract
+
+** New Feature
+    * HV-1493 - engine              - Support a temporal validation tolerance when applying temporal constraints
+    * HV-1466 - validators          - Add a @UniqueElements constraints
+
+** Task
+    * HV-1513 - engine              - Rename static logger fields from "log" to "LOG"
+
 6.0.4.Final (25-10-2017)
 -------------------------
 
