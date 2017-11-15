@@ -351,7 +351,8 @@ When implementing your own temporal constraints, you might need to have access t
 
 It can be obtained by calling the `HibernateConstraintValidatorInitializationContext#getTemporalValidationTolerance()` method.
 
-Note that to get access to this context at initialization, your constraint validator has to implement the `HibernateConstraintValidator` contract.
+Note that to get access to this context at initialization, your constraint validator has to implement
+the `HibernateConstraintValidator` contract (see <<constraint-validator-hibernateconstraintvalidator>>).
 This contract is currently marked as incubating: it might be subject to change in the future.
 ====
 

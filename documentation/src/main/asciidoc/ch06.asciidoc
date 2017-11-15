@@ -116,8 +116,8 @@ While another name could be used, the Bean Validation specification recommends t
 ==== The constraint validator
 
 Having defined the annotation, you need to create a constraint validator, which is able to validate
-elements with a `@CheckCase` annotation. To do so, implement the interface `ConstraintValidator` as
-shown below:
+elements with a `@CheckCase` annotation. To do so, implement the Bean Validation interface `ConstraintValidator`
+as shown below:
 
 [[example-constraint-validator]]
 .Implementing a constraint validator for the constraint `@CheckCase`
@@ -175,6 +175,40 @@ Only after that the new constraint violation will be created.
 
 Refer to <<section-custom-property-paths>> to learn how to use the `ConstraintValidatorContext` API to
 control the property path of constraint violations for class-level constraints.
+
+[[constraint-validator-hibernateconstraintvalidator]]
+===== The `HibernateConstraintValidator` extension
+
+Hibernate Validator provides an extension to the `ConstraintValidator` contract: `HibernateConstraintValidator`.
+
+The purpose of this extension is to provide more contextual information to the `initialize()` method
+as, in the current `ConstraintValidator` contract, only the annotation is passed as parameter.
+
+The `initialize()` method of `HibernateConstraintValidator` takes two parameters:
+
+ * The `ConstraintDescriptor` of the constraint at hand.
+   You can get access to the annotation using `ConstraintDescriptor#getAnnotation()`.
+ * The `HibernateConstraintValidatorInitializationContext` which provides useful helpers and contextual
+   information, such as the clock provider or the temporal validation tolerance.
+
+This extension is marked as incubating so it might be subject to change.
+The plan is to standardize it and to include it in Bean Validation in the future.
+
+The example below shows how to base your validators on `HibernateConstraintValidator`:
+
+[[example-constraint-validator-hibernateconstraintvalidator]]
+.Using the `HibernateConstraintValidator` contract
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/MyFutureValidator.java[tags=include]
+----
+====
+
+[WARNING]
+====
+You should only implement one of the `initialize()` methods. Be aware that both are called when initializing the validator.
+====
 
 [[validator-customconstraints-errormessage]]
 ==== The error message
