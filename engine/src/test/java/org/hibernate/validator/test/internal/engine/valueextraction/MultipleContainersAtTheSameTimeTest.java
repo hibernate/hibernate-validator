@@ -23,6 +23,10 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.test.internal.engine.valueextraction.model.CustomContainer;
 import org.hibernate.validator.test.internal.engine.valueextraction.model.CustomContainerValueExtractor;
+import org.hibernate.validator.test.internal.engine.valueextraction.model.ImprovedCustomContainer;
+import org.hibernate.validator.test.internal.engine.valueextraction.model.ImprovedCustomContainerImpl;
+import org.hibernate.validator.test.internal.engine.valueextraction.model.ImprovedCustomContainerValueExtractor;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
 import org.testng.annotations.BeforeMethod;
@@ -31,6 +35,7 @@ import org.testng.annotations.Test;
 /**
  * @author Marko Bekhta
  */
+@CandidateForTck
 public class MultipleContainersAtTheSameTimeTest {
 
 	private Validator validator;
@@ -39,6 +44,7 @@ public class MultipleContainersAtTheSameTimeTest {
 	public void setupValidator() {
 		validator = ValidatorUtil.getConfiguration()
 				.addValueExtractor( new CustomContainerValueExtractor() )
+				.addValueExtractor( new ImprovedCustomContainerValueExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 	}
@@ -83,11 +89,47 @@ public class MultipleContainersAtTheSameTimeTest {
 	 * {@code ListValueExtractor} as well as {@code CustomContainerValueExtractor}
 	 */
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
-	public void testMultipleContainersAtTheSameTimeAnonymousClassShouldThrowException() throws Exception {
-		Set<ConstraintViolation<FooBar>> constraintViolations = validator.validate(
-				new FooBar( new FooBarContainer<String>() {
+	public void testMultipleContainersAtTheSameTimeWithTypeParameterSpecificShouldThrowException() throws Exception {
+		Set<ConstraintViolation<FooBar>> constraintViolations = validator.validate( new FooBar( new FooBarContainer<String>().add( "" ) ) );
+		assertNoViolations( constraintViolations );
+	}
 
-				}.add( "" ) ) );
+	/**
+	 * TODO: needs work
+	 */
+	@Test
+	public void testCascadingWhenUsingObjectReference() throws Exception {
+		class Bar {
+			@Valid
+			private final Object container;
+
+			Bar(ImprovedCustomContainer<List<String>, String> container) {
+				this.container = container;
+			}
+		}
+		Set<ConstraintViolation<Bar>> constraintViolations = validator.validate( new Bar( new ImprovedCustomContainerImpl<>( "" )  ) );
+		assertNoViolations( constraintViolations );
+	}
+
+	/**
+	 * Test for selecting a correct VE. Even though {@link ImprovedCustomContainerValueExtractor} is more
+	 * specific by container type - it shouldn't be selected based on the type argument where the constraint is  placed.
+	 * If {@link ImprovedCustomContainerValueExtractor} is selected an {@link IllegalStateException} will be thrown
+	 * by this extractor and test will fail.
+	 */
+	@Test
+	public void testFindingMaximallySpecificExtractorByTypeParameter() throws Exception {
+		class Foo {
+			@Valid
+			private final ImprovedCustomContainer<@Valid List<String>, String> container;
+
+			Foo(ImprovedCustomContainer<List<String>, String> container) {
+				this.container = container;
+			}
+		}
+
+		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate(
+				new Foo( new ImprovedCustomContainerImpl<>( "" ) ) );
 		assertNoViolations( constraintViolations );
 	}
 
