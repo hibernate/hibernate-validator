@@ -142,8 +142,8 @@ public class ValueExtractorManager {
 	 * Throws an exception if more than 2 maximally specific container-element-compliant value extractors are found.
 	 */
 	public ValueExtractorDescriptor getMaximallySpecificAndContainerElementCompliantValueExtractor(Class<?> declaredType, TypeVariable<?> typeParameter) {
-		Set<ValueExtractorDescriptor> maximallySpecificContainerElementCompliantValueExtractors = getMaximallySpecificValueExtractors( declaredType,
-				getTypeCompliantAndContainerElementCompliantValueExtractors( declaredType, typeParameter ) );
+		Set<ValueExtractorDescriptor> maximallySpecificContainerElementCompliantValueExtractors =
+				valueExtractorResolutionCache.getValueExtractors( declaredType, typeParameter, declaredType );
 
 		return getUniqueValueExtractorOrThrowException( declaredType, maximallySpecificContainerElementCompliantValueExtractors );
 	}
@@ -185,42 +185,6 @@ public class ValueExtractorManager {
 			throw LOG.getUnableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclaredException( runtimeType,
 					ValueExtractorHelper.toValueExtractorClasses( maximallySpecificContainerElementCompliantValueExtractors ) );
 		}
-	}
-
-	/**
-	 * Returns the set of type-compliant and container-element-compliant value extractors or an empty set if none was found.
-	 */
-	private Set<ValueExtractorDescriptor> getTypeCompliantAndContainerElementCompliantValueExtractors(Type declaredType, TypeVariable<?> typeParameter) {
-		boolean isInternal = TypeVariables.isInternal( typeParameter );
-		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings = null;
-		if ( !isInternal ) {
-			allBindings = TypeVariableBindings.getTypeVariableBindings( (Class<?>) typeParameter.getGenericDeclaration() );
-		}
-
-		Set<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
-				.stream()
-				.filter( e -> TypeHelper.isAssignable( e.getContainerType(), declaredType ) )
-				.collect( Collectors.toSet() );
-
-		Set<ValueExtractorDescriptor> containerElementCompliantExtractors = new HashSet<>();
-
-		for ( ValueExtractorDescriptor extractorDescriptor : typeCompatibleExtractors ) {
-			TypeVariable<?> typeParameterBoundToExtractorType;
-
-			if ( !isInternal ) {
-				Map<TypeVariable<?>, TypeVariable<?>> bindingsForExtractorType = allBindings.get( extractorDescriptor.getContainerType() );
-				typeParameterBoundToExtractorType = bind( typeParameter, bindingsForExtractorType );
-			}
-			else {
-				typeParameterBoundToExtractorType = typeParameter;
-			}
-
-			if ( Objects.equals( extractorDescriptor.getExtractedTypeParameter(), typeParameterBoundToExtractorType ) ) {
-				containerElementCompliantExtractors.add( extractorDescriptor );
-			}
-		}
-
-		return containerElementCompliantExtractors;
 	}
 
 	private Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> valueType, Set<ValueExtractorDescriptor> extractors) {
