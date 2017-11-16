@@ -75,19 +75,18 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	 */
 	private final boolean hasContainerElementsMarkedForCascading;
 
-	public static ContainerCascadingMetaData of(ValueExtractorManager valueExtractorManager, CascadingMetaDataBuilder cascadingMetaDataBuilder,
-			Object context) {
-		return new ContainerCascadingMetaData( valueExtractorManager, cascadingMetaDataBuilder );
+	public static ContainerCascadingMetaData of(CascadingMetaDataBuilder cascadingMetaDataBuilder, Object context) {
+		return new ContainerCascadingMetaData( cascadingMetaDataBuilder );
 	}
 
-	private ContainerCascadingMetaData(ValueExtractorManager valueExtractorManager, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+	private ContainerCascadingMetaData(CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 		this(
 				cascadingMetaDataBuilder.getEnclosingType(),
 				cascadingMetaDataBuilder.getTypeParameter(),
 				cascadingMetaDataBuilder.getDeclaredContainerClass(),
 				cascadingMetaDataBuilder.getDeclaredTypeParameter(),
 				cascadingMetaDataBuilder.getContainerElementTypesCascadingMetaData().entrySet().stream()
-						.map( entry -> new ContainerCascadingMetaData( valueExtractorManager, entry.getValue() ) )
+						.map( entry -> new ContainerCascadingMetaData( entry.getValue() ) )
 						.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) ),
 				cascadingMetaDataBuilder.isCascading(),
 				GroupConversionHelper.of( cascadingMetaDataBuilder.getGroupConversions() ),
@@ -193,7 +192,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	}
 
 	@Override
-	public CascadingMetaData addRuntimeContainerSupport(Class<?> valueClass, ValueExtractorManager valueExtractorManager) {
+	public CascadingMetaData addRuntimeContainerSupport(ValueExtractorManager valueExtractorManager, Class<?> valueClass) {
 		return this;
 	}
 

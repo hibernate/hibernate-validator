@@ -7,10 +7,12 @@
 package org.hibernate.validator.test.internal.engine.valueextraction;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -60,9 +62,12 @@ public class MultipleContainersAtTheSameTimeTest {
 	public void testMultipleContainersAtTheSameTimeShouldNotThrowException() throws Exception {
 		List<String> strings = new Container();
 		strings.add( "" );
+		strings.add( null );
 
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( strings ) );
-		assertNoViolations( constraintViolations );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( "must not be null" )
+		);
 	}
 
 	/**
@@ -72,8 +77,13 @@ public class MultipleContainersAtTheSameTimeTest {
 	 */
 	@Test
 	public void testMultipleContainersAtTheSameTimeShouldAlsoNotThrowException() throws Exception {
-		Set<ConstraintViolation<Bar>> constraintViolations = validator.validate( new Bar( new BarContainer() ) );
-		assertNoViolations( constraintViolations );
+		BarContainer container = new BarContainer();
+		container.add( null );
+		container.add( "test" );
+		Set<ConstraintViolation<Bar>> constraintViolations = validator.validate( new Bar( container ) );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( "must not be null" )
+		);
 	}
 
 	/**
@@ -82,8 +92,7 @@ public class MultipleContainersAtTheSameTimeTest {
 	 */
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void testMultipleContainersAtTheSameTimeShouldThrowException() throws Exception {
-		Set<ConstraintViolation<FooBar>> constraintViolations = validator.validate( new FooBar( new FooBarContainer<String>().add( "" ) ) );
-		assertNoViolations( constraintViolations );
+		validator.validate( new FooBar( new FooBarContainer<String>().add( "" ) ) );
 	}
 
 	/**
@@ -92,8 +101,7 @@ public class MultipleContainersAtTheSameTimeTest {
 	 */
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void testMultipleContainersAtTheSameTimeWithTypeParameterSpecificShouldThrowException() throws Exception {
-		Set<ConstraintViolation<FooBar>> constraintViolations = validator.validate( new FooBar( new FooBarContainer<String>().add( "" ) ) );
-		assertNoViolations( constraintViolations );
+		validator.validate( new FooBar( new FooBarContainer<String>().add( "" ) ) );
 	}
 
 	/**
@@ -126,16 +134,21 @@ public class MultipleContainersAtTheSameTimeTest {
 	public void testFindingMaximallySpecificExtractorByTypeParameter() throws Exception {
 		class Foo {
 			@Valid
-			private final ImprovedCustomContainer<@Valid List<String>, String> container;
+			private final ImprovedCustomContainer<@Valid List<@NotNull String>, String> container;
 
 			Foo(ImprovedCustomContainer<List<String>, String> container) {
 				this.container = container;
 			}
 		}
 
-		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate(
-				new Foo( new ImprovedCustomContainerImpl<>( "" ) ) );
-		assertNoViolations( constraintViolations );
+		ImprovedCustomContainerImpl<List<String>, String> container = new ImprovedCustomContainerImpl<>( "" );
+		container.add( null );
+		container.add( Collections.singletonList( "" ) );
+		container.add( Collections.singletonList( null ) );
+		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( container ) );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( "must not be null" )
+		);
 	}
 
 	private static class Foo {
@@ -189,9 +202,11 @@ public class MultipleContainersAtTheSameTimeTest {
 
 	private static class BarContainer implements List<String>, CustomContainer<String> {
 
+		private final List<String> container = new ArrayList<>();
+
 		@Override
 		public int size() {
-			return 0;
+			return container.size();
 		}
 
 		@Override
@@ -206,7 +221,7 @@ public class MultipleContainersAtTheSameTimeTest {
 
 		@Override
 		public Iterator<String> iterator() {
-			return null;
+			return container.iterator();
 		}
 
 		@Override
@@ -221,7 +236,7 @@ public class MultipleContainersAtTheSameTimeTest {
 
 		@Override
 		public boolean add(String s) {
-			return false;
+			return container.add( s );
 		}
 
 		@Override
@@ -261,7 +276,7 @@ public class MultipleContainersAtTheSameTimeTest {
 
 		@Override
 		public String get(int index) {
-			return null;
+			return container.get( index );
 		}
 
 		@Override

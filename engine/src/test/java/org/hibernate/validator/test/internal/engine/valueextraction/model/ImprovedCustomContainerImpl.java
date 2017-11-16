@@ -36,4 +36,8 @@ public class ImprovedCustomContainerImpl<T, E> implements ImprovedCustomContaine
 	public E getE() {
 		return e;
 	}
+
+	public void add(T t) {
+		list.add( t );
+	}
 }

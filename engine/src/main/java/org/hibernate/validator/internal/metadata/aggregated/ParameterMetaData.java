@@ -170,7 +170,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 					parameterType,
 					adaptOriginsAndImplicitGroups( getDirectConstraints() ),
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
-					cascadingMetaDataBuilder.build( valueExtractorManager, executableForNameRetrieval )
+					cascadingMetaDataBuilder.build( executableForNameRetrieval )
 			);
 		}
 	}

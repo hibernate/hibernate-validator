@@ -100,32 +100,29 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 	}
 
 	@Override
-	public CascadingMetaData addRuntimeContainerSupport(Class<?> valueClass, ValueExtractorManager valueExtractorManager) {
+	public CascadingMetaData addRuntimeContainerSupport(ValueExtractorManager valueExtractorManager, Class<?> valueClass) {
 		if ( !cascading ) {
 			return this;
 		}
 
 		ValueExtractorDescriptor compliantValueExtractor = valueExtractorManager
-				.getMaximallySpecificAndRuntimeContainerElementCompliantValueExtractor( valueClass );
+				.getMaximallySpecificValueExtractorForAllContainerElements( valueClass );
 		if ( compliantValueExtractor == null ) {
 			return this;
 		}
 
-		ContainerCascadingMetaData containerElementCascadingMetaData = getContainerElementCascadingMetaData( compliantValueExtractor );
-		if ( containerElementCascadingMetaData == null ) {
-			return this;
-		}
-
-		return new ContainerCascadingMetaData( valueClass, Collections.singletonList( containerElementCascadingMetaData ), groupConversionHelper );
-	}
-
-	private ContainerCascadingMetaData getContainerElementCascadingMetaData(ValueExtractorDescriptor compliantValueExtractor) {
 		return new ContainerCascadingMetaData(
-				compliantValueExtractor.getContainerType(),
-				compliantValueExtractor.getExtractedTypeParameter(),
-				compliantValueExtractor.getContainerType(),
-				compliantValueExtractor.getExtractedTypeParameter(),
-				groupConversionHelper.isEmpty() ? GroupConversionHelper.EMPTY : groupConversionHelper
+				valueClass,
+				Collections.singletonList(
+						new ContainerCascadingMetaData(
+								compliantValueExtractor.getContainerType(),
+								compliantValueExtractor.getExtractedTypeParameter(),
+								compliantValueExtractor.getContainerType(),
+								compliantValueExtractor.getExtractedTypeParameter(),
+								groupConversionHelper.isEmpty() ? GroupConversionHelper.EMPTY : groupConversionHelper
+						)
+				),
+				groupConversionHelper
 		);
 	}
 

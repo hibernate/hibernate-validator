@@ -598,7 +598,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				CascadingMetaData cascadingMetaData = cascadable.getCascadingMetaData();
 
 				if ( value != null ) {
-					CascadingMetaData effectiveCascadingMetaData = cascadingMetaData.addRuntimeContainerSupport( value.getClass(), valueExtractorManager );
+					CascadingMetaData effectiveCascadingMetaData = cascadingMetaData.addRuntimeContainerSupport( valueExtractorManager, value.getClass() );
 
 					// validate cascading on the annotated object
 					if ( effectiveCascadingMetaData.isCascading() ) {
@@ -651,8 +651,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			ValueExtractorDescriptor extractor = valueExtractorManager.getMaximallySpecificAndRuntimeContainerElementCompliantValueExtractor(
 					cascadingMetaData.getEnclosingType(),
-					value.getClass(),
-					cascadingMetaData.getTypeParameter()
+					cascadingMetaData.getTypeParameter(),
+					value.getClass()
 			);
 
 			if ( extractor == null ) {
