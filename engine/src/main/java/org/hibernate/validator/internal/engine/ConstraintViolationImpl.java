@@ -278,28 +278,25 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		if ( interpolatedMessage != null ? !interpolatedMessage.equals( that.interpolatedMessage ) : that.interpolatedMessage != null ) {
 			return false;
 		}
+		if ( messageTemplate != null ? !messageTemplate.equals( that.messageTemplate ) : that.messageTemplate != null ) {
+			return false;
+		}
 		if ( propertyPath != null ? !propertyPath.equals( that.propertyPath ) : that.propertyPath != null ) {
 			return false;
 		}
-		if ( rootBean != null ? !rootBean.equals( that.rootBean ) : that.rootBean != null ) {
+		if ( rootBean != null ? ( rootBean != that.rootBean ) : that.rootBean != null ) {
 			return false;
 		}
-		if ( leafBeanInstance != null ? !leafBeanInstance.equals( that.leafBeanInstance ) : that.leafBeanInstance != null ) {
+		if ( leafBeanInstance != null ? ( leafBeanInstance != that.leafBeanInstance ) : that.leafBeanInstance != null ) {
+			return false;
+		}
+		if ( value != null ? ( value != that.value ) : that.value != null ) {
 			return false;
 		}
 		if ( constraintDescriptor != null ? !constraintDescriptor.equals( that.constraintDescriptor ) : that.constraintDescriptor != null ) {
 			return false;
 		}
 		if ( elementType != null ? !elementType.equals( that.elementType ) : that.elementType != null ) {
-			return false;
-		}
-		if ( messageTemplate != null ? !messageTemplate.equals( that.messageTemplate ) : that.messageTemplate != null ) {
-			return false;
-		}
-		if ( rootBeanClass != null ? !rootBeanClass.equals( that.rootBeanClass ) : that.rootBeanClass != null ) {
-			return false;
-		}
-		if ( value != null ? !value.equals( that.value ) : that.value != null ) {
 			return false;
 		}
 
@@ -334,7 +331,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		result = 31 * result + System.identityHashCode( value );
 		result = 31 * result + ( constraintDescriptor != null ? constraintDescriptor.hashCode() : 0 );
 		result = 31 * result + ( messageTemplate != null ? messageTemplate.hashCode() : 0 );
-		result = 31 * result + ( rootBeanClass != null ? rootBeanClass.hashCode() : 0 );
 		result = 31 * result + ( elementType != null ? elementType.hashCode() : 0 );
 		return result;
 	}
