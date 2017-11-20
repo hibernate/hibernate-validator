@@ -572,7 +572,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			}
 		}
 
-		LOG.logTemporalValidationTolerance( Duration.ZERO );
 		return Duration.ZERO;
 	}
 
