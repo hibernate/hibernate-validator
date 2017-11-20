@@ -31,7 +31,7 @@ abstract class AbstractTraversableHolder {
 
 		AbstractTraversableHolder that = (AbstractTraversableHolder) o;
 
-		if ( traversableObject != null ? !traversableObject.equals( that.traversableObject ) : that.traversableObject != null ) {
+		if ( traversableObject != null ? ( traversableObject != that.traversableObject ) : that.traversableObject != null ) {
 			return false;
 		}
 		if ( !traversableProperty.equals( that.traversableProperty ) ) {
