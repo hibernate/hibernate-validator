@@ -91,9 +91,14 @@ public class ValidationContext<T> {
 	private final Object executableReturnValue;
 
 	/**
-	 * The set of already processed unit of works. See {@link ProcessedUnit}.
+	 * The set of already processed path meta constraint units ({@link BeanPathMetaConstraintProcessedUnit}).
 	 */
-	private final Set<Object> processedUnits;
+	private final Set<BeanPathMetaConstraintProcessedUnit> processedPathUnits;
+
+	/**
+	 * The set of already processed group units ({@link BeanGroupProcessedUnit}).
+	 */
+	private final Set<BeanGroupProcessedUnit> processedGroupUnits;
 
 	/**
 	 * Maps an object to a list of paths in which it has been validated. The objects are the bean instances.
@@ -175,7 +180,8 @@ public class ValidationContext<T> {
 		this.executableParameters = executableParameters;
 		this.executableReturnValue = executableReturnValue;
 
-		this.processedUnits = new HashSet<>();
+		this.processedGroupUnits = new HashSet<>();
+		this.processedPathUnits = new HashSet<>();
 		this.processedPathsPerBean = new IdentityHashMap<>();
 		this.failingConstraintViolations = newHashSet();
 	}
@@ -355,11 +361,11 @@ public class ValidationContext<T> {
 	}
 
 	public boolean hasMetaConstraintBeenProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint) {
-		return processedUnits.contains( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
+		return processedPathUnits.contains( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
 	}
 
 	public void markConstraintProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint) {
-		processedUnits.add( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
+		processedPathUnits.add( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
 	}
 
 	public String getValidatedProperty() {
@@ -438,7 +444,7 @@ public class ValidationContext<T> {
 	}
 
 	private boolean isAlreadyValidatedForCurrentGroup(Object value, Class<?> group) {
-		return processedUnits.contains( new BeanGroupProcessedUnit( value, group ) );
+		return processedGroupUnits.contains( new BeanGroupProcessedUnit( value, group ) );
 	}
 
 	private void markCurrentBeanAsProcessedForCurrentPath(Object bean, PathImpl path) {
@@ -448,7 +454,7 @@ public class ValidationContext<T> {
 	}
 
 	private void markCurrentBeanAsProcessedForCurrentGroup(Object bean, Class<?> group) {
-		processedUnits.add( new BeanGroupProcessedUnit( bean, group ) );
+		processedGroupUnits.add( new BeanGroupProcessedUnit( bean, group ) );
 	}
 
 	/**
@@ -614,10 +620,7 @@ public class ValidationContext<T> {
 			if ( this == o ) {
 				return true;
 			}
-			if ( o == null || o.getClass() != BeanGroupProcessedUnit.class ) {
-				return false;
-			}
-
+			// No need to check if the class match because of how this class is used in the set.
 			BeanGroupProcessedUnit that = (BeanGroupProcessedUnit) o;
 
 			if ( bean != that.bean ) {  // instance equality
@@ -662,19 +665,16 @@ public class ValidationContext<T> {
 			if ( this == o ) {
 				return true;
 			}
-			if ( o == null || o.getClass() != BeanPathMetaConstraintProcessedUnit.class ) {
-				return false;
-			}
-
+			// No need to check if the class match because of how this class is used in the set.
 			BeanPathMetaConstraintProcessedUnit that = (BeanPathMetaConstraintProcessedUnit) o;
 
 			if ( bean != that.bean ) {  // instance equality
 				return false;
 			}
-			if ( !path.equals( that.path ) ) {
+			if ( metaConstraint != that.metaConstraint ) {
 				return false;
 			}
-			if ( metaConstraint != that.metaConstraint ) {
+			if ( !path.equals( that.path ) ) {
 				return false;
 			}
 
