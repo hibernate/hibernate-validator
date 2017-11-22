@@ -15,6 +15,7 @@ import java.security.PrivilegedAction;
 
 import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
@@ -63,10 +64,12 @@ public class FieldCascadable implements Cascadable {
 
 	public static class Builder implements Cascadable.Builder {
 
+		private final ValueExtractorManager valueExtractorManager;
 		private final Field field;
 		private CascadingMetaDataBuilder cascadingMetaDataBuilder;
 
-		public Builder(Field field, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+		public Builder(ValueExtractorManager valueExtractorManager, Field field, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+			this.valueExtractorManager = valueExtractorManager;
 			this.field = field;
 			this.cascadingMetaDataBuilder = cascadingMetaDataBuilder;
 		}
@@ -78,7 +81,7 @@ public class FieldCascadable implements Cascadable {
 
 		@Override
 		public FieldCascadable build() {
-			return new FieldCascadable( getAccessible( field ), cascadingMetaDataBuilder.build( field ) );
+			return new FieldCascadable( getAccessible( field ), cascadingMetaDataBuilder.build( valueExtractorManager, field ) );
 		}
 
 		/**

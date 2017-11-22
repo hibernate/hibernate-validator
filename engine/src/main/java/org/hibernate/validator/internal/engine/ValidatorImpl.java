@@ -652,7 +652,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ValueExtractorDescriptor extractor = valueExtractorManager.getMaximallySpecificAndRuntimeContainerElementCompliantValueExtractor(
 					cascadingMetaData.getEnclosingType(),
 					cascadingMetaData.getTypeParameter(),
-					value.getClass()
+					value.getClass(),
+					cascadingMetaData.getValueExtractorCandidates()
 			);
 
 			if ( extractor == null ) {

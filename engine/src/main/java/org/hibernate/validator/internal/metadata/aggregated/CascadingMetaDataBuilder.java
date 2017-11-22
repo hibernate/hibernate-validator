@@ -23,6 +23,7 @@ import javax.validation.GroupSequence;
 
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
@@ -207,14 +208,14 @@ public class CascadingMetaDataBuilder {
 		return new CascadingMetaDataBuilder( this.enclosingType, this.typeParameter, cascading, nestedCascadingTypeParameterMap, groupConversions );
 	}
 
-	public CascadingMetaData build(Object context) {
+	public CascadingMetaData build(ValueExtractorManager valueExtractorManager, Object context) {
 		validateGroupConversions( context );
 
 		if ( containerElementTypesCascadingMetaData.isEmpty() ) {
 			return NonContainerCascadingMetaData.of( this, context );
 		}
 		else {
-			return ContainerCascadingMetaData.of( this, context );
+			return ContainerCascadingMetaData.of( valueExtractorManager, this, context );
 		}
 	}
 

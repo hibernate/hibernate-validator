@@ -122,7 +122,8 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 								groupConversionHelper.isEmpty() ? GroupConversionHelper.EMPTY : groupConversionHelper
 						)
 				),
-				groupConversionHelper
+				groupConversionHelper,
+				Collections.singleton( compliantValueExtractor )
 		);
 	}
 

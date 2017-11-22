@@ -381,7 +381,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
-					cascadingMetaDataBuilder.build( executable ),
+					cascadingMetaDataBuilder.build( valueExtractorManager, executable ),
 					isConstrained,
 					isGetterMethod
 			);

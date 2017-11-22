@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
@@ -60,11 +61,13 @@ public class GetterCascadable implements Cascadable {
 
 	public static class Builder implements Cascadable.Builder {
 
+		private final ValueExtractorManager valueExtractorManager;
 		private final Method method;
 		private CascadingMetaDataBuilder cascadingMetaDataBuilder;
 
 		// Note: the method passed here has to be accessible: the caller is responsible for that
-		public Builder(Method method, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+		public Builder(ValueExtractorManager valueExtractorManager, Method method, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+			this.valueExtractorManager = valueExtractorManager;
 			this.method = method;
 			this.cascadingMetaDataBuilder = cascadingMetaDataBuilder;
 		}
@@ -76,7 +79,7 @@ public class GetterCascadable implements Cascadable {
 
 		@Override
 		public GetterCascadable build() {
-			return new GetterCascadable( method, cascadingMetaDataBuilder.build( method ) );
+			return new GetterCascadable( method, cascadingMetaDataBuilder.build( valueExtractorManager, method ) );
 		}
 	}
 }
