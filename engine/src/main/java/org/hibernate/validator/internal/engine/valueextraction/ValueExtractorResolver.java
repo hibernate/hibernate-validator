@@ -54,12 +54,7 @@ class ValueExtractorResolver {
 	 * Returns the maximally specific type compliant value extractors or an empty set if none was found.
 	 */
 	public Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> valueType) {
-		Set<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
-				.stream()
-				.filter( e -> TypeHelper.isAssignable( TypeHelper.getErasedReferenceType( e.getContainerType() ), valueType ) )
-				.collect( Collectors.toSet() );
-
-		return getMaximallySpecificValueExtractors( valueType, typeCompatibleExtractors );
+		return getValueExtractors( valueType );
 	}
 
 	/**
@@ -95,6 +90,10 @@ class ValueExtractorResolver {
 	 * Throws an exception if more than 2 maximally specific container-element-compliant value extractors are found.
 	 */
 	public ValueExtractorDescriptor getMaximallySpecificValueExtractorForAllContainerElements(Class<?> runtimeType) {
+		// if it's a Map assignable type it gets a special treatment to support legacy containers
+		if ( TypeHelper.isAssignable( Map.class, runtimeType ) ) {
+			return MapValueExtractor.DESCRIPTOR;
+		}
 		return getUniqueValueExtractorOrThrowException( runtimeType, getValueExtractors( runtimeType ) );
 	}
 
@@ -113,48 +112,37 @@ class ValueExtractorResolver {
 		}
 	}
 
-	private Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> valueType, Set<ValueExtractorDescriptor> extractors) {
-		Set<ValueExtractorDescriptor> candidates = CollectionHelper.newHashSet( extractors.size() );
+	private Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Set<ValueExtractorDescriptor> possibleValueExtractors) {
+		Set<ValueExtractorDescriptor> valueExtractorDescriptors = CollectionHelper.newHashSet( possibleValueExtractors.size() );
 
-		for ( ValueExtractorDescriptor descriptor : extractors ) {
-			// in the case of cascaded validation, some of the proposed value extractors
-			// might not be compatible with the runtime type we have in the end so we need
-			// to skip them
-			if ( !TypeHelper.isAssignable( descriptor.getContainerType(), valueType ) ) {
+		for ( ValueExtractorDescriptor descriptor : possibleValueExtractors ) {
+			if ( valueExtractorDescriptors.isEmpty() ) {
+				valueExtractorDescriptors.add( descriptor );
 				continue;
 			}
-			performMaximallySpecificFilteringIteration( candidates, descriptor );
-		}
+			Iterator<ValueExtractorDescriptor> candidatesIterator = valueExtractorDescriptors.iterator();
+			boolean isNewRoot = true;
+			while ( candidatesIterator.hasNext() ) {
+				ValueExtractorDescriptor candidate = candidatesIterator.next();
 
-		return candidates;
-	}
+				// we consider the strictly more specific value extractor so 2 value extractors for the same container
+				// type should throw an error in the end if no other more specific value extractor is found.
+				if ( candidate.getContainerType().equals( descriptor.getContainerType() ) ) {
+					continue;
+				}
 
-	private void performMaximallySpecificFilteringIteration(Set<ValueExtractorDescriptor> valueExtractorDescriptors, ValueExtractorDescriptor descriptor) {
-		if ( valueExtractorDescriptors.isEmpty() ) {
-			valueExtractorDescriptors.add( descriptor );
-			return;
-		}
-		Iterator<ValueExtractorDescriptor> candidatesIterator = valueExtractorDescriptors.iterator();
-		boolean isNewRoot = true;
-		while ( candidatesIterator.hasNext() ) {
-			ValueExtractorDescriptor candidate = candidatesIterator.next();
-
-			// we consider the strictly more specific value extractor so 2 value extractors for the same container
-			// type should throw an error in the end if no other more specific value extractor is found.
-			if ( candidate.getContainerType().equals( descriptor.getContainerType() ) ) {
-				continue;
+				if ( TypeHelper.isAssignable( candidate.getContainerType(), descriptor.getContainerType() ) ) {
+					candidatesIterator.remove();
+				}
+				else if ( TypeHelper.isAssignable( descriptor.getContainerType(), candidate.getContainerType() ) ) {
+					isNewRoot = false;
+				}
 			}
-
-			if ( TypeHelper.isAssignable( candidate.getContainerType(), descriptor.getContainerType() ) ) {
-				candidatesIterator.remove();
-			}
-			else if ( TypeHelper.isAssignable( descriptor.getContainerType(), candidate.getContainerType() ) ) {
-				isNewRoot = false;
+			if ( isNewRoot ) {
+				valueExtractorDescriptors.add( descriptor );
 			}
 		}
-		if ( isNewRoot ) {
-			valueExtractorDescriptors.add( descriptor );
-		}
+		return valueExtractorDescriptors;
 	}
 
 	private Set<ValueExtractorDescriptor> getValueExtractors(Class<?> runtimeType) {
@@ -163,31 +151,21 @@ class ValueExtractorResolver {
 		}
 		Set<ValueExtractorDescriptor> valueExtractorDescriptors = possibleValueExtractorsByRuntimeType.get( runtimeType );
 		if ( valueExtractorDescriptors == null ) {
-			// if it's a Map assignable type it gets a special treatment to support legacy containers
-			if ( TypeHelper.isAssignable( Map.class, runtimeType ) ) {
-				valueExtractorDescriptors = Collections.singleton( MapValueExtractor.DESCRIPTOR );
-			}
-			else {
-				//otherwise we just look for maximally specific extractors for the runtime type
-				Set<ValueExtractorDescriptor> possibleValueExtractors = valueExtractors.values()
-						.stream()
-						.filter( e -> TypeHelper.isAssignable( e.getContainerType(), runtimeType ) )
-						.collect( Collectors.toSet() );
+			//otherwise we just look for maximally specific extractors for the runtime type
+			Set<ValueExtractorDescriptor> possibleValueExtractors = valueExtractors.values()
+					.stream()
+					.filter( e -> TypeHelper.isAssignable( e.getContainerType(), runtimeType ) )
+					.collect( Collectors.toSet() );
 
-				valueExtractorDescriptors = CollectionHelper.newHashSet( possibleValueExtractors.size() );
-
-				for ( ValueExtractorDescriptor descriptor : possibleValueExtractors ) {
-					performMaximallySpecificFilteringIteration( valueExtractorDescriptors, descriptor );
-				}
-			}
-			if ( valueExtractorDescriptors.isEmpty() ) {
-				nonContainerTypes.put( runtimeType, NON_CONTAINER_VALUE );
-			}
-			else {
-				Set<ValueExtractorDescriptor> extractorDescriptorsToCache = CollectionHelper.toImmutableSet( valueExtractorDescriptors );
-				possibleValueExtractorsByRuntimeType.put( runtimeType, extractorDescriptorsToCache );
-				return extractorDescriptorsToCache;
-			}
+			valueExtractorDescriptors = getMaximallySpecificValueExtractors( possibleValueExtractors );
+		}
+		if ( valueExtractorDescriptors.isEmpty() ) {
+			nonContainerTypes.put( runtimeType, NON_CONTAINER_VALUE );
+		}
+		else {
+			Set<ValueExtractorDescriptor> extractorDescriptorsToCache = CollectionHelper.toImmutableSet( valueExtractorDescriptors );
+			possibleValueExtractorsByRuntimeType.put( runtimeType, extractorDescriptorsToCache );
+			return extractorDescriptorsToCache;
 		}
 
 		return valueExtractorDescriptors;
@@ -213,11 +191,7 @@ class ValueExtractorResolver {
 							)
 					).collect( Collectors.toSet() );
 
-			valueExtractorDescriptors = CollectionHelper.newHashSet( possibleValueExtractors.size() );
-
-			for ( ValueExtractorDescriptor descriptor : possibleValueExtractors ) {
-				performMaximallySpecificFilteringIteration( valueExtractorDescriptors, descriptor );
-			}
+			valueExtractorDescriptors = getMaximallySpecificValueExtractors( possibleValueExtractors );
 
 			if ( valueExtractorDescriptors.isEmpty() ) {
 				nonContainerTypes.put( runtimeType, NON_CONTAINER_VALUE );
