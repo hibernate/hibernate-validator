@@ -91,12 +91,12 @@ public class ValidationContext<T> {
 	private final Object executableReturnValue;
 
 	/**
-	 * The set of already processed path meta constraint units ({@link BeanPathMetaConstraintProcessedUnit}).
+	 * The set of already processed meta constraints per bean - path ({@link BeanPathMetaConstraintProcessedUnit}).
 	 */
 	private final Set<BeanPathMetaConstraintProcessedUnit> processedPathUnits;
 
 	/**
-	 * The set of already processed group units ({@link BeanGroupProcessedUnit}).
+	 * The set of already processed groups per bean ({@link BeanGroupProcessedUnit}).
 	 */
 	private final Set<BeanGroupProcessedUnit> processedGroupUnits;
 
@@ -620,7 +620,8 @@ public class ValidationContext<T> {
 			if ( this == o ) {
 				return true;
 			}
-			// No need to check if the class match because of how this class is used in the set.
+
+			// No need to check if the class matches because of how this class is used in the set.
 			BeanGroupProcessedUnit that = (BeanGroupProcessedUnit) o;
 
 			if ( bean != that.bean ) {  // instance equality
@@ -665,7 +666,8 @@ public class ValidationContext<T> {
 			if ( this == o ) {
 				return true;
 			}
-			// No need to check if the class match because of how this class is used in the set.
+
+			// No need to check if the class matches because of how this class is used in the set.
 			BeanPathMetaConstraintProcessedUnit that = (BeanPathMetaConstraintProcessedUnit) o;
 
 			if ( bean != that.bean ) {  // instance equality
