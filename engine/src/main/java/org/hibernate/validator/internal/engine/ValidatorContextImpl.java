@@ -188,4 +188,5 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				traversableResolverResultCacheEnabled
 		);
 	}
+
 }
