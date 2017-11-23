@@ -138,6 +138,11 @@ public class ValidationContext<T> {
 	 */
 	private String validatedProperty;
 
+	/**
+	 * Describes what is validated with the current validation context.
+	 */
+	private final ValidationOperation validationOperation;
+
 	private ValidationContext(ConstraintValidatorManager constraintValidatorManager,
 			ConstraintValidatorFactory constraintValidatorFactory,
 			ValidatorScopedContext validatorScopedContext,
@@ -148,7 +153,8 @@ public class ValidationContext<T> {
 			BeanMetaData<T> rootBeanMetaData,
 			Executable executable,
 			Object[] executableParameters,
-			Object executableReturnValue) {
+			Object executableReturnValue,
+			ValidationOperation validationOperation) {
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.validatorScopedContext = validatorScopedContext;
 		this.constraintValidatorFactory = constraintValidatorFactory;
@@ -161,6 +167,7 @@ public class ValidationContext<T> {
 		this.executable = executable;
 		this.executableParameters = executableParameters;
 		this.executableReturnValue = executableReturnValue;
+		this.validationOperation = validationOperation;
 
 		this.processedGroupUnits = new HashSet<>();
 		this.processedPathUnits = new HashSet<>();
@@ -222,7 +229,7 @@ public class ValidationContext<T> {
 	 * created for parameter validation, {@code null} otherwise.
 	 */
 	public List<String> getParameterNames() {
-		if ( executableParameters == null ) {
+		if ( !ValidationOperation.PARAMETER_VALIDATION.equals( validationOperation ) ) {
 			return null;
 		}
 
@@ -286,55 +293,55 @@ public class ValidationContext<T> {
 		// at this point we make a copy of the path to avoid side effects
 		Path path = PathImpl.createCopy( constraintViolationCreationContext.getPath() );
 		Object dynamicPayload = constraintViolationCreationContext.getDynamicPayload();
-		if ( executableParameters != null ) {
-			return ConstraintViolationImpl.forParameterValidation(
-					messageTemplate,
-					constraintViolationCreationContext.getMessageParameters(),
-					constraintViolationCreationContext.getExpressionVariables(),
-					interpolatedMessage,
-					getRootBeanClass(),
-					getRootBean(),
-					localContext.getCurrentBean(),
-					localContext.getCurrentValidatedValue(),
-					path,
-					descriptor,
-					localContext.getElementType(),
-					executableParameters,
-					dynamicPayload
-			);
-		}
-		else if ( executableReturnValue != null ) {
-			return ConstraintViolationImpl.forReturnValueValidation(
-					messageTemplate,
-					constraintViolationCreationContext.getMessageParameters(),
-					constraintViolationCreationContext.getExpressionVariables(),
-					interpolatedMessage,
-					getRootBeanClass(),
-					getRootBean(),
-					localContext.getCurrentBean(),
-					localContext.getCurrentValidatedValue(),
-					path,
-					descriptor,
-					localContext.getElementType(),
-					executableReturnValue,
-					dynamicPayload
-			);
-		}
-		else {
-			return ConstraintViolationImpl.forBeanValidation(
-					messageTemplate,
-					constraintViolationCreationContext.getMessageParameters(),
-					constraintViolationCreationContext.getExpressionVariables(),
-					interpolatedMessage,
-					getRootBeanClass(),
-					getRootBean(),
-					localContext.getCurrentBean(),
-					localContext.getCurrentValidatedValue(),
-					path,
-					descriptor,
-					localContext.getElementType(),
-					dynamicPayload
-			);
+
+		switch ( validationOperation ) {
+			case PARAMETER_VALIDATION:
+				return ConstraintViolationImpl.forParameterValidation(
+						messageTemplate,
+						constraintViolationCreationContext.getMessageParameters(),
+						constraintViolationCreationContext.getExpressionVariables(),
+						interpolatedMessage,
+						getRootBeanClass(),
+						getRootBean(),
+						localContext.getCurrentBean(),
+						localContext.getCurrentValidatedValue(),
+						path,
+						descriptor,
+						localContext.getElementType(),
+						executableParameters,
+						dynamicPayload
+				);
+			case RETURN_VALUE_VALIDATION:
+				return ConstraintViolationImpl.forReturnValueValidation(
+						messageTemplate,
+						constraintViolationCreationContext.getMessageParameters(),
+						constraintViolationCreationContext.getExpressionVariables(),
+						interpolatedMessage,
+						getRootBeanClass(),
+						getRootBean(),
+						localContext.getCurrentBean(),
+						localContext.getCurrentValidatedValue(),
+						path,
+						descriptor,
+						localContext.getElementType(),
+						executableReturnValue,
+						dynamicPayload
+				);
+			default:
+				return ConstraintViolationImpl.forBeanValidation(
+						messageTemplate,
+						constraintViolationCreationContext.getMessageParameters(),
+						constraintViolationCreationContext.getExpressionVariables(),
+						interpolatedMessage,
+						getRootBeanClass(),
+						getRootBean(),
+						localContext.getCurrentBean(),
+						localContext.getCurrentValidatedValue(),
+						path,
+						descriptor,
+						localContext.getElementType(),
+						dynamicPayload
+				);
 		}
 	}
 
@@ -477,7 +484,8 @@ public class ValidationContext<T> {
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					null, //executable
 					null, //executable parameters
-					null //executable return value
+					null, //executable return value
+					ValidationOperation.BEAN_VALIDATION
 			);
 		}
 
@@ -495,7 +503,8 @@ public class ValidationContext<T> {
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					null, //executable
 					null, //executable parameters
-					null //executable return value
+					null, //executable return value
+					ValidationOperation.PROPERTY_VALIDATION
 			);
 		}
 
@@ -511,7 +520,8 @@ public class ValidationContext<T> {
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					null, //executable
 					null, //executable parameters
-					null //executable return value
+					null, //executable return value
+					ValidationOperation.VALUE_VALIDATION
 			);
 		}
 
@@ -533,7 +543,8 @@ public class ValidationContext<T> {
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					executable,
 					executableParameters,
-					null //executable return value
+					null, //executable return value
+					ValidationOperation.PARAMETER_VALIDATION
 			);
 		}
 
@@ -554,7 +565,8 @@ public class ValidationContext<T> {
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					executable,
 					null, //executable parameters
-					executableReturnValue
+					executableReturnValue,
+					ValidationOperation.RETURN_VALUE_VALIDATION
 			);
 		}
 	}
@@ -734,5 +746,13 @@ public class ValidationContext<T> {
 		public boolean isTraversableResolverResultCacheEnabled() {
 			return this.traversableResolverResultCacheEnabled;
 		}
+	}
+
+	/**
+	 * Describes possible places where validation operations can occur.
+	 */
+	private enum ValidationOperation {
+		BEAN_VALIDATION, PROPERTY_VALIDATION, VALUE_VALIDATION,
+		PARAMETER_VALIDATION, RETURN_VALUE_VALIDATION
 	}
 }
