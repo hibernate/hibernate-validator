@@ -40,6 +40,7 @@ import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
+import org.hibernate.validator.internal.engine.ValidationContext.ValidatorScopedContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.engine.groups.Group;
@@ -106,11 +107,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private final ConstraintValidatorFactory constraintValidatorFactory;
 
 	/**
-	 * {@link MessageInterpolator} as passed to the constructor of this instance.
-	 */
-	private final MessageInterpolator messageInterpolator;
-
-	/**
 	 * {@link TraversableResolver} as passed to the constructor of this instance.
 	 * Never use it directly, always use {@link #getCachingTraversableResolver()} to retrieved the single threaded caching wrapper.
 	 */
@@ -127,27 +123,12 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final ConstraintValidatorManager constraintValidatorManager;
 
-	/**
-	 * Used for retrieving parameter names to be used in constraint violations or node names.
-	 */
-	private final ExecutableParameterNameProvider parameterNameProvider;
-
-	/**
-	 * Used to get the current time when validating {@code @Past} and {@code @Future}.
-	 */
-	private final ClockProvider clockProvider;
-
-	/**
-	 * Indicates if validation has to be stopped on first constraint violation.
-	 */
-	private final boolean failFast;
-
-	/**
-	 * Indicates if the {@code TraversableResolver} result cache is enabled.
-	 */
-	private final boolean traversableResolverResultCacheEnabled;
-
 	private final ValueExtractorManager valueExtractorManager;
+
+	/**
+	 * Context containing all validator level configuraions .
+	 */
+	private final ValidatorScopedContext validatorScopedContext;
 
 	/**
 	 * The constraint initialization context is stored at this level to prevent creating a new instance each time we
@@ -169,18 +150,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			boolean traversableResolverResultCacheEnabled,
 			Duration temporalValidationTolerance) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
-		this.messageInterpolator = messageInterpolator;
-		this.traversableResolver = traversableResolver;
 		this.beanMetaDataManager = beanMetaDataManager;
-		this.parameterNameProvider = parameterNameProvider;
-		this.clockProvider = clockProvider;
 		this.valueExtractorManager = valueExtractorManager;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.validationOrderGenerator = validationOrderGenerator;
-		this.failFast = failFast;
-		this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
-		this.constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
-				temporalValidationTolerance );
+		this.traversableResolver = traversableResolver;
+		this.validatorScopedContext = new ValidatorScopedContext( messageInterpolator, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast, traversableResolverResultCacheEnabled );
+		this.constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl( validatorScopedContext.getScriptEvaluatorFactory(), validatorScopedContext.getClockProvider(), validatorScopedContext.getTemporalValidationTolerance() );
 	}
 
 	@Override
@@ -196,7 +172,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 		ValueContext<?, Object> valueContext = ValueContext.getLocalExecutionContext(
-				parameterNameProvider,
+				validatorScopedContext.getParameterNameProvider(),
 				object,
 				validationContext.getRootBeanMetaData(),
 				PathImpl.createRootPath()
@@ -288,7 +264,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		sanityCheckGroups( groups );
 
 		ValidationContext<T> validationContext = getValidationContextBuilder().forValidateParameters(
-				parameterNameProvider,
+				validatorScopedContext.getParameterNameProvider(),
 				object,
 				executable,
 				parameterValues
@@ -351,12 +327,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return ValidationContext.getValidationContextBuilder(
 				beanMetaDataManager,
 				constraintValidatorManager,
-				messageInterpolator,
 				constraintValidatorFactory,
-				TraversableResolvers.wrapWithCachingForSingleValidation( traversableResolver, traversableResolverResultCacheEnabled ),
-				clockProvider,
-				constraintValidatorInitializationContext,
-				failFast
+				validatorScopedContext,
+				TraversableResolvers.wrapWithCachingForSingleValidation( traversableResolver, validatorScopedContext.isTraversableResolverResultCacheEnabled() ),
+				constraintValidatorInitializationContext
+
 		);
 	}
 
@@ -779,7 +754,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		ValueContext<?, Object> newValueContext;
 		if ( value != null ) {
 			newValueContext = ValueContext.getLocalExecutionContext(
-					parameterNameProvider,
+					validatorScopedContext.getParameterNameProvider(),
 					value,
 					beanMetaDataManager.getBeanMetaData( value.getClass() ),
 					valueContext.getPropertyPath()
@@ -788,7 +763,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 		else {
 			newValueContext = ValueContext.getLocalExecutionContext(
-					parameterNameProvider,
+					validatorScopedContext.getParameterNameProvider(),
 					valueContext.getCurrentBeanType(),
 					valueContext.getCurrentBeanMetaData(),
 					valueContext.getPropertyPath()
@@ -885,7 +860,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		ValueContext<Object[], Object> cascadingValueContext = ValueContext.getLocalExecutionContext(
 				beanMetaDataManager,
-				parameterNameProvider,
+				validatorScopedContext.getParameterNameProvider(),
 				parameterValues,
 				executableMetaData.getValidatableParametersMetaData(),
 				PathImpl.createPathForExecutable( executableMetaData )
@@ -1019,7 +994,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		if ( object != null ) {
 			valueContext = ValueContext.getLocalExecutionContext(
 					beanMetaDataManager,
-					parameterNameProvider,
+					validatorScopedContext.getParameterNameProvider(),
 					object,
 					validatable,
 					PathImpl.createPathForExecutable( executableMetaData )
@@ -1028,7 +1003,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		else {
 			valueContext = ValueContext.getLocalExecutionContext(
 					beanMetaDataManager,
-					parameterNameProvider,
+					validatorScopedContext.getParameterNameProvider(),
 					(Class<T>) null, //the type is not required in this case (only for cascaded validation)
 					validatable,
 					PathImpl.createPathForExecutable( executableMetaData )
@@ -1071,7 +1046,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		if ( value != null ) {
 			cascadingValueContext = ValueContext.getLocalExecutionContext(
 					beanMetaDataManager,
-					parameterNameProvider,
+					validatorScopedContext.getParameterNameProvider(),
 					value,
 					executableMetaData.getReturnValueMetaData(),
 					PathImpl.createPathForExecutable( executableMetaData )
@@ -1242,7 +1217,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		validationContext.setValidatedProperty( propertyMetaData.getName() );
 		propertyPath.removeLeafNode();
 
-		return ValueContext.getLocalExecutionContext( parameterNameProvider, value, beanMetaData, propertyPath );
+		return ValueContext.getLocalExecutionContext( validatorScopedContext.getParameterNameProvider(), value, beanMetaData, propertyPath );
 	}
 
 	/**
@@ -1295,7 +1270,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		validationContext.setValidatedProperty( propertyMetaData.getName() );
 		propertyPath.removeLeafNode();
 
-		return ValueContext.getLocalExecutionContext( parameterNameProvider, clazz, beanMetaData, propertyPath );
+		return ValueContext.getLocalExecutionContext( validatorScopedContext.getParameterNameProvider(), clazz, beanMetaData, propertyPath );
 	}
 
 	private boolean isValidationRequired(ValidationContext<?> validationContext,
