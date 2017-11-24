@@ -10,9 +10,11 @@ import java.lang.reflect.TypeVariable;
 import java.util.Set;
 
 import javax.validation.metadata.GroupConversionDescriptor;
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 
 /**
  * An aggregated view of the cascading validation metadata. Note that it also includes the cascading validation metadata
@@ -46,14 +48,15 @@ public interface CascadingMetaData {
 	 * Add additional cascading metadata when:
 	 * <ul>
 	 * <li>the element is marked with {@code @Valid},</li>
-	 * <li>the runtime type of the element is collection based (e.g. collections, maps or arrays),</li>
-	 * <li>and the static type isn't collection based.</li>
+	 * <li>the runtime type of the element is container based (e.g. collections, maps or arrays),</li>
+	 * <li>and there are {@link ValueExtractor}s present for such container,</li>
+	 * <li>and the declared type isn't container based.</li>
 	 * </ul>
 	 * <p>
 	 * An example of this particular situation is: {@code @Valid private Object element = new ArrayList<String>()}.
 	 * <p>
-	 * Note that if the static type is collection based, the cascading information are directly included at bootstrap
+	 * Note that if the declared type is container based, the cascading information is directly included at bootstrap
 	 * time.
 	 */
-	CascadingMetaData addRuntimeLegacyCollectionSupport(Class<?> valueClass);
+	CascadingMetaData addRuntimeContainerSupport(ValueExtractorManager valueExtractorManager, Class<?> valueClass);
 }
