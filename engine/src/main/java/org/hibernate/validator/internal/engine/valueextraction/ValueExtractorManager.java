@@ -12,18 +12,17 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.ValidationException;
 import javax.validation.valueextraction.ValueExtractor;
 
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
@@ -97,7 +96,7 @@ public class ValueExtractorManager {
 		}
 
 		valueExtractors = Collections.unmodifiableMap( tmpValueExtractors );
-		valueExtractorResolver = new ValueExtractorResolver( getValueExtractorDescriptorsAsList() );
+		valueExtractorResolver = new ValueExtractorResolver( new HashSet<>( valueExtractors.values() ) );
 	}
 
 	public ValueExtractorManager(ValueExtractorManager template,
@@ -106,7 +105,7 @@ public class ValueExtractorManager {
 		tmpValueExtractors.putAll( externalValueExtractorDescriptors );
 
 		valueExtractors = Collections.unmodifiableMap( tmpValueExtractors );
-		valueExtractorResolver = new ValueExtractorResolver( getValueExtractorDescriptorsAsList() );
+		valueExtractorResolver = new ValueExtractorResolver( new HashSet<>( valueExtractors.values() ) );
 	}
 
 	public static Set<ValueExtractor<?>> getDefaultValueExtractors() {
@@ -116,31 +115,41 @@ public class ValueExtractorManager {
 	}
 
 	/**
-	 * Should be used to find a most specific {@link ValueExtractor} based on a declared type, when creating
-	 * {@link MetaConstraint} and there's a need to determine a {@link ValueExtractorDescriptor} for a wrapped value.
+	 * Used to find all the maximally specific value extractors based on a declared type in the case of value unwrapping.
+	 * <p>
+	 * There might be several of them as there might be several type parameters.
+	 * <p>
+	 * Used for container element constraints.
 	 *
 	 * @see ValueExtractorResolver#getMaximallySpecificValueExtractors(Class)
 	 */
-	public Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> valueType) {
-		return valueExtractorResolver.getMaximallySpecificValueExtractors( valueType );
+	public Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> declaredType) {
+		return valueExtractorResolver.getMaximallySpecificValueExtractors( declaredType );
 	}
 
 	/**
-	 * Should be used to find a most specific {@link ValueExtractor} based on a declared type, when creating
-	 * {@link MetaConstraint} and there's a need to determine a {@link ValueExtractorDescriptor} for a type argument.
+	 * Used to find the maximally specific and container element compliant value extractor based on the declared type
+	 * and the type parameter.
+	 * <p>
+	 * Used for container element constraints.
 	 *
 	 * @see ValueExtractorResolver#getMaximallySpecificAndContainerElementCompliantValueExtractor(Class, TypeVariable)
+	 * @throws ConstraintDeclarationException if more than 2 maximally specific container-element-compliant value extractors are found
 	 */
 	public ValueExtractorDescriptor getMaximallySpecificAndContainerElementCompliantValueExtractor(Class<?> declaredType, TypeVariable<?> typeParameter) {
 		return valueExtractorResolver.getMaximallySpecificAndContainerElementCompliantValueExtractor( declaredType, typeParameter );
 	}
 
 	/**
-	 * Should be used to find a most specific {@link ValueExtractor} based on a runtime type, when the actual
-	 * cascading container validation should perform extraction. Most specific one is determined from candidates
-	 * passed to this method.
+	 * Used to find the maximally specific and container element compliant value extractor based on the runtime type.
+	 * <p>
+	 * The maximally specific one is chosen among the candidates passed to this method.
+	 * <p>
+	 * Used for cascading validation.
 	 *
-	 * @see ValueExtractorResolver#getMaximallySpecificAndRuntimeContainerElementCompliantValueExtractor(Type, TypeVariable, Class, Collection)
+	 * @see ValueExtractorResolver#getMaximallySpecificAndRuntimeContainerElementCompliantValueExtractor(Type,
+	 * TypeVariable, Class, Collection)
+	 * @throws ConstraintDeclarationException if more than 2 maximally specific container-element-compliant value extractors are found
 	 */
 	public ValueExtractorDescriptor getMaximallySpecificAndRuntimeContainerElementCompliantValueExtractor(Type declaredType, TypeVariable<?> typeParameter,
 			Class<?> runtimeType, Collection<ValueExtractorDescriptor> valueExtractorCandidates) {
@@ -167,11 +176,16 @@ public class ValueExtractorManager {
 	}
 
 	/**
-	 * Should be used to determine if passed runtime type is a container and if so return a corresponding
-	 * maximally specific {@link ValueExtractor} for it.
+	 * Used to determine if the passed runtime type is a container and if so return a corresponding maximally specific
+	 * value extractor.
 	 * <p>
-	 * The special case is when passed type is assignable to {@link Map} to support legacy container validation.
-	 * In such case {@link MapValueExtractor} will be returned.
+	 * Obviously, it only works if there's only one value extractor corresponding to the runtime type as we don't
+	 * precise any type parameter.
+	 * <p>
+	 * There is a special case: when the passed type is assignable to a {@link Map}, the {@link MapValueExtractor} will
+	 * be returned. This is required by the Bean Validation specification.
+	 * <p>
+	 * Used for cascading validation when the {@code @Valid} annotation is placed on the whole container.
 	 *
 	 * @see ValueExtractorResolver#getMaximallySpecificValueExtractorForAllContainerElements(Class)
 	 */
@@ -180,7 +194,11 @@ public class ValueExtractorManager {
 	}
 
 	/**
-	 * Should be used to find possible {@link ValueExtractor} candidates based on declared type and type variable.
+	 * Used to determine the value extractor candidates valid for a declared type and type variable.
+	 * <p>
+	 * The effective value extractor will be narrowed from these candidates using the runtime type.
+	 * <p>
+	 * Used to optimize the choice of the value extractor in the case of cascading validation.
 	 *
 	 * @see ValueExtractorResolver#getValueExtractorCandidatesForCascadedValidation(Type, TypeVariable)
 	 */
@@ -224,11 +242,6 @@ public class ValueExtractorManager {
 		catch (ValidationException e) {
 			return false;
 		}
-	}
-
-	private List<ValueExtractorDescriptor> getValueExtractorDescriptorsAsList() {
-		return valueExtractors.values().stream().collect(
-				Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) );
 	}
 
 	/**

@@ -54,9 +54,9 @@ public class MultipleContainersAtTheSameTimeTest {
 	}
 
 	/**
-	 * Even though there runtime type implements both {@link List} and {@link CustomContainer} the constraint
-	 * is declared only on the list side of the hierarchy hence we cannot bind this constraint to
-	 * {@link CustomContainer} and as a result use {@code CustomContainerValueExtractor}
+	 * Even though, there, the runtime type implements both {@link List} and {@link CustomContainer}, the constraint is
+	 * declared only on the list side of the hierarchy hence we cannot bind this constraint to {@link CustomContainer}
+	 * and as a result we only retain {@code CustomContainerValueExtractor}.
 	 */
 	@Test
 	public void testMultipleContainersAtTheSameTimeShouldNotThrowException() throws Exception {
@@ -71,9 +71,9 @@ public class MultipleContainersAtTheSameTimeTest {
 	}
 
 	/**
-	 * Even though there runtime type implements both {@link List} and {@link CustomContainer} the constraint
+	 * Even though, there, the runtime type implements both {@link List} and {@link CustomContainer}, the constraint
 	 * is declared only on the list side of the hierarchy hence we cannot bind this constraint to
-	 * {@link CustomContainer} and as a result use {@code CustomContainerValueExtractor}
+	 * {@link CustomContainer} and as a result we only retain {@code CustomContainerValueExtractor}
 	 */
 	@Test
 	public void testMultipleContainersAtTheSameTimeShouldAlsoNotThrowException() throws Exception {
@@ -87,8 +87,8 @@ public class MultipleContainersAtTheSameTimeTest {
 	}
 
 	/**
-	 * Test should fail as constraint is declared on a {@link FooBarContainer} which accept both
-	 * {@code ListValueExtractor} as well as {@code CustomContainerValueExtractor}
+	 * Test should fail as the constraint is declared on a {@link FooBarContainer} which accepts both
+	 * {@code ListValueExtractor} and {@code CustomContainerValueExtractor}.
 	 */
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void testMultipleContainersAtTheSameTimeShouldThrowException() throws Exception {
@@ -96,8 +96,8 @@ public class MultipleContainersAtTheSameTimeTest {
 	}
 
 	/**
-	 * Test should fail as constraint is declared on a {@link FooBarContainer} which accept both
-	 * {@code ListValueExtractor} as well as {@code CustomContainerValueExtractor}
+	 * Test should fail as the constraint is declared on a {@link FooBarContainer} which accepts both
+	 * {@code ListValueExtractor} and {@code CustomContainerValueExtractor}.
 	 */
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void testMultipleContainersAtTheSameTimeWithTypeParameterSpecificShouldThrowException() throws Exception {
@@ -105,7 +105,8 @@ public class MultipleContainersAtTheSameTimeTest {
 	}
 
 	/**
-	 * Test that container is determined at runtime and that maximally specific VE is used for that container.
+	 * Test that container is determined at runtime and that the maximally specific value extractor is used for that
+	 * container.
 	 */
 	@Test
 	public void testCascadingWhenUsingObjectReferenceUsesMostSpecificValueExtractor() throws Exception {
@@ -125,9 +126,10 @@ public class MultipleContainersAtTheSameTimeTest {
 	}
 
 	/**
-	 * Test for selecting a correct VE. Even though {@link ImprovedCustomContainerValueExtractor} is more
-	 * specific by container type - it shouldn't be selected based on the type argument where the constraint is  placed.
-	 * If {@link ImprovedCustomContainerValueExtractor} is selected an {@link IllegalStateException} will be thrown
+	 * Test that the correct value extractor is selected. Even though {@link ImprovedCustomContainerValueExtractor} is more
+	 * specific by container type, it shouldn't be selected based on the type argument where the constraint is  placed.
+	 * <p>
+	 * If {@link ImprovedCustomContainerValueExtractor} is selected, an {@link IllegalStateException} will be thrown
 	 * by this extractor and test will fail.
 	 */
 	@Test
@@ -319,5 +321,4 @@ public class MultipleContainersAtTheSameTimeTest {
 			return null;
 		}
 	}
-
 }
