@@ -59,6 +59,11 @@ public class ValidationContext<T> {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
+	 * The current validation operation (e.g. bean validation, parameter validation).
+	 */
+	private final ValidationOperation validationOperation;
+
+	/**
 	 * Caches and manages life cycle of constraint validator instances.
 	 */
 	private final ConstraintValidatorManager constraintValidatorManager;
@@ -119,14 +124,14 @@ public class ValidationContext<T> {
 	private final ConstraintValidatorFactory constraintValidatorFactory;
 
 	/**
+	 * Context containing all {@link Validator} level helpers and configuration properties.
+	 */
+	private final ValidatorScopedContext validatorScopedContext;
+
+	/**
 	 * Allows a JPA provider to decide whether a property should be validated.
 	 */
 	private final TraversableResolver traversableResolver;
-
-	/**
-	 * Context containing all validator level configurations.
-	 */
-	private final ValidatorScopedContext validatorScopedContext;
 
 	/**
 	 * The constraint validator initialization context.
@@ -138,12 +143,8 @@ public class ValidationContext<T> {
 	 */
 	private String validatedProperty;
 
-	/**
-	 * Describes what is validated with the current validation context.
-	 */
-	private final ValidationOperation validationOperation;
-
-	private ValidationContext(ConstraintValidatorManager constraintValidatorManager,
+	private ValidationContext(ValidationOperation validationOperation,
+			ConstraintValidatorManager constraintValidatorManager,
 			ConstraintValidatorFactory constraintValidatorFactory,
 			ValidatorScopedContext validatorScopedContext,
 			TraversableResolver traversableResolver,
@@ -153,8 +154,9 @@ public class ValidationContext<T> {
 			BeanMetaData<T> rootBeanMetaData,
 			Executable executable,
 			Object[] executableParameters,
-			Object executableReturnValue,
-			ValidationOperation validationOperation) {
+			Object executableReturnValue) {
+		this.validationOperation = validationOperation;
+
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.validatorScopedContext = validatorScopedContext;
 		this.constraintValidatorFactory = constraintValidatorFactory;
@@ -167,7 +169,6 @@ public class ValidationContext<T> {
 		this.executable = executable;
 		this.executableParameters = executableParameters;
 		this.executableReturnValue = executableReturnValue;
-		this.validationOperation = validationOperation;
 
 		this.processedGroupUnits = new HashSet<>();
 		this.processedPathUnits = new HashSet<>();
@@ -474,6 +475,7 @@ public class ValidationContext<T> {
 			@SuppressWarnings("unchecked")
 			Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 			return new ValidationContext<>(
+					ValidationOperation.BEAN_VALIDATION,
 					constraintValidatorManager,
 					constraintValidatorFactory,
 					validatorScopedContext,
@@ -484,8 +486,7 @@ public class ValidationContext<T> {
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					null, //executable
 					null, //executable parameters
-					null, //executable return value
-					ValidationOperation.BEAN_VALIDATION
+					null //executable return value
 			);
 		}
 
@@ -493,6 +494,7 @@ public class ValidationContext<T> {
 			@SuppressWarnings("unchecked")
 			Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 			return new ValidationContext<>(
+					ValidationOperation.PROPERTY_VALIDATION,
 					constraintValidatorManager,
 					constraintValidatorFactory,
 					validatorScopedContext,
@@ -503,25 +505,24 @@ public class ValidationContext<T> {
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					null, //executable
 					null, //executable parameters
-					null, //executable return value
-					ValidationOperation.PROPERTY_VALIDATION
+					null //executable return value
 			);
 		}
 
 		public <T> ValidationContext<T> forValidateValue(Class<T> rootBeanClass) {
 			return new ValidationContext<>(
+					ValidationOperation.VALUE_VALIDATION,
 					constraintValidatorManager,
 					constraintValidatorFactory,
 					validatorScopedContext,
 					traversableResolver,
 					constraintValidatorInitializationContext,
-					null,
-					rootBeanClass, //root bean
+					null, //root bean
+					rootBeanClass,
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					null, //executable
 					null, //executable parameters
-					null, //executable return value
-					ValidationOperation.VALUE_VALIDATION
+					null //executable return value
 			);
 		}
 
@@ -533,6 +534,7 @@ public class ValidationContext<T> {
 			@SuppressWarnings("unchecked")
 			Class<T> rootBeanClass = rootBean != null ? (Class<T>) rootBean.getClass() : (Class<T>) executable.getDeclaringClass();
 			return new ValidationContext<>(
+					ValidationOperation.PARAMETER_VALIDATION,
 					constraintValidatorManager,
 					constraintValidatorFactory,
 					validatorScopedContext,
@@ -543,8 +545,7 @@ public class ValidationContext<T> {
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					executable,
 					executableParameters,
-					null, //executable return value
-					ValidationOperation.PARAMETER_VALIDATION
+					null //executable return value
 			);
 		}
 
@@ -555,6 +556,7 @@ public class ValidationContext<T> {
 			@SuppressWarnings("unchecked")
 			Class<T> rootBeanClass = rootBean != null ? (Class<T>) rootBean.getClass() : (Class<T>) executable.getDeclaringClass();
 			return new ValidationContext<>(
+					ValidationOperation.RETURN_VALUE_VALIDATION,
 					constraintValidatorManager,
 					constraintValidatorFactory,
 					validatorScopedContext,
@@ -565,8 +567,7 @@ public class ValidationContext<T> {
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					executable,
 					null, //executable parameters
-					executableReturnValue,
-					ValidationOperation.RETURN_VALUE_VALIDATION
+					executableReturnValue
 			);
 		}
 	}
@@ -666,18 +667,19 @@ public class ValidationContext<T> {
 	}
 
 	/**
-	 * Context object storing all possible validator configurable properties.
-	 * There should be just one per {@link Validator} instance.
+	 * Context object storing the {@link Validator} level helper and configuration properties.
+	 * <p>
+	 * There should be only one per {@code Validator} instance.
 	 */
 	static class ValidatorScopedContext {
 
 		/**
-		 * The default message interpolator for this factory.
+		 * The message interpolator.
 		 */
 		private final MessageInterpolator messageInterpolator;
 
 		/**
-		 * The default parameter name provider for this factory.
+		 * The parameter name provider.
 		 */
 		private final ExecutableParameterNameProvider parameterNameProvider;
 
@@ -708,8 +710,9 @@ public class ValidationContext<T> {
 		 */
 		private final boolean traversableResolverResultCacheEnabled;
 
-		ValidatorScopedContext(MessageInterpolator messageInterpolator, ExecutableParameterNameProvider parameterNameProvider, ClockProvider clockProvider, Duration temporalValidationTolerance,
-				ScriptEvaluatorFactory scriptEvaluatorFactory, boolean failFast, boolean traversableResolverResultCacheEnabled) {
+		ValidatorScopedContext(MessageInterpolator messageInterpolator, ExecutableParameterNameProvider parameterNameProvider, ClockProvider clockProvider,
+				Duration temporalValidationTolerance, ScriptEvaluatorFactory scriptEvaluatorFactory, boolean failFast,
+				boolean traversableResolverResultCacheEnabled) {
 			this.messageInterpolator = messageInterpolator;
 			this.parameterNameProvider = parameterNameProvider;
 			this.clockProvider = clockProvider;
@@ -749,10 +752,13 @@ public class ValidationContext<T> {
 	}
 
 	/**
-	 * Describes possible places where validation operations can occur.
+	 * The different validation operations that can occur.
 	 */
 	private enum ValidationOperation {
-		BEAN_VALIDATION, PROPERTY_VALIDATION, VALUE_VALIDATION,
-		PARAMETER_VALIDATION, RETURN_VALUE_VALIDATION
+		BEAN_VALIDATION,
+		PROPERTY_VALIDATION,
+		VALUE_VALIDATION,
+		PARAMETER_VALIDATION,
+		RETURN_VALUE_VALIDATION
 	}
 }

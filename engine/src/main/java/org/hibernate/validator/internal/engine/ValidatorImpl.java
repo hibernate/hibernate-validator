@@ -126,7 +126,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private final ValueExtractorManager valueExtractorManager;
 
 	/**
-	 * Context containing all validator level configuraions .
+	 * Context containing all {@link Validator} level helpers and configuration properties.
 	 */
 	private final ValidatorScopedContext validatorScopedContext;
 
