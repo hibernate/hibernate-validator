@@ -6,9 +6,23 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.ISBNDef;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.internal.constraintvalidators.hv.ISBNValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
@@ -103,6 +117,25 @@ public class ISBNValidatorTest {
 		assertInvalidISBN( "978-0-55555555555555" );
 	}
 
+	@Test
+	public void testProgrammaticDefinition() throws Exception {
+		HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class );
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Book.class )
+				.property( "isbn", FIELD )
+				.constraint( new ISBNDef().type( ISBN.Type.ISBN13 ) );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Set<ConstraintViolation<Book>> constraintViolations = validator.validate( new Book( "978-0-54560-495-6" ) );
+		assertNoViolations( constraintViolations );
+
+		constraintViolations = validator.validate( new Book( "978-0-54560-495-7" ) );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ISBN.class )
+		);
+	}
+
 	private void assertValidISBN(String isbn) {
 		assertTrue( validator.isValid( isbn, null ), isbn + " should be a valid ISBN" );
 	}
@@ -115,5 +148,14 @@ public class ISBNValidatorTest {
 		ConstraintAnnotationDescriptor.Builder<ISBN> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( ISBN.class );
 		descriptorBuilder.setAttribute( "type", type );
 		return descriptorBuilder.build().getAnnotation();
+	}
+
+	private static class Book {
+
+		private final String isbn;
+
+		private Book(String isbn) {
+			this.isbn = isbn;
+		}
 	}
 }
