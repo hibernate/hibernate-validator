@@ -22,6 +22,7 @@ import org.hibernate.validator.ap.testmodel.FieldLevelValidationUsingBuiltInCons
 import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithCodePointLengthConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithISBNConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithJava8DateTime;
 import org.hibernate.validator.ap.testmodel.ModelWithJavaMoneyTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
@@ -720,6 +721,22 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 17 ),
 				new DiagnosticExpectation( Kind.ERROR, 20 ),
 				new DiagnosticExpectation( Kind.ERROR, 23 )
+		);
+	}
+
+	@Test
+	public void isbnConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithISBNConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 22 )
 		);
 	}
 }

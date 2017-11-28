@@ -69,6 +69,7 @@ public class TypeNames {
 		public static final String CODE_POINT_LENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".CodePointLength";
 		public static final String CURRENCY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Currency";
 		public static final String EMAIL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Email";
+		public static final String ISBN = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ISBN";
 		public static final String LENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Length";
 		public static final String MOD_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ModCheck";
 		public static final String LUHN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".LuhnCheck";

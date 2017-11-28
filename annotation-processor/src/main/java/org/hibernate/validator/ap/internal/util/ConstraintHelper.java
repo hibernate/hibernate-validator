@@ -292,6 +292,7 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.DURATION_MAX, Duration.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.DURATION_MIN, Duration.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.EMAIL, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.ISBN, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.LENGTH, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.MOD_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.LUHN_CHECK, CharSequence.class );
