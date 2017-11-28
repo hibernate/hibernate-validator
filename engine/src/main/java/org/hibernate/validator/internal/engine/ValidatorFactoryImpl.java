@@ -27,6 +27,7 @@ import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import javax.validation.spi.ConfigurationState;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -75,36 +76,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
-	 * The default message interpolator for this factory.
+	 * Context containing all {@link ValidatorFactory} level helpers and configuration properties.
 	 */
-	private final MessageInterpolator messageInterpolator;
-
-	/**
-	 * The default traversable resolver for this factory.
-	 */
-	private final TraversableResolver traversableResolver;
-
-	/**
-	 * The default parameter name provider for this factory.
-	 */
-	private final ExecutableParameterNameProvider parameterNameProvider;
-
-	/**
-	 * Provider for the current time when validating {@code @Future} or {@code @Past}
-	 */
-	private final ClockProvider clockProvider;
-
-	/**
-	 * Defines the temporal validation tolerance i.e. the allowed margin of error when comparing date/time in temporal
-	 * constraints.
-	 */
-	private final Duration temporalValidationTolerance;
-
-	/**
-	 * Used to get the {@code ScriptEvaluatorFactory} when validating {@code @ScriptAssert} and
-	 * {@code @ParameterScriptAssert} constraints.
-	 */
-	private final ScriptEvaluatorFactory scriptEvaluatorFactory;
+	private final ValidatorFactoryScopedContext validatorFactoryScopedContext;
 
 	/**
 	 * The constraint validator manager for this factory.
@@ -134,19 +108,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final ExecutableHelper executableHelper;
 
 	/**
-	 * Hibernate Validator specific flag to abort validation on first constraint violation.
-	 */
-	private final boolean failFast;
-
-	/**
 	 * Hibernate Validator specific flags to relax constraints on parameters.
 	 */
 	private final MethodValidationConfiguration methodValidationConfiguration;
-
-	/**
-	 * Hibernate Validator specific flag to disable the {@code TraversableResolver} result cache.
-	 */
-	private final boolean traversableResolverResultCacheEnabled;
 
 	/**
 	 * Metadata provider for XML configuration.
@@ -211,18 +175,19 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				).build();
 
 		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
-
-		this.messageInterpolator = configurationState.getMessageInterpolator();
-		this.traversableResolver = configurationState.getTraversableResolver();
-		this.parameterNameProvider = new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() );
-		this.clockProvider = configurationState.getClockProvider();
-		this.scriptEvaluatorFactory = getScriptEvaluatorFactory( configurationState, properties, externalClassLoader );
-		this.temporalValidationTolerance = getTemporalValidationTolerance( configurationState, properties );
-		this.failFast = getFailFast( hibernateSpecificConfig, properties );
-		this.traversableResolverResultCacheEnabled = getTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties );
+		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
+				configurationState.getMessageInterpolator(),
+				configurationState.getTraversableResolver(),
+				new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() ),
+				configurationState.getClockProvider(),
+				getTemporalValidationTolerance( configurationState, properties ),
+				getScriptEvaluatorFactory( configurationState, properties, externalClassLoader ),
+				getFailFast( hibernateSpecificConfig, properties ),
+				getTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties )
+		);
 
 		if ( LOG.isDebugEnabled() ) {
-			logValidatorFactoryScopedConfiguration( configurationState, this.scriptEvaluatorFactory.getClass() );
+			logValidatorFactoryScopedConfiguration( validatorFactoryScopedContext );
 		}
 	}
 
@@ -267,27 +232,20 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	public Validator getValidator() {
 		return createValidator(
 				constraintValidatorManager.getDefaultConstraintValidatorFactory(),
-				messageInterpolator,
-				traversableResolver,
-				parameterNameProvider,
-				clockProvider,
-				scriptEvaluatorFactory,
-				failFast,
-				temporalValidationTolerance,
 				valueExtractorManager,
-				methodValidationConfiguration,
-				traversableResolverResultCacheEnabled
+				validatorFactoryScopedContext,
+				methodValidationConfiguration
 		);
 	}
 
 	@Override
 	public MessageInterpolator getMessageInterpolator() {
-		return messageInterpolator;
+		return validatorFactoryScopedContext.getMessageInterpolator();
 	}
 
 	@Override
 	public TraversableResolver getTraversableResolver() {
-		return traversableResolver;
+		return validatorFactoryScopedContext.getTraversableResolver();
 	}
 
 	@Override
@@ -297,30 +255,30 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	@Override
 	public ParameterNameProvider getParameterNameProvider() {
-		return parameterNameProvider.getDelegate();
+		return validatorFactoryScopedContext.getParameterNameProvider().getDelegate();
 	}
 
 	public ExecutableParameterNameProvider getExecutableParameterNameProvider() {
-		return parameterNameProvider;
+		return validatorFactoryScopedContext.getParameterNameProvider();
 	}
 
 	@Override
 	public ClockProvider getClockProvider() {
-		return clockProvider;
+		return validatorFactoryScopedContext.getClockProvider();
 	}
 
 	@Override
 	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
-		return scriptEvaluatorFactory;
+		return validatorFactoryScopedContext.getScriptEvaluatorFactory();
 	}
 
 	@Override
 	public Duration getTemporalValidationTolerance() {
-		return temporalValidationTolerance;
+		return validatorFactoryScopedContext.getTemporalValidationTolerance();
 	}
 
 	public boolean isFailFast() {
-		return failFast;
+		return validatorFactoryScopedContext.isFailFast();
 	}
 
 	MethodValidationConfiguration getMethodValidationConfiguration() {
@@ -328,7 +286,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	public boolean isTraversableResolverResultCacheEnabled() {
-		return traversableResolverResultCacheEnabled;
+		return validatorFactoryScopedContext.isTraversableResolverResultCacheEnabled();
 	}
 
 	ValueExtractorManager getValueExtractorManager() {
@@ -356,30 +314,27 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		for ( BeanMetaDataManager beanMetaDataManager : beanMetaDataManagers.values() ) {
 			beanMetaDataManager.clear();
 		}
-		scriptEvaluatorFactory.clear();
+		validatorFactoryScopedContext.getScriptEvaluatorFactory().clear();
+	}
+
+	public ValidatorFactoryScopedContext getValidatorFactoryScopedContext() {
+		return this.validatorFactoryScopedContext;
 	}
 
 	Validator createValidator(ConstraintValidatorFactory constraintValidatorFactory,
-			MessageInterpolator messageInterpolator,
-			TraversableResolver traversableResolver,
-			ExecutableParameterNameProvider parameterNameProvider,
-			ClockProvider clockProvider,
-			ScriptEvaluatorFactory scriptEvaluatorFactory,
-			boolean failFast,
-			Duration temporalValidationTolerance,
 			ValueExtractorManager valueExtractorManager,
-			MethodValidationConfiguration methodValidationConfiguration,
-			boolean traversableResolverResultCacheEnabled) {
+			ValidatorFactoryScopedContext validatorFactoryScopedContext,
+			MethodValidationConfiguration methodValidationConfiguration) {
 
 		ValidationOrderGenerator validationOrderGenerator = new ValidationOrderGenerator();
 
 		BeanMetaDataManager beanMetaDataManager = beanMetaDataManagers.computeIfAbsent(
-				new BeanMetaDataManagerKey( parameterNameProvider, valueExtractorManager, methodValidationConfiguration ),
+				new BeanMetaDataManagerKey( validatorFactoryScopedContext.getParameterNameProvider(), valueExtractorManager, methodValidationConfiguration ),
 				key -> new BeanMetaDataManager(
 						constraintHelper,
 						executableHelper,
 						typeResolutionHelper,
-						parameterNameProvider,
+						validatorFactoryScopedContext.getParameterNameProvider(),
 						valueExtractorManager,
 						validationOrderGenerator,
 						buildDataProviders(),
@@ -389,18 +344,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		return new ValidatorImpl(
 				constraintValidatorFactory,
-				messageInterpolator,
-				traversableResolver,
 				beanMetaDataManager,
-				parameterNameProvider,
-				clockProvider,
-				scriptEvaluatorFactory,
 				valueExtractorManager,
 				constraintValidatorManager,
 				validationOrderGenerator,
-				failFast,
-				traversableResolverResultCacheEnabled,
-				temporalValidationTolerance
+				validatorFactoryScopedContext
 		);
 	}
 
@@ -588,13 +536,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		);
 	}
 
-	private static void logValidatorFactoryScopedConfiguration(ConfigurationState configurationState,
-			Class<? extends ScriptEvaluatorFactory> scriptEvaluatorFactoryClass) {
-		LOG.logValidatorFactoryScopedConfiguration( configurationState.getMessageInterpolator().getClass(), "message interpolator" );
-		LOG.logValidatorFactoryScopedConfiguration( configurationState.getTraversableResolver().getClass(), "traversable resolver" );
-		LOG.logValidatorFactoryScopedConfiguration( configurationState.getParameterNameProvider().getClass(), "parameter name provider" );
-		LOG.logValidatorFactoryScopedConfiguration( configurationState.getClockProvider().getClass(), "clock provider" );
-		LOG.logValidatorFactoryScopedConfiguration( scriptEvaluatorFactoryClass, "script evaluator factory" );
+	private static void logValidatorFactoryScopedConfiguration(ValidatorFactoryScopedContext context) {
+		LOG.logValidatorFactoryScopedConfiguration( context.getMessageInterpolator().getClass(), "message interpolator" );
+		LOG.logValidatorFactoryScopedConfiguration( context.getTraversableResolver().getClass(), "traversable resolver" );
+		LOG.logValidatorFactoryScopedConfiguration( context.getParameterNameProvider().getClass(), "parameter name provider" );
+		LOG.logValidatorFactoryScopedConfiguration( context.getClockProvider().getClass(), "clock provider" );
+		LOG.logValidatorFactoryScopedConfiguration( context.getScriptEvaluatorFactory().getClass(), "script evaluator factory" );
 	}
 
 	/**
@@ -676,6 +623,199 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		public String toString() {
 			return "BeanMetaDataManagerKey [parameterNameProvider=" + parameterNameProvider + ", valueExtractorManager=" + valueExtractorManager
 					+ ", methodValidationConfiguration=" + methodValidationConfiguration + "]";
+		}
+	}
+
+	static class ValidatorFactoryScopedContext {
+		/**
+		 * The default message interpolator for this factory.
+		 */
+		private final MessageInterpolator messageInterpolator;
+
+		/**
+		 * The default traversable resolver for this factory.
+		 */
+		private final TraversableResolver traversableResolver;
+
+		/**
+		 * The default parameter name provider for this factory.
+		 */
+		private final ExecutableParameterNameProvider parameterNameProvider;
+
+		/**
+		 * Provider for the current time when validating {@code @Future} or {@code @Past}
+		 */
+		private final ClockProvider clockProvider;
+
+		/**
+		 * Defines the temporal validation tolerance i.e. the allowed margin of error when comparing date/time in temporal
+		 * constraints.
+		 */
+		private final Duration temporalValidationTolerance;
+
+		/**
+		 * Used to get the {@code ScriptEvaluatorFactory} when validating {@code @ScriptAssert} and
+		 * {@code @ParameterScriptAssert} constraints.
+		 */
+		private final ScriptEvaluatorFactory scriptEvaluatorFactory;
+
+		/**
+		 * Hibernate Validator specific flag to abort validation on first constraint violation.
+		 */
+		private final boolean failFast;
+
+		/**
+		 * Hibernate Validator specific flag to disable the {@code TraversableResolver} result cache.
+		 */
+		private final boolean traversableResolverResultCacheEnabled;
+
+		private ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ExecutableParameterNameProvider parameterNameProvider, ClockProvider clockProvider, Duration temporalValidationTolerance,
+											  ScriptEvaluatorFactory scriptEvaluatorFactory, boolean failFast, boolean traversableResolverResultCacheEnabled) {
+			this.messageInterpolator = messageInterpolator;
+			this.traversableResolver = traversableResolver;
+			this.parameterNameProvider = parameterNameProvider;
+			this.clockProvider = clockProvider;
+			this.temporalValidationTolerance = temporalValidationTolerance;
+			this.scriptEvaluatorFactory = scriptEvaluatorFactory;
+			this.failFast = failFast;
+			this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
+		}
+
+		public MessageInterpolator getMessageInterpolator() {
+			return this.messageInterpolator;
+		}
+
+		public TraversableResolver getTraversableResolver() {
+			return this.traversableResolver;
+		}
+
+		public ExecutableParameterNameProvider getParameterNameProvider() {
+			return this.parameterNameProvider;
+		}
+
+		public ClockProvider getClockProvider() {
+			return this.clockProvider;
+		}
+
+		public Duration getTemporalValidationTolerance() {
+			return this.temporalValidationTolerance;
+		}
+
+		public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
+			return this.scriptEvaluatorFactory;
+		}
+
+		public boolean isFailFast() {
+			return this.failFast;
+		}
+
+		public boolean isTraversableResolverResultCacheEnabled() {
+			return this.traversableResolverResultCacheEnabled;
+		}
+
+		static class Builder {
+			private final ValidatorFactoryScopedContext defaultContext;
+
+			private MessageInterpolator messageInterpolator;
+			private TraversableResolver traversableResolver;
+			private ExecutableParameterNameProvider parameterNameProvider;
+			private ClockProvider clockProvider;
+			private ScriptEvaluatorFactory scriptEvaluatorFactory;
+			private Duration temporalValidationTolerance;
+			private boolean failFast;
+			private boolean traversableResolverResultCacheEnabled;
+
+			Builder(ValidatorFactoryScopedContext defaultContext) {
+				this.defaultContext = defaultContext != null ? defaultContext : new ValidatorFactoryScopedContext( null, null, null, null, null, null, false, false );
+
+				this.messageInterpolator = defaultContext.messageInterpolator;
+				this.traversableResolver = defaultContext.traversableResolver;
+				this.parameterNameProvider = defaultContext.parameterNameProvider;
+				this.clockProvider = defaultContext.clockProvider;
+				this.scriptEvaluatorFactory = defaultContext.scriptEvaluatorFactory;
+				this.temporalValidationTolerance = defaultContext.temporalValidationTolerance;
+				this.failFast = defaultContext.failFast;
+				this.traversableResolverResultCacheEnabled = defaultContext.traversableResolverResultCacheEnabled;
+			}
+
+			public Builder setMessageInterpolator(MessageInterpolator messageInterpolator) {
+				if ( messageInterpolator == null ) {
+					this.messageInterpolator = defaultContext.messageInterpolator;
+				}
+				else {
+					this.messageInterpolator = messageInterpolator;
+				}
+
+				return this;
+			}
+
+			public Builder setTraversableResolver(TraversableResolver traversableResolver) {
+				if ( traversableResolver == null ) {
+					this.traversableResolver = defaultContext.traversableResolver;
+				}
+				else {
+					this.traversableResolver = traversableResolver;
+				}
+				return this;
+			}
+
+			public Builder setParameterNameProvider(ParameterNameProvider parameterNameProvider) {
+				if ( parameterNameProvider == null ) {
+					this.parameterNameProvider = defaultContext.parameterNameProvider;
+				}
+				else {
+					this.parameterNameProvider = new ExecutableParameterNameProvider( parameterNameProvider );
+				}
+				return this;
+			}
+
+			public Builder setClockProvider(ClockProvider clockProvider) {
+				if ( clockProvider == null ) {
+					this.clockProvider = defaultContext.clockProvider;
+				}
+				else {
+					this.clockProvider = clockProvider;
+				}
+				return this;
+			}
+
+			public Builder setTemporalValidationTolerance(Duration temporalValidationTolerance) {
+				this.temporalValidationTolerance = temporalValidationTolerance == null ? Duration.ZERO : temporalValidationTolerance.abs();
+				return this;
+			}
+
+			public Builder setScriptEvaluatorFactory(ScriptEvaluatorFactory scriptEvaluatorFactory) {
+				if ( scriptEvaluatorFactory == null ) {
+					this.scriptEvaluatorFactory = defaultContext.scriptEvaluatorFactory;
+				}
+				else {
+					this.scriptEvaluatorFactory = scriptEvaluatorFactory;
+				}
+				return this;
+			}
+
+			public Builder setFailFast(boolean failFast) {
+				this.failFast = failFast;
+				return this;
+			}
+
+			public Builder setTraversableResolverResultCacheEnabled(boolean traversableResolverResultCacheEnabled) {
+				this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
+				return this;
+			}
+
+			public ValidatorFactoryScopedContext build() {
+				return new ValidatorFactoryScopedContext(
+						messageInterpolator,
+						traversableResolver,
+						parameterNameProvider,
+						clockProvider,
+						temporalValidationTolerance,
+						scriptEvaluatorFactory,
+						failFast,
+						traversableResolverResultCacheEnabled
+				);
+			}
 		}
 	}
 }

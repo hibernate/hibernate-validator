@@ -31,6 +31,7 @@ import javax.validation.Validator;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
+import org.hibernate.validator.internal.engine.ValidatorFactoryImpl.ValidatorFactoryScopedContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
@@ -710,16 +711,14 @@ public class ValidationContext<T> {
 		 */
 		private final boolean traversableResolverResultCacheEnabled;
 
-		ValidatorScopedContext(MessageInterpolator messageInterpolator, ExecutableParameterNameProvider parameterNameProvider, ClockProvider clockProvider,
-				Duration temporalValidationTolerance, ScriptEvaluatorFactory scriptEvaluatorFactory, boolean failFast,
-				boolean traversableResolverResultCacheEnabled) {
-			this.messageInterpolator = messageInterpolator;
-			this.parameterNameProvider = parameterNameProvider;
-			this.clockProvider = clockProvider;
-			this.temporalValidationTolerance = temporalValidationTolerance;
-			this.scriptEvaluatorFactory = scriptEvaluatorFactory;
-			this.failFast = failFast;
-			this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
+		ValidatorScopedContext(ValidatorFactoryScopedContext validatorFactoryScopedContext) {
+			this.messageInterpolator = validatorFactoryScopedContext.getMessageInterpolator();
+			this.parameterNameProvider = validatorFactoryScopedContext.getParameterNameProvider();
+			this.clockProvider = validatorFactoryScopedContext.getClockProvider();
+			this.temporalValidationTolerance = validatorFactoryScopedContext.getTemporalValidationTolerance();
+			this.scriptEvaluatorFactory = validatorFactoryScopedContext.getScriptEvaluatorFactory();
+			this.failFast = validatorFactoryScopedContext.isFailFast();
+			this.traversableResolverResultCacheEnabled = validatorFactoryScopedContext.isTraversableResolverResultCacheEnabled();
 		}
 
 		public MessageInterpolator getMessageInterpolator() {

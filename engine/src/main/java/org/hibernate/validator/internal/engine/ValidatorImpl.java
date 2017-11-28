@@ -14,7 +14,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,11 +24,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
-import javax.validation.MessageInterpolator;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
@@ -41,6 +38,7 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
 import org.hibernate.validator.internal.engine.ValidationContext.ValidatorScopedContext;
+import org.hibernate.validator.internal.engine.ValidatorFactoryImpl.ValidatorFactoryScopedContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.engine.groups.Group;
@@ -71,12 +69,10 @@ import org.hibernate.validator.internal.metadata.location.GetterConstraintLocati
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * The main Bean Validation class. This is the core processing class of Hibernate Validator.
@@ -137,25 +133,18 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private final HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext;
 
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
-			MessageInterpolator messageInterpolator,
-			TraversableResolver traversableResolver,
 			BeanMetaDataManager beanMetaDataManager,
-			ExecutableParameterNameProvider parameterNameProvider,
-			ClockProvider clockProvider,
-			ScriptEvaluatorFactory scriptEvaluatorFactory,
 			ValueExtractorManager valueExtractorManager,
 			ConstraintValidatorManager constraintValidatorManager,
 			ValidationOrderGenerator validationOrderGenerator,
-			boolean failFast,
-			boolean traversableResolverResultCacheEnabled,
-			Duration temporalValidationTolerance) {
+			ValidatorFactoryScopedContext validatorFactoryScopedContext) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.valueExtractorManager = valueExtractorManager;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.validationOrderGenerator = validationOrderGenerator;
-		this.traversableResolver = traversableResolver;
-		this.validatorScopedContext = new ValidatorScopedContext( messageInterpolator, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast, traversableResolverResultCacheEnabled );
+		this.validatorScopedContext = new ValidatorScopedContext( validatorFactoryScopedContext );
+		this.traversableResolver = validatorFactoryScopedContext.getTraversableResolver();
 		this.constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl( validatorScopedContext.getScriptEvaluatorFactory(), validatorScopedContext.getClockProvider(), validatorScopedContext.getTemporalValidationTolerance() );
 	}
 
