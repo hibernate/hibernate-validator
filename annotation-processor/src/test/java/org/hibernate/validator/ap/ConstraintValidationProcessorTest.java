@@ -106,7 +106,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-840" )
+	@TestForIssue(jiraKey = "HV-840")
 	public void overridingMethodParameterConstraintsTest() {
 		File sourceFile = compilerHelper.getSourceFile( MethodOverridingTests.class );
 
@@ -143,7 +143,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-567" )
+	@TestForIssue(jiraKey = "HV-567")
 	public void hibernateValidatorProvidedCustomConstraints() {
 		File sourceFile = compilerHelper.getSourceFile( HibernateValidatorProvidedCustomConstraints.class );
 
@@ -177,7 +177,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-1297" )
+	@TestForIssue(jiraKey = "HV-1297")
 	public void beanValidationConstraints() {
 		File sourceFile = compilerHelper.getSourceFile( BeanValidationConstraints.class );
 
@@ -512,9 +512,8 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
-				diagnostics, new DiagnosticExpectation(
-				Kind.ERROR, 22
-		)
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 22 )
 		);
 	}
 
