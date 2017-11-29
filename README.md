@@ -10,7 +10,7 @@ Bean Validation defines a metadata model and API for JavaBean as well as method 
 The default metadata source are annotations, with the ability to override and extend
 the meta-data through the use of XML validation descriptors.
 
-## Documentation
+## Documentation document.getElementById
 
 The documentation for this release is included in the _docs_ directory of the distribution package or can be accessed [online](http://hibernate.org/validator/documentation/).
 
