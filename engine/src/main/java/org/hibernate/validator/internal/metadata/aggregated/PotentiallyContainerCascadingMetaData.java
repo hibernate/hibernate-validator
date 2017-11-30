@@ -8,62 +8,45 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.TypeVariable;
+import java.util.Collections;
 import java.util.Set;
 
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
- * A simplified view of the cascading validation metadata for a non container element.
+ * A simplified view of the cascading validation metadata for a potentially container element at runtime.
+ * Has a set of possible {@link ValueExtractorDescriptor}s that might be applied to a potential runtime type.
  *
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class NonContainerCascadingMetaData implements CascadingMetaData {
+public class PotentiallyContainerCascadingMetaData implements CascadingMetaData {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
-
-	private static final NonContainerCascadingMetaData NON_CASCADING = new NonContainerCascadingMetaData( false,
-			GroupConversionHelper.EMPTY );
-
-	private static final NonContainerCascadingMetaData CASCADING_WITHOUT_GROUP_CONVERSIONS = new NonContainerCascadingMetaData( true,
-			GroupConversionHelper.EMPTY );
-
-	/**
-	 * If this type parameter is marked for cascading.
-	 */
-	private final boolean cascading;
 
 	/**
 	 * The group conversions defined for this type parameter.
 	 */
-	private GroupConversionHelper groupConversionHelper;
+	private final GroupConversionHelper groupConversionHelper;
 
-	public static NonContainerCascadingMetaData of(CascadingMetaDataBuilder cascadingMetaDataBuilder, Object context) {
-		if ( !cascadingMetaDataBuilder.isCascading() ) {
-			return NON_CASCADING;
-		}
-		else if ( cascadingMetaDataBuilder.getGroupConversions().isEmpty() ) {
-			return CASCADING_WITHOUT_GROUP_CONVERSIONS;
-		}
-		else {
-			return new NonContainerCascadingMetaData( cascadingMetaDataBuilder );
-		}
+	private final Set<ValueExtractorDescriptor> potentialValueExtractorDescriptors;
+
+	public static PotentiallyContainerCascadingMetaData of(CascadingMetaDataBuilder cascadingMetaDataBuilder, Set<ValueExtractorDescriptor> potentialValueExtractorDescriptors, Object context) {
+		return new PotentiallyContainerCascadingMetaData( cascadingMetaDataBuilder, potentialValueExtractorDescriptors );
 	}
 
-	private NonContainerCascadingMetaData(CascadingMetaDataBuilder cascadingMetaDataBuilder) {
-		this(
-				cascadingMetaDataBuilder.isCascading(),
-				GroupConversionHelper.of( cascadingMetaDataBuilder.getGroupConversions() )
-		);
+	private PotentiallyContainerCascadingMetaData(CascadingMetaDataBuilder cascadingMetaDataBuilder, Set<ValueExtractorDescriptor> potentialValueExtractorDescriptors) {
+		this( potentialValueExtractorDescriptors, GroupConversionHelper.of( cascadingMetaDataBuilder.getGroupConversions() ) );
 	}
 
-	private NonContainerCascadingMetaData(boolean cascading, GroupConversionHelper groupConversionHelper) {
-		this.cascading = cascading;
+	private PotentiallyContainerCascadingMetaData(Set<ValueExtractorDescriptor> potentialValueExtractorDescriptors, GroupConversionHelper groupConversionHelper) {
+		this.potentialValueExtractorDescriptors = potentialValueExtractorDescriptors;
 		this.groupConversionHelper = groupConversionHelper;
 	}
 
@@ -74,12 +57,12 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 
 	@Override
 	public boolean isCascading() {
-		return cascading;
+		return true;
 	}
 
 	@Override
 	public boolean isMarkedForCascadingOnAnnotatedObjectOrContainerElements() {
-		return cascading;
+		return true;
 	}
 
 	@Override
@@ -99,7 +82,26 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 
 	@Override
 	public CascadingMetaData addRuntimeContainerSupport(ValueExtractorManager valueExtractorManager, Class<?> valueClass) {
-		return this;
+		ValueExtractorDescriptor compliantValueExtractor = valueExtractorManager
+				.getMaximallySpecificValueExtractorForAllContainerElements( valueClass, potentialValueExtractorDescriptors );
+		if ( compliantValueExtractor == null ) {
+			return this;
+		}
+
+		return new ContainerCascadingMetaData(
+				valueClass,
+				Collections.singletonList(
+						new ContainerCascadingMetaData(
+								compliantValueExtractor.getContainerType(),
+								compliantValueExtractor.getExtractedTypeParameter(),
+								compliantValueExtractor.getContainerType(),
+								compliantValueExtractor.getExtractedTypeParameter(),
+								groupConversionHelper.isEmpty() ? GroupConversionHelper.EMPTY : groupConversionHelper
+						)
+				),
+				groupConversionHelper,
+				Collections.singleton( compliantValueExtractor )
+		);
 	}
 
 	@Override
@@ -117,7 +119,6 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 		StringBuilder sb = new StringBuilder();
 		sb.append( getClass().getSimpleName() );
 		sb.append( " [" );
-		sb.append( "cascading=" ).append( cascading ).append( ", " );
 		sb.append( "groupConversions=" ).append( groupConversionHelper ).append( ", " );
 		sb.append( "]" );
 		return sb.toString();

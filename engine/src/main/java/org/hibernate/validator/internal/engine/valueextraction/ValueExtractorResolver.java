@@ -19,9 +19,14 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.ContainerCascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.PotentiallyContainerCascadingMetaData;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
 import org.hibernate.validator.internal.util.TypeVariables;
@@ -64,7 +69,7 @@ class ValueExtractorResolver {
 	 * Used for container element constraints.
 	 */
 	public Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> declaredType) {
-		return getRuntimeCompliantValueExtractors( declaredType );
+		return getRuntimeCompliantValueExtractors( declaredType, valueExtractors );
 	}
 
 	/**
@@ -115,13 +120,13 @@ class ValueExtractorResolver {
 	 *
 	 * @throws ConstraintDeclarationException if more than 2 maximally specific container-element-compliant value extractors are found
 	 */
-	public ValueExtractorDescriptor getMaximallySpecificValueExtractorForAllContainerElements(Class<?> runtimeType) {
+	public ValueExtractorDescriptor getMaximallySpecificValueExtractorForAllContainerElements(Class<?> runtimeType, Set<ValueExtractorDescriptor> potentialValueExtractorDescriptors) {
 		// if it's a Map assignable type, it gets a special treatment to conform to the Bean Validation specification
 		if ( TypeHelper.isAssignable( Map.class, runtimeType ) ) {
 			return MapValueExtractor.DESCRIPTOR;
 		}
 
-		return getUniqueValueExtractorOrThrowException( runtimeType, getRuntimeCompliantValueExtractors( runtimeType ) );
+		return getUniqueValueExtractorOrThrowException( runtimeType, getRuntimeCompliantValueExtractors( runtimeType, potentialValueExtractorDescriptors ) );
 	}
 
 	/**
@@ -140,6 +145,51 @@ class ValueExtractorResolver {
 		valueExtractorDescriptors.addAll( getPotentiallyRuntimeTypeCompliantAndContainerElementCompliantValueExtractors( declaredType, typeParameter ) );
 
 		return CollectionHelper.toImmutableSet( valueExtractorDescriptors );
+	}
+
+	/**
+	 * Used to determine the possible value extractors that can be applied to a declared type.
+	 * <p>
+	 * Used when building cascading metadata in {@link CascadingMetaDataBuilder} to decide if it should be promoted to
+	 * {@link ContainerCascadingMetaData} with cascaded constrained type arguments.
+	 * <p>
+	 * An example could be when we need to upgrade BV 1.1 style {@code @Valid private List<SomeBean> list;}
+	 * to {@code private List<@Valid SomeBean> list;}
+	 * <p>
+	 * Searches only for maximally specific value extractors based on a type.
+	 * <p>
+	 * Types that are assignable to {@link Map} are handled as a special case - key value extractor is ignored for them.
+	 */
+
+	public Set<ValueExtractorDescriptor> getPossibleValueExtractorCandidatesForCascadedValidation(Type enclosingType) {
+		// if it's a Map assignable type, it gets a special treatment to conform to the Bean Validation specification
+		boolean mapAssignable = TypeHelper.isAssignable( Map.class, enclosingType );
+
+		Class<?> enclosingClass = ReflectionHelper.getClassFromType( enclosingType );
+		return getRuntimeCompliantValueExtractors( enclosingClass, valueExtractors )
+				.stream()
+				.filter( ved -> !mapAssignable || !ved.equals( MapKeyExtractor.DESCRIPTOR ) )
+				.collect( Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) );
+	}
+
+	/**
+	 * Used to determine the value extractors which potentially could be applied to the runtime type of a given declared type.
+	 * <p>
+	 * An example could be when there's a declaration like {@code private PotentiallyContainerAtRuntime<@Valid Bean>;} and there's
+	 * no value extractor present for {@code PotentiallyContainerAtRuntime} but there's one available for
+	 * {@code Container extends PotentiallyContainerAtRuntime}.
+	 * <p>
+	 * Returned set of extractors is used to determine if at runtime a value extractor can be applied to a runtime type,
+	 * and if {@link PotentiallyContainerCascadingMetaData} should be promoted to {@link ContainerCascadingMetaData}.
+	 *
+	 * @return a set of {@link ValueExtractorDescriptor}s that possibly might be applied to a {@code declaredType}
+	 * at a runtime.
+	 */
+	public Set<ValueExtractorDescriptor> getPotentialValueExtractorCandidatesForCascadedValidation(Type declaredType) {
+		return valueExtractors
+				.stream()
+				.filter( e -> TypeHelper.isAssignable( declaredType, e.getContainerType() ) )
+				.collect( Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) );
 	}
 
 	/**
@@ -233,7 +283,7 @@ class ValueExtractorResolver {
 	 * @return a set of runtime compliant value extractors based on a runtime type. If there are no available value extractors
 	 * an empty set will be returned which means the type is not a container.
 	 */
-	private Set<ValueExtractorDescriptor> getRuntimeCompliantValueExtractors(Class<?> runtimeType) {
+	private Set<ValueExtractorDescriptor> getRuntimeCompliantValueExtractors(Class<?> runtimeType, Set<ValueExtractorDescriptor> potentialValueExtractorDescriptors) {
 		if ( nonContainerTypes.contains( runtimeType ) ) {
 			return Collections.emptySet();
 		}
@@ -241,7 +291,7 @@ class ValueExtractorResolver {
 		Set<ValueExtractorDescriptor> valueExtractorDescriptors = possibleValueExtractorsByRuntimeType.get( runtimeType );
 		if ( valueExtractorDescriptors == null ) {
 			//otherwise we just look for maximally specific extractors for the runtime type
-			Set<ValueExtractorDescriptor> possibleValueExtractors = valueExtractors
+			Set<ValueExtractorDescriptor> possibleValueExtractors = potentialValueExtractorDescriptors
 					.stream()
 					.filter( e -> TypeHelper.isAssignable( e.getContainerType(), runtimeType ) )
 					.collect( Collectors.toSet() );

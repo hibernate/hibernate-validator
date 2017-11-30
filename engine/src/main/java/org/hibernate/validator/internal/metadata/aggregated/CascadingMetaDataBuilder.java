@@ -11,11 +11,10 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,6 +22,8 @@ import javax.validation.GroupSequence;
 
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorHelper;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -127,24 +128,8 @@ public class CascadingMetaDataBuilder {
 		return NON_CASCADING;
 	}
 
-	public static CascadingMetaDataBuilder annotatedObject(Type cascadableType, boolean cascading,
-			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
-		Map<TypeVariable<?>, CascadingMetaDataBuilder> amendedContainerElementsCascadingMetaData;
-		if ( cascading ) {
-			amendedContainerElementsCascadingMetaData = addPotentialLegacyCascadingMetaData( cascadableType, containerElementTypesCascadingMetaData,
-					groupConversions );
-		}
-		else {
-			amendedContainerElementsCascadingMetaData = containerElementTypesCascadingMetaData;
-		}
-
-		return new CascadingMetaDataBuilder( cascadableType, AnnotatedObject.INSTANCE, cascading, amendedContainerElementsCascadingMetaData, groupConversions );
-	}
-
-	public static CascadingMetaDataBuilder arrayElement(Type cascadableType, boolean cascading,
-			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
-		return new CascadingMetaDataBuilder( cascadableType, new ArrayElement( cascadableType ), cascading,
-				containerElementTypesCascadingMetaData, groupConversions );
+	public static CascadingMetaDataBuilder annotatedObject(Type cascadableType, boolean cascading, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
+		return new CascadingMetaDataBuilder( cascadableType, AnnotatedObject.INSTANCE, cascading, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
 	public TypeVariable<?> getTypeParameter() {
@@ -211,12 +196,59 @@ public class CascadingMetaDataBuilder {
 	public CascadingMetaData build(ValueExtractorManager valueExtractorManager, Object context) {
 		validateGroupConversions( context );
 
-		if ( containerElementTypesCascadingMetaData.isEmpty() ) {
-			return NonContainerCascadingMetaData.of( this, context );
-		}
-		else {
+		// we are 100% sure that we have a container and its elements are marked for cascading
+		if ( !containerElementTypesCascadingMetaData.isEmpty() && hasContainerElementsMarkedForCascading ) {
 			return ContainerCascadingMetaData.of( valueExtractorManager, this, context );
 		}
+
+		if ( cascading ) {
+			// Now we are at the case when we might have something like @Valid SomeType something;
+			//
+			// First we should check if there are any available VE that can be applied to the current declared type (SomeType)
+			// If such are found we promote the cascading to the type variable that we have VE for.
+			// In case of the Map, call to valueExtractorManager.getPossibleValueExtractorCandidatesForCascadedValidation()
+			// will not return MapKeyExtractor, hence by default it will only return MapValueExtractor which matches BV Spec.
+			//
+			// If we found more than one value extractor we throw an exception.
+			Set<ValueExtractorDescriptor> possibleValueExtractorCandidates = valueExtractorManager.getPossibleValueExtractorCandidatesForCascadedValidation( enclosingType );
+			if ( !possibleValueExtractorCandidates.isEmpty() ) {
+				if ( possibleValueExtractorCandidates.size() > 1 ) {
+					throw LOG.getUnableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclaredException(
+							ReflectionHelper.getClassFromType( enclosingType ),
+							ValueExtractorHelper.toValueExtractorClasses( possibleValueExtractorCandidates )
+					);
+				}
+				return ContainerCascadingMetaData.of(
+						valueExtractorManager,
+						new CascadingMetaDataBuilder(
+								enclosingType,
+								typeParameter,
+								cascading,
+								addCascadingMetaDataBasedOnValueExtractor( enclosingType, containerElementTypesCascadingMetaData, groupConversions, possibleValueExtractorCandidates.iterator().next() ),
+								groupConversions
+						),
+						context
+				);
+			}
+
+			// If there are no possible VEs that can be applied right away to a declared type we should check if
+			// there are any VEs that can be potentially applied to our type at runtime. This should cover cases
+			// like @Valid Object object; or @Valid ContainerWithoutRegisteredVE container; where at runtime we can have
+			// object = new ArrayList<>(); or container = new ContainerWithRegisteredVE(); (ContainerWithRegisteredVE extends ContainerWithoutRegisteredVE)
+			// so we are looking for VEs such that ValueExtractorDescriptor#getContainerType() is assignable to declared type under
+			// inspection.
+			Set<ValueExtractorDescriptor> potentialValueExtractorCandidates = valueExtractorManager.getPotentialValueExtractorCandidatesForCascadedValidation( enclosingType );
+
+			// if such VEs were found we return an instance of PotentiallyContainerCascadingMetaData that will store those potential VEs
+			// and they will be used at runtime to check if any of those could be applied to a runtime type and if PotentiallyContainerCascadingMetaData
+			// should be promoted to ContainerCascadingMetaData or not.
+			if ( !potentialValueExtractorCandidates.isEmpty() ) {
+				return PotentiallyContainerCascadingMetaData.of( this, potentialValueExtractorCandidates, context );
+			}
+		}
+
+		// if cascading == false, or none of the above cases matched we just return a non container metadata
+		return NonContainerCascadingMetaData.of( this, context );
 	}
 
 	private void validateGroupConversions(Object context) {
@@ -317,40 +349,35 @@ public class CascadingMetaDataBuilder {
 		return mergedGroupConversions;
 	}
 
-	private static Map<TypeVariable<?>, CascadingMetaDataBuilder> addPotentialLegacyCascadingMetaData(Type cascadableType,
-			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
+	private static Map<TypeVariable<?>, CascadingMetaDataBuilder> addCascadingMetaDataBasedOnValueExtractor(Type cascadableType, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions,
+			 ValueExtractorDescriptor possibleValueExtractor) {
 		Class<?> cascadableClass = ReflectionHelper.getClassFromType( cascadableType );
-
-		if ( Map.class.isAssignableFrom( cascadableClass ) ) {
-			return addLegacyCascadingMetaData( cascadableClass, Map.class, 1, containerElementTypesCascadingMetaData, groupConversions );
-		}
-		else if ( List.class.isAssignableFrom( cascadableClass ) ) {
-			return addLegacyCascadingMetaData( cascadableClass, List.class, 0, containerElementTypesCascadingMetaData, groupConversions );
-		}
-		else if ( Iterable.class.isAssignableFrom( cascadableClass ) ) {
-			return addLegacyCascadingMetaData( cascadableClass, Iterable.class, 0, containerElementTypesCascadingMetaData, groupConversions );
-		}
-		else if ( Optional.class.isAssignableFrom( cascadableClass ) ) {
-			return addLegacyCascadingMetaData( cascadableClass, Optional.class, 0, containerElementTypesCascadingMetaData, groupConversions );
-		}
-		else if ( cascadableClass.isArray() ) {
+		if ( cascadableClass.isArray() ) {
 			// for arrays, we need to add an ArrayElement cascading metadata: it's the only way arrays support cascading at the moment.
 			return addArrayElementCascadingMetaData( cascadableClass, containerElementTypesCascadingMetaData, groupConversions );
 		}
 		else {
-			return containerElementTypesCascadingMetaData;
+			Map<TypeVariable<?>, CascadingMetaDataBuilder> cascadingMetaData = containerElementTypesCascadingMetaData;
+				cascadingMetaData = addCascadingMetaData(
+						cascadableClass,
+						possibleValueExtractor.getContainerType(),
+						possibleValueExtractor.getExtractedTypeParameter(),
+						cascadingMetaData,
+						groupConversions
+				);
+			return cascadingMetaData;
 		}
 	}
 
-	private static Map<TypeVariable<?>, CascadingMetaDataBuilder> addLegacyCascadingMetaData(final Class<?> enclosingType, Class<?> referenceType,
-			int typeParameterIndex, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData,
+	private static Map<TypeVariable<?>, CascadingMetaDataBuilder> addCascadingMetaData(final Class<?> enclosingType, Class<?> referenceType,
+			TypeVariable<?> typeParameter, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData,
 			Map<Class<?>, Class<?>> groupConversions) {
 		// we try to find a corresponding type parameter in the current cascadable type
 		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> typeVariableBindings = TypeVariableBindings.getTypeVariableBindings( enclosingType );
 		final TypeVariable<?> correspondingTypeParameter = typeVariableBindings.get( referenceType ).entrySet().stream()
 				.filter( e -> Objects.equals( e.getKey().getGenericDeclaration(), enclosingType ) )
 				.collect( Collectors.toMap( Map.Entry::getValue, Map.Entry::getKey ) )
-				.get( referenceType.getTypeParameters()[typeParameterIndex] );
+				.get( typeParameter );
 
 		Class<?> cascadableClass;
 		TypeVariable<?> cascadableTypeParameter;
@@ -361,7 +388,7 @@ public class CascadingMetaDataBuilder {
 		else {
 			// if we can't find one, we default to the reference type (e.g. List.class for instance)
 			cascadableClass = referenceType;
-			cascadableTypeParameter = referenceType.getTypeParameters()[typeParameterIndex];
+			cascadableTypeParameter = typeParameter;
 		}
 
 		Map<TypeVariable<?>, CascadingMetaDataBuilder> amendedCascadingMetadata = CollectionHelper.newHashMap( containerElementTypesCascadingMetaData.size() + 1 );

@@ -8,14 +8,17 @@ package org.hibernate.validator.test.internal.engine.valueextraction;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ConstraintDeclarationException;
@@ -23,13 +26,20 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.test.internal.engine.valueextraction.model.ContainerWithAdditionalConstraints;
+import org.hibernate.validator.test.internal.engine.valueextraction.model.ContainerWithAdditionalConstraintsExtractor;
 import org.hibernate.validator.test.internal.engine.valueextraction.model.CustomContainer;
 import org.hibernate.validator.test.internal.engine.valueextraction.model.CustomContainerValueExtractor;
 import org.hibernate.validator.test.internal.engine.valueextraction.model.ImprovedCustomContainer;
 import org.hibernate.validator.test.internal.engine.valueextraction.model.ImprovedCustomContainerImpl;
 import org.hibernate.validator.test.internal.engine.valueextraction.model.ImprovedCustomContainerValueExtractor;
+import org.hibernate.validator.test.internal.engine.valueextraction.model.Pair;
+import org.hibernate.validator.test.internal.engine.valueextraction.model.PairLeftValueExtractor;
+import org.hibernate.validator.test.internal.engine.valueextraction.model.PairRightValueExtractor;
 import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
@@ -49,6 +59,9 @@ public class MultipleContainersAtTheSameTimeTest {
 		validator = ValidatorUtil.getConfiguration()
 				.addValueExtractor( new CustomContainerValueExtractor() )
 				.addValueExtractor( new ImprovedCustomContainerValueExtractor() )
+				.addValueExtractor( new PairLeftValueExtractor() )
+				.addValueExtractor( new PairRightValueExtractor() )
+				.addValueExtractor( new ContainerWithAdditionalConstraintsExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 	}
@@ -111,6 +124,7 @@ public class MultipleContainersAtTheSameTimeTest {
 	@Test
 	public void testCascadingWhenUsingObjectReferenceUsesMostSpecificValueExtractor() throws Exception {
 		class Bar {
+
 			@Valid
 			private final Object container;
 
@@ -135,7 +149,7 @@ public class MultipleContainersAtTheSameTimeTest {
 	@Test
 	public void testFindingMaximallySpecificExtractorByTypeParameter() throws Exception {
 		class Foo {
-			@Valid
+
 			private final ImprovedCustomContainer<@Valid List<@NotNull String>, String> container;
 
 			Foo(ImprovedCustomContainer<List<String>, String> container) {
@@ -150,6 +164,138 @@ public class MultipleContainersAtTheSameTimeTest {
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( container ) );
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( NotNull.class ).withMessage( "must not be null" )
+		);
+	}
+
+	/**
+	 * When we have a case like {@code @Valid Container<T1, T2, ...Tn> container} and we have VE for more than one type variable
+	 * an exception should be thrown
+	 */
+	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	public void testMultipleTypeVariablesWithGlobalValid() throws Exception {
+		class Foo {
+
+			@Valid
+			private final Pair<List<@NotNull String>, String> container;
+
+			Foo(Pair<List<String>, String> container) {
+				this.container = container;
+			}
+		}
+
+		validator.validate( new Foo( new Pair<>( Collections.singletonList( "" ), "" ) ) );
+	}
+
+	/**
+	 * When we have global and local {@code @Valid} case for example something like {@code @Valid Container<@Valid T1, T2, ...Tn> container}
+	 * and we have VE for more than one type variable, global {@code Valid} will be ignored and
+	 */
+	@Test
+	public void testGlobalAndLocalValidWithMultipleExtractorsAvailable() throws Exception {
+		class Foo {
+
+			@Valid
+			private final Pair<@Valid List<@NotBlank String>, String> container;
+
+			Foo(Pair<List<String>, String> container) {
+				this.container = container;
+			}
+		}
+
+		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( new Pair<>( Collections.singletonList( "" ), null ) ) );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotBlank.class ).withMessage( "must not be blank" )
+		);
+	}
+
+	/**
+	 * Test how combinations of global/local {@code @Valid} is handled for a {@code Map} container.
+	 *
+	 */
+	@Test
+	public void testGlobalAndLocalValidOnMap() throws Exception {
+		Map<FalseBooleanWrapper, FalseBooleanWrapper> container = new HashMap<>();
+		FalseBooleanWrapper key = new FalseBooleanWrapper();
+		container.put( key, new FalseBooleanWrapper() );
+
+		Set<ConstraintViolation<ValidKeyFoo>> constraintViolations = validator.validate( new ValidKeyFoo( container ) );
+
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( AssertTrue.class )
+						.withPropertyPath( pathWith()
+								.property( "container" )
+								.property( "bool", true, key, null, Map.class, 0 )
+						).withMessage( "must be true" )
+		);
+
+		Set<ConstraintViolation<ValidValueFoo>> constraintValueViolations = validator.validate( new ValidValueFoo( container ) );
+
+		assertThat( constraintValueViolations ).containsOnlyViolations(
+				violationOf( AssertTrue.class )
+						.withPropertyPath( pathWith()
+								.property( "container" )
+								.property( "bool", true, key, null, Map.class, 1 )
+						).withMessage( "must be true" )
+		);
+	}
+
+	/**
+	 * Test that global {@code @Valid} is applied to properties of the container as well as to extracted values.
+	 */
+	@Test
+	public void testContainerWithGlobalValidAndAdditionalConstraintsInContainer() throws Exception {
+		class Foo {
+
+			@Valid
+			private final ContainerWithAdditionalConstraints<FalseBooleanWrapper> container;
+
+			Foo(ContainerWithAdditionalConstraints<FalseBooleanWrapper> container) {
+				this.container = container;
+			}
+		}
+		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( new ContainerWithAdditionalConstraints<FalseBooleanWrapper>().add( new FalseBooleanWrapper() ) ) );
+
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( AssertTrue.class )
+						.withPropertyPath( pathWith()
+								.property( "container" )
+								.property( "bool", true, null, null, ContainerWithAdditionalConstraints.class, 0 )
+						).withMessage( "must be true" ),
+				violationOf( AssertTrue.class )
+						.withPropertyPath( pathWith()
+								.property( "container" )
+								.property( "empty" )
+						).withMessage( "must be true" )
+		);
+	}
+
+	/**
+	 * Test that global {@code @Valid} is applied to properties of the container, when there's a {@code @Valid} on type argument.
+	 */
+	@Test
+	public void testContainerWithGlobalAndLocalValidAndAdditionalConstraintsInContainer() throws Exception {
+		class Foo {
+
+			@Valid
+			private final ContainerWithAdditionalConstraints<@Valid FalseBooleanWrapper> container;
+
+			Foo(ContainerWithAdditionalConstraints<FalseBooleanWrapper> container) {
+				this.container = container;
+			}
+		}
+		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( new ContainerWithAdditionalConstraints<FalseBooleanWrapper>().add( new FalseBooleanWrapper() ) ) );
+
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( AssertTrue.class )
+						.withPropertyPath( pathWith()
+								.property( "container" )
+								.property( "bool", true, null, null, ContainerWithAdditionalConstraints.class, 0 )
+						).withMessage( "must be true" ),
+				violationOf( AssertTrue.class )
+						.withPropertyPath( pathWith()
+								.property( "container" )
+								.property( "empty" )
+						).withMessage( "must be true" )
 		);
 	}
 
@@ -180,6 +326,32 @@ public class MultipleContainersAtTheSameTimeTest {
 
 		private FooBar(FooBarContainer<String> fooBarContainer) {
 			this.fooBarContainer = fooBarContainer;
+		}
+	}
+
+	private static class FalseBooleanWrapper {
+
+		@AssertTrue
+		private boolean bool = false;
+	}
+
+	private static class ValidKeyFoo {
+
+		@Valid
+		private final Map<@Valid FalseBooleanWrapper, FalseBooleanWrapper> container;
+
+		ValidKeyFoo(Map<FalseBooleanWrapper, FalseBooleanWrapper> container) {
+			this.container = container;
+		}
+	}
+
+	private static class ValidValueFoo {
+
+		@Valid
+		private final Map<FalseBooleanWrapper, @Valid FalseBooleanWrapper> container;
+
+		ValidValueFoo(Map<FalseBooleanWrapper, FalseBooleanWrapper> container) {
+			this.container = container;
 		}
 	}
 

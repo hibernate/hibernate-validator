@@ -187,10 +187,10 @@ public class ValueExtractorManager {
 	 * <p>
 	 * Used for cascading validation when the {@code @Valid} annotation is placed on the whole container.
 	 *
-	 * @see ValueExtractorResolver#getMaximallySpecificValueExtractorForAllContainerElements(Class)
+	 * @see ValueExtractorResolver#getMaximallySpecificValueExtractorForAllContainerElements(Class, Set)
 	 */
-	public ValueExtractorDescriptor getMaximallySpecificValueExtractorForAllContainerElements(Class<?> runtimeType) {
-		return valueExtractorResolver.getMaximallySpecificValueExtractorForAllContainerElements( runtimeType );
+	public ValueExtractorDescriptor getMaximallySpecificValueExtractorForAllContainerElements(Class<?> runtimeType, Set<ValueExtractorDescriptor> potentialValueExtractorDescriptors) {
+		return valueExtractorResolver.getMaximallySpecificValueExtractorForAllContainerElements( runtimeType, potentialValueExtractorDescriptors );
 	}
 
 	/**
@@ -204,6 +204,20 @@ public class ValueExtractorManager {
 	 */
 	public Set<ValueExtractorDescriptor> getValueExtractorCandidatesForCascadedValidation(Type enclosingType, TypeVariable<?> typeParameter) {
 		return valueExtractorResolver.getValueExtractorCandidatesForCascadedValidation( enclosingType, typeParameter );
+	}
+
+	/**
+	 * @see ValueExtractorResolver#getPossibleValueExtractorCandidatesForCascadedValidation(Type)
+	 */
+	public Set<ValueExtractorDescriptor> getPossibleValueExtractorCandidatesForCascadedValidation(Type enclosingType) {
+		return valueExtractorResolver.getPossibleValueExtractorCandidatesForCascadedValidation( enclosingType );
+	}
+
+	/**
+	 * @see ValueExtractorResolver#getPotentialValueExtractorCandidatesForCascadedValidation(Type)
+	 */
+	public Set<ValueExtractorDescriptor> getPotentialValueExtractorCandidatesForCascadedValidation(Type enclosingType) {
+		return valueExtractorResolver.getPotentialValueExtractorCandidatesForCascadedValidation( enclosingType );
 	}
 
 	@Override
