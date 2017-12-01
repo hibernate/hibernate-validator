@@ -711,6 +711,8 @@ public class ValidationContext<T> {
 		 */
 		private final boolean traversableResolverResultCacheEnabled;
 
+		private final Object dynamicPayload;
+
 		ValidatorScopedContext(ValidatorFactoryScopedContext validatorFactoryScopedContext) {
 			this.messageInterpolator = validatorFactoryScopedContext.getMessageInterpolator();
 			this.parameterNameProvider = validatorFactoryScopedContext.getParameterNameProvider();
@@ -719,6 +721,7 @@ public class ValidationContext<T> {
 			this.scriptEvaluatorFactory = validatorFactoryScopedContext.getScriptEvaluatorFactory();
 			this.failFast = validatorFactoryScopedContext.isFailFast();
 			this.traversableResolverResultCacheEnabled = validatorFactoryScopedContext.isTraversableResolverResultCacheEnabled();
+			this.dynamicPayload = validatorFactoryScopedContext.getDynamicPayload();
 		}
 
 		public MessageInterpolator getMessageInterpolator() {
@@ -747,6 +750,10 @@ public class ValidationContext<T> {
 
 		public boolean isTraversableResolverResultCacheEnabled() {
 			return this.traversableResolverResultCacheEnabled;
+		}
+
+		public Object getDynamicPayload() {
+			return this.dynamicPayload;
 		}
 	}
 
