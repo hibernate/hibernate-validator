@@ -102,6 +102,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private boolean traversableResolverResultCacheEnabled = true;
 	private ScriptEvaluatorFactory scriptEvaluatorFactory;
 	private Duration temporalValidationTolerance;
+	private Object constraintValidatorPayload;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -285,6 +286,14 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
+	@Override
+	public HibernateValidatorConfiguration constraintValidatorPayload(Object constraintValidatorPayload) {
+		Contracts.assertNotNull( constraintValidatorPayload, MESSAGES.parameterMustNotBeNull( "constraintValidatorPayload" ) );
+
+		this.constraintValidatorPayload = constraintValidatorPayload;
+		return this;
+	}
+
 	public boolean isAllowParallelMethodsDefineParameterConstraints() {
 		return this.methodValidationConfigurationBuilder.isAllowParallelMethodsDefineParameterConstraints();
 	}
@@ -435,6 +444,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public Duration getTemporalValidationTolerance() {
 		return temporalValidationTolerance;
+	}
+
+	public Object getConstraintValidatorPayload() {
+		return constraintValidatorPayload;
 	}
 
 	@Override

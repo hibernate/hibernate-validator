@@ -184,7 +184,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				getTemporalValidationTolerance( configurationState, properties ),
 				getScriptEvaluatorFactory( configurationState, properties, externalClassLoader ),
 				getFailFast( hibernateSpecificConfig, properties ),
-				getTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties )
+				getTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
+				getConstraintValidatorPayload( hibernateSpecificConfig, properties )
 		);
 
 		if ( LOG.isDebugEnabled() ) {
@@ -527,6 +528,17 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return Duration.ZERO;
 	}
 
+	private Object getConstraintValidatorPayload(ConfigurationState configurationState, Map<String, String> properties) {
+		if ( configurationState instanceof ConfigurationImpl ) {
+			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
+			if ( hibernateSpecificConfig.getConstraintValidatorPayload() != null ) {
+				LOG.logConstraintValidatorPayload( hibernateSpecificConfig.getConstraintValidatorPayload() );
+				return hibernateSpecificConfig.getConstraintValidatorPayload();
+			}
+		}
+		return null;
+	}
+
 	private static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,
 			ConstraintHelper constraintHelper) {
 		Set<Class<?>> definedConstraints = newHashSet();
@@ -685,8 +697,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		 */
 		private final boolean traversableResolverResultCacheEnabled;
 
+		private final Object dynamicPayload;
+
 		private ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ExecutableParameterNameProvider parameterNameProvider, ClockProvider clockProvider, Duration temporalValidationTolerance,
-											  ScriptEvaluatorFactory scriptEvaluatorFactory, boolean failFast, boolean traversableResolverResultCacheEnabled) {
+											  ScriptEvaluatorFactory scriptEvaluatorFactory, boolean failFast, boolean traversableResolverResultCacheEnabled, Object dynamicPayload) {
 			this.messageInterpolator = messageInterpolator;
 			this.traversableResolver = traversableResolver;
 			this.parameterNameProvider = parameterNameProvider;
@@ -695,6 +709,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 			this.failFast = failFast;
 			this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
+			this.dynamicPayload = dynamicPayload;
 		}
 
 		public MessageInterpolator getMessageInterpolator() {
@@ -729,6 +744,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			return this.traversableResolverResultCacheEnabled;
 		}
 
+		public Object getDynamicPayload() {
+			return this.dynamicPayload;
+		}
+
 		static class Builder {
 			private final ValidatorFactoryScopedContext defaultContext;
 
@@ -740,6 +759,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			private Duration temporalValidationTolerance;
 			private boolean failFast;
 			private boolean traversableResolverResultCacheEnabled;
+			private Object dynamicPayload;
 
 			Builder(ValidatorFactoryScopedContext defaultContext) {
 				Contracts.assertNotNull( defaultContext, "Default context cannot be null." );
@@ -753,6 +773,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				this.temporalValidationTolerance = defaultContext.temporalValidationTolerance;
 				this.failFast = defaultContext.failFast;
 				this.traversableResolverResultCacheEnabled = defaultContext.traversableResolverResultCacheEnabled;
+				this.dynamicPayload = defaultContext.dynamicPayload;
 			}
 
 			public Builder setMessageInterpolator(MessageInterpolator messageInterpolator) {
@@ -821,6 +842,16 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				return this;
 			}
 
+			public Builder setDynamicPayload(Object dynamicPayload) {
+				if ( scriptEvaluatorFactory == null ) {
+					this.dynamicPayload = defaultContext.dynamicPayload;
+				}
+				else {
+					this.dynamicPayload = dynamicPayload;
+				}
+				return this;
+			}
+
 			public ValidatorFactoryScopedContext build() {
 				return new ValidatorFactoryScopedContext(
 						messageInterpolator,
@@ -830,7 +861,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						temporalValidationTolerance,
 						scriptEvaluatorFactory,
 						failFast,
-						traversableResolverResultCacheEnabled
+						traversableResolverResultCacheEnabled,
+						dynamicPayload
 				);
 			}
 		}

@@ -145,7 +145,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.validationOrderGenerator = validationOrderGenerator;
 		this.validatorScopedContext = new ValidatorScopedContext( validatorFactoryScopedContext );
 		this.traversableResolver = validatorFactoryScopedContext.getTraversableResolver();
-		this.constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl( validatorScopedContext.getScriptEvaluatorFactory(), validatorScopedContext.getClockProvider(), validatorScopedContext.getTemporalValidationTolerance() );
+		this.constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl( validatorScopedContext.getScriptEvaluatorFactory(), validatorScopedContext.getClockProvider(), validatorScopedContext.getTemporalValidationTolerance(), validatorScopedContext.getDynamicPayload() );
 	}
 
 	@Override

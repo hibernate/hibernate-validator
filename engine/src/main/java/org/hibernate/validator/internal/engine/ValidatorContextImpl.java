@@ -138,6 +138,12 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
+	public HibernateValidatorContext withConstraintValidatorPayload(Object dynamicPayload) {
+		validatorFactoryContextBuilder.setDynamicPayload( dynamicPayload );
+		return this;
+	}
+
+	@Override
 	public Validator getValidator() {
 		return validatorFactory.createValidator(
 				constraintValidatorFactory,
