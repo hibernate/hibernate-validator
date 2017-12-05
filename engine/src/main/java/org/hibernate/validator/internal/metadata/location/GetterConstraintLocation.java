@@ -18,7 +18,6 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 /**
  * Getter method constraint location.
@@ -131,9 +130,7 @@ public class GetterConstraintLocation implements ConstraintLocation {
 		}
 
 		Class<?> clazz = original.getDeclaringClass();
-		Method accessibleMethod = run( GetDeclaredMethod.action( clazz, original.getName() ) );
-
-		run( SetAccessibility.action( accessibleMethod ) );
+		Method accessibleMethod = run( GetDeclaredMethod.andMakeAccessible( clazz, original.getName() ) );
 
 		return accessibleMethod;
 	}
