@@ -37,7 +37,7 @@ public final class GetDeclaredMethodHandle implements PrivilegedAction<MethodHan
 
 	/**
 	 * Before using this method on arbitrary classes, you need to check the {@code HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS}
-	 * permission against the security manager.
+	 * permission against the security manager, if the calling class exposes the handle to clients.
 	 */
 	public static GetDeclaredMethodHandle andMakeAccessible(Lookup lookup, Class<?> clazz, String methodName, Class<?>... parameterTypes) {
 		return new GetDeclaredMethodHandle( lookup, clazz, methodName, true, parameterTypes );
