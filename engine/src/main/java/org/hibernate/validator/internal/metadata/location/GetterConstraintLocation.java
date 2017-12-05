@@ -110,7 +110,7 @@ public class GetterConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public int hashCode() {
-		int result = method != null ? method.hashCode() : 0;
+		int result = method.hashCode();
 		result = 31 * result + typeForValidatorResolution.hashCode();
 		return result;
 	}
