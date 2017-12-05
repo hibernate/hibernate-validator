@@ -88,7 +88,7 @@ application server. You can learn more about the integration of Bean Validation 
 ==== Running with a security manager
 
 Hibernate Validator supports running with a {javaTechnotesBaseUrl}/guides/security/index.html[security manager] being enabled.
-To do so, you must assign several permissions to the Hibernate Validator and the Bean Validation API code bases.
+To do so, you must assign several permissions to the code bases of Hibernate Validator, the Bean Validation API and the code base calling Bean Validation.
 The following shows how to do this via a {javaTechnotesBaseUrl}/guides/security/PolicyFiles.html[policy file] as processed by the Java default policy implementation:
 
 .Policy file for using Hibernate Validator with a security manager
@@ -110,12 +110,12 @@ grant codeBase "file:path/to/hibernate-validator-{hvVersion}.jar" {
 grant codeBase "file:path/to/validation-api-{bvVersion}.jar" {
     permission java.io.FilePermission "path/to/hibernate-validator-{hvVersion}.jar", "read";
 };
+
+grant codeBase "file:path/to/validation-caller-x.y.z.jar" {
+    permission org.hibernate.validator.HibernateValidatorPermission "accessPrivateMembers";
+};
 ----
 ====
-
-All API invocations requiring special permissions are done via privileged actions.
-This means only Hibernate Validator and the Bean Validation API themselves need the listed permissions.
-You don't need to assign any permissions to other code bases calling Hibernate Validator.
 
 ==== Updating Hibernate Validator in WildFly
 
