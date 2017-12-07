@@ -375,22 +375,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		// process first single groups. For these we can optimise object traversal by first running all validations on the current bean
 		// before traversing the object.
 		Iterator<Group> groupIterator = validationOrder.getGroupIterator();
-		while ( groupIterator.hasNext() ) {
-			Group group = groupIterator.next();
-			valueContext.setCurrentGroup( group.getDefiningClass() );
-			validateConstraintsForCurrentGroup( validationContext, valueContext );
-			if ( shouldFailFast( validationContext ) ) {
-				return validationContext.getFailingConstraints();
-			}
+		iterateConstraintsForCurrentGroup( validationContext, valueContext, groupIterator );
+		if ( shouldFailFast( validationContext ) ) {
+			return validationContext.getFailingConstraints();
 		}
+
 		groupIterator = validationOrder.getGroupIterator();
-		while ( groupIterator.hasNext() ) {
-			Group group = groupIterator.next();
-			valueContext.setCurrentGroup( group.getDefiningClass() );
-			validateCascadedConstraints( validationContext, valueContext );
-			if ( shouldFailFast( validationContext ) ) {
-				return validationContext.getFailingConstraints();
-			}
+		iterateCascadeConstraints( validationContext, valueContext, groupIterator );
+		if ( shouldFailFast( validationContext ) ) {
+			return validationContext.getFailingConstraints();
 		}
 
 		// now we process sequences. For sequences I have to traverse the object graph since I have to stop processing when an error occurs.
@@ -419,6 +412,22 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 		}
 		return validationContext.getFailingConstraints();
+	}
+
+	private <T, U> void iterateCascadeConstraints(ValidationContext<T> validationContext, ValueContext<U, Object> valueContext, Iterator<Group> groupIterator) {
+		while ( groupIterator.hasNext() ) {
+			Group group = groupIterator.next();
+			valueContext.setCurrentGroup( group.getDefiningClass() );
+			validateCascadedConstraints( validationContext, valueContext );
+		}
+	}
+
+	private <T, U> void iterateConstraintsForCurrentGroup(ValidationContext<T> validationContext, ValueContext<U, Object> valueContext, Iterator<Group> groupIterator) {
+		while ( groupIterator.hasNext() ) {
+			Group group = groupIterator.next();
+			valueContext.setCurrentGroup( group.getDefiningClass() );
+			validateConstraintsForCurrentGroup( validationContext, valueContext );
+		}
 	}
 
 	private void validateConstraintsForCurrentGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
