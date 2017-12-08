@@ -220,10 +220,6 @@
         <!-- add-opens options required for Arquillian and WildFly -->
         <arquillian.javaVmArguments.add-opens></arquillian.javaVmArguments.add-opens>
 
-        <!-- JavaDoc stylesheet name -->
-        <!-- styles for jdk8 and jdk9 are different-->
-        <javadoc-stylesheet-name>stylesheet.css</javadoc-stylesheet-name>
-
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
 
@@ -803,8 +799,6 @@
                     <version>3.0.0-M1</version>
                     <configuration>
                         <docfilessubdirs>true</docfilessubdirs>
-                        <javadocDirectory>${project.basedir}/../src/main/javadoc</javadocDirectory>
-                        <stylesheetfile>${javadoc-stylesheet-name}</stylesheetfile>
                         <bottom>
                             <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat, Inc.</a> All Rights Reserved]]></bottom>
                     </configuration>
@@ -1151,7 +1145,6 @@
                     --add-opens=java.management/javax.management.openmbean=ALL-UNNAMED
                     --add-opens=java.naming/javax.naming=ALL-UNNAMED
                 </arquillian.javaVmArguments.add-opens>
-                <javadoc-stylesheet-name>stylesheet-jdk9.css</javadoc-stylesheet-name>
             </properties>
             <build>
                 <pluginManagement>
