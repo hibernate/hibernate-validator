@@ -116,7 +116,7 @@
         <tck.version>2.0.0.Final</tck.version>
 
         <!-- Version to be used as baseline for API/SPI change reports -->
-        <previous.stable>6.0.4.Final</previous.stable>
+        <previous.stable>5.3.5.Final</previous.stable>
 
         <paranamer.version>2.8</paranamer.version>
         <javax.el.version>3.0.1-b08</javax.el.version>
@@ -852,7 +852,7 @@
                     <configuration>
                         <oldVersion>
                             <dependency>
-                                <groupId>org.hibernate.validator</groupId>
+                                <groupId>org.hibernate</groupId>
                                 <artifactId>${project.artifactId}</artifactId>
                                 <version>${previous.stable}</version>
                                 <type>${project.packaging}</type>
