@@ -25,7 +25,9 @@ import javax.validation.ParameterNameProvider;
  * @author Khalid Alqinyah
  *
  * @since 5.2
+ * @deprecated since 6.0 - getting the parameter names via reflection is now enabled by default
  */
+@Deprecated
 public class ReflectionParameterNameProvider implements ParameterNameProvider {
 
 	@Override
