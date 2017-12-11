@@ -683,6 +683,10 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
+`@ISBN`:: Checks that the annotated character sequence is a valid https://en.wikipedia.org/wiki/International_Standard_Book_Number[ISBN]. `type` determines the type of ISBN. The default is ISBN-13.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@Length(min=, max=)`:: Validates that the annotated character sequence is between `min` and `max` included
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: Column length will be set to max
