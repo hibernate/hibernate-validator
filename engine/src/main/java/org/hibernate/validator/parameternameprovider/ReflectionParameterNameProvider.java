@@ -16,16 +16,9 @@ import java.util.List;
 import javax.validation.ParameterNameProvider;
 
 /**
- * Uses Java 8 reflection to get the parameter names.
- *
- * <p>For this provider to return the actual parameter names, classes must be compiled with the '-parameters' compiler
- * argument. Otherwise, the JDK will return synthetic names in the form {@code arg0}, {@code arg1}, etc.</p>
- *
- * <p>See also <a href="http://openjdk.java.net/jeps/118">JEP 118</a></p>
  * @author Khalid Alqinyah
- *
  * @since 5.2
- * @deprecated since 6.0 - getting the parameter names via reflection is now enabled by default
+ * @deprecated since 6.0 - getting the parameter names via reflection is now enabled by default. Planned for removal.
  */
 @Deprecated
 public class ReflectionParameterNameProvider implements ParameterNameProvider {
