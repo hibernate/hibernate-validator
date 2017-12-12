@@ -23,6 +23,7 @@ public interface TypeConstraintMappingContext<C> extends Constrainable<TypeConst
 		PropertyTarget,
 		MethodTarget,
 		ConstructorTarget,
+		AnnotationProcessingOptions<TypeConstraintMappingContext<C>>,
 		AnnotationIgnoreOptions<TypeConstraintMappingContext<C>> {
 
 	/**
