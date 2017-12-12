@@ -37,8 +37,8 @@ public class ConstraintMappingContributorConfiguredInValidationXmlTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-955")
-	public void shouldApplyConstraintMappingsFromContributorConfiguredInValidationXml() {
-		runWithCustomValidationXml( "constraint-mapping-contributor-validation.xml", new Runnable() {
+	public void shouldApplyConstraintMappingsFromContributorsConfiguredInValidationXml() {
+		runWithCustomValidationXml( "constraint-mapping-contributors-validation.xml", new Runnable() {
 
 			@Override
 			public void run() {
@@ -56,7 +56,29 @@ public class ConstraintMappingContributorConfiguredInValidationXmlTest {
 				);
 			}
 		} );
+	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1545")
+	public void shouldApplyConstraintMappingsFromContributorsConfiguredInValidationXmlWithDeprecatedProperty() {
+		runWithCustomValidationXml( "deprecated-constraint-mapping-contributor-validation.xml", new Runnable() {
+
+			@Override
+			public void run() {
+				Validator validator = ValidatorUtil.getValidator();
+
+				Set<? extends ConstraintViolation<?>> violations = validator.validate( new Marathon() );
+				assertThat( violations ).containsOnlyViolations(
+						violationOf( NotNull.class ).withProperty( "name" ),
+						violationOf( Min.class ).withProperty( "numberOfHelpers" )
+				);
+
+				violations = validator.validate( new Runner() );
+				assertThat( violations ).containsOnlyViolations(
+						violationOf( AssertTrue.class ).withProperty( "paidEntryFee" )
+				);
+			}
+		} );
 	}
 
 	private void runWithCustomValidationXml(String validationXmlName, Runnable runnable) {
