@@ -63,7 +63,14 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	String ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS = "hibernate.validator.allow_parallel_method_parameter_constraint";
 
 	/**
-	 * Property for configuring a constraint mapping contributor, allowing to set up one or more constraint mappings for
+	 * @deprecated planned for removal. Use hibernate.validator.constraint_mapping_contributors instead.
+	 * @since 5.2
+	 */
+	@Deprecated
+	String CONSTRAINT_MAPPING_CONTRIBUTOR = "hibernate.validator.constraint_mapping_contributor";
+
+	/**
+	 * Property for configuring constraint mapping contributors, allowing to set up one or more constraint mappings for
 	 * the default validator factory. Accepts a String with the comma separated fully-qualified class names of one or more
 	 * {@link org.hibernate.validator.spi.cfg.ConstraintMappingContributor} implementations.
 	 *
