@@ -57,6 +57,7 @@ import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.EAN;
+import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
@@ -254,6 +255,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorprese
 import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.hv.CodePointLengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.ISBNValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValidator;
@@ -414,6 +416,8 @@ public class ConstraintHelper {
 		futureOrPresentValidators.add( FutureOrPresentValidatorForZonedDateTime.class );
 
 		putConstraints( tmpConstraints, FutureOrPresent.class, futureOrPresentValidators );
+
+		putConstraint( tmpConstraints, ISBN.class, ISBNValidator.class );
 
 		if ( isJavaMoneyInClasspath() ) {
 			putConstraints( tmpConstraints, Max.class, Arrays.asList(
