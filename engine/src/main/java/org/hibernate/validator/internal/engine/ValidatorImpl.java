@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.ElementType;
@@ -17,6 +16,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -434,7 +434,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private <U> void validateConstraintsForDefaultGroup(ValidationContext<?> validationContext, ValueContext<U, Object> valueContext) {
 		final BeanMetaData<U> beanMetaData = valueContext.getCurrentBeanMetaData();
-		final Map<Class<?>, Class<?>> validatedInterfaces = newHashMap();
+		final Map<Class<?>, Class<?>> validatedInterfaces = new HashMap<>();
 
 		// evaluating the constraints of a bean per class in hierarchy, this is necessary to detect potential default group re-definitions
 		for ( Class<? super U> clazz : beanMetaData.getClassHierarchy() ) {
