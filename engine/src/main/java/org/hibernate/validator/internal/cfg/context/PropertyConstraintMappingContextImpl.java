@@ -82,6 +82,11 @@ final class PropertyConstraintMappingContextImpl
 	}
 
 	@Override
+	public PropertyConstraintMappingContext ignoreAnnotations() {
+		return ignoreAnnotations( true );
+	}
+
+	@Override
 	public PropertyConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
 		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsOnMember( member, ignoreAnnotations );
 		return this;
