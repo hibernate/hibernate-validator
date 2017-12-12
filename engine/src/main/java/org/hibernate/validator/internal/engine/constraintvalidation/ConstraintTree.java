@@ -227,13 +227,17 @@ public class ConstraintTree<A extends Annotation> {
 			return false;
 		}
 
+		if ( constraintViolations.isEmpty() ) {
+			return true;
+		}
+
 		// report as single violation and there is already a violation
-		if ( descriptor.isReportAsSingleViolation() && descriptor.getCompositionType() == AND && !constraintViolations.isEmpty() ) {
+		if ( descriptor.isReportAsSingleViolation() && descriptor.getCompositionType() == AND ) {
 			return false;
 		}
 
 		// explicit fail fast mode
-		if ( executionContext.isFailFastModeEnabled() && !constraintViolations.isEmpty() ) {
+		if ( executionContext.isFailFastModeEnabled() ) {
 			return false;
 		}
 
