@@ -47,7 +47,7 @@ public class ISBNValidatorTest {
 
 	@Test
 	public void validISBN10() throws Exception {
-		validator.initialize( initializeAnnotation( ISBN.Type.ISBN10 ) );
+		validator.initialize( initializeAnnotation( ISBN.Type.ISBN_10 ) );
 
 		assertValidISBN( null );
 		assertValidISBN( "99921-58-10-7" );
@@ -62,7 +62,7 @@ public class ISBNValidatorTest {
 
 	@Test
 	public void invalidISBN10() throws Exception {
-		validator.initialize( initializeAnnotation( ISBN.Type.ISBN10 ) );
+		validator.initialize( initializeAnnotation( ISBN.Type.ISBN_10 ) );
 
 		// invalid check-digit
 		assertInvalidISBN( "99921-58-10-8" );
@@ -82,7 +82,7 @@ public class ISBNValidatorTest {
 
 	@Test
 	public void validISBN13() throws Exception {
-		validator.initialize( initializeAnnotation( ISBN.Type.ISBN13 ) );
+		validator.initialize( initializeAnnotation( ISBN.Type.ISBN_13 ) );
 
 		assertValidISBN( null );
 		assertValidISBN( "978-123-456-789-7" );
@@ -98,7 +98,7 @@ public class ISBNValidatorTest {
 
 	@Test
 	public void invalidISBN13() throws Exception {
-		validator.initialize( initializeAnnotation( ISBN.Type.ISBN13 ) );
+		validator.initialize( initializeAnnotation( ISBN.Type.ISBN_13 ) );
 
 		// invalid check-digit
 		assertInvalidISBN( "978-123-456-789-6" );
@@ -123,7 +123,7 @@ public class ISBNValidatorTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Book.class )
 				.property( "isbn", FIELD )
-				.constraint( new ISBNDef().type( ISBN.Type.ISBN13 ) );
+				.constraint( new ISBNDef().type( ISBN.Type.ISBN_13 ) );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 

@@ -36,6 +36,7 @@ import org.hibernate.validator.constraints.ISBN.List;
  * parts of the number (ex. {@code 978-161-729-045-9}).
  *
  * @author Marko Bekhta
+ * @since 6.0.6
  */
 @Documented
 @Constraint(validatedBy = { })
@@ -50,7 +51,7 @@ public @interface ISBN {
 
 	Class<? extends Payload>[] payload() default { };
 
-	Type type() default Type.ISBN13;
+	Type type() default Type.ISBN_13;
 
 	/**
 	 * Defines several {@code @ISBN} annotations on the same element.
@@ -65,10 +66,10 @@ public @interface ISBN {
 
 	/**
 	 * Defines the ISBN length. Valid lengths of ISBNs are {@code 10} and {@code 13}
-	 * which are represented as {@link Type#ISBN10} and {@link Type#ISBN13} respectively.
+	 * which are represented as {@link Type#ISBN_10} and {@link Type#ISBN_13} respectively.
 	 */
 	enum Type {
-		ISBN10,
-		ISBN13
+		ISBN_10,
+		ISBN_13
 	}
 }

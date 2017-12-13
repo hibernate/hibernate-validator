@@ -33,11 +33,11 @@ public class ISBNValidator implements ConstraintValidator<ISBN, CharSequence> {
 	@Override
 	public void initialize(ISBN constraintAnnotation) {
 		switch ( constraintAnnotation.type() ) {
-			case ISBN10:
+			case ISBN_10:
 				length = 10;
 				checkChecksumFunction = this::checkChecksumISBN10;
 				break;
-			case ISBN13:
+			case ISBN_13:
 				length = 13;
 				checkChecksumFunction = this::checkChecksumISBN13;
 				break;

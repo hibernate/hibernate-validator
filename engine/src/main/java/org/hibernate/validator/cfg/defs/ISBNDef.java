@@ -11,6 +11,7 @@ import org.hibernate.validator.constraints.ISBN;
 
 /**
  * @author Marko Bekhta
+ * @since 6.0.6
  */
 public class ISBNDef extends ConstraintDef<ISBNDef, ISBN> {
 
