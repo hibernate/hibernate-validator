@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator-parent</artifactId>
-        <version>6.0.6-SNAPSHOT</version>
+        <version>6.0.6.Final</version>
     </parent>
     <artifactId>hibernate-validator-test-utils</artifactId>
 
