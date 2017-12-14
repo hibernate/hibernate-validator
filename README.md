@@ -1,6 +1,6 @@
 # Hibernate Validator
 
-*Version: 6.0.5.Final - 15-11-2017*
+*Version: 6.0.6.Final - 14-12-2017*
 
 
 ## What is it?
@@ -35,7 +35,7 @@ Logging will delegate any log requests to that provider.
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.0.5.Final</version>
+            <version>6.0.6.Final</version>
         </dependency>
 
   You also need an API and implementation of the Unified Expression Language. These dependencies must be explicitly added in an SE environment.
@@ -54,7 +54,7 @@ extension by adding the following dependency:
         <dependency>
            <groupId>org.hibernate.validator</groupId>
            <artifactId>hibernate-validator-cdi</artifactId>
-           <version>6.0.5.Final</version>
+           <version>6.0.6.Final</version>
         </dependency>
 
 * _hibernate-validator-annotation-processor-&lt;version&gt;.jar_ is an optional jar which can be integrated with your build
