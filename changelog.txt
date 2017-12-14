@@ -1,6 +1,30 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.6.Final (14-12-2017)
+-------------------------
+
+** Improvement
+    * HV-1533 - engine               - Small performance improvements
+    * HV-1531 - engine               - Regroup the ValidatorFactory scoped properties in ValidatorFactoryContext
+    * HV-1530 - annotation-processor - Add CodePointLength to supported AP types
+    * HV-1527 - engine               - Separate Group and MetaConstraint - Path processed units in ValidationContext
+    * HV-1525 - engine               - Various AbstractMessageInterpolator performance improvements
+    * HV-1524 - engine               - Log temporal validation tolerance only if it has been explicitly set
+    * HV-1522 - engine               - Improve performance of ConstraintViolationImpl hashCode() method
+    * HV-1506 - engine               - Regroup the Validator scoped properties in ValidationContext
+
+** New Feature
+    * HV-1541 - engine               - Add new constraint for ISBN
+
+** Task
+    * HV-1546 - engine               - Reintroduce AnnotationProcessingOptions
+    * HV-1545 - engine               - Reintroduce hibernate.validator.constraint_mapping_contributor
+    * HV-1538 - engine               - Make the @Incubating annotation @Documented
+    * HV-1537 - engine               - Reintroduce ReflectionParameterNameProvider to avoid API breakage
+    * HV-1536 - engine               - Update description of required permissions in the reference guide
+    * HV-1535 - build                - Use the default style for JavaDoc
+
 6.0.5.Final (15-11-2017)
 -------------------------
 
