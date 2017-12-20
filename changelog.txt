@@ -1,6 +1,12 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.7.Final (20-12-2017)
+-------------------------
+
+** Task
+    * HV-1548 - build - Upgrade the Bean Validation API and TCK to 2.0.1.Final
+
 6.0.6.Final (14-12-2017)
 -------------------------
 
