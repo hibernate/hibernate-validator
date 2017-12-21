@@ -798,6 +798,7 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.0.0-M1</version>
                     <configuration>
+                        <quiet>true</quiet>
                         <docfilessubdirs>true</docfilessubdirs>
                         <bottom>
                             <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat, Inc.</a> All Rights Reserved]]></bottom>
