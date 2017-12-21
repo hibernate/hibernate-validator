@@ -16,12 +16,14 @@ addons:
 cache:
   directories:
     - $HOME/.m2
+before_install:
+  - BUILD_OPTIONS='-s settings-example.xml'
 install:
   # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
   - mvn -N io.takari:maven:wrapper
   - ./mvnw -v
   # first run to download all the Maven dependencies without logging
-  - travis_wait ./mvnw -s settings-example.xml -U -B -q -DskipTests=true install
+  - travis_wait ./mvnw $BUILD_OPTIONS -U -B -q -DskipTests=true install
 before_script:
 script:
-  - ./mvnw -s settings-example.xml clean verify
+  - ./mvnw $BUILD_OPTIONS clean verify
