@@ -28,4 +28,7 @@ before_script:
 script:
   - ./mvnw $BUILD_OPTIONS -DskipDistro=true checkstyle:check
     && BUILD_OPTIONS+=' -Dcheckstyle.skip'
-    && ./mvnw $BUILD_OPTIONS clean verify
+    && ./mvnw $BUILD_OPTIONS clean install
+before_cache:
+  # Do not put Hibernate Validator artifacts into the cache
+  - rm -r $HOME/.m2/repository/org/hibernate/validator/ $HOME/.m2/repository/org/hibernate/hibernate-validator*
