@@ -23,7 +23,9 @@ install:
   - mvn -N io.takari:maven:wrapper
   - ./mvnw -v
   # first run to download all the Maven dependencies without logging
-  - travis_wait ./mvnw $BUILD_OPTIONS -U -B -q -DskipTests=true install
+  - travis_wait ./mvnw $BUILD_OPTIONS -U -B -q -Dcheckstyle.skip -DskipTests=true install
 before_script:
 script:
-  - ./mvnw $BUILD_OPTIONS clean verify
+  - ./mvnw $BUILD_OPTIONS -DskipDistro=true checkstyle:check
+    && BUILD_OPTIONS+=' -Dcheckstyle.skip'
+    && ./mvnw $BUILD_OPTIONS clean verify
