@@ -11,7 +11,7 @@ is also a great way to deepen your understanding of Bean Validation and Hibernat
 
 If you have any further questions about Hibernate Validator or want to share some of your use cases,
 have a look at the http://community.jboss.org/en/hibernate/validator[Hibernate Validator
-Wiki], the https://forum.hibernate.org/viewforum.php?f=9[Hibernate Validator Forum] and the
+Wiki], the https://discourse.hibernate.org/c/hibernate-validator[Hibernate Validator Forum] and the
 https://stackoverflow.com/questions/tagged/hibernate-validator[Hibernate Validator tag on Stack Overflow].
 
 In case you would like to report a bug use
