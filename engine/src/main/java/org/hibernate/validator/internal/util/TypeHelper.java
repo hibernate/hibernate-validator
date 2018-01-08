@@ -113,6 +113,13 @@ public final class TypeHelper {
 
 		if ( supertype instanceof ParameterizedType ) {
 			if ( type instanceof Class<?> ) {
+				// First let's check if it is the same class and if the supertype's type arguments only are unbound wildcards
+				// see HV-1551
+				if ( getErasedReferenceType( supertype ).equals( type ) ) {
+					return isUnbound( (ParameterizedType) supertype );
+				}
+
+				// Then we end up exploring the superclasses/interfaces
 				return isSuperAssignable( supertype, type );
 			}
 
@@ -342,6 +349,14 @@ public final class TypeHelper {
 		}
 		//FIXME raise an exception if validatorType is not a class
 		return validatorType;
+	}
+
+	public static boolean isUnboundWildcard(Type type) {
+		if ( !( type instanceof WildcardType ) ) {
+			return false;
+		}
+		WildcardType wildcardType = (WildcardType) type;
+		return isEmptyBounds( wildcardType.getUpperBounds() ) && isEmptyBounds( wildcardType.getLowerBounds() );
 	}
 
 	private static Type resolveTypes(Map<Type, Type> resolvedTypes, Type type) {
@@ -630,5 +645,19 @@ public final class TypeHelper {
 		}
 
 		return map;
+	}
+
+	private static boolean isUnbound(ParameterizedType parameterizedType) {
+		for ( Type typeArgument : parameterizedType.getActualTypeArguments() ) {
+			if ( !isUnboundWildcard( typeArgument ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private static boolean isEmptyBounds(Type[] bounds) {
+		return bounds == null || bounds.length == 0 || ( bounds.length == 1 && Object.class.equals( bounds[0] ) );
 	}
 }

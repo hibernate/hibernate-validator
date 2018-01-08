@@ -12,7 +12,6 @@ import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -75,7 +74,7 @@ public class ValueExtractorDescriptor {
 			AnnotatedParameterizedType parameterizedExtractedType = (AnnotatedParameterizedType) containerType;
 			int i = 0;
 			for ( AnnotatedType typeArgument : parameterizedExtractedType.getAnnotatedActualTypeArguments() ) {
-				if ( !isUnboundWildcard( typeArgument.getType() ) ) {
+				if ( !TypeHelper.isUnboundWildcard( typeArgument.getType() ) ) {
 					throw LOG.getOnlyUnboundWildcardTypeArgumentsSupportedForContainerTypeOfValueExtractorException( extractorImplementationType );
 				}
 				if ( typeArgument.isAnnotationPresent( ExtractedValue.class ) ) {
@@ -97,18 +96,6 @@ public class ValueExtractorDescriptor {
 		}
 
 		return extractedTypeParameter;
-	}
-
-	private static boolean isUnboundWildcard(Type type) {
-		if ( !( type instanceof WildcardType ) ) {
-			return false;
-		}
-		WildcardType wildcardType = (WildcardType) type;
-		return isEmptyBounds( wildcardType.getUpperBounds() ) && isEmptyBounds( wildcardType.getLowerBounds() );
-	}
-
-	private static boolean isEmptyBounds(Type[] bounds) {
-		return bounds == null || bounds.length == 0 || ( bounds.length == 1 && Object.class.equals( bounds[0] ) );
 	}
 
 	private static Optional<Class<?>> getExtractedType(AnnotatedParameterizedType valueExtractorDefinition) {
