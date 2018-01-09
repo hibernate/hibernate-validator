@@ -20,7 +20,10 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  *
  * @author Hardy Ferentschik
  */
-public class SizeValidatorForCollection implements ConstraintValidator<Size, Collection<?>> {
+@SuppressWarnings("rawtypes")
+// as per the JLS, Collection<?> is a subtype of Collection, so we need to explicitly reference
+// Collection here to support having properties defined as Collection (see HV-1551)
+public class SizeValidatorForCollection implements ConstraintValidator<Size, Collection> {
 
 	private  static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -45,7 +48,7 @@ public class SizeValidatorForCollection implements ConstraintValidator<Size, Col
 	 *         {@code false} otherwise.
 	 */
 	@Override
-	public boolean isValid(Collection<?> collection, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Collection collection, ConstraintValidatorContext constraintValidatorContext) {
 		if ( collection == null ) {
 			return true;
 		}

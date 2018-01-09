@@ -17,7 +17,10 @@ import javax.validation.constraints.NotEmpty;
  *
  * @author Guillaume Smet
  */
-public class NotEmptyValidatorForCollection implements ConstraintValidator<NotEmpty, Collection<?>> {
+// as per the JLS, Collection<?> is a subtype of Collection, so we need to explicitly reference
+// Collection here to support having properties defined as Collection (see HV-1551)
+@SuppressWarnings("rawtypes")
+public class NotEmptyValidatorForCollection implements ConstraintValidator<NotEmpty, Collection> {
 
 	/**
 	 * Checks the collection is not {@code null} and not empty.
@@ -27,7 +30,7 @@ public class NotEmptyValidatorForCollection implements ConstraintValidator<NotEm
 	 * @return returns {@code true} if the collection is not {@code null} and the collection is not empty
 	 */
 	@Override
-	public boolean isValid(Collection<?> collection, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Collection collection, ConstraintValidatorContext constraintValidatorContext) {
 		if ( collection == null ) {
 			return false;
 		}

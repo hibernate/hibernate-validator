@@ -29,7 +29,10 @@ import org.hibernate.validator.internal.util.CollectionHelper;
  * @author Tadhg Pearson
  * @author Guillaume Smet
  */
-public class UniqueElementsValidator implements ConstraintValidator<UniqueElements, Collection<?>> {
+@SuppressWarnings("rawtypes")
+// as per the JLS, Collection<?> is a subtype of Collection, so we need to explicitly reference
+// Collection here to support having properties defined as Collection (see HV-1551)
+public class UniqueElementsValidator implements ConstraintValidator<UniqueElements, Collection> {
 
 	/**
 	 * @param collection the collection to validate
@@ -38,7 +41,7 @@ public class UniqueElementsValidator implements ConstraintValidator<UniqueElemen
 	 * @return true if the input collection is null or does not contain duplicate elements
 	 */
 	@Override
-	public boolean isValid(Collection<?> collection, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Collection collection, ConstraintValidatorContext constraintValidatorContext) {
 		if ( collection == null || collection.size() < 2 ) {
 			return true;
 		}

@@ -20,7 +20,10 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  *
  * @author Hardy Ferentschik
  */
-public class SizeValidatorForMap implements ConstraintValidator<Size, Map<?, ?>> {
+// as per the JLS, Map<?, ?> is a subtype of Map, so we need to explicitly reference
+// Map here to support having properties defined as Map (see HV-1551)
+@SuppressWarnings("rawtypes")
+public class SizeValidatorForMap implements ConstraintValidator<Size, Map> {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -45,7 +48,7 @@ public class SizeValidatorForMap implements ConstraintValidator<Size, Map<?, ?>>
 	 *         {@code false} otherwise.
 	 */
 	@Override
-	public boolean isValid(Map<?, ?> map, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Map map, ConstraintValidatorContext constraintValidatorContext) {
 		if ( map == null ) {
 			return true;
 		}
