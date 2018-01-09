@@ -171,7 +171,7 @@
         <pax.url.version>2.5.2</pax.url.version>
         <apache.karaf.version>4.1.1</apache.karaf.version>
         <osgi-core.version>6.0.0</osgi-core.version>
-        <payara.version>5.0.0.Alpha1</payara.version>
+        <payara.version>5.Beta1</payara.version>
         <payara-arquillian.version>1.0.Beta2</payara-arquillian.version>
 
         <puppycrawl.checkstyle.version>8.1</puppycrawl.checkstyle.version>
