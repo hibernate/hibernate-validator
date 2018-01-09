@@ -20,7 +20,6 @@
     <description>Hibernate Validator OSGi integration test for Felix using Payara Server</description>
 
     <properties>
-        <hibernate.validator.version>6.0.3-SNAPSHOT</hibernate.validator.version>
         <hibernate-validator-parent.path>../..</hibernate-validator-parent.path>
     </properties>
 
@@ -150,7 +149,7 @@
                                 <artifactItem>
                                     <groupId>org.hibernate.validator</groupId>
                                     <artifactId>hibernate-validator</artifactId>
-                                    <version>${hibernate.validator.version}</version>
+                                    <version>${project.version}</version>
                                     <type>jar</type>
                                     <outputDirectory>${project.build.directory}/payara5/glassfish/modules</outputDirectory>
                                     <destFileName>hibernate-validator.jar</destFileName>
@@ -159,7 +158,7 @@
                                 <artifactItem>
                                     <groupId>org.hibernate.validator</groupId>
                                     <artifactId>hibernate-validator-cdi</artifactId>
-                                    <version>${hibernate.validator.version}</version>
+                                    <version>${project.version}</version>
                                     <type>jar</type>
                                     <outputDirectory>${project.build.directory}/payara5/glassfish/modules</outputDirectory>
                                     <destFileName>hibernate-validator-cdi.jar</destFileName>
