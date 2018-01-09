@@ -254,7 +254,7 @@ public class ConstraintValidatorManager {
 	 * Tries to reduce all assignable classes down to a single class.
 	 *
 	 * @param assignableTypes The set of all classes which are assignable to the class of the value to be validated and
-	 * which are handled by at least one of the  validators for the specified constraint.
+	 * which are handled by at least one of the validators for the specified constraint.
 	 */
 	private void resolveAssignableTypes(List<Type> assignableTypes) {
 		if ( assignableTypes.size() == 0 || assignableTypes.size() == 1 ) {
