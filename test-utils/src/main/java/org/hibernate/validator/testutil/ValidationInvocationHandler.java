@@ -21,6 +21,8 @@ import javax.validation.Validator;
  */
 public class ValidationInvocationHandler implements InvocationHandler {
 
+	private static final Object[] EMPTY_ARGS = new Object[0];
+
 	private final Object wrapped;
 
 	private final Validator validator;
@@ -38,7 +40,7 @@ public class ValidationInvocationHandler implements InvocationHandler {
 		Set<ConstraintViolation<Object>> constraintViolations = validator.forExecutables().validateParameters(
 				wrapped,
 				method,
-				args == null ? new Object[] { } : args,
+				args == null ? EMPTY_ARGS : args,
 				groups
 		);
 

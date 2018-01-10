@@ -10,7 +10,7 @@ import java.lang.annotation.Annotation;
 
 import javax.validation.Payload;
 
-import org.hibernate.validator.internal.util.StringHelper;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 
 /**
  * Base class for all constraint definition types. Each sub type represents a
@@ -42,28 +42,18 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 	}
 
 	public C message(String message) {
-		addParameter( "message", message );
+		addParameter( ConstraintHelper.MESSAGE, message );
 		return getThis();
 	}
 
 	public C groups(Class<?>... groups) {
-		addParameter( "groups", groups );
+		addParameter( ConstraintHelper.GROUPS, groups );
 		return getThis();
 	}
 
 	@SuppressWarnings("unchecked")
 	public C payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
+		addParameter( ConstraintHelper.PAYLOAD, payload );
 		return getThis();
-	}
-
-	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( this.getClass().getName() );
-		sb.append( ", constraintType=" ).append( StringHelper.toShortString( annotationType ) );
-		sb.append( ", parameters=" ).append( parameters );
-		sb.append( '}' );
-		return sb.toString();
 	}
 }

@@ -7,6 +7,8 @@
 package org.hibernate.validator.internal.engine.resolver;
 
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
+
 import javax.persistence.Persistence;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
@@ -15,16 +17,17 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
- * An implementation of {@code TraversableResolver} which is aware of JPA 2 and utilizes {@code PersistenceUtil} to get
+ * An implementation of {@code TraversableResolver} which is aware of JPA 2 and utilizes {@code PersistenceUtil} to
  * query the reachability of a property.
- * This resolver will be automatically enabled if JPA 2 is on the classpath and the {@code DefaultTraversableResolver} is
+ * This resolver will be automatically enabled if JPA 2 is on the classpath and the default {@code TraversableResolver} is
  * used.
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
-public class JPATraversableResolver implements TraversableResolver {
-	private static final Log log = LoggerFactory.make();
+class JPATraversableResolver implements TraversableResolver {
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
 	public final boolean isReachable(Object traversableObject,
@@ -32,8 +35,8 @@ public class JPATraversableResolver implements TraversableResolver {
 									 Class<?> rootBeanType,
 									 Path pathToTraversableObject,
 									 ElementType elementType) {
-		if ( log.isTraceEnabled() ) {
-			log.tracef(
+		if ( LOG.isTraceEnabled() ) {
+			LOG.tracef(
 					"Calling isReachable on object %s with node name %s.",
 					traversableObject,
 					traversableProperty.getName()

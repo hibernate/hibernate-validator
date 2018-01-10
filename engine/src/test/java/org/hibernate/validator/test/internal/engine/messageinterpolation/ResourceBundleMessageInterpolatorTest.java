@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
+import static org.testng.Assert.assertEquals;
+
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -16,6 +18,7 @@ import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.validation.MessageInterpolator;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
@@ -24,15 +27,13 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
 
 /**
  * Tests for message interpolation.
@@ -42,29 +43,25 @@ import static org.testng.Assert.assertEquals;
 public class ResourceBundleMessageInterpolatorTest {
 
 	private ResourceBundleMessageInterpolator interpolator;
-	private NotNull notNull;
 	private ConstraintDescriptorImpl<NotNull> notNullDescriptor;
-	private Size size;
 	private ConstraintDescriptorImpl<Size> sizeDescriptor;
 
 	@BeforeTest
 	public void setUp() {
 		// Create some annotations for testing using AnnotationProxies
-		AnnotationDescriptor<NotNull> descriptor = new AnnotationDescriptor<NotNull>( NotNull.class );
-		notNull = AnnotationFactory.create( descriptor );
-		notNullDescriptor = new ConstraintDescriptorImpl<NotNull>(
+		ConstraintAnnotationDescriptor.Builder<NotNull> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( NotNull.class );
+		notNullDescriptor = new ConstraintDescriptorImpl<>(
 				new ConstraintHelper(),
 				null,
-				notNull,
+				descriptorBuilder.build(),
 				java.lang.annotation.ElementType.FIELD
 		);
 
-		AnnotationDescriptor<Size> sizeAnnotationDescriptor = new AnnotationDescriptor<Size>( Size.class );
-		size = AnnotationFactory.create( sizeAnnotationDescriptor );
-		sizeDescriptor = new ConstraintDescriptorImpl<Size>(
+		ConstraintAnnotationDescriptor.Builder<Size> sizeAnnotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<Size>( Size.class );
+		sizeDescriptor = new ConstraintDescriptorImpl<>(
 				new ConstraintHelper(),
 				null,
-				size,
+				sizeAnnotationDescriptorBuilder.build(),
 				java.lang.annotation.ElementType.FIELD
 		);
 	}
@@ -172,13 +169,13 @@ public class ResourceBundleMessageInterpolatorTest {
 		MessageInterpolatorContext messageInterpolatorContext = createMessageInterpolatorContext( notNullDescriptor );
 
 		String expected = "must not be null";
-		String actual = interpolator.interpolate( notNull.message(), messageInterpolatorContext );
+		String actual = interpolator.interpolate( notNullDescriptor.getAnnotation().message(), messageInterpolatorContext );
 		assertEquals( actual, expected, "Wrong substitution" );
 
 		expected = "size must be between 0 and 2147483647";  // unknown token {}
 
 		messageInterpolatorContext = createMessageInterpolatorContext( sizeDescriptor );
-		actual = interpolator.interpolate( size.message(), messageInterpolatorContext );
+		actual = interpolator.interpolate( sizeDescriptor.getAnnotation().message(), messageInterpolatorContext );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
 
@@ -188,7 +185,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		MessageInterpolatorContext messageInterpolatorContext = createMessageInterpolatorContext( notNullDescriptor );
 
 		String expected = "darf nicht null sein";
-		String actual = interpolator.interpolate( notNull.message(), messageInterpolatorContext, Locale.GERMAN );
+		String actual = interpolator.interpolate( notNullDescriptor.getAnnotation().message(), messageInterpolatorContext, Locale.GERMAN );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
 
@@ -199,7 +196,7 @@ public class ResourceBundleMessageInterpolatorTest {
 
 		String expected = "no puede ser null";
 		String actual = interpolator.interpolate(
-				notNull.message(),
+				notNullDescriptor.getAnnotation().message(),
 				messageInterpolatorContext,
 				new Locale( "es", "ES" )
 		);
@@ -209,15 +206,16 @@ public class ResourceBundleMessageInterpolatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-102")
 	public void testRecursiveMessageInterpolation() {
-		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
-		descriptor.setValue( "message", "{replace.in.user.bundle1}" );
-		descriptor.setValue( "value", 10L );
-		Max max = AnnotationFactory.create( descriptor );
+		ConstraintAnnotationDescriptor.Builder<Max> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Max.class );
+		descriptorBuilder.setMessage( "{replace.in.user.bundle1}" );
+		descriptorBuilder.setAttribute( "value", 10L );
+
+		ConstraintAnnotationDescriptor<Max> descriptor = descriptorBuilder.build();
 
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
 				new ConstraintHelper(),
 				null,
-				max,
+				descriptorBuilder.build(),
 				java.lang.annotation.ElementType.FIELD
 		);
 
@@ -227,7 +225,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		MessageInterpolator.Context messageInterpolatorContext = createMessageInterpolatorContext( constraintDescriptor );
 
 		String expected = "{replace.in.default.bundle2}";
-		String actual = interpolator.interpolate( max.message(), messageInterpolatorContext );
+		String actual = interpolator.interpolate( descriptor.getAnnotation().message(), messageInterpolatorContext );
 		assertEquals(
 				actual, expected, "Within default bundle replacement parameter evaluation should not be recursive!"
 		);
@@ -236,16 +234,17 @@ public class ResourceBundleMessageInterpolatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-182")
 	public void testCorrectMessageInterpolationIfParameterCannotBeReplaced() {
-		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
+		ConstraintAnnotationDescriptor.Builder<Max> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Max.class );
 		String message = "Message should stay unchanged since {fubar} is not replaceable";
-		descriptor.setValue( "message", message );
-		descriptor.setValue( "value", 10L );
-		Max max = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setMessage( message );
+		descriptorBuilder.setAttribute( "value", 10L );
+
+		ConstraintAnnotationDescriptor<Max> maxDescriptor = descriptorBuilder.build();
 
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
 				new ConstraintHelper(),
 				null,
-				max,
+				maxDescriptor,
 				java.lang.annotation.ElementType.FIELD
 		);
 
@@ -255,7 +254,7 @@ public class ResourceBundleMessageInterpolatorTest {
 
 		MessageInterpolator.Context messageInterpolatorContext = createMessageInterpolatorContext( constraintDescriptor );
 
-		String actual = interpolator.interpolate( max.message(), messageInterpolatorContext );
+		String actual = interpolator.interpolate( maxDescriptor.getMessage(), messageInterpolatorContext );
 		assertEquals(
 				actual, message, "The message should not have changed."
 		);

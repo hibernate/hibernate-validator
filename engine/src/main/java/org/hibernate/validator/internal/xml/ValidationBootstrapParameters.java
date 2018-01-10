@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.xml;
 
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
@@ -36,7 +37,8 @@ import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
  * @author Hardy Ferentschik
  */
 public class ValidationBootstrapParameters {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private MessageInterpolator messageInterpolator;
@@ -56,7 +58,7 @@ public class ValidationBootstrapParameters {
 		setProviderClass( bootstrapConfiguration.getDefaultProviderClassName(), externalClassLoader );
 		setMessageInterpolator( bootstrapConfiguration.getMessageInterpolatorClassName(), externalClassLoader );
 		setTraversableResolver( bootstrapConfiguration.getTraversableResolverClassName(), externalClassLoader );
-		setConstraintFactory( bootstrapConfiguration.getConstraintValidatorFactoryClassName(), externalClassLoader );
+		setConstraintValidatorFactory( bootstrapConfiguration.getConstraintValidatorFactoryClassName(), externalClassLoader );
 		setParameterNameProvider( bootstrapConfiguration.getParameterNameProviderClassName(), externalClassLoader );
 		setClockProvider( bootstrapConfiguration.getClockProviderClassName(), externalClassLoader );
 		setValueExtractors( bootstrapConfiguration.getValueExtractorClassNames(), externalClassLoader );
@@ -155,10 +157,10 @@ public class ValidationBootstrapParameters {
 				providerClass = (Class<? extends ValidationProvider<?>>) run(
 						LoadClass.action( providerFqcn, externalClassLoader )
 				);
-				log.usingValidationProvider( providerClass );
+				LOG.usingValidationProvider( providerClass );
 			}
 			catch (Exception e) {
-				throw log.getUnableToInstantiateValidationProviderClassException( providerFqcn, e );
+				throw LOG.getUnableToInstantiateValidationProviderClassException( providerFqcn, e );
 			}
 		}
 	}
@@ -171,10 +173,10 @@ public class ValidationBootstrapParameters {
 						LoadClass.action( messageInterpolatorFqcn, externalClassLoader )
 				);
 				messageInterpolator = run( NewInstance.action( messageInterpolatorClass, "message interpolator" ) );
-				log.usingMessageInterpolator( messageInterpolatorClass );
+				LOG.usingMessageInterpolator( messageInterpolatorClass );
 			}
 			catch (ValidationException e) {
-				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorFqcn, e );
+				throw LOG.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorFqcn, e );
 			}
 		}
 	}
@@ -187,26 +189,26 @@ public class ValidationBootstrapParameters {
 						LoadClass.action( traversableResolverFqcn, externalClassLoader )
 				);
 				traversableResolver = run( NewInstance.action( clazz, "traversable resolver" ) );
-				log.usingTraversableResolver( clazz );
+				LOG.usingTraversableResolver( clazz );
 			}
 			catch (ValidationException e) {
-				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverFqcn, e );
+				throw LOG.getUnableToInstantiateTraversableResolverClassException( traversableResolverFqcn, e );
 			}
 		}
 	}
 
-	private void setConstraintFactory(String constraintFactoryFqcn, ClassLoader externalClassLoader) {
-		if ( constraintFactoryFqcn != null ) {
+	private void setConstraintValidatorFactory(String constraintValidatorFactoryFqcn, ClassLoader externalClassLoader) {
+		if ( constraintValidatorFactoryFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<? extends ConstraintValidatorFactory> clazz = (Class<? extends ConstraintValidatorFactory>) run(
-						LoadClass.action( constraintFactoryFqcn, externalClassLoader )
+						LoadClass.action( constraintValidatorFactoryFqcn, externalClassLoader )
 				);
-				constraintValidatorFactory = run( NewInstance.action( clazz, "constraint factory class" ) );
-				log.usingConstraintFactory( clazz );
+				constraintValidatorFactory = run( NewInstance.action( clazz, "constraint validator factory class" ) );
+				LOG.usingConstraintValidatorFactory( clazz );
 			}
 			catch (ValidationException e) {
-				throw log.getUnableToInstantiateConstraintFactoryClassException( constraintFactoryFqcn, e );
+				throw LOG.getUnableToInstantiateConstraintValidatorFactoryClassException( constraintValidatorFactoryFqcn, e );
 			}
 		}
 	}
@@ -219,10 +221,10 @@ public class ValidationBootstrapParameters {
 						LoadClass.action( parameterNameProviderFqcn, externalClassLoader )
 				);
 				parameterNameProvider = run( NewInstance.action( clazz, "parameter name provider class" ) );
-				log.usingParameterNameProvider( clazz );
+				LOG.usingParameterNameProvider( clazz );
 			}
 			catch (ValidationException e) {
-				throw log.getUnableToInstantiateParameterNameProviderClassException( parameterNameProviderFqcn, e );
+				throw LOG.getUnableToInstantiateParameterNameProviderClassException( parameterNameProviderFqcn, e );
 			}
 		}
 	}
@@ -235,10 +237,10 @@ public class ValidationBootstrapParameters {
 						LoadClass.action( clockProviderFqcn, externalClassLoader )
 				);
 				clockProvider = run( NewInstance.action( clazz, "clock provider class" ) );
-				log.usingClockProvider( clazz );
+				LOG.usingClockProvider( clazz );
 			}
 			catch (ValidationException e) {
-				throw log.getUnableToInstantiateClockProviderClassException( clockProviderFqcn, e );
+				throw LOG.getUnableToInstantiateClockProviderClassException( clockProviderFqcn, e );
 			}
 		}
 	}
@@ -255,7 +257,7 @@ public class ValidationBootstrapParameters {
 				valueExtractor = run( NewInstance.action( clazz, "value extractor class" ) );
 			}
 			catch (ValidationException e) {
-				throw log.getUnableToInstantiateValueExtractorClassException( valueExtractorFqcn, e );
+				throw LOG.getUnableToInstantiateValueExtractorClassException( valueExtractorFqcn, e );
 			}
 
 
@@ -263,20 +265,20 @@ public class ValidationBootstrapParameters {
 			ValueExtractorDescriptor previous = valueExtractorDescriptors.put( descriptor.getKey(), descriptor );
 
 			if ( previous != null ) {
-				throw log.getValueExtractorForTypeAndTypeUseAlreadyPresentException( valueExtractor, previous.getValueExtractor() );
+				throw LOG.getValueExtractorForTypeAndTypeUseAlreadyPresentException( valueExtractor, previous.getValueExtractor() );
 			}
 
-			log.addingValueExtractor( (Class<? extends ValueExtractor<?>>) valueExtractor.getClass() );
+			LOG.addingValueExtractor( (Class<? extends ValueExtractor<?>>) valueExtractor.getClass() );
 		}
 	}
 
 	private void setMappingStreams(Set<String> mappingFileNames, ClassLoader externalClassLoader) {
 		for ( String mappingFileName : mappingFileNames ) {
-			log.debugf( "Trying to open input stream for %s.", mappingFileName );
+			LOG.debugf( "Trying to open input stream for %s.", mappingFileName );
 
 			InputStream in = ResourceLoaderHelper.getResettableInputStreamForPath( mappingFileName, externalClassLoader );
 			if ( in == null ) {
-				throw log.getUnableToOpenInputStreamForMappingFileException( mappingFileName );
+				throw LOG.getUnableToOpenInputStreamForMappingFileException( mappingFileName );
 			}
 			mappings.add( in );
 		}

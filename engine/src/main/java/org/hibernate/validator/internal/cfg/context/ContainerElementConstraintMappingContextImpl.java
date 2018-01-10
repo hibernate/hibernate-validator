@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -32,7 +33,7 @@ import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueTarget;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
@@ -52,7 +53,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class ContainerElementConstraintMappingContextImpl extends CascadableConstraintMappingContextImplBase<ContainerElementConstraintMappingContext> implements ContainerElementConstraintMappingContext {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final TypeConstraintMappingContextImpl<?> typeContext;
 	private final ContainerElementTarget parentContainerElementTarget;
@@ -204,15 +205,15 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 		return ConstraintType.GENERIC;
 	}
 
-	CascadingTypeParameter getCascadingTypeParameter() {
-		return new CascadingTypeParameter(
+	CascadingMetaDataBuilder getContainerElementCascadingMetaDataBuilder() {
+		return new CascadingMetaDataBuilder(
 			parentLocation.getTypeForValidatorResolution(),
 			typeParameter,
 			isCascading,
 			nestedContainerElementContexts.values()
 					.stream()
-					.map( ContainerElementConstraintMappingContextImpl::getCascadingTypeParameter )
-					.collect( Collectors.toMap( CascadingTypeParameter::getTypeParameter, Function.identity() ) ),
+					.map( ContainerElementConstraintMappingContextImpl::getContainerElementCascadingMetaDataBuilder )
+					.collect( Collectors.toMap( CascadingMetaDataBuilder::getTypeParameter, Function.identity() ) ),
 			groupConversions
 		);
 	}
@@ -235,7 +236,7 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<>(
 				constraintHelper,
 				config.getLocation().getMember(),
-				config.createAnnotationProxy(),
+				config.createAnnotationDescriptor(),
 				config.getElementType(),
 				getConstraintType()
 		);

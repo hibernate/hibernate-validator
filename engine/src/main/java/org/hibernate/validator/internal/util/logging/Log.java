@@ -5,17 +5,21 @@
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.internal.util.logging;
+
+import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -47,9 +51,14 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.logging.formatter.ClassObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfObjectsToStringFormatter;
+import org.hibernate.validator.internal.util.logging.formatter.DurationFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatter;
+import org.hibernate.validator.internal.util.logging.formatter.ObjectArrayFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
 import org.hibernate.validator.internal.xml.ContainerElementTypePath;
+import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
@@ -79,8 +88,8 @@ public interface Log extends BasicLogger {
 	void ignoringXmlConfiguration();
 
 	@LogMessage(level = INFO)
-	@Message(id = 3, value = "Using %s as constraint factory.")
-	void usingConstraintFactory(@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidatorFactory> constraintFactoryClass);
+	@Message(id = 3, value = "Using %s as constraint validator factory.")
+	void usingConstraintValidatorFactory(@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidatorFactory> constraintValidatorFactoryClass);
 
 	@LogMessage(level = INFO)
 	@Message(id = 4, value = "Using %s as message interpolator.")
@@ -156,7 +165,7 @@ public interface Log extends BasicLogger {
 	ValidationException getExceptionDuringIsValidCallException(@Cause RuntimeException e);
 
 	@Message(id = 29, value = "Constraint factory returned null when trying to create instance of %s.")
-	ValidationException getConstraintFactoryMustNotReturnNullException(@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidator<?, ?>> validatorClass);
+	ValidationException getConstraintValidatorFactoryMustNotReturnNullException(@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidator<?, ?>> validatorClass);
 
 	@Message(id = 30,
 			value = "No validator could be found for constraint '%s' validating type '%s'. Check configuration for '%s'")
@@ -303,23 +312,25 @@ public interface Log extends BasicLogger {
 	ConstraintDefinitionException getWrongAttributeTypeForOverriddenConstraintException(@FormatWith(ClassObjectFormatter.class) Class<?> expectedReturnType,
 			@FormatWith(ClassObjectFormatter.class) Class<?> currentReturnType);
 
-	@Message(id = 82, value = "Wrong parameter type. Expected: %1$s Actual: %2$s.")
-	ValidationException getWrongParameterTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> expectedType,
+	@Message(id = 82, value = "Wrong type for attribute '%2$s' of annotation %1$s. Expected: %3$s. Actual: %4$s.")
+	ValidationException getWrongAnnotationAttributeTypeException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass,
+			String attributeName, @FormatWith(ClassObjectFormatter.class) Class<?> expectedType,
 			@FormatWith(ClassObjectFormatter.class) Class<?> currentType);
 
-	@Message(id = 83, value = "The specified annotation defines no parameter '%s'.")
-	ValidationException getUnableToFindAnnotationParameterException(String parameterName, @Cause NoSuchMethodException e);
+	@Message(id = 83, value = "The specified annotation %1$s defines no attribute '%2$s'.")
+	ValidationException getUnableToFindAnnotationAttributeException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass,
+			String parameterName, @Cause NoSuchMethodException e);
 
-	@Message(id = 84, value = "Unable to get '%1$s' from %2$s.")
-	ValidationException getUnableToGetAnnotationParameterException(String parameterName,
-			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass, @Cause Exception e);
+	@Message(id = 84, value = "Unable to get attribute '%2$s' from annotation %1$s.")
+	ValidationException getUnableToGetAnnotationAttributeException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass,
+			String parameterName, @Cause Exception e);
 
-	@Message(id = 85, value = "No value provided for parameter '%1$s' of annotation @%2$s.")
-	IllegalArgumentException getNoValueProvidedForAnnotationParameterException(String parameterName,
+	@Message(id = 85, value = "No value provided for attribute '%1$s' of annotation @%2$s.")
+	IllegalArgumentException getNoValueProvidedForAnnotationAttributeException(String parameterName,
 			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotation);
 
-	@Message(id = 86, value = "Trying to instantiate %1$s with unknown parameter(s): %2$s.")
-	RuntimeException getTryingToInstantiateAnnotationWithUnknownParametersException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationType,
+	@Message(id = 86, value = "Trying to instantiate annotation %1$s with unknown attribute(s): %2$s.")
+	RuntimeException getTryingToInstantiateAnnotationWithUnknownAttributesException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationType,
 			Set<String> unknownParameters);
 
 	@Message(id = 87, value = "Property name cannot be null or empty.")
@@ -344,7 +355,7 @@ public interface Log extends BasicLogger {
 	IllegalArgumentException getMissingActualTypeArgumentForTypeParameterException(TypeVariable<?> typeParameter);
 
 	@Message(id = 95, value = "Unable to instantiate constraint factory class %s.")
-	ValidationException getUnableToInstantiateConstraintFactoryClassException(String constraintFactoryClassName, @Cause ValidationException e);
+	ValidationException getUnableToInstantiateConstraintValidatorFactoryClassException(String constraintValidatorFactoryClassName, @Cause ValidationException e);
 
 	@Message(id = 96, value = "Unable to open input stream for mapping file %s.")
 	ValidationException getUnableToOpenInputStreamForMappingFileException(String mappingFileName);
@@ -433,10 +444,10 @@ public interface Log extends BasicLogger {
 	ConstraintDeclarationException getMultipleGroupConversionsForSameSourceException(@FormatWith(ClassObjectFormatter.class) Class<?> from,
 			@FormatWith(CollectionOfClassesObjectFormatter.class) Collection<Class<?>> tos);
 
-	@Message(id = 125, value = "Found group conversions for non-cascading element: %s.")
-	ConstraintDeclarationException getGroupConversionOnNonCascadingElementException(String location);
+	@Message(id = 125, value = "Found group conversions for non-cascading element at: %s.")
+	ConstraintDeclarationException getGroupConversionOnNonCascadingElementException(Object context);
 
-	@Message(id = 127, value = "Found group conversion using a group sequence as source: %s.")
+	@Message(id = 127, value = "Found group conversion using a group sequence as source at: %s.")
 	ConstraintDeclarationException getGroupConversionForSequenceException(@FormatWith(ClassObjectFormatter.class) Class<?> from);
 
 	@LogMessage(level = WARN)
@@ -652,12 +663,8 @@ public interface Log extends BasicLogger {
 	ValidationException getUnableToInitializeELExpressionFactoryException(@Cause Throwable e);
 
 	@LogMessage(level = WARN)
-	@Message(id = 184, value = "ParameterMessageInterpolator has been chosen, EL interpolation will not be supported")
-	void creationOfParameterMessageInterpolation();
-
-	@LogMessage(level = WARN)
-	@Message(id = 185, value = "Message contains EL expression: %1s, which is unsupported with chosen Interpolator")
-	void getElUnsupported(String expression);
+	@Message(id = 185, value = "Message contains EL expression: %1s, which is not supported by the selected message interpolator")
+	void warnElIsUnsupported(String expression);
 
 	@Message(id = 189,
 			value = "The configuration of value unwrapping for property '%s' of bean '%s' is inconsistent between the field and its getter.")
@@ -747,8 +754,8 @@ public interface Log extends BasicLogger {
 	ValidationException getContainerElementTypeHasAlreadyBeenConfiguredViaXmlMappingConfigurationException(ConstraintLocation rootConstraintLocation,
 			ContainerElementTypePath path);
 
-	@Message(id = 218, value = "Having parallel definitions of ValueExtractor on a given class is not allowed: %s.")
-	ValueExtractorDefinitionException getParallelDefinitionsOfValueExtractorException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorImplementationType);
+	@Message(id = 218, value = "Having parallel definitions of value extractors on a given class is not allowed: %s.")
+	ValueExtractorDefinitionException getParallelDefinitionsOfValueExtractorsException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorImplementationType);
 
 	@SuppressWarnings("rawtypes")
 	@Message(id = 219, value = "Unable to get the most specific value extractor for type %1$s as several most specific value extractors are declared: %2$s.")
@@ -786,4 +793,48 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 226, value = "Container element constraints and cascading validation are not supported on arrays: %1$s")
 	ValidationException getContainerElementConstraintsAndCascadedValidationNotSupportedOnArraysException(@FormatWith(TypeFormatter.class) Type type);
+
+	@Message(id = 227, value = "The validated type %1$s does not specify the property: %2$s")
+	IllegalArgumentException getPropertyNotDefinedByValidatedTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> validatedType, String propertyName);
+
+	@Message(id = 228, value = "No value extractor found when narrowing down to the runtime type %3$s among the value extractors for type parameter '%2$s' of type %1$s.")
+	ConstraintDeclarationException getNoValueExtractorFoundForTypeException(@FormatWith(TypeFormatter.class) Type declaredType,
+			TypeVariable<?> declaredTypeParameter, @FormatWith(ClassObjectFormatter.class) Class<?> valueType);
+
+	@Message(id = 229, value = "Unable to cast %1$s to %2$s.")
+	ClassCastException getUnableToCastException(Object object, @FormatWith(ClassObjectFormatter.class) Class<?> clazz);
+
+	@LogMessage(level = INFO)
+	@Message(id = 230, value = "Using %s as script evaluator factory.")
+	void usingScriptEvaluatorFactory(@FormatWith(ClassObjectFormatter.class) Class<? extends ScriptEvaluatorFactory> scriptEvaluatorFactoryClass);
+
+	@Message(id = 231, value = "Unable to instantiate script evaluator factory class %s.")
+	ValidationException getUnableToInstantiateScriptEvaluatorFactoryClassException(String scriptEvaluatorFactoryClassName, @Cause Exception e);
+
+	@Message(id = 232, value = "No JSR 223 script engine found for language \"%s\".")
+	ScriptEvaluatorNotFoundException getUnableToFindScriptEngineException(String languageName);
+
+	@Message(id = 233, value = "An error occurred while executing the script: \"%s\".")
+	ScriptEvaluationException getErrorExecutingScriptException(String script, @Cause Exception e);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = 234, value = "Using %1$s as ValidatorFactory-scoped %2$s.")
+	void logValidatorFactoryScopedConfiguration(@FormatWith(ClassObjectFormatter.class) Class<?> configuredClass, String configuredElement);
+
+	@Message(id = 235, value = "Unable to create an annotation descriptor for %1$s.")
+	ValidationException getUnableToCreateAnnotationDescriptor(@FormatWith(ClassObjectFormatter.class) Class<?> configuredClass, @Cause Throwable e);
+
+	@Message(id = 236, value = "Unable to find the method required to create the constraint annotation descriptor.")
+	ValidationException getUnableToFindAnnotationDefDeclaredMethods(@Cause Exception e);
+
+	@Message(id = 237, value = "Unable to access method %3$s of class %2$s with parameters %4$s using lookup %1$s.")
+	ValidationException getUnableToAccessMethodException(Lookup lookup, @FormatWith(ClassObjectFormatter.class) Class<?> clazz, String methodName,
+			@FormatWith(ObjectArrayFormatter.class) Object[] parameterTypes, @Cause Throwable e);
+
+	@LogMessage(level = INFO)
+	@Message(id = 238, value = "Temporal validation tolerance set to %1$s.")
+	void logTemporalValidationTolerance(@FormatWith(DurationFormatter.class) Duration tolerance);
+
+	@Message(id = 239, value = "Unable to parse the temporal validation tolerance property %s. It should be a duration represented in milliseconds.")
+	ValidationException getUnableToParseTemporalValidationToleranceException(String toleranceProperty, @Cause Exception e);
 }

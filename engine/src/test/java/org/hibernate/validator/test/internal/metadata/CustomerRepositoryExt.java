@@ -109,7 +109,7 @@ public class CustomerRepositoryExt extends CustomerRepository {
 		return 0;
 	}
 
-	public void zap() {
+	public void zap(@NotNull Integer value) {
 	}
 
 	@Min(0)

@@ -8,6 +8,8 @@ package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
 import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.BEGIN_TERM;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -15,11 +17,12 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class InterpolationTermState implements ParserState {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
 	public void terminate(TokenCollector tokenCollector) throws MessageDescriptorFormatException {
-		throw log.getNonTerminatedParameterException(
+		throw LOG.getNonTerminatedParameterException(
 				tokenCollector.getOriginalMessageDescriptor(),
 				BEGIN_TERM
 		);
@@ -33,7 +36,7 @@ public class InterpolationTermState implements ParserState {
 
 	@Override
 	public void handleBeginTerm(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException {
-		throw log.getNestedParameterException( tokenCollector.getOriginalMessageDescriptor() );
+		throw LOG.getNestedParameterException( tokenCollector.getOriginalMessageDescriptor() );
 	}
 
 	@Override

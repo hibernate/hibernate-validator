@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 
 /**
  * Provides a unified view on cascadable elements of all kinds, be it properties
@@ -56,7 +56,8 @@ public interface Cascadable {
 
 	public interface Builder {
 
-		void mergeCascadingMetaData(CascadingTypeParameter cascadingMetaData);
+		void mergeCascadingMetaData(CascadingMetaDataBuilder cascadingMetaDataBuilder);
+
 		Cascadable build();
 	}
 }

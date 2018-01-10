@@ -8,16 +8,28 @@ package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
+import javax.validation.ValidationException;
+
+import org.hibernate.validator.cfg.AnnotationDef;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethodHandle;
 
 /**
  * Represents a programmatically configured constraint and meta-data
@@ -27,12 +39,17 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
  */
 class ConfiguredConstraint<A extends Annotation> {
 
-	private final ConstraintDefAccessor<A> constraint;
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+
+	private static final MethodHandle CREATE_ANNOTATION_DESCRIPTOR_METHOD_HANDLE =
+			run( GetDeclaredMethodHandle.andMakeAccessible( MethodHandles.lookup(), AnnotationDef.class, "createAnnotationDescriptor" ) );
+
+	private final ConstraintDef<?, A> constraint;
 	private final ConstraintLocation location;
 	private final ElementType elementType;
 
 	private ConfiguredConstraint(ConstraintDef<?, A> constraint, ConstraintLocation location, ElementType elementType) {
-		this.constraint = new ConstraintDefAccessor<>( constraint );
+		this.constraint = constraint;
 		this.location = location;
 		this.elementType = elementType;
 	}
@@ -92,8 +109,17 @@ class ConfiguredConstraint<A extends Annotation> {
 		return location;
 	}
 
-	public A createAnnotationProxy() {
-		return constraint.createAnnotationProxy();
+	public ConstraintAnnotationDescriptor<A> createAnnotationDescriptor() {
+		try {
+			AnnotationDescriptor<A> annotationDescriptor = (AnnotationDescriptor<A>) CREATE_ANNOTATION_DESCRIPTOR_METHOD_HANDLE.invoke( constraint );
+			return new ConstraintAnnotationDescriptor<>( annotationDescriptor );
+		}
+		catch (Throwable e) {
+			if ( e instanceof ValidationException ) {
+				throw (ValidationException) e;
+			}
+			throw LOG.getUnableToCreateAnnotationDescriptor( constraint.getClass(), e );
+		}
 	}
 
 	@Override
@@ -101,23 +127,16 @@ class ConfiguredConstraint<A extends Annotation> {
 		return constraint.toString();
 	}
 
-	/**
-	 * Provides access to the members of a {@link ConstraintDef}.
-	 */
-	private static class ConstraintDefAccessor<A extends Annotation>
-			extends ConstraintDef<ConstraintDefAccessor<A>, A> {
-
-		private ConstraintDefAccessor(ConstraintDef<?, A> original) {
-			super( original );
-		}
-
-		@Override
-		protected A createAnnotationProxy() {
-			return super.createAnnotationProxy();
-		}
-	}
-
 	public ElementType getElementType() {
 		return elementType;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <V> V run(PrivilegedAction<V> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

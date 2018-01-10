@@ -6,19 +6,18 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.money;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import javax.money.MonetaryAmount;
 import javax.validation.ConstraintValidator;
 import javax.validation.constraints.Min;
 
+import org.hibernate.validator.internal.constraintvalidators.bv.money.MinValidatorForMonetaryAmount;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+
 import org.javamoney.moneta.Money;
 import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.constraintvalidators.bv.money.MinValidatorForMonetaryAmount;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 /**
  * @author Lukas Niemeier
@@ -57,9 +56,9 @@ public class MinValidatorForMonetaryAmountTest {
 	}
 
 	private Min min(final long value) {
-		AnnotationDescriptor<Min> descriptor = new AnnotationDescriptor<>( Min.class );
-		descriptor.setValue( "value", value );
-		return AnnotationFactory.create( descriptor );
+		ConstraintAnnotationDescriptor.Builder<Min> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Min.class );
+		descriptorBuilder.setAttribute( "value", value );
+		return descriptorBuilder.build().getAnnotation();
 	}
 
 }

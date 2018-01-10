@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -29,8 +30,8 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
@@ -46,13 +47,11 @@ import org.hibernate.validator.internal.xml.binding.PayloadType;
  * @author Hardy Ferentschik
  */
 class MetaConstraintBuilder {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final Pattern IS_ONLY_WHITESPACE = Pattern.compile( "\\s*" );
-
-	private static final String MESSAGE_PARAM = "message";
-	private static final String GROUPS_PARAM = "groups";
-	private static final String PAYLOAD_PARAM = "payload";
+	private static final Class[] EMPTY_CLASSES_ARRAY = new Class[0];
 
 	private final ClassLoadingHelper classLoadingHelper;
 	private final ConstraintHelper constraintHelper;
@@ -78,62 +77,62 @@ class MetaConstraintBuilder {
 			annotationClass = (Class<A>) classLoadingHelper.loadClass( constraint.getAnnotation(), defaultPackage );
 		}
 		catch (ValidationException e) {
-			throw log.getUnableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
+			throw LOG.getUnableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
 		}
-		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( annotationClass );
+		ConstraintAnnotationDescriptor.Builder<A> annotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( annotationClass );
 
 		if ( constraint.getMessage() != null ) {
-			annotationDescriptor.setValue( MESSAGE_PARAM, constraint.getMessage() );
+			annotationDescriptorBuilder.setMessage( constraint.getMessage() );
 		}
-		annotationDescriptor.setValue( GROUPS_PARAM, getGroups( constraint.getGroups(), defaultPackage ) );
-		annotationDescriptor.setValue( PAYLOAD_PARAM, getPayload( constraint.getPayload(), defaultPackage ) );
+		annotationDescriptorBuilder.setGroups( getGroups( constraint.getGroups(), defaultPackage ) )
+				.setPayload( getPayload( constraint.getPayload(), defaultPackage ) );
 
 		for ( ElementType elementType : constraint.getElement() ) {
 			String name = elementType.getName();
 			checkNameIsValid( name );
 			Class<?> returnType = getAnnotationParameterType( annotationClass, name );
 			Object elementValue = getElementValue( elementType, returnType, defaultPackage );
-			annotationDescriptor.setValue( name, elementValue );
+			annotationDescriptorBuilder.setAttribute( name, elementValue );
 		}
 
-		A annotation;
+		ConstraintAnnotationDescriptor<A> annotationDescriptor;
 		try {
-			annotation = AnnotationFactory.create( annotationDescriptor );
+			annotationDescriptor = annotationDescriptorBuilder.build();
 		}
 		catch (RuntimeException e) {
-			throw log.getUnableToCreateAnnotationForConfiguredConstraintException( e );
+			throw LOG.getUnableToCreateAnnotationForConfiguredConstraintException( e );
 		}
 
 		// we set initially ConstraintOrigin.DEFINED_LOCALLY for all xml configured constraints
 		// later we will make copies of this constraint descriptor when needed and adjust the ConstraintOrigin
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				constraintHelper, constraintLocation.getMember(), annotation, type, constraintType
+				constraintHelper, constraintLocation.getMember(), annotationDescriptor, type, constraintType
 		);
 
 		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor, constraintLocation );
 	}
 
 	private <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType, String defaultPackage) {
-		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( returnType );
+		AnnotationDescriptor.Builder<A> annotationDescriptorBuilder = new AnnotationDescriptor.Builder<>( returnType );
 		for ( ElementType elementType : annotationType.getElement() ) {
 			String name = elementType.getName();
 			Class<?> parameterType = getAnnotationParameterType( returnType, name );
 			Object elementValue = getElementValue( elementType, parameterType, defaultPackage );
-			annotationDescriptor.setValue( name, elementValue );
+			annotationDescriptorBuilder.setAttribute( name, elementValue );
 		}
-		return AnnotationFactory.create( annotationDescriptor );
+		return annotationDescriptorBuilder.build().getAnnotation();
 	}
 
 	private static void checkNameIsValid(String name) {
-		if ( MESSAGE_PARAM.equals( name ) || GROUPS_PARAM.equals( name ) ) {
-			throw log.getReservedParameterNamesException( MESSAGE_PARAM, GROUPS_PARAM, PAYLOAD_PARAM );
+		if ( ConstraintHelper.MESSAGE.equals( name ) || ConstraintHelper.GROUPS.equals( name ) ) {
+			throw LOG.getReservedParameterNamesException( ConstraintHelper.MESSAGE, ConstraintHelper.GROUPS, ConstraintHelper.PAYLOAD );
 		}
 	}
 
 	private static <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
 		Method m = run( GetMethod.action( annotationClass, name ) );
 		if ( m == null ) {
-			throw log.getAnnotationDoesNotContainAParameterException( annotationClass, name );
+			throw LOG.getAnnotationDoesNotContainAParameterException( annotationClass, name );
 		}
 		return m.getReturnType();
 	}
@@ -148,11 +147,11 @@ class MetaConstraintBuilder {
 					return "";
 				}
 				else {
-					throw log.getEmptyElementOnlySupportedWhenCharSequenceIsExpectedExpection();
+					throw LOG.getEmptyElementOnlySupportedWhenCharSequenceIsExpectedExpection();
 				}
 			}
 			else if ( elementType.getContent().size() > 1 ) {
-				throw log.getAttemptToSpecifyAnArrayWhereSingleValueIsExpectedException();
+				throw LOG.getAttemptToSpecifyAnArrayWhereSingleValueIsExpectedException();
 			}
 			return getSingleValue( elementType.getContent().get( 0 ), returnType, defaultPackage );
 		}
@@ -197,11 +196,11 @@ class MetaConstraintBuilder {
 				returnValue = buildAnnotation( annotationType, annotationClass, defaultPackage );
 			}
 			catch (ClassCastException e) {
-				throw log.getUnexpectedParameterValueException( e );
+				throw LOG.getUnexpectedParameterValueException( e );
 			}
 		}
 		else {
-			throw log.getUnexpectedParameterValueException();
+			throw LOG.getUnexpectedParameterValueException();
 		}
 		return returnValue;
 
@@ -214,7 +213,7 @@ class MetaConstraintBuilder {
 				returnValue = Byte.parseByte( value );
 			}
 			catch (NumberFormatException e) {
-				throw log.getInvalidNumberFormatException( "byte", e );
+				throw LOG.getInvalidNumberFormatException( "byte", e );
 			}
 		}
 		else if ( returnType == short.class ) {
@@ -222,7 +221,7 @@ class MetaConstraintBuilder {
 				returnValue = Short.parseShort( value );
 			}
 			catch (NumberFormatException e) {
-				throw log.getInvalidNumberFormatException( "short", e );
+				throw LOG.getInvalidNumberFormatException( "short", e );
 			}
 		}
 		else if ( returnType == int.class ) {
@@ -230,7 +229,7 @@ class MetaConstraintBuilder {
 				returnValue = Integer.parseInt( value );
 			}
 			catch (NumberFormatException e) {
-				throw log.getInvalidNumberFormatException( "int", e );
+				throw LOG.getInvalidNumberFormatException( "int", e );
 			}
 		}
 		else if ( returnType == long.class ) {
@@ -238,7 +237,7 @@ class MetaConstraintBuilder {
 				returnValue = Long.parseLong( value );
 			}
 			catch (NumberFormatException e) {
-				throw log.getInvalidNumberFormatException( "long", e );
+				throw LOG.getInvalidNumberFormatException( "long", e );
 			}
 		}
 		else if ( returnType == float.class ) {
@@ -246,7 +245,7 @@ class MetaConstraintBuilder {
 				returnValue = Float.parseFloat( value );
 			}
 			catch (NumberFormatException e) {
-				throw log.getInvalidNumberFormatException( "float", e );
+				throw LOG.getInvalidNumberFormatException( "float", e );
 			}
 		}
 		else if ( returnType == double.class ) {
@@ -254,7 +253,7 @@ class MetaConstraintBuilder {
 				returnValue = Double.parseDouble( value );
 			}
 			catch (NumberFormatException e) {
-				throw log.getInvalidNumberFormatException( "double", e );
+				throw LOG.getInvalidNumberFormatException( "double", e );
 			}
 		}
 		else if ( returnType == boolean.class ) {
@@ -262,7 +261,7 @@ class MetaConstraintBuilder {
 		}
 		else if ( returnType == char.class ) {
 			if ( value.length() != 1 ) {
-				throw log.getInvalidCharValueException( value );
+				throw LOG.getInvalidCharValueException( value );
 			}
 			returnValue = value.charAt( 0 );
 		}
@@ -279,7 +278,7 @@ class MetaConstraintBuilder {
 				returnValue = Enum.valueOf( enumClass, value );
 			}
 			catch (ClassCastException e) {
-				throw log.getInvalidReturnTypeException( returnType, e );
+				throw LOG.getInvalidReturnTypeException( returnType, e );
 			}
 		}
 		return returnValue;
@@ -287,7 +286,7 @@ class MetaConstraintBuilder {
 
 	private Class<?>[] getGroups(GroupsType groupsType, String defaultPackage) {
 		if ( groupsType == null ) {
-			return new Class[] { };
+			return EMPTY_CLASSES_ARRAY;
 		}
 
 		List<Class<?>> groupList = newArrayList();
@@ -300,14 +299,14 @@ class MetaConstraintBuilder {
 	@SuppressWarnings("unchecked")
 	private Class<? extends Payload>[] getPayload(PayloadType payloadType, String defaultPackage) {
 		if ( payloadType == null ) {
-			return new Class[] { };
+			return EMPTY_CLASSES_ARRAY;
 		}
 
 		List<Class<? extends Payload>> payloadList = newArrayList();
 		for ( String groupClass : payloadType.getValue() ) {
 			Class<?> payload = classLoadingHelper.loadClass( groupClass, defaultPackage );
 			if ( !Payload.class.isAssignableFrom( payload ) ) {
-				throw log.getWrongPayloadClassException( payload );
+				throw LOG.getWrongPayloadClassException( payload );
 			}
 			else {
 				payloadList.add( (Class<? extends Payload>) payload );

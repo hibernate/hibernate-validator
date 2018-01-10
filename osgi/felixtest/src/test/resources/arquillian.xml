@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<arquillian xmlns="http://jboss.org/schema/arquillian"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://jboss.org/schema/arquillian
+        http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+
+    <!-- Uncomment in order to inspect deployments -->
+    <!--
+    <engine>
+        <property name="deploymentExportPath">${basedir}/target/</property>
+    </engine>
+    -->
+
+    <container qualifier="paraya" default="true">
+        <configuration>
+            <property name="glassFishHome">${basedir}/target/payara5</property>
+            <!--
+            Uncomment to enable debug mode (debug port is 9009, suspend is disabled):
+            <property name="debug">true</property>
+            -->
+        </configuration>
+    </container>
+
+</arquillian>

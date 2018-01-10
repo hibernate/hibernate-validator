@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.engine;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.toImmutableMap;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import javax.validation.metadata.ConstraintDescriptor;
@@ -27,7 +28,7 @@ import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolator
  */
 public class MessageInterpolatorContext implements HibernateMessageInterpolatorContext {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private final Object validatedValue;
@@ -80,7 +81,7 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 		if ( type.isAssignableFrom( HibernateMessageInterpolatorContext.class ) ) {
 			return type.cast( this );
 		}
-		throw log.getTypeNotSupportedForUnwrappingException( type );
+		throw LOG.getTypeNotSupportedForUnwrappingException( type );
 	}
 
 	@Override
@@ -100,7 +101,7 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 		if ( rootBeanType != null ? !rootBeanType.equals( that.rootBeanType ) : that.rootBeanType != null ) {
 			return false;
 		}
-		if ( validatedValue != null ? !validatedValue.equals( that.validatedValue ) : that.validatedValue != null ) {
+		if ( validatedValue != null ? ( validatedValue != that.validatedValue ) : that.validatedValue != null ) {
 			return false;
 		}
 
@@ -110,7 +111,7 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 	@Override
 	public int hashCode() {
 		int result = constraintDescriptor != null ? constraintDescriptor.hashCode() : 0;
-		result = 31 * result + ( validatedValue != null ? validatedValue.hashCode() : 0 );
+		result = 31 * result + System.identityHashCode( validatedValue );
 		result = 31 * result + ( rootBeanType != null ? rootBeanType.hashCode() : 0 );
 		return result;
 	}

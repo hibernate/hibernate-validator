@@ -5,8 +5,8 @@
   ~ License: Apache License, Version 2.0
   ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
   -->
-<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
-        "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+        "http://checkstyle.sourceforge.net/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
 
@@ -131,17 +131,13 @@
             <property name="option" value="space"/>
         </module>
 
-        <!-- Required to get SuppressionCommentFilter to work -->
-        <module name="FileContentsHolder" />
-
+        <module name="SuppressionCommentFilter" />
     </module>
 
     <module name="RegexpSingleline">
         <property name="format" value="\s+$" />
         <property name="message" value="White spaces at the end of line" />
     </module>
-
-    <module name="SuppressionCommentFilter" />
 
     <module name="SuppressionFilter">
         <property name="file" value="/suppressions.xml" />

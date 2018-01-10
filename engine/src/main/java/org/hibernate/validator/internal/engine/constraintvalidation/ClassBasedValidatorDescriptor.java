@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -28,7 +29,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 class ClassBasedValidatorDescriptor<A extends Annotation> implements ConstraintValidatorDescriptor<A> {
 
 	private static final long serialVersionUID = -8207687559460098548L;
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Class<? extends ConstraintValidator<A, ?>> validatorClass;
 	private final Type validatedType;
@@ -60,11 +61,11 @@ class ClassBasedValidatorDescriptor<A extends Annotation> implements ConstraintV
 	}
 
 	@Override
-	public ConstraintValidator<A, ?> newInstance(ConstraintValidatorFactory constraintFactory) {
-		ConstraintValidator<A, ?> constraintValidator = constraintFactory.getInstance( validatorClass );
+	public ConstraintValidator<A, ?> newInstance(ConstraintValidatorFactory constraintValidatorFactory) {
+		ConstraintValidator<A, ?> constraintValidator = constraintValidatorFactory.getInstance( validatorClass );
 
 		if ( constraintValidator == null ) {
-			throw LOG.getConstraintFactoryMustNotReturnNullException( validatorClass );
+			throw LOG.getConstraintValidatorFactoryMustNotReturnNullException( validatorClass );
 		}
 
 		return constraintValidator;

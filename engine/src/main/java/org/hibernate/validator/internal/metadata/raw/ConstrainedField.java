@@ -9,7 +9,7 @@ package org.hibernate.validator.internal.metadata.raw;
 import java.lang.reflect.Field;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.StringHelper;
 
@@ -31,15 +31,15 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	 * @param field The represented field.
 	 * @param constraints The constraints of the represented field, if any.
 	 * @param typeArgumentConstraints Type arguments constraints, if any.
-	 * @param cascadingMetaData The cascaded validation metadata for this element and its container elements.
+	 * @param cascadingMetaDataBuilder The cascaded validation metadata for this element and its container elements.
 	 */
 	public ConstrainedField(ConfigurationSource source,
 							Field field,
 							Set<MetaConstraint<?>> constraints,
 							Set<MetaConstraint<?>> typeArgumentConstraints,
-							CascadingTypeParameter cascadingMetaData) {
+							CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 
-		super( source, ConstrainedElementKind.FIELD, constraints, typeArgumentConstraints, cascadingMetaData );
+		super( source, ConstrainedElementKind.FIELD, constraints, typeArgumentConstraints, cascadingMetaDataBuilder );
 
 		this.field = field;
 	}

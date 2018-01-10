@@ -6,39 +6,38 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.util.List;
 import java.util.Map;
-import javax.validation.ConstraintValidator;
+
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
+import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper;
 import org.hibernate.validator.internal.util.Contracts;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Validator for the {@link ParameterScriptAssert} constraint annotation.
  *
  * @author Gunnar Morling
  * @author Guillaume Smet
+ * @author Marko Bekhta
  */
 @SupportedValidationTarget(ValidationTarget.PARAMETERS)
-public class ParameterScriptAssertValidator implements ConstraintValidator<ParameterScriptAssert, Object[]> {
-
-	private ScriptAssertContext scriptAssertContext;
-	private String escapedScript;
+public class ParameterScriptAssertValidator extends AbstractScriptAssertValidator<ParameterScriptAssert, Object[]> {
 
 	@Override
-	public void initialize(ParameterScriptAssert constraintAnnotation) {
+	public void initialize(ConstraintDescriptor<ParameterScriptAssert> constraintDescriptor, HibernateConstraintValidatorInitializationContext initializationContext) {
+		ParameterScriptAssert constraintAnnotation = constraintDescriptor.getAnnotation();
 		validateParameters( constraintAnnotation );
-		this.scriptAssertContext = new ScriptAssertContext( constraintAnnotation.lang(), constraintAnnotation.script() );
-		this.escapedScript = InterpolationHelper.escapeMessageParameter( constraintAnnotation.script() );
+		initialize( constraintAnnotation.lang(), constraintAnnotation.script(), initializationContext );
 	}
 
 	@Override

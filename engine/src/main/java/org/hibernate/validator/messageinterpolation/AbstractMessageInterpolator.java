@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
+import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
+
+import java.lang.invoke.MethodHandles;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -29,8 +32,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
-import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
-
 /**
  * Resource bundle backed message interpolator.
  *
@@ -38,11 +39,13 @@ import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.R
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Adam Stawicki
+ * @author Marko Bekhta
  *
  * @since 5.2
  */
 public abstract class AbstractMessageInterpolator implements MessageInterpolator {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The default initial capacity for this cache.
@@ -217,7 +220,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			interpolatedMessage = interpolateMessage( message, context, defaultLocale );
 		}
 		catch (MessageDescriptorFormatException e) {
-			log.warn( e.getMessage() );
+			LOG.warn( e.getMessage() );
 		}
 		return interpolatedMessage;
 	}
@@ -229,16 +232,16 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			interpolatedMessage = interpolateMessage( message, context, locale );
 		}
 		catch (ValidationException e) {
-			log.warn( e.getMessage() );
+			LOG.warn( e.getMessage() );
 		}
 		return interpolatedMessage;
 	}
 
 	/**
 	 * Runs the message interpolation according to algorithm specified in the Bean Validation specification.
-	 * <br/>
+	 * <p>
 	 * Note:
-	 * <br/>
+	 * <p>
 	 * Look-ups in user bundles is recursive whereas look-ups in default bundle are not!
 	 *
 	 * @param message the message to interpolate
@@ -247,105 +250,34 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 *
 	 * @return the interpolated message.
 	 */
-	private String interpolateMessage(String message, Context context, Locale locale)
-			throws MessageDescriptorFormatException {
-		LocalizedMessage localisedMessage = new LocalizedMessage( message, locale );
+	private String interpolateMessage(String message, Context context, Locale locale) throws MessageDescriptorFormatException {
 		String resolvedMessage = null;
 
+		// either retrieve message from cache, or if message is not yet there or caching is disabled,
+		// perform message resolution algorithm (step 1)
 		if ( cachingEnabled ) {
-			resolvedMessage = resolvedMessages.get( localisedMessage );
+			resolvedMessage = resolvedMessages.computeIfAbsent( new LocalizedMessage( message, locale ), lm -> resolveMessage( message, locale ) );
+		}
+		else {
+			resolvedMessage = resolveMessage( message, locale );
 		}
 
-		// if the message is not already in the cache we have to run step 1-3 of the message resolution
-		if ( resolvedMessage == null ) {
-			ResourceBundle userResourceBundle = userResourceBundleLocator
-					.getResourceBundle( locale );
+		// there's no need for steps 2-3 unless there's `{param}`/`${expr}` in the message
+		if ( resolvedMessage.indexOf( '{' ) > -1 ) {
+			// resolve parameter expressions (step 2)
+			resolvedMessage = interpolateExpression(
+					new TokenIterator( getParameterTokens( resolvedMessage, tokenizedParameterMessages, InterpolationTermType.PARAMETER ) ),
+					context,
+					locale
+			);
 
-			ResourceBundle constraintContributorResourceBundle = contributorResourceBundleLocator
-					.getResourceBundle( locale );
-
-			ResourceBundle defaultResourceBundle = defaultResourceBundleLocator
-					.getResourceBundle( locale );
-
-			String userBundleResolvedMessage;
-			resolvedMessage = message;
-			boolean evaluatedDefaultBundleOnce = false;
-			do {
-				// search the user bundle recursive (step1)
-				userBundleResolvedMessage = interpolateBundleMessage(
-						resolvedMessage, userResourceBundle, locale, true
-				);
-
-				// search the constraint contributor bundle recursive (only if the user did not define a message)
-				if ( !hasReplacementTakenPlace( userBundleResolvedMessage, resolvedMessage ) ) {
-					userBundleResolvedMessage = interpolateBundleMessage(
-							resolvedMessage, constraintContributorResourceBundle, locale, true
-					);
-				}
-
-				// exit condition - we have at least tried to validate against the default bundle and there was no
-				// further replacements
-				if ( evaluatedDefaultBundleOnce
-						&& !hasReplacementTakenPlace( userBundleResolvedMessage, resolvedMessage ) ) {
-					break;
-				}
-
-				// search the default bundle non recursive (step2)
-				resolvedMessage = interpolateBundleMessage(
-						userBundleResolvedMessage,
-						defaultResourceBundle,
-						locale,
-						false
-				);
-				evaluatedDefaultBundleOnce = true;
-			} while ( true );
+			// resolve EL expressions (step 3)
+			resolvedMessage = interpolateExpression(
+					new TokenIterator( getParameterTokens( resolvedMessage, tokenizedELMessages, InterpolationTermType.EL ) ),
+					context,
+					locale
+			);
 		}
-
-		// cache resolved message
-		if ( cachingEnabled ) {
-			String cachedResolvedMessage = resolvedMessages.putIfAbsent( localisedMessage, resolvedMessage );
-			if ( cachedResolvedMessage != null ) {
-				resolvedMessage = cachedResolvedMessage;
-			}
-		}
-
-		// resolve parameter expressions (step 4)
-		List<Token> tokens = null;
-		if ( cachingEnabled ) {
-			tokens = tokenizedParameterMessages.get( resolvedMessage );
-		}
-		if ( tokens == null ) {
-			TokenCollector tokenCollector = new TokenCollector( resolvedMessage, InterpolationTermType.PARAMETER );
-			tokens = tokenCollector.getTokenList();
-
-			if ( cachingEnabled ) {
-				tokenizedParameterMessages.putIfAbsent( resolvedMessage, tokens );
-			}
-		}
-		resolvedMessage = interpolateExpression(
-				new TokenIterator( tokens ),
-				context,
-				locale
-		);
-
-		// resolve EL expressions (step 5)
-		tokens = null;
-		if ( cachingEnabled ) {
-			tokens = tokenizedELMessages.get( resolvedMessage );
-		}
-		if ( tokens == null ) {
-			TokenCollector tokenCollector = new TokenCollector( resolvedMessage, InterpolationTermType.EL );
-			tokens = tokenCollector.getTokenList();
-
-			if ( cachingEnabled ) {
-				tokenizedELMessages.putIfAbsent( resolvedMessage, tokens );
-			}
-		}
-		resolvedMessage = interpolateExpression(
-				new TokenIterator( tokens ),
-				context,
-				locale
-		);
 
 		// last but not least we have to take care of escaped literals
 		resolvedMessage = replaceEscapedLiterals( resolvedMessage );
@@ -353,11 +285,76 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		return resolvedMessage;
 	}
 
+	private List<Token> getParameterTokens(String resolvedMessage, ConcurrentReferenceHashMap<String, List<Token>> cache, InterpolationTermType termType) {
+		if ( cachingEnabled ) {
+			return cache.computeIfAbsent(
+					resolvedMessage,
+					rm -> new TokenCollector( resolvedMessage, termType ).getTokenList()
+			);
+		}
+		else {
+			return new TokenCollector( resolvedMessage, termType ).getTokenList();
+		}
+	}
+
+	private String resolveMessage(String message, Locale locale) {
+		//if message does not contain something like "{message.key}" we can ignore next steps and just return the message
+		if ( message.indexOf( '{' ) < 0 ) {
+			return message;
+		}
+
+		String resolvedMessage = message;
+
+		ResourceBundle userResourceBundle = userResourceBundleLocator
+				.getResourceBundle( locale );
+
+		ResourceBundle constraintContributorResourceBundle = contributorResourceBundleLocator
+				.getResourceBundle( locale );
+
+		ResourceBundle defaultResourceBundle = defaultResourceBundleLocator
+				.getResourceBundle( locale );
+
+		String userBundleResolvedMessage;
+		boolean evaluatedDefaultBundleOnce = false;
+		do {
+			// search the user bundle recursive (step 1.1)
+			userBundleResolvedMessage = interpolateBundleMessage(
+					resolvedMessage, userResourceBundle, locale, true
+			);
+
+			// search the constraint contributor bundle recursive (only if the user did not define a message)
+			if ( !hasReplacementTakenPlace( userBundleResolvedMessage, resolvedMessage ) ) {
+				userBundleResolvedMessage = interpolateBundleMessage(
+						resolvedMessage, constraintContributorResourceBundle, locale, true
+				);
+			}
+
+			// exit condition - we have at least tried to validate against the default bundle and there was no
+			// further replacements
+			if ( evaluatedDefaultBundleOnce && !hasReplacementTakenPlace( userBundleResolvedMessage, resolvedMessage ) ) {
+				break;
+			}
+
+			// search the default bundle non recursive (step 1.2)
+			resolvedMessage = interpolateBundleMessage(
+					userBundleResolvedMessage,
+					defaultResourceBundle,
+					locale,
+					false
+			);
+			evaluatedDefaultBundleOnce = true;
+		} while ( true );
+
+		return resolvedMessage;
+	}
+
 	private String replaceEscapedLiterals(String resolvedMessage) {
-		resolvedMessage = LEFT_BRACE.matcher( resolvedMessage ).replaceAll( "{" );
-		resolvedMessage = RIGHT_BRACE.matcher( resolvedMessage ).replaceAll( "}" );
-		resolvedMessage = SLASH.matcher( resolvedMessage ).replaceAll( Matcher.quoteReplacement( "\\" ) );
-		resolvedMessage = DOLLAR.matcher( resolvedMessage ).replaceAll( Matcher.quoteReplacement( "$" ) );
+		if ( resolvedMessage.indexOf( '\\' ) > -1 ) {
+			resolvedMessage = LEFT_BRACE.matcher( resolvedMessage ).replaceAll( "{" );
+			resolvedMessage = RIGHT_BRACE.matcher( resolvedMessage ).replaceAll( "}" );
+			resolvedMessage = SLASH.matcher( resolvedMessage ).replaceAll( Matcher.quoteReplacement( "\\" ) );
+			resolvedMessage = DOLLAR.matcher( resolvedMessage ).replaceAll( Matcher.quoteReplacement( "$" ) );
+		}
 		return resolvedMessage;
 	}
 

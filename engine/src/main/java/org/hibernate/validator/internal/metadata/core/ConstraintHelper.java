@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.core;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -52,11 +53,14 @@ import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import javax.validation.constraintvalidation.ValidationTarget;
 
+import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.EAN;
+import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LuhnCheck;
+import org.hibernate.validator.constraints.MinAge;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.ModCheck;
@@ -64,6 +68,7 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
+import org.hibernate.validator.constraints.UniqueElements;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.pl.NIP;
@@ -249,9 +254,12 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorprese
 import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForYear;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForYearMonth;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForZonedDateTime;
+import org.hibernate.validator.internal.constraintvalidators.hv.CodePointLengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.ISBNValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.MinAgeValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidator;
@@ -259,6 +267,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptA
 import org.hibernate.validator.internal.constraintvalidators.hv.SafeHtmlValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.UniqueElementsValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.pl.NIPValidator;
@@ -271,10 +280,11 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
+import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttribute;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Keeps track of builtin constraints and their validator implementations, as well as already resolved validator definitions.
@@ -290,14 +300,18 @@ public class ConstraintHelper {
 	public static final String MESSAGE = "message";
 	public static final String VALIDATION_APPLIES_TO = "validationAppliesTo";
 
-	private static final List<String> SUPPORTED_VALID_METHODS = Arrays.asList( VALIDATION_APPLIES_TO );
+	private static final List<String> SUPPORTED_VALID_METHODS = Collections.singletonList( VALIDATION_APPLIES_TO );
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
 	private static final String JAVA_MONEY_CLASS_NAME = "javax.money.MonetaryAmount";
 
-	// immutable
+	@Immutable
 	private final Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> builtinConstraints;
+
+	private final ConcurrentMap<Class<? extends Annotation>, Boolean> externalConstraints = new ConcurrentHashMap<>();
+
+	private final ConcurrentMap<Class<? extends Annotation>, Boolean> multiValueConstraints = new ConcurrentHashMap<>();
 
 	private final ValidatorDescriptorMap validatorDescriptors = new ValidatorDescriptorMap();
 
@@ -405,6 +419,8 @@ public class ConstraintHelper {
 
 		putConstraints( tmpConstraints, FutureOrPresent.class, futureOrPresentValidators );
 
+		putConstraint( tmpConstraints, ISBN.class, ISBNValidator.class );
+
 		if ( isJavaMoneyInClasspath() ) {
 			putConstraints( tmpConstraints, Max.class, Arrays.asList(
 					MaxValidatorForBigDecimal.class,
@@ -447,6 +463,8 @@ public class ConstraintHelper {
 					MinValidatorForCharSequence.class
 			) );
 		}
+
+		putConstraint( tmpConstraints, MinAge.class, MinAgeValidator.class );
 
 		if ( isJavaMoneyInClasspath() ) {
 			putConstraints( tmpConstraints, Negative.class, Arrays.asList(
@@ -647,6 +665,7 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, EAN.class, EANValidator.class );
 		putConstraint( tmpConstraints, org.hibernate.validator.constraints.Email.class, org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator.class );
 		putConstraint( tmpConstraints, Length.class, LengthValidator.class );
+		putConstraint( tmpConstraints, CodePointLength.class, CodePointLengthValidator.class );
 		putConstraint( tmpConstraints, ModCheck.class, ModCheckValidator.class );
 		putConstraint( tmpConstraints, LuhnCheck.class, LuhnCheckValidator.class );
 		putConstraint( tmpConstraints, Mod10Check.class, Mod10CheckValidator.class );
@@ -658,6 +677,7 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, ParameterScriptAssert.class, ParameterScriptAssertValidator.class );
 		putConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
 		putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
+		putConstraint( tmpConstraints, UniqueElements.class, UniqueElementsValidator.class );
 		putConstraint( tmpConstraints, URL.class, URLValidator.class );
 
 		this.builtinConstraints = Collections.unmodifiableMap( tmpConstraints );
@@ -771,22 +791,24 @@ public class ConstraintHelper {
 			return false;
 		}
 
-		boolean isMultiValueConstraint = false;
-		final Method method = run( GetMethod.action( annotationType, "value" ) );
-		if ( method != null ) {
-			Class<?> returnType = method.getReturnType();
-			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
-				@SuppressWarnings("unchecked")
-				Class<? extends Annotation> componentType = (Class<? extends Annotation>) returnType.getComponentType();
-				if ( isConstraintAnnotation( componentType ) || isBuiltinConstraint( componentType ) ) {
-					isMultiValueConstraint = true;
-				}
-				else {
-					isMultiValueConstraint = false;
+		return multiValueConstraints.computeIfAbsent( annotationType, a -> {
+			boolean isMultiValueConstraint = false;
+			final Method method = run( GetMethod.action( a, "value" ) );
+			if ( method != null ) {
+				Class<?> returnType = method.getReturnType();
+				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
+					@SuppressWarnings("unchecked")
+					Class<? extends Annotation> componentType = (Class<? extends Annotation>) returnType.getComponentType();
+					if ( isConstraintAnnotation( componentType ) ) {
+						isMultiValueConstraint = Boolean.TRUE;
+					}
+					else {
+						isMultiValueConstraint = Boolean.FALSE;
+					}
 				}
 			}
-		}
-		return isMultiValueConstraint;
+			return isMultiValueConstraint;
+		} );
 	}
 
 	/**
@@ -802,7 +824,7 @@ public class ConstraintHelper {
 	 */
 	public <A extends Annotation> List<Annotation> getConstraintsFromMultiValueConstraint(A multiValueConstraint) {
 		Annotation[] annotations = run(
-				GetAnnotationParameter.action(
+				GetAnnotationAttribute.action(
 						multiValueConstraint,
 						"value",
 						Annotation[].class
@@ -826,24 +848,32 @@ public class ConstraintHelper {
 	 * @return {@code true} if the annotation fulfills the above conditions, {@code false} otherwise.
 	 */
 	public boolean isConstraintAnnotation(Class<? extends Annotation> annotationType) {
+		// Note: we don't use isJdkAnnotation() here as it does more harm than good.
+
+		if ( isBuiltinConstraint( annotationType ) ) {
+			return true;
+		}
+
 		if ( annotationType.getAnnotation( Constraint.class ) == null ) {
 			return false;
 		}
 
-		assertMessageParameterExists( annotationType );
-		assertGroupsParameterExists( annotationType );
-		assertPayloadParameterExists( annotationType );
-		assertValidationAppliesToParameterSetUpCorrectly( annotationType );
-		assertNoParameterStartsWithValid( annotationType );
+		return externalConstraints.computeIfAbsent( annotationType, a -> {
+			assertMessageParameterExists( a );
+			assertGroupsParameterExists( a );
+			assertPayloadParameterExists( a );
+			assertValidationAppliesToParameterSetUpCorrectly( a );
+			assertNoParameterStartsWithValid( a );
 
-		return true;
+			return Boolean.TRUE;
+		} );
 	}
 
 	private void assertNoParameterStartsWithValid(Class<? extends Annotation> annotationType) {
 		final Method[] methods = run( GetDeclaredMethods.action( annotationType ) );
 		for ( Method m : methods ) {
 			if ( m.getName().startsWith( "valid" ) && !SUPPORTED_VALID_METHODS.contains( m.getName() ) ) {
-				throw log.getConstraintParametersCannotStartWithValidException();
+				throw LOG.getConstraintParametersCannotStartWithValidException();
 			}
 		}
 	}
@@ -852,15 +882,15 @@ public class ConstraintHelper {
 		try {
 			final Method method = run( GetMethod.action( annotationType, PAYLOAD ) );
 			if ( method == null ) {
-				throw log.getConstraintWithoutMandatoryParameterException( PAYLOAD, annotationType.getName() );
+				throw LOG.getConstraintWithoutMandatoryParameterException( PAYLOAD, annotationType.getName() );
 			}
 			Class<?>[] defaultPayload = (Class<?>[]) method.getDefaultValue();
 			if ( defaultPayload.length != 0 ) {
-				throw log.getWrongDefaultValueForPayloadParameterException( annotationType.getName() );
+				throw LOG.getWrongDefaultValueForPayloadParameterException( annotationType.getName() );
 			}
 		}
 		catch (ClassCastException e) {
-			throw log.getWrongTypeForPayloadParameterException( annotationType.getName(), e );
+			throw LOG.getWrongTypeForPayloadParameterException( annotationType.getName(), e );
 		}
 	}
 
@@ -868,25 +898,25 @@ public class ConstraintHelper {
 		try {
 			final Method method = run( GetMethod.action( annotationType, GROUPS ) );
 			if ( method == null ) {
-				throw log.getConstraintWithoutMandatoryParameterException( GROUPS, annotationType.getName() );
+				throw LOG.getConstraintWithoutMandatoryParameterException( GROUPS, annotationType.getName() );
 			}
 			Class<?>[] defaultGroups = (Class<?>[]) method.getDefaultValue();
 			if ( defaultGroups.length != 0 ) {
-				throw log.getWrongDefaultValueForGroupsParameterException( annotationType.getName() );
+				throw LOG.getWrongDefaultValueForGroupsParameterException( annotationType.getName() );
 			}
 		}
 		catch (ClassCastException e) {
-			throw log.getWrongTypeForGroupsParameterException( annotationType.getName(), e );
+			throw LOG.getWrongTypeForGroupsParameterException( annotationType.getName(), e );
 		}
 	}
 
 	private void assertMessageParameterExists(Class<? extends Annotation> annotationType) {
 		final Method method = run( GetMethod.action( annotationType, MESSAGE ) );
 		if ( method == null ) {
-			throw log.getConstraintWithoutMandatoryParameterException( MESSAGE, annotationType.getName() );
+			throw LOG.getConstraintWithoutMandatoryParameterException( MESSAGE, annotationType.getName() );
 		}
 		if ( method.getReturnType() != String.class ) {
-			throw log.getWrongTypeForMessageParameterException( annotationType.getName() );
+			throw LOG.getWrongTypeForMessageParameterException( annotationType.getName() );
 		}
 	}
 
@@ -903,20 +933,20 @@ public class ConstraintHelper {
 
 		if ( hasGenericValidators && hasCrossParameterValidator ) {
 			if ( method == null ) {
-				throw log.getGenericAndCrossParameterConstraintDoesNotDefineValidationAppliesToParameterException(
+				throw LOG.getGenericAndCrossParameterConstraintDoesNotDefineValidationAppliesToParameterException(
 						annotationType
 				);
 			}
 			if ( method.getReturnType() != ConstraintTarget.class ) {
-				throw log.getValidationAppliesToParameterMustHaveReturnTypeConstraintTargetException( annotationType );
+				throw LOG.getValidationAppliesToParameterMustHaveReturnTypeConstraintTargetException( annotationType );
 			}
 			ConstraintTarget defaultValue = (ConstraintTarget) method.getDefaultValue();
 			if ( defaultValue != ConstraintTarget.IMPLICIT ) {
-				throw log.getValidationAppliesToParameterMustHaveDefaultValueImplicitException( annotationType );
+				throw LOG.getValidationAppliesToParameterMustHaveDefaultValueImplicitException( annotationType );
 			}
 		}
 		else if ( method != null ) {
-			throw log.getValidationAppliesToParameterMustNotBeDefinedForNonGenericAndCrossParameterConstraintException(
+			throw LOG.getValidationAppliesToParameterMustNotBeDefinedForNonGenericAndCrossParameterConstraintException(
 					annotationType
 			);
 		}
@@ -930,6 +960,11 @@ public class ConstraintHelper {
 		Package pakkage = annotation.getPackage();
 		return pakkage != null && pakkage.getName() != null &&
 				( pakkage.getName().startsWith( "java." ) || pakkage.getName().startsWith( "jdk.internal" ) );
+	}
+
+	public void clear() {
+		externalConstraints.clear();
+		multiValueConstraints.clear();
 	}
 
 	private static boolean isJodaTimeInClasspath() {
@@ -970,7 +1005,7 @@ public class ConstraintHelper {
 
 	private static boolean isClassPresent(String className) {
 		try {
-			run( LoadClass.action( className, ConstraintHelper.class.getClassLoader() ) );
+			run( LoadClass.action( className, ConstraintHelper.class.getClassLoader(), false ) );
 			return true;
 		}
 		catch (ValidationException e) {

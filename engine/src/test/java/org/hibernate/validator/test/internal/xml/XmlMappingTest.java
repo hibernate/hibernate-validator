@@ -230,6 +230,44 @@ public class XmlMappingTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-1463")
+	public void testScriptEvaluatorFactoryConfiguration() {
+		validationXmlTestHelper.runWithCustomValidationXml(
+				"script-evaluator-factory-validation.xml", () -> {
+					//given
+					BootstrapConfiguration bootstrapConfiguration = ValidatorUtil.getConfiguration()
+							.getBootstrapConfiguration();
+
+					//then
+					assertEquals(
+							bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.SCRIPT_EVALUATOR_FACTORY_CLASSNAME ),
+							CustomScriptEvaluatorFactory.class.getName()
+					);
+
+				}
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1493")
+	public void testTemporalValidationToleranceConfiguration() {
+		validationXmlTestHelper.runWithCustomValidationXml(
+				"temporal-validation-tolerance-duration-validation.xml", () -> {
+					//given
+					BootstrapConfiguration bootstrapConfiguration = ValidatorUtil.getConfiguration()
+							.getBootstrapConfiguration();
+
+					//then
+					assertEquals(
+							bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.TEMPORAL_VALIDATION_TOLERANCE ),
+							"123456"
+					);
+
+				}
+		);
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HV-707")
 	public void shouldReturnDefaultExecutableTypesForValidationXmlWithoutTypesGiven() {
 		validationXmlTestHelper.runWithCustomValidationXml(

@@ -7,7 +7,14 @@
 
 package org.hibernate.validator;
 
+import java.time.Duration;
+
 import javax.validation.ValidatorFactory;
+
+import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.spi.scripting.ScriptEvaluator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * Provides Hibernate Validator extensions to {@link ValidatorFactory}.
@@ -16,6 +23,29 @@ import javax.validation.ValidatorFactory;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public interface HibernateValidatorFactory extends ValidatorFactory {
+
+	/**
+	 * Returns the factory responsible for creating {@link ScriptEvaluator}s used to
+	 * evaluate script expressions of {@link ScriptAssert} and {@link ParameterScriptAssert}
+	 * constraints.
+	 *
+	 * @return a {@link ScriptEvaluatorFactory} instance
+	 *
+	 * @since 6.0.3
+	 */
+	@Incubating
+	ScriptEvaluatorFactory getScriptEvaluatorFactory();
+
+	/**
+	 * Returns the temporal validation tolerance i.e. the acceptable margin of error when comparing date/time in
+	 * temporal constraints.
+	 *
+	 * @return the tolerance
+	 *
+	 * @since 6.0.5
+	 */
+	@Incubating
+	Duration getTemporalValidationTolerance();
 
 	/**
 	 * Returns a context for validator configuration via options from the

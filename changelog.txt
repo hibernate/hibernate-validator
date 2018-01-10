@@ -1,6 +1,164 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.7.Final (20-12-2017)
+-------------------------
+
+** Task
+    * HV-1548 - build - Upgrade the Bean Validation API and TCK to 2.0.1.Final
+
+6.0.6.Final (14-12-2017)
+-------------------------
+
+** Improvement
+    * HV-1533 - engine               - Small performance improvements
+    * HV-1531 - engine               - Regroup the ValidatorFactory scoped properties in ValidatorFactoryContext
+    * HV-1530 - annotation-processor - Add CodePointLength to supported AP types
+    * HV-1527 - engine               - Separate Group and MetaConstraint - Path processed units in ValidationContext
+    * HV-1525 - engine               - Various AbstractMessageInterpolator performance improvements
+    * HV-1524 - engine               - Log temporal validation tolerance only if it has been explicitly set
+    * HV-1522 - engine               - Improve performance of ConstraintViolationImpl hashCode() method
+    * HV-1506 - engine               - Regroup the Validator scoped properties in ValidationContext
+
+** New Feature
+    * HV-1541 - engine               - Add new constraint for ISBN
+
+** Task
+    * HV-1546 - engine               - Reintroduce AnnotationProcessingOptions
+    * HV-1545 - engine               - Reintroduce hibernate.validator.constraint_mapping_contributor
+    * HV-1538 - engine               - Make the @Incubating annotation @Documented
+    * HV-1537 - engine               - Reintroduce ReflectionParameterNameProvider to avoid API breakage
+    * HV-1536 - engine               - Update description of required permissions in the reference guide
+    * HV-1535 - build                - Use the default style for JavaDoc
+
+6.0.5.Final (15-11-2017)
+-------------------------
+
+** Bug
+    * HV-1520 - engine              - Fix *ProcessedUnit equals() implementations
+    * HV-1516 - validators          - E-mail validator does not allow IDN ascii domain labels
+
+** Improvement
+    * HV-1519 - build               - Fix the jqassistant build
+    * HV-1518 - engine              - Various minor cleanups
+    * HV-1515 - translations        - Add missing strings to the simplified Chinese translation
+    * HV-1514 - performance         - Update the versions used in the benchmarks and make the latest benchmark compatible with BV 1.1
+    * HV-1512 - engine, performance - Improve initialization cost of all logger classes
+    * HV-1511 - engine              - Don't expose AnnotationDescriptor in AnnotationDef
+    * HV-1505 - engine              - Create ConstraintAnnotationDescriptor for typed access to groups() etc.
+    * HV-1497 - engine              - Extend the ConstraintValidator#initialize() contract
+
+** New Feature
+    * HV-1493 - engine              - Support a temporal validation tolerance when applying temporal constraints
+    * HV-1466 - validators          - Add a @UniqueElements constraints
+
+** Task
+    * HV-1513 - engine              - Rename static logger fields from "log" to "LOG"
+
+6.0.4.Final (25-10-2017)
+-------------------------
+
+** Bug
+    * HV-1508 - engine      - Reset the hashCode of PathImpl when we remove the leaf node
+    * HV-1373 - engine      - Validator calls objects hashCode() after failed @NotNull validation
+
+** Improvement
+    * HV-1509 - engine      - Reference constraint validator factory consistently
+    * HV-1507 - engine      - Avoid resetting the PathImpl.hashCode() when setting the property value
+    * HV-1503 - engine      - Store the initialized ConstraintValidator in ConstraintTree
+    * HV-1502 - engine      - Use AnnotationDescriptor to access annotations information
+    * HV-1323 - engine      - Drop WARN log message in ParameterMessageInterpolator instantiation
+    * HV-1040 - engine      - Field-level constraint performance impairment
+
+** Task
+    * HV-1501 - build       - Update the base versions for API comparison and performance tests
+    * HV-1472 - integration - Provide patch file for WildFly 11 Final
+
+6.0.3.Final (19-10-2017)
+-------------------------
+
+** Bug
+    * HV-1494 - validators         - Hibernate Validator specific @NotEmpty used on return type throws an exception
+    * HV-1492 - engine             - Parameters passed in wrong order to log method
+    * HV-1490 - engine             - Feature detection in ConstraintHelper not consistent with what is required by HV
+    * HV-1485 - engine             - ConstraintViolationImpl is not serializable if the constraint can target a generic type (typically Collection)
+    * HV-1481 - engine             - @Valid ignores Iterables/Arrays returned by methods with a generic return type
+    * HV-1478 - build, integration - hibernate-validator-cdi has invalid OSGi manifest
+    * HV-1474 - engine             - Incorrect NodeImpl hashCode()/equals() contract
+    * HV-1184 - engine             - JaCoCo code coverage fails since ConstraintDescriptorImpl#buildAnnotationParameterMap() does not filter out synthetic methods
+
+** Improvement
+    * HV-1499 - documentation      - Update the getting started guide with the latest additions to the policy file
+    * HV-1487 - engine             - Add an option to disable the TraversableResolver result cache
+    * HV-1486 - engine             - Add a toString() to AnnotationParameters
+    * HV-1482 - engine             - Reduce visibility of some of the value extractors
+    * HV-1480 - engine             - Performance and memory allocation improvements
+    * HV-1479 - validators         - Document requirement of java.xml.bind module on Java 9 when using XML descriptors
+    * HV-1476 - build              - Update checkstyle to latest
+    * HV-1475 - build              - Update Maven dependencies
+    * HV-1469 - engine             - ScriptEvaluatorFactory should be scoped to the validator factory
+    * HV-1417 - documentation      - Documentation - Discuss ContainerElementTypeDescriptor and al.
+    * HV-1415 - documentation      - Documentation - Discuss the Path API
+    * HV-937 - documentation      - Make use of custom asciidoctor template to change numbering of examples and cross referencing in documentation
+
+** New Feature
+    * HV-1496 - engine             - Add @CodePointLength constraint that validates code point length
+    * HV-1463 - engine             - Make bootstrapping of script evaluators for @ScriptAssert more flexible
+
+** Task
+    * HV-1488 - integration        - Upgrade WildFly to 11.0.0.CR1
+    * HV-1464 - documentation      - Remove requirement for CLA
+
+6.0.2.Final (22-08-2017)
+-------------------------
+
+** Bug
+    * HV-1471 - engine               - Properly reset the context after constraint validation
+    * HV-1470 - annotation-processor - ConstraintValidatorCheck should be made a warning
+
+** Task
+    * HV-1467 - translations         - Add missing Portuguese constraint violation messages
+    * HV-1462 - integration          - Provide patch file for WildFly 11 Beta1
+    * HV-1395 - annotation-processor - Support OptionalInt/OptionalDouble/OptionalLong in the annotation processor
+
+6.0.1.Final (04-08-2017)
+-------------------------
+
+** Improvement
+    * HV-1460 - build         - Remove the Maven version prerequisite as it's redundant with the enforcer configuration and now generates a warning
+    * HV-1459 - build         - Add a "sigtest" profile to make running the SigTest test easier
+    * HV-1457 - translations  - Update the Persian translation
+    * HV-1456 - engine        - Fix comments mixed up by Eclipse refactorings
+    * HV-1455 - engine        - Improve Validator#validate...() sanity checks
+    * HV-1454 - build         - Support JDK 9 build 180
+    * HV-1452 - engine        - Add Spanish translations for BV 2.0 constraints
+    * HV-1448 - engine        - Remove some superfluous fields from metamodel
+    * HV-1447 - engine        - Remove metadata for unconstrained methods from the aggregated metamodel
+    * HV-1445 - engine        - Remove BeanConfiguration cache in AnnotationMetadataProvider
+    * HV-1443 - engine        - AbstractConstrainedElement#isConstrained() should also return true if there are group conversions without cascading
+    * HV-1442 - engine        - Fix root cascading metadata for arrays in the programmatic API
+    * HV-1441 - engine        - Clean up the initialization of CascadingMetaData
+    * HV-1439 - engine        - Improve overall performances
+    * HV-1438 - engine        - Narrow down value extractors considered for cascaded validation to the ones compatible
+    * HV-1437 - engine        - Look at reducing the runtime memory usage of the ValidatorFactory
+    * HV-1422 - documentation - Extract properties for base URLs commonly used in the reference guide
+    * HV-1405 - tests         - Review assertCorrectPropertyPathStringRepresentations usage
+
+** Task
+    * HV-1446 - engine        - Remove UnconstrainedEntityMetaDataSingleton
+    * HV-1440 - integration   - Provide patch file for WildFly 11 Alpha1
+    * HV-1420 - documentation - Reference documentation update
+
+6.0.0.Final (04-08-2017)
+-------------------------
+
+** Improvement
+    * HV-1458 - engine - Avoid performance regression for cascaded validation
+    * HV-1451 - engine - Add @PastOrPresent and @FutureOrPresent messages
+
+** Task
+    * HV-1453 - build  - Upgrade to final versions of BV API and TCK
+
 6.0.0.CR3 (11-07-2017)
 -------------------------
 

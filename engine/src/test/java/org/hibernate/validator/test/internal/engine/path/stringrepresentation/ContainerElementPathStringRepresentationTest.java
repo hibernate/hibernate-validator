@@ -15,6 +15,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -192,6 +193,42 @@ public class ContainerElementPathStringRepresentationTest extends AbstractPathSt
 				"map[k].<map value>[0].<list element>" );
 	}
 
+	// HV-1428 Container element support is disabled for arrays
+	@Test(enabled = false)
+	public void testArrayPath() throws Exception {
+		Set<ConstraintViolation<Region>> constraintViolations = validator.validate( new Region(
+				Arrays.asList( new Address( null, null ) ),
+				Arrays.asList( null )
+		) );
+
+		assertCorrectPropertyPathStringRepresentations(
+				constraintViolations,
+				"array[0].<iterable element>[0].street",
+				"array[1].<iterable element>[0].<list element>"
+		);
+	}
+
+	@Test
+	public void testSetPath() throws Exception {
+		Set<ConstraintViolation<AddressBook>> constraintViolations = validator.validate(
+				new AddressBook()
+						.add( new Address( null, null ) )
+						.add( new Address( "Street", new City( "C" ) ) )
+						.add( new Address( "Street2", new City( "C" ) ) )
+						.add( new Address( "other", new City( "a" ) ) )
+						.add( null )
+		);
+
+		assertCorrectPropertyPathStringRepresentations(
+				constraintViolations,
+				"addresses[].street",
+				"addresses[].city.name",
+				"addresses[].city.name",
+				"addresses[].city.name",
+				"addresses[].<iterable element>"
+		);
+	}
+
 	private static class DemographicStatistics {
 
 		private Map<@NotNull @Valid Address, @NotNull Integer> inhabitantsPerAddress = new HashMap<>();
@@ -207,6 +244,29 @@ public class ContainerElementPathStringRepresentationTest extends AbstractPathSt
 
 		public void add(Address address) {
 			addresses.add( address );
+		}
+	}
+
+	private static class AddressBook {
+
+		private final Set<@Valid @NotNull Address> addresses;
+
+		private AddressBook() {
+			this.addresses = new HashSet<>();
+		}
+
+		public AddressBook add(Address address) {
+			this.addresses.add( address );
+			return this;
+		}
+	}
+
+	private static class Region {
+
+		private final List<@Valid @NotNull Address>[] addresses;
+
+		private Region(List<Address>... addresses) {
+			this.addresses = addresses;
 		}
 	}
 

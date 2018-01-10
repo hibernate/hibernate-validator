@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
@@ -19,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,10 +67,11 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Chris Beckey &lt;cbeckey@paypal.com&gt;
+ * @author Guillaume Smet
  */
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Represents the "sequence" of just Default.class.
@@ -100,9 +103,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final Set<MetaConstraint<?>> directMetaConstraints;
 
 	/**
-	 * Contains constrained related meta data for all methods and constructors of the type represented by this bean meta
-	 * data. Keyed by executable, values are an aggregated view on each executable together with all the executables
-	 * from the inheritance hierarchy with the same signature.
+	 * Contains constrained related meta data for all the constrained methods and constructors of the type represented
+	 * by this bean meta data. Keyed by executable, values are an aggregated view on each executable together with all
+	 * the executables from the inheritance hierarchy with the same signature.
 	 * <p>
 	 * An entry will be stored once under the signature of the represented method and all the methods it overrides
 	 * (there will only be more than one entry in case of generics in the parameters, e.g. in case of a super-type
@@ -111,6 +114,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	@Immutable
 	private final Map<String, ExecutableMetaData> executableMetaDataMap;
+
+	/**
+	 * The set of unconstrained executables of the bean. It contains all the relevant signatures, following the same
+	 * rules as {@code executableMetaDataMap}.
+	 */
+	@Immutable
+	private final Set<String> unconstrainedExecutables;
 
 	/**
 	 * Property meta data keyed against the property name
@@ -171,17 +181,27 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.propertyMetaDataMap = newHashMap();
 
 		Set<PropertyMetaData> propertyMetaDataSet = newHashSet();
+
 		Set<ExecutableMetaData> executableMetaDataSet = newHashSet();
+		Set<String> tmpUnconstrainedExecutables = newHashSet();
+
 		boolean hasConstraints = false;
 
 		for ( ConstraintMetaData constraintMetaData : constraintMetaDataSet ) {
-			hasConstraints |= constraintMetaData.isCascading() || constraintMetaData.isConstrained();
+			boolean elementHasConstraints = constraintMetaData.isCascading() || constraintMetaData.isConstrained();
+			hasConstraints |= elementHasConstraints;
 
 			if ( constraintMetaData.getKind() == ElementKind.PROPERTY ) {
 				propertyMetaDataSet.add( (PropertyMetaData) constraintMetaData );
 			}
 			else {
-				executableMetaDataSet.add( (ExecutableMetaData) constraintMetaData );
+				ExecutableMetaData executableMetaData = (ExecutableMetaData) constraintMetaData;
+				if ( elementHasConstraints ) {
+					executableMetaDataSet.add( executableMetaData );
+				}
+				else {
+					tmpUnconstrainedExecutables.addAll( executableMetaData.getSignatures() );
+				}
 			}
 		}
 
@@ -211,6 +231,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.directMetaConstraints = getDirectConstraints();
 
 		this.executableMetaDataMap = CollectionHelper.toImmutableMap( bySignature( executableMetaDataSet ) );
+		this.unconstrainedExecutables = CollectionHelper.toImmutableSet( tmpUnconstrainedExecutables );
 
 		boolean defaultGroupSequenceIsRedefined = defaultGroupSequenceIsRedefined();
 		List<Class<?>> resolvedDefaultGroupSequence = getDefaultGroupSequence( null );
@@ -266,7 +287,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	@Override
 	public PropertyMetaData getMetaDataFor(String propertyName) {
-		return propertyMetaDataMap.get( propertyName );
+		PropertyMetaData propertyMetaData = propertyMetaDataMap.get( propertyName );
+
+		if ( propertyMetaData == null ) {
+			throw LOG.getPropertyNotDefinedByValidatedTypeException( beanClass, propertyName );
+		}
+
+		return propertyMetaData;
 	}
 
 	@Override
@@ -280,8 +307,24 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	@Override
-	public ExecutableMetaData getMetaDataFor(Executable executable) {
-		return executableMetaDataMap.get( ExecutableHelper.getSignature( executable ) );
+	public Optional<ExecutableMetaData> getMetaDataFor(Executable executable) {
+		String signature = ExecutableHelper.getSignature( executable );
+
+		if ( unconstrainedExecutables.contains( signature ) ) {
+			return Optional.empty();
+		}
+
+		ExecutableMetaData executableMetaData = executableMetaDataMap.get( ExecutableHelper.getSignature( executable ) );
+
+		if ( executableMetaData == null ) {
+			// there is no executable metadata - specified object and method do not match
+			throw LOG.getMethodOrConstructorNotDefinedByValidatedTypeException(
+					beanClass,
+					executable
+			);
+		}
+
+		return Optional.of( executableMetaData );
 	}
 
 	@Override
@@ -388,7 +431,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private static <T> DefaultGroupSequenceContext<T> getDefaultGroupSequenceData(Class<?> beanClass, List<Class<?>> defaultGroupSequence, DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider, ValidationOrderGenerator validationOrderGenerator) {
 		if ( defaultGroupSequence != null && defaultGroupSequenceProvider != null ) {
-			throw log.getInvalidDefaultGroupSequenceDefinitionException();
+			throw LOG.getInvalidDefaultGroupSequenceDefinitionException();
 		}
 
 		DefaultGroupSequenceContext<T> context = new DefaultGroupSequenceContext<>();
@@ -455,7 +498,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					groupSequenceContainsDefault = true;
 				}
 				else if ( group.getName().equals( Default.class.getName() ) ) {
-					throw log.getNoDefaultGroupInGroupSequenceException();
+					throw LOG.getNoDefaultGroupInGroupSequenceException();
 				}
 				else {
 					validDefaultGroupSequence.add( group );
@@ -463,10 +506,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 		if ( !groupSequenceContainsDefault ) {
-			throw log.getBeanClassMustBePartOfRedefinedDefaultGroupSequenceException( beanClass );
+			throw LOG.getBeanClassMustBePartOfRedefinedDefaultGroupSequenceException( beanClass );
 		}
-		if ( log.isTraceEnabled() ) {
-			log.tracef(
+		if ( LOG.isTraceEnabled() ) {
+			LOG.tracef(
 					"Members of the default group sequence for bean %s are: %s.",
 					beanClass.getName(),
 					validDefaultGroupSequence
@@ -612,6 +655,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private static class BuilderDelegate {
 		private final Class<?> beanClass;
+		private final ConstrainedElement constrainedElement;
 		private final ConstraintHelper constraintHelper;
 		private final ExecutableHelper executableHelper;
 		private final TypeResolutionHelper typeResolutionHelper;
@@ -620,7 +664,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		private MetaDataBuilder propertyBuilder;
 		private ExecutableMetaData.Builder methodBuilder;
 		private final MethodValidationConfiguration methodValidationConfiguration;
-
+		private final int hashCode;
 
 		public BuilderDelegate(
 				Class<?> beanClass,
@@ -633,6 +677,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				MethodValidationConfiguration methodValidationConfiguration
 		) {
 			this.beanClass = beanClass;
+			this.constrainedElement = constrainedElement;
 			this.constraintHelper = constraintHelper;
 			this.executableHelper = executableHelper;
 			this.typeResolutionHelper = typeResolutionHelper;
@@ -692,6 +737,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					);
 					break;
 			}
+
+			this.hashCode = buildHashCode();
 		}
 
 		public boolean add(ConstrainedElement constrainedElement) {
@@ -737,6 +784,40 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 
 			return metaDataSet;
+		}
+
+		@Override
+		public int hashCode() {
+			return hashCode;
+		}
+
+		private int buildHashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + beanClass.hashCode();
+			result = prime * result + constrainedElement.hashCode();
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) {
+				return true;
+			}
+			if ( !super.equals( obj ) ) {
+				return false;
+			}
+			if ( getClass() != obj.getClass() ) {
+				return false;
+			}
+			BuilderDelegate other = (BuilderDelegate) obj;
+			if ( !beanClass.equals( other.beanClass ) ) {
+				return false;
+			}
+			if ( !constrainedElement.equals( other.constrainedElement ) ) {
+				return false;
+			}
+			return true;
 		}
 	}
 

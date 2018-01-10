@@ -502,7 +502,9 @@ before they are propagated to the model.
 
 [[section-constraint-violation-methods]]
 
-==== `ConstraintViolation` methods
+==== `ConstraintViolation`
+
+===== `ConstraintViolation` methods
 
 Now it is time to have a closer look at what a `ConstraintViolation` is.
 Using the different methods of `ConstraintViolation` a lot of useful information about the cause of the validation failure can be determined.
@@ -527,6 +529,17 @@ The values under "Example" column refer to <<example-validator-validate>>.
 	Example::: `null`
 `getConstraintDescriptor()`:: Constraint metadata reported to fail
 	Example::: descriptor for `@NotNull`
+
+===== Exploiting the property path
+
+To determine the element that triggered the violation, you need to exploit the result of the `getPropertyPath()`
+method.
+
+The returned `Path` is composed of ``Node``s describing the path to the element.
+
+More information about the structure of the `Path` and the various types of ``Node``s can be found in
+{bvSpecUrl}#validationapi-constraintviolation[the `ConstraintViolation` section] of the
+Bean Validation specification.
 
 [[section-builtin-constraints]]
 === Built-in constraints
@@ -670,9 +683,17 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
+`@ISBN`:: Checks that the annotated character sequence is a valid https://en.wikipedia.org/wiki/International_Standard_Book_Number[ISBN]. `type` determines the type of ISBN. The default is ISBN-13.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@Length(min=, max=)`:: Validates that the annotated character sequence is between `min` and `max` included
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: Column length will be set to max
+
+`@CodePointLength(min=, max=, normalizationStrategy=)`:: Validates that code point length of the annotated character sequence is between `min` and `max` included. Validates normalized value if `normalizationStrategy` is set.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
 
 `@LuhnCheck(startIndex= , endIndex=, checkDigitIndex=, ignoreNonDigitCharacters=)`:: Checks that the digits within the annotated character sequence pass the Luhn checksum algorithm (see also http://en.wikipedia.org/wiki/Luhn_algorithm[Luhn algorithm]). `startIndex` and `endIndex` allow to only run the algorithm on the specified sub-string. `checkDigitIndex` allows to use an arbitrary digit within the character sequence as the check digit. If not specified it is assumed that the check digit is part of the specified range. Last but not least, `ignoreNonDigitCharacters` allows to ignore non digit characters.
 	Supported data types::: `CharSequence`
@@ -697,6 +718,10 @@ In addition, `baseURI` allows to specify the base URI used to resolve relative U
 
 `@ScriptAssert(lang=, script=, alias=, reportOn=)`:: Checks whether the given script can successfully be evaluated against the annotated element. In order to use this constraint, an implementation of the Java Scripting API as defined by JSR 223 ("Scripting for the Java^TM^ Platform") must be a part of the class path. The expressions to be evaluated can be written in any scripting or expression language, for which a JSR 223 compatible engine can be found in the class path. Even though this is a class-level constraint, one can use the `reportOn` attribute to report a constraint violation on a specific property rather than the whole object.
 	Supported data types::: Any type
+	Hibernate metadata impact::: None
+
+`@UniqueElements`:: Checks that the annotated collection only contains unique elements. The equality is determined using the `equals()` method. The default message does not include the list of duplicate elements but you can include it by overriding the message and using the `{duplicates}` message parameter. The list of duplicate elements is also included in the dynamic payload of the constraint violation.
+	Supported data types::: `Collection`
 	Hibernate metadata impact::: None
 
 `@URL(protocol=, host=, port=, regexp=, flags=)`:: Checks if the annotated character sequence is a valid URL according to RFC2396. If any of the optional parameters `protocol`, `host` or `port` are specified, the corresponding URL fragments must match the specified values. The optional parameters `regexp` and `flags` allow to specify an additional regular expression (including regular expression flags) which the URL must match. Per default this constraint used the `java.net.URL` constructor to verify whether a given string represents a valid URL. A regular expression based version is also available - `RegexpURLValidator` - which can be configured via XML (see <<section-mapping-xml-constraints>>) or the programmatic API (see <<section-programmatic-constraint-definition>>).

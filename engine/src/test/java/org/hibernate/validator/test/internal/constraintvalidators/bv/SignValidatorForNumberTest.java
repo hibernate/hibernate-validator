@@ -55,8 +55,8 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.Posi
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForLong;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForShort;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+
 import org.testng.annotations.Test;
 
 /**
@@ -67,24 +67,22 @@ public class SignValidatorForNumberTest {
 
 	@Test
 	public void testPositiveValidator() {
-		testPositive( AnnotationFactory.create( new AnnotationDescriptor<>( Positive.class ) ) );
+		testPositive( new ConstraintAnnotationDescriptor.Builder<>( Positive.class ).build().getAnnotation() );
 	}
 
 	@Test
 	public void testPositiveOrZeroValidator() {
-		testPositiveOrZero( AnnotationFactory.create( new AnnotationDescriptor<>( PositiveOrZero.class ) ) );
+		testPositiveOrZero( new ConstraintAnnotationDescriptor.Builder<>( PositiveOrZero.class ).build().getAnnotation() );
 	}
 
 	@Test
 	public void testNegativeValidator() {
-		AnnotationDescriptor<Negative> descriptor = new AnnotationDescriptor<>( Negative.class );
-
-		testNegative( AnnotationFactory.create( descriptor ) );
+		testNegative( new ConstraintAnnotationDescriptor.Builder<>( Negative.class ).build().getAnnotation() );
 	}
 
 	@Test
 	public void testNegativeOrZeroValidator() {
-		testNegativeOrZero( AnnotationFactory.create( new AnnotationDescriptor<>( NegativeOrZero.class ) ) );
+		testNegativeOrZero( new ConstraintAnnotationDescriptor.Builder<>( NegativeOrZero.class ).build().getAnnotation() );
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

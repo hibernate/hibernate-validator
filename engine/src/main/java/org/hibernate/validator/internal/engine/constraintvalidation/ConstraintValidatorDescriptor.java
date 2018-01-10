@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.EnumSet;
@@ -23,7 +22,7 @@ import org.hibernate.validator.cfg.context.ConstraintDefinitionContext.Validatio
  *
  * @author Gunnar Morling
  */
-public interface ConstraintValidatorDescriptor<A extends Annotation> extends Serializable {
+public interface ConstraintValidatorDescriptor<A extends Annotation> {
 
 	/**
 	 * The implementation type of the represented validator.
@@ -43,7 +42,7 @@ public interface ConstraintValidatorDescriptor<A extends Annotation> extends Ser
 	/**
 	 * Creates a new instance of the represented implementation type.
 	 */
-	ConstraintValidator<A, ?> newInstance(ConstraintValidatorFactory constraintFactory);
+	ConstraintValidator<A, ?> newInstance(ConstraintValidatorFactory constraintValidatorFactory);
 
 	static <A extends Annotation> ConstraintValidatorDescriptor<A> forClass(Class<? extends ConstraintValidator<A, ?>> validatorClass) {
 		return new ClassBasedValidatorDescriptor<>( validatorClass );

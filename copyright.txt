@@ -26,6 +26,7 @@ Guillaume Smet
 Gunnar Morling
 Hardy Ferentschik
 Henno Vermeulen
+Hilmer Chona
 Jan-Willem Willebrands
 Jason T. Greene
 Jiri Bilek
@@ -34,6 +35,7 @@ Julien May
 Juraci Krohling
 Justin Nauman
 Kathryn Killebrew
+Kazuki Shimizu
 Kevin Pollet
 Khalid Alqinyah
 Lee KyoungIl
@@ -55,9 +57,11 @@ Shane Bryzak
 Shelly McGowan
 Steve Ebersole
 Strong Liu
+Tadhg Pearson
 Tomaz Cerar
 Tommy Johansen
 Victor Rezende dos Santos
 Willi Schönborn
 Xavier Sosnovsky
+Yanming Zhou
 Yoann Rodière

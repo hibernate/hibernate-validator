@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.size;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -19,9 +20,12 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  *
  * @author Hardy Ferentschik
  */
-public class SizeValidatorForMap implements ConstraintValidator<Size, Map<?, ?>> {
+// as per the JLS, Map<?, ?> is a subtype of Map, so we need to explicitly reference
+// Map here to support having properties defined as Map (see HV-1551)
+@SuppressWarnings("rawtypes")
+public class SizeValidatorForMap implements ConstraintValidator<Size, Map> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private int min;
 	private int max;
@@ -44,7 +48,7 @@ public class SizeValidatorForMap implements ConstraintValidator<Size, Map<?, ?>>
 	 *         {@code false} otherwise.
 	 */
 	@Override
-	public boolean isValid(Map<?, ?> map, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Map map, ConstraintValidatorContext constraintValidatorContext) {
 		if ( map == null ) {
 			return true;
 		}
@@ -54,13 +58,13 @@ public class SizeValidatorForMap implements ConstraintValidator<Size, Map<?, ?>>
 
 	private void validateParameters() {
 		if ( min < 0 ) {
-			throw log.getMaxCannotBeNegativeException();
+			throw LOG.getMaxCannotBeNegativeException();
 		}
 		if ( max < 0 ) {
-			throw log.getMaxCannotBeNegativeException();
+			throw LOG.getMaxCannotBeNegativeException();
 		}
 		if ( max < min ) {
-			throw log.getLengthCannotBeNegativeException();
+			throw LOG.getLengthCannotBeNegativeException();
 		}
 	}
 }

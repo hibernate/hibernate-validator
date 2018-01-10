@@ -7,6 +7,8 @@
 
 package org.hibernate.validator;
 
+import java.time.Duration;
+
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -122,4 +124,33 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 * @since 5.3
 	 */
 	HibernateValidatorContext allowParallelMethodsDefineParameterConstraints(boolean allow);
+
+	/**
+	 * Define whether the per validation call caching of {@link TraversableResolver} results is enabled. The default
+	 * value is {@code true}, i.e. the caching is enabled.
+	 * <p>
+	 * This behavior was initially introduced to cache the {@code JPATraversableResolver} results but the map lookups it
+	 * introduces can be counterproductive when the {@code TraversableResolver} calls are very fast.
+	 *
+	 * @param enabled flag determining whether per validation call caching is enabled for {@code TraversableResolver}
+	 * results.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.0.3
+	 */
+	HibernateValidatorContext enableTraversableResolverResultCache(boolean enabled);
+
+	/**
+	 * Define the temporal validation tolerance i.e. the acceptable margin of error
+	 * when comparing date/time in temporal constraints.
+	 *
+	 * @param temporalValidationTolerance the tolerance
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.0.5
+	 */
+	@Incubating
+	HibernateValidatorContext temporalValidationTolerance(Duration temporalValidationTolerance);
 }

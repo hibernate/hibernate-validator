@@ -8,6 +8,8 @@ package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
 import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.EL_DESIGNATOR;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -15,7 +17,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class ELState implements ParserState {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
 	public void terminate(TokenCollector tokenCollector) throws MessageDescriptorFormatException {
@@ -44,7 +47,7 @@ public class ELState implements ParserState {
 
 	@Override
 	public void handleEndTerm(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException {
-		throw log.getNonTerminatedParameterException(
+		throw LOG.getNonTerminatedParameterException(
 				tokenCollector.getOriginalMessageDescriptor(),
 				character
 		);

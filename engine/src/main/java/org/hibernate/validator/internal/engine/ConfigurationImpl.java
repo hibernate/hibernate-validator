@@ -12,8 +12,10 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +39,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
-import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver;
+import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.Contracts;
@@ -52,6 +54,7 @@ import org.hibernate.validator.internal.xml.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * Hibernate specific {@code Configuration} implementation.
@@ -68,7 +71,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		Version.touch();
 	}
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ResourceBundleLocator defaultResourceBundleLocator;
 
@@ -89,12 +92,16 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final Set<InputStream> configurationStreams = newHashSet();
 	private BootstrapConfiguration bootstrapConfiguration;
 
+	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = new HashMap<>();
+
 	// HV-specific options
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
 	private boolean failFast;
 	private ClassLoader externalClassLoader;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
-	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = new HashMap<>();
+	private boolean traversableResolverResultCacheEnabled = true;
+	private ScriptEvaluatorFactory scriptEvaluatorFactory;
+	private Duration temporalValidationTolerance;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -109,7 +116,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public ConfigurationImpl(ValidationProvider<?> provider) {
 		this();
 		if ( provider == null ) {
-			throw log.getInconsistentConfigurationException();
+			throw LOG.getInconsistentConfigurationException();
 		}
 		this.providerResolver = null;
 		validationBootstrapParameters.setProvider( provider );
@@ -121,7 +128,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator(
 				ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES
 		);
-		this.defaultTraversableResolver = new DefaultTraversableResolver();
+		this.defaultTraversableResolver = TraversableResolvers.getDefault();
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
@@ -135,9 +142,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final ConfigurationImpl messageInterpolator(MessageInterpolator interpolator) {
-		if ( log.isDebugEnabled() ) {
+		if ( LOG.isDebugEnabled() ) {
 			if ( interpolator != null ) {
-				log.debug( "Setting custom MessageInterpolator of type " + interpolator.getClass().getName() );
+				LOG.debug( "Setting custom MessageInterpolator of type " + interpolator.getClass().getName() );
 			}
 		}
 		this.validationBootstrapParameters.setMessageInterpolator( interpolator );
@@ -146,9 +153,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final ConfigurationImpl traversableResolver(TraversableResolver resolver) {
-		if ( log.isDebugEnabled() ) {
+		if ( LOG.isDebugEnabled() ) {
 			if ( resolver != null ) {
-				log.debug( "Setting custom TraversableResolver of type " + resolver.getClass().getName() );
+				LOG.debug( "Setting custom TraversableResolver of type " + resolver.getClass().getName() );
 			}
 		}
 		this.validationBootstrapParameters.setTraversableResolver( resolver );
@@ -156,10 +163,20 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
+	public final ConfigurationImpl enableTraversableResolverResultCache(boolean enabled) {
+		this.traversableResolverResultCacheEnabled = enabled;
+		return this;
+	}
+
+	public final boolean isTraversableResolverResultCacheEnabled() {
+		return traversableResolverResultCacheEnabled;
+	}
+
+	@Override
 	public final ConfigurationImpl constraintValidatorFactory(ConstraintValidatorFactory constraintValidatorFactory) {
-		if ( log.isDebugEnabled() ) {
+		if ( LOG.isDebugEnabled() ) {
 			if ( constraintValidatorFactory != null ) {
-				log.debug(
+				LOG.debug(
 						"Setting custom ConstraintValidatorFactory of type " + constraintValidatorFactory.getClass()
 								.getName()
 				);
@@ -171,9 +188,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public HibernateValidatorConfiguration parameterNameProvider(ParameterNameProvider parameterNameProvider) {
-		if ( log.isDebugEnabled() ) {
+		if ( LOG.isDebugEnabled() ) {
 			if ( parameterNameProvider != null ) {
-				log.debug(
+				LOG.debug(
 						"Setting custom ParameterNameProvider of type " + parameterNameProvider.getClass()
 								.getName()
 				);
@@ -185,9 +202,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public HibernateValidatorConfiguration clockProvider(ClockProvider clockProvider) {
-		if ( log.isDebugEnabled() ) {
+		if ( LOG.isDebugEnabled() ) {
 			if ( clockProvider != null ) {
-				log.debug( "Setting custom ClockProvider of type " + clockProvider.getClass().getName() );
+				LOG.debug( "Setting custom ClockProvider of type " + clockProvider.getClass().getName() );
 			}
 		}
 		this.validationBootstrapParameters.setClockProvider( clockProvider );
@@ -202,11 +219,11 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		ValueExtractorDescriptor previous = valueExtractorDescriptors.put( descriptor.getKey(), descriptor );
 
 		if ( previous != null ) {
-			throw log.getValueExtractorForTypeAndTypeUseAlreadyPresentException( extractor, previous.getValueExtractor() );
+			throw LOG.getValueExtractorForTypeAndTypeUseAlreadyPresentException( extractor, previous.getValueExtractor() );
 		}
 
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Adding value extractor " + extractor );
+		if ( LOG.isDebugEnabled() ) {
+			LOG.debug( "Adding value extractor " + extractor );
 		}
 
 		return this;
@@ -249,6 +266,22 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@Override
 	public HibernateValidatorConfiguration allowParallelMethodsDefineParameterConstraints(boolean allow) {
 		this.methodValidationConfigurationBuilder.allowParallelMethodsDefineParameterConstraints( allow );
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorConfiguration scriptEvaluatorFactory(ScriptEvaluatorFactory scriptEvaluatorFactory) {
+		Contracts.assertNotNull( scriptEvaluatorFactory, MESSAGES.parameterMustNotBeNull( "scriptEvaluatorFactory" ) );
+
+		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorConfiguration temporalValidationTolerance(Duration temporalValidationTolerance) {
+		Contracts.assertNotNull( temporalValidationTolerance, MESSAGES.parameterMustNotBeNull( "temporalValidationTolerance" ) );
+
+		this.temporalValidationTolerance = temporalValidationTolerance.abs();
 		return this;
 	}
 
@@ -313,7 +346,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 						}
 					}
 					if ( factory == null ) {
-						throw log.getUnableToFindProviderException( providerClass );
+						throw LOG.getUnableToFindProviderException( providerClass );
 					}
 				}
 				else {
@@ -330,7 +363,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 					in.close();
 				}
 				catch (IOException io) {
-					log.unableToCloseInputStream();
+					LOG.unableToCloseInputStream();
 				}
 			}
 		}
@@ -394,6 +427,14 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@Override
 	public ClockProvider getClockProvider() {
 		return validationBootstrapParameters.getClockProvider();
+	}
+
+	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
+		return scriptEvaluatorFactory;
+	}
+
+	public Duration getTemporalValidationTolerance() {
+		return temporalValidationTolerance;
 	}
 
 	@Override
@@ -466,7 +507,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	 */
 	private void parseValidationXml() {
 		if ( ignoreXmlConfiguration ) {
-			log.ignoringXmlConfiguration();
+			LOG.ignoringXmlConfiguration();
 
 			if ( validationBootstrapParameters.getTraversableResolver() == null ) {
 				validationBootstrapParameters.setTraversableResolver( defaultTraversableResolver );

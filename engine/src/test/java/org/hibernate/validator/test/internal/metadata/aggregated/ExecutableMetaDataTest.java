@@ -23,6 +23,7 @@ import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
+import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
@@ -60,6 +61,7 @@ public class ExecutableMetaDataTest {
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptySet() ),
+				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
 				new MethodValidationConfiguration.Builder().build()
 		);
@@ -70,7 +72,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void getNameOfMethod() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getName() ).isEqualTo( method.getName() );
 	}
@@ -78,7 +80,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void getNameOfConstructor() throws Exception {
 		Constructor<CustomerRepositoryExt> constructor = CustomerRepositoryExt.class.getConstructor( String.class );
-		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor( constructor );
+		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor( constructor ).get();
 
 		assertThat( constructorMetaData.getName() ).isEqualTo( constructor.getDeclaringClass().getSimpleName() );
 	}
@@ -86,15 +88,15 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void getTypeForMethod() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getType() ).isEqualTo( Customer.class );
 	}
 
 	@Test
 	public void getTypeForVoidMethod() throws Exception {
-		Method method = CustomerRepositoryExt.class.getMethod( "zap" );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		Method method = CustomerRepositoryExt.class.getMethod( "zap", Integer.class );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getType() ).isEqualTo( void.class );
 	}
@@ -102,7 +104,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void getTypeForConstructor() throws Exception {
 		Constructor<CustomerRepositoryExt> constructor = CustomerRepositoryExt.class.getConstructor( String.class );
-		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor( constructor );
+		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor( constructor ).get();
 
 		assertThat( constructorMetaData.getType() ).isEqualTo( CustomerRepositoryExt.class );
 	}
@@ -110,7 +112,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void getParameterTypes() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getParameterTypes() ).isEqualTo( method.getParameterTypes() );
 	}
@@ -118,7 +120,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void getParameterTypesForParameterlessExcutable() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getParameterTypes() ).isEqualTo( method.getParameterTypes() );
 	}
@@ -126,7 +128,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void getKindForMethod() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getKind() ).isEqualTo( ElementKind.METHOD );
 	}
@@ -135,7 +137,7 @@ public class ExecutableMetaDataTest {
 	public void getKindForConstructor() throws Exception {
 
 		Constructor<CustomerRepositoryExt> constructor = CustomerRepositoryExt.class.getConstructor( String.class );
-		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor( constructor );
+		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor( constructor ).get();
 
 		assertThat( constructorMetaData.getKind() ).isEqualTo( ElementKind.CONSTRUCTOR );
 	}
@@ -143,7 +145,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void getIdentifierForMethod() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getSignatures() ).containsOnly(
 				"createCustomer(java.lang.CharSequence,java.lang.String)"
@@ -153,7 +155,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void getIdentifierForParameterlessMethod() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getSignatures() ).containsOnly( "foo()" );
 	}
@@ -161,7 +163,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void getIdentifierForConstructor() throws Exception {
 		Constructor<CustomerRepositoryExt> constructor = CustomerRepositoryExt.class.getConstructor( String.class );
-		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor( constructor );
+		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor( constructor ).get();
 
 		assertThat( constructorMetaData.getSignatures() ).containsOnly( "CustomerRepositoryExt(java.lang.String)" );
 	}
@@ -171,7 +173,7 @@ public class ExecutableMetaDataTest {
 	public void getIdentifierForOverridingGenericMethod() throws Exception {
 		Method method = JobRepositoryImpl.class.getMethod( "createJob", UUID.class );
 		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( JobRepositoryImpl.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getSignatures() )
 			.describedAs( "Expecting super-type and sub-type method signatures" )
@@ -179,7 +181,7 @@ public class ExecutableMetaDataTest {
 
 		method = JobRepository.class.getMethod( "createJob", Object.class );
 		beanMetaData = beanMetaDataManager.getBeanMetaData( JobRepository.class );
-		methodMetaData = beanMetaData.getMetaDataFor( method );
+		methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getSignatures() )
 			.describedAs( "Expecting only super-type method signature" )
@@ -187,7 +189,7 @@ public class ExecutableMetaDataTest {
 
 		method = SpecialJobRepositoryImpl.class.getMethod( "createJob", Object.class );
 		beanMetaData = beanMetaDataManager.getBeanMetaData( SpecialJobRepositoryImpl.class );
-		methodMetaData = beanMetaData.getMetaDataFor( method );
+		methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getSignatures() )
 			.describedAs( "Expecting method signatures from super-types" )
@@ -199,7 +201,7 @@ public class ExecutableMetaDataTest {
 	public void getIdentifierForOverloadedMethod() throws Exception {
 		Method method = SpecialJobRepositoryImpl.class.getMethod( "createJob", String.class );
 		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( SpecialJobRepositoryImpl.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getSignatures() )
 			.describedAs( "Expecting sub-type method signature which overloads but not overrides super-type methods" )
@@ -209,7 +211,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void methodWithConstrainedParameter() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
@@ -238,7 +240,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void methodWithCascadedParameter() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "saveCustomer", Customer.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
@@ -259,7 +261,7 @@ public class ExecutableMetaDataTest {
 				DateMidnight.class,
 				DateMidnight.class
 		);
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
@@ -279,7 +281,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void methodWithConstrainedReturnValue() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "bar" );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
@@ -294,7 +296,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void returnValueConstraintFromSuperType() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "bar" );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData ).hasSize( 1 );
 		assertFalse( methodMetaData.isCascading() );
@@ -308,7 +310,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void returnValueConstraintsAddUpInHierarchy() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "baz" );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
@@ -318,7 +320,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void methodWithCascadedReturnValue() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertTrue( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
@@ -329,7 +331,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void locallyDefinedGroupConversion() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "methodWithReturnValueGroupConversion" );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat(
 				methodMetaData.getReturnValueMetaData()
@@ -344,15 +346,7 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void unconstrainedMethod() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "updateCustomer", Customer.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
-		assertFalse( methodMetaData.isCascading() );
-		assertFalse( methodMetaData.isConstrained() );
-		assertThat( methodMetaData ).isEmpty();
-		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
-
-		assertThat( methodMetaData.getParameterMetaData( 0 ).isConstrained() ).isFalse();
-		assertThat( methodMetaData.getParameterMetaData( 0 ).isCascading() ).isFalse();
-		assertThat( methodMetaData.getParameterMetaData( 0 ) ).isEmpty();
+		assertFalse( beanMetaData.getMetaDataFor( method ).isPresent() );
 	}
 }

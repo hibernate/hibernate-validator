@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
@@ -15,6 +16,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,6 +31,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -51,7 +54,7 @@ import org.xml.sax.SAXException;
  */
 public class ValidationXmlParser {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String VALIDATION_XML_FILE = "META-INF/validation.xml";
 	private static final Map<String, String> SCHEMAS_BY_VERSION = Collections.unmodifiableMap( getSchemasByVersion() );
@@ -118,7 +121,7 @@ public class ValidationXmlParser {
 			return createBootstrapConfiguration( validationConfig );
 		}
 		catch (XMLStreamException | IOException | SAXException e) {
-			throw log.getUnableToParseValidationXmlFileException( VALIDATION_XML_FILE, e );
+			throw LOG.getUnableToParseValidationXmlFileException( VALIDATION_XML_FILE, e );
 		}
 		finally {
 			run( SetContextClassLoader.action( previousTccl ) );
@@ -127,14 +130,14 @@ public class ValidationXmlParser {
 	}
 
 	private InputStream getValidationXmlInputStream() {
-		log.debugf( "Trying to load %s for XML based Validator configuration.", VALIDATION_XML_FILE );
+		LOG.debugf( "Trying to load %s for XML based Validator configuration.", VALIDATION_XML_FILE );
 		InputStream inputStream = ResourceLoaderHelper.getResettableInputStreamForPath( VALIDATION_XML_FILE, externalClassLoader );
 
 		if ( inputStream != null ) {
 			return inputStream;
 		}
 		else {
-			log.debugf( "No %s found. Using annotation based configuration only.", VALIDATION_XML_FILE );
+			LOG.debugf( "No %s found. Using annotation based configuration only.", VALIDATION_XML_FILE );
 			return null;
 		}
 	}
@@ -143,14 +146,14 @@ public class ValidationXmlParser {
 		String schemaResource = SCHEMAS_BY_VERSION.get( schemaVersion );
 
 		if ( schemaResource == null ) {
-			throw log.getUnsupportedSchemaVersionException( VALIDATION_XML_FILE, schemaVersion );
+			throw LOG.getUnsupportedSchemaVersionException( VALIDATION_XML_FILE, schemaVersion );
 		}
 
 		return xmlParserHelper.getSchema( schemaResource );
 	}
 
 	private ValidationConfigType unmarshal(XMLEventReader xmlEventReader) {
-		log.parsingXMLFile( VALIDATION_XML_FILE );
+		LOG.parsingXMLFile( VALIDATION_XML_FILE );
 
 		try {
 			// JAXBContext#newInstance() requires several permissions internally and doesn't use any privileged blocks
@@ -164,7 +167,7 @@ public class ValidationXmlParser {
 			return root.getValue();
 		}
 		catch (Exception e) {
-			throw log.getUnableToParseValidationXmlFileException( VALIDATION_XML_FILE, e );
+			throw LOG.getUnableToParseValidationXmlFileException( VALIDATION_XML_FILE, e );
 		}
 	}
 
@@ -173,15 +176,15 @@ public class ValidationXmlParser {
 			inputStream.close();
 		}
 		catch (IOException io) {
-			log.unableToCloseXMLFileInputStream( VALIDATION_XML_FILE );
+			LOG.unableToCloseXMLFileInputStream( VALIDATION_XML_FILE );
 		}
 	}
 
 	private BootstrapConfiguration createBootstrapConfiguration(ValidationConfigType config) {
 		Map<String, String> properties = new HashMap<>();
 		for ( PropertyType property : config.getProperty() ) {
-			if ( log.isDebugEnabled() ) {
-				log.debugf(
+			if ( LOG.isDebugEnabled() ) {
+				LOG.debugf(
 						"Found property '%s' with value '%s' in validation.xml.",
 						property.getName(),
 						property.getValue()
@@ -203,6 +206,7 @@ public class ValidationXmlParser {
 				config.getTraversableResolver(),
 				config.getParameterNameProvider(),
 				config.getClockProvider(),
+				getScriptEvaluatorFactoryClassProperty( config.getProperty() ),
 				getValueExtractorClassNames( config ),
 				defaultValidatedExecutableTypes,
 				executableValidationEnabled,
@@ -211,11 +215,18 @@ public class ValidationXmlParser {
 		);
 	}
 
+	private String getScriptEvaluatorFactoryClassProperty(List<PropertyType> properties) {
+		return properties.stream()
+				.filter( property -> HibernateValidatorConfiguration.SCRIPT_EVALUATOR_FACTORY_CLASSNAME.equals( property.getName() ) )
+				.map( PropertyType::getValue )
+				.findFirst().orElse( null );
+	}
+
 	private Set<String> getValueExtractorClassNames(ValidationConfigType config) {
 		Set<String> valueExtractorClassNames = CollectionHelper.newHashSet( config.getValueExtractor().size() );
 		for ( String className : config.getValueExtractor() ) {
 			if ( !valueExtractorClassNames.add( className ) ) {
-				throw log.getDuplicateDefinitionsOfValueExtractorException( className );
+				throw LOG.getDuplicateDefinitionsOfValueExtractorException( className );
 			}
 		}
 		return valueExtractorClassNames;

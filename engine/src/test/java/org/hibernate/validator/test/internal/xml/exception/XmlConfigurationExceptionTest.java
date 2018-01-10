@@ -25,7 +25,7 @@ public class XmlConfigurationExceptionTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-620")
-	public void testMissingAnnotationParameter() {
+	public void testMissingAnnotationAttribute() {
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping( XmlConfigurationExceptionTest.class.getResourceAsStream( "hv-620-mapping.xml" ) );
 
@@ -38,7 +38,7 @@ public class XmlConfigurationExceptionTest {
 			Throwable cause = e.getCause();
 			assertEquals(
 					cause.getMessage(),
-					"HV000085: No value provided for parameter 'regexp' of annotation @javax.validation.constraints.Pattern.",
+					"HV000085: No value provided for attribute 'regexp' of annotation @javax.validation.constraints.Pattern.",
 					"Wrong error message"
 			);
 		}

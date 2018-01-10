@@ -24,8 +24,7 @@ import org.hibernate.validator.cfg.defs.Mod11CheckDef;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Mod11Check.ProcessingDirection;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
@@ -294,16 +293,16 @@ public class Mod11CheckValidatorTest {
 			char treatCheck10As,
 			char treatCheck11As,
 			ProcessingDirection processingDirection) {
-		AnnotationDescriptor<Mod11Check> descriptor = new AnnotationDescriptor<Mod11Check>( Mod11Check.class );
-		descriptor.setValue( "startIndex", start );
-		descriptor.setValue( "endIndex", end );
-		descriptor.setValue( "checkDigitIndex", checkDigitIndex );
-		descriptor.setValue( "ignoreNonDigitCharacters", ignoreNonDigits );
-		descriptor.setValue( "treatCheck10As", treatCheck10As );
-		descriptor.setValue( "treatCheck11As", treatCheck11As );
-		descriptor.setValue( "processingDirection", processingDirection );
+		ConstraintAnnotationDescriptor.Builder<Mod11Check> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Mod11Check.class );
+		descriptorBuilder.setAttribute( "startIndex", start );
+		descriptorBuilder.setAttribute( "endIndex", end );
+		descriptorBuilder.setAttribute( "checkDigitIndex", checkDigitIndex );
+		descriptorBuilder.setAttribute( "ignoreNonDigitCharacters", ignoreNonDigits );
+		descriptorBuilder.setAttribute( "treatCheck10As", treatCheck10As );
+		descriptorBuilder.setAttribute( "treatCheck11As", treatCheck11As );
+		descriptorBuilder.setAttribute( "processingDirection", processingDirection );
 
-		return AnnotationFactory.create( descriptor );
+		return descriptorBuilder.build().getAnnotation();
 	}
 
 	private static class Product {

@@ -6,16 +6,15 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidator;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * Tests for the {@code ModCheckValidator}.
@@ -116,14 +115,14 @@ public class ModCheckValidatorTest {
 	}
 
 	private ModCheck createModCheckAnnotation(ModCheck.ModType modType, int multiplier, int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {
-		AnnotationDescriptor<ModCheck> descriptor = new AnnotationDescriptor<ModCheck>( ModCheck.class );
-		descriptor.setValue( "modType", modType );
-		descriptor.setValue( "multiplier", multiplier );
-		descriptor.setValue( "startIndex", start );
-		descriptor.setValue( "endIndex", end );
-		descriptor.setValue( "checkDigitPosition", checkDigitIndex );
-		descriptor.setValue( "ignoreNonDigitCharacters", ignoreNonDigits );
+		ConstraintAnnotationDescriptor.Builder<ModCheck> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( ModCheck.class );
+		descriptorBuilder.setAttribute( "modType", modType );
+		descriptorBuilder.setAttribute( "multiplier", multiplier );
+		descriptorBuilder.setAttribute( "startIndex", start );
+		descriptorBuilder.setAttribute( "endIndex", end );
+		descriptorBuilder.setAttribute( "checkDigitPosition", checkDigitIndex );
+		descriptorBuilder.setAttribute( "ignoreNonDigitCharacters", ignoreNonDigits );
 
-		return AnnotationFactory.create( descriptor );
+		return descriptorBuilder.build().getAnnotation();
 	}
 }

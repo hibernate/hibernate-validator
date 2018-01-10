@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.size;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -19,9 +20,12 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  *
  * @author Hardy Ferentschik
  */
-public class SizeValidatorForCollection implements ConstraintValidator<Size, Collection<?>> {
+@SuppressWarnings("rawtypes")
+// as per the JLS, Collection<?> is a subtype of Collection, so we need to explicitly reference
+// Collection here to support having properties defined as Collection (see HV-1551)
+public class SizeValidatorForCollection implements ConstraintValidator<Size, Collection> {
 
-	private  static final Log log = LoggerFactory.make();
+	private  static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private int min;
 	private int max;
@@ -44,7 +48,7 @@ public class SizeValidatorForCollection implements ConstraintValidator<Size, Col
 	 *         {@code false} otherwise.
 	 */
 	@Override
-	public boolean isValid(Collection<?> collection, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Collection collection, ConstraintValidatorContext constraintValidatorContext) {
 		if ( collection == null ) {
 			return true;
 		}
@@ -54,13 +58,13 @@ public class SizeValidatorForCollection implements ConstraintValidator<Size, Col
 
 	private void validateParameters() {
 		if ( min < 0 ) {
-			throw log.getMinCannotBeNegativeException();
+			throw LOG.getMinCannotBeNegativeException();
 		}
 		if ( max < 0 ) {
-			throw log.getMaxCannotBeNegativeException();
+			throw LOG.getMaxCannotBeNegativeException();
 		}
 		if ( max < min ) {
-			throw log.getLengthCannotBeNegativeException();
+			throw LOG.getLengthCannotBeNegativeException();
 		}
 	}
 }

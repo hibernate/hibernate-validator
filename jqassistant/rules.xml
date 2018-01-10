@@ -13,7 +13,7 @@
             MATCH
                 (class)-[:`EXTENDS`]->(supertype)
             WHERE
-                NOT class.fqn =~ ".*\\.internal\\..*"
+                NOT (class.fqn =~ "^org\\.hibernate\\.validator\\.test\\..*" OR class.fqn =~ "^org\\.hibernate\\.validator\\.testutils\\..*" OR class.fqn =~ ".*\\.internal\\..*")
                 AND supertype.fqn =~ ".*\\.internal\\..*"
             RETURN
                 class
@@ -21,7 +21,7 @@
             MATCH
                 (class)-[:`IMPLEMENTS`]->(supertype)
             WHERE
-                NOT class.fqn =~ ".*\\.internal\\..*"
+                NOT (class.fqn =~ "^org\\.hibernate\\.validator\\.test\\..*" OR class.fqn =~ "^org\\.hibernate\\.validator\\.testutils\\..*" OR class.fqn =~ ".*\\.internal\\..*")
                 AND supertype.fqn =~ ".*\\.internal\\..*"
             RETURN
                 class
@@ -35,7 +35,7 @@
             MATCH
                 (class)-[:`DECLARES`]->(method)-[:`RETURNS`]->(returntype)
             WHERE
-                NOT class.fqn =~ ".*\\.internal\\..*"
+                NOT (class.fqn =~ "^org\\.hibernate\\.validator\\.test\\..*" OR class.fqn =~ "^org\\.hibernate\\.validator\\.testutils\\..*" OR class.fqn =~ ".*\\.internal\\..*")
                 AND (method.visibility="public" OR method.visibility="protected")
                 AND returntype.fqn =~ ".*\\.internal\\..*"
             RETURN
@@ -46,7 +46,7 @@
             MATCH
                 (class)-[:`DECLARES`]->(method)-[:`HAS`]->(parameter)-[:`OF_TYPE`]->(parametertype)
             WHERE
-                NOT class.fqn =~ ".*\\.internal\\..*"
+                NOT (class.fqn =~ "^org\\.hibernate\\.validator\\.test\\..*" OR class.fqn =~ "^org\\.hibernate\\.validator\\.testutils\\..*" OR class.fqn =~ ".*\\.internal\\..*")
                 AND (method.visibility="public" OR method.visibility="protected")
                 AND parametertype.fqn =~ ".*\\.internal\\..*"
             RETURN
@@ -60,7 +60,7 @@
             MATCH
                 (class)-[:`DECLARES`]->(field)-[:`OF_TYPE`]->(fieldtype)
             WHERE
-                NOT class.fqn =~ ".*\\.internal\\..*"
+                NOT (class.fqn =~ "^org\\.hibernate\\.validator\\.test\\..*" OR class.fqn =~ "^org\\.hibernate\\.validator\\.testutils\\..*" OR class.fqn =~ ".*\\.internal\\..*")
                 AND (field.visibility="public" OR field.visibility="protected")
                 AND fieldtype.fqn =~ ".*\\.internal\\..*"
             RETURN

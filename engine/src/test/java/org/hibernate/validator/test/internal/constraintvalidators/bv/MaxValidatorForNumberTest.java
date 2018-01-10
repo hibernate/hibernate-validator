@@ -23,10 +23,8 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.dec
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForFloat;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForLong;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForNumber;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
-
 import org.testng.annotations.Test;
 
 /**
@@ -39,30 +37,30 @@ public class MaxValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 
 	@Test
 	public void testIsValidMax() {
-		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
-		descriptor.setValue( "value", 15L );
-		descriptor.setValue( "message", "{validator.max}" );
-		Max m = AnnotationFactory.create( descriptor );
+		ConstraintAnnotationDescriptor.Builder<Max> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Max.class );
+		descriptorBuilder.setAttribute( "value", 15L );
+		descriptorBuilder.setMessage( "{validator.max}" );
+		Max m = descriptorBuilder.build().getAnnotation();
 
 		testMax( m, true );
 	}
 
 	@Test
 	public void testIsValidDecimalMax() {
-		AnnotationDescriptor<DecimalMax> descriptor = new AnnotationDescriptor<DecimalMax>( DecimalMax.class );
-		descriptor.setValue( "value", "15.0E0" );
-		descriptor.setValue( "message", "{validator.max}" );
-		DecimalMax m = AnnotationFactory.create( descriptor );
+		ConstraintAnnotationDescriptor.Builder<DecimalMax> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( DecimalMax.class );
+		descriptorBuilder.setAttribute( "value", "15.0E0" );
+		descriptorBuilder.setMessage( "{validator.max}" );
+		DecimalMax m = descriptorBuilder.build().getAnnotation();
 
 		testDecimalMax( m, true );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testInitializeDecimalMaxWithInvalidValue() {
-		AnnotationDescriptor<DecimalMax> descriptor = new AnnotationDescriptor<DecimalMax>( DecimalMax.class );
-		descriptor.setValue( "value", "foobar" );
-		descriptor.setValue( "message", "{validator.max}" );
-		DecimalMax m = AnnotationFactory.create( descriptor );
+		ConstraintAnnotationDescriptor.Builder<DecimalMax> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( DecimalMax.class );
+		descriptorBuilder.setAttribute( "value", "foobar" );
+		descriptorBuilder.setMessage( "{validator.max}" );
+		DecimalMax m = descriptorBuilder.build().getAnnotation();
 
 		DecimalMaxValidatorForNumber constraint = new DecimalMaxValidatorForNumber();
 		constraint.initialize( m );
@@ -72,11 +70,11 @@ public class MaxValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 	@TestForIssue(jiraKey = "HV-256")
 	public void testIsValidDecimalMaxExclusive() {
 		boolean inclusive = false;
-		AnnotationDescriptor<DecimalMax> descriptor = new AnnotationDescriptor<DecimalMax>( DecimalMax.class );
-		descriptor.setValue( "value", "15.0E0" );
-		descriptor.setValue( "inclusive", inclusive );
-		descriptor.setValue( "message", "{validator.max}" );
-		DecimalMax m = AnnotationFactory.create( descriptor );
+		ConstraintAnnotationDescriptor.Builder<DecimalMax> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( DecimalMax.class );
+		descriptorBuilder.setAttribute( "value", "15.0E0" );
+		descriptorBuilder.setAttribute( "inclusive", inclusive );
+		descriptorBuilder.setMessage( "{validator.max}" );
+		DecimalMax m = descriptorBuilder.build().getAnnotation();
 		testDecimalMax( m, false );
 
 	}

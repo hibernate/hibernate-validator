@@ -22,6 +22,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.MalformedParameterizedTypeException;
@@ -49,9 +50,10 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public final class TypeHelper {
+
 	private static final Map<Class<?>, Set<Class<?>>> SUBTYPES_BY_PRIMITIVE;
 	private static final int VALIDATOR_TYPE_INDEX = 1;
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	static {
 		Map<Class<?>, Set<Class<?>>> subtypesByPrimitive = newHashMap();
@@ -186,7 +188,7 @@ public final class TypeHelper {
 	}
 
 	public static Class<?> getErasedReferenceType(Type type) {
-		Contracts.assertTrue( isReferenceType( type ), "type is not a reference type: " + type );
+		Contracts.assertTrue( isReferenceType( type ), "type is not a reference type: %s", type );
 		return (Class<?>) getErasedType( type );
 	}
 
@@ -315,7 +317,7 @@ public final class TypeHelper {
 			ConstraintValidatorDescriptor<A> previous = validatorsTypes.put( type, validator );
 
 			if ( previous != null ) {
-				throw log.getMultipleValidatorsForSameTypeException( annotationType, type, previous.getValidatorClass(), validator.getValidatorClass() );
+				throw LOG.getMultipleValidatorsForSameTypeException( annotationType, type, previous.getValidatorClass(), validator.getValidatorClass() );
 			}
 		}
 
@@ -329,7 +331,7 @@ public final class TypeHelper {
 		//we now have all bind from a type to its resolution at one level
 		Type validatorType = ( (ParameterizedType) constraintValidatorType ).getActualTypeArguments()[VALIDATOR_TYPE_INDEX];
 		if ( validatorType == null ) {
-			throw log.getNullIsAnInvalidTypeForAConstraintValidatorException();
+			throw LOG.getNullIsAnInvalidTypeForAConstraintValidatorException();
 		}
 		else if ( validatorType instanceof GenericArrayType ) {
 			validatorType = TypeHelper.getArrayType( TypeHelper.getComponentType( validatorType ) );
@@ -340,6 +342,14 @@ public final class TypeHelper {
 		}
 		//FIXME raise an exception if validatorType is not a class
 		return validatorType;
+	}
+
+	public static boolean isUnboundWildcard(Type type) {
+		if ( !( type instanceof WildcardType ) ) {
+			return false;
+		}
+		WildcardType wildcardType = (WildcardType) type;
+		return isEmptyBounds( wildcardType.getUpperBounds() ) && isEmptyBounds( wildcardType.getLowerBounds() );
 	}
 
 	private static Type resolveTypes(Map<Type, Type> resolvedTypes, Type type) {
@@ -604,7 +614,7 @@ public final class TypeHelper {
 			Type actualTypeArgument = actualTypeArgumentsByParameter.get( typeParameter );
 
 			if ( actualTypeArgument == null ) {
-				throw log.getMissingActualTypeArgumentForTypeParameterException( typeParameter );
+				throw LOG.getMissingActualTypeArgumentForTypeParameterException( typeParameter );
 			}
 
 			actualTypeArguments[i] = actualTypeArgument;
@@ -628,5 +638,9 @@ public final class TypeHelper {
 		}
 
 		return map;
+	}
+
+	private static boolean isEmptyBounds(Type[] bounds) {
+		return bounds == null || bounds.length == 0 || ( bounds.length == 1 && Object.class.equals( bounds[0] ) );
 	}
 }

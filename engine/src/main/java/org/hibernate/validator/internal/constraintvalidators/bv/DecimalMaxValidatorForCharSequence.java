@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv;
 
+import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -22,7 +23,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class DecimalMaxValidatorForCharSequence implements ConstraintValidator<DecimalMax, CharSequence> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private BigDecimal maxValue;
 	private boolean inclusive;
@@ -33,7 +34,7 @@ public class DecimalMaxValidatorForCharSequence implements ConstraintValidator<D
 			this.maxValue = new BigDecimal( maxValue.value() );
 		}
 		catch (NumberFormatException nfe) {
-			throw log.getInvalidBigDecimalFormatException( maxValue.value(), nfe );
+			throw LOG.getInvalidBigDecimalFormatException( maxValue.value(), nfe );
 		}
 		this.inclusive = maxValue.inclusive();
 	}

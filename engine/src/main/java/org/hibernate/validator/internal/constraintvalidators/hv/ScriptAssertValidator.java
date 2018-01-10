@@ -8,12 +8,12 @@ package org.hibernate.validator.internal.constraintvalidators.hv;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
-import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.util.Contracts;
 
 /**
@@ -25,23 +25,21 @@ import org.hibernate.validator.internal.util.Contracts;
  * @author Marko Bekhta
  * @author Guillaume Smet
  */
-public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, Object> {
+public class ScriptAssertValidator extends AbstractScriptAssertValidator<ScriptAssert, Object> {
 
 	private String alias;
 	private String reportOn;
 	private String message;
-	private ScriptAssertContext scriptAssertContext;
-	private String escapedScript;
 
 	@Override
-	public void initialize(ScriptAssert constraintAnnotation) {
+	public void initialize(ConstraintDescriptor<ScriptAssert> constraintDescriptor, HibernateConstraintValidatorInitializationContext initializationContext) {
+		ScriptAssert constraintAnnotation = constraintDescriptor.getAnnotation();
 		validateParameters( constraintAnnotation );
+		initialize( constraintAnnotation.lang(), constraintAnnotation.script(), initializationContext );
 
 		this.alias = constraintAnnotation.alias();
 		this.reportOn = constraintAnnotation.reportOn();
 		this.message = constraintAnnotation.message();
-		this.scriptAssertContext = new ScriptAssertContext( constraintAnnotation.lang(), constraintAnnotation.script() );
-		this.escapedScript = InterpolationHelper.escapeMessageParameter( constraintAnnotation.script() );
 	}
 
 	@Override

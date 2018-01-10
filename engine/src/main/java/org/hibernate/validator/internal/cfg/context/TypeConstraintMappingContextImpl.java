@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -56,7 +57,7 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 public final class TypeConstraintMappingContextImpl<C> extends ConstraintMappingContextImplBase
 		implements TypeConstraintMappingContext<C> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Class<C> beanClass;
 
@@ -77,6 +78,11 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	public TypeConstraintMappingContext<C> constraint(ConstraintDef<?, ?> definition) {
 		addConstraint( ConfiguredConstraint.forType( definition, beanClass ) );
 		return this;
+	}
+
+	@Override
+	public TypeConstraintMappingContext<C> ignoreAnnotations() {
+		return ignoreAnnotations( true );
 	}
 
 	@Override
@@ -114,11 +120,11 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		);
 
 		if ( member == null || member.getDeclaringClass() != beanClass ) {
-			throw log.getUnableToFindPropertyWithAccessException( beanClass, property, elementType );
+			throw LOG.getUnableToFindPropertyWithAccessException( beanClass, property, elementType );
 		}
 
 		if ( configuredMembers.contains( member ) ) {
-			throw log.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass, property );
+			throw LOG.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass, property );
 		}
 
 		PropertyConstraintMappingContextImpl context = new PropertyConstraintMappingContextImpl(
@@ -138,11 +144,11 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		Method method = run( GetDeclaredMethod.action( beanClass, name, parameterTypes ) );
 
 		if ( method == null || method.getDeclaringClass() != beanClass ) {
-			throw log.getBeanDoesNotContainMethodException( beanClass, name, Arrays.asList( parameterTypes ) );
+			throw LOG.getBeanDoesNotContainMethodException( beanClass, name, Arrays.asList( parameterTypes ) );
 		}
 
 		if ( configuredMembers.contains( method ) ) {
-			throw log.getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(
+			throw LOG.getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(
 					beanClass,
 					ExecutableHelper.getExecutableAsString( name, parameterTypes )
 			);
@@ -160,14 +166,14 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		Constructor<C> constructor = run( GetDeclaredConstructor.action( beanClass, parameterTypes ) );
 
 		if ( constructor == null || constructor.getDeclaringClass() != beanClass ) {
-			throw log.getBeanDoesNotContainConstructorException(
+			throw LOG.getBeanDoesNotContainConstructorException(
 					beanClass,
 					Arrays.asList( parameterTypes )
 			);
 		}
 
 		if ( configuredMembers.contains( constructor ) ) {
-			throw log.getConstructorHasAlreadyBeConfiguredViaProgrammaticApiException(
+			throw LOG.getConstructorHasAlreadyBeConfiguredViaProgrammaticApiException(
 					beanClass,
 					ExecutableHelper.getExecutableAsString( beanClass.getSimpleName(), parameterTypes )
 			);
@@ -251,11 +257,11 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		Contracts.assertNotNull( clazz, MESSAGES.classCannotBeNull() );
 
 		if ( property == null || property.length() == 0 ) {
-			throw log.getPropertyNameCannotBeNullOrEmptyException();
+			throw LOG.getPropertyNameCannotBeNullOrEmptyException();
 		}
 
 		if ( !( ElementType.FIELD.equals( elementType ) || ElementType.METHOD.equals( elementType ) ) ) {
-			throw log.getElementTypeHasToBeFieldOrMethodException();
+			throw LOG.getElementTypeHasToBeFieldOrMethodException();
 		}
 
 		Member member = null;

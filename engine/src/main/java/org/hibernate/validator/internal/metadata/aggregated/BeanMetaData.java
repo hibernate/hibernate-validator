@@ -9,9 +9,9 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import java.lang.reflect.Executable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.engine.groups.Sequence;
@@ -23,6 +23,7 @@ import org.hibernate.validator.internal.metadata.facets.Validatable;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public interface BeanMetaData<T> extends Validatable {
 
@@ -48,7 +49,9 @@ public interface BeanMetaData<T> extends Validatable {
 	 *
 	 * @param propertyName The property name.
 	 *
-	 * @return Constraint-related meta data or {@code null} if no property with the given name exists.
+	 * @return Constraint-related meta data.
+	 *
+	 * @throws IllegalArgumentException In case no property with the given name exists.
 	 */
 	PropertyMetaData getMetaDataFor(String propertyName);
 
@@ -92,19 +95,18 @@ public interface BeanMetaData<T> extends Validatable {
 	Set<MetaConstraint<?>> getDirectMetaConstraints();
 
 	/**
-	 * Returns the constraint-related meta data for the given executable of the
-	 * class represented by this bean meta data.
+	 * Returns the constraint-related metadata for the given executable of the
+	 * class represented by this bean metadata.
 	 *
 	 * @param executable The executable of interest.
 	 *
-	 * @return An aggregated view on the constraint related meta data from the
-	 *         given method all the methods from super-types which it overrides
-	 *         or implements.
+	 * @return An optional either containing an aggregated view on the constraint related metadata from the
+	 *         given method and all the methods from super-types which it overrides
+	 *         or implements or being empty if the method is not constrained at all.
 	 *
-	 * @throws ConstraintDeclarationException In case any of the rules for the declaration of method
-	 * constraints described in the Bean Validation specification is violated.
+	 * @throws IllegalArgumentException In case the method cannot be found in the bean.
 	 */
-	ExecutableMetaData getMetaDataFor(Executable executable) throws ConstraintDeclarationException;
+	Optional<ExecutableMetaData> getMetaDataFor(Executable executable) throws IllegalArgumentException;
 
 	/**
 	 * @return Returns a list of classes representing the class hierarchy for the entity. The list start with the

@@ -6,13 +6,23 @@
  */
 package org.hibernate.validator;
 
+import java.time.Duration;
 import java.util.Set;
 
 import javax.validation.Configuration;
+import javax.validation.TraversableResolver;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.PastOrPresent;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluator;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * Uniquely identifies Hibernate Validator in the Bean Validation bootstrap
@@ -53,13 +63,49 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	String ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS = "hibernate.validator.allow_parallel_method_parameter_constraint";
 
 	/**
-	 * Property for configuring a constraint mapping contributor, allowing to set up one or more constraint mappings for
+	 * @deprecated planned for removal. Use hibernate.validator.constraint_mapping_contributors instead.
+	 * @since 5.2
+	 */
+	@Deprecated
+	String CONSTRAINT_MAPPING_CONTRIBUTOR = "hibernate.validator.constraint_mapping_contributor";
+
+	/**
+	 * Property for configuring constraint mapping contributors, allowing to set up one or more constraint mappings for
 	 * the default validator factory. Accepts a String with the comma separated fully-qualified class names of one or more
 	 * {@link org.hibernate.validator.spi.cfg.ConstraintMappingContributor} implementations.
 	 *
 	 * @since 5.3
 	 */
 	String CONSTRAINT_MAPPING_CONTRIBUTORS = "hibernate.validator.constraint_mapping_contributors";
+
+	/**
+	 * Property corresponding to the {@link #enableTraversableResolverResultCache(boolean)}.
+	 * Accepts {@code true} or {@code false}.
+	 * Defaults to {@code true}.
+	 *
+	 * @since 6.0.3
+	 */
+	String ENABLE_TRAVERSABLE_RESOLVER_RESULT_CACHE = "hibernate.validator.enable_traversable_resolver_result_cache";
+
+	/**
+	 * Property for configuring the script evaluator factory, allowing to set up which factory will be used to create
+	 * {@link ScriptEvaluator}s for evaluation of script expressions in
+	 * {@link ScriptAssert} and {@link ParameterScriptAssert}
+	 * constraints. A fully qualified name of a class implementing {@link ScriptEvaluatorFactory} is expected as a value.
+	 *
+	 * @since 6.0.3
+	 */
+	@Incubating
+	String SCRIPT_EVALUATOR_FACTORY_CLASSNAME = "hibernate.validator.script_evaluator_factory";
+
+	/**
+	 * Property for configuring temporal validation tolerance, allowing to set the acceptable margin of error when
+	 * comparing date/time in temporal constraints. In milliseconds.
+	 *
+	 * @since 6.0.5
+	 */
+	@Incubating
+	String TEMPORAL_VALIDATION_TOLERANCE = "hibernate.validator.temporal_validation_tolerance";
 
 	/**
 	 * <p>
@@ -210,4 +256,46 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @since 5.3
 	 */
 	HibernateValidatorConfiguration allowParallelMethodsDefineParameterConstraints(boolean allow);
+
+	/**
+	 * Define whether the per validation call caching of {@link TraversableResolver} results is enabled. The default
+	 * value is {@code true}, i.e. the caching is enabled.
+	 * <p>
+	 * This behavior was initially introduced to cache the {@code JPATraversableResolver} results but the map lookups it
+	 * introduces can be counterproductive when the {@code TraversableResolver} calls are very fast.
+	 *
+	 * @param enabled flag determining whether per validation call caching is enabled for {@code TraversableResolver}
+	 * results.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.0.3
+	 */
+	HibernateValidatorConfiguration enableTraversableResolverResultCache(boolean enabled);
+
+	/**
+	 * Allows to specify a custom {@link ScriptEvaluatorFactory} responsible for creating {@link ScriptEvaluator}s
+	 * used to evaluate script expressions for {@link ScriptAssert} and {@link ParameterScriptAssert} constraints.
+	 *
+	 * @param scriptEvaluatorFactory the {@link ScriptEvaluatorFactory} to be used
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.0.3
+	 */
+	@Incubating
+	HibernateValidatorConfiguration scriptEvaluatorFactory(ScriptEvaluatorFactory scriptEvaluatorFactory);
+
+	/**
+	 * Allows to set the acceptable margin of error when comparing date/time in temporal constraints such as
+	 * {@link Past}/{@link PastOrPresent} and {@link Future}/{@link FutureOrPresent}.
+	 *
+	 * @param temporalValidationTolerance the acceptable tolerance
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.0.5
+	 */
+	@Incubating
+	HibernateValidatorConfiguration temporalValidationTolerance(Duration temporalValidationTolerance);
 }

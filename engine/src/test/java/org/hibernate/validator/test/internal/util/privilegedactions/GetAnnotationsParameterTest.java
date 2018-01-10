@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.util.privilegedactions;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.lang.annotation.Annotation;
@@ -17,7 +17,7 @@ import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
+import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttribute;
 import org.testng.annotations.Test;
 
 /**
@@ -53,29 +53,26 @@ public class GetAnnotationsParameterTest {
 				return this.getClass();
 			}
 		};
-		String message = GetAnnotationParameter.action( testAnnotation, "message", String.class ).run();
+		String message = GetAnnotationAttribute.action( testAnnotation, "message", String.class ).run();
 		assertEquals( "test", message, "Wrong message" );
 
-		Class<?>[] group = GetAnnotationParameter.action( testAnnotation, "groups", Class[].class ).run();
-		assertEquals( group[0], Default.class, "Wrong message" );
+		Class<?>[] group = GetAnnotationAttribute.action( testAnnotation, "groups", Class[].class ).run();
+		assertEquals( group[0], Default.class, "Wrong group" );
 
 		try {
-			GetAnnotationParameter.action( testAnnotation, "message", Integer.class ).run();
+			GetAnnotationAttribute.action( testAnnotation, "message", Integer.class ).run();
 			fail();
 		}
 		catch (ValidationException e) {
-			assertTrue( e.getMessage().contains( "Wrong parameter type." ), "Wrong exception message" );
+			assertThat( e.getMessage() ).startsWith( "HV000082" ).as( "Wrong exception message" );
 		}
 
 		try {
-			GetAnnotationParameter.action( testAnnotation, "foo", Integer.class ).run();
+			GetAnnotationAttribute.action( testAnnotation, "foo", Integer.class ).run();
 			fail();
 		}
 		catch (ValidationException e) {
-			assertTrue(
-					e.getMessage().contains( "The specified annotation defines no parameter" ),
-					"Wrong exception message"
-			);
+			assertThat( e.getMessage() ).startsWith( "HV000083" ).as( "Wrong exception message" );
 		}
 	}
 }

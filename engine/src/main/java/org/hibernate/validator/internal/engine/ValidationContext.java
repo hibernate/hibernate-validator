@@ -6,10 +6,11 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Executable;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -26,8 +27,11 @@ import javax.validation.ParameterNameProvider;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
+import javax.validation.Validator;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
+import org.hibernate.validator.internal.engine.ValidatorFactoryImpl.ValidatorFactoryScopedContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
@@ -36,9 +40,9 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.IdentitySet;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
  * Context object keeping track of all required data for a validation call.
@@ -53,7 +57,12 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class ValidationContext<T> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+
+	/**
+	 * The current validation operation (e.g. bean validation, parameter validation).
+	 */
+	private final ValidationOperation validationOperation;
 
 	/**
 	 * Caches and manages life cycle of constraint validator instances.
@@ -91,10 +100,14 @@ public class ValidationContext<T> {
 	private final Object executableReturnValue;
 
 	/**
-	 * Maps a group to an identity set to keep track of already validated objects. We have to make sure
-	 * that each object gets only validated once per group and property path.
+	 * The set of already processed meta constraints per bean - path ({@link BeanPathMetaConstraintProcessedUnit}).
 	 */
-	private final Map<Class<?>, IdentitySet> processedBeansPerGroup;
+	private final Set<BeanPathMetaConstraintProcessedUnit> processedPathUnits;
+
+	/**
+	 * The set of already processed groups per bean ({@link BeanGroupProcessedUnit}).
+	 */
+	private final Set<BeanGroupProcessedUnit> processedGroupUnits;
 
 	/**
 	 * Maps an object to a list of paths in which it has been validated. The objects are the bean instances.
@@ -102,19 +115,9 @@ public class ValidationContext<T> {
 	private final Map<Object, Set<PathImpl>> processedPathsPerBean;
 
 	/**
-	 * Maps processed constraints to the bean and path for which they have been processed.
-	 */
-	private final Map<BeanAndPath, IdentitySet> processedMetaConstraints;
-
-	/**
 	 * Contains all failing constraints so far.
 	 */
 	private final Set<ConstraintViolation<T>> failingConstraintViolations;
-
-	/**
-	 * The message resolver which should be used in this context.
-	 */
-	private final MessageInterpolator messageInterpolator;
 
 	/**
 	 * The constraint factory which should be used in this context.
@@ -122,50 +125,44 @@ public class ValidationContext<T> {
 	private final ConstraintValidatorFactory constraintValidatorFactory;
 
 	/**
+	 * Context containing all {@link Validator} level helpers and configuration properties.
+	 */
+	private final ValidatorScopedContext validatorScopedContext;
+
+	/**
 	 * Allows a JPA provider to decide whether a property should be validated.
 	 */
 	private final TraversableResolver traversableResolver;
 
 	/**
-	 * Parameter name provider which should be used in this context.
+	 * The constraint validator initialization context.
 	 */
-	private final ExecutableParameterNameProvider parameterNameProvider;
-
-	/**
-	 * Clock provider which should be used in this context.
-	 */
-	private final ClockProvider clockProvider;
-
-	/**
-	 * Whether or not validation should fail on the first constraint violation.
-	 */
-	private final boolean failFast;
+	private final HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext;
 
 	/**
 	 * The name of the validated (leaf) property in case of a validateProperty()/validateValue() call.
 	 */
 	private String validatedProperty;
 
-	private ValidationContext(ConstraintValidatorManager constraintValidatorManager,
-			MessageInterpolator messageInterpolator,
+	private ValidationContext(ValidationOperation validationOperation,
+			ConstraintValidatorManager constraintValidatorManager,
 			ConstraintValidatorFactory constraintValidatorFactory,
+			ValidatorScopedContext validatorScopedContext,
 			TraversableResolver traversableResolver,
-			ExecutableParameterNameProvider parameterNameProvider,
-			ClockProvider clockProvider,
-			boolean failFast,
+			HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext,
 			T rootBean,
 			Class<T> rootBeanClass,
 			BeanMetaData<T> rootBeanMetaData,
 			Executable executable,
 			Object[] executableParameters,
 			Object executableReturnValue) {
+		this.validationOperation = validationOperation;
+
 		this.constraintValidatorManager = constraintValidatorManager;
-		this.messageInterpolator = messageInterpolator;
+		this.validatorScopedContext = validatorScopedContext;
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.traversableResolver = traversableResolver;
-		this.parameterNameProvider = parameterNameProvider;
-		this.clockProvider = clockProvider;
-		this.failFast = failFast;
+		this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
 
 		this.rootBean = rootBean;
 		this.rootBeanClass = rootBeanClass;
@@ -174,29 +171,27 @@ public class ValidationContext<T> {
 		this.executableParameters = executableParameters;
 		this.executableReturnValue = executableReturnValue;
 
-		this.processedBeansPerGroup = newHashMap();
+		this.processedGroupUnits = new HashSet<>();
+		this.processedPathUnits = new HashSet<>();
 		this.processedPathsPerBean = new IdentityHashMap<>();
-		this.processedMetaConstraints = newHashMap();
 		this.failingConstraintViolations = newHashSet();
 	}
 
 	public static ValidationContextBuilder getValidationContextBuilder(
 			BeanMetaDataManager beanMetaDataManager,
 			ConstraintValidatorManager constraintValidatorManager,
-			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
+			ValidatorScopedContext validatorScopedContext,
 			TraversableResolver traversableResolver,
-			ClockProvider clockProvider,
-			boolean failFast) {
+			HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext) {
 
 		return new ValidationContextBuilder(
 				beanMetaDataManager,
 				constraintValidatorManager,
-				messageInterpolator,
 				constraintValidatorFactory,
+				validatorScopedContext,
 				traversableResolver,
-				clockProvider,
-				failFast
+				constraintValidatorInitializationContext
 		);
 	}
 
@@ -221,7 +216,7 @@ public class ValidationContext<T> {
 	}
 
 	public boolean isFailFastModeEnabled() {
-		return failFast;
+		return validatorScopedContext.isFailFast();
 	}
 
 	public ConstraintValidatorManager getConstraintValidatorManager() {
@@ -236,15 +231,19 @@ public class ValidationContext<T> {
 	 * created for parameter validation, {@code null} otherwise.
 	 */
 	public List<String> getParameterNames() {
-		if ( parameterNameProvider == null ) {
+		if ( !ValidationOperation.PARAMETER_VALIDATION.equals( validationOperation ) ) {
 			return null;
 		}
 
-		return parameterNameProvider.getParameterNames( executable );
+		return validatorScopedContext.getParameterNameProvider().getParameterNames( executable );
 	}
 
 	public ClockProvider getClockProvider() {
-		return clockProvider;
+		return validatorScopedContext.getClockProvider();
+	}
+
+	public HibernateConstraintValidatorInitializationContext getConstraintValidatorInitializationContext() {
+		return constraintValidatorInitializationContext;
 	}
 
 	public Set<ConstraintViolation<T>> createConstraintViolations(ValueContext<?, ?> localContext,
@@ -296,75 +295,64 @@ public class ValidationContext<T> {
 		// at this point we make a copy of the path to avoid side effects
 		Path path = PathImpl.createCopy( constraintViolationCreationContext.getPath() );
 		Object dynamicPayload = constraintViolationCreationContext.getDynamicPayload();
-		if ( executableParameters != null ) {
-			return ConstraintViolationImpl.forParameterValidation(
-					messageTemplate,
-					constraintViolationCreationContext.getMessageParameters(),
-					constraintViolationCreationContext.getExpressionVariables(),
-					interpolatedMessage,
-					getRootBeanClass(),
-					getRootBean(),
-					localContext.getCurrentBean(),
-					localContext.getCurrentValidatedValue(),
-					path,
-					descriptor,
-					localContext.getElementType(),
-					executableParameters,
-					dynamicPayload
-			);
-		}
-		else if ( executableReturnValue != null ) {
-			return ConstraintViolationImpl.forReturnValueValidation(
-					messageTemplate,
-					constraintViolationCreationContext.getMessageParameters(),
-					constraintViolationCreationContext.getExpressionVariables(),
-					interpolatedMessage,
-					getRootBeanClass(),
-					getRootBean(),
-					localContext.getCurrentBean(),
-					localContext.getCurrentValidatedValue(),
-					path,
-					descriptor,
-					localContext.getElementType(),
-					executableReturnValue,
-					dynamicPayload
-			);
-		}
-		else {
-			return ConstraintViolationImpl.forBeanValidation(
-					messageTemplate,
-					constraintViolationCreationContext.getMessageParameters(),
-					constraintViolationCreationContext.getExpressionVariables(),
-					interpolatedMessage,
-					getRootBeanClass(),
-					getRootBean(),
-					localContext.getCurrentBean(),
-					localContext.getCurrentValidatedValue(),
-					path,
-					descriptor,
-					localContext.getElementType(),
-					dynamicPayload
-			);
+
+		switch ( validationOperation ) {
+			case PARAMETER_VALIDATION:
+				return ConstraintViolationImpl.forParameterValidation(
+						messageTemplate,
+						constraintViolationCreationContext.getMessageParameters(),
+						constraintViolationCreationContext.getExpressionVariables(),
+						interpolatedMessage,
+						getRootBeanClass(),
+						getRootBean(),
+						localContext.getCurrentBean(),
+						localContext.getCurrentValidatedValue(),
+						path,
+						descriptor,
+						localContext.getElementType(),
+						executableParameters,
+						dynamicPayload
+				);
+			case RETURN_VALUE_VALIDATION:
+				return ConstraintViolationImpl.forReturnValueValidation(
+						messageTemplate,
+						constraintViolationCreationContext.getMessageParameters(),
+						constraintViolationCreationContext.getExpressionVariables(),
+						interpolatedMessage,
+						getRootBeanClass(),
+						getRootBean(),
+						localContext.getCurrentBean(),
+						localContext.getCurrentValidatedValue(),
+						path,
+						descriptor,
+						localContext.getElementType(),
+						executableReturnValue,
+						dynamicPayload
+				);
+			default:
+				return ConstraintViolationImpl.forBeanValidation(
+						messageTemplate,
+						constraintViolationCreationContext.getMessageParameters(),
+						constraintViolationCreationContext.getExpressionVariables(),
+						interpolatedMessage,
+						getRootBeanClass(),
+						getRootBean(),
+						localContext.getCurrentBean(),
+						localContext.getCurrentValidatedValue(),
+						path,
+						descriptor,
+						localContext.getElementType(),
+						dynamicPayload
+				);
 		}
 	}
 
 	public boolean hasMetaConstraintBeenProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint) {
-		// TODO switch to proper multi key map (HF)
-		IdentitySet processedConstraints = processedMetaConstraints.get( new BeanAndPath( bean, path ) );
-		return processedConstraints != null && processedConstraints.contains( metaConstraint );
+		return processedPathUnits.contains( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
 	}
 
 	public void markConstraintProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint) {
-		// TODO switch to proper multi key map (HF)
-		BeanAndPath beanAndPath = new BeanAndPath( bean, path );
-		if ( processedMetaConstraints.containsKey( beanAndPath ) ) {
-			processedMetaConstraints.get( beanAndPath ).add( metaConstraint );
-		}
-		else {
-			IdentitySet set = new IdentitySet();
-			set.add( metaConstraint );
-			processedMetaConstraints.put( beanAndPath, set );
-		}
+		processedPathUnits.add( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
 	}
 
 	public String getValidatedProperty() {
@@ -398,7 +386,7 @@ public class ValidationContext<T> {
 		);
 
 		try {
-			return messageInterpolator.interpolate(
+			return validatorScopedContext.getMessageInterpolator().interpolate(
 					messageTemplate,
 					context
 			);
@@ -407,7 +395,7 @@ public class ValidationContext<T> {
 			throw ve;
 		}
 		catch (Exception e) {
-			throw log.getExceptionOccurredDuringMessageInterpolationException( e );
+			throw LOG.getExceptionOccurredDuringMessageInterpolationException( e );
 		}
 	}
 
@@ -443,33 +431,17 @@ public class ValidationContext<T> {
 	}
 
 	private boolean isAlreadyValidatedForCurrentGroup(Object value, Class<?> group) {
-		IdentitySet objectsProcessedInCurrentGroups = processedBeansPerGroup.get( group );
-		return objectsProcessedInCurrentGroups != null && objectsProcessedInCurrentGroups.contains( value );
+		return processedGroupUnits.contains( new BeanGroupProcessedUnit( value, group ) );
 	}
 
-	private void markCurrentBeanAsProcessedForCurrentPath(Object value, PathImpl path) {
+	private void markCurrentBeanAsProcessedForCurrentPath(Object bean, PathImpl path) {
 		// HV-1031 The path object is mutated as we traverse the object tree, hence copy it before saving it
-		path = PathImpl.createCopy( path );
-
-		if ( processedPathsPerBean.containsKey( value ) ) {
-			processedPathsPerBean.get( value ).add( path );
-		}
-		else {
-			Set<PathImpl> set = new HashSet<>();
-			set.add( path );
-			processedPathsPerBean.put( value, set );
-		}
+		processedPathsPerBean.computeIfAbsent( bean, b -> new HashSet<>() )
+				.add( PathImpl.createCopy( path ) );
 	}
 
-	private void markCurrentBeanAsProcessedForCurrentGroup(Object value, Class<?> group) {
-		if ( processedBeansPerGroup.containsKey( group ) ) {
-			processedBeansPerGroup.get( group ).add( value );
-		}
-		else {
-			IdentitySet set = new IdentitySet();
-			set.add( value );
-			processedBeansPerGroup.put( group, set );
-		}
+	private void markCurrentBeanAsProcessedForCurrentGroup(Object bean, Class<?> group) {
+		processedGroupUnits.add( new BeanGroupProcessedUnit( bean, group ) );
 	}
 
 	/**
@@ -480,45 +452,41 @@ public class ValidationContext<T> {
 	public static class ValidationContextBuilder {
 		private final BeanMetaDataManager beanMetaDataManager;
 		private final ConstraintValidatorManager constraintValidatorManager;
-		private final MessageInterpolator messageInterpolator;
 		private final ConstraintValidatorFactory constraintValidatorFactory;
 		private final TraversableResolver traversableResolver;
-		private final ClockProvider clockProvider;
-		private final boolean failFast;
+		private final HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext;
+		private final ValidatorScopedContext validatorScopedContext;
 
 		private ValidationContextBuilder(
 				BeanMetaDataManager beanMetaDataManager,
 				ConstraintValidatorManager constraintValidatorManager,
-				MessageInterpolator messageInterpolator,
 				ConstraintValidatorFactory constraintValidatorFactory,
+				ValidatorScopedContext validatorScopedContext,
 				TraversableResolver traversableResolver,
-				ClockProvider clockProvider,
-				boolean failFast) {
+				HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext) {
 			this.beanMetaDataManager = beanMetaDataManager;
 			this.constraintValidatorManager = constraintValidatorManager;
-			this.messageInterpolator = messageInterpolator;
 			this.constraintValidatorFactory = constraintValidatorFactory;
 			this.traversableResolver = traversableResolver;
-			this.clockProvider = clockProvider;
-			this.failFast = failFast;
+			this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
+			this.validatorScopedContext = validatorScopedContext;
 		}
 
 		public <T> ValidationContext<T> forValidate(T rootBean) {
 			@SuppressWarnings("unchecked")
 			Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 			return new ValidationContext<>(
+					ValidationOperation.BEAN_VALIDATION,
 					constraintValidatorManager,
-					messageInterpolator,
 					constraintValidatorFactory,
+					validatorScopedContext,
 					traversableResolver,
-					null,
-					clockProvider, //parameter name provider,
-					failFast,
+					constraintValidatorInitializationContext,
 					rootBean,
 					rootBeanClass,
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
-					null,
 					null, //executable
+					null, //executable parameters
 					null //executable return value
 			);
 		}
@@ -527,36 +495,34 @@ public class ValidationContext<T> {
 			@SuppressWarnings("unchecked")
 			Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 			return new ValidationContext<>(
+					ValidationOperation.PROPERTY_VALIDATION,
 					constraintValidatorManager,
-					messageInterpolator,
 					constraintValidatorFactory,
+					validatorScopedContext,
 					traversableResolver,
-					null,
-					clockProvider, //parameter name provider,
-					failFast,
+					constraintValidatorInitializationContext,
 					rootBean,
 					rootBeanClass,
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
-					null,
 					null, //executable
+					null, //executable parameters
 					null //executable return value
 			);
 		}
 
 		public <T> ValidationContext<T> forValidateValue(Class<T> rootBeanClass) {
 			return new ValidationContext<>(
+					ValidationOperation.VALUE_VALIDATION,
 					constraintValidatorManager,
-					messageInterpolator,
 					constraintValidatorFactory,
+					validatorScopedContext,
 					traversableResolver,
-					null,
-					clockProvider, //parameter name provider
-					failFast,
-					null,
-					rootBeanClass, //root bean
+					constraintValidatorInitializationContext,
+					null, //root bean
+					rootBeanClass,
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
-					null,
 					null, //executable
+					null, //executable parameters
 					null //executable return value
 			);
 		}
@@ -569,13 +535,12 @@ public class ValidationContext<T> {
 			@SuppressWarnings("unchecked")
 			Class<T> rootBeanClass = rootBean != null ? (Class<T>) rootBean.getClass() : (Class<T>) executable.getDeclaringClass();
 			return new ValidationContext<>(
+					ValidationOperation.PARAMETER_VALIDATION,
 					constraintValidatorManager,
-					messageInterpolator,
 					constraintValidatorFactory,
+					validatorScopedContext,
 					traversableResolver,
-					parameterNameProvider,
-					clockProvider,
-					failFast,
+					constraintValidatorInitializationContext,
 					rootBean,
 					rootBeanClass,
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
@@ -592,32 +557,32 @@ public class ValidationContext<T> {
 			@SuppressWarnings("unchecked")
 			Class<T> rootBeanClass = rootBean != null ? (Class<T>) rootBean.getClass() : (Class<T>) executable.getDeclaringClass();
 			return new ValidationContext<>(
+					ValidationOperation.RETURN_VALUE_VALIDATION,
 					constraintValidatorManager,
-					messageInterpolator,
 					constraintValidatorFactory,
+					validatorScopedContext,
 					traversableResolver,
-					null,
-					clockProvider, //parameter name provider
-					failFast,
+					constraintValidatorInitializationContext,
 					rootBean,
 					rootBeanClass,
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					executable,
-					null,
+					null, //executable parameters
 					executableReturnValue
 			);
 		}
 	}
 
-	private static final class BeanAndPath {
-		private final Object bean;
-		private final Path path;
-		private final int hashCode;
+	private static final class BeanGroupProcessedUnit {
 
-		private BeanAndPath(Object bean, Path path) {
+		// these fields are final but we don't mark them as final as an optimization
+		private Object bean;
+		private Class<?> group;
+		private int hashCode;
+
+		private BeanGroupProcessedUnit(Object bean, Class<?> group) {
 			this.bean = bean;
-			this.path = path;
-			// pre-calculate hash code, the class is immutable and hashCode is needed often
+			this.group = group;
 			this.hashCode = createHashCode();
 		}
 
@@ -626,13 +591,60 @@ public class ValidationContext<T> {
 			if ( this == o ) {
 				return true;
 			}
-			if ( o == null || getClass() != o.getClass() ) {
+
+			// No need to check if the class matches because of how this class is used in the set.
+			BeanGroupProcessedUnit that = (BeanGroupProcessedUnit) o;
+
+			if ( bean != that.bean ) {  // instance equality
+				return false;
+			}
+			if ( !group.equals( that.group ) ) {
 				return false;
 			}
 
-			BeanAndPath that = (BeanAndPath) o;
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			return hashCode;
+		}
+
+		private int createHashCode() {
+			int result = System.identityHashCode( bean );
+			result = 31 * result + group.hashCode();
+			return result;
+		}
+	}
+
+	private static final class BeanPathMetaConstraintProcessedUnit {
+
+		// these fields are final but we don't mark them as final as an optimization
+		private Object bean;
+		private Path path;
+		private MetaConstraint<?> metaConstraint;
+		private int hashCode;
+
+		private BeanPathMetaConstraintProcessedUnit(Object bean, Path path, MetaConstraint<?> metaConstraint) {
+			this.bean = bean;
+			this.path = path;
+			this.metaConstraint = metaConstraint;
+			this.hashCode = createHashCode();
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+
+			// No need to check if the class matches because of how this class is used in the set.
+			BeanPathMetaConstraintProcessedUnit that = (BeanPathMetaConstraintProcessedUnit) o;
 
 			if ( bean != that.bean ) {  // instance equality
+				return false;
+			}
+			if ( metaConstraint != that.metaConstraint ) {
 				return false;
 			}
 			if ( !path.equals( that.path ) ) {
@@ -650,7 +662,102 @@ public class ValidationContext<T> {
 		private int createHashCode() {
 			int result = System.identityHashCode( bean );
 			result = 31 * result + path.hashCode();
+			result = 31 * result + System.identityHashCode( metaConstraint );
 			return result;
 		}
+	}
+
+	/**
+	 * Context object storing the {@link Validator} level helper and configuration properties.
+	 * <p>
+	 * There should be only one per {@code Validator} instance.
+	 */
+	static class ValidatorScopedContext {
+
+		/**
+		 * The message interpolator.
+		 */
+		private final MessageInterpolator messageInterpolator;
+
+		/**
+		 * The parameter name provider.
+		 */
+		private final ExecutableParameterNameProvider parameterNameProvider;
+
+		/**
+		 * Provider for the current time when validating {@code @Future} or {@code @Past}
+		 */
+		private final ClockProvider clockProvider;
+
+		/**
+		 * Defines the temporal validation tolerance i.e. the allowed margin of error when comparing date/time in temporal
+		 * constraints.
+		 */
+		private final Duration temporalValidationTolerance;
+
+		/**
+		 * Used to get the {@code ScriptEvaluatorFactory} when validating {@code @ScriptAssert} and
+		 * {@code @ParameterScriptAssert} constraints.
+		 */
+		private final ScriptEvaluatorFactory scriptEvaluatorFactory;
+
+		/**
+		 * Hibernate Validator specific flag to abort validation on first constraint violation.
+		 */
+		private final boolean failFast;
+
+		/**
+		 * Hibernate Validator specific flag to disable the {@code TraversableResolver} result cache.
+		 */
+		private final boolean traversableResolverResultCacheEnabled;
+
+		ValidatorScopedContext(ValidatorFactoryScopedContext validatorFactoryScopedContext) {
+			this.messageInterpolator = validatorFactoryScopedContext.getMessageInterpolator();
+			this.parameterNameProvider = validatorFactoryScopedContext.getParameterNameProvider();
+			this.clockProvider = validatorFactoryScopedContext.getClockProvider();
+			this.temporalValidationTolerance = validatorFactoryScopedContext.getTemporalValidationTolerance();
+			this.scriptEvaluatorFactory = validatorFactoryScopedContext.getScriptEvaluatorFactory();
+			this.failFast = validatorFactoryScopedContext.isFailFast();
+			this.traversableResolverResultCacheEnabled = validatorFactoryScopedContext.isTraversableResolverResultCacheEnabled();
+		}
+
+		public MessageInterpolator getMessageInterpolator() {
+			return this.messageInterpolator;
+		}
+
+		public ExecutableParameterNameProvider getParameterNameProvider() {
+			return this.parameterNameProvider;
+		}
+
+		public ClockProvider getClockProvider() {
+			return this.clockProvider;
+		}
+
+		public Duration getTemporalValidationTolerance() {
+			return this.temporalValidationTolerance;
+		}
+
+		public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
+			return this.scriptEvaluatorFactory;
+		}
+
+		public boolean isFailFast() {
+			return this.failFast;
+		}
+
+		public boolean isTraversableResolverResultCacheEnabled() {
+			return this.traversableResolverResultCacheEnabled;
+		}
+	}
+
+	/**
+	 * The different validation operations that can occur.
+	 */
+	private enum ValidationOperation {
+		BEAN_VALIDATION,
+		PROPERTY_VALIDATION,
+		VALUE_VALIDATION,
+		PARAMETER_VALIDATION,
+		RETURN_VALUE_VALIDATION
 	}
 }

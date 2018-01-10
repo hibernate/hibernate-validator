@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.util.privilegedactions;
 
+import java.lang.invoke.MethodHandles;
 import java.security.PrivilegedAction;
 
 import org.hibernate.validator.HibernateValidator;
@@ -28,7 +29,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public final class LoadClass implements PrivilegedAction<Class<?>> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String HIBERNATE_VALIDATOR_CLASS_NAME = "org.hibernate.validator";
 
@@ -85,15 +86,15 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 					return Class.forName( className, false, contextClassLoader );
 				}
 				catch (ClassNotFoundException e) {
-					throw log.getUnableToLoadClassException( className, contextClassLoader, e );
+					throw LOG.getUnableToLoadClassException( className, contextClassLoader, e );
 				}
 			}
 			else {
-				throw log.getUnableToLoadClassException( className, loader, exception );
+				throw LOG.getUnableToLoadClassException( className, loader, exception );
 			}
 		}
 		else {
-			throw log.getUnableToLoadClassException( className, loader, exception );
+			throw LOG.getUnableToLoadClassException( className, loader, exception );
 		}
 	}
 
@@ -129,11 +130,11 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 				return Class.forName( className, true, loader );
 			}
 			catch (ClassNotFoundException e) {
-				throw log.getUnableToLoadClassException( className, loader, e );
+				throw LOG.getUnableToLoadClassException( className, loader, e );
 			}
 		}
 		else {
-			throw log.getUnableToLoadClassException( className, classLoader, exception );
+			throw LOG.getUnableToLoadClassException( className, classLoader, exception );
 		}
 	}
 }

@@ -7,7 +7,8 @@
 package org.hibernate.validator.test.parameternameprovider;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
 import java.lang.annotation.Annotation;
@@ -24,6 +25,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider;
+import org.hibernate.validator.testutil.ConstraintViolationAssert;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
 
@@ -95,7 +97,12 @@ public class ParanamerParameterNameProviderTest {
 				parameterValues
 		);
 
-		assertCorrectPropertyPathStringRepresentations( violations, "pauseGame.durationInSeconds" );
+		ConstraintViolationAssert.assertThat( violations ).containsOnlyViolations(
+				violationOf( Min.class ).withPropertyPath( pathWith()
+						.method( "pauseGame" )
+						.parameter( "durationInSeconds", 0 )
+				)
+		);
 	}
 
 	@SuppressWarnings("unused")

@@ -6,7 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.cascaded;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.ArrayList;
@@ -38,10 +40,19 @@ public class CascadingOnIterableMapWithAdditionalPropertiesTest {
 	public void testValidateCustomIterableType() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<IterableExtHolder>> constraintViolations = validator.validate( new IterableExtHolder() );
-		assertCorrectPropertyPathStringRepresentations(
-				constraintViolations,
-				"iterableExt.value",
-				"iterableExt[].number"
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "iterableExt" )
+								.property( "value" )
+
+						),
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.property( "iterableExt" )
+								.property( "number", true, null, null, IterableExt.class, null )
+
+						)
 		);
 	}
 
@@ -50,10 +61,19 @@ public class CascadingOnIterableMapWithAdditionalPropertiesTest {
 	public void testValidateCustomListType() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<ListExtHolder>> constraintViolations = validator.validate( new ListExtHolder() );
-		assertCorrectPropertyPathStringRepresentations(
-				constraintViolations,
-				"listExt.value",
-				"listExt[1].number"
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "listExt" )
+								.property( "value" )
+
+						),
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.property( "listExt" )
+								.property( "number", true, null, 1, ListExt.class, null )
+
+						)
 		);
 	}
 
@@ -62,10 +82,19 @@ public class CascadingOnIterableMapWithAdditionalPropertiesTest {
 	public void testValidateCustomMapType() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<MapExtHolder>> constraintViolations = validator.validate( new MapExtHolder() );
-		assertCorrectPropertyPathStringRepresentations(
-				constraintViolations,
-				"mapExt.value",
-				"mapExt[second].number"
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+						.withPropertyPath( pathWith()
+								.property( "mapExt" )
+								.property( "value" )
+
+						),
+				violationOf( Min.class )
+						.withPropertyPath( pathWith()
+								.property( "mapExt" )
+								.property( "number", true, "second", null, MapExt.class, null )
+
+						)
 		);
 	}
 

@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.raw;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.util.Collections;
@@ -18,7 +19,7 @@ import java.util.Set;
 
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -37,7 +38,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  */
 public class ConstrainedExecutable extends AbstractConstrainedElement {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Executable executable;
 
@@ -62,14 +63,14 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * @param returnValueConstraints Type arguments constraints, if any.
 	 * @param typeArgumentConstraints The type argument constraints on the return value of the represented executable,
 	 * if any.
-	 * @param cascadingMetaData The cascaded validation metadata for this element and its container elements.
+	 * @param cascadingMetaDataBuilder The cascaded validation metadata for this element and its container elements.
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
 			Executable executable,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Set<MetaConstraint<?>> typeArgumentConstraints,
-			CascadingTypeParameter cascadingMetaData) {
+			CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 		this(
 				source,
 				executable,
@@ -77,7 +78,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
 				typeArgumentConstraints,
-				cascadingMetaData
+				cascadingMetaDataBuilder
 		);
 	}
 
@@ -93,7 +94,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * @param returnValueConstraints The return value constraints of the represented executable, if any.
 	 * @param typeArgumentConstraints The type argument constraints on the return value of the represented executable,
 	 * if any.
-	 * @param cascadingMetaData The cascaded validation metadata for this element and its container elements.
+	 * @param cascadingMetaDataBuilder The cascaded validation metadata for this element and its container elements.
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
@@ -102,19 +103,19 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Set<MetaConstraint<?>> typeArgumentConstraints,
-			CascadingTypeParameter cascadingMetaData) {
+			CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 		super(
 				source,
 				( executable instanceof Constructor ) ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
 				returnValueConstraints,
 				typeArgumentConstraints,
-				cascadingMetaData
+				cascadingMetaDataBuilder
 		);
 
 		this.executable = executable;
 
 		if ( parameterMetaData.size() != executable.getParameterTypes().length ) {
-			throw log.getInvalidLengthOfParameterMetaDataListException(
+			throw LOG.getInvalidLengthOfParameterMetaDataListException(
 					executable,
 					executable.getParameterTypes().length,
 					parameterMetaData.size()
@@ -140,7 +141,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	public ConstrainedParameter getParameterMetaData(int parameterIndex) {
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
-			throw log.getInvalidExecutableParameterIndexException(
+			throw LOG.getInvalidExecutableParameterIndexException(
 					executable,
 					parameterIndex
 			);
@@ -241,7 +242,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		for ( ConstrainedParameter parameter : parameterMetaData ) {
 			ConstrainedParameter otherParameter = other.getParameterMetaData( i );
 			// FIXME: how to deal with method overriding with type overloading of one of the parameters?
-			if ( !parameter.getCascadingMetaData().equals( otherParameter.getCascadingMetaData() )
+			if ( !parameter.getCascadingMetaDataBuilder().equals( otherParameter.getCascadingMetaDataBuilder() )
 				|| !getDescriptors( parameter.getConstraints() ).equals( getDescriptors( otherParameter.getConstraints() ) ) ) {
 				return false;
 			}
@@ -279,7 +280,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		Set<MetaConstraint<?>> mergedTypeArgumentConstraints = new HashSet<>( typeArgumentConstraints );
 		mergedTypeArgumentConstraints.addAll( other.typeArgumentConstraints );
 
-		CascadingTypeParameter mergedCascadingMetaData = cascadingMetaData.merge( other.cascadingMetaData );
+		CascadingMetaDataBuilder mergedCascadingMetaDataBuilder = cascadingMetaDataBuilder.merge( other.cascadingMetaDataBuilder );
 
 		return new ConstrainedExecutable(
 				mergedSource,
@@ -288,7 +289,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				mergedCrossParameterConstraints,
 				mergedReturnValueConstraints,
 				mergedTypeArgumentConstraints,
-				mergedCascadingMetaData
+				mergedCascadingMetaDataBuilder
 		);
 	}
 

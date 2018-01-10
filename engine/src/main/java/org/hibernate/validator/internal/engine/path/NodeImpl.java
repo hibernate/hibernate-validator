@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.engine.path;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class NodeImpl
 	private static final long serialVersionUID = 2075466571633860499L;
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[]{};
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String INDEX_OPEN = "[";
 	private static final String INDEX_CLOSE = "]";
@@ -60,7 +61,6 @@ public class NodeImpl
 	private final Integer index;
 	private final Object key;
 	private final ElementKind kind;
-	private final int hashCode;
 
 	//type-specific attributes
 	private final Class<?>[] parameterTypes;
@@ -69,6 +69,7 @@ public class NodeImpl
 	private final Class<?> containerClass;
 	private final Integer typeArgumentIndex;
 
+	private int hashCode = -1;
 	private String asString;
 
 	private NodeImpl(String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
@@ -84,7 +85,6 @@ public class NodeImpl
 		this.parameterIndex = parameterIndex;
 		this.containerClass = containerClass;
 		this.typeArgumentIndex = typeArgumentIndex;
-		this.hashCode = buildHashCode();
 	}
 
 	//TODO It would be nicer if we could return PropertyNode
@@ -208,7 +208,7 @@ public class NodeImpl
 		);
 	}
 
-	public static NodeImpl setIndex(NodeImpl node, Integer index) {
+	public static NodeImpl makeIterableAndSetIndex(NodeImpl node, Integer index) {
 		return new NodeImpl(
 				node.name,
 				node.parent,
@@ -224,7 +224,7 @@ public class NodeImpl
 		);
 	}
 
-	public static NodeImpl setMapKey(NodeImpl node, Object key) {
+	public static NodeImpl makeIterableAndSetMapKey(NodeImpl node, Object key) {
 		return new NodeImpl(
 				node.name,
 				node.parent,
@@ -353,7 +353,7 @@ public class NodeImpl
 			return nodeType.cast( this );
 		}
 
-		throw log.getUnableToNarrowNodeTypeException( this.getClass(), kind, nodeType );
+		throw LOG.getUnableToNarrowNodeTypeException( this.getClass(), kind, nodeType );
 	}
 
 	@Override
@@ -439,8 +439,7 @@ public class NodeImpl
 		result = prime * result + ( ( kind == null ) ? 0 : kind.hashCode() );
 		result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
 		result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
-		result = prime * result + ( ( parameterTypes == null ) ? 0 : parameterTypes.hashCode() );
-		result = prime * result + ( ( parent == null ) ? 0 : parent.hashCode() );
+		result = prime * result + ( ( parameterTypes == null ) ? 0 : Arrays.hashCode( parameterTypes ) );
 		result = prime * result + ( ( containerClass == null ) ? 0 : containerClass.hashCode() );
 		result = prime * result + ( ( typeArgumentIndex == null ) ? 0 : typeArgumentIndex.hashCode() );
 		return result;
@@ -448,6 +447,10 @@ public class NodeImpl
 
 	@Override
 	public int hashCode() {
+		if ( hashCode == -1 ) {
+			hashCode = buildHashCode();
+		}
+
 		return hashCode;
 	}
 
@@ -522,15 +525,7 @@ public class NodeImpl
 				return false;
 			}
 		}
-		else if ( !parameterTypes.equals( other.parameterTypes ) ) {
-			return false;
-		}
-		if ( parent == null ) {
-			if ( other.parent != null ) {
-				return false;
-			}
-		}
-		else if ( !parent.equals( other.parent ) ) {
+		else if ( !Arrays.equals( parameterTypes, other.parameterTypes ) ) {
 			return false;
 		}
 		return true;

@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator-parent</artifactId>
-        <version>6.0.0-SNAPSHOT</version>
+        <version>6.0.8-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -22,7 +22,6 @@
 
     <properties>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
-        <automatic.module.name>org.hibernate.validator</automatic.module.name>
     </properties>
 
     <distributionManagement>
@@ -200,7 +199,7 @@
                                 <manifestEntries>
                                     <Specification-Title>Bean Validation</Specification-Title>
                                     <Specification-Version>2.0</Specification-Version>
-                                    <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+                                    <Automatic-Module-Name>${hibernate-validator.module-name}</Automatic-Module-Name>
                                 </manifestEntries>
                             </archive>
                         </configuration>
@@ -212,9 +211,11 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
+                        <Bundle-SymbolicName>${hibernate-validator.bundle-name}</Bundle-SymbolicName>
                         <Import-Package>
                             javax.persistence.*;version="[2.0.0,3.0.0)";resolution:=optional,
                             javax.validation.*;version="[2.0.0,3.0.0)",
+                            javax.script.*;version="0",
                             javax.xml.*;version="0",
                             javax.el.*;version="[2.0.0,4.0.0)";resolution:=optional,
                             org.xml.sax.*;version="0",
@@ -382,6 +383,58 @@
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>sigtest</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-tck-bv-api-signature-file</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.hibernate.beanvalidation.tck</groupId>
+                                            <artifactId>beanvalidation-tck-tests</artifactId>
+                                            <version>${tck.version}</version>
+                                            <type>jar</type>
+                                            <overWrite>true</overWrite>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <!-- We just need the signature file and nothing else -->
+                                    <includes>**/*.sig</includes>
+                                    <outputDirectory>${project.build.directory}/api-signature</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.netbeans.tools</groupId>
+                        <artifactId>sigtest-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <packages>javax.validation,javax.validation.bootstrap,javax.validation.constraints,
+                                javax.validation.constraintvalidation,javax.validation.executable,javax.validation.groups,
+                                javax.validation.metadata,javax.validation.spi,javax.validation.valueextraction
+                            </packages>
+                            <sigfile>${project.build.directory}/api-signature/validation-api-java8.sig</sigfile>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

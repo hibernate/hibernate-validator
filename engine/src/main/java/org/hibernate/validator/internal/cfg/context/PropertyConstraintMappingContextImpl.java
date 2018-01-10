@@ -82,6 +82,11 @@ final class PropertyConstraintMappingContextImpl
 	}
 
 	@Override
+	public PropertyConstraintMappingContext ignoreAnnotations() {
+		return ignoreAnnotations( true );
+	}
+
+	@Override
 	public PropertyConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
 		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsOnMember( member, ignoreAnnotations );
 		return this;
@@ -119,7 +124,7 @@ final class PropertyConstraintMappingContextImpl
 					(Field) member,
 					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-					getCascadingMetaData()
+					getCascadingMetaDataBuilder()
 			);
 		}
 		else {
@@ -128,7 +133,7 @@ final class PropertyConstraintMappingContextImpl
 					(Executable) member,
 					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-					getCascadingMetaData()
+					getCascadingMetaDataBuilder()
 			);
 		}
 	}

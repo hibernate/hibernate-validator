@@ -23,8 +23,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.Mod10CheckDef;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValidator;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
@@ -207,15 +206,15 @@ public class Mod10CheckValidatorTest {
 	}
 
 	private Mod10Check createMod10CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits, int multiplier, int weight) {
-		AnnotationDescriptor<Mod10Check> descriptor = new AnnotationDescriptor<Mod10Check>( Mod10Check.class );
-		descriptor.setValue( "startIndex", start );
-		descriptor.setValue( "endIndex", end );
-		descriptor.setValue( "checkDigitIndex", checkDigitIndex );
-		descriptor.setValue( "ignoreNonDigitCharacters", ignoreNonDigits );
-		descriptor.setValue( "multiplier", multiplier );
-		descriptor.setValue( "weight", weight );
+		ConstraintAnnotationDescriptor.Builder<Mod10Check> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Mod10Check.class );
+		descriptorBuilder.setAttribute( "startIndex", start );
+		descriptorBuilder.setAttribute( "endIndex", end );
+		descriptorBuilder.setAttribute( "checkDigitIndex", checkDigitIndex );
+		descriptorBuilder.setAttribute( "ignoreNonDigitCharacters", ignoreNonDigits );
+		descriptorBuilder.setAttribute( "multiplier", multiplier );
+		descriptorBuilder.setAttribute( "weight", weight );
 
-		return AnnotationFactory.create( descriptor );
+		return descriptorBuilder.build().getAnnotation();
 	}
 
 	private Mod10Check createMod10CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {

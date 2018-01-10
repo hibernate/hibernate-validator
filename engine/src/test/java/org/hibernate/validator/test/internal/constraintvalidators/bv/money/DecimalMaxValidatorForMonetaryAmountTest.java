@@ -6,19 +6,18 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.money;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import javax.money.MonetaryAmount;
 import javax.validation.ConstraintValidator;
 import javax.validation.constraints.DecimalMax;
 
+import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMaxValidatorForMonetaryAmount;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+
 import org.javamoney.moneta.Money;
 import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMaxValidatorForMonetaryAmount;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 /**
  * @author Lukas Niemeier
@@ -71,10 +70,10 @@ public class DecimalMaxValidatorForMonetaryAmountTest {
 	}
 
 	private DecimalMax decimalMax(final String value, final boolean inclusive) {
-		AnnotationDescriptor<DecimalMax> descriptor = new AnnotationDescriptor<>( DecimalMax.class );
-		descriptor.setValue( "value", value );
-		descriptor.setValue( "inclusive", inclusive );
-		return AnnotationFactory.create( descriptor );
+		ConstraintAnnotationDescriptor.Builder<DecimalMax> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( DecimalMax.class );
+		descriptorBuilder.setAttribute( "value", value );
+		descriptorBuilder.setAttribute( "inclusive", inclusive );
+		return descriptorBuilder.build().getAnnotation();
 	}
 
 }

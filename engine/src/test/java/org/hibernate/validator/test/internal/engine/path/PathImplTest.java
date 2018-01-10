@@ -29,6 +29,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
+import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -196,12 +197,13 @@ public class PathImplTest {
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptySet() ),
+				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
 				new MethodValidationConfiguration.Builder().build()
 		);
 
 		ExecutableMetaData executableMetaData = beanMetaDataManager.getBeanMetaData( Container.class )
-				.getMetaDataFor( executable );
+				.getMetaDataFor( executable ).get();
 
 		PathImpl methodParameterPath = PathImpl.createPathForExecutable( executableMetaData );
 
@@ -217,7 +219,7 @@ public class PathImplTest {
 		@Valid
 		Map<Key, Item> store = new HashMap<>();
 
-		public void addItem(Key id, Item item) {
+		public void addItem(@NotNull Key id, @NotNull Item item) {
 			store.put( id, item );
 		}
 	}

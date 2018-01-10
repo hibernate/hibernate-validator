@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv;
 
+import java.lang.invoke.MethodHandles;
 import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
 import javax.validation.ConstraintValidator;
@@ -22,7 +23,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class PatternValidator implements ConstraintValidator<Pattern, CharSequence> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private java.util.regex.Pattern pattern;
 	private String escapedRegexp;
@@ -39,7 +40,7 @@ public class PatternValidator implements ConstraintValidator<Pattern, CharSequen
 			pattern = java.util.regex.Pattern.compile( parameters.regexp(), intFlag );
 		}
 		catch (PatternSyntaxException e) {
-			throw log.getInvalidRegularExpressionException( e );
+			throw LOG.getInvalidRegularExpressionException( e );
 		}
 
 		escapedRegexp = InterpolationHelper.escapeMessageParameter( parameters.regexp() );

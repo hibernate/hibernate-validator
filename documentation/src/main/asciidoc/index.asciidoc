@@ -3,9 +3,11 @@ Hardy Ferentschik; Gunnar Morling; Guillaume Smet
 :doctype: book
 :revdate: {docdate}
 :sectanchors:
+:xrefstyle: full
 :anchor:
 :toc: left
 :toclevels: 3
+:sectnumlevels: 5
 :docinfodir: {docinfodir}
 :docinfo:
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
@@ -38,3 +40,5 @@ include::ch11.asciidoc[]
 include::ch12.asciidoc[]
 
 include::ch13.asciidoc[]
+
+include::ch14.asciidoc[]

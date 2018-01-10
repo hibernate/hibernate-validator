@@ -8,7 +8,9 @@ package org.hibernate.validator.test.internal.engine.cascaded;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -39,7 +41,20 @@ public class CascadingOnClassLevelConstraintTest {
 		Validator validator = ValidatorUtil.getValidator();
 		Set<ConstraintViolation<Bar>> violations = validator.validate( new Bar() );
 
-		assertCorrectPropertyPathStringRepresentations( violations, "foos[0]", "foos[1]" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ValidFoo.class )
+						.withPropertyPath( pathWith()
+								.property( "foos" )
+								.bean( true, null, 0, List.class, 0 )
+
+						),
+				violationOf( ValidFoo.class )
+						.withPropertyPath( pathWith()
+								.property( "foos" )
+								.bean( true, null, 1, List.class, 0 )
+
+						)
+		);
 	}
 
 	@Test
@@ -47,7 +62,20 @@ public class CascadingOnClassLevelConstraintTest {
 		Validator validator = ValidatorUtil.getValidator();
 		Set<ConstraintViolation<BarUsingTypeParameterOnField>> violations = validator.validate( new BarUsingTypeParameterOnField() );
 
-		assertCorrectPropertyPathStringRepresentations( violations, "foos[0]", "foos[1]" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ValidFoo.class )
+						.withPropertyPath( pathWith()
+								.property( "foos" )
+								.bean( true, null, 0, List.class, 0 )
+
+						),
+				violationOf( ValidFoo.class )
+						.withPropertyPath( pathWith()
+								.property( "foos" )
+								.bean( true, null, 1, List.class, 0 )
+
+						)
+		);
 	}
 
 	@Test
@@ -55,7 +83,20 @@ public class CascadingOnClassLevelConstraintTest {
 		Validator validator = ValidatorUtil.getValidator();
 		Set<ConstraintViolation<BarUsingTypeParameterOnGetter>> violations = validator.validate( new BarUsingTypeParameterOnGetter() );
 
-		assertCorrectPropertyPathStringRepresentations( violations, "foos[0]", "foos[1]" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( ValidFoo.class )
+						.withPropertyPath( pathWith()
+								.property( "foos" )
+								.bean( true, null, 0, List.class, 0 )
+
+						),
+				violationOf( ValidFoo.class )
+						.withPropertyPath( pathWith()
+								.property( "foos" )
+								.bean( true, null, 1, List.class, 0 )
+
+						)
+		);
 	}
 
 	@ValidFoo

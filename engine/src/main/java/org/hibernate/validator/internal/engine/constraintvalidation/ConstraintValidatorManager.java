@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,15 +18,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.constraints.Null;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeHelper;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -35,13 +40,14 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class ConstraintValidatorManager {
-	private static final Log LOG = LoggerFactory.make();
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Dummy {@code ConstraintValidator} used as placeholder for the case that for a given context there exists
 	 * no matching constraint validator instance
 	 */
-	private static ConstraintValidator<?, ?> DUMMY_CONSTRAINT_VALIDATOR = new ConstraintValidator<Null, Object>() {
+	static ConstraintValidator<?, ?> DUMMY_CONSTRAINT_VALIDATOR = new ConstraintValidator<Null, Object>() {
 
 		@Override
 		public boolean isValid(Object value, ConstraintValidatorContext context) {
@@ -87,26 +93,30 @@ public class ConstraintValidatorManager {
 	/**
 	 * @param validatedValueType the type of the value to be validated. Cannot be {@code null}.
 	 * @param descriptor the constraint descriptor for which to get an initialized constraint validator. Cannot be {@code null}
-	 * @param constraintFactory constraint factory used to instantiate the constraint validator. Cannot be {@code null}.
+	 * @param constraintValidatorFactory constraint factory used to instantiate the constraint validator. Cannot be {@code null}.
+	 * @param initializationContext context used on constraint validator initialization
 	 * @param <A> the annotation type
 	 *
 	 * @return an initialized constraint validator for the given type and annotation of the value to be validated.
 	 * {@code null} is returned if no matching constraint validator could be found.
 	 */
-	public <A extends Annotation> ConstraintValidator<A, ?> getInitializedValidator(Type validatedValueType,
+	public <A extends Annotation> ConstraintValidator<A, ?> getInitializedValidator(
+			Type validatedValueType,
 			ConstraintDescriptorImpl<A> descriptor,
-			ConstraintValidatorFactory constraintFactory) {
+			ConstraintValidatorFactory constraintValidatorFactory,
+			HibernateConstraintValidatorInitializationContext initializationContext) {
 		Contracts.assertNotNull( validatedValueType );
 		Contracts.assertNotNull( descriptor );
-		Contracts.assertNotNull( constraintFactory );
+		Contracts.assertNotNull( constraintValidatorFactory );
+		Contracts.assertNotNull( initializationContext );
 
-		CacheKey key = new CacheKey( descriptor.getAnnotation(), validatedValueType, constraintFactory );
+		CacheKey key = new CacheKey( descriptor.getAnnotationDescriptor(), validatedValueType, constraintValidatorFactory );
 
 		@SuppressWarnings("unchecked")
 		ConstraintValidator<A, ?> constraintValidator = (ConstraintValidator<A, ?>) constraintValidatorCache.get( key );
 
 		if ( constraintValidator == null ) {
-			constraintValidator = createAndInitializeValidator( validatedValueType, descriptor, constraintFactory );
+			constraintValidator = createAndInitializeValidator( validatedValueType, descriptor, constraintValidatorFactory, initializationContext );
 			constraintValidator = cacheValidator( key, constraintValidator );
 		}
 		else {
@@ -119,12 +129,12 @@ public class ConstraintValidatorManager {
 	private <A extends Annotation> ConstraintValidator<A, ?> cacheValidator(CacheKey key,
 			ConstraintValidator<A, ?> constraintValidator) {
 		// we only cache constraint validator instances for the default and most recently used factory
-		if ( key.constraintFactory != defaultConstraintValidatorFactory && key.constraintFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) {
+		if ( key.constraintValidatorFactory != defaultConstraintValidatorFactory && key.constraintValidatorFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) {
 
 			synchronized ( mostRecentlyUsedNonDefaultConstraintValidatorFactoryMutex ) {
-				if ( key.constraintFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) {
+				if ( key.constraintValidatorFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) {
 					clearEntriesForFactory( mostRecentlyUsedNonDefaultConstraintValidatorFactory );
-					mostRecentlyUsedNonDefaultConstraintValidatorFactory = key.constraintFactory;
+					mostRecentlyUsedNonDefaultConstraintValidatorFactory = key.constraintValidatorFactory;
 				}
 			}
 		}
@@ -136,9 +146,11 @@ public class ConstraintValidatorManager {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <A extends Annotation> ConstraintValidator<A, ?> createAndInitializeValidator(Type validatedValueType,
+	private <A extends Annotation> ConstraintValidator<A, ?> createAndInitializeValidator(
+			Type validatedValueType,
 			ConstraintDescriptorImpl<A> descriptor,
-			ConstraintValidatorFactory constraintFactory) {
+			ConstraintValidatorFactory constraintValidatorFactory,
+			HibernateConstraintValidatorInitializationContext initializationContext) {
 
 		ConstraintValidatorDescriptor<A> validatorDescriptor = findMatchingValidatorDescriptor( descriptor, validatedValueType );
 		ConstraintValidator<A, ?> constraintValidator;
@@ -147,20 +159,20 @@ public class ConstraintValidatorManager {
 			constraintValidator = (ConstraintValidator<A, ?>) DUMMY_CONSTRAINT_VALIDATOR;
 		}
 		else {
-			constraintValidator = validatorDescriptor.newInstance( constraintFactory );
-			initializeValidator( descriptor, constraintValidator );
+			constraintValidator = validatorDescriptor.newInstance( constraintValidatorFactory );
+			initializeValidator( descriptor, constraintValidator, initializationContext );
 		}
 
 		return constraintValidator;
 	}
 
-	private void clearEntriesForFactory(ConstraintValidatorFactory constraintFactory) {
+	private void clearEntriesForFactory(ConstraintValidatorFactory constraintValidatorFactory) {
 		Iterator<Entry<CacheKey, ConstraintValidator<?, ?>>> cacheEntries = constraintValidatorCache.entrySet().iterator();
 
 		while ( cacheEntries.hasNext() ) {
 			Entry<CacheKey, ConstraintValidator<?, ?>> cacheEntry = cacheEntries.next();
-			if ( cacheEntry.getKey().getConstraintFactory() == constraintFactory ) {
-				constraintFactory.releaseInstance( cacheEntry.getValue() );
+			if ( cacheEntry.getKey().getConstraintValidatorFactory() == constraintValidatorFactory ) {
+				constraintValidatorFactory.releaseInstance( cacheEntry.getValue() );
 				cacheEntries.remove();
 			}
 		}
@@ -168,7 +180,7 @@ public class ConstraintValidatorManager {
 
 	public void clear() {
 		for ( Map.Entry<CacheKey, ConstraintValidator<?, ?>> entry : constraintValidatorCache.entrySet() ) {
-			entry.getKey().getConstraintFactory().releaseInstance( entry.getValue() );
+			entry.getKey().getConstraintValidatorFactory().releaseInstance( entry.getValue() );
 		}
 		constraintValidatorCache.clear();
 	}
@@ -220,11 +232,20 @@ public class ConstraintValidatorManager {
 		return determinedSuitableTypes;
 	}
 
-	private <A extends Annotation> void initializeValidator(ConstraintDescriptor<A> descriptor, ConstraintValidator<A, ?> constraintValidator) {
+	private <A extends Annotation> void initializeValidator(
+			ConstraintDescriptor<A> descriptor,
+			ConstraintValidator<A, ?> constraintValidator,
+			HibernateConstraintValidatorInitializationContext initializationContext) {
 		try {
+			if ( constraintValidator instanceof HibernateConstraintValidator ) {
+				( (HibernateConstraintValidator<A, ?>) constraintValidator ).initialize( descriptor, initializationContext );
+			}
 			constraintValidator.initialize( descriptor.getAnnotation() );
 		}
 		catch (RuntimeException e) {
+			if ( e instanceof ConstraintDeclarationException ) {
+				throw e;
+			}
 			throw LOG.getUnableToInitializeConstraintValidatorException( constraintValidator.getClass(), e );
 		}
 	}
@@ -233,7 +254,7 @@ public class ConstraintValidatorManager {
 	 * Tries to reduce all assignable classes down to a single class.
 	 *
 	 * @param assignableTypes The set of all classes which are assignable to the class of the value to be validated and
-	 * which are handled by at least one of the  validators for the specified constraint.
+	 * which are handled by at least one of the validators for the specified constraint.
 	 */
 	private void resolveAssignableTypes(List<Type> assignableTypes) {
 		if ( assignableTypes.size() == 0 || assignableTypes.size() == 1 ) {
@@ -257,20 +278,20 @@ public class ConstraintValidatorManager {
 	}
 
 	private static final class CacheKey {
-		private final Annotation annotation;
+		private final ConstraintAnnotationDescriptor<?> annotationDescriptor;
 		private final Type validatedType;
-		private final ConstraintValidatorFactory constraintFactory;
+		private final ConstraintValidatorFactory constraintValidatorFactory;
 		private final int hashCode;
 
-		private CacheKey(Annotation annotation, Type validatorType, ConstraintValidatorFactory constraintFactory) {
-			this.annotation = annotation;
+		private CacheKey(ConstraintAnnotationDescriptor<?> annotationDescriptor, Type validatorType, ConstraintValidatorFactory constraintValidatorFactory) {
+			this.annotationDescriptor = annotationDescriptor;
 			this.validatedType = validatorType;
-			this.constraintFactory = constraintFactory;
+			this.constraintValidatorFactory = constraintValidatorFactory;
 			this.hashCode = createHashCode();
 		}
 
-		public ConstraintValidatorFactory getConstraintFactory() {
-			return constraintFactory;
+		public ConstraintValidatorFactory getConstraintValidatorFactory() {
+			return constraintValidatorFactory;
 		}
 
 		@Override
@@ -284,13 +305,13 @@ public class ConstraintValidatorManager {
 
 			CacheKey cacheKey = (CacheKey) o;
 
-			if ( annotation != null ? !annotation.equals( cacheKey.annotation ) : cacheKey.annotation != null ) {
+			if ( !annotationDescriptor.equals( cacheKey.annotationDescriptor ) ) {
 				return false;
 			}
-			if ( constraintFactory != null ? !constraintFactory.equals( cacheKey.constraintFactory ) : cacheKey.constraintFactory != null ) {
+			if ( !validatedType.equals( cacheKey.validatedType ) ) {
 				return false;
 			}
-			if ( validatedType != null ? !validatedType.equals( cacheKey.validatedType ) : cacheKey.validatedType != null ) {
+			if ( !constraintValidatorFactory.equals( cacheKey.constraintValidatorFactory ) ) {
 				return false;
 			}
 
@@ -303,9 +324,9 @@ public class ConstraintValidatorManager {
 		}
 
 		private int createHashCode() {
-			int result = annotation != null ? annotation.hashCode() : 0;
-			result = 31 * result + ( validatedType != null ? validatedType.hashCode() : 0 );
-			result = 31 * result + ( constraintFactory != null ? constraintFactory.hashCode() : 0 );
+			int result = annotationDescriptor.hashCode();
+			result = 31 * result + validatedType.hashCode();
+			result = 31 * result + constraintValidatorFactory.hashCode();
 			return result;
 		}
 	}

@@ -11,13 +11,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.reflect.Method;
 
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 
 /**
  * @author Gunnar Morling
@@ -26,17 +23,17 @@ public class AnnotationProxyTest {
 
 	private MyAnno realAnnotation;
 
-	private AnnotationDescriptor<MyAnno> descriptor;
+	private AnnotationDescriptor.Builder<MyAnno> descriptorBuilder;
 
 	@BeforeMethod
 	public void setupAnnotations() throws Exception {
 		realAnnotation = Foo.class.getAnnotation( MyAnno.class );
-		descriptor = getDescriptorFromAnnotation( realAnnotation );
+		descriptorBuilder = getDescriptorBuilderFromAnnotation( realAnnotation );
 	}
 
 	@Test
 	public void testEqualsAnnotationsAreEqual() {
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isEqualTo( proxiedAnnotation );
@@ -45,27 +42,27 @@ public class AnnotationProxyTest {
 
 	@Test
 	public void testEqualsAnnotationsAreSame() {
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isEqualTo( proxiedAnnotation );
 	}
 
 	@Test
 	public void testEqualsCheckNull() {
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( null );
 	}
 
 	@Test
 	public void testEqualsAnnotationTypesDiffer() {
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		MyOtherAnno anotherAnnotation = Baz.class.getAnnotation( MyOtherAnno.class );
-		AnnotationDescriptor<MyOtherAnno> anotherDescriptor = getDescriptorFromAnnotation(
+		AnnotationDescriptor.Builder<MyOtherAnno> anotherDescriptor = getDescriptorBuilderFromAnnotation(
 				anotherAnnotation
 		);
-		MyOtherAnno anotherProxiedAnnotation = AnnotationFactory.create( anotherDescriptor );
+		MyOtherAnno anotherProxiedAnnotation = anotherDescriptor.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( anotherProxiedAnnotation );
 		assertThat( anotherProxiedAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -74,8 +71,8 @@ public class AnnotationProxyTest {
 
 	@Test
 	public void testEqualsPrimitiveMembersDiffer() {
-		descriptor.setValue( "int_", 42 );
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "int_", 42 );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -85,9 +82,9 @@ public class AnnotationProxyTest {
 	@Test
 	public void testEqualsDoubleNaNEqualsItself() throws Exception {
 		realAnnotation = Bar.class.getMethod( "nanDouble" ).getAnnotation( MyAnno.class );
-		descriptor = getDescriptorFromAnnotation( realAnnotation );
+		descriptorBuilder = getDescriptorBuilderFromAnnotation( realAnnotation );
 
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isEqualTo( proxiedAnnotation );
@@ -97,10 +94,10 @@ public class AnnotationProxyTest {
 	@Test
 	public void testEqualsDoubleZeroNotEqualToMinusZero() throws Exception {
 		realAnnotation = Bar.class.getMethod( "zeroDouble" ).getAnnotation( MyAnno.class );
-		descriptor = getDescriptorFromAnnotation( realAnnotation );
-		descriptor.setValue( "double_", -0.0 );
+		descriptorBuilder = getDescriptorBuilderFromAnnotation( realAnnotation );
+		descriptorBuilder.setAttribute( "double_", -0.0 );
 
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -110,9 +107,9 @@ public class AnnotationProxyTest {
 	@Test
 	public void testEqualsFloatNaNEqualsItself() throws Exception {
 		realAnnotation = Bar.class.getMethod( "nanFloat" ).getAnnotation( MyAnno.class );
-		descriptor = getDescriptorFromAnnotation( realAnnotation );
+		descriptorBuilder = getDescriptorBuilderFromAnnotation( realAnnotation );
 
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isEqualTo( proxiedAnnotation );
@@ -122,10 +119,10 @@ public class AnnotationProxyTest {
 	@Test
 	public void testEqualsFloatZeroNotEqualToMinusZero() throws Exception {
 		realAnnotation = Bar.class.getMethod( "zeroFloat" ).getAnnotation( MyAnno.class );
-		descriptor = getDescriptorFromAnnotation( realAnnotation );
-		descriptor.setValue( "float_", -0.0f );
+		descriptorBuilder = getDescriptorBuilderFromAnnotation( realAnnotation );
+		descriptorBuilder.setAttribute( "float_", -0.0f );
 
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -134,8 +131,8 @@ public class AnnotationProxyTest {
 
 	@Test
 	public void testEqualsStringMembersDiffer() {
-		descriptor.setValue( "string", "Bar" );
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "string", "Bar" );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -144,8 +141,8 @@ public class AnnotationProxyTest {
 
 	@Test
 	public void testEqualsClassMembersDiffer() {
-		descriptor.setValue( "class_", Integer.class );
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "class_", Integer.class );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -154,8 +151,8 @@ public class AnnotationProxyTest {
 
 	@Test
 	public void testEqualsBooleanArrayMembersDiffer() {
-		descriptor.setValue( "booleans", new boolean[] { } );
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "booleans", new boolean[] { } );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -164,8 +161,8 @@ public class AnnotationProxyTest {
 
 	@Test
 	public void testEqualsByteArrayMembersDiffer() {
-		descriptor.setValue( "bytes", new byte[] { } );
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "bytes", new byte[] { } );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -174,8 +171,8 @@ public class AnnotationProxyTest {
 
 	@Test
 	public void testEqualsCharArrayMembersDiffer() {
-		descriptor.setValue( "chars", new char[] { } );
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "chars", new char[] { } );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -184,8 +181,8 @@ public class AnnotationProxyTest {
 
 	@Test
 	public void testEqualsDoubleArrayMembersDiffer() {
-		descriptor.setValue( "doubles", new double[] { } );
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "doubles", new double[] { } );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -194,8 +191,8 @@ public class AnnotationProxyTest {
 
 	@Test
 	public void testEqualsFloatArrayMembersDiffer() {
-		descriptor.setValue( "floats", new float[] { } );
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "floats", new float[] { } );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -204,8 +201,8 @@ public class AnnotationProxyTest {
 
 	@Test
 	public void testEqualsIntArrayMembersDiffer() {
-		descriptor.setValue( "ints", new int[] { } );
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "ints", new int[] { } );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -214,8 +211,8 @@ public class AnnotationProxyTest {
 
 	@Test
 	public void testEqualsLongArrayMembersDiffer() {
-		descriptor.setValue( "longs", new long[] { } );
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "longs", new long[] { } );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -224,8 +221,8 @@ public class AnnotationProxyTest {
 
 	@Test
 	public void testEqualsShortArrayMembersDiffer() {
-		descriptor.setValue( "shorts", new short[] { } );
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "shorts", new short[] { } );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -234,8 +231,8 @@ public class AnnotationProxyTest {
 
 	@Test
 	public void testEqualsClassArrayMembersDiffer() {
-		descriptor.setValue( "classes", new Class<?>[] { } );
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "classes", new Class<?>[] { } );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation ).isNotEqualTo( realAnnotation );
 		assertThat( realAnnotation ).isNotEqualTo( proxiedAnnotation );
@@ -244,7 +241,7 @@ public class AnnotationProxyTest {
 
 	@Test
 	public void testHashCode() {
-		MyAnno proxiedAnnotation = AnnotationFactory.create( descriptor );
+		MyAnno proxiedAnnotation = descriptorBuilder.build().getAnnotation();
 
 		assertThat( proxiedAnnotation.hashCode() ).isEqualTo( realAnnotation.hashCode() );
 	}
@@ -256,25 +253,8 @@ public class AnnotationProxyTest {
 	 *
 	 * @return A descriptor for the given annotation.
 	 */
-	private <A extends Annotation> AnnotationDescriptor<A> getDescriptorFromAnnotation(A annotation) {
-		@SuppressWarnings("unchecked")
-		Class<A> annotationType = (Class<A>) annotation.annotationType();
-
-		AnnotationDescriptor<A> descriptor = new AnnotationDescriptor<A>( annotationType );
-
-		for ( Method method : GetDeclaredMethods.action( annotationType ).run() ) {
-			try {
-				descriptor.setValue( method.getName(), method.invoke( annotation ) );
-			}
-			catch (RuntimeException e) {
-				throw e;
-			}
-			catch (Exception e) {
-				throw new RuntimeException( e );
-			}
-		}
-
-		return descriptor;
+	private <A extends Annotation> AnnotationDescriptor.Builder<A> getDescriptorBuilderFromAnnotation(A annotation) {
+		return new AnnotationDescriptor.Builder<A>( annotation );
 	}
 
 	@MyAnno

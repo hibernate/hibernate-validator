@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.time.past;
 
+import java.time.Duration;
 import java.time.Instant;
 
 import javax.validation.constraints.Past;
@@ -25,4 +26,8 @@ public abstract class AbstractPastInstantBasedValidator<T> extends AbstractInsta
 		return result < 0;
 	}
 
+	@Override
+	protected Duration getEffectiveTemporalValidationTolerance(Duration absoluteTemporalValidationTolerance) {
+		return absoluteTemporalValidationTolerance;
+	}
 }

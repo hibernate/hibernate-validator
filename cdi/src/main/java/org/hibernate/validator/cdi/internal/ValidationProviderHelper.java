@@ -82,7 +82,7 @@ public class ValidationProviderHelper {
 	/**
 	 * Whether the given provider is Hibernate Validator or not.
 	 */
-	boolean isHibernateValidator() {
+	public boolean isHibernateValidator() {
 		return isHibernateValidator;
 	}
 

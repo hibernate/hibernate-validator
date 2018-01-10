@@ -6,8 +6,11 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
+import static org.testng.Assert.assertEquals;
+
 import java.util.Collections;
 import java.util.Locale;
+
 import javax.validation.MessageInterpolator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -15,14 +18,12 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
 
 /**
  * Tests for message interpolation using EL.
@@ -38,21 +39,19 @@ public class ExpressionLanguageMessageInterpolationTest {
 	@BeforeTest
 	public void setUp() {
 		// Create some annotations for testing using AnnotationProxies
-		AnnotationDescriptor<NotNull> descriptor = new AnnotationDescriptor<NotNull>( NotNull.class );
-		NotNull notNull = AnnotationFactory.create( descriptor );
-		notNullDescriptor = new ConstraintDescriptorImpl<NotNull>(
+		ConstraintAnnotationDescriptor.Builder<NotNull> notNullAnnotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( NotNull.class );
+		notNullDescriptor = new ConstraintDescriptorImpl<>(
 				new ConstraintHelper(),
 				null,
-				notNull,
+				notNullAnnotationDescriptorBuilder.build(),
 				java.lang.annotation.ElementType.FIELD
 		);
 
-		AnnotationDescriptor<Size> sizeAnnotationDescriptor = new AnnotationDescriptor<Size>( Size.class );
-		Size size = AnnotationFactory.create( sizeAnnotationDescriptor );
-		sizeDescriptor = new ConstraintDescriptorImpl<Size>(
+		ConstraintAnnotationDescriptor.Builder<Size> sizeAnnotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Size.class );
+		sizeDescriptor = new ConstraintDescriptorImpl<>(
 				new ConstraintHelper(),
 				null,
-				size,
+				sizeAnnotationDescriptorBuilder.build(),
 				java.lang.annotation.ElementType.FIELD
 		);
 

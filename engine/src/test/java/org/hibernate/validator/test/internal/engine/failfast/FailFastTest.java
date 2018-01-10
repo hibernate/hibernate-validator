@@ -16,6 +16,7 @@ import static org.testng.Assert.fail;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -54,7 +55,8 @@ import org.testng.annotations.Test;
  * @author Hardy Ferentschik
  */
 public class FailFastTest {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private final A testInstance = new A();
 
 	@Test

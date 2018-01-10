@@ -11,7 +11,7 @@ import java.util.Set;
 import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
 
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
 /**
@@ -75,7 +75,7 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 * Returns the cascading metadata (e.g. {@link Valid} and {@link ConvertGroup}) for the element and the potential
 	 * container elements.
 	 */
-	CascadingTypeParameter getCascadingMetaData();
+	CascadingMetaDataBuilder getCascadingMetaDataBuilder();
 
 	/**
 	 * Whether this element is constrained or not. This is the case, if this

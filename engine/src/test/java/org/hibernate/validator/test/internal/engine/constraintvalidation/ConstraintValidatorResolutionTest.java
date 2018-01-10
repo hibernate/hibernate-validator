@@ -54,13 +54,13 @@ public class ConstraintValidatorResolutionTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-623")
-	public void validatorForParametrizedTypeIsCorrectlyResolved() {
+	public void validatorForParameterizedTypeIsCorrectlyResolved() {
 
 		//given
 		constraintMapping.type( Value.class )
 				.constraint(
-						new GenericConstraintDef<ConstraintWithParametrizedValidator>(
-								ConstraintWithParametrizedValidator.class
+						new GenericConstraintDef<ConstraintWithParameterizedValidator>(
+								ConstraintWithParameterizedValidator.class
 						)
 				);
 
@@ -71,7 +71,7 @@ public class ConstraintValidatorResolutionTest {
 
 		//then
 		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( ConstraintWithParametrizedValidator.class )
+				violationOf( ConstraintWithParameterizedValidator.class )
 		);
 	}
 
@@ -95,25 +95,24 @@ public class ConstraintValidatorResolutionTest {
 	}
 
 	/**
-	 * As per the JLS, {@code Value<T>} is a sub-type of of the raw type
+	 * As per the JLS, {@code Value<T>} is a sub-type of the raw type
 	 * {@code Value}. Therefore
-	 * {@link ParametrizedValidatorForConstraintWithRawAndParametrizedValidator}
+	 * {@link ParameterizedValidatorForConstraintWithRawAndParameterizedValidator}
 	 * is more specific than
-	 * {@link RawValidatorForConstraintWithRawAndParametrizedValidator}.
+	 * {@link RawValidatorForConstraintWithRawAndParameterizedValidator}.
 	 *
 	 * @see <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-4.html#jls-4.10.2">JLS</a> (subtyping)
 	 * @see <a href="http://beanvalidation.org/2.0/spec/#typevalidatorresolution">BV spec</a> (constraint validator resolution)
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HV-623")
-
-	public void parametrizedValidatorHasPrecedenceOverRawValidator() {
+	public void parameterizedValidatorHasPrecedenceOverRawValidator() {
 
 		//given
 		constraintMapping.type( Value.class )
 				.constraint(
-						new GenericConstraintDef<ConstraintWithRawAndParametrizedValidator>(
-								ConstraintWithRawAndParametrizedValidator.class
+						new GenericConstraintDef<ConstraintWithRawAndParameterizedValidator>(
+								ConstraintWithRawAndParameterizedValidator.class
 						)
 				);
 
@@ -124,7 +123,7 @@ public class ConstraintValidatorResolutionTest {
 
 		//then
 		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( ConstraintWithRawAndParametrizedValidator.class ).withMessage( "ParametrizedValidatorForConstraintWithRawAndParametrizedValidator" )
+				violationOf( ConstraintWithRawAndParameterizedValidator.class ).withMessage( "ParameterizedValidatorForConstraintWithRawAndParameterizedValidator" )
 		);
 	}
 
@@ -133,9 +132,9 @@ public class ConstraintValidatorResolutionTest {
 
 	@Target({ TYPE, ANNOTATION_TYPE })
 	@Retention(RetentionPolicy.RUNTIME)
-	@Constraint(validatedBy = ParametrizedValidator.class)
+	@Constraint(validatedBy = ParameterizedValidator.class)
 	@Documented
-	public @interface ConstraintWithParametrizedValidator {
+	public @interface ConstraintWithParameterizedValidator {
 		String message() default "foo";
 
 		Class<?>[] groups() default { };
@@ -143,8 +142,8 @@ public class ConstraintValidatorResolutionTest {
 		Class<? extends Payload>[] payload() default { };
 	}
 
-	public static class ParametrizedValidator
-			implements ConstraintValidator<ConstraintWithParametrizedValidator, Value<?>> {
+	public static class ParameterizedValidator
+			implements ConstraintValidator<ConstraintWithParameterizedValidator, Value<?>> {
 
 		@Override
 		public boolean isValid(Value<?> settingValue, ConstraintValidatorContext context) {
@@ -176,11 +175,11 @@ public class ConstraintValidatorResolutionTest {
 	@Target({ TYPE, ANNOTATION_TYPE })
 	@Retention(RetentionPolicy.RUNTIME)
 	@Constraint(validatedBy = {
-			RawValidatorForConstraintWithRawAndParametrizedValidator.class,
-			ParametrizedValidatorForConstraintWithRawAndParametrizedValidator.class
+			RawValidatorForConstraintWithRawAndParameterizedValidator.class,
+			ParameterizedValidatorForConstraintWithRawAndParameterizedValidator.class
 	})
 	@Documented
-	public @interface ConstraintWithRawAndParametrizedValidator {
+	public @interface ConstraintWithRawAndParameterizedValidator {
 		String message() default "foo";
 
 		Class<?>[] groups() default { };
@@ -188,27 +187,27 @@ public class ConstraintValidatorResolutionTest {
 		Class<? extends Payload>[] payload() default { };
 	}
 
-	public static class ParametrizedValidatorForConstraintWithRawAndParametrizedValidator
-			implements ConstraintValidator<ConstraintWithRawAndParametrizedValidator, Value<?>> {
+	public static class ParameterizedValidatorForConstraintWithRawAndParameterizedValidator
+			implements ConstraintValidator<ConstraintWithRawAndParameterizedValidator, Value<?>> {
 
 		@Override
 		public boolean isValid(Value<?> value, ConstraintValidatorContext context) {
 			context.disableDefaultConstraintViolation();
 			context.buildConstraintViolationWithTemplate(
-					"ParametrizedValidatorForConstraintWithRawAndParametrizedValidator"
+					"ParameterizedValidatorForConstraintWithRawAndParameterizedValidator"
 			).addConstraintViolation();
 			return false;
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static class RawValidatorForConstraintWithRawAndParametrizedValidator
-			implements ConstraintValidator<ConstraintWithRawAndParametrizedValidator, Value> {
+	public static class RawValidatorForConstraintWithRawAndParameterizedValidator
+			implements ConstraintValidator<ConstraintWithRawAndParameterizedValidator, Value> {
 
 		@Override
 		public boolean isValid(Value value, ConstraintValidatorContext context) {
 			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate( "RawValidatorForConstraintWithRawAndParametrizedValidator" )
+			context.buildConstraintViolationWithTemplate( "RawValidatorForConstraintWithRawAndParameterizedValidator" )
 					.addConstraintViolation();
 			return false;
 		}

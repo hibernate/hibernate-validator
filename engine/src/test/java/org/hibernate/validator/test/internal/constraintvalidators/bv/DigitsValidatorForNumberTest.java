@@ -6,16 +6,18 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
-import java.math.BigDecimal;
-import javax.validation.constraints.Digits;
-
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import org.testng.annotations.Test;
+
+import java.math.BigDecimal;
+
+import javax.validation.constraints.Digits;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForNumber;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * @author Alaa Nassef
@@ -23,14 +25,19 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory
  */
 public class DigitsValidatorForNumberTest {
 
+	private ConstraintAnnotationDescriptor.Builder<Digits> descriptorBuilder;
+
+	@BeforeMethod
+	public void setUp() throws Exception {
+		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Digits.class );
+		descriptorBuilder.setMessage( "{validator.digits}" );
+	}
+
 	@Test
 	public void testIsValid() {
-
-		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );
-		descriptor.setValue( "integer", 5 );
-		descriptor.setValue( "fraction", 2 );
-		descriptor.setValue( "message", "{validator.digits}" );
-		Digits p = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "integer", 5 );
+		descriptorBuilder.setAttribute( "fraction", 2 );
+		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
 		constraint.initialize( p );
@@ -53,12 +60,9 @@ public class DigitsValidatorForNumberTest {
 
 	@Test
 	public void testIsValidZeroLength() {
-
-		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );
-		descriptor.setValue( "integer", 0 );
-		descriptor.setValue( "fraction", 0 );
-		descriptor.setValue( "message", "{validator.digits}" );
-		Digits p = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "integer", 0 );
+		descriptorBuilder.setAttribute( "fraction", 0 );
+		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
 		constraint.initialize( p );
@@ -71,12 +75,9 @@ public class DigitsValidatorForNumberTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNegativeIntegerLength() {
-
-		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );
-		descriptor.setValue( "integer", -1 );
-		descriptor.setValue( "fraction", 1 );
-		descriptor.setValue( "message", "{validator.digits}" );
-		Digits p = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "integer", -1 );
+		descriptorBuilder.setAttribute( "fraction", 1 );
+		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
 		constraint.initialize( p );
@@ -84,12 +85,9 @@ public class DigitsValidatorForNumberTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNegativeFractionLength() {
-
-		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );
-		descriptor.setValue( "integer", 1 );
-		descriptor.setValue( "fraction", -1 );
-		descriptor.setValue( "message", "{validator.digits}" );
-		Digits p = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "integer", 1 );
+		descriptorBuilder.setAttribute( "fraction", -1 );
+		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
 		constraint.initialize( p );
@@ -97,11 +95,9 @@ public class DigitsValidatorForNumberTest {
 
 	@Test
 	public void testTrailingZerosAreTrimmed() {
-		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );
-		descriptor.setValue( "integer", 12 );
-		descriptor.setValue( "fraction", 3 );
-		descriptor.setValue( "message", "{validator.digits}" );
-		Digits p = AnnotationFactory.create( descriptor );
+		descriptorBuilder.setAttribute( "integer", 12 );
+		descriptorBuilder.setAttribute( "fraction", 3 );
+		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
 		constraint.initialize( p );

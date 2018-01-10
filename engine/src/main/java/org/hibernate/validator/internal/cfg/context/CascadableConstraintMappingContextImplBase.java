@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.cfg.context;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -23,7 +24,7 @@ import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingCont
 import org.hibernate.validator.cfg.context.ContainerElementTarget;
 import org.hibernate.validator.cfg.context.GroupConversionTargetContext;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -41,7 +42,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C>>
 		extends ConstraintMappingContextImplBase implements Cascadable<C> {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Type configuredType;
 	protected boolean isCascading;
@@ -155,25 +156,20 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 			.collect( Collectors.toSet() );
 	}
 
-	protected CascadingTypeParameter getCascadingMetaData() {
-		Map<TypeVariable<?>, CascadingTypeParameter> typeParametersCascadingMetaData = containerElementContexts.values().stream()
-				.filter( c -> c.getCascadingTypeParameter() != null )
-				.collect( Collectors.toMap( c -> c.getCascadingTypeParameter().getTypeParameter(), c -> c.getCascadingTypeParameter() ) );
+	protected CascadingMetaDataBuilder getCascadingMetaDataBuilder() {
+		Map<TypeVariable<?>, CascadingMetaDataBuilder> typeParametersCascadingMetaData = containerElementContexts.values().stream()
+				.filter( c -> c.getContainerElementCascadingMetaDataBuilder() != null )
+				.collect( Collectors.toMap( c -> c.getContainerElementCascadingMetaDataBuilder().getTypeParameter(),
+						c -> c.getContainerElementCascadingMetaDataBuilder() ) );
 
 		for ( ContainerElementConstraintMappingContextImpl typeArgumentContext : containerElementContexts.values() ) {
-			CascadingTypeParameter cascadingTypeParameter = typeArgumentContext.getCascadingTypeParameter();
-			if ( cascadingTypeParameter != null ) {
-				typeParametersCascadingMetaData.put( cascadingTypeParameter.getTypeParameter(), cascadingTypeParameter );
+			CascadingMetaDataBuilder cascadingMetaDataBuilder = typeArgumentContext.getContainerElementCascadingMetaDataBuilder();
+			if ( cascadingMetaDataBuilder != null ) {
+				typeParametersCascadingMetaData.put( cascadingMetaDataBuilder.getTypeParameter(), cascadingMetaDataBuilder );
 			}
 		}
 
-
-		boolean isArray = TypeHelper.isArray( configuredType );
-		CascadingTypeParameter cascadingMetaData = isArray
-				? CascadingTypeParameter.arrayElement( configuredType, isCascading, typeParametersCascadingMetaData, groupConversions )
-				: CascadingTypeParameter.annotatedObject( configuredType, isCascading, typeParametersCascadingMetaData, groupConversions );
-
-		return cascadingMetaData;
+		return CascadingMetaDataBuilder.annotatedObject( configuredType, isCascading, typeParametersCascadingMetaData, groupConversions );
 	}
 
 	private static class ContainerElementPathKey {

@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.cfg.context;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Executable;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +17,7 @@ import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContex
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -37,7 +38,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 abstract class ExecutableConstraintMappingContextImpl {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected final TypeConstraintMappingContextImpl<?> typeContext;
 	protected final Executable executable;
@@ -53,13 +54,13 @@ abstract class ExecutableConstraintMappingContextImpl {
 
 	public ParameterConstraintMappingContext parameter(int index) {
 		if ( index < 0 || index >= executable.getParameterTypes().length ) {
-			throw log.getInvalidExecutableParameterIndexException( executable, index );
+			throw LOG.getInvalidExecutableParameterIndexException( executable, index );
 		}
 
 		ParameterConstraintMappingContextImpl context = parameterContexts[index];
 
 		if ( context != null ) {
-			throw log.getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(
+			throw LOG.getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass(),
 					executable,
 					index
@@ -73,7 +74,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 
 	public CrossParameterConstraintMappingContext crossParameter() {
 		if ( crossParameterContext != null ) {
-			throw log.getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(
+			throw LOG.getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass(),
 					executable
 			);
@@ -85,7 +86,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 
 	public ReturnValueConstraintMappingContext returnValue() {
 		if ( returnValueContext != null ) {
-			throw log.getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(
+			throw LOG.getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass(),
 					executable
 			);
@@ -112,7 +113,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ) : Collections.<MetaConstraint<?>>emptySet(),
-				returnValueContext != null ? returnValueContext.getCascadingMetaData() : CascadingTypeParameter.nonCascading()
+				returnValueContext != null ? returnValueContext.getCascadingMetaDataBuilder() : CascadingMetaDataBuilder.nonCascading()
 		);
 	}
 

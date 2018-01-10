@@ -10,7 +10,7 @@
 
     <groupId>org.hibernate.validator</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
-    <version>6.0.0-SNAPSHOT</version>
+    <version>6.0.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Validator Aggregator</name>
@@ -60,6 +60,12 @@
             <organization>Red Hat, Inc.</organization>
             <url>http://in.relation.to/guillaume-smet/</url>
         </developer>
+        <developer>
+            <id>marko.bekhta</id>
+            <name>Marko Bekhta</name>
+            <email>marko.prykladna@gmail.com</email>
+            <url>http://in.relation.to/marko-bekhta/</url>
+        </developer>
     </developers>
 
     <contributors>
@@ -93,22 +99,34 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
+        <!-- Module names used for Java 9 modules and OSGi bundles -->
+        <hibernate-validator.module-name>org.hibernate.validator</hibernate-validator.module-name>
+        <hibernate-validator-cdi.module-name>org.hibernate.validator.cdi</hibernate-validator-cdi.module-name>
+        <!-- TODO in 6.1: make the names consistent by removing the bundle properties, see HV-1484 -->
+        <hibernate-validator.bundle-name>org.hibernate.validator.hibernate-validator</hibernate-validator.bundle-name>
+        <hibernate-validator-cdi.bundle-name>org.hibernate.validator.hibernate-validator-cdi</hibernate-validator-cdi.bundle-name>
+
         <!-- see http://maven.apache.org/general.html -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- No need to build the javadocs per module. Aggregated javadocs are build in the distribution module. See also HV-894 -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
-        <bv.api.version>2.0.0.CR3</bv.api.version>
+        <bv.api.version>2.0.1.Final</bv.api.version>
+        <tck.version>2.0.1.Final</tck.version>
+
         <!-- Version to be used as baseline for API/SPI change reports -->
-        <previous.stable>5.4.1.Final</previous.stable>
+        <previous.stable>6.0.4.Final</previous.stable>
 
         <paranamer.version>2.8</paranamer.version>
         <javax.el.version>3.0.1-b08</javax.el.version>
         <jboss.logging.version>3.3.0.Final</jboss.logging.version>
         <jboss.logging.processor.version>2.0.2.Final</jboss.logging.processor.version>
 
+        <!-- Currently supported version of WildFly -->
         <wildfly.version>10.1.0.Final</wildfly.version>
+        <!-- Used to create a patch file for WildFly next -->
+        <wildfly-next.version>11.0.0.Final</wildfly-next.version>
 
         <!--
             These dependencies should be aligned with the ones from the WildFly version we support
@@ -135,16 +153,16 @@
         <moneta.version>1.1</moneta.version>
 
         <!-- WildFly patching infrastructure -->
-        <wildfly-patch-gen-maven-plugin.version>2.0.1.Alpha3</wildfly-patch-gen-maven-plugin.version>
+        <wildfly-patch-gen-maven-plugin.version>2.0.1.Alpha5</wildfly-patch-gen-maven-plugin.version>
         <wildfly-patch-gen-maven-plugin.woodstox.version>5.0.3</wildfly-patch-gen-maven-plugin.woodstox.version>
-        <wildfly-maven-plugin.version>1.1.0.Alpha11</wildfly-maven-plugin.version>
-        <wildfly-core.version>1.0.1.Final</wildfly-core.version>
+        <wildfly-maven-plugin.version>1.2.0.Alpha6</wildfly-maven-plugin.version>
+        <wildfly-core.version>3.0.0.Beta27</wildfly-core.version>
 
         <!-- Test dependencies -->
         <arquillian.version>1.1.11.Final</arquillian.version>
         <testng.version>6.8</testng.version>
         <!-- it must be the exact same version than the one used in the Bean Validation TCK -->
-        <assertj-core.version>3.7.0</assertj-core.version>
+        <assertj-core.version>3.8.0</assertj-core.version>
         <junit.version>4.12</junit.version>
         <easymock.version>3.4</easymock.version>
 
@@ -153,23 +171,31 @@
         <pax.url.version>2.5.2</pax.url.version>
         <apache.karaf.version>4.1.1</apache.karaf.version>
         <osgi-core.version>6.0.0</osgi-core.version>
+        <payara.version>5.Beta1</payara.version>
+        <payara-arquillian.version>1.0.Beta2</payara-arquillian.version>
 
-        <puppycrawl.checkstyle.version>7.6</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>8.1</puppycrawl.checkstyle.version>
 
-        <groovy.version>2.4.8</groovy.version>
+        <groovy.version>2.4.12</groovy.version>
+
+        <guava.version>23.0</guava.version>
+
+        <spring-expression.version>4.3.10.RELEASE</spring-expression.version>
 
         <!-- Asciidoctor -->
         <hibernate-asciidoctor-theme.version>1.0.1.Final</hibernate-asciidoctor-theme.version>
-        <hibernate-asciidoctor-extensions.version>1.0.1.Final</hibernate-asciidoctor-extensions.version>
+        <hibernate-asciidoctor-extensions.version>1.0.3.Final</hibernate-asciidoctor-extensions.version>
         <asciidoctor-maven-plugin.version>1.5.5</asciidoctor-maven-plugin.version>
         <jruby.version>9.1.8.0</jruby.version>
-        <asciidoctorj.version>1.6.0-alpha.3</asciidoctorj.version>
-        <asciidoctorj-pdf.version>1.5.0-alpha.15</asciidoctorj-pdf.version>
+        <asciidoctorj.version>1.6.0-alpha.5</asciidoctorj.version>
+        <asciidoctorj-pdf.version>1.5.0-alpha.16</asciidoctorj-pdf.version>
 
         <!-- URLs used in javadoc and documentation generation -->
+        <bv.spec.url>http://beanvalidation.org/2.0/spec/</bv.spec.url>
         <java.api-docs.base-url>http://docs.oracle.com/javase/8/docs/api</java.api-docs.base-url>
         <java.technotes.base-url>http://docs.oracle.com/javase/8/docs/technotes</java.technotes.base-url>
         <javaee.api-docs.base-url>http://docs.oracle.com/javaee/7/api</javaee.api-docs.base-url>
+        <javafx.docs.url>http://docs.oracle.com/javase/8/javase-clienttechnologies.htm</javafx.docs.url>
         <bv.api-docs.base-url>http://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api</bv.api-docs.base-url>
         <javamoney.api-docs.base-url>http://javamoney.github.io/apidocs</javamoney.api-docs.base-url>
 
@@ -194,19 +220,11 @@
         <!-- add-opens options required for Arquillian and WildFly -->
         <arquillian.javaVmArguments.add-opens></arquillian.javaVmArguments.add-opens>
 
-        <!-- JavaDoc stylesheet name -->
-        <!-- styles for jdk8 and jdk9 are different-->
-        <javadoc-stylesheet-name>stylesheet.css</javadoc-stylesheet-name>
-
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
 
         <hibernate-validator-parent.path>.</hibernate-validator-parent.path>
     </properties>
-
-    <prerequisites>
-        <maven>3.0.3</maven>
-    </prerequisites>
 
     <dependencyManagement>
         <dependencies>
@@ -281,6 +299,11 @@
                 <groupId>org.javamoney</groupId>
                 <artifactId>moneta</artifactId>
                 <version>${moneta.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>${osgi-core.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jsoup</groupId>
@@ -398,7 +421,12 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>20.0</version>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-expression</artifactId>
+                <version>${spring-expression.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -414,7 +442,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
+                <version>3.0.0-M1</version>
                 <executions>
                     <execution>
                         <id>enforce-java</id>
@@ -427,7 +455,7 @@
                                     <version>[1.8.0-20,)</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
-                                    <version>3.0.3</version>
+                                    <version>3.3.1</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
@@ -666,18 +694,9 @@
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>integration-test</id>
-                            <goals>
-                                <goal>integration-test</goal>
-                                <goal>verify</goal>
-                            </goals>
-                            <configuration>
-                                <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.argLine.add-modules} ${maven-surefire-plugin.argLine.add-opens}</argLine>
-                            </configuration>
-                        </execution>
-                    </executions>
+                    <configuration>
+                        <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.argLine.add-modules} ${maven-surefire-plugin.argLine.add-opens}</argLine>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
@@ -777,11 +796,10 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.10.4</version>
+                    <version>3.0.0-M1</version>
                     <configuration>
+                        <quiet>true</quiet>
                         <docfilessubdirs>true</docfilessubdirs>
-                        <javadocDirectory>${project.basedir}/../src/main/javadoc</javadocDirectory>
-                        <stylesheetfile>${javadoc-stylesheet-name}</stylesheetfile>
                         <bottom>
                             <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat, Inc.</a> All Rights Reserved]]></bottom>
                     </configuration>
@@ -835,8 +853,7 @@
                     <configuration>
                         <oldVersion>
                             <dependency>
-                                <!-- Using 5.x group id for the time being -->
-                                <groupId>org.hibernate</groupId>
+                                <groupId>org.hibernate.validator</groupId>
                                 <artifactId>${project.artifactId}</artifactId>
                                 <version>${previous.stable}</version>
                                 <type>${project.packaging}</type>
@@ -899,6 +916,11 @@
                             </exclusions>
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.netbeans.tools</groupId>
+                    <artifactId>sigtest-maven-plugin</artifactId>
+                    <version>1.0</version>
                 </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>
@@ -1124,7 +1146,6 @@
                     --add-opens=java.management/javax.management.openmbean=ALL-UNNAMED
                     --add-opens=java.naming/javax.naming=ALL-UNNAMED
                 </arquillian.javaVmArguments.add-opens>
-                <javadoc-stylesheet-name>stylesheet-jdk9.css</javadoc-stylesheet-name>
             </properties>
             <build>
                 <pluginManagement>
@@ -1150,9 +1171,9 @@
                             <artifactId>wildfly-maven-plugin</artifactId>
                             <configuration>
                                 <javaOpts>
-                                    <javaOpt>--add-opens=java.base/java.lang=ALL-UNNAMED</javaOpt>
-                                    <javaOpt>--add-opens=java.base/java.security=ALL-UNNAMED</javaOpt>
-                                    <javaOpt>--add-opens=java.base/java.io=ALL-UNNAMED</javaOpt>
+                                    --add-opens=java.base/java.lang=ALL-UNNAMED
+                                    --add-opens=java.base/java.security=ALL-UNNAMED
+                                    --add-opens=java.base/java.io=ALL-UNNAMED
                                 </javaOpts>
                             </configuration>
                         </plugin>
@@ -1162,12 +1183,19 @@
         </profile>
         <profile>
             <id>jqassistant</id>
+            <!--
+            To run the analysis on the engine module and launch a Neo4j server accessible at http://localhost:7474/, run:
+                mvn -pl engine jqassistant:scan jqassistant:server -Pjqassistant
+            To run the analysis on the engine module:
+                mvn clean install -pl engine -Pjqassistant -DskipTests=true
+            Our rules are in jqassistant/rules.xml.
+            -->
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.buschmais.jqassistant.scm</groupId>
+                        <groupId>com.buschmais.jqassistant</groupId>
                         <artifactId>jqassistant-maven-plugin</artifactId>
-                        <version>1.1.4</version>
+                        <version>1.3.0</version>
                         <executions>
                             <execution>
                                 <goals>

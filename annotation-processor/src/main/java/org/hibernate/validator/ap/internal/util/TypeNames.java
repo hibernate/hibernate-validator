@@ -66,8 +66,10 @@ public class TypeNames {
 
 		private static final String ORG_HIBERNATE_VALIDATOR_CONSTRAINTS = "org.hibernate.validator.constraints";
 
+		public static final String CODE_POINT_LENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".CodePointLength";
 		public static final String CURRENCY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Currency";
 		public static final String EMAIL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Email";
+		public static final String ISBN = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ISBN";
 		public static final String LENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Length";
 		public static final String MOD_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ModCheck";
 		public static final String LUHN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".LuhnCheck";
@@ -80,6 +82,7 @@ public class TypeNames {
 		public static final String NOT_EMPTY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotEmpty";
 		public static final String SAFE_HTML = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".SafeHtml";
 		public static final String SCRIPT_ASSERT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ScriptAssert";
+		public static final String UNIQUE_ELEMENTS = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".UniqueElements";
 		public static final String URL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".URL";
 		public static final String DURATION_MIN = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".time.DurationMin";
 		public static final String DURATION_MAX = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".time.DurationMax";
@@ -99,6 +102,12 @@ public class TypeNames {
 
 		public static final String MONETARY_AMOUNT = JAVAX_MONEY + ".MonetaryAmount";
 
+	}
+
+	public static class SupportedForUnwrapTypes {
+		public static final String OPTIONAL_INT = "java.util.OptionalInt";
+		public static final String OPTIONAL_LONG = "java.util.OptionalLong";
+		public static final String OPTIONAL_DOUBLE = "java.util.OptionalDouble";
 	}
 
 }

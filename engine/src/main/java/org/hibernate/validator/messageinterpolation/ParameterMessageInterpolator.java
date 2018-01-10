@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
@@ -22,16 +23,12 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class ParameterMessageInterpolator extends AbstractMessageInterpolator {
 
-	private static final Log log = LoggerFactory.make();
-
-	public ParameterMessageInterpolator() {
-		log.creationOfParameterMessageInterpolation();
-	}
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
 	public String interpolate(Context context, Locale locale, String term) {
 		if ( InterpolationTerm.isElExpression( term ) ) {
-			log.getElUnsupported( term );
+			LOG.warnElIsUnsupported( term );
 			return term;
 		}
 		else {
@@ -39,5 +36,4 @@ public class ParameterMessageInterpolator extends AbstractMessageInterpolator {
 			return parameterTermResolver.interpolate( context, term );
 		}
 	}
-
 }

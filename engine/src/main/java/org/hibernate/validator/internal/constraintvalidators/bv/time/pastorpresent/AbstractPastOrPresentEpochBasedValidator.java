@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent;
 
+import java.time.Duration;
+
 import javax.validation.constraints.PastOrPresent;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractEpochBasedTimeValidator;
@@ -23,4 +25,8 @@ public abstract class AbstractPastOrPresentEpochBasedValidator<T> extends Abstra
 		return result <= 0;
 	}
 
+	@Override
+	protected Duration getEffectiveTemporalValidationTolerance(Duration absoluteTemporalValidationTolerance) {
+		return absoluteTemporalValidationTolerance;
+	}
 }

@@ -18,7 +18,6 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
@@ -66,9 +65,9 @@ public abstract class MetaDataBuilder {
 	 * @param constrainedElement The element to add.
 	 */
 	public void add(ConstrainedElement constrainedElement) {
-		directConstraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getConstraints() ) );
-		containerElementsConstraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getTypeArgumentConstraints() ) );
-		isCascading = isCascading || constrainedElement.getCascadingMetaData().isMarkedForCascadingOnElementOrContainerElements();
+		directConstraints.addAll( adaptConstraints( constrainedElement, constrainedElement.getConstraints() ) );
+		containerElementsConstraints.addAll( adaptConstraints( constrainedElement, constrainedElement.getTypeArgumentConstraints() ) );
+		isCascading = isCascading || constrainedElement.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements();
 	}
 
 	/**
@@ -131,7 +130,7 @@ public abstract class MetaDataBuilder {
 		ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<>(
 				constraintHelper,
 				constraint.getLocation().getMember(),
-				constraint.getDescriptor().getAnnotation(),
+				constraint.getDescriptor().getAnnotationDescriptor(),
 				constraint.getElementType(),
 				constraintClass.isInterface() ? constraintClass : null,
 				definedIn,
@@ -144,7 +143,7 @@ public abstract class MetaDataBuilder {
 	/**
 	 * Allows specific sub-classes to customize the retrieved constraints.
 	 */
-	protected Set<MetaConstraint<?>> adaptConstraints(ConstrainedElementKind constrainedElementKind, Set<MetaConstraint<?>> constraints) {
+	protected Set<MetaConstraint<?>> adaptConstraints(ConstrainedElement constrainedElement, Set<MetaConstraint<?>> constraints) {
 		return constraints;
 	}
 
@@ -165,4 +164,5 @@ public abstract class MetaDataBuilder {
 			return ConstraintOrigin.DEFINED_IN_HIERARCHY;
 		}
 	}
+
 }

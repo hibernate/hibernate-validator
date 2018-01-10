@@ -20,10 +20,13 @@ import javax.tools.Diagnostic.Kind;
 
 import org.hibernate.validator.ap.testmodel.FieldLevelValidationUsingBuiltInConstraints;
 import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithCodePointLengthConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithISBNConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithJava8DateTime;
 import org.hibernate.validator.ap.testmodel.ModelWithJavaMoneyTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
+import org.hibernate.validator.ap.testmodel.ModelWithUniqueElementsConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithoutConstraints;
 import org.hibernate.validator.ap.testmodel.MultipleConstraintsOfSameType;
 import org.hibernate.validator.ap.testmodel.ValidationUsingAtValidAnnotation;
@@ -57,6 +60,7 @@ import org.hibernate.validator.ap.testmodel.customconstraints.CheckCase;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCaseValidator;
 import org.hibernate.validator.ap.testmodel.customconstraints.FieldLevelValidationUsingCustomConstraints;
 import org.hibernate.validator.ap.testmodel.customconstraints.HibernateValidatorProvidedCustomConstraints;
+import org.hibernate.validator.ap.testmodel.customconstraints.UnwrappingConstraints;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.BazDefaultGroupSequenceProvider;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.FooBarBazDefaultGroupSequenceProvider;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.FooBarDefaultGroupSequenceProvider;
@@ -103,7 +107,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-840" )
+	@TestForIssue(jiraKey = "HV-840")
 	public void overridingMethodParameterConstraintsTest() {
 		File sourceFile = compilerHelper.getSourceFile( MethodOverridingTests.class );
 
@@ -140,7 +144,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-567" )
+	@TestForIssue(jiraKey = "HV-567")
 	public void hibernateValidatorProvidedCustomConstraints() {
 		File sourceFile = compilerHelper.getSourceFile( HibernateValidatorProvidedCustomConstraints.class );
 
@@ -174,7 +178,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-1297" )
+	@TestForIssue(jiraKey = "HV-1297")
 	public void beanValidationConstraints() {
 		File sourceFile = compilerHelper.getSourceFile( BeanValidationConstraints.class );
 
@@ -509,9 +513,8 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
-				diagnostics, new DiagnosticExpectation(
-				Kind.ERROR, 22
-		)
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 22 )
 		);
 	}
 
@@ -662,5 +665,78 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 63 )
 		);
 
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1395")
+	public void unwrappingConstraints() {
+		File sourceFile = compilerHelper.getSourceFile( UnwrappingConstraints.class );
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 33 ),
+				new DiagnosticExpectation( Kind.ERROR, 36 ),
+				new DiagnosticExpectation( Kind.ERROR, 39 ),
+				new DiagnosticExpectation( Kind.ERROR, 42 ),
+				new DiagnosticExpectation( Kind.ERROR, 45 ),
+				new DiagnosticExpectation( Kind.ERROR, 48 ),
+				new DiagnosticExpectation( Kind.WARNING, 54 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1466")
+	public void uniqueElementsConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithUniqueElementsConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 26 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1530")
+	public void codePointLengthConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithCodePointLengthConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 17 ),
+				new DiagnosticExpectation( Kind.ERROR, 20 ),
+				new DiagnosticExpectation( Kind.ERROR, 23 )
+		);
+	}
+
+	@Test
+	public void isbnConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithISBNConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 22 )
+		);
 	}
 }

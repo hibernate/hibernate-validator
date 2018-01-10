@@ -88,7 +88,7 @@ application server. You can learn more about the integration of Bean Validation 
 ==== Running with a security manager
 
 Hibernate Validator supports running with a {javaTechnotesBaseUrl}/guides/security/index.html[security manager] being enabled.
-To do so, you must assign several permissions to the Hibernate Validator and the Bean Validation API code bases.
+To do so, you must assign several permissions to the code bases of Hibernate Validator, the Bean Validation API and the code base calling Bean Validation.
 The following shows how to do this via a {javaTechnotesBaseUrl}/guides/security/PolicyFiles.html[policy file] as processed by the Java default policy implementation:
 
 .Policy file for using Hibernate Validator with a security manager
@@ -101,6 +101,8 @@ grant codeBase "file:path/to/hibernate-validator-{hvVersion}.jar" {
     permission java.lang.RuntimePermission "accessDeclaredMembers";
     permission java.lang.RuntimePermission "setContextClassLoader";
 
+    permission org.hibernate.validator.HibernateValidatorPermission "accessPrivateMembers";
+
     // Only needed when working with XML descriptors (validation.xml or XML constraint mappings)
     permission java.util.PropertyPermission "mapAnyUriToUri", "read";
 };
@@ -108,12 +110,12 @@ grant codeBase "file:path/to/hibernate-validator-{hvVersion}.jar" {
 grant codeBase "file:path/to/validation-api-{bvVersion}.jar" {
     permission java.io.FilePermission "path/to/hibernate-validator-{hvVersion}.jar", "read";
 };
+
+grant codeBase "file:path/to/validation-caller-x.y.z.jar" {
+    permission org.hibernate.validator.HibernateValidatorPermission "accessPrivateMembers";
+};
 ----
 ====
-
-All API invocations requiring special permissions are done via privileged actions.
-This means only Hibernate Validator and the Bean Validation API themselves need the listed permissions.
-You don't need to assign any permissions to other code bases calling Hibernate Validator.
 
 ==== Updating Hibernate Validator in WildFly
 
@@ -121,6 +123,23 @@ The http://wildfly.org/[WildFly application server] contains Hibernate Validator
 In order to update the server modules for Bean Validation API and Hibernate Validator to the latest and greatest, the patch mechanism of WildFly can be used.
 
 You can download the patch file from http://sourceforge.net/projects/hibernate/files/hibernate-validator[SourceForge] or from Maven Central using the following dependency:
+
+.Maven dependency for WildFly {wildflyNextVersion} patch file
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+<dependency>
+    <groupId>org.hibernate.validator</groupId>
+    <artifactId>hibernate-validator-modules</artifactId>
+    <version>{hvVersion}</version>
+    <classifier>wildfly-{wildflyNextVersion}-patch</classifier>
+    <type>zip</type>
+</dependency>
+----
+====
+
+We also provide a patch for the previous version of WildFly:
 
 .Maven dependency for WildFly {wildflyVersion} patch file
 ====
@@ -144,7 +163,7 @@ Having downloaded the patch file, you can apply it to WildFly by running this co
 [source]
 [subs="verbatim,attributes"]
 ----
-$JBOSS_HOME/bin/jboss-cli.sh patch apply hibernate-validator-modules-{hvVersion}-wildfly-{wildflyVersion}-patch.zip
+$JBOSS_HOME/bin/jboss-cli.sh patch apply hibernate-validator-modules-{hvVersion}-wildfly-{wildflyNextVersion}-patch.zip
 ----
 ====
 
@@ -176,6 +195,22 @@ These are the module names as declared using the `Automatic-Module-Name` header:
 * Hibernate Validator annotation processor: `org.hibernate.validator.annotationprocessor`
 
 These module names are preliminary and may be changed when providing real module descriptors in a future release.
+
+When using Bean Validation XML descriptors (_META-INF/validation.xml_ and/or constraint mapping files), the `java.xml.bind` module must be enabled.
+Do so by appending `--add-modules java.xml.bind` to your _java_ invocation.
+
+[WARNING]
+====
+When using Hibernate Validator with CDI, be careful to not enable the `java.xml.ws.annotation` module of the JDK.
+This module contains a subset of the JSR 250 API ("Commons Annotations"), but some annotations such as `javax.annotation.Priority` are missing.
+This causes the method validation interceptor of Hibernate Validator to not be registered, i.e. method validation won't work.
+
+Instead, add the full JSR 250 API to the unnamed module (i.e. the classpath), e.g. by pulling in the _javax.annotation:javax.annotation-api_ dependency
+(there already is a transitive dependency to the JSR 250 API when depending on _org.hibernate.validator:hibernate-validator-cdi_).
+
+If you need to enable the `java.xml.ws.annotation` module for some reason, you should patch it with the contents of the full API
+by appending `--patch-module java.xml.ws.annotation=/path/to/complete-jsr250-api.jar` to your _java_ invocation.
+====
 
 [[validator-gettingstarted-createmodel]]
 === Applying constraints

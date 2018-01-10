@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.util.privilegedactions;
 
+import java.lang.invoke.MethodHandles;
 import java.security.PrivilegedAction;
 
 import org.hibernate.validator.internal.util.logging.Log;
@@ -19,7 +20,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public final class NewInstance<T> implements PrivilegedAction<T> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Class<T> clazz;
 	private final String message;
@@ -39,13 +40,13 @@ public final class NewInstance<T> implements PrivilegedAction<T> {
 			return clazz.newInstance();
 		}
 		catch (InstantiationException e) {
-			throw log.getUnableToInstantiateException( message, clazz, e );
+			throw LOG.getUnableToInstantiateException( message, clazz, e );
 		}
 		catch (IllegalAccessException e) {
-			throw log.getUnableToInstantiateException( clazz, e );
+			throw LOG.getUnableToInstantiateException( clazz, e );
 		}
 		catch (RuntimeException e) {
-			throw log.getUnableToInstantiateException( clazz, e );
+			throw LOG.getUnableToInstantiateException( clazz, e );
 		}
 	}
 }

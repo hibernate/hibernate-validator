@@ -6,15 +6,13 @@
  */
 package org.hibernate.validator.test.internal.util.annotationfactory;
 
+import static org.testng.Assert.assertEquals;
+
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
-
-import static org.testng.Assert.assertEquals;
 
 
 /**
@@ -24,11 +22,11 @@ public class AnnotationFactoryTest {
 
 	@Test
 	public void createAnnotationProxy() {
-		AnnotationDescriptor<Size> descriptor = new AnnotationDescriptor<Size>( Size.class );
-		descriptor.setValue( "min", 5 );
-		descriptor.setValue( "max", 10 );
+		AnnotationDescriptor.Builder<Size> descriptorBuilder = new AnnotationDescriptor.Builder<>( Size.class );
+		descriptorBuilder.setAttribute( "min", 5 );
+		descriptorBuilder.setAttribute( "max", 10 );
 
-		Size size = AnnotationFactory.create( descriptor );
+		Size size = descriptorBuilder.build().getAnnotation();
 
 		assertEquals( size.min(), 5, "Wrong parameter value" );
 		assertEquals( size.max(), 10, "Wrong parameter value" );
@@ -36,16 +34,16 @@ public class AnnotationFactoryTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void createAnnotationProxyMissingRequiredParameter() {
-		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor<Pattern>( Pattern.class );
-		AnnotationFactory.create( descriptor );
+		AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
+		descriptorBuilder.build().getAnnotation();
 	}
 
 	@Test
 	public void createAnnotationProxyWithRequiredParameter() {
-		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor<Pattern>( Pattern.class );
-		descriptor.setValue( "regexp", ".*" );
+		AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
+		descriptorBuilder.setAttribute( "regexp", ".*" );
 
-		Pattern pattern = AnnotationFactory.create( descriptor );
+		Pattern pattern = descriptorBuilder.build().getAnnotation();
 
 		assertEquals( ".*", pattern.regexp(), "Wrong parameter value" );
 	}

@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.test.internal.engine.cascaded;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
@@ -45,11 +44,6 @@ public class NestedCascadingArraySupportTest {
 
 		constraintViolations = validator.validate( CinemaArray.invalidCinemaArray() );
 
-		assertCorrectPropertyPathStringRepresentations(
-				constraintViolations,
-				"array[0].<iterable element>[0].<list element>",
-				"array[0].<iterable element>[1].visitor.name"
-		);
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()

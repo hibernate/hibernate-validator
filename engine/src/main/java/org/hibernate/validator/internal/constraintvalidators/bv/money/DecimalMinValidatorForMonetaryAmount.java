@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.money;
 
+import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import javax.money.MonetaryAmount;
 import javax.validation.ConstraintValidator;
@@ -24,7 +25,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class DecimalMinValidatorForMonetaryAmount implements ConstraintValidator<DecimalMin, MonetaryAmount> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private BigDecimal minValue;
 	private boolean inclusive;
@@ -35,7 +36,7 @@ public class DecimalMinValidatorForMonetaryAmount implements ConstraintValidator
 			this.minValue = new BigDecimal( minValue.value() );
 		}
 		catch (NumberFormatException nfe) {
-			throw log.getInvalidBigDecimalFormatException( minValue.value(), nfe );
+			throw LOG.getInvalidBigDecimalFormatException( minValue.value(), nfe );
 		}
 		this.inclusive = minValue.inclusive();
 	}

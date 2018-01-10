@@ -6,9 +6,12 @@
  */
 package org.hibernate.validator.performance.cascaded;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validation;
@@ -27,8 +30,6 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Hardy Ferentschik
@@ -51,7 +52,7 @@ public class CascadedValidation {
 	@Fork(value = 1)
 	@Threads(50)
 	@Warmup(iterations = 10)
-	@Measurement(iterations = 50)
+	@Measurement(iterations = 20)
 	public void testCascadedValidation(CascadedValidationState state, Blackhole bh) {
 		// TODO graphs needs to be generated and deeper
 		Person kermit = new Person( "kermit" );
@@ -66,17 +67,6 @@ public class CascadedValidation {
 		assertThat( violations ).hasSize( 0 );
 
 		bh.consume( violations );
-	}
-
-	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
-	@OutputTimeUnit(TimeUnit.MILLISECONDS)
-	@Fork(value = 1)
-	@Threads(50)
-	@Warmup(iterations = 10)
-	@Measurement(iterations = 50, batchSize = 1_000)
-	public void testCascadedValidationIterative(CascadedValidationState state, Blackhole bh) throws Exception {
-		testCascadedValidation( state, bh );
 	}
 
 	public class Person {

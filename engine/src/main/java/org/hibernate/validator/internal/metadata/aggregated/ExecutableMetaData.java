@@ -16,7 +16,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,7 +27,6 @@ import javax.validation.metadata.ParameterDescriptor;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
@@ -76,6 +74,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	private final Set<String> signatures;
 
 	private final ReturnValueMetaData returnValueMetaData;
+	private final ElementKind kind;
 
 	private ExecutableMetaData(
 			String name,
@@ -95,8 +94,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				returnType,
 				returnValueConstraints,
 				returnValueContainerElementConstraints,
-				kind,
-				cascadingMetaData.isMarkedForCascadingOnElementOrContainerElements(),
+				cascadingMetaData.isMarkedForCascadingOnAnnotatedObjectOrContainerElements(),
 				isConstrained
 		);
 
@@ -111,6 +109,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				cascadingMetaData
 		);
 		this.isGetter = isGetter;
+		this.kind = kind;
 	}
 
 	/**
@@ -193,6 +192,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	}
 
 	@Override
+	public ElementKind getKind() {
+		return kind;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder parameterBuilder = new StringBuilder();
 
@@ -255,7 +259,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		private final Set<MethodConfigurationRule> rules;
 		private boolean isConstrained = false;
-		private CascadingTypeParameter cascadingMetaData;
+		private CascadingMetaDataBuilder cascadingMetaDataBuilder;
 
 		/**
 		 * Holds a merged representation of the configurations for one method
@@ -284,7 +288,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			this.parameterNameProvider = parameterNameProvider;
 			this.kind = constrainedExecutable.getKind();
 			this.executable = constrainedExecutable.getExecutable();
-			this.rules = new HashSet<>( methodValidationConfiguration.getConfiguredRuleSet() );
+			this.rules = methodValidationConfiguration.getConfiguredRuleSet();
 			this.isGetterMethod = constrainedExecutable.isGetterMethod();
 
 			add( constrainedExecutable );
@@ -323,11 +327,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			constrainedExecutables.add( constrainedExecutable );
 			isConstrained = isConstrained || constrainedExecutable.isConstrained();
 			crossParameterConstraints.addAll( constrainedExecutable.getCrossParameterConstraints() );
-			if ( cascadingMetaData == null ) {
-				cascadingMetaData = constrainedExecutable.getCascadingMetaData();
+			if ( cascadingMetaDataBuilder == null ) {
+				cascadingMetaDataBuilder = constrainedExecutable.getCascadingMetaDataBuilder();
 			}
 			else {
-				cascadingMetaData = cascadingMetaData.merge( constrainedExecutable.getCascadingMetaData() );
+				cascadingMetaDataBuilder = cascadingMetaDataBuilder.merge( constrainedExecutable.getCascadingMetaDataBuilder() );
 			}
 
 			addToExecutablesByDeclaringType( constrainedExecutable );
@@ -371,12 +375,13 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					ReflectionHelper.typeOf( executable ),
 					executable.getParameterTypes(),
 					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
-					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? Collections.singleton( ExecutableHelper.getSignature( executable ) ) : signatures,
+					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? Collections.singleton( ExecutableHelper.getSignature( executable ) ) :
+							CollectionHelper.toImmutableSet( signatures ),
 					adaptOriginsAndImplicitGroups( getDirectConstraints() ),
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
-					new CascadingMetaData( cascadingMetaData ),
+					cascadingMetaDataBuilder.build( valueExtractorManager, executable ),
 					isConstrained,
 					isGetterMethod
 			);

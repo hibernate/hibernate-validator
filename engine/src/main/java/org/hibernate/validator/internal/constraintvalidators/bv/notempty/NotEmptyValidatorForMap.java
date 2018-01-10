@@ -17,7 +17,10 @@ import javax.validation.constraints.NotEmpty;
  *
  * @author Guillaume Smet
  */
-public class NotEmptyValidatorForMap implements ConstraintValidator<NotEmpty, Map<?, ?>> {
+// as per the JLS, Map<?, ?> is a subtype of Map, so we need to explicitly reference
+// Map here to support having properties defined as Map (see HV-1551)
+@SuppressWarnings("rawtypes")
+public class NotEmptyValidatorForMap implements ConstraintValidator<NotEmpty, Map> {
 
 	/**
 	 * Checks the map is not {@code null} and not empty.
@@ -27,7 +30,7 @@ public class NotEmptyValidatorForMap implements ConstraintValidator<NotEmpty, Ma
 	 * @return returns {@code true} if the map is not {@code null} and the map is not empty
 	 */
 	@Override
-	public boolean isValid(Map<?, ?> map, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Map map, ConstraintValidatorContext constraintValidatorContext) {
 		if ( map == null ) {
 			return false;
 		}

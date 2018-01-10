@@ -137,10 +137,6 @@ public class ValueContext<T, V> {
 		return currentValue;
 	}
 
-	public final void setPropertyPath(PathImpl propertyPath) {
-		this.propertyPath = propertyPath;
-	}
-
 	public final void appendNode(Cascadable node) {
 		PathImpl newPath = PathImpl.createCopy( propertyPath );
 		node.appendTo( newPath );
@@ -163,12 +159,12 @@ public class ValueContext<T, V> {
 		propertyPath.makeLeafNodeIterable();
 	}
 
-	public final void setKey(Object key) {
-		propertyPath.setLeafNodeMapKey( key );
+	public final void markCurrentPropertyAsIterableAndSetKey(Object key) {
+		propertyPath.makeLeafNodeIterableAndSetMapKey( key );
 	}
 
-	public final void setIndex(Integer index) {
-		propertyPath.setLeafNodeIndex( index );
+	public final void markCurrentPropertyAsIterableAndSetIndex(Integer index) {
+		propertyPath.makeLeafNodeIterableAndSetIndex( index );
 	}
 
 	/**
@@ -196,7 +192,7 @@ public class ValueContext<T, V> {
 	}
 
 	public final void setCurrentValidatedValue(V currentValue) {
-		propertyPath.setLeafNodeValue( currentValue );
+		propertyPath.setLeafNodeValueIfRequired( currentValue );
 		this.currentValue = currentValue;
 	}
 
@@ -210,6 +206,15 @@ public class ValueContext<T, V> {
 
 	public final void setElementType(ElementType elementType) {
 		this.elementType = elementType;
+	}
+
+	public final ValueState<V> getCurrentValueState() {
+		return new ValueState<V>( propertyPath, currentValue );
+	}
+
+	public final void resetValueState(ValueState<V> valueState) {
+		this.propertyPath = valueState.propertyPath;
+		this.currentValue = valueState.currentValue;
 	}
 
 	@Override
@@ -229,5 +234,17 @@ public class ValueContext<T, V> {
 	public Object getValue(Object parent, ConstraintLocation location) {
 		// TODO: For BVAL-214 we'd get the value from a map or another alternative structure instead
 		return location.getValue( parent );
+	}
+
+	public static class ValueState<V> {
+
+		private final PathImpl propertyPath;
+
+		private final V currentValue;
+
+		private ValueState(PathImpl propertyPath, V currentValue) {
+			this.propertyPath = propertyPath;
+			this.currentValue = currentValue;
+		}
 	}
 }

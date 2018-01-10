@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.core;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Member;
 import java.util.Map;
 
@@ -23,7 +24,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
  */
 public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOptions {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Keeps track whether the 'ignore-annotations' flag is set on bean level in the xml configuration. If 'ignore-annotations'
@@ -107,8 +108,8 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 		else {
 			ignoreAnnotation = areAllConstraintAnnotationsIgnoredFor( clazz );
 		}
-		if ( log.isDebugEnabled() && ignoreAnnotation ) {
-			log.debugf( "Class level annotation are getting ignored for %s.", clazz.getName() );
+		if ( LOG.isDebugEnabled() && ignoreAnnotation ) {
+			LOG.debugf( "Class level annotation are getting ignored for %s.", clazz.getName() );
 		}
 		return ignoreAnnotation;
 	}

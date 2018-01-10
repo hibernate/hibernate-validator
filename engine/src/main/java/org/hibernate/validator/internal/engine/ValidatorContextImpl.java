@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import java.lang.invoke.MethodHandles;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,9 +20,9 @@ import javax.validation.Validator;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.internal.engine.ValidatorFactoryImpl.ValidatorFactoryScopedContext;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -33,28 +35,20 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class ValidatorContextImpl implements HibernateValidatorContext {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ValidatorFactoryImpl validatorFactory;
 
-	private MessageInterpolator messageInterpolator;
-	private TraversableResolver traversableResolver;
 	private ConstraintValidatorFactory constraintValidatorFactory;
-	private ExecutableParameterNameProvider parameterNameProvider;
-	private ClockProvider clockProvider;
-	private boolean failFast;
+	private final ValidatorFactoryScopedContext.Builder validatorFactoryContextBuilder;
 	private final ValueExtractorManager valueExtractorManager;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder;
 	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors;
 
 	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory) {
+		this.validatorFactoryContextBuilder = new ValidatorFactoryScopedContext.Builder( validatorFactory.getValidatorFactoryScopedContext() );
 		this.validatorFactory = validatorFactory;
-		this.messageInterpolator = validatorFactory.getMessageInterpolator();
-		this.traversableResolver = validatorFactory.getTraversableResolver();
 		this.constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
-		this.parameterNameProvider = validatorFactory.getExecutableParameterNameProvider();
-		this.clockProvider = validatorFactory.getClockProvider();
-		this.failFast = validatorFactory.isFailFast();
 		this.methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder( validatorFactory.getMethodValidationConfiguration() );
 		this.valueExtractorManager = validatorFactory.getValueExtractorManager();
 		this.valueExtractorDescriptors = new HashMap<>();
@@ -62,23 +56,13 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 
 	@Override
 	public HibernateValidatorContext messageInterpolator(MessageInterpolator messageInterpolator) {
-		if ( messageInterpolator == null ) {
-			this.messageInterpolator = validatorFactory.getMessageInterpolator();
-		}
-		else {
-			this.messageInterpolator = messageInterpolator;
-		}
+		validatorFactoryContextBuilder.setMessageInterpolator( messageInterpolator );
 		return this;
 	}
 
 	@Override
 	public HibernateValidatorContext traversableResolver(TraversableResolver traversableResolver) {
-		if ( traversableResolver == null ) {
-			this.traversableResolver = validatorFactory.getTraversableResolver();
-		}
-		else {
-			this.traversableResolver = traversableResolver;
-		}
+		validatorFactoryContextBuilder.setTraversableResolver( traversableResolver );
 		return this;
 	}
 
@@ -95,23 +79,13 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 
 	@Override
 	public HibernateValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider) {
-		if ( parameterNameProvider == null ) {
-			this.parameterNameProvider = validatorFactory.getExecutableParameterNameProvider();
-		}
-		else {
-			this.parameterNameProvider = new ExecutableParameterNameProvider( parameterNameProvider );
-		}
+		validatorFactoryContextBuilder.setParameterNameProvider( parameterNameProvider );
 		return this;
 	}
 
 	@Override
 	public HibernateValidatorContext clockProvider(ClockProvider clockProvider) {
-		if ( clockProvider == null ) {
-			this.clockProvider = validatorFactory.getClockProvider();
-		}
-		else {
-			this.clockProvider = clockProvider;
-		}
+		validatorFactoryContextBuilder.setClockProvider( clockProvider );
 		return this;
 	}
 
@@ -129,7 +103,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 
 	@Override
 	public HibernateValidatorContext failFast(boolean failFast) {
-		this.failFast = failFast;
+		validatorFactoryContextBuilder.setFailFast( failFast );
 		return this;
 	}
 
@@ -152,15 +126,23 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
+	public HibernateValidatorContext enableTraversableResolverResultCache(boolean enabled) {
+		validatorFactoryContextBuilder.setTraversableResolverResultCacheEnabled( enabled );
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorContext temporalValidationTolerance(Duration temporalValidationTolerance) {
+		validatorFactoryContextBuilder.setTemporalValidationTolerance( temporalValidationTolerance );
+		return this;
+	}
+
+	@Override
 	public Validator getValidator() {
 		return validatorFactory.createValidator(
 				constraintValidatorFactory,
-				messageInterpolator,
-				traversableResolver,
-				parameterNameProvider,
-				clockProvider,
-				failFast,
 				valueExtractorDescriptors.isEmpty() ? valueExtractorManager : new ValueExtractorManager( valueExtractorManager, valueExtractorDescriptors ),
+				validatorFactoryContextBuilder.build(),
 				methodValidationConfigurationBuilder.build()
 		);
 	}

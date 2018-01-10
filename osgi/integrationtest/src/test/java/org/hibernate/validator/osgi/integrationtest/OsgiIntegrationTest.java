@@ -19,6 +19,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRunti
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -29,15 +30,20 @@ import java.util.stream.Collectors;
 import javax.el.ELManager;
 import javax.el.ExpressionFactory;
 import javax.money.spi.Bootstrap;
+import javax.script.ScriptEngineFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.Validator;
 import javax.validation.spi.ValidationProvider;
 
+import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.osgi.scripting.MultiClassLoaderScriptEvaluatorFactory;
+import org.hibernate.validator.osgi.scripting.OsgiScriptEvaluatorFactory;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.javamoney.moneta.Money;
 import org.javamoney.moneta.spi.MonetaryConfig;
@@ -49,8 +55,10 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.options.MavenUrlReference;
+import org.osgi.framework.FrameworkUtil;
 
 import com.example.Customer;
+import com.example.Event;
 import com.example.ExampleConstraintValidatorFactory;
 import com.example.Order;
 import com.example.RetailOrder;
@@ -252,6 +260,60 @@ public class OsgiIntegrationTest {
 		Set<ConstraintViolation<Bean>> constraintViolations = validator.validate( new Bean() );
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals( MustMatch.class, constraintViolations.iterator().next().getConstraintDescriptor().getAnnotation().annotationType() );
+	}
+
+	@Test
+	public void canUseScriptAssertConstraintWithMultiClassLoaderScriptEvaluatorFactory() {
+		//tag::scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory[]
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.scriptEvaluatorFactory(
+						new MultiClassLoaderScriptEvaluatorFactory( GroovyScriptEngineFactory.class.getClassLoader() )
+				)
+				.buildValidatorFactory()
+				.getValidator();
+		//end::scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory[]
+
+		canUseScriptAssertConstraint( validator );
+	}
+
+	@Test
+	public void canUseScriptAssertConstraintWithOsgiScriptEvaluatorFactory() {
+		//tag::scriptEvaluatorFactoryOsgiScriptEvaluatorFactory[]
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.scriptEvaluatorFactory(
+						new OsgiScriptEvaluatorFactory( FrameworkUtil.getBundle( this.getClass() ).getBundleContext() )
+				)
+				.buildValidatorFactory()
+				.getValidator();
+		//end::scriptEvaluatorFactoryOsgiScriptEvaluatorFactory[]
+
+		canUseScriptAssertConstraint( validator );
+	}
+
+	private void canUseScriptAssertConstraint(Validator validator) {
+		Set<ConstraintViolation<Event>> constraintViolations = validator.validate( new Event( LocalDate.of( 2017, 8, 8 ), LocalDate.of( 2016, 8, 8 ) ) );
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals( "start of event cannot be after the end", constraintViolations.iterator().next().getMessage() );
+		assertEquals( ScriptAssert.class, constraintViolations.iterator().next().getConstraintDescriptor().getAnnotation().annotationType() );
+	}
+
+	@Test
+	public void canUseVariousScriptingLanguagesInScripAssertConstraint() {
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.externalClassLoader( getClass().getClassLoader() )
+				.scriptEvaluatorFactory(
+						new MultiClassLoaderScriptEvaluatorFactory(
+								GroovyScriptEngineFactory.class.getClassLoader(),
+								ScriptEngineFactory.class.getClassLoader() // for JS
+						)
+				).buildValidatorFactory()
+				.getValidator();
+
+		Set<ConstraintViolation<Event.EventLocation>> constraintViolations = validator.validate( new Event.EventLocation() );
+		assertEquals( 0, constraintViolations.size() );
 	}
 
 	private ExpressionFactory buildExpressionFactory() {

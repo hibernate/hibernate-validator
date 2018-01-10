@@ -76,12 +76,12 @@ public final class ConstraintViolationAssert {
 	 */
 	public static void assertCorrectPropertyPathStringRepresentations(Set<? extends ConstraintViolation<?>> violations,
 			String... expectedPropertyPaths) {
-		Set<String> actualPaths = violations.stream()
+		List<String> actualPaths = violations.stream()
 			.map( ConstraintViolation::getPropertyPath )
 			.map( Path::toString )
-			.collect( Collectors.toSet() );
+			.collect( Collectors.toList() );
 
-		Assertions.assertThat( actualPaths ).containsOnly( expectedPropertyPaths );
+		Assertions.assertThat( actualPaths ).containsExactlyInAnyOrder( expectedPropertyPaths );
 	}
 
 	public static ConstraintViolationSetAssert assertThat(Set<? extends ConstraintViolation<?>> actualViolations) {
@@ -95,6 +95,15 @@ public final class ConstraintViolationAssert {
 	 */
 	public static void assertNoViolations(Set<? extends ConstraintViolation<?>> violations) {
 		Assertions.assertThat( violations ).isEmpty();
+	}
+
+	/**
+	 * Asserts that the given violation list has no violations (is empty).
+	 *
+	 * @param violations The violation list to verify.
+	 */
+	public static void assertNoViolations(Set<? extends ConstraintViolation<?>> violations, String message) {
+		Assertions.assertThat( violations ).describedAs( message ).isEmpty();
 	}
 
 	public static void assertConstraintTypes(Set<? extends ConstraintDescriptor<?>> descriptors,
@@ -243,6 +252,11 @@ public final class ConstraintViolationAssert {
 
 		protected ConstraintViolationSetAssert(Set<? extends ConstraintViolation<?>> actualViolations) {
 			super( actualViolations );
+		}
+
+		@Override
+		public ConstraintViolationSetAssert describedAs(String description, Object... args) {
+			return (ConstraintViolationSetAssert) super.describedAs( description, args );
 		}
 
 		public void containsOnlyViolations(ViolationExpectation... expectedViolations) {

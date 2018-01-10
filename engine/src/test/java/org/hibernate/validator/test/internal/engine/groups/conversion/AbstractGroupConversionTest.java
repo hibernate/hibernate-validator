@@ -8,8 +8,12 @@ package org.hibernate.validator.test.internal.engine.groups.conversion;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +39,7 @@ import org.testng.annotations.Test;
  */
 public abstract class AbstractGroupConversionTest {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected Validator validator;
 
@@ -44,13 +48,31 @@ public abstract class AbstractGroupConversionTest {
 	@Test
 	public void groupConversionOnField() {
 		Set<ConstraintViolation<User1>> violations = validator.validate( new User1() );
-		assertCorrectPropertyPathStringRepresentations( violations, "addresses[].street1", "addresses[].zipCode" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "street1", true, null, null, Set.class, 0 )
+				),
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "zipCode" , true, null, null, Set.class, 0 )
+				)
+		);
 	}
 
 	@Test
 	public void groupConversionOnGetter() {
 		Set<ConstraintViolation<User2>> violations = validator.validate( new User2() );
-		assertCorrectPropertyPathStringRepresentations( violations, "addresses[].street1", "addresses[].zipCode" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "street1", true, null, null, Set.class, 0 )
+				),
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "zipCode" , true, null, null, Set.class, 0 )
+				)
+		);
 	}
 
 	@Test
@@ -61,7 +83,18 @@ public abstract class AbstractGroupConversionTest {
 				new List<?>[] { Arrays.asList( new Address() ) }
 		);
 
-		assertCorrectPropertyPathStringRepresentations( violations, "setAddresses.addresses[0].street1", "setAddresses.addresses[0].zipCode" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith()
+						.method( "setAddresses" )
+						.parameter( "addresses",0 )
+						.property( "street1", true, null, 0, List.class, 0 )
+				),
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.method( "setAddresses" )
+						.parameter( "addresses",0 )
+						.property( "zipCode" , true, null, 0, List.class, 0 )
+				)
+		);
 	}
 
 	@Test
@@ -72,6 +105,18 @@ public abstract class AbstractGroupConversionTest {
 				Arrays.asList( new Address() )
 		);
 
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith()
+						.method( "findAddresses" )
+						.returnValue()
+						.property( "street1", true, null, 0, List.class, 0 )
+				),
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.method( "findAddresses" )
+						.returnValue()
+						.property( "zipCode" , true, null, 0, List.class, 0 )
+				)
+		);
 		assertCorrectPropertyPathStringRepresentations(
 				violations,
 				"findAddresses.<return value>[0].street1",
@@ -82,28 +127,85 @@ public abstract class AbstractGroupConversionTest {
 	@Test
 	public void multipleGroupConversionsOnField() {
 		Set<ConstraintViolation<User3>> violations = validator.validate( new User3() );
-		assertCorrectPropertyPathStringRepresentations( violations, "addresses[].street1", "addresses[].zipCode" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "street1", true, null, null, Set.class, 0 )
+				),
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "zipCode" , true, null, null, Set.class, 0 )
+				)
+		);
 
 		violations = validator.validate( new User3(), Complete.class );
 		for ( ConstraintViolation<User3> constraintViolation : violations ) {
 			log.info( constraintViolation.getPropertyPath() );
 		}
-		assertCorrectPropertyPathStringRepresentations( violations, "addresses[].doorCode", "addresses[].street1", "addresses[].zipCode" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "street1", true, null, null, Set.class, 0 )
+				),
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "doorCode", true, null, null, Set.class, 0 )
+				),
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "zipCode" , true, null, null, Set.class, 0 )
+				)
+		);
 	}
 
 	@Test
 	public void multipleGroupConversionsOnGetter() {
 		Set<ConstraintViolation<User4>> violations = validator.validate( new User4() );
-		assertCorrectPropertyPathStringRepresentations( violations, "addresses[].street1", "addresses[].zipCode" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "street1", true, null, null, Set.class, 0 )
+				),
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "zipCode" , true, null, null, Set.class, 0 )
+				)
+		);
 
 		violations = validator.validate( new User4(), Complete.class );
-		assertCorrectPropertyPathStringRepresentations( violations, "addresses[].doorCode", "addresses[].street1", "addresses[].zipCode" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "street1", true, null, null, Set.class, 0 )
+				),
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "doorCode", true, null, null, Set.class, 0 )
+				),
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "zipCode" , true, null, null, Set.class, 0 )
+				)
+		);
 	}
 
 	@Test
 	public void conversionIsEvaluatedPerProperty() {
 		Set<ConstraintViolation<User5>> violations = validator.validate( new User5() );
-		assertCorrectPropertyPathStringRepresentations( violations, "addresses[].street1", "addresses[].zipCode", "phoneNumber.number" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "street1", true, null, null, Set.class, 0 )
+				),
+				violationOf( NotNull.class ).withPropertyPath( pathWith()
+						.property( "phoneNumber" )
+						.property( "number" )
+				),
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.property( "addresses" )
+						.property( "zipCode" , true, null, null, Set.class, 0 )
+				)
+		);
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class,

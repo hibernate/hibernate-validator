@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.engine;
 
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import javax.validation.ConstraintViolation;
@@ -24,7 +25,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<T>, Serializable {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 	private static final long serialVersionUID = -4970067626703103139L;
 
 	private final String interpolatedMessage;
@@ -230,7 +232,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		if ( type.isAssignableFrom( HibernateConstraintViolation.class ) ) {
 			return type.cast( this );
 		}
-		throw log.getTypeNotSupportedForUnwrappingException( type );
+		throw LOG.getTypeNotSupportedForUnwrappingException( type );
 	}
 
 	@Override
@@ -276,28 +278,25 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		if ( interpolatedMessage != null ? !interpolatedMessage.equals( that.interpolatedMessage ) : that.interpolatedMessage != null ) {
 			return false;
 		}
+		if ( messageTemplate != null ? !messageTemplate.equals( that.messageTemplate ) : that.messageTemplate != null ) {
+			return false;
+		}
 		if ( propertyPath != null ? !propertyPath.equals( that.propertyPath ) : that.propertyPath != null ) {
 			return false;
 		}
-		if ( rootBean != null ? !rootBean.equals( that.rootBean ) : that.rootBean != null ) {
+		if ( rootBean != null ? ( rootBean != that.rootBean ) : that.rootBean != null ) {
 			return false;
 		}
-		if ( leafBeanInstance != null ? !leafBeanInstance.equals( that.leafBeanInstance ) : that.leafBeanInstance != null ) {
+		if ( leafBeanInstance != null ? ( leafBeanInstance != that.leafBeanInstance ) : that.leafBeanInstance != null ) {
+			return false;
+		}
+		if ( value != null ? ( value != that.value ) : that.value != null ) {
 			return false;
 		}
 		if ( constraintDescriptor != null ? !constraintDescriptor.equals( that.constraintDescriptor ) : that.constraintDescriptor != null ) {
 			return false;
 		}
 		if ( elementType != null ? !elementType.equals( that.elementType ) : that.elementType != null ) {
-			return false;
-		}
-		if ( messageTemplate != null ? !messageTemplate.equals( that.messageTemplate ) : that.messageTemplate != null ) {
-			return false;
-		}
-		if ( rootBeanClass != null ? !rootBeanClass.equals( that.rootBeanClass ) : that.rootBeanClass != null ) {
-			return false;
-		}
-		if ( value != null ? !value.equals( that.value ) : that.value != null ) {
 			return false;
 		}
 
@@ -327,12 +326,11 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	private int createHashCode() {
 		int result = interpolatedMessage != null ? interpolatedMessage.hashCode() : 0;
 		result = 31 * result + ( propertyPath != null ? propertyPath.hashCode() : 0 );
-		result = 31 * result + ( rootBean != null ? rootBean.hashCode() : 0 );
-		result = 31 * result + ( leafBeanInstance != null ? leafBeanInstance.hashCode() : 0 );
-		result = 31 * result + ( value != null ? value.hashCode() : 0 );
+		result = 31 * result + System.identityHashCode( rootBean );
+		result = 31 * result + System.identityHashCode( leafBeanInstance );
+		result = 31 * result + System.identityHashCode( value );
 		result = 31 * result + ( constraintDescriptor != null ? constraintDescriptor.hashCode() : 0 );
 		result = 31 * result + ( messageTemplate != null ? messageTemplate.hashCode() : 0 );
-		result = 31 * result + ( rootBeanClass != null ? rootBeanClass.hashCode() : 0 );
 		result = 31 * result + ( elementType != null ? elementType.hashCode() : 0 );
 		return result;
 	}

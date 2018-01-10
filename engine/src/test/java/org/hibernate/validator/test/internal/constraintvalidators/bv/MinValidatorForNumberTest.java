@@ -23,10 +23,8 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.dec
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForFloat;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForLong;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForNumber;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
-
 import org.testng.annotations.Test;
 
 /**
@@ -39,30 +37,30 @@ public class MinValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 
 	@Test
 	public void testIsValidMinValidator() {
-		AnnotationDescriptor<Min> descriptor = new AnnotationDescriptor<Min>( Min.class );
-		descriptor.setValue( "value", 15L );
-		descriptor.setValue( "message", "{validator.min}" );
-		Min m = AnnotationFactory.create( descriptor );
+		ConstraintAnnotationDescriptor.Builder<Min> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Min.class );
+		descriptorBuilder.setAttribute( "value", 15L );
+		descriptorBuilder.setMessage( "{validator.min}" );
+		Min m = descriptorBuilder.build().getAnnotation();
 
 		testMin( m, true );
 	}
 
 	@Test
 	public void testIsValidDecimalMinValidator() {
-		AnnotationDescriptor<DecimalMin> descriptor = new AnnotationDescriptor<DecimalMin>( DecimalMin.class );
-		descriptor.setValue( "value", "1500E-2" );
-		descriptor.setValue( "message", "{validator.min}" );
-		DecimalMin m = AnnotationFactory.create( descriptor );
+		ConstraintAnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( DecimalMin.class );
+		descriptorBuilder.setAttribute( "value", "1500E-2" );
+		descriptorBuilder.setMessage( "{validator.min}" );
+		DecimalMin m = descriptorBuilder.build().getAnnotation();
 
 		testDecimalMin( m, true );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testInitializeDecimalMinWithInvalidValue() {
-		AnnotationDescriptor<DecimalMin> descriptor = new AnnotationDescriptor<DecimalMin>( DecimalMin.class );
-		descriptor.setValue( "value", "foobar" );
-		descriptor.setValue( "message", "{validator.min}" );
-		DecimalMin m = AnnotationFactory.create( descriptor );
+		ConstraintAnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( DecimalMin.class );
+		descriptorBuilder.setAttribute( "value", "foobar" );
+		descriptorBuilder.setMessage( "{validator.min}" );
+		DecimalMin m = descriptorBuilder.build().getAnnotation();
 
 		DecimalMinValidatorForNumber constraint = new DecimalMinValidatorForNumber();
 		constraint.initialize( m );
@@ -72,11 +70,11 @@ public class MinValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 	@TestForIssue(jiraKey = "HV-256")
 	public void testIsValidDecimalMinExclusive() {
 		boolean inclusive = false;
-		AnnotationDescriptor<DecimalMin> descriptor = new AnnotationDescriptor<DecimalMin>( DecimalMin.class );
-		descriptor.setValue( "value", "1500E-2" );
-		descriptor.setValue( "inclusive", inclusive );
-		descriptor.setValue( "message", "{validator.min}" );
-		DecimalMin m = AnnotationFactory.create( descriptor );
+		ConstraintAnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( DecimalMin.class );
+		descriptorBuilder.setAttribute( "value", "1500E-2" );
+		descriptorBuilder.setAttribute( "inclusive", inclusive );
+		descriptorBuilder.setMessage( "{validator.min}" );
+		DecimalMin m = descriptorBuilder.build().getAnnotation();
 
 		testDecimalMin( m, inclusive );
 	}

@@ -19,7 +19,6 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
-import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -195,20 +194,18 @@ public class MetaConstraint<A extends Annotation> {
 
 		@Override
 		public void indexedValue(String nodeName, int index, Object value) {
-			valueContext.markCurrentPropertyAsIterable();
-			valueContext.setIndex( index );
+			valueContext.markCurrentPropertyAsIterableAndSetIndex( index );
 			doValidate( value, nodeName );
 		}
 
 		@Override
 		public void keyedValue(String nodeName, Object key, Object value) {
-			valueContext.markCurrentPropertyAsIterable();
-			valueContext.setKey( key );
+			valueContext.markCurrentPropertyAsIterableAndSetKey( key );
 			doValidate( value, nodeName );
 		}
 
 		private void doValidate(Object value, String nodeName) {
-			PathImpl before = valueContext.getPropertyPath();
+			ValueContext.ValueState<Object> originalValueState = valueContext.getCurrentValueState();
 
 			Class<?> containerClass = currentValueExtractionPathNode.getContainerClass();
 			if ( containerClass != null ) {
@@ -235,8 +232,8 @@ public class MetaConstraint<A extends Annotation> {
 				success &= doValidateConstraint( validationContext, valueContext );
 			}
 
-			// reset the path to the state before this call
-			valueContext.setPropertyPath( before );
+			// reset the value context to the state before this call
+			valueContext.resetValueState( originalValueState );
 		}
 
 		public boolean isSuccess() {

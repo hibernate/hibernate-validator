@@ -6,11 +6,13 @@
  */
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * @author Gunnar Morling
  */
 public class SpecialJobRepositoryImpl extends JobRepositoryImpl {
 
-	public void createJob(String id) {
+	public void createJob(@NotNull String id) {
 	}
 }

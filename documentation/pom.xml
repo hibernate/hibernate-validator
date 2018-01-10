@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator-parent</artifactId>
-        <version>6.0.0-SNAPSHOT</version>
+        <version>6.0.8-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -28,6 +28,7 @@
         <asciidoctor.examples-source-dir>${basedir}/src/test/java</asciidoctor.examples-source-dir>
         <asciidoctor.examples-resources-dir>${basedir}/src/test/resources</asciidoctor.examples-resources-dir>
         <asciidoctor.engine-source-dir>${basedir}/../engine/src/main/java</asciidoctor.engine-source-dir>
+        <asciidoctor.osgi-integrationtest-source-dir>${basedir}/../osgi/integrationtest/src/test/java</asciidoctor.osgi-integrationtest-source-dir>
 
         <html.meta.description>Hibernate Validator, Annotation based constraints for your domain model - Reference Documentation</html.meta.description>
         <html.meta.keywords>hibernate, validator, hibernate validator, validation, bean validation</html.meta.keywords>
@@ -64,6 +65,26 @@
         <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-jsr223</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-expression</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -226,15 +247,19 @@
                         <sourcedir>${asciidoctor.examples-source-dir}</sourcedir>
                         <resourcesdir>${asciidoctor.examples-resources-dir}</resourcesdir>
                         <engine-sourcedir>${asciidoctor.engine-source-dir}</engine-sourcedir>
+                        <osgi-integrationtest-sourcedir>${asciidoctor.osgi-integrationtest-source-dir}</osgi-integrationtest-sourcedir>
 
                         <hvVersion>${project.version}</hvVersion>
                         <bvVersion>${bv.api.version}</bvVersion>
                         <wildflyVersion>${wildfly.version}</wildflyVersion>
+                        <wildflyNextVersion>${wildfly-next.version}</wildflyNextVersion>
 
                         <!-- URLs -->
                         <javaApiDocsUrl>${java.api-docs.base-url}/</javaApiDocsUrl>
                         <bvApiDocsUrl>${bv.api-docs.base-url}/</bvApiDocsUrl>
+                        <bvSpecUrl>${bv.spec.url}</bvSpecUrl>
                         <javaTechnotesBaseUrl>${java.technotes.base-url}</javaTechnotesBaseUrl>
+                        <javafxDocsUrl>${javafx.docs.url}</javafxDocsUrl>
                     </attributes>
                 </configuration>
             </plugin>

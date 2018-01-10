@@ -15,11 +15,10 @@ import java.security.PrivilegedAction;
 
 import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
-import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 /**
  * A {@link Cascadable} backed by a field of a Java bean.
@@ -29,16 +28,13 @@ import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 public class FieldCascadable implements Cascadable {
 
 	private final Field field;
-	private final String propertyName;
 	private final Type cascadableType;
 	private final CascadingMetaData cascadingMetaData;
 
 	FieldCascadable(Field field, CascadingMetaData cascadingMetaData) {
 		this.field = field;
-		this.propertyName = field.getName();
 		this.cascadableType = ReflectionHelper.typeOf( field );
 		this.cascadingMetaData = cascadingMetaData;
-		this.cascadingMetaData.validateGroupConversions( field.toString() );
 	}
 
 	@Override
@@ -58,7 +54,7 @@ public class FieldCascadable implements Cascadable {
 
 	@Override
 	public void appendTo(PathImpl path) {
-		path.addPropertyNode( propertyName );
+		path.addPropertyNode( field.getName() );
 	}
 
 	@Override
@@ -68,22 +64,24 @@ public class FieldCascadable implements Cascadable {
 
 	public static class Builder implements Cascadable.Builder {
 
+		private final ValueExtractorManager valueExtractorManager;
 		private final Field field;
-		private CascadingTypeParameter cascadingMetaData;
+		private CascadingMetaDataBuilder cascadingMetaDataBuilder;
 
-		public Builder(Field field, CascadingTypeParameter cascadingMetaData) {
+		public Builder(ValueExtractorManager valueExtractorManager, Field field, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+			this.valueExtractorManager = valueExtractorManager;
 			this.field = field;
-			this.cascadingMetaData = cascadingMetaData;
+			this.cascadingMetaDataBuilder = cascadingMetaDataBuilder;
 		}
 
 		@Override
-		public void mergeCascadingMetaData(CascadingTypeParameter cascadingMetaData) {
-			this.cascadingMetaData = this.cascadingMetaData.merge( cascadingMetaData );
+		public void mergeCascadingMetaData(CascadingMetaDataBuilder cascadingMetaData) {
+			this.cascadingMetaDataBuilder = this.cascadingMetaDataBuilder.merge( cascadingMetaData );
 		}
 
 		@Override
 		public FieldCascadable build() {
-			return new FieldCascadable( getAccessible( field ), new CascadingMetaData( cascadingMetaData ) );
+			return new FieldCascadable( getAccessible( field ), cascadingMetaDataBuilder.build( valueExtractorManager, field ) );
 		}
 
 		/**
@@ -101,11 +99,8 @@ public class FieldCascadable implements Cascadable {
 			}
 
 			Class<?> clazz = original.getDeclaringClass();
-			Field member = run( GetDeclaredField.action( clazz, original.getName() ) );
 
-			run( SetAccessibility.action( member ) );
-
-			return member;
+			return run( GetDeclaredField.andMakeAccessible( clazz, original.getName() ) );
 		}
 
 		/**

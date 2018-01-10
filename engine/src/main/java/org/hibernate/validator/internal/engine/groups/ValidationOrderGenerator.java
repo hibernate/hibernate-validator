@@ -6,9 +6,10 @@
  */
 package org.hibernate.validator.internal.engine.groups;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -27,16 +28,9 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class ValidationOrderGenerator {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ConcurrentMap<Class<?>, Sequence> resolvedSequences = new ConcurrentHashMap<Class<?>, Sequence>();
-
-	private final DefaultValidationOrder validationOrderForDefaultGroup;
-
-	public ValidationOrderGenerator() {
-		validationOrderForDefaultGroup = new DefaultValidationOrder();
-		validationOrderForDefaultGroup.insertGroup( Group.DEFAULT_GROUP );
-	}
 
 	/**
 	 * Creates a {@link ValidationOrder} for the given validation group.
@@ -49,8 +43,12 @@ public class ValidationOrderGenerator {
 	 * @return a {@link ValidationOrder} for the given validation group
 	 */
 	public ValidationOrder getValidationOrder(Class<?> group, boolean expand) {
+		if ( Default.class.equals( group ) ) {
+			return ValidationOrder.DEFAULT_GROUP;
+		}
+
 		if ( expand ) {
-			return getValidationOrder( Arrays.<Class<?>>asList( group ) );
+			return getValidationOrder( Collections.<Class<?>>singletonList( group ) );
 		}
 		else {
 			DefaultValidationOrder validationOrder = new DefaultValidationOrder();
@@ -68,18 +66,18 @@ public class ValidationOrderGenerator {
 	 */
 	public ValidationOrder getValidationOrder(Collection<Class<?>> groups) {
 		if ( groups == null || groups.size() == 0 ) {
-			throw log.getAtLeastOneGroupHasToBeSpecifiedException();
+			throw LOG.getAtLeastOneGroupHasToBeSpecifiedException();
 		}
 
 		// HV-621 - if we deal with the Default group we return the default ValidationOrder. No need to
 		// process Default as other groups which saves several reflection calls (HF)
 		if ( groups.size() == 1 && groups.contains( Default.class ) ) {
-			return validationOrderForDefaultGroup;
+			return ValidationOrder.DEFAULT_GROUP;
 		}
 
 		for ( Class<?> clazz : groups ) {
 			if ( !clazz.isInterface() ) {
-				throw log.getGroupHasToBeAnInterfaceException( clazz );
+				throw LOG.getGroupHasToBeAnInterfaceException( clazz );
 			}
 		}
 
@@ -103,7 +101,7 @@ public class ValidationOrderGenerator {
 
 	public ValidationOrder getDefaultValidationOrder(Class<?> clazz, List<Class<?>> defaultGroupSequence) {
 		DefaultValidationOrder validationOrder = new DefaultValidationOrder();
-		insertSequence( clazz, defaultGroupSequence.toArray( new Class<?>[0] ), false, validationOrder );
+		insertSequence( clazz, defaultGroupSequence.toArray( new Class<?>[defaultGroupSequence.size()] ), false, validationOrder );
 		return validationOrder;
 	}
 
@@ -145,7 +143,7 @@ public class ValidationOrderGenerator {
 
 	private Sequence resolveSequence(Class<?> sequenceClass, Class<?>[] sequenceElements, List<Class<?>> processedSequences) {
 		if ( processedSequences.contains( sequenceClass ) ) {
-			throw log.getCyclicDependencyInGroupsDefinitionException();
+			throw LOG.getCyclicDependencyInGroupsDefinitionException();
 		}
 		else {
 			processedSequences.add( sequenceClass );
@@ -169,7 +167,7 @@ public class ValidationOrderGenerator {
 		for ( Group tmpGroup : groups ) {
 			if ( resolvedGroupSequence.contains( tmpGroup ) && resolvedGroupSequence.indexOf( tmpGroup ) < resolvedGroupSequence
 					.size() - 1 ) {
-				throw log.getUnableToExpandGroupSequenceException();
+				throw LOG.getUnableToExpandGroupSequenceException();
 			}
 			resolvedGroupSequence.add( tmpGroup );
 		}

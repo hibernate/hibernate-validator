@@ -12,6 +12,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
@@ -62,7 +63,7 @@ import org.xml.sax.SAXException;
  */
 public class MappingXmlParser {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Set<Class<?>> processedClasses = newHashSet();
 	private final ConstraintHelper constraintHelper;
@@ -169,7 +170,7 @@ public class MappingXmlParser {
 			}
 		}
 		catch (JAXBException | SAXException | IOException | XMLStreamException e) {
-			throw log.getErrorParsingMappingFileException( e );
+			throw LOG.getErrorParsingMappingFileException( e );
 		}
 	}
 
@@ -289,7 +290,7 @@ public class MappingXmlParser {
 		for ( ConstraintDefinitionType constraintDefinition : constraintDefinitionList ) {
 			String annotationClassName = constraintDefinition.getAnnotation();
 			if ( alreadyProcessedConstraintDefinitions.contains( annotationClassName ) ) {
-				throw log.getOverridingConstraintDefinitionsInMultipleMappingFilesException( annotationClassName );
+				throw LOG.getOverridingConstraintDefinitionsInMultipleMappingFilesException( annotationClassName );
 			}
 			else {
 				alreadyProcessedConstraintDefinitions.add( annotationClassName );
@@ -297,7 +298,7 @@ public class MappingXmlParser {
 
 			Class<?> clazz = classLoadingHelper.loadClass( annotationClassName, defaultPackage );
 			if ( !clazz.isAnnotation() ) {
-				throw log.getIsNotAnAnnotationException( clazz );
+				throw LOG.getIsNotAnAnnotationException( clazz );
 			}
 			Class<? extends Annotation> annotationClass = (Class<? extends Annotation>) clazz;
 
@@ -315,7 +316,7 @@ public class MappingXmlParser {
 					.loadClass( validatorClassName, defaultPackage );
 
 			if ( !ConstraintValidator.class.isAssignableFrom( validatorClass ) ) {
-				throw log.getIsNotAConstraintValidatorClassException( validatorClass );
+				throw LOG.getIsNotAConstraintValidatorClassException( validatorClass );
 			}
 
 			constraintValidatorDescriptors.add( ConstraintValidatorDescriptor.forClass( validatorClass ) );
@@ -329,7 +330,7 @@ public class MappingXmlParser {
 
 	private void checkClassHasNotBeenProcessed(Set<Class<?>> processedClasses, Class<?> beanClass) {
 		if ( processedClasses.contains( beanClass ) ) {
-			throw log.getBeanClassHasAlreadyBeConfiguredInXmlException( beanClass );
+			throw LOG.getBeanClassHasAlreadyBeConfiguredInXmlException( beanClass );
 		}
 	}
 
@@ -351,7 +352,7 @@ public class MappingXmlParser {
 
 			for ( ConstrainedElement constrainedElement : newConstrainedElements ) {
 				if ( existingConstrainedElements.contains( constrainedElement ) ) {
-						throw log.getConstrainedElementConfiguredMultipleTimesException(
+						throw LOG.getConstrainedElementConfiguredMultipleTimesException(
 								constrainedElement.toString()
 						);
 				}
@@ -381,7 +382,7 @@ public class MappingXmlParser {
 			constraintMappings = root.getValue();
 		}
 		catch (Exception e) {
-			throw log.getErrorParsingMappingFileException( e );
+			throw LOG.getErrorParsingMappingFileException( e );
 		}
 		return constraintMappings;
 	}
@@ -390,7 +391,7 @@ public class MappingXmlParser {
 		String schemaResource = SCHEMAS_BY_VERSION.get( schemaVersion );
 
 		if ( schemaResource == null ) {
-			throw log.getUnsupportedSchemaVersionException( "constraint mapping file", schemaVersion );
+			throw LOG.getUnsupportedSchemaVersionException( "constraint mapping file", schemaVersion );
 		}
 
 		return schemaResource;
@@ -420,7 +421,7 @@ public class MappingXmlParser {
 			throw e;
 		}
 		catch (Exception e) {
-			throw log.getErrorParsingMappingFileException( e );
+			throw LOG.getErrorParsingMappingFileException( e );
 		}
 	}
 

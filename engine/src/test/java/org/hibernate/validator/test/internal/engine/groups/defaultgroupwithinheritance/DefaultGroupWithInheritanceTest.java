@@ -6,16 +6,18 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.defaultgroupwithinheritance;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
-
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 
 /**
  * @author Gunnar Morling
@@ -28,7 +30,10 @@ public class DefaultGroupWithInheritanceTest {
 		Validator validator = ValidatorUtil.getValidator();
 
 		Set<ConstraintViolation<A>> violations = validator.validate( new A() );
-		assertCorrectPropertyPathStringRepresentations( violations, "foo", "bar" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "foo" ),
+				violationOf( NotNull.class ).withProperty( "bar" )
+		);
 	}
 
 	@Test
@@ -36,6 +41,9 @@ public class DefaultGroupWithInheritanceTest {
 		Validator validator = ValidatorUtil.getValidator();
 
 		Set<ConstraintViolation<B>> violations = validator.validate( new B(), Max.class, Min.class );
-		assertCorrectPropertyPathStringRepresentations( violations, "foo", "bar" );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "foo" ),
+				violationOf( NotNull.class ).withProperty( "bar" )
+		);
 	}
 }

@@ -8,7 +8,7 @@ def processFileInplace(File file, Closure processText) {
 }
 
 // Add javafx.api module to the global modules
-standaloneXml = new File( project.properties['wildflyTargetDir'], 'standalone/configuration/standalone.xml' )
+standaloneXml = new File( project.properties['wildfly.target-dir'], 'standalone/configuration/standalone.xml' )
 println "[INFO] Add javafx.api as global module"
 
 processFileInplace( standaloneXml ) { text ->

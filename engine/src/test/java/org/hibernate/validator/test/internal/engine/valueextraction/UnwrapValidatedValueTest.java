@@ -25,6 +25,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.MaxDef;
 import org.hibernate.validator.test.internal.engine.valueextraction.model.Account;
+import org.hibernate.validator.test.internal.engine.valueextraction.model.Company;
 import org.hibernate.validator.test.internal.engine.valueextraction.model.Customer;
 import org.hibernate.validator.test.internal.engine.valueextraction.model.Order;
 import org.hibernate.validator.test.internal.engine.valueextraction.model.OrderLine;
@@ -35,7 +36,6 @@ import org.hibernate.validator.test.internal.engine.valueextraction.model.UiInpu
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -133,6 +133,19 @@ public class UnwrapValidatedValueTest {
 				Customer.class,
 				"name",
 				new StringProperty( "Bob" )
+		);
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1471")
+	public void shouldUnwrapPropertyValuesDuringValueValidationAndProperlyResetContextAfterConstraintValidation() {
+		Set<ConstraintViolation<Company>> violations = validator.validateValue(
+				Company.class,
+				"name",
+				new StringProperty( "Acm" )
 		);
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( Size.class )

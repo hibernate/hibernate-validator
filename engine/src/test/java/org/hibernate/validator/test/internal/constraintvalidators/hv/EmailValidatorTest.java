@@ -85,6 +85,8 @@ public class EmailValidatorTest {
 		isValidEmail( "user@localserver" );
 		isValidEmail( "user@tt" );
 		isValidEmail( "user@[IPv6:2001:DB8::1]" );
+		isValidEmail( "xn--80ahgue5b@xn--p-8sbkgc5ag7bhce.xn--ba-lmcq" );
+		isValidEmail( "nothing@xn--fken-gra.no" );
 	}
 
 	@Test

@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.xml;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -41,7 +42,8 @@ import org.hibernate.validator.internal.xml.binding.GetterType;
  * @author Guillaume Smet
  */
 class ConstrainedGetterBuilder {
-	private static final Log log = LoggerFactory.make();
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final GroupConversionBuilder groupConversionBuilder;
 	private final MetaConstraintBuilder metaConstraintBuilder;
@@ -104,9 +106,8 @@ class ConstrainedGetterBuilder {
 		return constrainedExecutables;
 	}
 
-	private CascadingTypeParameter getCascadingMetaDataForGetter(Map<TypeVariable<?>, CascadingTypeParameter> containerElementTypesCascadingMetaData, Method method,
+	private CascadingMetaDataBuilder getCascadingMetaDataForGetter(Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Method method,
 			GetterType getterType, String defaultPackage) {
-		boolean isArray = method.getReturnType().isArray();
 		Type type = ReflectionHelper.typeOf( method );
 		boolean isCascaded = getterType.getValid() != null;
 		Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
@@ -114,14 +115,12 @@ class ConstrainedGetterBuilder {
 				defaultPackage
 		);
 
-		return isArray
-				? CascadingTypeParameter.arrayElement( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions )
-				: CascadingTypeParameter.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
+		return CascadingMetaDataBuilder.annotatedObject( type, isCascaded, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
 	private static Method findGetter(Class<?> beanClass, String getterName, List<String> alreadyProcessedGetterNames) {
 		if ( alreadyProcessedGetterNames.contains( getterName ) ) {
-			throw log.getIsDefinedTwiceInMappingXmlForBeanException( getterName, beanClass );
+			throw LOG.getIsDefinedTwiceInMappingXmlForBeanException( getterName, beanClass );
 		}
 		else {
 			alreadyProcessedGetterNames.add( getterName );
@@ -129,7 +128,7 @@ class ConstrainedGetterBuilder {
 
 		final Method method = run( GetMethodFromPropertyName.action( beanClass, getterName ) );
 		if ( method == null ) {
-			throw log.getBeanDoesNotContainThePropertyException( beanClass, getterName );
+			throw LOG.getBeanDoesNotContainThePropertyException( beanClass, getterName );
 		}
 
 		return method;
