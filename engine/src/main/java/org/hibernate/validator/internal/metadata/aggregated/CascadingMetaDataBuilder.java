@@ -196,55 +196,67 @@ public class CascadingMetaDataBuilder {
 	public CascadingMetaData build(ValueExtractorManager valueExtractorManager, Object context) {
 		validateGroupConversions( context );
 
-		// we are 100% sure that we have a container and its elements are marked for cascading
-		if ( !containerElementTypesCascadingMetaData.isEmpty() && hasContainerElementsMarkedForCascading ) {
-			return ContainerCascadingMetaData.of( valueExtractorManager, this, context );
+		// In the case the whole object is not annotated as cascading, we don't need to enable
+		// the runtime detection of container so we can return early.
+		if ( !cascading ) {
+			// We have cascading enabled for at least one of the container elements
+			if ( !containerElementTypesCascadingMetaData.isEmpty() && hasContainerElementsMarkedForCascading ) {
+				return ContainerCascadingMetaData.of( valueExtractorManager, this, context );
+			}
+			// It is not a container or it doesn't have cascading enabled on any container element
+			else {
+				return NonContainerCascadingMetaData.of( this, context );
+			}
 		}
 
-		if ( cascading ) {
-			// Now we are at the case when we might have something like @Valid SomeType something;
-			//
-			// First we should check if there are any available VE that can be applied to the current declared type (SomeType)
-			// If such are found we promote the cascading to the type variable that we have VE for.
-			// In case of the Map, call to valueExtractorManager.getPossibleValueExtractorCandidatesForCascadedValidation()
-			// will not return MapKeyExtractor, hence by default it will only return MapValueExtractor which matches BV Spec.
-			//
-			// If we found more than one value extractor we throw an exception.
-			Set<ValueExtractorDescriptor> possibleValueExtractorCandidates = valueExtractorManager.getPossibleValueExtractorCandidatesForCascadedValidation( enclosingType );
-			if ( !possibleValueExtractorCandidates.isEmpty() ) {
-				if ( possibleValueExtractorCandidates.size() > 1 ) {
-					throw LOG.getUnableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclaredException(
-							ReflectionHelper.getClassFromType( enclosingType ),
-							ValueExtractorHelper.toValueExtractorClasses( possibleValueExtractorCandidates )
-					);
-				}
-				return ContainerCascadingMetaData.of(
-						valueExtractorManager,
-						new CascadingMetaDataBuilder(
-								enclosingType,
-								typeParameter,
-								cascading,
-								addCascadingMetaDataBasedOnValueExtractor( enclosingType, containerElementTypesCascadingMetaData, groupConversions, possibleValueExtractorCandidates.iterator().next() ),
-								groupConversions
-						),
-						context
+		// We are now in the case where @Valid is defined on the whole object e.g. @Valid SomeType property;.
+		//
+		// In this case, we try to detect if SomeType is a container i.e. if it has a valid value extractor.
+		//
+		// If SomeType is a container, we will enable cascading validation for this container, if and only if
+		// we have only one compatible value extractor.
+		//
+		// In the special case of a Map, only MapValueExtractor is considered compatible in this case as per
+		// the Bean Validation spec.
+		//
+		// If we find several compatible value extractors, we throw an exception.
+		Set<ValueExtractorDescriptor> possibleValueExtractorCandidates = valueExtractorManager.getPossibleValueExtractorCandidatesForCascadedValidation( enclosingType );
+		if ( !possibleValueExtractorCandidates.isEmpty() ) {
+			if ( possibleValueExtractorCandidates.size() > 1 ) {
+				throw LOG.getUnableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclaredException(
+						ReflectionHelper.getClassFromType( enclosingType ),
+						ValueExtractorHelper.toValueExtractorClasses( possibleValueExtractorCandidates )
 				);
 			}
 
-			// If there are no possible VEs that can be applied right away to a declared type we should check if
-			// there are any VEs that can be potentially applied to our type at runtime. This should cover cases
-			// like @Valid Object object; or @Valid ContainerWithoutRegisteredVE container; where at runtime we can have
-			// object = new ArrayList<>(); or container = new ContainerWithRegisteredVE(); (ContainerWithRegisteredVE extends ContainerWithoutRegisteredVE)
-			// so we are looking for VEs such that ValueExtractorDescriptor#getContainerType() is assignable to declared type under
-			// inspection.
-			Set<ValueExtractorDescriptor> potentialValueExtractorCandidates = valueExtractorManager.getPotentialValueExtractorCandidatesForCascadedValidation( enclosingType );
+			return ContainerCascadingMetaData.of(
+					valueExtractorManager,
+					new CascadingMetaDataBuilder(
+							enclosingType,
+							typeParameter,
+							cascading,
+							addCascadingMetaDataBasedOnValueExtractor( enclosingType, containerElementTypesCascadingMetaData, groupConversions,
+									possibleValueExtractorCandidates.iterator().next() ),
+							groupConversions
+					),
+					context
+			);
+		}
 
-			// if such VEs were found we return an instance of PotentiallyContainerCascadingMetaData that will store those potential VEs
-			// and they will be used at runtime to check if any of those could be applied to a runtime type and if PotentiallyContainerCascadingMetaData
-			// should be promoted to ContainerCascadingMetaData or not.
-			if ( !potentialValueExtractorCandidates.isEmpty() ) {
-				return PotentiallyContainerCascadingMetaData.of( this, potentialValueExtractorCandidates, context );
-			}
+		// If there are no possible VEs that can be applied right away to a declared type we should check if
+		// there are any VEs that can be potentially applied to our type at runtime. This should cover cases
+		// like @Valid Object object; or @Valid ContainerWithoutRegisteredVE container; where at runtime we can have
+		// object = new ArrayList<>(); or container = new ContainerWithRegisteredVE(); (with ContainerWithRegisteredVE
+		// extends ContainerWithoutRegisteredVE)
+		// so we are looking for VEs such that ValueExtractorDescriptor#getContainerType() is assignable to the declared
+		// type under inspection.
+		Set<ValueExtractorDescriptor> potentialValueExtractorCandidates = valueExtractorManager.getPotentialValueExtractorCandidatesForCascadedValidation( enclosingType );
+
+		// if such VEs were found we return an instance of PotentiallyContainerCascadingMetaData that will store those potential VEs
+		// and they will be used at runtime to check if any of those could be applied to a runtime type and if PotentiallyContainerCascadingMetaData
+		// should be promoted to ContainerCascadingMetaData or not.
+		if ( !potentialValueExtractorCandidates.isEmpty() ) {
+			return PotentiallyContainerCascadingMetaData.of( this, potentialValueExtractorCandidates, context );
 		}
 
 		// if cascading == false, or none of the above cases matched we just return a non container metadata

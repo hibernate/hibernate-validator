@@ -188,7 +188,8 @@ public class MultipleContainersAtTheSameTimeTest {
 
 	/**
 	 * When we have global and local {@code @Valid} case for example something like {@code @Valid Container<@Valid T1, T2, ...Tn> container}
-	 * and we have VE for more than one type variable, global {@code Valid} will be ignored and
+	 * and we have VE for more than one type variable, we will receive an exception as we cannot determine to which argument
+	 * a global {@code @Valid} should be applied.
 	 */
 	@Test
 	public void testGlobalAndLocalValidWithMultipleExtractorsAvailable() throws Exception {
@@ -202,15 +203,19 @@ public class MultipleContainersAtTheSameTimeTest {
 			}
 		}
 
-		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( new Pair<>( Collections.singletonList( "" ), null ) ) );
-		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( NotBlank.class ).withMessage( "must not be blank" )
-		);
+		assertThatThrownBy( () -> validator.validate( new Foo( new Pair<>( Collections.singletonList( "" ), null ) ) ) )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageContaining( "HV000219: Unable to get the most specific value extractor for type" );
 	}
 
 	/**
 	 * Test how combinations of global/local {@code @Valid} is handled for a {@code Map} container.
+	 * We have {@code @Valid} declared globally on a {@code Map} container, hence values of the map
+	 * should be validated. And we also have a {@code @Valid} on a key argument, hence keys should
+	 * be validated as well.
 	 *
+	 * For the second assertion {@code @Valid} is declared globally on a {@code Map} container,
+	 * and also on a value argument of the map. Hence only values of the map should be validated.
 	 */
 	@Test
 	public void testGlobalAndLocalValidOnMap() throws Exception {
@@ -218,17 +223,22 @@ public class MultipleContainersAtTheSameTimeTest {
 		FalseBooleanWrapper key = new FalseBooleanWrapper();
 		container.put( key, new FalseBooleanWrapper() );
 
-		Set<ConstraintViolation<ValidKeyFoo>> constraintViolations = validator.validate( new ValidKeyFoo( container ) );
+		Set<ConstraintViolation<GlobalValidAndValidKeyFoo>> constraintViolations = validator.validate( new GlobalValidAndValidKeyFoo( container ) );
 
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( AssertTrue.class )
 						.withPropertyPath( pathWith()
 								.property( "container" )
 								.property( "bool", true, key, null, Map.class, 0 )
+						).withMessage( "must be true" ),
+				violationOf( AssertTrue.class )
+						.withPropertyPath( pathWith()
+								.property( "container" )
+								.property( "bool", true, key, null, Map.class, 1 )
 						).withMessage( "must be true" )
 		);
 
-		Set<ConstraintViolation<ValidValueFoo>> constraintValueViolations = validator.validate( new ValidValueFoo( container ) );
+		Set<ConstraintViolation<GlobalValidAndValidValueFoo>> constraintValueViolations = validator.validate( new GlobalValidAndValidValueFoo( container ) );
 
 		assertThat( constraintValueViolations ).containsOnlyViolations(
 				violationOf( AssertTrue.class )
@@ -335,22 +345,22 @@ public class MultipleContainersAtTheSameTimeTest {
 		private boolean bool = false;
 	}
 
-	private static class ValidKeyFoo {
+	private static class GlobalValidAndValidKeyFoo {
 
 		@Valid
 		private final Map<@Valid FalseBooleanWrapper, FalseBooleanWrapper> container;
 
-		ValidKeyFoo(Map<FalseBooleanWrapper, FalseBooleanWrapper> container) {
+		GlobalValidAndValidKeyFoo(Map<FalseBooleanWrapper, FalseBooleanWrapper> container) {
 			this.container = container;
 		}
 	}
 
-	private static class ValidValueFoo {
+	private static class GlobalValidAndValidValueFoo {
 
 		@Valid
 		private final Map<FalseBooleanWrapper, @Valid FalseBooleanWrapper> container;
 
-		ValidValueFoo(Map<FalseBooleanWrapper, FalseBooleanWrapper> container) {
+		GlobalValidAndValidValueFoo(Map<FalseBooleanWrapper, FalseBooleanWrapper> container) {
 			this.container = container;
 		}
 	}

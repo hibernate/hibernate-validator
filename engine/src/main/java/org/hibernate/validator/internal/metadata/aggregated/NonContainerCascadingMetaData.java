@@ -18,7 +18,10 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
- * A simplified view of the cascading validation metadata for a non container element.
+ * A simplified view of the cascading validation metadata for an element that does not contain any container element
+ * cascading.
+ * <p>
+ * Note that the element might be a container but doesn't have any cascading metadata on the container elements.
  *
  * @author Guillaume Smet
  * @author Marko Bekhta
@@ -99,6 +102,7 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 
 	@Override
 	public CascadingMetaData addRuntimeContainerSupport(ValueExtractorManager valueExtractorManager, Class<?> valueClass) {
+		// do nothing, we are sure it is not a container
 		return this;
 	}
 

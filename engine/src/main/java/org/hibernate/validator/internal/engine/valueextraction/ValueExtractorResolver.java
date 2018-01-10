@@ -160,7 +160,6 @@ class ValueExtractorResolver {
 	 * <p>
 	 * Types that are assignable to {@link Map} are handled as a special case - key value extractor is ignored for them.
 	 */
-
 	public Set<ValueExtractorDescriptor> getPossibleValueExtractorCandidatesForCascadedValidation(Type enclosingType) {
 		// if it's a Map assignable type, it gets a special treatment to conform to the Bean Validation specification
 		boolean mapAssignable = TypeHelper.isAssignable( Map.class, enclosingType );
