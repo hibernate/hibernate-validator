@@ -256,6 +256,13 @@
                 <type>zip</type>
             </dependency>
             <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-validator-modules</artifactId>
+                <version>${project.version}</version>
+                <classifier>wildfly-${wildfly-next.version}-patch</classifier>
+                <type>zip</type>
+            </dependency>
+            <dependency>
                 <groupId>javax.validation</groupId>
                 <artifactId>validation-api</artifactId>
                 <version>${bv.api.version}</version>

@@ -89,6 +89,19 @@
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-annotations</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-validator-modules</artifactId>
+            <classifier>wildfly-${wildfly.version}-patch</classifier>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-validator-modules</artifactId>
+            <classifier>wildfly-${wildfly-next.version}-patch</classifier>
+            <type>zip</type>
+        </dependency>
     </dependencies>
 
     <build>
@@ -154,6 +167,7 @@
                     </descriptors>
                     <finalName>hibernate-validator-${project.version}</finalName>
                     <tarLongFileMode>gnu</tarLongFileMode>
+                    <outputDirectory>${project.build.directory}/dist/</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>
@@ -165,10 +179,29 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-jbossmodules-to-dist</id>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <phase>install</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/dist/</outputDirectory>
+                            <includeGroupIds>${project.groupId}</includeGroupIds>
+                            <includeArtifactIds>hibernate-validator-modules</includeArtifactIds>
+                            <includeTypes>zip</includeTypes>
+                            <excludeTransitive>true</excludeTransitive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
-    <profile>
+        <profile>
             <id>jdk9</id>
             <activation>
                 <jdk>9</jdk>
