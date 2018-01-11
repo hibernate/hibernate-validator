@@ -11,7 +11,10 @@
     <formats>
         <format>tar.gz</format>
         <format>zip</format>
+        <!-- Uncomment the following line to simplify content inspection: -->
+        <!--
         <format>dir</format>
+        -->
     </formats>
 
     <!-- Configure the artifacts to include  -->
