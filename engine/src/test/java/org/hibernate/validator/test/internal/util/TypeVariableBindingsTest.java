@@ -17,8 +17,6 @@ import java.util.Map;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
 import org.testng.annotations.Test;
 
-import com.google.common.collect.Multimap;
-
 /**
  * @author Gunnar Morling
  */
@@ -89,6 +87,9 @@ public class TypeVariableBindingsTest {
 		);
 	}
 
+	private interface Multimap<K, V> {
+
+	}
 	private interface MiddleMap<S, W> extends Multimap<S, W>, List<W> {
 	}
 
