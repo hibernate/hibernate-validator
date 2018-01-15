@@ -31,36 +31,44 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * <p>
  *
  * @author Hillmer Chona
- * @since 6.0.x
+ * @since 6.0.8
  */
-
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Retention(RUNTIME)
-@Repeatable(MinAge.List.class)
+@Repeatable(AgeMin.List.class)
 @Documented
 @Constraint(validatedBy = {})
-public @interface MinAge {
+public @interface AgeMin {
 
-	String message() default "{org.hibernate.validator.constraints.MinAge.message}";
+	String message() default "{org.hibernate.validator.constraints.AgeMin.message}";
 
 	Class<?>[] groups() default {};
 
 	Class<? extends Payload>[] payload() default {};
 
 	/**
-	 * @return value the age must be greater or equal to
+	 * @return value the age in years from a given date must be greater or equal to
 	 */
 	int value();
 
 	/**
-	 * Defines several {@link MinAge} annotations on the same element.
+	 * Specifies whether the specified value is inclusive or exclusive.
+	 * By default, it is inclusive.
 	 *
-	 * @see MinAge
+	 * @return {@code true} if the number of years from a given date must be higher or equal to the specified value,
+	 *         {@code false} if the number of years from a given date must be higher
+	 */
+	boolean inclusive() default true;
+
+	/**
+	 * Defines several {@link AgeMin} annotations on the same element.
+	 *
+	 * @see AgeMin
 	 */
 	@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 	@Retention(RUNTIME)
 	@Documented
 	@interface List {
-		MinAge[] value();
+		AgeMin[] value();
 	}
 }

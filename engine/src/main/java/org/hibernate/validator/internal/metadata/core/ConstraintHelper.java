@@ -60,7 +60,7 @@ import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LuhnCheck;
-import org.hibernate.validator.constraints.MinAge;
+import org.hibernate.validator.constraints.AgeMin;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.ModCheck;
@@ -259,7 +259,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ISBNValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.MinAgeValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.AgeMinValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidator;
@@ -464,7 +464,7 @@ public class ConstraintHelper {
 			) );
 		}
 
-		putConstraint( tmpConstraints, MinAge.class, MinAgeValidator.class );
+		putConstraint( tmpConstraints, AgeMin.class, AgeMinValidator.class );
 
 		if ( isJavaMoneyInClasspath() ) {
 			putConstraints( tmpConstraints, Negative.class, Arrays.asList(
