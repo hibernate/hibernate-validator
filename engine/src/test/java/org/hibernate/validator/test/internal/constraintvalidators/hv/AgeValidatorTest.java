@@ -31,7 +31,6 @@ import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDesc
 import org.hibernate.validator.testutil.TestForIssue;
 
 import org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.time.LocalDate;
