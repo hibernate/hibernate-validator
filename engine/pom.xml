@@ -309,8 +309,11 @@
         <profile>
             <id>jdk9</id>
             <activation>
-                <jdk>9</jdk>
+                <jdk>[9,)</jdk>
             </activation>
+            <properties>
+                <maven-surefire-plugin.argLine>--illegal-access=deny</maven-surefire-plugin.argLine>
+            </properties>
             <build>
                 <plugins>
                     <plugin>

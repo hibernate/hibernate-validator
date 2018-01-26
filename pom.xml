@@ -1131,7 +1131,7 @@
         <profile>
             <id>jdk9</id>
             <activation>
-                <jdk>9</jdk>
+                <jdk>[9,)</jdk>
             </activation>
             <properties>
                 <maven-surefire-plugin.argLine.add-modules>--add-modules=${maven-surefire-plugin.jigsaw.modules}</maven-surefire-plugin.argLine.add-modules>
