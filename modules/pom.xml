@@ -314,7 +314,7 @@
         <profile>
             <id>jdk9</id>
             <activation>
-                <jdk>9</jdk>
+                <jdk>[9,)</jdk>
             </activation>
             <properties>
                 <patch-gen-maven-plugin.argLine.add-opens>--add-opens=java.base/java.lang=ALL-UNNAMED</patch-gen-maven-plugin.argLine.add-opens>
