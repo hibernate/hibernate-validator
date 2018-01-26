@@ -22,7 +22,7 @@
 
     <properties>
         <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-tests-suite.xml</tck.suite.file>
-        <wildfly.target-dir>${project.build.directory}/wildfly-${wildfly.version}</wildfly.target-dir>
+        <wildfly.target-dir>${project.build.directory}/wildfly-${wildfly-tck.version}</wildfly.target-dir>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug />
 
@@ -253,7 +253,7 @@
                                         <artifactItem>
                                             <groupId>org.wildfly</groupId>
                                             <artifactId>wildfly-dist</artifactId>
-                                            <version>${wildfly.version}</version>
+                                            <version>${wildfly-tck.version}</version>
                                             <type>tar.gz</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${project.build.directory}</outputDirectory>
@@ -273,7 +273,7 @@
                                             <groupId>${project.groupId}</groupId>
                                             <artifactId>hibernate-validator-modules</artifactId>
                                             <version>${project.version}</version>
-                                            <classifier>wildfly-${wildfly.version}-patch</classifier>
+                                            <classifier>wildfly-${wildfly-tck.version}-patch</classifier>
                                             <type>zip</type>
                                             <outputDirectory>${project.build.directory}</outputDirectory>
                                         </artifactItem>
@@ -296,7 +296,7 @@
                                     <offline>true</offline>
                                     <fail-on-error>false</fail-on-error>
                                     <commands>
-                                        <command>patch apply --path ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly.version}-patch.zip</command>
+                                        <command>patch apply --path ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly-tck.version}-patch.zip</command>
                                     </commands>
                                 </configuration>
                             </execution>

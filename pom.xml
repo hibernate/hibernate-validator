@@ -120,22 +120,24 @@
 
         <paranamer.version>2.8</paranamer.version>
         <javax.el.version>3.0.1-b08</javax.el.version>
-        <jboss.logging.version>3.3.0.Final</jboss.logging.version>
-        <jboss.logging.processor.version>2.0.2.Final</jboss.logging.processor.version>
+        <jboss.logging.version>3.3.1.Final</jboss.logging.version>
+        <jboss.logging.processor.version>2.1.0.Final</jboss.logging.processor.version>
 
         <!-- Currently supported version of WildFly -->
         <wildfly.version>10.1.0.Final</wildfly.version>
         <!-- Used to create a patch file for WildFly next -->
         <wildfly-next.version>11.0.0.Final</wildfly-next.version>
+        <!-- Version used to run the TCK in incontainer mode -->
+        <wildfly-tck.version>${wildfly-next.version}</wildfly-tck.version>
 
         <!--
             These dependencies should be aligned with the ones from the WildFly version we support
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
-        <classmate.version>1.3.1</classmate.version>
+        <classmate.version>1.3.3</classmate.version>
         <jsoup.version>1.8.3</jsoup.version>
-        <joda-time.version>2.9.5</joda-time.version>
-        <slf4j.version>1.7.7</slf4j.version> <!-- Note: Wildfly 10.1.0.Final uses a custom jboss version -->
+        <joda-time.version>2.9.7</joda-time.version>
+        <slf4j.version>1.7.22</slf4j.version> <!-- Note: Wildfly 10.1.0.Final uses a custom jboss version -->
         <hibernate-jpa-2.1-api.version>1.0.0.Final</hibernate-jpa-2.1-api.version>
 
         <!--
@@ -144,8 +146,8 @@
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
         <cdi-api.version>1.2</cdi-api.version>
-        <weld.version>2.3.5.Final</weld.version>
-        <wildfly-arquillian.version>2.0.0.Final</wildfly-arquillian.version>
+        <weld.version>2.4.3.Final</weld.version>
+        <wildfly-arquillian.version>2.1.0.Final</wildfly-arquillian.version>
         <jboss-ejb-api_3.2_spec.version>1.0.0.Final</jboss-ejb-api_3.2_spec.version>
 
         <!-- JavaMoney dependencies -->
@@ -156,7 +158,7 @@
         <wildfly-patch-gen-maven-plugin.version>2.0.1.Alpha5</wildfly-patch-gen-maven-plugin.version>
         <wildfly-patch-gen-maven-plugin.woodstox.version>5.0.3</wildfly-patch-gen-maven-plugin.woodstox.version>
         <wildfly-maven-plugin.version>1.2.0.Alpha6</wildfly-maven-plugin.version>
-        <wildfly-core.version>3.0.0.Beta27</wildfly-core.version>
+        <wildfly-core.version>3.0.10.Final</wildfly-core.version>
 
         <!-- Test dependencies -->
         <arquillian.version>1.1.11.Final</arquillian.version>

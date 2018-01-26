@@ -53,6 +53,7 @@ grant codeBase "file:${localRepository}/com/fasterxml/classmate/-" {
 
 grant codeBase "file:${localRepository}/org/jboss/logging/jboss-logging/-" {
     permission java.util.PropertyPermission "org.jboss.logging.provider", "read";
+    permission java.util.PropertyPermission "org.jboss.logging.locale", "read";
 };
 
 /* =================== */
