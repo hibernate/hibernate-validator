@@ -201,11 +201,7 @@
         <bv.api-docs.base-url>http://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api</bv.api-docs.base-url>
         <javamoney.api-docs.base-url>http://javamoney.github.io/apidocs</javamoney.api-docs.base-url>
 
-        <!--
-        Do not upgrade Surefire and Failsafe to 2.19+.
-        See https://hibernate.atlassian.net/browse/HV-1117
-        -->
-        <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>2.20.1</maven-surefire-plugin.version>
 
         <!-- Used to add further arguments to the arg line for specific sub-modules and profiles -->
         <maven-surefire-plugin.argLine></maven-surefire-plugin.argLine>
@@ -503,7 +499,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.7.0</version>
                     <configuration>
                         <testCompilerArgument>-parameters</testCompilerArgument>
                     </configuration>
@@ -572,7 +568,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>2.3</version>
+                    <version>2.4.1</version>
                     <configuration>
                         <!-- if the Java version used is too new, don't fail, just do nothing -->
                         <failOnUnsupportedJava>false</failOnUnsupportedJava>
@@ -709,7 +705,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>2.10</version>
+                    <version>3.0.2</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
@@ -717,7 +713,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>3.1.0</version>
                     <dependencies>
                         <!--
                         We need to use a more recent version of the plexus-archiver to support JDK 9
@@ -751,6 +747,10 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
+                    <!--
+                    1.6.0 has a bug that affects us, waiting for the next version
+                    https://github.com/mojohaus/exec-maven-plugin/issues/75
+                    -->
                     <version>1.5.0</version>
                 </plugin>
                 <plugin>
@@ -788,7 +788,7 @@
                 <plugin>
                     <groupId>ch.mfrey.maven.plugin</groupId>
                     <artifactId>copy-maven-plugin</artifactId>
-                    <version>0.0.5</version>
+                    <version>0.0.6</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -797,7 +797,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-source-plugin</artifactId>
@@ -805,7 +805,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.0-M1</version>
+                    <version>3.0.0</version>
                     <configuration>
                         <quiet>true</quiet>
                         <docfilessubdirs>true</docfilessubdirs>
@@ -819,7 +819,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.0.2</version>
                     <configuration>
                         <!-- By default the "@" character is a delimiter, causing files containing
                              that character to not be filtered properly -->
@@ -832,7 +832,7 @@
                 <plugin>
                     <groupId>org.codehaus.gmavenplus</groupId>
                     <artifactId>gmavenplus-plugin</artifactId>
-                    <version>1.5</version>
+                    <version>1.6</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.codehaus.groovy</groupId>
@@ -844,7 +844,7 @@
                 <plugin>
                     <groupId>org.apache.servicemix.tooling</groupId>
                     <artifactId>depends-maven-plugin</artifactId>
-                    <version>1.3.1</version>
+                    <version>1.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -858,7 +858,7 @@
                     -->
                     <groupId>com.github.siom79.japicmp</groupId>
                     <artifactId>japicmp-maven-plugin</artifactId>
-                    <version>0.9.1</version>
+                    <version>0.11.0</version>
                     <configuration>
                         <oldVersion>
                             <dependency>
@@ -886,7 +886,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>2.2</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <!-- WildFly patching infrastructure plugins -->
                 <plugin>

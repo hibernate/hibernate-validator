@@ -146,7 +146,7 @@
                             <packages>org.hibernate.validator.ap*</packages>
                         </group>
                     </groups>
-                    <additionalparam>${javadoc.additional.param}</additionalparam>
+                    <additionalOptions>${javadoc.additional.options}</additionalOptions>
                 </configuration>
                 <executions>
                     <execution>
@@ -207,7 +207,7 @@
                 <jdk>[9,)</jdk>
             </activation>
             <properties>
-                <javadoc.additional.param>-html5 --add-modules=${maven-javadoc-plugin.jigsaw.modules}</javadoc.additional.param>
+                <javadoc.additional.options>-html5 --add-modules=${maven-javadoc-plugin.jigsaw.modules}</javadoc.additional.options>
             </properties>
         </profile>
     </profiles>
