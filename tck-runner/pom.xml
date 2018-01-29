@@ -366,7 +366,6 @@
             </activation>
             <properties>
                 <maven-surefire-plugin.argLine.add-opens>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED</maven-surefire-plugin.argLine.add-opens>
-                <tck.suite.file>${project.build.directory}/test-classes/tck-tests-jdk9.xml</tck.suite.file>
             </properties>
         </profile>
     </profiles>
