@@ -113,7 +113,7 @@
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
         <bv.api.version>2.0.1.Final</bv.api.version>
-        <tck.version>2.0.1.Final</tck.version>
+        <tck.version>2.0.2.Final</tck.version>
 
         <!-- Version to be used as baseline for API/SPI change reports -->
         <previous.stable>6.0.4.Final</previous.stable>
