@@ -33,6 +33,14 @@ import org.testng.xml.XmlTest;
  * -Darquillian.protocol=LocalSecurityManagerTesting
  * -Dorg.jboss.testharness.spi.StandaloneContainers=org.hibernate.jsr303.tck.util.StandaloneContainersImpl
  * </pre>
+ * <p>
+ * Add the following option when you want to enable the security manager:
+ * <pre>
+ * -Djava.security.manager
+ * </pre>
+ * <p>
+ * You may also need to update your test.policy file to apply the permissions to the right source tree.
+ * See the comments in the file.
  *
  * @author Gunnar Morling
  */
