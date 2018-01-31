@@ -41,6 +41,7 @@ import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -96,11 +97,17 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@Immutable
 	private final Set<MetaConstraint<?>> allMetaConstraints;
 
+	@Immutable
+	private final Map<ConstraintLocation, Set<MetaConstraint<?>>> allMetaConstraintsByLocation;
+
 	/**
 	 * Set of all constraints which are directly defined on the bean or any of the directly implemented interfaces
 	 */
 	@Immutable
 	private final Set<MetaConstraint<?>> directMetaConstraints;
+
+	@Immutable
+	private final Map<ConstraintLocation, Set<MetaConstraint<?>>> directMetaConstraintsByLocation;
 
 	/**
 	 * Contains constrained related meta data for all the constrained methods and constructors of the type represented
@@ -217,6 +224,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.hasConstraints = hasConstraints;
 		this.cascadedProperties = CollectionHelper.toImmutableSet( cascadedProperties );
 		this.allMetaConstraints = CollectionHelper.toImmutableSet( allMetaConstraints );
+		this.allMetaConstraintsByLocation = allMetaConstraints.stream().collect(
+				Collectors.collectingAndThen(
+						Collectors.groupingBy( MetaConstraint::getLocation, Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) ),
+						CollectionHelper::toImmutableMap
+				)
+		);
 
 		this.classHierarchyWithoutInterfaces = CollectionHelper.toImmutableList( ClassHierarchyHelper.getHierarchy(
 				beanClass,
@@ -229,6 +242,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.validationOrder = defaultGroupContext.validationOrder;
 
 		this.directMetaConstraints = getDirectConstraints();
+		this.directMetaConstraintsByLocation = directMetaConstraints.stream().collect(
+				Collectors.collectingAndThen(
+						Collectors.groupingBy( MetaConstraint::getLocation, Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) ),
+						CollectionHelper::toImmutableMap
+				)
+		);
 
 		this.executableMetaDataMap = CollectionHelper.toImmutableMap( bySignature( executableMetaDataSet ) );
 		this.unconstrainedExecutables = CollectionHelper.toImmutableSet( tmpUnconstrainedExecutables );
@@ -302,8 +321,18 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	@Override
+	public Map<ConstraintLocation, Set<MetaConstraint<?>>> getMetaConstraintsByLocation() {
+		return allMetaConstraintsByLocation;
+	}
+
+	@Override
 	public Set<MetaConstraint<?>> getDirectMetaConstraints() {
 		return directMetaConstraints;
+	}
+
+	@Override
+	public Map<ConstraintLocation, Set<MetaConstraint<?>>> getDirectMetaConstraintsByLocation() {
+		return directMetaConstraintsByLocation;
 	}
 
 	@Override
