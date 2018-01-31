@@ -28,19 +28,9 @@ public class FooFieldConstraintLocation implements ConstraintLocation {
 	/**
 	 * The member the constraint was defined on.
 	 */
-	private static final MethodHandle property;
-	private static final Field string;
+	private final MethodHandle property;
+	private final Field string;
 
-	static {
-		try {
-			string = Foo.class.getDeclaredField( "string" );
-			string.setAccessible( true );
-			property = MethodHandles.lookup().unreflectGetter( string );
-		}
-		catch (IllegalAccessException | NoSuchFieldException e) {
-			throw new IllegalStateException( e );
-		}
-	}
 
 	/**
 	 * The property name associated with the member.
@@ -55,6 +45,14 @@ public class FooFieldConstraintLocation implements ConstraintLocation {
 	FooFieldConstraintLocation() {
 		this.propertyName = "string";
 		this.typeForValidatorResolution = String.class;
+		try {
+			string = Foo.class.getDeclaredField( "string" );
+			string.setAccessible( true );
+			property = MethodHandles.lookup().unreflectGetter( string );
+		}
+		catch (IllegalAccessException | NoSuchFieldException e) {
+			throw new IllegalStateException( e );
+		}
 	}
 
 	@Override

@@ -28,19 +28,8 @@ public class FooGetterConstraintLocation implements ConstraintLocation {
 	/**
 	 * The method the constraint was defined on.
 	 */
-	private static final MethodHandle property;
-	private static final Method method;
-
-	static {
-		try {
-			method = Foo.class.getMethod( "isTrue" );
-			method.setAccessible( true );
-			property = MethodHandles.lookup().unreflect( method );
-		}
-		catch (IllegalAccessException | NoSuchMethodException e) {
-			throw new IllegalStateException( e );
-		}
-	}
+	private final MethodHandle property;
+	private final Method method;
 
 	/**
 	 * The property name associated with the method.
@@ -53,6 +42,14 @@ public class FooGetterConstraintLocation implements ConstraintLocation {
 	private final Type typeForValidatorResolution;
 
 	FooGetterConstraintLocation() {
+		try {
+			method = Foo.class.getMethod( "isTrue" );
+			method.setAccessible( true );
+			property = MethodHandles.lookup().unreflect( method );
+		}
+		catch (IllegalAccessException | NoSuchMethodException e) {
+			throw new IllegalStateException( e );
+		}
 		this.propertyName = ReflectionHelper.getPropertyName( method );
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( ReflectionHelper.typeOf( method ) );
 	}
