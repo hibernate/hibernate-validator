@@ -40,11 +40,11 @@ public interface ConstraintLocation {
 	}
 
 	static ConstraintLocation forField(Field field) {
-		return new FieldConstraintLocation( field );
+		return new FooFieldConstraintLocation();
 	}
 
 	static ConstraintLocation forGetter(Method getter) {
-		return new GetterConstraintLocation( getter );
+		return new FooGetterConstraintLocation();
 	}
 
 	static ConstraintLocation forTypeArgument(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type typeOfAnnotatedElement) {
