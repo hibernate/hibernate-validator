@@ -84,12 +84,6 @@ public interface BeanMetaData<T> extends Validatable {
 	boolean defaultGroupSequenceIsRedefined();
 
 	/**
-	 * @return A set of {@code MetaConstraint} instances encapsulating the information of all the constraints
-	 *         defined on the bean. This collection includes constraints from super classes as well
-	 */
-	Set<MetaConstraint<?>> getMetaConstraints();
-
-	/**
 	 * @return A map of {@code MetaConstraint} instances encapsulating the information of all the constraints
 	 * 		defined on the bean, grouped by constraint location. This collection includes constraints
 	 * 		from super classes as well
@@ -97,12 +91,10 @@ public interface BeanMetaData<T> extends Validatable {
 	Map<ConstraintLocation, Set<MetaConstraint<?>>> getMetaConstraintsByLocation();
 
 	/**
-	 * @return A set of {@code MetaConstraint} instances encapsulating the information of all the constraints
-	 *         defined on the bean directly (including constraints defined on implemented interfaces). It does not
-	 *         contain constraints from super classes or interfaces implemented by super classes
+	 * @return A map of {@code MetaConstraint} instances encapsulating the information of all the constraints
+	 *         defined on the bean directly (including constraints defined on implemented interfaces), grouped by constraint
+	 *         location. It does not contain constraints from super classes or interfaces implemented by super classes
 	 */
-	Set<MetaConstraint<?>> getDirectMetaConstraints();
-
 	Map<ConstraintLocation, Set<MetaConstraint<?>>> getDirectMetaConstraintsByLocation();
 
 	/**
