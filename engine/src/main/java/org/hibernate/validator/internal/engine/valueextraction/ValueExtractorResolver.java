@@ -42,14 +42,14 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-class ValueExtractorResolver {
+public class ValueExtractorResolver {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final Object NON_CONTAINER_VALUE = new Object();
 
 	@Immutable
-	private final Set<ValueExtractorDescriptor> valueExtractors;
+	private final Set<ValueExtractorDescriptor> registeredValueExtractors;
 
 	private final ConcurrentHashMap<ValueExtractorCacheKey, Set<ValueExtractorDescriptor>> possibleValueExtractorsByRuntimeTypeAndTypeParameter = new ConcurrentHashMap<>();
 
@@ -58,7 +58,7 @@ class ValueExtractorResolver {
 	private final ConcurrentHashMap<Class<?>, Object> nonContainerTypes = new ConcurrentHashMap<>();
 
 	ValueExtractorResolver(Set<ValueExtractorDescriptor> valueExtractors) {
-		this.valueExtractors = CollectionHelper.toImmutableSet( valueExtractors );
+		this.registeredValueExtractors = CollectionHelper.toImmutableSet( valueExtractors );
 	}
 
 	/**
@@ -69,7 +69,7 @@ class ValueExtractorResolver {
 	 * Used for container element constraints.
 	 */
 	public Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> declaredType) {
-		return getRuntimeCompliantValueExtractors( declaredType, valueExtractors );
+		return getRuntimeCompliantValueExtractors( declaredType, registeredValueExtractors );
 	}
 
 	/**
@@ -83,7 +83,7 @@ class ValueExtractorResolver {
 	public ValueExtractorDescriptor getMaximallySpecificAndContainerElementCompliantValueExtractor(Class<?> declaredType, TypeVariable<?> typeParameter) {
 		return getUniqueValueExtractorOrThrowException(
 				declaredType,
-				getRuntimeAndContainerElementComplaintValueExtractorsFromPossibleCandidates( declaredType, typeParameter, declaredType, valueExtractors )
+				getRuntimeAndContainerElementComplaintValueExtractorsFromPossibleCandidates( declaredType, typeParameter, declaredType, registeredValueExtractors )
 		);
 	}
 
@@ -94,16 +94,32 @@ class ValueExtractorResolver {
 	 * <p>
 	 * Used for cascading validation.
 	 *
-	 * @throws ConstraintDeclarationException if more than 2 maximally specific runtime container-element-compliant value extractors are found
+	 * @see ValueExtractorResolver#getMaximallySpecificAndRuntimeContainerElementCompliantValueExtractor(Type,
+	 * TypeVariable, Class, Collection)
+	 * @throws ConstraintDeclarationException if more than 2 maximally specific container-element-compliant value extractors are found
 	 */
 	public ValueExtractorDescriptor getMaximallySpecificAndRuntimeContainerElementCompliantValueExtractor(Type declaredType, TypeVariable<?> typeParameter,
 			Class<?> runtimeType, Collection<ValueExtractorDescriptor> valueExtractorCandidates) {
-		return getUniqueValueExtractorOrThrowException(
-				runtimeType,
-				getRuntimeAndContainerElementComplaintValueExtractorsFromPossibleCandidates(
-						declaredType, typeParameter, runtimeType, valueExtractorCandidates
-				)
-		);
+
+		if ( valueExtractorCandidates.size() == 1 ) {
+			return valueExtractorCandidates.iterator().next();
+		}
+		else if ( !valueExtractorCandidates.isEmpty() ) {
+			return getUniqueValueExtractorOrThrowException(
+					runtimeType,
+					getRuntimeAndContainerElementComplaintValueExtractorsFromPossibleCandidates(
+							declaredType, typeParameter, runtimeType, valueExtractorCandidates
+					)
+			);
+		}
+		else {
+			return getUniqueValueExtractorOrThrowException(
+					runtimeType,
+					getRuntimeAndContainerElementComplaintValueExtractorsFromPossibleCandidates(
+							declaredType, typeParameter, runtimeType, registeredValueExtractors
+					)
+			);
+		}
 	}
 
 	/**
@@ -140,7 +156,7 @@ class ValueExtractorResolver {
 		Set<ValueExtractorDescriptor> valueExtractorDescriptors = new HashSet<>();
 
 		valueExtractorDescriptors.addAll( getRuntimeAndContainerElementComplaintValueExtractorsFromPossibleCandidates( declaredType, typeParameter,
-				TypeHelper.getErasedReferenceType( declaredType ), valueExtractors
+				TypeHelper.getErasedReferenceType( declaredType ), registeredValueExtractors
 		) );
 		valueExtractorDescriptors.addAll( getPotentiallyRuntimeTypeCompliantAndContainerElementCompliantValueExtractors( declaredType, typeParameter ) );
 
@@ -160,12 +176,12 @@ class ValueExtractorResolver {
 	 * <p>
 	 * Types that are assignable to {@link Map} are handled as a special case - key value extractor is ignored for them.
 	 */
-	public Set<ValueExtractorDescriptor> getPossibleValueExtractorCandidatesForCascadedValidation(Type enclosingType) {
+	public Set<ValueExtractorDescriptor> getValueExtractorCandidatesForContainerDetectionOfGlobalCascadedValidation(Type enclosingType) {
 		// if it's a Map assignable type, it gets a special treatment to conform to the Bean Validation specification
 		boolean mapAssignable = TypeHelper.isAssignable( Map.class, enclosingType );
 
 		Class<?> enclosingClass = ReflectionHelper.getClassFromType( enclosingType );
-		return getRuntimeCompliantValueExtractors( enclosingClass, valueExtractors )
+		return getRuntimeCompliantValueExtractors( enclosingClass, registeredValueExtractors )
 				.stream()
 				.filter( ved -> !mapAssignable || !ved.equals( MapKeyExtractor.DESCRIPTOR ) )
 				.collect( Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) );
@@ -185,7 +201,7 @@ class ValueExtractorResolver {
 	 * at a runtime.
 	 */
 	public Set<ValueExtractorDescriptor> getPotentialValueExtractorCandidatesForCascadedValidation(Type declaredType) {
-		return valueExtractors
+		return registeredValueExtractors
 				.stream()
 				.filter( e -> TypeHelper.isAssignable( declaredType, e.getContainerType() ) )
 				.collect( Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) );
@@ -201,7 +217,7 @@ class ValueExtractorResolver {
 		boolean isInternal = TypeVariables.isInternal( typeParameter );
 		Type erasedDeclaredType = TypeHelper.getErasedReferenceType( declaredType );
 
-		Set<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors
+		Set<ValueExtractorDescriptor> typeCompatibleExtractors = registeredValueExtractors
 				.stream()
 				.filter( e -> TypeHelper.isAssignable( erasedDeclaredType, e.getContainerType() ) )
 				.collect( Collectors.toSet() );

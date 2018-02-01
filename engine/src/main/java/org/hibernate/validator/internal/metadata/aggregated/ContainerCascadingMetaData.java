@@ -129,7 +129,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		}
 		else {
 			this.valueExtractorCandidates = CollectionHelper.toImmutableSet(
-					valueExtractorManager.getValueExtractorCandidatesForCascadedValidation( this.enclosingType, this.typeParameter )
+					valueExtractorManager.getResolver().getValueExtractorCandidatesForCascadedValidation( this.enclosingType, this.typeParameter )
 			);
 
 			if ( this.valueExtractorCandidates.size() == 0 ) {

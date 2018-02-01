@@ -82,7 +82,7 @@ public class PotentiallyContainerCascadingMetaData implements CascadingMetaData 
 
 	@Override
 	public CascadingMetaData addRuntimeContainerSupport(ValueExtractorManager valueExtractorManager, Class<?> valueClass) {
-		ValueExtractorDescriptor compliantValueExtractor = valueExtractorManager
+		ValueExtractorDescriptor compliantValueExtractor = valueExtractorManager.getResolver()
 				.getMaximallySpecificValueExtractorForAllContainerElements( valueClass, potentialValueExtractorDescriptors );
 		if ( compliantValueExtractor == null ) {
 			return this;

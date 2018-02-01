@@ -77,7 +77,7 @@ public class ValueExtractorManager {
 	}
 
 	@Immutable
-	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractors;
+	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> registeredValueExtractors;
 
 	private final ValueExtractorResolver valueExtractorResolver;
 
@@ -95,49 +95,23 @@ public class ValueExtractorManager {
 			tmpValueExtractors.put( descriptor.getKey(), descriptor );
 		}
 
-		valueExtractors = Collections.unmodifiableMap( tmpValueExtractors );
-		valueExtractorResolver = new ValueExtractorResolver( new HashSet<>( valueExtractors.values() ) );
+		registeredValueExtractors = Collections.unmodifiableMap( tmpValueExtractors );
+		valueExtractorResolver = new ValueExtractorResolver( new HashSet<>( registeredValueExtractors.values() ) );
 	}
 
 	public ValueExtractorManager(ValueExtractorManager template,
 			Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> externalValueExtractorDescriptors) {
-		LinkedHashMap<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> tmpValueExtractors = new LinkedHashMap<>( template.valueExtractors );
+		LinkedHashMap<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> tmpValueExtractors = new LinkedHashMap<>( template.registeredValueExtractors );
 		tmpValueExtractors.putAll( externalValueExtractorDescriptors );
 
-		valueExtractors = Collections.unmodifiableMap( tmpValueExtractors );
-		valueExtractorResolver = new ValueExtractorResolver( new HashSet<>( valueExtractors.values() ) );
+		registeredValueExtractors = Collections.unmodifiableMap( tmpValueExtractors );
+		valueExtractorResolver = new ValueExtractorResolver( new HashSet<>( registeredValueExtractors.values() ) );
 	}
 
 	public static Set<ValueExtractor<?>> getDefaultValueExtractors() {
 		return SPEC_DEFINED_EXTRACTORS.stream()
 				.map( d -> d.getValueExtractor() )
 				.collect( Collectors.collectingAndThen( Collectors.toSet(), Collections::unmodifiableSet ) );
-	}
-
-	/**
-	 * Used to find all the maximally specific value extractors based on a declared type in the case of value unwrapping.
-	 * <p>
-	 * There might be several of them as there might be several type parameters.
-	 * <p>
-	 * Used for container element constraints.
-	 *
-	 * @see ValueExtractorResolver#getMaximallySpecificValueExtractors(Class)
-	 */
-	public Set<ValueExtractorDescriptor> getMaximallySpecificValueExtractors(Class<?> declaredType) {
-		return valueExtractorResolver.getMaximallySpecificValueExtractors( declaredType );
-	}
-
-	/**
-	 * Used to find the maximally specific and container element compliant value extractor based on the declared type
-	 * and the type parameter.
-	 * <p>
-	 * Used for container element constraints.
-	 *
-	 * @see ValueExtractorResolver#getMaximallySpecificAndContainerElementCompliantValueExtractor(Class, TypeVariable)
-	 * @throws ConstraintDeclarationException if more than 2 maximally specific container-element-compliant value extractors are found
-	 */
-	public ValueExtractorDescriptor getMaximallySpecificAndContainerElementCompliantValueExtractor(Class<?> declaredType, TypeVariable<?> typeParameter) {
-		return valueExtractorResolver.getMaximallySpecificAndContainerElementCompliantValueExtractor( declaredType, typeParameter );
 	}
 
 	/**
@@ -170,61 +144,20 @@ public class ValueExtractorManager {
 					declaredType,
 					typeParameter,
 					runtimeType,
-					valueExtractors.values()
+					registeredValueExtractors.values()
 			);
 		}
 	}
 
-	/**
-	 * Used to determine if the passed runtime type is a container and if so return a corresponding maximally specific
-	 * value extractor.
-	 * <p>
-	 * Obviously, it only works if there's only one value extractor corresponding to the runtime type as we don't
-	 * precise any type parameter.
-	 * <p>
-	 * There is a special case: when the passed type is assignable to a {@link Map}, the {@link MapValueExtractor} will
-	 * be returned. This is required by the Bean Validation specification.
-	 * <p>
-	 * Used for cascading validation when the {@code @Valid} annotation is placed on the whole container.
-	 *
-	 * @see ValueExtractorResolver#getMaximallySpecificValueExtractorForAllContainerElements(Class, Set)
-	 */
-	public ValueExtractorDescriptor getMaximallySpecificValueExtractorForAllContainerElements(Class<?> runtimeType, Set<ValueExtractorDescriptor> potentialValueExtractorDescriptors) {
-		return valueExtractorResolver.getMaximallySpecificValueExtractorForAllContainerElements( runtimeType, potentialValueExtractorDescriptors );
-	}
-
-	/**
-	 * Used to determine the value extractor candidates valid for a declared type and type variable.
-	 * <p>
-	 * The effective value extractor will be narrowed from these candidates using the runtime type.
-	 * <p>
-	 * Used to optimize the choice of the value extractor in the case of cascading validation.
-	 *
-	 * @see ValueExtractorResolver#getValueExtractorCandidatesForCascadedValidation(Type, TypeVariable)
-	 */
-	public Set<ValueExtractorDescriptor> getValueExtractorCandidatesForCascadedValidation(Type enclosingType, TypeVariable<?> typeParameter) {
-		return valueExtractorResolver.getValueExtractorCandidatesForCascadedValidation( enclosingType, typeParameter );
-	}
-
-	/**
-	 * @see ValueExtractorResolver#getPossibleValueExtractorCandidatesForCascadedValidation(Type)
-	 */
-	public Set<ValueExtractorDescriptor> getPossibleValueExtractorCandidatesForCascadedValidation(Type enclosingType) {
-		return valueExtractorResolver.getPossibleValueExtractorCandidatesForCascadedValidation( enclosingType );
-	}
-
-	/**
-	 * @see ValueExtractorResolver#getPotentialValueExtractorCandidatesForCascadedValidation(Type)
-	 */
-	public Set<ValueExtractorDescriptor> getPotentialValueExtractorCandidatesForCascadedValidation(Type enclosingType) {
-		return valueExtractorResolver.getPotentialValueExtractorCandidatesForCascadedValidation( enclosingType );
+	public ValueExtractorResolver getResolver() {
+		return valueExtractorResolver;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ( ( valueExtractors == null ) ? 0 : valueExtractors.hashCode() );
+		result = prime * result + ( ( registeredValueExtractors == null ) ? 0 : registeredValueExtractors.hashCode() );
 		return result;
 	}
 
@@ -241,7 +174,7 @@ public class ValueExtractorManager {
 		}
 		ValueExtractorManager other = (ValueExtractorManager) obj;
 
-		return valueExtractors.equals( other.valueExtractors );
+		return registeredValueExtractors.equals( other.registeredValueExtractors );
 	}
 
 	private static boolean isJavaFxInClasspath() {

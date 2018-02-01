@@ -80,7 +80,7 @@ public class MetaConstraints {
 		}
 
 		Class<?> declaredType = TypeHelper.getErasedReferenceType( location.getTypeForValidatorResolution() );
-		Set<ValueExtractorDescriptor> valueExtractorDescriptorCandidates = valueExtractorManager.getMaximallySpecificValueExtractors( declaredType );
+		Set<ValueExtractorDescriptor> valueExtractorDescriptorCandidates = valueExtractorManager.getResolver().getMaximallySpecificValueExtractors( declaredType );
 		ValueExtractorDescriptor selectedValueExtractorDescriptor;
 
 		// we want to force the unwrapping so we require one and only one maximally specific value extractors
@@ -138,7 +138,7 @@ public class MetaConstraints {
 		Class<?> declaredType = typeArgumentConstraintLocation.getContainerClass();
 		TypeVariable<?> typeParameter = typeArgumentConstraintLocation.getTypeParameter();
 
-		ValueExtractorDescriptor valueExtractorDescriptor = valueExtractorManager
+		ValueExtractorDescriptor valueExtractorDescriptor = valueExtractorManager.getResolver()
 				.getMaximallySpecificAndContainerElementCompliantValueExtractor( declaredType, typeParameter );
 
 		if ( valueExtractorDescriptor == null ) {

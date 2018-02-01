@@ -220,12 +220,16 @@ public class CascadingMetaDataBuilder {
 		// the Bean Validation spec.
 		//
 		// If we find several compatible value extractors, we throw an exception.
-		Set<ValueExtractorDescriptor> possibleValueExtractorCandidates = valueExtractorManager.getPossibleValueExtractorCandidatesForCascadedValidation( enclosingType );
-		if ( !possibleValueExtractorCandidates.isEmpty() ) {
-			if ( possibleValueExtractorCandidates.size() > 1 ) {
+		//
+		// The value extractor returned here is just used to add the proper cascading metadata to the type
+		// argument of the container. Proper value extractor resolution is executed at runtime.
+		Set<ValueExtractorDescriptor> containerDetectionValueExtractorCandidates = valueExtractorManager.getResolver()
+				.getValueExtractorCandidatesForContainerDetectionOfGlobalCascadedValidation( enclosingType );
+		if ( !containerDetectionValueExtractorCandidates.isEmpty() ) {
+			if ( containerDetectionValueExtractorCandidates.size() > 1 ) {
 				throw LOG.getUnableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclaredException(
 						ReflectionHelper.getClassFromType( enclosingType ),
-						ValueExtractorHelper.toValueExtractorClasses( possibleValueExtractorCandidates )
+						ValueExtractorHelper.toValueExtractorClasses( containerDetectionValueExtractorCandidates )
 				);
 			}
 
@@ -235,8 +239,8 @@ public class CascadingMetaDataBuilder {
 							enclosingType,
 							typeParameter,
 							cascading,
-							addCascadingMetaDataBasedOnValueExtractor( enclosingType, containerElementTypesCascadingMetaData, groupConversions,
-									possibleValueExtractorCandidates.iterator().next() ),
+							addCascadingMetaDataBasedOnContainerDetection( enclosingType, containerElementTypesCascadingMetaData, groupConversions,
+									containerDetectionValueExtractorCandidates.iterator().next() ),
 							groupConversions
 					),
 					context
@@ -250,7 +254,8 @@ public class CascadingMetaDataBuilder {
 		// extends ContainerWithoutRegisteredVE)
 		// so we are looking for VEs such that ValueExtractorDescriptor#getContainerType() is assignable to the declared
 		// type under inspection.
-		Set<ValueExtractorDescriptor> potentialValueExtractorCandidates = valueExtractorManager.getPotentialValueExtractorCandidatesForCascadedValidation( enclosingType );
+		Set<ValueExtractorDescriptor> potentialValueExtractorCandidates = valueExtractorManager.getResolver()
+				.getPotentialValueExtractorCandidatesForCascadedValidation( enclosingType );
 
 		// if such VEs were found we return an instance of PotentiallyContainerCascadingMetaData that will store those potential VEs
 		// and they will be used at runtime to check if any of those could be applied to a runtime type and if PotentiallyContainerCascadingMetaData
@@ -361,7 +366,8 @@ public class CascadingMetaDataBuilder {
 		return mergedGroupConversions;
 	}
 
-	private static Map<TypeVariable<?>, CascadingMetaDataBuilder> addCascadingMetaDataBasedOnValueExtractor(Type cascadableType, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions,
+	private static Map<TypeVariable<?>, CascadingMetaDataBuilder> addCascadingMetaDataBasedOnContainerDetection(Type cascadableType, Map<TypeVariable<?>,
+			CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions,
 			 ValueExtractorDescriptor possibleValueExtractor) {
 		Class<?> cascadableClass = ReflectionHelper.getClassFromType( cascadableType );
 		if ( cascadableClass.isArray() ) {
