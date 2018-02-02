@@ -510,17 +510,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private void validateMetaConstraints(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent,
-			Iterable<MetaConstraint<?>> constraints) {
-
-		for ( MetaConstraint<?> metaConstraint : constraints ) {
-			validateMetaConstraint( validationContext, valueContext, parent, metaConstraint );
-			if ( shouldFailFast( validationContext ) ) {
-				break;
-			}
-		}
-	}
-
-	private void validateMetaConstraints(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent,
 			Map<ConstraintLocation, Set<MetaConstraint<?>>> constraints) {
 
 		for ( Map.Entry<ConstraintLocation, Set<MetaConstraint<?>>> entry : constraints.entrySet() ) {
@@ -529,28 +518,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				break;
 			}
 		}
-	}
-
-	private boolean validateMetaConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, MetaConstraint<?> metaConstraint) {
-		ValueContext.ValueState<Object> originalValueState = valueContext.getCurrentValueState();
-		valueContext.appendNode( metaConstraint.getLocation() );
-		boolean success = true;
-
-		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
-
-			if ( parent != null ) {
-				valueContext.setCurrentValidatedValue( valueContext.getValue( parent, metaConstraint.getLocation() ) );
-			}
-
-			success = metaConstraint.validateConstraint( validationContext, valueContext );
-
-			validationContext.markConstraintProcessed( valueContext.getCurrentBean(), valueContext.getPropertyPath(), metaConstraint );
-		}
-
-		// reset the value context to the state before this call
-		valueContext.resetValueState( originalValueState );
-
-		return success;
 	}
 
 	private boolean validateMetaConstraintsOnLocation(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, Set<MetaConstraint<?>> metaConstraints, ConstraintLocation location) {
@@ -971,13 +938,14 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private <T> void validateParametersForSingleGroup(ValidationContext<T> validationContext, Object[] parameterValues, ExecutableMetaData executableMetaData, Class<?> currentValidatedGroup) {
-		if ( !executableMetaData.getCrossParameterConstraints().isEmpty() ) {
+		Map<ConstraintLocation, Set<MetaConstraint<?>>> crossParameterConstraints = executableMetaData.getCrossParameterConstraints();
+		if ( !crossParameterConstraints.isEmpty() ) {
 			ValueContext<T, Object> valueContext = getExecutableValueContext(
 					validationContext.getRootBean(), executableMetaData, executableMetaData.getValidatableParametersMetaData(), currentValidatedGroup
 			);
 
 			// 1. validate cross-parameter constraints
-			validateMetaConstraints( validationContext, valueContext, parameterValues, executableMetaData.getCrossParameterConstraints() );
+			validateMetaConstraints( validationContext, valueContext, parameterValues, crossParameterConstraints );
 			if ( shouldFailFast( validationContext ) ) {
 				return;
 			}
@@ -1010,7 +978,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				}
 			}
 
-			validateMetaConstraints( validationContext, valueContext, parameterValues, parameterMetaData );
+			validateMetaConstraints( validationContext, valueContext, parameterValues, parameterMetaData.getAllConstraints() );
 			if ( shouldFailFast( validationContext ) ) {
 				return;
 			}
@@ -1171,7 +1139,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		ReturnValueMetaData returnValueMetaData = executableMetaData.getReturnValueMetaData();
 
-		validateMetaConstraints( validationContext, valueContext, value, returnValueMetaData );
+		validateMetaConstraints( validationContext, valueContext, value, returnValueMetaData.getAllConstraints() );
 	}
 
 	/**

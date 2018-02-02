@@ -50,7 +50,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	@Immutable
 	private final Set<MetaConstraint<?>> containerElementsConstraints;
 	@Immutable
-	private final Set<MetaConstraint<?>>  allConstraints;
+	private final Map<ConstraintLocation, Set<MetaConstraint<?>>> allMetaConstraintsByLocation;
 	private final boolean isCascading;
 	private final boolean isConstrained;
 
@@ -64,8 +64,13 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 		this.type = type;
 		this.directConstraints = CollectionHelper.toImmutableSet( directConstraints );
 		this.containerElementsConstraints = CollectionHelper.toImmutableSet( containerElementsConstraints );
-		this.allConstraints = Stream.concat( directConstraints.stream(), containerElementsConstraints.stream() )
-				.collect( Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) );
+		this.allMetaConstraintsByLocation = Stream.concat( directConstraints.stream(), containerElementsConstraints.stream() )
+				.collect(
+						Collectors.collectingAndThen(
+								Collectors.groupingBy( MetaConstraint::getLocation, Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) ),
+								CollectionHelper::toImmutableMap
+						)
+				);
 		this.isCascading = isCascading;
 		this.isConstrained = isConstrained;
 	}
@@ -82,11 +87,11 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 
 	@Override
 	public Iterator<MetaConstraint<?>> iterator() {
-		return allConstraints.iterator();
+		return allMetaConstraintsByLocation.values().stream().flatMap( Set::stream ).iterator();
 	}
 
-	public Set<MetaConstraint<?>> getAllConstraints() {
-		return allConstraints;
+	public Map<ConstraintLocation, Set<MetaConstraint<?>>> getAllConstraints() {
+		return allMetaConstraintsByLocation;
 	}
 
 	public Set<MetaConstraint<?>> getDirectConstraints() {
@@ -147,14 +152,9 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 		return true;
 	}
 
-	protected Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {
-		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
-
-		for ( MetaConstraint<?> oneConstraint : constraints ) {
-			theValue.add( oneConstraint.getDescriptor() );
-		}
-
-		return theValue;
+	protected Set<ConstraintDescriptorImpl<?>> asDescriptors(Stream<MetaConstraint<?>> constraints) {
+		return constraints.map( MetaConstraint::getDescriptor )
+				.collect( Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) );
 	}
 
 	protected Set<ContainerElementTypeDescriptor> asContainerElementTypeDescriptors(
@@ -181,7 +181,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 			containerElementTypeDescriptors.add( new ContainerElementTypeDescriptorImpl(
 					childContainerElementMetaDataTree.elementType,
 					childContainerElementMetaDataTree.containerClass, TypeVariables.getTypeParameterIndex( childTypeParameter ),
-					asDescriptors( childContainerElementMetaDataTree.constraints ),
+					asDescriptors( childContainerElementMetaDataTree.constraints.stream() ),
 					childrenDescriptors,
 					childContainerElementMetaDataTree.cascading,
 					defaultGroupSequenceRedefined, defaultGroupSequence,

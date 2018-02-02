@@ -213,7 +213,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		for ( PropertyMetaData propertyMetaData : propertyMetaDataSet ) {
 			propertyMetaDataMap.put( propertyMetaData.getName(), propertyMetaData );
 			cascadedProperties.addAll( propertyMetaData.getCascadables() );
-			allMetaConstraints.addAll( propertyMetaData.getAllConstraints() );
+			allMetaConstraints.addAll( propertyMetaData.getAllConstraints().values().stream().flatMap( Set::stream ).collect( Collectors.toSet() ) );
 		}
 
 		this.hasConstraints = hasConstraints;
