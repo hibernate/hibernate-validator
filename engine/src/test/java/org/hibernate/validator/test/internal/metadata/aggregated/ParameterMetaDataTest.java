@@ -15,6 +15,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ParameterNameProvider;
@@ -28,10 +29,13 @@ import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.aggregated.AbstractConstraintMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -80,9 +84,9 @@ public class ParameterMetaDataTest {
 		assertTrue( parameterMetaData.isConstrained() );
 		assertEquals( parameterMetaData.getIndex(), 1 );
 		assertEquals( parameterMetaData.getName(), "lastName" );
-		assertThat( parameterMetaData ).hasSize( 1 );
+		assertThat( parameterMetaData.getAllConstraints() ).hasSize( 1 );
 		assertEquals(
-				parameterMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
+				getSingleMetaConstraint( parameterMetaData ).getDescriptor().getAnnotation().annotationType(), NotNull.class
 		);
 	}
 
@@ -97,7 +101,7 @@ public class ParameterMetaDataTest {
 		assertTrue( parameterMetaData.isConstrained() );
 		assertEquals( parameterMetaData.getIndex(), 0 );
 		assertEquals( parameterMetaData.getName(), "customer" );
-		assertThat( parameterMetaData ).isEmpty();
+		assertThat( parameterMetaData.getAllConstraints() ).isEmpty();
 	}
 
 	@Test
@@ -144,9 +148,9 @@ public class ParameterMetaDataTest {
 
 		assertEquals( parameterMetaData.getIndex(), 0 );
 		assertEquals( parameterMetaData.getName(), "good", "Parameter name from Service should be used, nor ServiceImpl" );
-		assertThat( parameterMetaData ).hasSize( 1 );
+		assertThat( parameterMetaData.getAllConstraints() ).hasSize( 1 );
 		assertEquals(
-				parameterMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
+				getSingleMetaConstraint( parameterMetaData ).getDescriptor().getAnnotation().annotationType(), NotNull.class
 		);
 	}
 
@@ -183,5 +187,13 @@ public class ParameterMetaDataTest {
 				return defaultProvider.getParameterNames( method );
 			}
 		}
+	}
+
+	private static MetaConstraint<?> getSingleMetaConstraint(AbstractConstraintMetaData metaData) {
+		return getSingleMetaConstraint( metaData.getAllConstraints() );
+	}
+
+	private static MetaConstraint<?> getSingleMetaConstraint(Map<ConstraintLocation, Set<MetaConstraint<?>>> metaConstraints) {
+		return metaConstraints.values().stream().flatMap( Set::stream ).findFirst().get();
 	}
 }

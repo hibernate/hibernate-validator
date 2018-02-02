@@ -6,15 +6,12 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -83,11 +80,6 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	@Override
 	public Type getType() {
 		return type;
-	}
-
-	@Override
-	public Iterator<MetaConstraint<?>> iterator() {
-		return allMetaConstraintsByLocation.values().stream().flatMap( Set::stream ).iterator();
 	}
 
 	public Map<ConstraintLocation, Set<MetaConstraint<?>>> getAllConstraints() {

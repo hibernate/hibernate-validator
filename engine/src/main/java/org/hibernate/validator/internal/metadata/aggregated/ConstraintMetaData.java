@@ -12,8 +12,6 @@ import java.util.List;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ElementDescriptor;
 
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-
 /**
  * An aggregated view of the constraint related meta data for a given bean/type
  * element and all the elements in the inheritance hierarchy which it overrides
@@ -21,7 +19,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
  *
  * @author Gunnar Morling
  */
-public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
+public interface ConstraintMetaData {
 
 	/**
 	 * Returns the name of this meta data object.
