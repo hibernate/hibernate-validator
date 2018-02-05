@@ -130,6 +130,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private final ValueExtractorManager valueExtractorManager;
 
+	private final ValidationOrderGenerator validationOrderGenerator;
+
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		ClassLoader externalClassLoader = getExternalClassLoader( configurationState );
 
@@ -176,6 +178,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				).build();
 
 		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
+
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
 				configurationState.getMessageInterpolator(),
 				configurationState.getTraversableResolver(),
@@ -187,6 +190,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				getTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
 				getConstraintValidatorPayload( hibernateSpecificConfig )
 		);
+
+		this.validationOrderGenerator = new ValidationOrderGenerator();
 
 		if ( LOG.isDebugEnabled() ) {
 			logValidatorFactoryScopedConfiguration( validatorFactoryScopedContext );
@@ -327,8 +332,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ValueExtractorManager valueExtractorManager,
 			ValidatorFactoryScopedContext validatorFactoryScopedContext,
 			MethodValidationConfiguration methodValidationConfiguration) {
-
-		ValidationOrderGenerator validationOrderGenerator = new ValidationOrderGenerator();
 
 		BeanMetaDataManager beanMetaDataManager = beanMetaDataManagers.computeIfAbsent(
 				new BeanMetaDataManagerKey( validatorFactoryScopedContext.getParameterNameProvider(), valueExtractorManager, methodValidationConfiguration ),
