@@ -209,7 +209,7 @@ public class MetaConstraint<A extends Annotation> {
 
 			Class<?> containerClass = currentValueExtractionPathNode.getContainerClass();
 			if ( containerClass != null ) {
-				valueContext.setTypeParameter( containerClass, currentValueExtractionPathNode.getTypeParameter() );
+				valueContext.setTypeParameter( containerClass, currentValueExtractionPathNode.getTypeParameterIndex() );
 			}
 
 			if ( nodeName != null ) {
@@ -245,11 +245,13 @@ public class MetaConstraint<A extends Annotation> {
 
 		private final Class<?> containerClass;
 		private final TypeVariable<?> typeParameter;
+		private final Integer typeParameterIndex;
 		private final ValueExtractorDescriptor valueExtractorDescriptor;
 
-		ContainerClassTypeParameterAndExtractor(Class<?> containerClass, TypeVariable<?> typeParameter, ValueExtractorDescriptor valueExtractorDescriptor) {
+		ContainerClassTypeParameterAndExtractor(Class<?> containerClass, TypeVariable<?> typeParameter, Integer typeParameterIndex, ValueExtractorDescriptor valueExtractorDescriptor) {
 			this.containerClass = containerClass;
 			this.typeParameter = typeParameter;
+			this.typeParameterIndex = typeParameterIndex;
 			this.valueExtractorDescriptor = valueExtractorDescriptor;
 		}
 
@@ -257,6 +259,7 @@ public class MetaConstraint<A extends Annotation> {
 		public String toString() {
 			return "ContainerClassTypeParameterAndExtractor [containerClass=" + containerClass +
 					", typeParameter=" + typeParameter +
+					", typeParameterIndex=" + typeParameterIndex +
 					", valueExtractorDescriptor=" + valueExtractorDescriptor + "]";
 		}
 	}
@@ -267,6 +270,7 @@ public class MetaConstraint<A extends Annotation> {
 		ValueExtractionPathNode getNext();
 		Class<?> getContainerClass();
 		TypeVariable<?> getTypeParameter();
+		Integer getTypeParameterIndex();
 		ValueExtractorDescriptor getValueExtractorDescriptor();
 	}
 
@@ -274,11 +278,13 @@ public class MetaConstraint<A extends Annotation> {
 
 		private final Class<?> containerClass;
 		private final TypeVariable<?> typeParameter;
+		private final Integer typeParameterIndex;
 		private final ValueExtractorDescriptor valueExtractorDescriptor;
 
 		public SingleValueExtractionPathNode(ContainerClassTypeParameterAndExtractor typeParameterAndExtractor) {
 			this.containerClass = typeParameterAndExtractor.containerClass;
 			this.typeParameter = typeParameterAndExtractor.typeParameter;
+			this.typeParameterIndex = typeParameterAndExtractor.typeParameterIndex;
 			this.valueExtractorDescriptor = typeParameterAndExtractor.valueExtractorDescriptor;
 		}
 
@@ -308,6 +314,11 @@ public class MetaConstraint<A extends Annotation> {
 		}
 
 		@Override
+		public Integer getTypeParameterIndex() {
+			return typeParameterIndex;
+		}
+
+		@Override
 		public ValueExtractorDescriptor getValueExtractorDescriptor() {
 			return valueExtractorDescriptor;
 		}
@@ -326,12 +337,14 @@ public class MetaConstraint<A extends Annotation> {
 		private final ValueExtractionPathNode next;
 		private final Class<?> containerClass;
 		private final TypeVariable<?> typeParameter;
+		private final Integer typeParameterIndex;
 		private final ValueExtractorDescriptor valueExtractorDescriptor;
 
 		private LinkedValueExtractionPathNode( ValueExtractionPathNode previous, List<ContainerClassTypeParameterAndExtractor> elements) {
 			ContainerClassTypeParameterAndExtractor first = elements.get( 0 );
 			this.containerClass = first.containerClass;
 			this.typeParameter = first.typeParameter;
+			this.typeParameterIndex = first.typeParameterIndex;
 			this.valueExtractorDescriptor = first.valueExtractorDescriptor;
 			this.previous = previous;
 
@@ -366,6 +379,11 @@ public class MetaConstraint<A extends Annotation> {
 		@Override
 		public TypeVariable<?> getTypeParameter() {
 			return typeParameter;
+		}
+
+		@Override
+		public Integer getTypeParameterIndex() {
+			return typeParameterIndex;
 		}
 
 		@Override

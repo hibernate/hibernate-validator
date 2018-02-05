@@ -70,7 +70,7 @@ public class TypeVariables {
 	}
 
 	public static Integer getTypeParameterIndex(TypeVariable<?> typeParameter) {
-		if ( isArrayElement( typeParameter ) ) {
+		if ( typeParameter == null || isArrayElement( typeParameter ) ) {
 			return null;
 		}
 

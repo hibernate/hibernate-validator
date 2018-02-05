@@ -120,14 +120,14 @@ public class MetaConstraints {
 		}
 
 		if ( selectedValueExtractorDescriptor.getExtractedType().isPresent() ) {
-			valueExtractionPath.add( new ContainerClassTypeParameterAndExtractor( declaredType, null, selectedValueExtractorDescriptor ) );
+			valueExtractionPath.add( new ContainerClassTypeParameterAndExtractor( declaredType, null, null, selectedValueExtractorDescriptor ) );
 			return selectedValueExtractorDescriptor.getExtractedType().get();
 		}
 		else {
 			Class<?> wrappedValueType = getWrappedValueType( typeResolutionHelper, location.getTypeForValidatorResolution(), selectedValueExtractorDescriptor );
 			TypeVariable<?> typeParameter = getContainerClassTypeParameter( declaredType, selectedValueExtractorDescriptor );
 
-			valueExtractionPath.add( new ContainerClassTypeParameterAndExtractor( declaredType, typeParameter, selectedValueExtractorDescriptor ) );
+			valueExtractionPath.add( new ContainerClassTypeParameterAndExtractor( declaredType, typeParameter, TypeVariables.getTypeParameterIndex( typeParameter ), selectedValueExtractorDescriptor ) );
 
 			return wrappedValueType;
 		}
@@ -145,9 +145,11 @@ public class MetaConstraints {
 			throw LOG.getNoValueExtractorFoundForTypeException( declaredType, typeParameter );
 		}
 
+		TypeVariable<?> actualTypeParameter = TypeVariables.getActualTypeParameter( typeParameter );
 		valueExtractionPath.add( new ContainerClassTypeParameterAndExtractor(
 				TypeVariables.getContainerClass( typeParameter ),
-				TypeVariables.getActualTypeParameter( typeParameter ),
+				actualTypeParameter,
+				TypeVariables.getTypeParameterIndex( actualTypeParameter ),
 				valueExtractorDescriptor ) );
 	}
 

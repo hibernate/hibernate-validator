@@ -57,6 +57,12 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	private final TypeVariable<?> declaredTypeParameter;
 
 	/**
+	 * Index of the declared type parameter: it is the one used in the node of the property path.
+	 * It is cached here for performance reasons.
+	 */
+	private final Integer declaredTypeParameterIndex;
+
+	/**
 	 * Possibly the cascading type parameters corresponding to this type parameter if it is a parameterized type.
 	 */
 	@Immutable
@@ -112,6 +118,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		this.typeParameter = typeParameter;
 		this.declaredContainerClass = declaredContainerClass;
 		this.declaredTypeParameter = declaredTypeParameter;
+		this.declaredTypeParameterIndex = TypeVariables.getTypeParameterIndex( declaredTypeParameter );
 		this.containerElementTypesCascadingMetaData = containerElementTypesCascadingMetaData;
 		this.cascading = cascading;
 		this.groupConversionHelper = groupConversionHelper;
@@ -137,6 +144,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		this.typeParameter = AnnotatedObject.INSTANCE;
 		this.declaredContainerClass = null;
 		this.declaredTypeParameter = null;
+		this.declaredTypeParameterIndex = null;
 		this.containerElementTypesCascadingMetaData = containerElementTypesCascadingMetaData;
 		this.cascading = true;
 		this.groupConversionHelper = groupConversionHelper;
@@ -150,6 +158,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		this.typeParameter = typeParameter;
 		this.declaredContainerClass = declaredContainerClass;
 		this.declaredTypeParameter = declaredTypeParameter;
+		this.declaredTypeParameterIndex = TypeVariables.getTypeParameterIndex( declaredTypeParameter );
 		this.containerElementTypesCascadingMetaData = Collections.emptyList();
 		this.cascading = true;
 		this.groupConversionHelper = groupConversionHelper;
@@ -177,6 +186,10 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 
 	public TypeVariable<?> getDeclaredTypeParameter() {
 		return declaredTypeParameter;
+	}
+
+	public Integer getDeclaredTypeParameterIndex() {
+		return declaredTypeParameterIndex;
 	}
 
 	@Override
