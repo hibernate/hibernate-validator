@@ -74,7 +74,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				getType(),
 				index,
 				getName(),
-				asDescriptors( getDirectConstraints() ),
+				asDescriptors( getDirectConstraints().stream() ),
 				asContainerElementTypeDescriptors( getContainerElementsConstraints(), cascadingMetaData, defaultGroupSequenceRedefined, defaultGroupSequence ),
 				cascadingMetaData.isCascading(),
 				defaultGroupSequenceRedefined,

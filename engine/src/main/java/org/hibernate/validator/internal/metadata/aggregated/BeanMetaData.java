@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import java.lang.reflect.Executable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -17,6 +18,7 @@ import javax.validation.metadata.BeanDescriptor;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
 /**
  * Interface defining the meta data about the constraints defined in a given bean.
@@ -82,17 +84,18 @@ public interface BeanMetaData<T> extends Validatable {
 	boolean defaultGroupSequenceIsRedefined();
 
 	/**
-	 * @return A set of {@code MetaConstraint} instances encapsulating the information of all the constraints
-	 *         defined on the bean. This collection includes constraints from super classes as well
+	 * @return A map of {@code MetaConstraint} instances encapsulating the information of all the constraints
+	 * 		defined on the bean, grouped by constraint location. This collection includes constraints
+	 * 		from super classes as well
 	 */
-	Set<MetaConstraint<?>> getMetaConstraints();
+	Map<ConstraintLocation, Set<MetaConstraint<?>>> getMetaConstraintsByLocation();
 
 	/**
-	 * @return A set of {@code MetaConstraint} instances encapsulating the information of all the constraints
-	 *         defined on the bean directly (including constraints defined on implemented interfaces). It does not
-	 *         contain constraints from super classes or interfaces implemented by super classes
+	 * @return A map of {@code MetaConstraint} instances encapsulating the information of all the constraints
+	 *         defined on the bean directly (including constraints defined on implemented interfaces), grouped by constraint
+	 *         location. It does not contain constraints from super classes or interfaces implemented by super classes
 	 */
-	Set<MetaConstraint<?>> getDirectMetaConstraints();
+	Map<ConstraintLocation, Set<MetaConstraint<?>>> getDirectMetaConstraintsByLocation();
 
 	/**
 	 * Returns the constraint-related metadata for the given executable of the

@@ -41,6 +41,7 @@ import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -94,13 +95,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Set of all constraints for this bean type (defined on any implemented interfaces or super types)
 	 */
 	@Immutable
-	private final Set<MetaConstraint<?>> allMetaConstraints;
+	private final Map<ConstraintLocation, Set<MetaConstraint<?>>> allMetaConstraintsByLocation;
 
 	/**
-	 * Set of all constraints which are directly defined on the bean or any of the directly implemented interfaces
+	 * Map of all constraints which are directly defined on the bean or any of the directly implemented interfaces grouped by
+	 * their location.
 	 */
 	@Immutable
-	private final Set<MetaConstraint<?>> directMetaConstraints;
+	private final Map<ConstraintLocation, Set<MetaConstraint<?>>> directMetaConstraintsByLocation;
 
 	/**
 	 * Contains constrained related meta data for all the constrained methods and constructors of the type represented
@@ -211,12 +213,17 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		for ( PropertyMetaData propertyMetaData : propertyMetaDataSet ) {
 			propertyMetaDataMap.put( propertyMetaData.getName(), propertyMetaData );
 			cascadedProperties.addAll( propertyMetaData.getCascadables() );
-			allMetaConstraints.addAll( propertyMetaData.getAllConstraints() );
+			allMetaConstraints.addAll( propertyMetaData.getAllConstraints().values().stream().flatMap( Set::stream ).collect( Collectors.toSet() ) );
 		}
 
 		this.hasConstraints = hasConstraints;
 		this.cascadedProperties = CollectionHelper.toImmutableSet( cascadedProperties );
-		this.allMetaConstraints = CollectionHelper.toImmutableSet( allMetaConstraints );
+		this.allMetaConstraintsByLocation = allMetaConstraints.stream().collect(
+				Collectors.collectingAndThen(
+						Collectors.groupingBy( MetaConstraint::getLocation, Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) ),
+						CollectionHelper::toImmutableMap
+				)
+		);
 
 		this.classHierarchyWithoutInterfaces = CollectionHelper.toImmutableList( ClassHierarchyHelper.getHierarchy(
 				beanClass,
@@ -228,7 +235,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.defaultGroupSequence = CollectionHelper.toImmutableList( defaultGroupContext.defaultGroupSequence );
 		this.validationOrder = defaultGroupContext.validationOrder;
 
-		this.directMetaConstraints = getDirectConstraints();
+		this.directMetaConstraintsByLocation = buildDirectMetaConstraintsByLocationMap();
 
 		this.executableMetaDataMap = CollectionHelper.toImmutableMap( bySignature( executableMetaDataSet ) );
 		this.unconstrainedExecutables = CollectionHelper.toImmutableSet( tmpUnconstrainedExecutables );
@@ -297,13 +304,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	@Override
-	public Set<MetaConstraint<?>> getMetaConstraints() {
-		return allMetaConstraints;
+	public Map<ConstraintLocation, Set<MetaConstraint<?>>> getMetaConstraintsByLocation() {
+		return allMetaConstraintsByLocation;
 	}
 
 	@Override
-	public Set<MetaConstraint<?>> getDirectMetaConstraints() {
-		return directMetaConstraints;
+	public Map<ConstraintLocation, Set<MetaConstraint<?>>> getDirectMetaConstraintsByLocation() {
+		return directMetaConstraintsByLocation;
 	}
 
 	@Override
@@ -453,22 +460,19 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return context;
 	}
 
-	private Set<MetaConstraint<?>> getDirectConstraints() {
-		Set<MetaConstraint<?>> constraints = newHashSet();
-
+	private Map<ConstraintLocation, Set<MetaConstraint<?>>> buildDirectMetaConstraintsByLocationMap() {
 		Set<Class<?>> classAndInterfaces = newHashSet();
 		classAndInterfaces.add( beanClass );
 		classAndInterfaces.addAll( ClassHierarchyHelper.getDirectlyImplementedInterfaces( beanClass ) );
 
-		for ( Class<?> clazz : classAndInterfaces ) {
-			for ( MetaConstraint<?> metaConstraint : allMetaConstraints ) {
-				if ( metaConstraint.getLocation().getDeclaringClass().equals( clazz ) ) {
-					constraints.add( metaConstraint );
-				}
-			}
-		}
-
-		return CollectionHelper.toImmutableSet( constraints );
+		return allMetaConstraintsByLocation.entrySet().stream()
+				.filter( entry -> classAndInterfaces.contains( entry.getKey().getDeclaringClass() ) )
+				.collect(
+						Collectors.collectingAndThen(
+								Collectors.toMap( Entry::getKey, Entry::getValue ),
+								CollectionHelper::toImmutableMap
+						)
+				);
 	}
 
 	/**
@@ -527,7 +531,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	public String toString() {
 		return "BeanMetaDataImpl"
 				+ "{beanClass=" + beanClass.getSimpleName()
-				+ ", constraintCount=" + getMetaConstraints().size()
+				+ ", constraintCount=" + allMetaConstraintsByLocation.values().stream().flatMap( Set::stream ).count()
 				+ ", cascadedPropertiesCount=" + cascadedProperties.size()
 				+ ", defaultGroupSequence=" + getDefaultGroupSequence( null ) + '}';
 	}

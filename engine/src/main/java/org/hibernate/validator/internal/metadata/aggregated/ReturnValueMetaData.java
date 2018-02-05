@@ -70,7 +70,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	public ReturnValueDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		return new ReturnValueDescriptorImpl(
 				getType(),
-				asDescriptors( getDirectConstraints() ),
+				asDescriptors( getDirectConstraints().stream() ),
 				asContainerElementTypeDescriptors( getContainerElementsConstraints(), cascadingMetaData, defaultGroupSequenceRedefined, defaultGroupSequence ),
 				cascadingMetaData.isCascading(),
 				defaultGroupSequenceRedefined,

@@ -93,7 +93,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		return new PropertyDescriptorImpl(
 				getType(),
 				getName(),
-				asDescriptors( getDirectConstraints() ),
+				asDescriptors( getDirectConstraints().stream() ),
 				asContainerElementTypeDescriptors( getContainerElementsConstraints(), firstCascadingMetaData, defaultGroupSequenceRedefined, defaultGroupSequence ),
 				firstCascadingMetaData != null ? firstCascadingMetaData.isCascading() : false,
 				defaultGroupSequenceRedefined,

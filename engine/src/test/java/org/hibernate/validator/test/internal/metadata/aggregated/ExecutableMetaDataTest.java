@@ -15,6 +15,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.validation.ElementKind;
@@ -26,10 +28,13 @@ import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.aggregated.AbstractConstraintMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -215,25 +220,23 @@ public class ExecutableMetaDataTest {
 
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertThat( methodMetaData ).isEmpty();
+		assertThat( methodMetaData.getAllConstraints() ).isEmpty();
 
 		assertFalse( methodMetaData.getParameterMetaData( 0 ).isConstrained() );
 		assertFalse( methodMetaData.getParameterMetaData( 0 ).isCascading() );
 
 		assertTrue( methodMetaData.getParameterMetaData( 1 ).isConstrained() );
 		assertFalse( methodMetaData.getParameterMetaData( 1 ).isCascading() );
-		assertThat( methodMetaData.getParameterMetaData( 1 ) ).hasSize( 1 );
+		assertThat( methodMetaData.getParameterMetaData( 1 ).getAllConstraints() ).hasSize( 1 );
 		assertEquals(
-				methodMetaData.getParameterMetaData( 1 )
-						.iterator()
-						.next()
+				getSingleMetaConstraint( methodMetaData.getParameterMetaData( 1 ) )
 						.getDescriptor()
 						.getAnnotation()
 						.annotationType(),
 				NotNull.class
 		);
 
-		assertThat( methodMetaData ).isEmpty();
+		assertThat( methodMetaData.getAllConstraints() ).isEmpty();
 		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
 	}
 
@@ -244,13 +247,13 @@ public class ExecutableMetaDataTest {
 
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertThat( methodMetaData ).isEmpty();
+		assertThat( methodMetaData.getAllConstraints() ).isEmpty();
 
 		assertTrue( methodMetaData.getParameterMetaData( 0 ).isConstrained() );
 		assertTrue( methodMetaData.getParameterMetaData( 0 ).isCascading() );
-		assertThat( methodMetaData.getParameterMetaData( 0 ) ).isEmpty();
+		assertThat( methodMetaData.getParameterMetaData( 0 ).getAllConstraints() ).isEmpty();
 
-		assertThat( methodMetaData ).isEmpty();
+		assertThat( methodMetaData.getAllConstraints() ).isEmpty();
 		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
 	}
 
@@ -265,13 +268,11 @@ public class ExecutableMetaDataTest {
 
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertThat( methodMetaData ).isEmpty();
+		assertThat( methodMetaData.getAllConstraints() ).isEmpty();
 
 		assertThat( methodMetaData.getCrossParameterConstraints() ).hasSize( 1 );
 		assertThat(
-				methodMetaData.getCrossParameterConstraints()
-						.iterator()
-						.next()
+				getSingleMetaConstraint( methodMetaData.getCrossParameterConstraints() )
 						.getDescriptor()
 						.getAnnotation()
 						.annotationType()
@@ -285,9 +286,9 @@ public class ExecutableMetaDataTest {
 
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertThat( methodMetaData ).hasSize( 1 );
+		assertThat( methodMetaData.getAllConstraints() ).hasSize( 1 );
 		assertEquals(
-				methodMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
+				getSingleMetaConstraint( methodMetaData ).getDescriptor().getAnnotation().annotationType(), NotNull.class
 		);
 
 		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
@@ -298,12 +299,10 @@ public class ExecutableMetaDataTest {
 		Method method = CustomerRepositoryExt.class.getMethod( "bar" );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
-		assertThat( methodMetaData ).hasSize( 1 );
+		assertThat( methodMetaData.getAllConstraints() ).hasSize( 1 );
 		assertFalse( methodMetaData.isCascading() );
 
-		ConstraintDescriptorImpl<? extends Annotation> descriptor = methodMetaData.iterator()
-				.next()
-				.getDescriptor();
+		ConstraintDescriptorImpl<? extends Annotation> descriptor = getSingleMetaConstraint( methodMetaData ).getDescriptor();
 		assertEquals( descriptor.getAnnotation().annotationType(), NotNull.class );
 	}
 
@@ -314,7 +313,7 @@ public class ExecutableMetaDataTest {
 
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertThat( methodMetaData ).hasSize( 2 );
+		assertThat( methodMetaData.getAllConstraints() ).hasSize( 2 );
 	}
 
 	@Test
@@ -324,7 +323,7 @@ public class ExecutableMetaDataTest {
 
 		assertTrue( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertThat( methodMetaData ).isEmpty();
+		assertThat( methodMetaData.getAllConstraints() ).isEmpty();
 		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
 	}
 
@@ -348,5 +347,13 @@ public class ExecutableMetaDataTest {
 		Method method = CustomerRepositoryExt.class.getMethod( "updateCustomer", Customer.class );
 
 		assertFalse( beanMetaData.getMetaDataFor( method ).isPresent() );
+	}
+
+	private static MetaConstraint<?> getSingleMetaConstraint(AbstractConstraintMetaData metaData) {
+		return getSingleMetaConstraint( metaData.getAllConstraints() );
+	}
+
+	private static MetaConstraint<?> getSingleMetaConstraint(Map<ConstraintLocation, Set<MetaConstraint<?>>> metaConstraints) {
+		return metaConstraints.values().stream().flatMap( Set::stream ).findFirst().get();
 	}
 }

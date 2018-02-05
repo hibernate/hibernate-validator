@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
@@ -30,6 +31,7 @@ import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigura
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
@@ -63,7 +65,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	@Immutable
 	private final List<ParameterMetaData> parameterMetaDataList;
 	@Immutable
-	private final Set<MetaConstraint<?>> crossParameterConstraints;
+	private final Map<ConstraintLocation, Set<MetaConstraint<?>>> crossParameterConstraints;
 	private final boolean isGetter;
 
 	/**
@@ -100,7 +102,12 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 		this.parameterTypes = parameterTypes;
 		this.parameterMetaDataList = CollectionHelper.toImmutableList( parameterMetaData );
-		this.crossParameterConstraints = CollectionHelper.toImmutableSet( crossParameterConstraints );
+		this.crossParameterConstraints = crossParameterConstraints.stream().collect(
+				Collectors.collectingAndThen(
+						Collectors.groupingBy( MetaConstraint::getLocation, Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) ),
+						CollectionHelper::toImmutableMap
+				)
+		);
 		this.signatures = signatures;
 		this.returnValueMetaData = new ReturnValueMetaData(
 				returnType,
@@ -147,7 +154,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 * method or constructor. May be empty but will never be
 	 * {@code null}.
 	 */
-	public Set<MetaConstraint<?>> getCrossParameterConstraints() {
+	public Map<ConstraintLocation, Set<MetaConstraint<?>>> getCrossParameterConstraints() {
 		return crossParameterConstraints;
 	}
 
@@ -164,7 +171,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		return new ExecutableDescriptorImpl(
 				getType(),
 				getName(),
-				asDescriptors( getCrossParameterConstraints() ),
+				asDescriptors( crossParameterConstraints.values().stream().flatMap( Set::stream ) ),
 				returnValueMetaData.asDescriptor(
 						defaultGroupSequenceRedefined,
 						defaultGroupSequence
