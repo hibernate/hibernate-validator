@@ -171,20 +171,19 @@ public class ValueContext<T, V> {
 	 * Sets the container element information.
 	 *
 	 * @param containerClass the class of the container
-	 * @param typeParameter the actual type parameter (i.e. not one of our internal type parameters)
+	 * @param typeParameterIndex the index of the actual type parameter
 	 *
 	 * @see TypeVariables#getContainerClass(TypeVariable)
 	 * @see TypeVariables#getActualTypeParameter(TypeVariable)
 	 * @see AnnotatedObject
 	 * @see ArrayElement
 	 */
-	public final void setTypeParameter(Class<?> containerClass, TypeVariable<?> typeParameter) {
+	public final void setTypeParameter(Class<?> containerClass, Integer typeParameterIndex) {
 		if ( containerClass == null ) {
 			return;
 		}
 
-		propertyPath.setLeafNodeTypeParameter( containerClass,
-				typeParameter != null ? TypeVariables.getTypeParameterIndex( typeParameter ) : null );
+		propertyPath.setLeafNodeTypeParameter( containerClass, typeParameterIndex );
 	}
 
 	public final void setCurrentGroup(Class<?> currentGroup) {

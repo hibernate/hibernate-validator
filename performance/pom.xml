@@ -27,7 +27,7 @@
         -->
         <profilingOptions>-showversion</profilingOptions>
         <history.directory>${project.basedir}/history</history.directory>
-        <jmh.version>1.17.5</jmh.version>
+        <jmh.version>1.20</jmh.version>
 
         <!-- default values, overridden per profile -->
         <beanvalidation-impl.name>none</beanvalidation-impl.name>
@@ -202,7 +202,7 @@
             </activation>
             <properties>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>6.0.5.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>6.0.7.Final</beanvalidation-impl.version>
             </properties>
             <dependencies>
                 <dependency>
