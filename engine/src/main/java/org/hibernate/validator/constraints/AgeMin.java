@@ -12,6 +12,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.time.temporal.ChronoUnit;
 
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -23,11 +24,14 @@ import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * The annotated element must be a date where the number of years go by to today must be
- * greater or equal to the specified value
+ * The annotated element must be a date where the number of Years, Days, Months, etc. according
+ * to an unit {@code java.time.temporal.ChronoUnit} go by to today must be
+ * greater or equal to the specified value if inclusive is true
+ * or is greater when inclusive is false.
  * <p>
  * <p>
  * The supported type is {@code LocalDate}. {@code null} is considered valid.
+ * The supported type is {@code Calendar}. {@code null} is considered valid.
  * <p>
  *
  * @author Hillmer Chona
@@ -47,7 +51,7 @@ public @interface AgeMin {
 	Class<? extends Payload>[] payload() default {};
 
 	/**
-	 * @return value the age in years from a given date must be greater or equal to
+	 * @return value the referenceAge according to unit from a given date must be greater or equal to
 	 */
 	int value();
 
@@ -60,6 +64,16 @@ public @interface AgeMin {
 	 */
 	boolean inclusive() default true;
 
+
+	/**
+	 * Specifies the date period unit ( years, months, days, etc.) that will be used to compare the given date
+	 * with the reference value.
+	 * By default, it is YEARS.
+	 *
+	 * @return unit the date period unit
+	 */
+	ChronoUnit unit() default ChronoUnit.YEARS;
+
 	/**
 	 * Defines several {@link AgeMin} annotations on the same element.
 	 *
@@ -71,4 +85,6 @@ public @interface AgeMin {
 	@interface List {
 		AgeMin[] value();
 	}
+
+
 }

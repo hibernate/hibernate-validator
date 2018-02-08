@@ -259,7 +259,6 @@ import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ISBNValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.AgeMinValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidator;
@@ -268,6 +267,8 @@ import org.hibernate.validator.internal.constraintvalidators.hv.SafeHtmlValidato
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.UniqueElementsValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.age.min.AgeMinValidatorForCalendar;
+import org.hibernate.validator.internal.constraintvalidators.hv.age.min.AgeMinValidatorForLocalDate;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.pl.NIPValidator;
@@ -464,7 +465,11 @@ public class ConstraintHelper {
 			) );
 		}
 
-		putConstraint( tmpConstraints, AgeMin.class, AgeMinValidator.class );
+		List<Class<? extends ConstraintValidator<AgeMin, ?>>> ageMinValidators = new ArrayList<>( 2 );
+		ageMinValidators.add( AgeMinValidatorForLocalDate.class );
+		ageMinValidators.add( AgeMinValidatorForCalendar.class );
+		putConstraints( tmpConstraints, AgeMin.class, ageMinValidators );
+
 
 		if ( isJavaMoneyInClasspath() ) {
 			putConstraints( tmpConstraints, Negative.class, Arrays.asList(
