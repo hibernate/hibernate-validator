@@ -300,9 +300,9 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	HibernateValidatorConfiguration temporalValidationTolerance(Duration temporalValidationTolerance);
 
 	/**
-	 * Allows to set a dynamic payload.
+	 * Allows to set a payload which will be passed to the constraint validators.
 	 *
-	 * @param constraintValidatorPayload the dynamic payload
+	 * @param constraintValidatorPayload the payload passed to constraint validators
 	 *
 	 * @return {@code this} following the chaining method pattern
 	 *

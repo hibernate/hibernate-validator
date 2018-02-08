@@ -155,14 +155,14 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	HibernateValidatorContext temporalValidationTolerance(Duration temporalValidationTolerance);
 
 	/**
-	 * Define a dynamic payload.
+	 * Define a payload passed to the constraint validators.
 	 *
-	 * @param dynamicPayload the dynamic payload
+	 * @param constraintValidatorPayload the payload passed to constraint validators
 	 *
 	 * @return {@code this} following the chaining method pattern
 	 *
 	 * @since 6.0.8
 	 */
 	@Incubating
-	HibernateValidatorContext withConstraintValidatorPayload(Object dynamicPayload);
+	HibernateValidatorContext constraintValidatorPayload(Object constraintValidatorPayload);
 }
