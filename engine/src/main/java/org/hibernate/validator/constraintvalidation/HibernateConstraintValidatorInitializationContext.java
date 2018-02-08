@@ -57,10 +57,12 @@ public interface HibernateConstraintValidatorInitializationContext {
 	Duration getTemporalValidationTolerance();
 
 	/**
-	 * Returns an instance of the specified type set by the user or {@code null} if no constraint validator payload of the given type has been set.
+	 * Returns an instance of the specified type or {@code null} if no constraint validator payload of the given type
+	 * has been set.
 	 *
-	 * @param type The type of payload to retrieve
-	 * @return an instance of the specified type or null if no payload has been set
+	 * @param type the type of payload to retrieve
+	 * @return an instance of the specified type or null if no payload of this type has been set
+	 * @since 6.0.8
 	 */
-	<C> C getDynamicPayload(Class<C> type);
+	<C> C getPayload(Class<C> type);
 }

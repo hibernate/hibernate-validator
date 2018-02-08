@@ -54,7 +54,6 @@ import org.hibernate.validator.internal.util.logging.formatter.CollectionOfObjec
 import org.hibernate.validator.internal.util.logging.formatter.DurationFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ObjectArrayFormatter;
-import org.hibernate.validator.internal.util.logging.formatter.ObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
 import org.hibernate.validator.internal.xml.ContainerElementTypePath;
 import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
@@ -839,7 +838,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 239, value = "Unable to parse the temporal validation tolerance property %s. It should be a duration represented in milliseconds.")
 	ValidationException getUnableToParseTemporalValidationToleranceException(String toleranceProperty, @Cause Exception e);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 240, value = "Constraint validator payload set to %1$s.")
-	void logConstraintValidatorPayload(@FormatWith(ObjectFormatter.class) Object payload);
+	void logConstraintValidatorPayload(Object payload);
 }
