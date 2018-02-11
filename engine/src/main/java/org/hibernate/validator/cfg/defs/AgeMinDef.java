@@ -26,13 +26,13 @@ public class AgeMinDef extends ConstraintDef<AgeMinDef, AgeMin> {
 		return this;
 	}
 
-	public AgeMinDef inclusive(boolean inclusive) {
-		addParameter( "inclusive", inclusive );
+	public AgeMinDef unit(ChronoUnit unit) {
+		addParameter( "unit", unit );
 		return this;
 	}
 
-	public AgeMinDef unit(ChronoUnit unit) {
-		addParameter( "unit", unit );
+	public AgeMinDef inclusive(boolean inclusive) {
+		addParameter( "inclusive", inclusive );
 		return this;
 	}
 }

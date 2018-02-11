@@ -24,15 +24,25 @@ import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * The annotated element must be a date where the number of Years, Days, Months, etc. according
- * to an unit {@code java.time.temporal.ChronoUnit} go by to today must be
- * greater or equal to the specified value if inclusive is true
- * or is greater when inclusive is false.
+ * The annotated element must be an instant, date or time for which at least
+ * the specified amount ({@link AgeMin#value()}) of Years/Days/Months/etc. defined
+ * by {@link AgeMin#unit()} have passed till now.
  * <p>
+ * Supported types are:
+ * <ul>
+ *     <li>{@code java.util.Calendar}</li>
+ *     <li>{@code java.util.Date}</li>
+ *     <li>{@code java.time.chrono.HijrahDate}</li>
+ *     <li>{@code java.time.chrono.JapaneseDate}</li>
+ *     <li>{@code java.time.LocalDate}</li>
+ *     <li>{@code java.time.chrono.MinguoDate}</li>
+ *     <li>{@code java.time.chrono.ThaiBuddhistDate}</li>
+ *     <li>{@code java.time.Year}</li>
+ *     <li>{@code java.time.YearMonth}</li>
+ * </ul>
  * <p>
- * The supported type is {@code LocalDate}. {@code null} is considered valid.
- * The supported type is {@code Calendar}. {@code null} is considered valid.
- * <p>
+ * {@code null} elements are considered valid.
+ *
  *
  * @author Hillmer Chona
  * @since 6.0.8
@@ -51,28 +61,27 @@ public @interface AgeMin {
 	Class<? extends Payload>[] payload() default {};
 
 	/**
-	 * @return value the referenceAge according to unit from a given date must be greater or equal to
+	 * @return the age according to unit from a given instant, date or time must be greater or equal to
 	 */
 	int value();
+
+	/**
+	 * Specifies the date period unit ( Years/Days/Months/etc. ) that will be used to compare the given instant,
+	 * date or time with the reference value.
+	 * By default, it is ({@link ChronoUnit#YEARS}).
+	 *
+	 * @return the date period unit
+	 */
+	ChronoUnit unit() default ChronoUnit.YEARS;
 
 	/**
 	 * Specifies whether the specified value is inclusive or exclusive.
 	 * By default, it is inclusive.
 	 *
-	 * @return {@code true} if the number of years from a given date must be higher or equal to the specified value,
-	 *         {@code false} if the number of years from a given date must be higher
+	 * @return {@code true} if the date period units from a given instant, date or time must be higher or equal to the specified value,
+	 *         {@code false} if date period units from a given instant, date or time must be higher
 	 */
 	boolean inclusive() default true;
-
-
-	/**
-	 * Specifies the date period unit ( years, months, days, etc.) that will be used to compare the given date
-	 * with the reference value.
-	 * By default, it is YEARS.
-	 *
-	 * @return unit the date period unit
-	 */
-	ChronoUnit unit() default ChronoUnit.YEARS;
 
 	/**
 	 * Defines several {@link AgeMin} annotations on the same element.

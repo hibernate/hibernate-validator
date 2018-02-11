@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.constraintvalidators.hv.age.min;
 
 import java.time.Instant;
 
-import java.util.Calendar;
+import java.util.Date;
 
 /**
  *  Checks that the number of Years, Days, Months, etc. according to an unit {@code java.time.temporal.ChronoUnit}
@@ -18,11 +18,10 @@ import java.util.Calendar;
  * @author Hillmer Chona
  * @since 6.0.8
  */
-public class AgeMinValidatorForCalendar extends AbstractAgeMinInstantBasedValidator<Calendar> {
+public class AgeMinValidatorForDate extends AbstractAgeMinInstantBasedValidator<Date> {
 
 	@Override
-	protected Instant getInstant(Calendar value) {
+	protected Instant getInstant(Date value) {
 		return value.toInstant();
 	}
-
 }

@@ -268,7 +268,14 @@ import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertVali
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.UniqueElementsValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.age.min.AgeMinValidatorForCalendar;
+import org.hibernate.validator.internal.constraintvalidators.hv.age.min.AgeMinValidatorForDate;
+import org.hibernate.validator.internal.constraintvalidators.hv.age.min.AgeMinValidatorForHijrahDate;
+import org.hibernate.validator.internal.constraintvalidators.hv.age.min.AgeMinValidatorForJapaneseDate;
 import org.hibernate.validator.internal.constraintvalidators.hv.age.min.AgeMinValidatorForLocalDate;
+import org.hibernate.validator.internal.constraintvalidators.hv.age.min.AgeMinValidatorForMinguoDate;
+import org.hibernate.validator.internal.constraintvalidators.hv.age.min.AgeMinValidatorForThaiBuddhistDate;
+import org.hibernate.validator.internal.constraintvalidators.hv.age.min.AgeMinValidatorForYear;
+import org.hibernate.validator.internal.constraintvalidators.hv.age.min.AgeMinValidatorForYearMonth;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.pl.NIPValidator;
@@ -465,9 +472,16 @@ public class ConstraintHelper {
 			) );
 		}
 
-		List<Class<? extends ConstraintValidator<AgeMin, ?>>> ageMinValidators = new ArrayList<>( 2 );
-		ageMinValidators.add( AgeMinValidatorForLocalDate.class );
+		List<Class<? extends ConstraintValidator<AgeMin, ?>>> ageMinValidators = new ArrayList<>( 9 );
 		ageMinValidators.add( AgeMinValidatorForCalendar.class );
+		ageMinValidators.add( AgeMinValidatorForDate.class );
+		ageMinValidators.add( AgeMinValidatorForHijrahDate.class );
+		ageMinValidators.add( AgeMinValidatorForJapaneseDate.class );
+		ageMinValidators.add( AgeMinValidatorForLocalDate.class );
+		ageMinValidators.add( AgeMinValidatorForMinguoDate.class );
+		ageMinValidators.add( AgeMinValidatorForThaiBuddhistDate.class );
+		ageMinValidators.add( AgeMinValidatorForYear.class );
+		ageMinValidators.add( AgeMinValidatorForYearMonth.class );
 		putConstraints( tmpConstraints, AgeMin.class, ageMinValidators );
 
 
