@@ -45,6 +45,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.StringHelper;
@@ -741,8 +742,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			private boolean traversableResolverResultCacheEnabled;
 
 			Builder(ValidatorFactoryScopedContext defaultContext) {
-				this.defaultContext = defaultContext != null ? defaultContext : new ValidatorFactoryScopedContext( null, null, null, null, null, null, false, false );
+				Contracts.assertNotNull( defaultContext, "Default context cannot be null." );
 
+				this.defaultContext = defaultContext;
 				this.messageInterpolator = defaultContext.messageInterpolator;
 				this.traversableResolver = defaultContext.traversableResolver;
 				this.parameterNameProvider = defaultContext.parameterNameProvider;
