@@ -7,8 +7,14 @@ def processFileInplace(File file, Closure processText) {
     file.write( processText( text ) )
 }
 
+String getPropertyValue(String name) {
+    def value = session.userProperties[name]
+    if (value != null) return value //property was defined from command line e.g.: -DpropertyName=value
+    return project.properties[name]
+}
+
 // Add javafx.api module to the global modules
-standaloneXml = new File( project.properties['wildfly.target-dir'], 'standalone/configuration/standalone.xml' )
+standaloneXml = new File( getPropertyValue('wildfly.target-dir'), 'standalone/configuration/standalone.xml' )
 println "[INFO] Add javafx.api as global module"
 
 processFileInplace( standaloneXml ) { text ->
