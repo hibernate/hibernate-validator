@@ -26,6 +26,7 @@ import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBui
 import org.hibernate.validator.internal.metadata.aggregated.ContainerCascadingMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.PotentiallyContainerCascadingMetaData;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
@@ -100,23 +101,15 @@ public class ValueExtractorResolver {
 	 */
 	public ValueExtractorDescriptor getMaximallySpecificAndRuntimeContainerElementCompliantValueExtractor(Type declaredType, TypeVariable<?> typeParameter,
 			Class<?> runtimeType, Collection<ValueExtractorDescriptor> valueExtractorCandidates) {
-
+		Contracts.assertNotEmpty( valueExtractorCandidates, "Value extractor candidates cannot be empty" );
 		if ( valueExtractorCandidates.size() == 1 ) {
 			return valueExtractorCandidates.iterator().next();
-		}
-		else if ( !valueExtractorCandidates.isEmpty() ) {
-			return getUniqueValueExtractorOrThrowException(
-					runtimeType,
-					getRuntimeAndContainerElementComplaintValueExtractorsFromPossibleCandidates(
-							declaredType, typeParameter, runtimeType, valueExtractorCandidates
-					)
-			);
 		}
 		else {
 			return getUniqueValueExtractorOrThrowException(
 					runtimeType,
 					getRuntimeAndContainerElementComplaintValueExtractorsFromPossibleCandidates(
-							declaredType, typeParameter, runtimeType, registeredValueExtractors
+							declaredType, typeParameter, runtimeType, valueExtractorCandidates
 					)
 			);
 		}
