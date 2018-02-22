@@ -34,13 +34,17 @@ public abstract class AbstractAgeTimeBasedValidator<C extends Annotation, T exte
 
 	private Clock referenceClock;
 
-	protected int referenceAge;
+	private int referenceAge;
 
-	protected boolean inclusive;
+	private boolean inclusive;
 
-	protected ChronoUnit unit;
+	private ChronoUnit unit;
 
-	public void initialize(int referenceAge, ChronoUnit unit, boolean inclusive, HibernateConstraintValidatorInitializationContext initializationContext) {
+	public void initialize(
+			int referenceAge,
+			ChronoUnit unit,
+			boolean inclusive,
+			HibernateConstraintValidatorInitializationContext initializationContext) {
 		try {
 			this.referenceClock = Clock.offset(
 					initializationContext.getClockProvider().getClock(),
@@ -68,6 +72,13 @@ public abstract class AbstractAgeTimeBasedValidator<C extends Annotation, T exte
 	}
 
 	/**
+	 * Returns whether the specified value is inclusive or exclusive.
+	 */
+	protected boolean isInclusive() {
+		return this.inclusive;
+	}
+
+	/**
 	 * Returns the temporal validation tolerance to apply.
 	 */
 	protected abstract Duration getEffectiveTemporalValidationTolerance(Duration absoluteTemporalValidationTolerance);
@@ -77,12 +88,12 @@ public abstract class AbstractAgeTimeBasedValidator<C extends Annotation, T exte
 	 * {@link ClockProvider} increased or decreased with the specified referenceAge of Years/Days/Months/etc.
 	 * defined by {@link ChronoUnit}.
 	 */
-	protected abstract T getReferenceValue(Clock reference, int referenceAge, ChronoUnit unit );
+	protected abstract T getReferenceValue(Clock reference, int referenceAge, ChronoUnit unit);
 
 	/**
 	 * Returns whether the result of the comparison between the validated value and the age reference is considered
 	 * valid.
 	 */
-	protected abstract boolean isValid(long result);
+	protected abstract boolean isValid(int result);
 
 }

@@ -30,24 +30,23 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * <p>
  * Supported types are:
  * <ul>
- *     <li>{@code java.util.Calendar}</li>
- *     <li>{@code java.util.Date}</li>
- *     <li>{@code java.time.chrono.HijrahDate}</li>
- *     <li>{@code java.time.chrono.JapaneseDate}</li>
- *     <li>{@code java.time.LocalDate}</li>
- *     <li>{@code java.time.chrono.MinguoDate}</li>
- *     <li>{@code java.time.chrono.ThaiBuddhistDate}</li>
- *     <li>{@code java.time.Year}</li>
- *     <li>{@code java.time.YearMonth}</li>
+ * <li>{@code java.util.Calendar}</li>
+ * <li>{@code java.util.Date}</li>
+ * <li>{@code java.time.chrono.HijrahDate}</li>
+ * <li>{@code java.time.chrono.JapaneseDate}</li>
+ * <li>{@code java.time.LocalDate}</li>
+ * <li>{@code java.time.chrono.MinguoDate}</li>
+ * <li>{@code java.time.chrono.ThaiBuddhistDate}</li>
+ * <li>{@code java.time.Year}</li>
+ * <li>{@code java.time.YearMonth}</li>
  * </ul>
  * <p>
  * {@code null} elements are considered valid.
  *
- *
  * @author Hillmer Chona
  * @since 6.0.8
  */
-@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
+@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(AgeMin.List.class)
 @Documented
@@ -66,20 +65,21 @@ public @interface AgeMin {
 	int value();
 
 	/**
-	 * Specifies the date period unit ( Years/Days/Months/etc. ) that will be used to compare the given instant,
+	 * Specifies the date period unit ( Years/Days/Months. ) that will be used to compare the given instant,
 	 * date or time with the reference value.
-	 * By default, it is ({@link ChronoUnit#YEARS}).
+	 * By default, it is ({@link AgeMin.Unit#YEARS}).
 	 *
 	 * @return the date period unit
 	 */
-	ChronoUnit unit() default ChronoUnit.YEARS;
+
+	Unit unit() default Unit.YEARS;
 
 	/**
 	 * Specifies whether the specified value is inclusive or exclusive.
 	 * By default, it is inclusive.
 	 *
 	 * @return {@code true} if the date period units from a given instant, date or time must be higher or equal to the specified value,
-	 *         {@code false} if date period units from a given instant, date or time must be higher
+	 * {@code false} if date period units from a given instant, date or time must be higher
 	 */
 	boolean inclusive() default true;
 
@@ -88,11 +88,27 @@ public @interface AgeMin {
 	 *
 	 * @see AgeMin
 	 */
-	@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 	@Retention(RUNTIME)
 	@Documented
 	@interface List {
 		AgeMin[] value();
+	}
+
+	enum Unit {
+		YEARS( ChronoUnit.YEARS ), MONTHS( ChronoUnit.MONTHS ), DAYS( ChronoUnit.DAYS );
+
+		private final ChronoUnit chronoUnit;
+
+		Unit(ChronoUnit chronoUnit) {
+			this.chronoUnit = chronoUnit;
+
+		}
+
+		public ChronoUnit getChronoUnit() {
+			return chronoUnit;
+		}
+
 	}
 
 

@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.constraintvalidators.hv.age.min;
 
 import java.time.Clock;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.temporal.ChronoUnit;
 
@@ -22,6 +23,8 @@ public class AgeMinValidatorForYear extends AbstractAgeMinTimeBasedValidator<Yea
 
 	@Override
 	protected Year getReferenceValue(Clock reference, int referenceAge, ChronoUnit unit) {
-		return Year.now( reference ).minus( referenceAge, unit );
+		return Year.from( LocalDateTime.now( reference ).minus( referenceAge, unit ) );
 	}
+
+
 }

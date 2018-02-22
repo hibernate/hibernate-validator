@@ -35,11 +35,11 @@ public abstract class AbstractAgeInstantBasedValidator<C extends Annotation, T>
 
 	private Clock referenceClock;
 
-	protected int referenceAge;
+	private int referenceAge;
 
-	protected boolean inclusive;
+	private boolean inclusive;
 
-	protected ChronoUnit unit;
+	private ChronoUnit unit;
 
 	public void initialize(
 			int referenceAge,
@@ -69,13 +69,17 @@ public abstract class AbstractAgeInstantBasedValidator<C extends Annotation, T>
 		// As Instant does not support plus operation on ChronoUnits greater than DAYS we need to convert it to LocalDate
 		// first, which supports such operations.
 
-		long result = getInstant( value ).atZone( ZoneOffset.ofHours( 0 ) )
-				.toLocalDate()
-				.plus( referenceAge, unit )
-				.compareTo(
-						LocalDate.now( referenceClock ) );
+		int result = getInstant( value ).atZone( ZoneOffset.ofHours( 0 ) ).toLocalDate()
+				.compareTo( LocalDate.now( referenceClock ).minus( referenceAge, unit ) );
 
 		return isValid( result );
+	}
+
+	/**
+	 * Returns whether the specified value is inclusive or exclusive.
+	 */
+	protected boolean isInclusive() {
+		return this.inclusive;
 	}
 
 	/**
@@ -92,6 +96,6 @@ public abstract class AbstractAgeInstantBasedValidator<C extends Annotation, T>
 	 * Returns whether the result of the comparison between the validated value and the reference age is considered
 	 * valid.
 	 */
-	protected abstract boolean isValid(long result);
+	protected abstract boolean isValid(int result);
 
 }

@@ -88,7 +88,8 @@ public class AgeValidatorTest {
 	public void testLocalDate() throws Exception {
 
 		ConstraintValidator<AgeMin, LocalDate> constraintValidator = getInitializedValidator( new AgeMinValidatorForLocalDate(),
-																							  MINIMUM_AGE_YEARS, true );
+																							  MINIMUM_AGE_YEARS, true
+		);
 
 		LocalDate todayMinus18Years = LocalDate.now().minusYears( MINIMUM_AGE_YEARS );
 		LocalDate todayMinus2MonthAnd18Years = LocalDate.now().minusMonths( 2 ).minusYears( MINIMUM_AGE_YEARS );
@@ -122,10 +123,11 @@ public class AgeValidatorTest {
 
 	@Test
 	public void testLocalDateChronoUnits() throws Exception {
-		ConstraintValidator<AgeMin, LocalDate> constraintValidator = getInitializedValidatorForLocalDateWithUnit(
+		ConstraintValidator<AgeMin, LocalDate> constraintValidator = getInitializedValidatorWithUnit(
+				new AgeMinValidatorForLocalDate(),
 				MINIMUM_AGE_MONTHS,
 				true,
-				ChronoUnit.MONTHS
+				AgeMin.Unit.MONTHS
 		);
 
 		LocalDate todayMinus18Years = LocalDate.now().minusMonths( MINIMUM_AGE_MONTHS );
@@ -248,15 +250,23 @@ public class AgeValidatorTest {
 	@Test
 	public void testYear() throws Exception {
 
-		ConstraintValidator<AgeMin, Year> constraintValidator = getInitializedValidator(
+		boolean inclusive = true;
+		ConstraintValidator<AgeMin, Year> constraintValidator = getInitializedValidatorWithUnit(
 				new AgeMinValidatorForYear(),
 				MINIMUM_AGE_YEARS,
-				true
+				inclusive,
+				AgeMin.Unit.MONTHS
 		);
 
-		Year todayMinus18Years = Year.now().minus( MINIMUM_AGE_YEARS, ChronoUnit.YEARS );
-		Year nextYearMinus18Years = Year.now().plus( 1, ChronoUnit.YEARS )
-				.minus( MINIMUM_AGE_YEARS, ChronoUnit.YEARS );
+		Year todayMinus18Years = Year.from( LocalDate.now()
+													.minus( MINIMUM_AGE_YEARS, AgeMin.Unit.MONTHS.getChronoUnit() ) );
+		Year nextYearMinus18Years = Year.from( LocalDate.now()
+													   .plus( 1, ChronoUnit.YEARS )
+													   .minus(
+															   MINIMUM_AGE_YEARS,
+															   AgeMin.Unit.MONTHS.getChronoUnit()
+													   ) );
+
 
 		assertValidAge( null, constraintValidator );
 		assertValidAge( todayMinus18Years, constraintValidator );
@@ -281,8 +291,9 @@ public class AgeValidatorTest {
 	/**
 	 * @return an initialized {@link ConstraintValidator} using {@code DUMMY_CONSTRAINT_VALIDATOR_INITIALIZATION_CONTEXT}
 	 */
-	private <T> ConstraintValidator<AgeMin, T> getInitializedValidator(HibernateConstraintValidator<AgeMin, T> validator,
-																												   int value, boolean inclusive ) {
+	private <T> ConstraintValidator<AgeMin, T> getInitializedValidator(
+			HibernateConstraintValidator<AgeMin, T> validator,
+			int value, boolean inclusive) {
 
 		ConstraintAnnotationDescriptor.Builder<AgeMin> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>(
 				AgeMin.class );
@@ -298,8 +309,9 @@ public class AgeValidatorTest {
 	/**
 	 * @return an initialized {@link ConstraintValidator} using {@code DUMMY_CONSTRAINT_VALIDATOR_INITIALIZATION_CONTEXT}
 	 */
-	private ConstraintValidator<AgeMin, LocalDate> getInitializedValidatorForLocalDateWithUnit( int value, boolean inclusive, ChronoUnit unit) {
-		HibernateConstraintValidator<AgeMin, LocalDate> validator = new AgeMinValidatorForLocalDate();
+	private <T> ConstraintValidator<AgeMin, T> getInitializedValidatorWithUnit(
+			HibernateConstraintValidator<AgeMin, T> validator,
+			int value, boolean inclusive, AgeMin.Unit unit) {
 
 		ConstraintAnnotationDescriptor.Builder<AgeMin> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>(
 				AgeMin.class );
@@ -312,7 +324,7 @@ public class AgeValidatorTest {
 		return validator;
 	}
 
-	private <T> void  assertValidAge(T birthDate, ConstraintValidator<AgeMin, T> constraintValidator) {
+	private <T> void assertValidAge(T birthDate, ConstraintValidator<AgeMin, T> constraintValidator) {
 		assertTrue(
 				constraintValidator.isValid( birthDate, null ),
 				birthDate + " should be a date equal or more than " + MINIMUM_AGE_YEARS + " years before today"

@@ -11,7 +11,6 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;

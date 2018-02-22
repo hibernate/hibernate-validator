@@ -29,8 +29,10 @@ public abstract class AbstractAgeMinTimeBasedValidator<T extends Temporal & Temp
 	public void initialize(
 			ConstraintDescriptor<AgeMin> constraintDescriptor,
 			HibernateConstraintValidatorInitializationContext initializationContext) {
-		super.initialize( constraintDescriptor.getAnnotation().value(), constraintDescriptor.getAnnotation().unit(),
-						  constraintDescriptor.getAnnotation().inclusive(), initializationContext
+		super.initialize( constraintDescriptor.getAnnotation().value(),
+						  constraintDescriptor.getAnnotation().unit().getChronoUnit(),
+						  constraintDescriptor.getAnnotation().inclusive(),
+						  initializationContext
 		);
 	}
 
@@ -40,8 +42,8 @@ public abstract class AbstractAgeMinTimeBasedValidator<T extends Temporal & Temp
 	}
 
 	@Override
-	protected boolean isValid(long result) {
-		return super.inclusive ? result <= 0 : result < 0;
+	protected boolean isValid(int result) {
+		return isInclusive() ? result <= 0 : result < 0;
 	}
 
 }

@@ -9,8 +9,6 @@ package org.hibernate.validator.cfg.defs;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.AgeMin;
 
-import java.time.temporal.ChronoUnit;
-
 /**
  * @author Hillmer Chona
  * @since 6.0.8
@@ -26,7 +24,7 @@ public class AgeMinDef extends ConstraintDef<AgeMinDef, AgeMin> {
 		return this;
 	}
 
-	public AgeMinDef unit(ChronoUnit unit) {
+	public AgeMinDef unit(AgeMin.Unit unit) {
 		addParameter( "unit", unit );
 		return this;
 	}

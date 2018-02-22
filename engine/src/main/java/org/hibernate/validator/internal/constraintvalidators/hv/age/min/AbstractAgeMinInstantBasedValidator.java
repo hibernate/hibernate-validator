@@ -26,7 +26,7 @@ public abstract class AbstractAgeMinInstantBasedValidator<T> extends AbstractAge
 
 	@Override
 	public void initialize(ConstraintDescriptor<AgeMin> constraintDescriptor, HibernateConstraintValidatorInitializationContext initializationContext) {
-		super.initialize( constraintDescriptor.getAnnotation().value(), constraintDescriptor.getAnnotation().unit(),
+		super.initialize( constraintDescriptor.getAnnotation().value(), constraintDescriptor.getAnnotation().unit().getChronoUnit(),
 						  constraintDescriptor.getAnnotation().inclusive(), initializationContext );
 	}
 
@@ -36,7 +36,7 @@ public abstract class AbstractAgeMinInstantBasedValidator<T> extends AbstractAge
 	}
 
 	@Override
-	protected boolean isValid(long result) {
-		return this.inclusive ? result <= 0 : result < 0;
+	protected boolean isValid(int result) {
+		return isInclusive() ? result <= 0 : result < 0;
 	}
 }
