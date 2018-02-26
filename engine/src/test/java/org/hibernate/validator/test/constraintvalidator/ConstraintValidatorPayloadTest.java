@@ -49,6 +49,9 @@ public class ConstraintValidatorPayloadTest {
 				.getValidator();
 
 		assertNoViolations( validator.validate( new PayloadDummyEntity( Integer.class ) ) );
+
+		assertThat( validator.validate( new PayloadDummyEntity( String.class ) ) )
+				.containsOnlyViolations( violationOf( PayloadConstraint.class ) );
 	}
 
 	@Test
@@ -60,6 +63,9 @@ public class ConstraintValidatorPayloadTest {
 		Validator validator = configuration.buildValidatorFactory().getValidator();
 
 		assertNoViolations( validator.validate( new PayloadDummyEntity( String.class ) ) );
+
+		assertThat( validator.validate( new PayloadDummyEntity( Integer.class ) ) )
+				.containsOnlyViolations( violationOf( PayloadConstraint.class ) );
 	}
 
 	@Test
@@ -73,15 +79,6 @@ public class ConstraintValidatorPayloadTest {
 				.getValidator();
 
 		assertNoViolations( validator.validate( new PayloadDummyEntity( Integer.class ) ) );
-	}
-
-	@Test
-	public void testPayloadViolation() {
-		HibernateValidatorConfiguration configuration = getConfiguration();
-
-		Validator validator = configuration.buildValidatorFactory().unwrap( HibernateValidatorFactory.class )
-				.usingContext().constraintValidatorPayload( Integer.class )
-				.getValidator();
 
 		assertThat( validator.validate( new PayloadDummyEntity( String.class ) ) )
 				.containsOnlyViolations( violationOf( PayloadConstraint.class ) );
