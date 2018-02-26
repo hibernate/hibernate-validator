@@ -652,6 +652,7 @@
                             <exclude>**/src/test/resources/org/hibernate/validator/referenceguide/**/*.*</exclude>
                             <exclude>**/org/hibernate/validator/referenceguide/**/*.*</exclude>
                             <exclude>**/src/test/resources/org/hibernate/validator/test/internal/xml/**/*.xml</exclude>
+                            <exclude>.mvn/**</exclude>
                         </excludes>
                         <includes>
                             <include>**/*.java</include>
