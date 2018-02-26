@@ -17,7 +17,7 @@ public class Gear {
 
 	public static class AcmeGear extends Gear {
 		public AcmeGear() {
-			super( 100 );
+			super( 60 );
 		}
 	}
 }
