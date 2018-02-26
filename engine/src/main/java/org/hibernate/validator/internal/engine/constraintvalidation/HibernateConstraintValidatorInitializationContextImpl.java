@@ -51,7 +51,7 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 	}
 
 	@Override
-	public <C> C getPayload(Class<C> type) {
+	public <C> C getConstraintValidatorPayload(Class<C> type) {
 		if ( constraintValidatorPayload != null && type.isAssignableFrom( constraintValidatorPayload.getClass() ) ) {
 			return type.cast( constraintValidatorPayload );
 		}

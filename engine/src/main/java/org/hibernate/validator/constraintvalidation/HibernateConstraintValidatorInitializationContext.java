@@ -64,5 +64,5 @@ public interface HibernateConstraintValidatorInitializationContext {
 	 * @return an instance of the specified type or null if no payload of this type has been set
 	 * @since 6.0.8
 	 */
-	<C> C getPayload(Class<C> type);
+	<C> C getConstraintValidatorPayload(Class<C> type);
 }

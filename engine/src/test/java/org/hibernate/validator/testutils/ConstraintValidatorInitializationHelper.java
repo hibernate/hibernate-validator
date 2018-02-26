@@ -50,7 +50,7 @@ public class ConstraintValidatorInitializationHelper {
 		}
 
 		@Override
-		public <C> C getPayload(Class<C> type) {
+		public <C> C getConstraintValidatorPayload(Class<C> type) {
 			return null;
 		}
 	};

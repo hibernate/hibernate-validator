@@ -116,7 +116,7 @@ public class ConstraintValidatorPayloadTest {
 		@Override
 		public void initialize(ConstraintDescriptor<PayloadConstraint> constraintDescriptor,
 				HibernateConstraintValidatorInitializationContext initializationContext) {
-			this.payload = initializationContext.getPayload( Class.class );
+			this.payload = initializationContext.getConstraintValidatorPayload( Class.class );
 		}
 
 		@Override
