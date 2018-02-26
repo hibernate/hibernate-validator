@@ -189,7 +189,7 @@ The `initialize()` method of `HibernateConstraintValidator` takes two parameters
  * The `ConstraintDescriptor` of the constraint at hand.
    You can get access to the annotation using `ConstraintDescriptor#getAnnotation()`.
  * The `HibernateConstraintValidatorInitializationContext` which provides useful helpers and contextual
-   information, such as the clock provider or the temporal validation tolerance.
+   information, such as the clock provider, the temporal validation tolerance or the constraint validator payload.
 
 This extension is marked as incubating so it might be subject to change.
 The plan is to standardize it and to include it in Bean Validation in the future.
@@ -208,6 +208,66 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/MyFutureVa
 [WARNING]
 ====
 You should only implement one of the `initialize()` methods. Be aware that both are called when initializing the validator.
+====
+
+[[constraint-validator-payload]]
+===== Passing a payload to the constraint validator
+
+From time to time, you might want to condition the constraint validator behavior on some external parameters.
+
+For instance, your zip code validator could vary depending on the locale of your application instance if you have one
+instance per country.
+Another requirement could be to have different behaviors on specific environments: the staging environment may not have
+access to some external production resources necessary for the correct functioning of a validator.
+
+The notion of constraint validator payload was introduced for all these use cases.
+It is an object passed from the `Validator` instance to each constraint validator via the `HibernateConstraintValidatorInitializationContext`.
+
+The example below shows how to set a constraint validator payload during the `ValidatorFactory` initialization.
+Unless you override this default value, all the ``Validator``s created by this `ValidatorFactory` will have this
+constraint validator payload value set.
+
+[[example-constraint-validator-payload-definition-validatorfactory]]
+.Defining a constraint validator payload during the `ValidatorFactory` initialization
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintvalidatorpayload/ConstraintValidatorPayloadTest.java[tags=setConstraintValidatorPayloadDuringValidatorFactoryInitialization]
+----
+====
+
+Another option is to set the constraint validator payload per `Validator` using a context:
+
+[[example-constraint-validator-payload-definition-validatorcontext]]
+.Defining a constraint validator payload using a `Validator` context
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintvalidatorpayload/ConstraintValidatorPayloadTest.java[tags=setConstraintValidatorPayloadInValidatorContext]
+----
+====
+
+Once you have set the constraint validator payload, it is time to use it in your constrait validators as shown in the example below:
+
+[[example-constraint-validator-payload-usage]]
+.Using the constraint validator payload in a constraint validator
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintvalidatorpayload/ZipCodeValidator.java[tags=include]
+----
+====
+
+`HibernateConstraintValidatorInitializationContext#getConstraintValidatorPayload()` has a type parameter
+and returns the payload only if the payload is of the given type.
+
+[NOTE]
+====
+It is important to note that the constraint validator payload is different from the dynamic payload you can include in
+the constraint violation raised.
+
+The whole purpose of this constraint validator payload is to be used to condition the behavior of your constraint validators.
+It is not included in the constraint violations.
 ====
 
 [[validator-customconstraints-errormessage]]
