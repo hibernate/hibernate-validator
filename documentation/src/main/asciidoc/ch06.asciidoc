@@ -247,7 +247,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraint
 ----
 ====
 
-Once you have set the constraint validator payload, it is time to use it in your constrait validators as shown in the example below:
+Once you have set the constraint validator payload, it is time to use it in your constraint validators as shown in the example below:
 
 [[example-constraint-validator-payload-usage]]
 .Using the constraint validator payload in a constraint validator
@@ -267,7 +267,8 @@ It is important to note that the constraint validator payload is different from 
 the constraint violation raised.
 
 The whole purpose of this constraint validator payload is to be used to condition the behavior of your constraint validators.
-It is not included in the constraint violations.
+It is not included in the constraint violations, unless a specific `ConstraintValidator` implementation passes on the
+payload to emitted constraint violations by using the <<section-dynamic-payload,constraint violation dynamic payload mechanism>>.
 ====
 
 [[validator-customconstraints-errormessage]]
