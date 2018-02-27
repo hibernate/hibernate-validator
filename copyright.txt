@@ -44,6 +44,7 @@ Lucas Pouzac
 Lukas Niemeier
 Mark Hobson
 Marko Bekhta
+Matthias Kurz
 Mert Çalişkan
 Michal Fotyga
 Nicola Ferraro
