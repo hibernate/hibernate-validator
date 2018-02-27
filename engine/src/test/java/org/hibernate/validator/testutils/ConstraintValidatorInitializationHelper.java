@@ -48,6 +48,11 @@ public class ConstraintValidatorInitializationHelper {
 		public Duration getTemporalValidationTolerance() {
 			return Duration.ZERO;
 		}
+
+		@Override
+		public <C> C getConstraintValidatorPayload(Class<C> type) {
+			return null;
+		}
 	};
 
 	private ConstraintValidatorInitializationHelper() {

@@ -25,11 +25,14 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 
 	private final Duration temporalValidationTolerance;
 
+	private final Object constraintValidatorPayload;
+
 	public HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider,
-			Duration temporalValidationTolerance) {
+			Duration temporalValidationTolerance, Object constraintValidatorPayload) {
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.clockProvider = clockProvider;
 		this.temporalValidationTolerance = temporalValidationTolerance;
+		this.constraintValidatorPayload = constraintValidatorPayload;
 	}
 
 	@Override
@@ -45,5 +48,15 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 	@Override
 	public Duration getTemporalValidationTolerance() {
 		return temporalValidationTolerance;
+	}
+
+	@Override
+	public <C> C getConstraintValidatorPayload(Class<C> type) {
+		if ( constraintValidatorPayload != null && type.isAssignableFrom( constraintValidatorPayload.getClass() ) ) {
+			return type.cast( constraintValidatorPayload );
+		}
+		else {
+			return null;
+		}
 	}
 }

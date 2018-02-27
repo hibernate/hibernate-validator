@@ -153,4 +153,16 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 */
 	@Incubating
 	HibernateValidatorContext temporalValidationTolerance(Duration temporalValidationTolerance);
+
+	/**
+	 * Define a payload passed to the constraint validators.
+	 *
+	 * @param constraintValidatorPayload the payload passed to constraint validators
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.0.8
+	 */
+	@Incubating
+	HibernateValidatorContext constraintValidatorPayload(Object constraintValidatorPayload);
 }

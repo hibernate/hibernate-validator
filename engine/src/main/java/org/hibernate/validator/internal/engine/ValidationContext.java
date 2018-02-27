@@ -711,6 +711,11 @@ public class ValidationContext<T> {
 		 */
 		private final boolean traversableResolverResultCacheEnabled;
 
+		/**
+		 * Hibernate Validator specific payload passed to the constraint validators.
+		 */
+		private final Object constraintValidatorPayload;
+
 		ValidatorScopedContext(ValidatorFactoryScopedContext validatorFactoryScopedContext) {
 			this.messageInterpolator = validatorFactoryScopedContext.getMessageInterpolator();
 			this.parameterNameProvider = validatorFactoryScopedContext.getParameterNameProvider();
@@ -719,6 +724,7 @@ public class ValidationContext<T> {
 			this.scriptEvaluatorFactory = validatorFactoryScopedContext.getScriptEvaluatorFactory();
 			this.failFast = validatorFactoryScopedContext.isFailFast();
 			this.traversableResolverResultCacheEnabled = validatorFactoryScopedContext.isTraversableResolverResultCacheEnabled();
+			this.constraintValidatorPayload = validatorFactoryScopedContext.getConstraintValidatorPayload();
 		}
 
 		public MessageInterpolator getMessageInterpolator() {
@@ -747,6 +753,10 @@ public class ValidationContext<T> {
 
 		public boolean isTraversableResolverResultCacheEnabled() {
 			return this.traversableResolverResultCacheEnabled;
+		}
+
+		public Object getConstraintValidatorPayload() {
+			return this.constraintValidatorPayload;
 		}
 	}
 

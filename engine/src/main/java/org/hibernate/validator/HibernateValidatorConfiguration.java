@@ -298,4 +298,16 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	@Incubating
 	HibernateValidatorConfiguration temporalValidationTolerance(Duration temporalValidationTolerance);
+
+	/**
+	 * Allows to set a payload which will be passed to the constraint validators.
+	 *
+	 * @param constraintValidatorPayload the payload passed to constraint validators
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.0.8
+	 */
+	@Incubating
+	HibernateValidatorConfiguration constraintValidatorPayload(Object constraintValidatorPayload);
 }
