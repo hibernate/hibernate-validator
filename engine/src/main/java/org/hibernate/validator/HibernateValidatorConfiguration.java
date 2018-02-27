@@ -300,7 +300,8 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	HibernateValidatorConfiguration temporalValidationTolerance(Duration temporalValidationTolerance);
 
 	/**
-	 * Allows to set a payload which will be passed to the constraint validators.
+	 * Allows to set a payload which will be passed to the constraint validators. If the method is called multiple
+	 * times, only the payload passed last will be propagated.
 	 *
 	 * @param constraintValidatorPayload the payload passed to constraint validators
 	 *

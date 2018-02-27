@@ -247,7 +247,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraint
 ----
 ====
 
-Once you have set the constraint validator payload, it is time to use it in your constraint validators as shown in the example below:
+Once you have set the constraint validator payload, it can be used in your constraint validators as shown in the example below:
 
 [[example-constraint-validator-payload-usage]]
 .Using the constraint validator payload in a constraint validator

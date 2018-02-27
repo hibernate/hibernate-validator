@@ -155,7 +155,8 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	HibernateValidatorContext temporalValidationTolerance(Duration temporalValidationTolerance);
 
 	/**
-	 * Define a payload passed to the constraint validators.
+	 * Define a payload passed to the constraint validators. If the method is called multiple times, only the payload
+	 * passed last will be propagated.
 	 *
 	 * @param constraintValidatorPayload the payload passed to constraint validators
 	 *
