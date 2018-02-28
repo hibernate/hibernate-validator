@@ -262,6 +262,36 @@ public class ExecutableHelperTest {
 		);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1461")
+	public void testNonGenericAndGenericParams() throws NoSuchMethodException {
+		assertTrue(
+				executableHelper.overrides(
+						BarEntityService.class.getMethod( "update", Bar.class ),
+						EntityService.class.getMethod( "update", Foo.class )
+				)
+		);
+
+		assertTrue(
+				executableHelper.overrides(
+						BarEntityService.class.getMethod( "update", Long.class, Bar.class ),
+						EntityService.class.getMethod( "update", Long.class, Foo.class )
+				)
+		);
+	}
+
+	interface EntityService<T extends Foo> {
+		void update(T entity);
+
+		void update(Long id, T entity);
+	}
+
+	interface BarEntityService extends EntityService<Bar> {
+		void update(Bar entity);
+
+		void update(Long id, Bar entity);
+	}
+
 	public abstract static class GenericServiceBase<T> {
 		public abstract void doSomething(T t);
 	}
