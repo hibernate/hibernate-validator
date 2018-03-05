@@ -133,23 +133,6 @@ In order to update the server modules for Bean Validation API and Hibernate Vali
 
 You can download the patch file from http://sourceforge.net/projects/hibernate/files/hibernate-validator[SourceForge] or from Maven Central using the following dependency:
 
-.Maven dependency for WildFly {wildflyNextVersion} patch file
-====
-[source, XML]
-[subs="verbatim,attributes"]
-----
-<dependency>
-    <groupId>org.hibernate.validator</groupId>
-    <artifactId>hibernate-validator-modules</artifactId>
-    <version>{hvVersion}</version>
-    <classifier>wildfly-{wildflyNextVersion}-patch</classifier>
-    <type>zip</type>
-</dependency>
-----
-====
-
-We also provide a patch for the previous version of WildFly:
-
 .Maven dependency for WildFly {wildflyVersion} patch file
 ====
 [source, XML]
@@ -165,6 +148,23 @@ We also provide a patch for the previous version of WildFly:
 ----
 ====
 
+We also provide a patch for WildFly {wildflySecondaryVersion}:
+
+.Maven dependency for WildFly {wildflySecondaryVersion} patch file
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+<dependency>
+    <groupId>org.hibernate.validator</groupId>
+    <artifactId>hibernate-validator-modules</artifactId>
+    <version>{hvVersion}</version>
+    <classifier>wildfly-{wildflySecondaryVersion}-patch</classifier>
+    <type>zip</type>
+</dependency>
+----
+====
+
 Having downloaded the patch file, you can apply it to WildFly by running this command:
 
 .Applying the WildFly patch
@@ -172,7 +172,7 @@ Having downloaded the patch file, you can apply it to WildFly by running this co
 [source]
 [subs="verbatim,attributes"]
 ----
-$JBOSS_HOME/bin/jboss-cli.sh patch apply hibernate-validator-modules-{hvVersion}-wildfly-{wildflyNextVersion}-patch.zip
+$JBOSS_HOME/bin/jboss-cli.sh patch apply hibernate-validator-modules-{hvVersion}-wildfly-{wildflyVersion}-patch.zip
 ----
 ====
 

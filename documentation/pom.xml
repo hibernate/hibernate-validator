@@ -254,7 +254,7 @@
                         <jbossLoggingVersion>${jboss.logging.version}</jbossLoggingVersion>
                         <classmateVersion>${classmate.version}</classmateVersion>
                         <wildflyVersion>${wildfly.version}</wildflyVersion>
-                        <wildflyNextVersion>${wildfly-next.version}</wildflyNextVersion>
+                        <wildflySecondaryVersion>${wildfly-secondary.version}</wildflySecondaryVersion>
 
                         <!-- URLs -->
                         <javaApiDocsUrl>${java.api-docs.base-url}/</javaApiDocsUrl>

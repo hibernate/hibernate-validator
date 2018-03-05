@@ -99,7 +99,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-validator-modules</artifactId>
-            <classifier>wildfly-${wildfly-next.version}-patch</classifier>
+            <classifier>wildfly-${wildfly-secondary.version}-patch</classifier>
             <type>zip</type>
         </dependency>
     </dependencies>

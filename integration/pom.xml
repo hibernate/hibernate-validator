@@ -24,8 +24,8 @@
         <wildfly.target-dir>${project.build.directory}/wildfly-${wildfly.version}</wildfly.target-dir>
         <wildfly.modules-dir>${wildfly.target-dir}/modules/system/layers/base</wildfly.modules-dir>
 
-        <wildfly-next.target-dir>${project.build.directory}/wildfly-${wildfly-next.version}</wildfly-next.target-dir>
-        <wildfly-next.modules-dir>${wildfly-next.target-dir}/modules/system/layers/base</wildfly-next.modules-dir>
+        <wildfly-secondary.target-dir>${project.build.directory}/wildfly-${wildfly-secondary.version}</wildfly-secondary.target-dir>
+        <wildfly-secondary.modules-dir>${wildfly-secondary.target-dir}/modules/system/layers/base</wildfly-secondary.modules-dir>
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
@@ -165,17 +165,17 @@
                             <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-current.xml</summaryFile>
                         </configuration>
                     </execution>
-                    <!-- WildFly next -->
+                    <!-- WildFly secondary version -->
                     <execution>
-                        <id>wildfly-next-integration-test</id>
+                        <id>wildfly-secondary-integration-test</id>
                         <goals>
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
                             <systemPropertyVariables>
-                                <arquillian.launch>wildfly-next</arquillian.launch>
+                                <arquillian.launch>wildfly-secondary</arquillian.launch>
                             </systemPropertyVariables>
-                            <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-next.xml</summaryFile>
+                            <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-secondary.xml</summaryFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -186,7 +186,7 @@
                         <configuration>
                             <summaryFiles>
                                 <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-current.xml</summaryFile>
-                                <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-next.xml</summaryFile>
+                                <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-secondary.xml</summaryFile>
                             </summaryFiles>
                         </configuration>
                     </execution>
@@ -212,11 +212,11 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
-                                <!-- WildFly next -->
+                                <!-- WildFly secondary version -->
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
                                     <artifactId>wildfly-dist</artifactId>
-                                    <version>${wildfly-next.version}</version>
+                                    <version>${wildfly-secondary.version}</version>
                                     <type>tar.gz</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
@@ -241,12 +241,12 @@
                                     <type>zip</type>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
-                                <!-- WildFly next -->
+                                <!-- WildFly secondary version -->
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>hibernate-validator-modules</artifactId>
                                     <version>${project.version}</version>
-                                    <classifier>wildfly-${wildfly-next.version}-patch</classifier>
+                                    <classifier>wildfly-${wildfly-secondary.version}-patch</classifier>
                                     <type>zip</type>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
@@ -274,18 +274,18 @@
                                     <version>${moneta.version}</version>
                                     <outputDirectory>${wildfly.modules-dir}/org/javamoney/moneta/main/</outputDirectory>
                                 </artifactItem>
-                                <!-- WildFly next -->
+                                <!-- WildFly secondary version -->
                                 <artifactItem>
                                     <groupId>javax.money</groupId>
                                     <artifactId>money-api</artifactId>
                                     <version>${javax-money.version}</version>
-                                    <outputDirectory>${wildfly-next.modules-dir}/javax/money/api/main/</outputDirectory>
+                                    <outputDirectory>${wildfly-secondary.modules-dir}/javax/money/api/main/</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.javamoney</groupId>
                                     <artifactId>moneta</artifactId>
                                     <version>${moneta.version}</version>
-                                    <outputDirectory>${wildfly-next.modules-dir}/org/javamoney/moneta/main/</outputDirectory>
+                                    <outputDirectory>${wildfly-secondary.modules-dir}/org/javamoney/moneta/main/</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -312,15 +312,15 @@
                             </resources>
                         </configuration>
                     </execution>
-                    <!-- WildFly next -->
+                    <!-- WildFly secondary version -->
                     <execution>
-                        <id>copy-wildfly-next-resources</id>
+                        <id>copy-wildfly-secondary-resources</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${wildfly-next.modules-dir}</outputDirectory>
+                            <outputDirectory>${wildfly-secondary.modules-dir}</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/test/modules</directory>
@@ -351,19 +351,19 @@
                             </commands>
                         </configuration>
                     </execution>
-                    <!-- WildFly next -->
+                    <!-- WildFly secondary version -->
                     <execution>
-                        <id>apply-wildfly-next-patch-file</id>
+                        <id>apply-wildfly-secondary-patch-file</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>execute-commands</goal>
                         </goals>
                         <configuration>
                             <offline>true</offline>
-                            <jbossHome>${project.build.directory}/wildfly-${wildfly-next.version}/</jbossHome>
+                            <jbossHome>${project.build.directory}/wildfly-${wildfly-secondary.version}/</jbossHome>
                             <fail-on-error>false</fail-on-error>
                             <commands>
-                                <command>patch apply --path ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly-next.version}-patch.zip</command>
+                                <command>patch apply --path ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly-secondary.version}-patch.zip</command>
                             </commands>
                         </configuration>
                     </execution>
