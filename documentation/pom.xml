@@ -251,6 +251,8 @@
 
                         <hvVersion>${project.version}</hvVersion>
                         <bvVersion>${bv.api.version}</bvVersion>
+                        <jbossLoggingVersion>${jboss.logging.version}</jbossLoggingVersion>
+                        <classmateVersion>${classmate.version}</classmateVersion>
                         <wildflyVersion>${wildfly.version}</wildflyVersion>
                         <wildflyNextVersion>${wildfly-next.version}</wildflyNextVersion>
 

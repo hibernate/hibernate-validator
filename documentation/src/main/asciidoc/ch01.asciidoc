@@ -88,7 +88,7 @@ application server. You can learn more about the integration of Bean Validation 
 ==== Running with a security manager
 
 Hibernate Validator supports running with a {javaTechnotesBaseUrl}/guides/security/index.html[security manager] being enabled.
-To do so, you must assign several permissions to the code bases of Hibernate Validator, the Bean Validation API and the code base calling Bean Validation.
+To do so, you must assign several permissions to the code bases of Hibernate Validator, the Bean Validation API, Classmate and JBoss Logging and also to the code base calling Bean Validation.
 The following shows how to do this via a {javaTechnotesBaseUrl}/guides/security/PolicyFiles.html[policy file] as processed by the Java default policy implementation:
 
 .Policy file for using Hibernate Validator with a security manager
@@ -109,6 +109,15 @@ grant codeBase "file:path/to/hibernate-validator-{hvVersion}.jar" {
 
 grant codeBase "file:path/to/validation-api-{bvVersion}.jar" {
     permission java.io.FilePermission "path/to/hibernate-validator-{hvVersion}.jar", "read";
+};
+
+grant codeBase "file:path/to/jboss-logging-{jbossLoggingVersion}.jar" {
+    permission java.util.PropertyPermission "org.jboss.logging.provider", "read";
+    permission java.util.PropertyPermission "org.jboss.logging.locale", "read";
+};
+
+grant codeBase "file:path/to/classmate-{classmateVersion}.jar" {
+    permission java.lang.RuntimePermission "accessDeclaredMembers";
 };
 
 grant codeBase "file:path/to/validation-caller-x.y.z.jar" {
