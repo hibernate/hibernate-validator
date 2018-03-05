@@ -89,7 +89,7 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.weld</groupId>
-            <artifactId>weld-core</artifactId>
+            <artifactId>weld-core-impl</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -347,7 +347,7 @@
                             <jbossHome>${project.build.directory}/wildfly-${wildfly.version}/</jbossHome>
                             <fail-on-error>false</fail-on-error>
                             <commands>
-                                <command>patch apply --path ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly.version}-patch.zip</command>
+                                <command>patch apply ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly.version}-patch.zip</command>
                             </commands>
                         </configuration>
                     </execution>
@@ -363,7 +363,7 @@
                             <jbossHome>${project.build.directory}/wildfly-${wildfly-secondary.version}/</jbossHome>
                             <fail-on-error>false</fail-on-error>
                             <commands>
-                                <command>patch apply --path ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly-secondary.version}-patch.zip</command>
+                                <command>patch apply ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly-secondary.version}-patch.zip</command>
                             </commands>
                         </configuration>
                     </execution>
