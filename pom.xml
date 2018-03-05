@@ -124,11 +124,11 @@
         <jboss.logging.processor.version>2.1.0.Final</jboss.logging.processor.version>
 
         <!-- Currently supported version of WildFly -->
-        <wildfly.version>10.1.0.Final</wildfly.version>
-        <!-- Used to create a patch file for WildFly next -->
-        <wildfly-next.version>11.0.0.Final</wildfly-next.version>
+        <wildfly.version>11.0.0.Final</wildfly.version>
+        <!-- Used to create a patch file for the second version of WildFly we support -->
+        <wildfly-secondary.version>10.1.0.Final</wildfly-secondary.version>
         <!-- Version used to run the TCK in incontainer mode -->
-        <wildfly-tck.version>${wildfly-next.version}</wildfly-tck.version>
+        <wildfly-tck.version>${wildfly.version}</wildfly-tck.version>
 
         <!--
             These dependencies should be aligned with the ones from the WildFly version we support
@@ -257,7 +257,7 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-validator-modules</artifactId>
                 <version>${project.version}</version>
-                <classifier>wildfly-${wildfly-next.version}-patch</classifier>
+                <classifier>wildfly-${wildfly-secondary.version}-patch</classifier>
                 <type>zip</type>
             </dependency>
             <dependency>

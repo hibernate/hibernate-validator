@@ -33,12 +33,12 @@
         </configuration>
     </container>
 
-    <container qualifier="wildfly-next">
+    <container qualifier="wildfly-secondary">
         <protocol type="jmx-wildfly">
             <property name="executionType">REMOTE</property>
         </protocol>
         <configuration>
-            <property name="jbossHome">${basedir}/target/wildfly-${wildfly-next.version}</property>
+            <property name="jbossHome">${basedir}/target/wildfly-${wildfly-secondary.version}</property>
             <property name="javaVmArguments">
                 ${arquillian.javaVmArguments.add-opens}
             </property>
