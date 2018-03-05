@@ -124,9 +124,9 @@
         <jboss.logging.processor.version>2.1.0.Final</jboss.logging.processor.version>
 
         <!-- Currently supported version of WildFly -->
-        <wildfly.version>11.0.0.Final</wildfly.version>
+        <wildfly.version>12.0.0.Final</wildfly.version>
         <!-- Used to create a patch file for the second version of WildFly we support -->
-        <wildfly-secondary.version>10.1.0.Final</wildfly-secondary.version>
+        <wildfly-secondary.version>11.0.0.Final</wildfly-secondary.version>
         <!-- Version used to run the TCK in incontainer mode -->
         <wildfly-tck.version>${wildfly.version}</wildfly-tck.version>
 
@@ -134,21 +134,21 @@
             These dependencies should be aligned with the ones from the WildFly version we support
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
-        <classmate.version>1.3.3</classmate.version>
+        <classmate.version>1.3.4</classmate.version>
         <jsoup.version>1.8.3</jsoup.version>
         <joda-time.version>2.9.7</joda-time.version>
-        <slf4j.version>1.7.22</slf4j.version> <!-- Note: Wildfly 10.1.0.Final uses a custom jboss version -->
-        <hibernate-jpa-2.1-api.version>1.0.0.Final</hibernate-jpa-2.1-api.version>
+        <slf4j.version>1.7.22</slf4j.version>
+        <hibernate-jpa-2.1-api.version>1.0.2.Final</hibernate-jpa-2.1-api.version>
 
         <!--
             These dependencies are used for integration tests with WildFly.
             They should be aligned with the ones from the Wildfly version we support
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
-        <cdi-api.version>1.2</cdi-api.version>
-        <weld.version>2.4.3.Final</weld.version>
+        <cdi-api.version>2.0</cdi-api.version>
+        <weld.version>3.0.3.Final</weld.version>
         <wildfly-arquillian.version>2.1.0.Final</wildfly-arquillian.version>
-        <jboss-ejb-api_3.2_spec.version>1.0.0.Final</jboss-ejb-api_3.2_spec.version>
+        <jboss-ejb-api_3.2_spec.version>1.0.1.Final</jboss-ejb-api_3.2_spec.version>
 
         <!-- JavaMoney dependencies -->
         <javax-money.version>1.0.1</javax-money.version>
@@ -157,8 +157,8 @@
         <!-- WildFly patching infrastructure -->
         <wildfly-patch-gen-maven-plugin.version>2.0.1.Alpha5</wildfly-patch-gen-maven-plugin.version>
         <wildfly-patch-gen-maven-plugin.woodstox.version>5.0.3</wildfly-patch-gen-maven-plugin.woodstox.version>
-        <wildfly-maven-plugin.version>1.2.0.Alpha6</wildfly-maven-plugin.version>
-        <wildfly-core.version>3.0.10.Final</wildfly-core.version>
+        <wildfly-maven-plugin.version>1.2.1.Final</wildfly-maven-plugin.version>
+        <wildfly-core.version>4.0.0.Final</wildfly-core.version>
 
         <!-- Test dependencies -->
         <arquillian.version>1.1.11.Final</arquillian.version>
@@ -399,7 +399,7 @@
             </dependency>
             <dependency>
                 <groupId>org.jboss.weld</groupId>
-                <artifactId>weld-core</artifactId>
+                <artifactId>weld-core-impl</artifactId>
                 <version>${weld.version}</version>
             </dependency>
             <dependency>
@@ -416,7 +416,7 @@
             <dependency>
                 <groupId>org.jboss.arquillian.container</groupId>
                 <artifactId>arquillian-weld-se-embedded-1.1</artifactId>
-                <version>1.0.0.CR9</version>
+                <version>1.0.0.Final</version>
             </dependency>
             <dependency>
                 <groupId>com.thoughtworks.paranamer</groupId>

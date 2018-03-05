@@ -12,6 +12,7 @@ import static org.testng.Assert.fail;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
+import javax.enterprise.inject.spi.configurator.AnnotatedTypeConfigurator;
 import javax.inject.Inject;
 import javax.validation.ValidationException;
 
@@ -58,6 +59,13 @@ public class InvalidConfiguredClassInheritanceMethodValidationTest extends Arqui
 
 		public ProcessAnnotatedTypeImpl(AnnotatedType<T> annotatedType) {
 			this.annotatedType = annotatedType;
+		}
+
+		@Override
+		public AnnotatedTypeConfigurator<T> configureAnnotatedType() {
+			// returning null as it's not relevant for our tests and returning a CDI 2.0 only class is out of the
+			// question for now as we still support WildFly 11 and CDI 1.x.
+			return null;
 		}
 
 		@Override
