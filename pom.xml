@@ -120,7 +120,7 @@
 
         <paranamer.version>2.8</paranamer.version>
         <javax.el.version>3.0.1-b08</javax.el.version>
-        <jboss.logging.version>3.3.1.Final</jboss.logging.version>
+        <jboss.logging.version>3.3.2.Final</jboss.logging.version>
         <jboss.logging.processor.version>2.1.0.Final</jboss.logging.processor.version>
 
         <!-- Currently supported version of WildFly -->
