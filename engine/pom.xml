@@ -215,7 +215,7 @@
                             javax.el.*;version="[2.0.0,4.0.0)";resolution:=optional,
                             org.xml.sax.*;version="0",
                             org.jboss.logging.*;version="[3.1.0,4.0.0)",
-                            com.fasterxml.classmate.*;version="[${classmate.version},2.0.0)",
+                            com.fasterxml.classmate.*;version="[1.3,2.0.0)",
                             org.joda.time.*;version="[2.0.0,3.0.0)";resolution:=optional,
                             org.jsoup.*;version="[1.5.2,2.0.0)";resolution:=optional,
                             javax.money;version="[1.0.0,2.0.0)";resolution:=optional,
