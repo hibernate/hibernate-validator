@@ -253,6 +253,8 @@
                         <bvVersion>${bv.api.version}</bvVersion>
                         <jbossLoggingVersion>${jboss.logging.version}</jbossLoggingVersion>
                         <classmateVersion>${classmate.version}</classmateVersion>
+                        <javaxElVersion>${javax.el.version}</javaxElVersion>
+
                         <wildflyVersion>${wildfly.version}</wildflyVersion>
                         <wildflySecondaryVersion>${wildfly-secondary.version}</wildflySecondaryVersion>
 
