@@ -17,6 +17,7 @@ import java.security.PrivilegedAction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hibernate.validator.internal.util.classhierarchy.Filters;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetResolvedMemberMethods;
@@ -90,12 +91,81 @@ public final class ExecutableHelper {
 			return false;
 		}
 
-		if ( !Modifier.isPublic( superTypeMethod.getModifiers() ) && !Modifier.isProtected( superTypeMethod.getModifiers() )
-				&& !superTypeMethod.getDeclaringClass().getPackage().equals( subTypeMethod.getDeclaringClass().getPackage() ) ) {
+		if ( !isOneMethodVisibleToAnother( subTypeMethod, superTypeMethod ) ) {
 			return false;
 		}
 
 		return instanceMethodParametersResolveToSameTypes( subTypeMethod, superTypeMethod );
+	}
+
+	/**
+	 * Checks if a pair of given methods ({@code left} and {@code right}) are resolved to the same
+	 * method based on the {@code mainSubType} type.
+	 *
+	 * @param mainSubType a type at the bottom of class hierarchy to be used to lookup the methods.
+	 * @param left one of the methods to check
+	 * @param right another of the methods to check
+	 *
+	 * @return {@code true} if a pair of methods are equal {@code left == right}, or one of the methods
+	 * 		override another one in the class hierarchy with {@code mainSubType} at the bottom,
+	 * 		{@code false} otherwise.
+	 */
+	public boolean resolveToSameMethodInHierarchy(Class<?> mainSubType, Method left, Method right) {
+		Contracts.assertValueNotNull( mainSubType, "mainSubType" );
+		Contracts.assertValueNotNull( left, "left" );
+		Contracts.assertValueNotNull( right, "right" );
+
+		if ( left.equals( right ) ) {
+			return true;
+		}
+
+		if ( !left.getName().equals( right.getName() ) ) {
+			return false;
+		}
+
+		// methods with same name in the same class should be different
+		if ( left.getDeclaringClass().equals( right.getDeclaringClass() ) ) {
+			return false;
+		}
+
+		if ( left.getParameterTypes().length != right.getParameterTypes().length ) {
+			return false;
+		}
+
+		// if at least one method from a pair is static - they are different methods
+		if ( Modifier.isStatic( right.getModifiers() ) || Modifier.isStatic( left.getModifiers() ) ) {
+			return false;
+		}
+
+		// HV-861 Bridge method should be ignored. Classmates type/member resolution will take care of proper
+		// override detection without considering bridge methods
+		if ( left.isBridge() || right.isBridge() ) {
+			return false;
+		}
+
+		// if one of the methods is private - methods are different
+		if ( Modifier.isPrivate( left.getModifiers() ) || Modifier.isPrivate( right.getModifiers() ) ) {
+			return false;
+		}
+
+		if ( !isOneMethodVisibleToAnother( left, right ) || !isOneMethodVisibleToAnother( right, left ) ) {
+			return false;
+		}
+
+		// We need to check if the passed mainSubType is not a Weld proxy. In case of proxy we need to get
+		// a class that was proxied otherwise we can use the class itself. This is due to the issue that
+		// call to Class#getGenericInterfaces() on a Weld proxy returns raw types instead of parametrized
+		// generics and methods will not be resolved correctly.
+		return instanceMethodParametersResolveToSameTypes(
+				Filters.excludeProxies().accepts( mainSubType ) ? mainSubType : mainSubType.getSuperclass(),
+				left,
+				right
+		);
+	}
+
+	private static boolean isOneMethodVisibleToAnother(Method left, Method right) {
+		return Modifier.isPublic( right.getModifiers() ) || Modifier.isProtected( right.getModifiers() )
+				|| right.getDeclaringClass().getPackage().equals( left.getDeclaringClass().getPackage() );
 	}
 
 	public static String getSimpleName(Executable executable) {
@@ -140,14 +210,18 @@ public final class ExecutableHelper {
 	 * @return {@code true} if the parameters of the two methods resolve to the same types, {@code false otherwise}.
 	 */
 	private boolean instanceMethodParametersResolveToSameTypes(Method subTypeMethod, Method superTypeMethod) {
-		if ( subTypeMethod.getParameterTypes().length == 0 ) {
+		return instanceMethodParametersResolveToSameTypes( subTypeMethod.getDeclaringClass(), subTypeMethod, superTypeMethod );
+	}
+
+	private boolean instanceMethodParametersResolveToSameTypes(Class<?> mainSubType, Method left, Method right) {
+		if ( left.getParameterTypes().length == 0 ) {
 			return true;
 		}
 
-		ResolvedType resolvedSubType = typeResolver.resolve( subTypeMethod.getDeclaringClass() );
+		ResolvedType resolvedSubType = typeResolver.resolve( mainSubType );
 
 		MemberResolver memberResolver = new MemberResolver( typeResolver );
-		memberResolver.setMethodFilter( new SimpleMethodFilter( subTypeMethod, superTypeMethod ) );
+		memberResolver.setMethodFilter( new SimpleMethodFilter( left, right ) );
 		ResolvedTypeWithMembers typeWithMembers = memberResolver.resolve(
 				resolvedSubType,
 				null,
@@ -181,9 +255,9 @@ public final class ExecutableHelper {
 		catch (ArrayIndexOutOfBoundsException e) {
 			LOG.debug(
 					"Error in ExecutableHelper#instanceMethodParametersResolveToSameTypes comparing "
-							+ subTypeMethod
+							+ left
 							+ " with "
-							+ superTypeMethod
+							+ right
 			);
 		}
 

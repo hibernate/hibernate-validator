@@ -127,9 +127,6 @@ public class BeanMetaDataManager {
 		this.parameterNameProvider = parameterNameProvider;
 		this.validationOrderGenerator = validationOrderGenerator;
 
-		this.metaDataProviders = newArrayList();
-		this.metaDataProviders.addAll( optionalMetaDataProviders );
-
 		this.methodValidationConfiguration = methodValidationConfiguration;
 
 		this.beanMetaDataCache = new ConcurrentReferenceHashMap<>(
@@ -141,15 +138,19 @@ public class BeanMetaDataManager {
 				EnumSet.of( IDENTITY_COMPARISONS )
 		);
 
-		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders();
+		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders( optionalMetaDataProviders );
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
 					constraintHelper,
 					typeResolutionHelper,
 					valueExtractorManager,
 					annotationProcessingOptions
 			);
-
+		this.metaDataProviders = newArrayList();
+		// default annotation based metadata provider should go first in the list of providers to prevent possible issues
+		// similar to HV-1450. This way after the first run we will have all possible constrained elements in the list and
+		// should only merge in additional constraint information from other providers.
 		this.metaDataProviders.add( defaultProvider );
+		this.metaDataProviders.addAll( optionalMetaDataProviders );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -195,9 +196,9 @@ public class BeanMetaDataManager {
 	/**
 	 * @return returns the annotation ignores from the non annotation based meta data providers
 	 */
-	private AnnotationProcessingOptions getAnnotationProcessingOptionsFromNonDefaultProviders() {
+	private AnnotationProcessingOptions getAnnotationProcessingOptionsFromNonDefaultProviders(List<MetaDataProvider> optionalMetaDataProviders) {
 		AnnotationProcessingOptions options = new AnnotationProcessingOptionsImpl();
-		for ( MetaDataProvider metaDataProvider : metaDataProviders ) {
+		for ( MetaDataProvider metaDataProvider : optionalMetaDataProviders ) {
 			options.merge( metaDataProvider.getAnnotationProcessingOptions() );
 		}
 
