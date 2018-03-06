@@ -191,6 +191,10 @@ public class ValueExtractorManager {
 		}
 	}
 
+	public void clear() {
+		valueExtractorResolver.clear();
+	}
+
 	/**
 	 * Runs the given privileged action, using a privileged block if required.
 	 * <p>

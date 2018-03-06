@@ -200,6 +200,12 @@ public class ValueExtractorResolver {
 				.collect( Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) );
 	}
 
+	public void clear() {
+		nonContainerTypes.clear();
+		possibleValueExtractorsByRuntimeType.clear();
+		possibleValueExtractorsByRuntimeTypeAndTypeParameter.clear();
+	}
+
 	/**
 	 * Returns the set of potentially type-compliant and container-element-compliant value extractors or an empty set if none was found.
 	 * <p>

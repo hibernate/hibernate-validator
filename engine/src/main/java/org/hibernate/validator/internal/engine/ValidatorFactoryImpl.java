@@ -322,6 +322,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			beanMetaDataManager.clear();
 		}
 		validatorFactoryScopedContext.getScriptEvaluatorFactory().clear();
+		valueExtractorManager.clear();
 	}
 
 	public ValidatorFactoryScopedContext getValidatorFactoryScopedContext() {
