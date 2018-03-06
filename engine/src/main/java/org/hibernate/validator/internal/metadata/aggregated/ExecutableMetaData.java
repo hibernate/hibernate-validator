@@ -310,9 +310,15 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 			//are the locations equal (created by different builders) or
 			//does one of the executables override the other one?
-			return executable.equals( candidate ) ||
-					overrides( executable, candidate ) ||
-					overrides( candidate, executable );
+			return resolveToSameMethodInHierarchy( executable, candidate );
+		}
+
+		private boolean resolveToSameMethodInHierarchy(Executable first, Executable other) {
+			if ( first instanceof Constructor || other instanceof Constructor ) {
+				return first.equals( other );
+			}
+
+			return executableHelper.resolveToSameMethodInHierarchy( getBeanClass(), (Method) first, (Method) other );
 		}
 
 		private boolean overrides(Executable first, Executable other) {
