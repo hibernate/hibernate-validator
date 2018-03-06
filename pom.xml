@@ -119,7 +119,7 @@
         <previous.stable>6.0.4.Final</previous.stable>
 
         <paranamer.version>2.8</paranamer.version>
-        <javax.el.version>3.0.1-b08</javax.el.version>
+        <javax.el.version>3.0.1-b09</javax.el.version>
         <jboss.logging.version>3.3.2.Final</jboss.logging.version>
         <jboss.logging.processor.version>2.1.0.Final</jboss.logging.processor.version>
 

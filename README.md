@@ -44,7 +44,7 @@ Logging will delegate any log requests to that provider.
         <dependency>
            <groupId>org.glassfish</groupId>
            <artifactId>javax.el</artifactId>
-           <version>3.0.1-b08</version>
+           <version>3.0.1-b09</version>
         </dependency>
 
 * Bean Validation defines integration points with [CDI](http://jcp.org/en/jsr/detail?id=346). If your application runs
