@@ -247,11 +247,11 @@ public class ValueExtractorResolver {
 
 	private ValueExtractorDescriptor getUniqueValueExtractorOrThrowException(Class<?> runtimeType,
 			Set<ValueExtractorDescriptor> maximallySpecificContainerElementCompliantValueExtractors) {
-		if ( maximallySpecificContainerElementCompliantValueExtractors.isEmpty() ) {
-			return null;
-		}
-		else if ( maximallySpecificContainerElementCompliantValueExtractors.size() == 1 ) {
+		if ( maximallySpecificContainerElementCompliantValueExtractors.size() == 1 ) {
 			return maximallySpecificContainerElementCompliantValueExtractors.iterator().next();
+		}
+		else if ( maximallySpecificContainerElementCompliantValueExtractors.isEmpty() ) {
+			return null;
 		}
 		else {
 			throw LOG.getUnableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclaredException( runtimeType,
@@ -400,9 +400,11 @@ public class ValueExtractorResolver {
 
 	private static class ValueExtractorCacheKey {
 
-		private final Class<?> type;
-		private final TypeVariable<?> typeParameter;
-		private final int hashCode;
+		// These properties are not final on purpose, it's faster when they are not
+
+		private Class<?> type;
+		private TypeVariable<?> typeParameter;
+		private int hashCode;
 
 		ValueExtractorCacheKey(Class<?> type, TypeVariable<?> typeParameter) {
 			this.type = type;
@@ -415,9 +417,10 @@ public class ValueExtractorResolver {
 			if ( this == o ) {
 				return true;
 			}
-			if ( o == null || this.getClass() != o.getClass() ) {
+			if ( o == null ) {
 				return false;
 			}
+			// We don't check the class as an optimization, the keys of the map are ValueExtractorCacheKey anyway
 			ValueExtractorCacheKey that = (ValueExtractorCacheKey) o;
 			return Objects.equals( this.type, that.type ) &&
 					Objects.equals( this.typeParameter, that.typeParameter );
