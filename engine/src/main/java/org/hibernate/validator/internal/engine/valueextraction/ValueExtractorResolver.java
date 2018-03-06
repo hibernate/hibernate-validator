@@ -84,7 +84,7 @@ public class ValueExtractorResolver {
 	public ValueExtractorDescriptor getMaximallySpecificAndContainerElementCompliantValueExtractor(Class<?> declaredType, TypeVariable<?> typeParameter) {
 		return getUniqueValueExtractorOrThrowException(
 				declaredType,
-				getRuntimeAndContainerElementComplaintValueExtractorsFromPossibleCandidates( declaredType, typeParameter, declaredType, registeredValueExtractors )
+				getRuntimeAndContainerElementCompliantValueExtractorsFromPossibleCandidates( declaredType, typeParameter, declaredType, registeredValueExtractors )
 		);
 	}
 
@@ -108,7 +108,7 @@ public class ValueExtractorResolver {
 		else {
 			return getUniqueValueExtractorOrThrowException(
 					runtimeType,
-					getRuntimeAndContainerElementComplaintValueExtractorsFromPossibleCandidates(
+					getRuntimeAndContainerElementCompliantValueExtractorsFromPossibleCandidates(
 							declaredType, typeParameter, runtimeType, valueExtractorCandidates
 					)
 			);
@@ -148,7 +148,7 @@ public class ValueExtractorResolver {
 	public Set<ValueExtractorDescriptor> getValueExtractorCandidatesForCascadedValidation(Type declaredType, TypeVariable<?> typeParameter) {
 		Set<ValueExtractorDescriptor> valueExtractorDescriptors = new HashSet<>();
 
-		valueExtractorDescriptors.addAll( getRuntimeAndContainerElementComplaintValueExtractorsFromPossibleCandidates( declaredType, typeParameter,
+		valueExtractorDescriptors.addAll( getRuntimeAndContainerElementCompliantValueExtractorsFromPossibleCandidates( declaredType, typeParameter,
 				TypeHelper.getErasedReferenceType( declaredType ), registeredValueExtractors
 		) );
 		valueExtractorDescriptors.addAll( getPotentiallyRuntimeTypeCompliantAndContainerElementCompliantValueExtractors( declaredType, typeParameter ) );
@@ -325,7 +325,7 @@ public class ValueExtractorResolver {
 		return valueExtractorDescriptors;
 	}
 
-	private Set<ValueExtractorDescriptor> getRuntimeAndContainerElementComplaintValueExtractorsFromPossibleCandidates(Type declaredType,
+	private Set<ValueExtractorDescriptor> getRuntimeAndContainerElementCompliantValueExtractorsFromPossibleCandidates(Type declaredType,
 			TypeVariable<?> typeParameter, Class<?> runtimeType, Collection<ValueExtractorDescriptor> valueExtractorCandidates) {
 		if ( nonContainerTypes.contains( runtimeType ) ) {
 			return Collections.emptySet();
