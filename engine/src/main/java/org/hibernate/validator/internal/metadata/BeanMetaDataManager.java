@@ -11,6 +11,7 @@ import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.O
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -28,12 +29,14 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * This manager is in charge of providing all constraint related meta data
@@ -74,6 +77,7 @@ public class BeanMetaDataManager {
 	 * Additional metadata providers used for meta data retrieval if
 	 * the XML and/or programmatic configuration is used.
 	 */
+	@Immutable
 	private final List<MetaDataProvider> metaDataProviders;
 
 	/**
@@ -140,17 +144,20 @@ public class BeanMetaDataManager {
 
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders( optionalMetaDataProviders );
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
-					constraintHelper,
-					typeResolutionHelper,
-					valueExtractorManager,
-					annotationProcessingOptions
-			);
-		this.metaDataProviders = newArrayList();
-		// default annotation based metadata provider should go first in the list of providers to prevent possible issues
-		// similar to HV-1450. This way after the first run we will have all possible constrained elements in the list and
-		// should only merge in additional constraint information from other providers.
-		this.metaDataProviders.add( defaultProvider );
-		this.metaDataProviders.addAll( optionalMetaDataProviders );
+				constraintHelper,
+				typeResolutionHelper,
+				valueExtractorManager,
+				annotationProcessingOptions
+		);
+		List<MetaDataProvider> tmpMetaDataProviders = new ArrayList<>( optionalMetaDataProviders.size() + 1 );
+		// We add the annotation based metadata provider at the first position so that the entire metadata model is assembled
+		// first.
+		// The other optional metadata providers will then contribute their additional metadata to the preexisting model.
+		// This helps to mitigate issues like HV-1450.
+		tmpMetaDataProviders.add( defaultProvider );
+		tmpMetaDataProviders.addAll( optionalMetaDataProviders );
+
+		this.metaDataProviders = CollectionHelper.toImmutableList( tmpMetaDataProviders );
 	}
 
 	@SuppressWarnings("unchecked")
