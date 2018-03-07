@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator-parent</artifactId>
-        <version>6.0.8-SNAPSHOT</version>
+        <version>6.0.8.Final</version>
     </parent>
 
     <artifactId>hibernate-validator-relocation</artifactId>
