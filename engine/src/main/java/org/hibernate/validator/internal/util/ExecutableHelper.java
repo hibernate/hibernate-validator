@@ -91,7 +91,7 @@ public final class ExecutableHelper {
 			return false;
 		}
 
-		if ( !isOneMethodVisibleToAnother( subTypeMethod, superTypeMethod ) ) {
+		if ( !isMethodVisibleTo( superTypeMethod, subTypeMethod ) ) {
 			return false;
 		}
 
@@ -110,7 +110,7 @@ public final class ExecutableHelper {
 	 * 		override another one in the class hierarchy with {@code mainSubType} at the bottom,
 	 * 		{@code false} otherwise.
 	 */
-	public boolean resolveToSameMethodInHierarchy(Class<?> mainSubType, Method left, Method right) {
+	public boolean isResolvedToSameMethodInHierarchy(Class<?> mainSubType, Method left, Method right) {
 		Contracts.assertValueNotNull( mainSubType, "mainSubType" );
 		Contracts.assertValueNotNull( left, "left" );
 		Contracts.assertValueNotNull( right, "right" );
@@ -148,7 +148,7 @@ public final class ExecutableHelper {
 			return false;
 		}
 
-		if ( !isOneMethodVisibleToAnother( left, right ) || !isOneMethodVisibleToAnother( right, left ) ) {
+		if ( !isMethodVisibleTo( right, left ) || !isMethodVisibleTo( left, right ) ) {
 			return false;
 		}
 
@@ -163,9 +163,9 @@ public final class ExecutableHelper {
 		);
 	}
 
-	private static boolean isOneMethodVisibleToAnother(Method left, Method right) {
-		return Modifier.isPublic( right.getModifiers() ) || Modifier.isProtected( right.getModifiers() )
-				|| right.getDeclaringClass().getPackage().equals( left.getDeclaringClass().getPackage() );
+	private static boolean isMethodVisibleTo(Method visibleMethod, Method otherMethod) {
+		return Modifier.isPublic( visibleMethod.getModifiers() ) || Modifier.isProtected( visibleMethod.getModifiers() )
+				|| visibleMethod.getDeclaringClass().getPackage().equals( otherMethod.getDeclaringClass().getPackage() );
 	}
 
 	public static String getSimpleName(Executable executable) {

@@ -27,7 +27,7 @@ import org.testng.annotations.Test;
 public class MethodParameterConstraintsInParallelHierarchyTest {
 
 	/**
-	 * NOTE: prior to the changes where this test was added it would fail randomly.
+	 * NOTE: prior to the changes made for HV-1450, this test was failing randomly.
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HV-1450")
@@ -37,13 +37,14 @@ public class MethodParameterConstraintsInParallelHierarchyTest {
 		Method method = WebServiceImpl.class.getMethod( "getEntityVersion", Long.class );
 		Object[] params = new Object[] { null };
 
-		Validator validator = Validation.byDefaultProvider().configure()
-				.buildValidatorFactory().getValidator();
+		for ( int i = 0; i < 100; i++ ) {
+			Validator validator = Validation.byDefaultProvider().configure()
+					.buildValidatorFactory().getValidator();
 
-		Set<ConstraintViolation<WebServiceImpl>> violations =
-				validator.forExecutables().validateParameters( service, method, params );
+			Set<ConstraintViolation<WebServiceImpl>> violations = validator.forExecutables().validateParameters( service, method, params );
 
-		assertThat( violations ).containsOnlyViolations( violationOf( NotNull.class ) );
+			assertThat( violations ).containsOnlyViolations( violationOf( NotNull.class ) );
+		}
 	}
 
 	private class WebServiceImpl extends AbstractWebService implements ExtendedWebService {
