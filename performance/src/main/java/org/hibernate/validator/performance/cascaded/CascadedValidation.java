@@ -39,10 +39,22 @@ public class CascadedValidation {
 	@State(Scope.Benchmark)
 	public static class CascadedValidationState {
 		public volatile Validator validator;
+		public volatile Person person;
 
 		public CascadedValidationState() {
 			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 			validator = factory.getValidator();
+
+			// TODO graphs needs to be generated and deeper
+			Person kermit = new Person( "kermit" );
+			Person piggy = new Person( "miss piggy" );
+			Person gonzo = new Person( "gonzo" );
+
+			kermit.addFriend( piggy ).addFriend( gonzo );
+			piggy.addFriend( kermit ).addFriend( gonzo );
+			gonzo.addFriend( kermit ).addFriend( piggy );
+
+			person = kermit;
 		}
 	}
 
@@ -54,22 +66,13 @@ public class CascadedValidation {
 	@Warmup(iterations = 10)
 	@Measurement(iterations = 20)
 	public void testCascadedValidation(CascadedValidationState state, Blackhole bh) {
-		// TODO graphs needs to be generated and deeper
-		Person kermit = new Person( "kermit" );
-		Person piggy = new Person( "miss piggy" );
-		Person gonzo = new Person( "gonzo" );
-
-		kermit.addFriend( piggy ).addFriend( gonzo );
-		piggy.addFriend( kermit ).addFriend( gonzo );
-		gonzo.addFriend( kermit ).addFriend( piggy );
-
-		Set<ConstraintViolation<Person>> violations = state.validator.validate( kermit );
+		Set<ConstraintViolation<Person>> violations = state.validator.validate( state.person );
 		assertThat( violations ).hasSize( 0 );
 
 		bh.consume( violations );
 	}
 
-	public class Person {
+	public static class Person {
 		@NotNull
 		String name;
 

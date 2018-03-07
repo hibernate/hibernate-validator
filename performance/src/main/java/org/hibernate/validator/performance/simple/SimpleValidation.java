@@ -8,7 +8,6 @@ package org.hibernate.validator.performance.simple;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -37,30 +36,16 @@ import org.openjdk.jmh.infra.Blackhole;
  */
 public class SimpleValidation {
 
-	private static final String[] names = {
-			null,
-			"Jacob",
-			"Isabella",
-			"Ethan",
-			"Sophia",
-			"Michael",
-			"Emma",
-			"Jayden",
-			"Olivia",
-			"William"
-	};
-
 	@State(Scope.Benchmark)
 	public static class ValidationState {
 		public volatile Validator validator;
-		public volatile Random random;
+		public volatile Driver driver;
 
 		{
 			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 			validator = factory.getValidator();
-			random = new Random();
+			driver = new Driver( null, 17, false );
 		}
-
 	}
 
 	@Benchmark
@@ -71,13 +56,12 @@ public class SimpleValidation {
 	@Warmup(iterations = 10)
 	@Measurement(iterations = 20)
 	public void testSimpleBeanValidation(ValidationState state, Blackhole bh) {
-		DriverSetup driverSetup = new DriverSetup( state );
-		Set<ConstraintViolation<Driver>> violations = state.validator.validate( driverSetup.getDriver() );
-		assertThat( violations ).hasSize( driverSetup.getExpectedViolationCount() );
+		Set<ConstraintViolation<Driver>> violations = state.validator.validate( state.driver );
+		assertThat( violations ).hasSize( 3 );
 		bh.consume( violations );
 	}
 
-	public class Driver {
+	public static class Driver {
 		@NotNull
 		private String name;
 
@@ -91,52 +75,6 @@ public class SimpleValidation {
 			this.name = name;
 			this.age = age;
 			this.hasDrivingLicense = hasDrivingLicense;
-		}
-
-		@Override
-		public String toString() {
-			final StringBuilder sb = new StringBuilder();
-			sb.append( "Driver" );
-			sb.append( "{name='" ).append( name ).append( '\'' );
-			sb.append( ", age=" ).append( age );
-			sb.append( ", hasDrivingLicense=" ).append( hasDrivingLicense );
-			sb.append( '}' );
-			return sb.toString();
-		}
-	}
-
-	private class DriverSetup {
-		private int expectedViolationCount;
-		private Driver driver;
-
-		public DriverSetup(ValidationState state) {
-			expectedViolationCount = 0;
-
-			String name = names[state.random.nextInt( 10 )];
-			if ( name == null ) {
-				expectedViolationCount++;
-			}
-
-			int randomAge = state.random.nextInt( 100 );
-			if ( randomAge < 18 ) {
-				expectedViolationCount++;
-			}
-
-			int rand = state.random.nextInt( 2 );
-			boolean hasLicense = rand == 1;
-			if ( !hasLicense ) {
-				expectedViolationCount++;
-			}
-
-			driver = new Driver( name, randomAge, hasLicense );
-		}
-
-		public int getExpectedViolationCount() {
-			return expectedViolationCount;
-		}
-
-		public Driver getDriver() {
-			return driver;
 		}
 	}
 }
