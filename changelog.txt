@@ -1,6 +1,51 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.8.Final (07-03-2018)
+-------------------------
+
+** Bug
+    * HV-1554 - integration        - OSGi tests running on Payara fail randomly
+    * HV-1551 - engine             - Validator not found for @Size on non-parameterized Map/Collection properties
+    * HV-1461 - engine             - ExecutableHelper#overrides does not work correctly with the method containing generic and non generic parameters
+
+** Improvement
+    * HV-1582 - build, integration - Make the classmate OSGi version range less strict
+    * HV-1581 - build              - Make the Felix integration tests fail when a test fails
+    * HV-1580 - build              - Fix the path of the setupModules.groovy script
+    * HV-1576 - build, integration - Upgrade the integration tests and the base WildFly version to WildFly 12
+    * HV-1573 - build              - Ignore the Maven wrapper files in the license check
+    * HV-1572 - documentation      - Make the custom container type value extractor example more clear in the documentation
+    * HV-1569 - tck-runner         - updateStandaloneXml.groovy shoud take into account the property overridden with the command line
+    * HV-1568 - engine             - Prevent possible NullPointerException in ValidatorFactoryScopedContext.Builder
+    * HV-1567 - engine             - Make ValidationOrderGenerator global to the ValidatorFactory
+    * HV-1566 - engine             - Cache type variable index for performance reasons
+    * HV-1565 - documentation      - Add missing security manager permissions for JBoss Logging and Classmate in the documentation
+    * HV-1564 - build              - Upgrade the Maven plugins
+    * HV-1563 - build              - Update the TCK to 2.0.2.Final and reenable all the TCK tests with JDK 9
+    * HV-1562 - build              - JDK9+ build improvements
+    * HV-1560 - engine             - Remove Guava as dependency from engine
+    * HV-1559 - build              - Align dependency versions with what's in WildFly 11
+    * HV-1553 - translations       - Update Spanish translation of constraint messages
+    * HV-1543 - engine             - Simplify ConstraintTree in the case of non composing constraints
+    * HV-1444 - engine             - Support container only detectable at runtime for global cascaded validation and introduce a cache for the value extractors
+
+** New Feature
+    * HV-1529 - engine             - Allow to pass a payload to the constraint validators
+
+** Sub-task
+    * HV-1556 - integration        - Felix tests are referencing an outdated snapshot version
+    * HV-1555 - integration        - Upgrade Payara (used for the Felix tests) to 5.Beta1
+
+** Task
+    * HV-1584 - tck-runner         - Include JavaFX tests in TCK runs (local and incontainer)
+    * HV-1583 - build              - Update javax.el dependency to 3.0.1-b09
+    * HV-1570 - build              - Update JBoss Logging to version 3.3.2.Final
+    * HV-1558 - build              - Put the distribution files to upload into distribution/target/dir so that release scripts find them
+    * HV-1557 - build              - Remove old release scripts from the repository
+    * HV-1550 - build              - Clarify the build output in the Travis build
+    * HV-1549 - build              - Use mvn install instead of mvn verify in the Travis build
+
 6.0.7.Final (20-12-2017)
 -------------------------
 
