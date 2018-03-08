@@ -814,7 +814,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ValidationOrder validationOrder) {
 		BeanMetaData<T> beanMetaData = validationContext.getRootBeanMetaData();
 
-		Optional<ExecutableMetaData> executableMetaDataOptional = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
+		Optional<ExecutableMetaData> executableMetaDataOptional = validationContext.getExecutableMetaData();
 
 		if ( !executableMetaDataOptional.isPresent() ) {
 			// the method is unconstrained
@@ -1011,7 +1011,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private <V, T> void validateReturnValueInContext(ValidationContext<T> validationContext, T bean, V value, ValidationOrder validationOrder) {
 		BeanMetaData<T> beanMetaData = validationContext.getRootBeanMetaData();
 
-		Optional<ExecutableMetaData> executableMetaDataOptional = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
+		Optional<ExecutableMetaData> executableMetaDataOptional = validationContext.getExecutableMetaData();
 
 		if ( !executableMetaDataOptional.isPresent() ) {
 			// the method is unconstrained
