@@ -56,6 +56,12 @@ public class MetaConstraint<A extends Annotation> {
 	private final int hashCode;
 
 	/**
+	 * Indicates if the constraint is defined for one group only: used to optimize already validated constraints
+	 * tracking.
+	 */
+	private final boolean isDefinedForOneGroupOnly;
+
+	/**
 	 * @param constraintDescriptor The constraint descriptor for this constraint
 	 * @param location meta data about constraint placement
 	 * @param valueExtractorDescriptors the potential {@link ValueExtractor}s used to extract the value to validate
@@ -67,6 +73,7 @@ public class MetaConstraint<A extends Annotation> {
 		this.location = location;
 		this.valueExtractionPath = getValueExtractionPath( valueExtractionPath );
 		this.hashCode = buildHashCode( constraintDescriptor, location );
+		this.isDefinedForOneGroupOnly = constraintDescriptor.getGroups().size() <= 1;
 	}
 
 	private static ValueExtractionPathNode getValueExtractionPath(List<ContainerClassTypeParameterAndExtractor> valueExtractionPath) {
@@ -83,6 +90,10 @@ public class MetaConstraint<A extends Annotation> {
 	 */
 	public final Set<Class<?>> getGroupList() {
 		return constraintTree.getDescriptor().getGroups();
+	}
+
+	public final boolean isDefinedForOneGroupOnly() {
+		return isDefinedForOneGroupOnly;
 	}
 
 	public final ConstraintDescriptorImpl<A> getDescriptor() {

@@ -76,6 +76,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	private final ReturnValueMetaData returnValueMetaData;
 	private final ElementKind kind;
 
+	private final boolean hasCascadingParameters;
+
 	private ExecutableMetaData(
 			String name,
 			Type returnType,
@@ -84,7 +86,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Set<String> signatures,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Set<MetaConstraint<?>> returnValueContainerElementConstraints,
-			List<ParameterMetaData> parameterMetaData,
+			List<ParameterMetaData> parameterMetaDataList,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			CascadingMetaData cascadingMetaData,
 			boolean isConstrained,
@@ -99,7 +101,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		);
 
 		this.parameterTypes = parameterTypes;
-		this.parameterMetaDataList = CollectionHelper.toImmutableList( parameterMetaData );
+		this.parameterMetaDataList = CollectionHelper.toImmutableList( parameterMetaDataList );
 		this.crossParameterConstraints = CollectionHelper.toImmutableSet( crossParameterConstraints );
 		this.signatures = signatures;
 		this.returnValueMetaData = new ReturnValueMetaData(
@@ -110,6 +112,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		);
 		this.isGetter = isGetter;
 		this.kind = kind;
+
+		this.hasCascadingParameters = buildHasCascadingParameters( parameterMetaDataList );
 	}
 
 	/**
@@ -238,6 +242,19 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			return false;
 		}
 		return true;
+	}
+
+	public boolean hasCascadingParameters() {
+		return hasCascadingParameters;
+	}
+
+	private boolean buildHasCascadingParameters(List<ParameterMetaData> parameterMetaDataList) {
+		for ( ParameterMetaData parameterMetaData : parameterMetaDataList ) {
+			if ( parameterMetaData.isCascading() ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

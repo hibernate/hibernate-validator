@@ -113,4 +113,9 @@ public interface BeanMetaData<T> extends Validatable {
 	 *         element itself and goes up the hierarchy chain. Interfaces are not included.
 	 */
 	List<Class<? super T>> getClassHierarchy();
+
+	/**
+	 * @return {@code true} if there is at least one cascading property in the bean metadata, {@code false} otherwise.
+	 */
+	boolean hasCascadingProperties();
 }

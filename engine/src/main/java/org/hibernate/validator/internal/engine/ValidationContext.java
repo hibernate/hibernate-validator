@@ -16,6 +16,7 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,6 +39,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVi
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -100,6 +102,11 @@ public class ValidationContext<T> {
 	private final Object executableReturnValue;
 
 	/**
+	 * The metadata of the Executable. Will be non empty if we are in the case of method validation and the method is constrained.
+	 */
+	private final Optional<ExecutableMetaData> executableMetaData;
+
+	/**
 	 * The set of already processed meta constraints per bean - path ({@link BeanPathMetaConstraintProcessedUnit}).
 	 */
 	private final Set<BeanPathMetaConstraintProcessedUnit> processedPathUnits;
@@ -140,6 +147,11 @@ public class ValidationContext<T> {
 	private final HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext;
 
 	/**
+	 * Indicates if the tracking of already validated bean should be disabled.
+	 */
+	private final boolean disableAlreadyValidatedBeanTracking;
+
+	/**
 	 * The name of the validated (leaf) property in case of a validateProperty()/validateValue() call.
 	 */
 	private String validatedProperty;
@@ -155,7 +167,8 @@ public class ValidationContext<T> {
 			BeanMetaData<T> rootBeanMetaData,
 			Executable executable,
 			Object[] executableParameters,
-			Object executableReturnValue) {
+			Object executableReturnValue,
+			Optional<ExecutableMetaData> executableMetaData) {
 		this.validationOperation = validationOperation;
 
 		this.constraintValidatorManager = constraintValidatorManager;
@@ -175,6 +188,10 @@ public class ValidationContext<T> {
 		this.processedPathUnits = new HashSet<>();
 		this.processedPathsPerBean = new IdentityHashMap<>();
 		this.failingConstraintViolations = newHashSet();
+
+		this.executableMetaData = executableMetaData;
+
+		this.disableAlreadyValidatedBeanTracking = buildDisableAlreadyValidatedBeanTracking( validationOperation, rootBeanMetaData, executableMetaData );
 	}
 
 	public static ValidationContextBuilder getValidationContextBuilder(
@@ -209,6 +226,10 @@ public class ValidationContext<T> {
 
 	public Executable getExecutable() {
 		return executable;
+	}
+
+	public Optional<ExecutableMetaData> getExecutableMetaData() {
+		return executableMetaData;
 	}
 
 	public TraversableResolver getTraversableResolver() {
@@ -259,6 +280,10 @@ public class ValidationContext<T> {
 	}
 
 	public boolean isBeanAlreadyValidated(Object value, Class<?> group, PathImpl path) {
+		if ( disableAlreadyValidatedBeanTracking ) {
+			return false;
+		}
+
 		boolean alreadyValidated;
 		alreadyValidated = isAlreadyValidatedForCurrentGroup( value, group );
 
@@ -270,6 +295,10 @@ public class ValidationContext<T> {
 	}
 
 	public void markCurrentBeanAsProcessed(ValueContext<?, ?> valueContext) {
+		if ( disableAlreadyValidatedBeanTracking ) {
+			return;
+		}
+
 		markCurrentBeanAsProcessedForCurrentGroup( valueContext.getCurrentBean(), valueContext.getCurrentGroup() );
 		markCurrentBeanAsProcessedForCurrentPath( valueContext.getCurrentBean(), valueContext.getPropertyPath() );
 	}
@@ -348,10 +377,22 @@ public class ValidationContext<T> {
 	}
 
 	public boolean hasMetaConstraintBeenProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint) {
+		// this is only useful if the constraint is defined for more than 1 group as in the case it's only
+		// defined for one group, there is no chance it's going to be called twice.
+		if ( metaConstraint.isDefinedForOneGroupOnly() ) {
+			return false;
+		}
+
 		return processedPathUnits.contains( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
 	}
 
 	public void markConstraintProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint) {
+		// this is only useful if the constraint is defined for more than 1 group as in the case it's only
+		// defined for one group, there is no chance it's going to be called twice.
+		if ( metaConstraint.isDefinedForOneGroupOnly()  ) {
+			return;
+		}
+
 		processedPathUnits.add( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
 	}
 
@@ -370,6 +411,33 @@ public class ValidationContext<T> {
 		sb.append( "{rootBean=" ).append( rootBean );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	private static boolean buildDisableAlreadyValidatedBeanTracking(ValidationOperation validationOperation, BeanMetaData<?> rootBeanMetaData,
+			Optional<ExecutableMetaData> executableMetaData) {
+		switch ( validationOperation ) {
+			case BEAN_VALIDATION:
+			case PROPERTY_VALIDATION:
+			case VALUE_VALIDATION:
+				// note that in the case of property and value validation, we are considering the root bean, whereas we
+				// could consider the bean of the property or the value. We don't really have the info here though so it
+				// will do for now.
+				return !rootBeanMetaData.hasCascadingProperties();
+			case PARAMETER_VALIDATION:
+				if ( !executableMetaData.isPresent() ) {
+					// the method is unconstrained so there's no need to worry about the tracking
+					return false;
+				}
+				return !executableMetaData.get().hasCascadingParameters();
+			case RETURN_VALUE_VALIDATION:
+				if ( !executableMetaData.isPresent() ) {
+					// the method is unconstrained so there's no need to worry about the tracking
+					return false;
+				}
+				return !executableMetaData.get().getReturnValueMetaData().isCascading();
+			default:
+				return false;
+		}
 	}
 
 	private String interpolate(String messageTemplate,
@@ -487,7 +555,8 @@ public class ValidationContext<T> {
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					null, //executable
 					null, //executable parameters
-					null //executable return value
+					null, //executable return value
+					null //executable metadata
 			);
 		}
 
@@ -506,7 +575,8 @@ public class ValidationContext<T> {
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					null, //executable
 					null, //executable parameters
-					null //executable return value
+					null, //executable return value
+					null //executable metadata
 			);
 		}
 
@@ -523,7 +593,8 @@ public class ValidationContext<T> {
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					null, //executable
 					null, //executable parameters
-					null //executable return value
+					null, //executable return value
+					null //executable metadata
 			);
 		}
 
@@ -534,6 +605,8 @@ public class ValidationContext<T> {
 				Object[] executableParameters) {
 			@SuppressWarnings("unchecked")
 			Class<T> rootBeanClass = rootBean != null ? (Class<T>) rootBean.getClass() : (Class<T>) executable.getDeclaringClass();
+			BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
+
 			return new ValidationContext<>(
 					ValidationOperation.PARAMETER_VALIDATION,
 					constraintValidatorManager,
@@ -543,10 +616,11 @@ public class ValidationContext<T> {
 					constraintValidatorInitializationContext,
 					rootBean,
 					rootBeanClass,
-					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
+					rootBeanMetaData,
 					executable,
 					executableParameters,
-					null //executable return value
+					null, //executable return value
+					rootBeanMetaData.getMetaDataFor( executable )
 			);
 		}
 
@@ -556,6 +630,7 @@ public class ValidationContext<T> {
 				Object executableReturnValue) {
 			@SuppressWarnings("unchecked")
 			Class<T> rootBeanClass = rootBean != null ? (Class<T>) rootBean.getClass() : (Class<T>) executable.getDeclaringClass();
+			BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
 			return new ValidationContext<>(
 					ValidationOperation.RETURN_VALUE_VALIDATION,
 					constraintValidatorManager,
@@ -568,7 +643,8 @@ public class ValidationContext<T> {
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					executable,
 					null, //executable parameters
-					executableReturnValue
+					executableReturnValue,
+					rootBeanMetaData.getMetaDataFor( executable )
 			);
 		}
 	}
