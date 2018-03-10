@@ -6,14 +6,13 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
-import java.lang.reflect.Executable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Constrainable;
+import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
@@ -39,27 +38,23 @@ public interface ConstraintLocation {
 		return new BeanConstraintLocation( declaringClass );
 	}
 
-	static ConstraintLocation forField(Field field) {
-		return new FieldConstraintLocation( field );
-	}
-
-	static ConstraintLocation forGetter(Method getter) {
-		return new GetterConstraintLocation( getter );
+	static ConstraintLocation forProperty(Property property) {
+		return new PropertyConstraintLocation( property );
 	}
 
 	static ConstraintLocation forTypeArgument(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type typeOfAnnotatedElement) {
 		return new TypeArgumentConstraintLocation( delegate, typeParameter, typeOfAnnotatedElement );
 	}
 
-	static ConstraintLocation forReturnValue(Executable executable) {
+	static ConstraintLocation forReturnValue(Callable executable) {
 		return new ReturnValueConstraintLocation( executable );
 	}
 
-	static ConstraintLocation forCrossParameter(Executable executable) {
+	static ConstraintLocation forCrossParameter(Callable executable) {
 		return new CrossParameterConstraintLocation( executable );
 	}
 
-	static ConstraintLocation forParameter(Executable executable, int index) {
+	static ConstraintLocation forParameter(Callable executable, int index) {
 		return new ParameterConstraintLocation( executable, index );
 	}
 
@@ -73,7 +68,7 @@ public interface ConstraintLocation {
 	 *
 	 * @return the member represented by this location. Will be {@code null} when this location represents a type.
 	 */
-	Member getMember();
+	Constrainable getMember();
 
 	/**
 	 * Returns the type to be used when resolving constraint validators for constraints at this location. Note that this
@@ -91,7 +86,7 @@ public interface ConstraintLocation {
 
 	/**
 	 * Obtains the value of this location from the parent. The type of the passed parent depends on the location type,
-	 * e.g. a bean would be passed for a {@link FieldConstraintLocation} or {@link GetterConstraintLocation} but an
+	 * e.g. a bean would be passed for a {@link PropertyConstraintLocation} but an
 	 * object array for a {@link ParameterConstraintLocation}.
 	 */
 	Object getValue(Object parent);

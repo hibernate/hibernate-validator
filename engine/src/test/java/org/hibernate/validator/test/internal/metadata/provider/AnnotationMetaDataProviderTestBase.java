@@ -14,18 +14,21 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedProperty;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.properties.Constrainable;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 
 /**
  * @author Gunnar Morling
  */
 public abstract class AnnotationMetaDataProviderTestBase {
 
-	protected <T> ConstrainedField findConstrainedField(BeanConfiguration<T> beanConfiguration,
+	protected <T> ConstrainedProperty findConstrainedField(BeanConfiguration<T> beanConfiguration,
 														Class<? super T> clazz, String fieldName) throws Exception {
 
-		return (ConstrainedField) findConstrainedElement( beanConfiguration, clazz.getDeclaredField( fieldName ) );
+		return (ConstrainedProperty) findConstrainedElement( beanConfiguration, clazz.getDeclaredField( fieldName ) );
 	}
 
 	protected <T> ConstrainedExecutable findConstrainedMethod(BeanConfiguration<T> beanConfiguration,
@@ -59,14 +62,22 @@ public abstract class AnnotationMetaDataProviderTestBase {
 	protected ConstrainedElement findConstrainedElement(BeanConfiguration<?> beanConfiguration,
 														Member member) {
 
+		Constrainable constrainable;
+		if ( member instanceof Field ) {
+			constrainable = new JavaBeanField( (Field) member );
+		}
+		else {
+			constrainable = JavaBeanExecutable.of( (Executable) member );
+		}
+
 		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
 			if ( member instanceof Executable && constrainedElement instanceof ConstrainedExecutable ) {
-				if ( member.equals( ( (ConstrainedExecutable) constrainedElement ).getExecutable() ) ) {
+				if ( constrainable.equals( ( (ConstrainedExecutable) constrainedElement ).getCallable() ) ) {
 					return constrainedElement;
 				}
 			}
-			else if ( member instanceof Field && constrainedElement instanceof ConstrainedField ) {
-				if ( member.equals( ( (ConstrainedField) constrainedElement ).getField() ) ) {
+			else if ( constrainedElement instanceof ConstrainedProperty ) {
+				if ( constrainable.equals( ( (ConstrainedProperty) constrainedElement ).getProperty() ) ) {
 					return constrainedElement;
 				}
 			}

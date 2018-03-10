@@ -12,8 +12,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Executable;
-import java.lang.reflect.Member;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -46,8 +44,9 @@ import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedProperty;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -691,8 +690,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			this.methodValidationConfiguration = methodValidationConfiguration;
 
 			switch ( constrainedElement.getKind() ) {
-				case FIELD:
-					ConstrainedField constrainedField = (ConstrainedField) constrainedElement;
+				case PROPERTY:
+					ConstrainedProperty constrainedField = (ConstrainedProperty) constrainedElement;
 					propertyBuilder = new PropertyMetaData.Builder(
 							beanClass,
 							constrainedField,
@@ -704,11 +703,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				case CONSTRUCTOR:
 				case METHOD:
 					ConstrainedExecutable constrainedExecutable = (ConstrainedExecutable) constrainedElement;
-					Member member = constrainedExecutable.getExecutable();
+					Callable member = constrainedExecutable.getCallable();
 
 					// HV-890 Not adding meta-data for private super-type methods to the method meta-data of this bean;
 					// It is not needed and it may conflict with sub-type methods of the same signature
-					if ( !Modifier.isPrivate( member.getModifiers() ) || beanClass == member.getDeclaringClass() ) {
+					if ( !member.isPrivate() || beanClass == member.getDeclaringClass() ) {
 						methodBuilder = new ExecutableMetaData.Builder(
 								beanClass,
 								constrainedExecutable,

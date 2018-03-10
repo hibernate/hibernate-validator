@@ -56,7 +56,7 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedProperty;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutils.ValidatorUtil;
@@ -553,11 +553,11 @@ public class ConstraintMappingTest {
 		return null;
 	}
 
-	private ConstrainedField getConstrainedField(BeanConfiguration<?> beanConfiguration, String fieldName) {
+	private ConstrainedProperty getConstrainedField(BeanConfiguration<?> beanConfiguration, String fieldName) {
 		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
-			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD &&
-					( (ConstrainedField) constrainedElement ).getField().getName().equals( fieldName ) ) {
-				return (ConstrainedField) constrainedElement;
+			if ( constrainedElement.getKind() == ConstrainedElementKind.PROPERTY &&
+					( (ConstrainedProperty) constrainedElement ).getProperty().getPropertyName().equals( fieldName ) ) {
+				return (ConstrainedProperty) constrainedElement;
 			}
 		}
 
@@ -567,7 +567,7 @@ public class ConstraintMappingTest {
 	private ConstrainedExecutable getConstrainedExecutable(BeanConfiguration<?> beanConfiguration, String executableName) {
 		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
 			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
-					( (ConstrainedExecutable) constrainedElement ).getExecutable().getName().equals( executableName ) ) {
+					( (ConstrainedExecutable) constrainedElement ).getCallable().getName().equals( executableName ) ) {
 				return (ConstrainedExecutable) constrainedElement;
 			}
 		}

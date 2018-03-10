@@ -21,7 +21,6 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
@@ -41,7 +40,7 @@ final class ParameterConstraintMappingContextImpl
 	ParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext, int parameterIndex) {
 		super(
 			executableContext.getTypeContext().getConstraintMapping(),
-			executableContext.executable.getGenericParameterTypes()[parameterIndex]
+			executableContext.callable.getGenericParameterTypes()[parameterIndex]
 		);
 
 		this.executableContext = executableContext;
@@ -58,7 +57,7 @@ final class ParameterConstraintMappingContextImpl
 		super.addConstraint(
 				ConfiguredConstraint.forParameter(
 						definition,
-						executableContext.getExecutable(),
+						executableContext.getCallable(),
 						parameterIndex
 				)
 		);
@@ -68,7 +67,7 @@ final class ParameterConstraintMappingContextImpl
 	@Override
 	public ParameterConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
 		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsOnParameter(
-				executableContext.getExecutable(),
+				executableContext.getCallable(),
 				parameterIndex,
 				ignoreAnnotations
 		);
@@ -105,7 +104,7 @@ final class ParameterConstraintMappingContextImpl
 		return super.containerElement(
 				this,
 				executableContext.getTypeContext(),
-				ConstraintLocation.forParameter( executableContext.getExecutable(), parameterIndex )
+				ConstraintLocation.forParameter( executableContext.getCallable(), parameterIndex )
 		);
 	}
 
@@ -114,7 +113,7 @@ final class ParameterConstraintMappingContextImpl
 		return super.containerElement(
 				this,
 				executableContext.getTypeContext(),
-				ConstraintLocation.forParameter( executableContext.getExecutable(), parameterIndex ),
+				ConstraintLocation.forParameter( executableContext.getCallable(), parameterIndex ),
 				index,
 				nestedIndexes
 		);
@@ -122,11 +121,11 @@ final class ParameterConstraintMappingContextImpl
 
 	public ConstrainedParameter build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager) {
-		Type parameterType = ReflectionHelper.typeOf( executableContext.getExecutable(), parameterIndex );
+		Type parameterType = executableContext.getCallable().typeOfParameter( parameterIndex );
 
 		return new ConstrainedParameter(
 				ConfigurationSource.API,
-				executableContext.getExecutable(),
+				executableContext.getCallable(),
 				parameterType,
 				parameterIndex,
 				getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),

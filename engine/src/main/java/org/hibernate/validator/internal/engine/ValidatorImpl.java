@@ -63,8 +63,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.FieldConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.GetterConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.PropertyConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
@@ -1383,11 +1382,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			location = ( (TypeArgumentConstraintLocation) location ).getOuterDelegate();
 		}
 
-		if ( location instanceof FieldConstraintLocation ) {
-			return ( (FieldConstraintLocation) location ).getPropertyName();
-		}
-		else if ( location instanceof GetterConstraintLocation ) {
-			return ( (GetterConstraintLocation) location ).getPropertyName();
+		if ( location instanceof PropertyConstraintLocation ) {
+			return ( (PropertyConstraintLocation) location ).getPropertyName();
 		}
 
 		return null;

@@ -54,8 +54,8 @@ public abstract class MethodConfigurationRule {
 	 * {@code otherExecutable}, {@code false} otherwise
 	 */
 	protected boolean isDefinedOnSubType(ConstrainedExecutable executable, ConstrainedExecutable otherExecutable) {
-		Class<?> clazz = executable.getExecutable().getDeclaringClass();
-		Class<?> otherClazz = otherExecutable.getExecutable().getDeclaringClass();
+		Class<?> clazz = executable.getCallable().getDeclaringClass();
+		Class<?> otherClazz = otherExecutable.getCallable().getDeclaringClass();
 
 		return isStrictSubType( clazz, otherClazz );
 	}
@@ -71,8 +71,8 @@ public abstract class MethodConfigurationRule {
 	 * {@code otherExecutable}, {@code false} otherwise
 	 */
 	protected boolean isDefinedOnParallelType(ConstrainedExecutable executable, ConstrainedExecutable otherExecutable) {
-		Class<?> clazz = executable.getExecutable().getDeclaringClass();
-		Class<?> otherClazz = otherExecutable.getExecutable().getDeclaringClass();
+		Class<?> clazz = executable.getCallable().getDeclaringClass();
+		Class<?> otherClazz = otherExecutable.getCallable().getDeclaringClass();
 
 		return !( clazz.isAssignableFrom( otherClazz ) || otherClazz.isAssignableFrom( clazz ) );
 	}

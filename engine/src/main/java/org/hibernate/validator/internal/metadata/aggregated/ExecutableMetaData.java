@@ -10,9 +10,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,10 +30,10 @@ import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptor
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
@@ -260,7 +257,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 */
 		private final ConstrainedElement.ConstrainedElementKind kind;
 		private final Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
-		private Executable executable;
+		private Callable callable;
 		private final boolean isGetterMethod;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		private final Set<MethodConfigurationRule> rules;
@@ -293,7 +290,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			this.executableHelper = executableHelper;
 			this.parameterNameProvider = parameterNameProvider;
 			this.kind = constrainedExecutable.getKind();
-			this.executable = constrainedExecutable.getExecutable();
+			this.callable = constrainedExecutable.getCallable();
 			this.rules = methodValidationConfiguration.getConfiguredRuleSet();
 			this.isGetterMethod = constrainedExecutable.isGetterMethod();
 
@@ -306,27 +303,27 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				return false;
 			}
 
-			Executable candidate = ( (ConstrainedExecutable) constrainedElement ).getExecutable();
+			Callable candidate = ( (ConstrainedExecutable) constrainedElement ).getCallable();
 
 			//are the locations equal (created by different builders) or
 			//does one of the executables override the other one?
-			return isResolvedToSameMethodInHierarchy( executable, candidate );
+			return isResolvedToSameMethodInHierarchy( callable, candidate );
 		}
 
-		private boolean isResolvedToSameMethodInHierarchy(Executable first, Executable other) {
-			if ( first instanceof Constructor || other instanceof Constructor ) {
+		private boolean isResolvedToSameMethodInHierarchy(Callable first, Callable other) {
+			if ( first.isConstructor() || other.isConstructor() ) {
 				return first.equals( other );
 			}
 
-			return executableHelper.isResolvedToSameMethodInHierarchy( getBeanClass(), (Method) first, (Method) other );
+			return first.isResolvedToSameMethodInHierarchy( executableHelper, getBeanClass(), other );
 		}
 
-		private boolean overrides(Executable first, Executable other) {
-			if ( first instanceof Constructor || other instanceof Constructor ) {
+		private boolean overrides(Callable first, Callable other) {
+			if ( first.isConstructor() || other.isConstructor() ) {
 				return false;
 			}
 
-			return executableHelper.overrides( (Method) first, (Method) other );
+			return executableHelper.overrides( first, other );
 		}
 
 		@Override
@@ -334,7 +331,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			super.add( constrainedElement );
 			ConstrainedExecutable constrainedExecutable = (ConstrainedExecutable) constrainedElement;
 
-			signatures.add( ExecutableHelper.getSignature( constrainedExecutable.getExecutable() ) );
+			signatures.add( constrainedExecutable.getCallable().getSignature() );
 
 			constrainedExecutables.add( constrainedExecutable );
 			isConstrained = isConstrained || constrainedExecutable.isConstrained();
@@ -350,11 +347,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 			// keep the "lowest" executable in hierarchy to make sure any type parameters declared on super-types (and
 			// used in overridden methods) are resolved for the specific sub-type we are interested in
-			if ( executable != null && overrides(
-					constrainedExecutable.getExecutable(),
-					executable
+			if ( callable != null && overrides(
+					constrainedExecutable.getCallable(),
+					callable
 			) ) {
-				executable = constrainedExecutable.getExecutable();
+				callable = constrainedExecutable.getCallable();
 			}
 		}
 
@@ -365,7 +362,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 * @param executable The executable to merge.
 		 */
 		private void addToExecutablesByDeclaringType(ConstrainedExecutable executable) {
-			Class<?> beanClass = executable.getExecutable().getDeclaringClass();
+			Class<?> beanClass = executable.getCallable().getDeclaringClass();
 			ConstrainedExecutable mergedExecutable = executablesByDeclaringType.get( beanClass );
 
 			if ( mergedExecutable != null ) {
@@ -383,17 +380,17 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			assertCorrectnessOfConfiguration();
 
 			return new ExecutableMetaData(
-					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? executable.getDeclaringClass().getSimpleName() : executable.getName(),
-					ReflectionHelper.typeOf( executable ),
-					executable.getParameterTypes(),
+					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? callable.getDeclaringClass().getSimpleName() : callable.getName(),
+					callable.getType(),
+					callable.getParameterTypes(),
 					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
-					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? Collections.singleton( ExecutableHelper.getSignature( executable ) ) :
+					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? Collections.singleton( callable.getSignature() ) :
 							CollectionHelper.toImmutableSet( signatures ),
 					adaptOriginsAndImplicitGroups( getDirectConstraints() ),
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
-					cascadingMetaDataBuilder.build( valueExtractorManager, executable ),
+					cascadingMetaDataBuilder.build( valueExtractorManager, callable ),
 					isConstrained,
 					isGetterMethod
 			);
@@ -416,7 +413,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					for ( ConstrainedParameter oneParameter : oneExecutable.getAllParameterMetaData() ) {
 						parameterBuilders.add(
 								new ParameterMetaData.Builder(
-										executable.getDeclaringClass(),
+										callable.getDeclaringClass(),
 										oneParameter,
 										constraintHelper,
 										typeResolutionHelper,

@@ -4,52 +4,38 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.metadata.location;
+package org.hibernate.validator.internal.properties.javabean;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.hibernate.validator.HibernateValidatorPermission;
-import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 
 /**
- * Field constraint location.
- *
- * @author Hardy Ferentschik
- * @author Gunnar Morling
+ * @author Marko Bekhta
  */
-public class FieldConstraintLocation implements ConstraintLocation {
+public class JavaBeanField implements Property {
 
-	/**
-	 * The member the constraint was defined on.
-	 */
 	private final Field field;
-
-	private final Field accessibleField;
-
-	/**
-	 * The property name associated with the member.
-	 */
-	private final String propertyName;
-
-	/**
-	 * The type to be used for validator resolution for constraints at this location.
-	 */
+	private final String name;
 	private final Type typeForValidatorResolution;
+	private final Type type;
 
+	public JavaBeanField(Field field) {
+		this.field = getAccessible( field );
+		this.name = field.getName();
+		this.type = ReflectionHelper.typeOf( field );
+		this.typeForValidatorResolution = ReflectionHelper.boxedType( this.type );
+	}
 
-	FieldConstraintLocation(Field field) {
-		this.field = field;
-		this.accessibleField = getAccessible( field );
-		this.propertyName = ReflectionHelper.getPropertyName( field );
-		this.typeForValidatorResolution = ReflectionHelper.boxedType( ReflectionHelper.typeOf( field ) );
+	@Override
+	public String getName() {
+		return name;
 	}
 
 	@Override
@@ -58,12 +44,8 @@ public class FieldConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
-	public Member getMember() {
-		return field;
-	}
-
-	public String getPropertyName() {
-		return propertyName;
+	public Type getType() {
+		return type;
 	}
 
 	@Override
@@ -72,19 +54,18 @@ public class FieldConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
-	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path) {
-		path.addPropertyNode( propertyName );
+	public Object getValueFrom(Object bean) {
+		return ReflectionHelper.getValue( field, bean );
 	}
 
 	@Override
-	public Object getValue(Object parent) {
-		return ReflectionHelper.getValue( accessibleField, parent );
+	public Kind getKind() {
+		return Kind.FIELD;
 	}
 
 	@Override
-	public String toString() {
-		return "FieldConstraintLocation [member=" + StringHelper.toShortString( field ) + ", typeForValidatorResolution="
-				+ StringHelper.toShortString( typeForValidatorResolution ) + "]";
+	public String getPropertyName() {
+		return getName();
 	}
 
 	@Override
@@ -92,26 +73,30 @@ public class FieldConstraintLocation implements ConstraintLocation {
 		if ( this == o ) {
 			return true;
 		}
-		if ( o == null || getClass() != o.getClass() ) {
+		if ( o == null || this.getClass() != o.getClass() ) {
 			return false;
 		}
 
-		FieldConstraintLocation that = (FieldConstraintLocation) o;
+		JavaBeanField that = (JavaBeanField) o;
 
-		if ( field != null ? !field.equals( that.field ) : that.field != null ) {
+		if ( !this.field.equals( that.field ) ) {
 			return false;
 		}
-		if ( !typeForValidatorResolution.equals( that.typeForValidatorResolution ) ) {
+		if ( !this.name.equals( that.name ) ) {
 			return false;
 		}
-
-		return true;
+		if ( !this.typeForValidatorResolution.equals( that.typeForValidatorResolution ) ) {
+			return false;
+		}
+		return this.type.equals( that.type );
 	}
 
 	@Override
 	public int hashCode() {
-		int result = field != null ? field.hashCode() : 0;
-		result = 31 * result + typeForValidatorResolution.hashCode();
+		int result = this.field.hashCode();
+		result = 31 * result + this.name.hashCode();
+		result = 31 * result + this.typeForValidatorResolution.hashCode();
+		result = 31 * result + this.type.hashCode();
 		return result;
 	}
 

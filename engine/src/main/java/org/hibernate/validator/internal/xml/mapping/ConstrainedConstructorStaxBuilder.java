@@ -26,6 +26,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -84,6 +85,7 @@ class ConstrainedConstructorStaxBuilder extends AbstractConstrainedExecutableEle
 					parameterTypes
 			);
 		}
+		JavaBeanExecutable executable = JavaBeanExecutable.of( constructor );
 
 		if ( alreadyProcessedConstructors.contains( constructor ) ) {
 			throw LOG.getConstructorIsDefinedTwiceInMappingXmlForBeanException( constructor, beanClass );
@@ -95,7 +97,7 @@ class ConstrainedConstructorStaxBuilder extends AbstractConstrainedExecutableEle
 		// ignore annotations
 		if ( ignoreAnnotations.isPresent() ) {
 			annotationProcessingOptions.ignoreConstraintAnnotationsOnMember(
-					constructor,
+					executable,
 					ignoreAnnotations.get()
 			);
 		}
@@ -103,21 +105,21 @@ class ConstrainedConstructorStaxBuilder extends AbstractConstrainedExecutableEle
 		List<ConstrainedParameter> constrainedParameters = CollectionHelper.newArrayList( constrainedParameterStaxBuilders.size() );
 		for ( int index = 0; index < constrainedParameterStaxBuilders.size(); index++ ) {
 			ConstrainedParameterStaxBuilder builder = constrainedParameterStaxBuilders.get( index );
-			constrainedParameters.add( builder.build( constructor, index ) );
+			constrainedParameters.add( builder.build( executable, index ) );
 		}
 
 		Set<MetaConstraint<?>> crossParameterConstraints = getCrossParameterStaxBuilder()
-				.map( builder -> builder.build( constructor ) ).orElse( Collections.emptySet() );
+				.map( builder -> builder.build( executable ) ).orElse( Collections.emptySet() );
 
 		// parse the return value
 		Set<MetaConstraint<?>> returnValueConstraints = new HashSet<>();
 		Set<MetaConstraint<?>> returnValueTypeArgumentConstraints = new HashSet<>();
-		CascadingMetaDataBuilder cascadingMetaDataBuilder = getReturnValueStaxBuilder().map( builder -> builder.build( constructor, returnValueConstraints, returnValueTypeArgumentConstraints ) )
+		CascadingMetaDataBuilder cascadingMetaDataBuilder = getReturnValueStaxBuilder().map( builder -> builder.build( executable, returnValueConstraints, returnValueTypeArgumentConstraints ) )
 				.orElse( CascadingMetaDataBuilder.nonCascading() );
 
 		return new ConstrainedExecutable(
 				ConfigurationSource.XML,
-				constructor,
+				executable,
 				constrainedParameters,
 				crossParameterConstraints,
 				returnValueConstraints,

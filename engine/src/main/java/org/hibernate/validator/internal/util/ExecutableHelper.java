@@ -17,6 +17,7 @@ import java.security.PrivilegedAction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -44,6 +45,10 @@ public final class ExecutableHelper {
 
 	public ExecutableHelper(TypeResolutionHelper typeResolutionHelper) {
 		this.typeResolver = typeResolutionHelper.getTypeResolver();
+	}
+
+	public boolean overrides(Callable subTypeMethod, Callable superTypeMethod) {
+		return subTypeMethod.overrides( this, superTypeMethod );
 	}
 
 	/**

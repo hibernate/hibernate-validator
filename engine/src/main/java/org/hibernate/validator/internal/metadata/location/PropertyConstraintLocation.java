@@ -10,73 +10,79 @@ import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.properties.Constrainable;
+import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
- * Cross-parameter constraint location.
+ * Property constraint location.
  *
- * @author Hardy Ferentschik
- * @author Gunnar Morling
+ * @author Marko Bekhta
  */
-class CrossParameterConstraintLocation implements ConstraintLocation {
+public class PropertyConstraintLocation implements ConstraintLocation {
 
-	private final Constrainable executable;
+	/**
+	 * The member the constraint was defined on.
+	 */
+	private final Property property;
 
-	CrossParameterConstraintLocation(Constrainable executable) {
-		this.executable = executable;
+	PropertyConstraintLocation(Property property) {
+		this.property = property;
 	}
 
 	@Override
 	public Class<?> getDeclaringClass() {
-		return executable.getDeclaringClass();
+		return property.getDeclaringClass();
 	}
 
 	@Override
 	public Constrainable getMember() {
-		return executable;
+		return property;
+	}
+
+	public String getPropertyName() {
+		return property.getPropertyName();
 	}
 
 	@Override
 	public Type getTypeForValidatorResolution() {
-		return Object[].class;
+		return property.getTypeForValidatorResolution();
 	}
 
 	@Override
 	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path) {
-		path.addCrossParameterNode();
+		path.addPropertyNode( property.getPropertyName() );
 	}
 
 	@Override
 	public Object getValue(Object parent) {
-		return parent;
+		return property.getValueFrom( parent );
 	}
 
 	@Override
 	public String toString() {
-		return "CrossParameterConstraintLocation [executable=" + executable + "]";
+		return "PropertyConstraintLocation [property=" + property + "]";
 	}
 
 	@Override
-	public int hashCode() {
-		return executable.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if ( this == obj ) {
+	public boolean equals(Object o) {
+		if ( this == o ) {
 			return true;
 		}
-		if ( obj == null ) {
+		if ( o == null || getClass() != o.getClass() ) {
 			return false;
 		}
-		if ( getClass() != obj.getClass() ) {
-			return false;
-		}
-		CrossParameterConstraintLocation other = (CrossParameterConstraintLocation) obj;
-		if ( !executable.equals( other.executable ) ) {
+
+		PropertyConstraintLocation that = (PropertyConstraintLocation) o;
+
+		if ( !property.equals( that.property ) ) {
 			return false;
 		}
 
 		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return property.hashCode();
 	}
 }
