@@ -15,7 +15,6 @@ import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method return value.
@@ -31,10 +30,7 @@ final class ReturnValueConstraintMappingContextImpl
 	private final ExecutableConstraintMappingContextImpl executableContext;
 
 	ReturnValueConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext) {
-		super(
-			executableContext.getTypeContext().getConstraintMapping(),
-			ReflectionHelper.typeOf( executableContext.getExecutable() )
-		);
+		super( executableContext.getTypeContext().getConstraintMapping(), executableContext.getCallable().getType() );
 		this.executableContext = executableContext;
 	}
 
@@ -45,14 +41,14 @@ final class ReturnValueConstraintMappingContextImpl
 
 	@Override
 	public ReturnValueConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		super.addConstraint( ConfiguredConstraint.forExecutable( definition, executableContext.getExecutable() ) );
+		super.addConstraint( ConfiguredConstraint.forExecutable( definition, executableContext.getCallable() ) );
 		return this;
 	}
 
 	@Override
 	public ReturnValueConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
 		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsForReturnValue(
-				executableContext.getExecutable(), ignoreAnnotations
+				executableContext.getCallable(), ignoreAnnotations
 		);
 		return this;
 	}
@@ -80,7 +76,7 @@ final class ReturnValueConstraintMappingContextImpl
 	@Override
 	public ContainerElementConstraintMappingContext containerElementType() {
 		return super.containerElement(
-				this, executableContext.getTypeContext(), ConstraintLocation.forReturnValue( executableContext.getExecutable() )
+				this, executableContext.getTypeContext(), ConstraintLocation.forReturnValue( executableContext.getCallable() )
 		);
 	}
 
@@ -89,7 +85,7 @@ final class ReturnValueConstraintMappingContextImpl
 		return super.containerElement(
 				this,
 				executableContext.getTypeContext(),
-				ConstraintLocation.forReturnValue( executableContext.getExecutable()  ),
+				ConstraintLocation.forReturnValue( executableContext.getCallable()  ),
 				index,
 				nestedIndexes
 		);

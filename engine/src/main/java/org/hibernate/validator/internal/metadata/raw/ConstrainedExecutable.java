@@ -10,8 +10,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -21,9 +19,9 @@ import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
@@ -40,7 +38,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
-	private final Executable executable;
+	private final Callable callable;
 
 	/**
 	 * Constrained-related meta data for this executable's parameters.
@@ -59,7 +57,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * Creates a new executable meta data object for a parameter-less executable.
 	 *
 	 * @param source The source of meta data.
-	 * @param executable The represented executable.
+	 * @param callable The represented executable.
 	 * @param returnValueConstraints Type arguments constraints, if any.
 	 * @param typeArgumentConstraints The type argument constraints on the return value of the represented executable,
 	 * if any.
@@ -67,13 +65,13 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
-			Executable executable,
+			Callable callable,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Set<MetaConstraint<?>> typeArgumentConstraints,
 			CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 		this(
 				source,
-				executable,
+				callable,
 				Collections.<ConstrainedParameter>emptyList(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
@@ -86,7 +84,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * Creates a new executable meta data object.
 	 *
 	 * @param source The source of meta data.
-	 * @param executable The represented executable.
+	 * @param callable The represented executable.
 	 * @param parameterMetaData A list with parameter meta data. The length must correspond with the number of
 	 * parameters of the represented executable. So this list may be empty (in case of a parameterless executable), but
 	 * never {@code null}.
@@ -98,7 +96,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
-			Executable executable,
+			Callable callable,
 			List<ConstrainedParameter> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
@@ -106,18 +104,18 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 		super(
 				source,
-				( executable instanceof Constructor ) ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
+				callable.isConstructor() ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
 				returnValueConstraints,
 				typeArgumentConstraints,
 				cascadingMetaDataBuilder
 		);
 
-		this.executable = executable;
+		this.callable = callable;
 
-		if ( parameterMetaData.size() != executable.getParameterTypes().length ) {
+		if ( parameterMetaData.size() != callable.getParameterTypes().length ) {
 			throw LOG.getInvalidLengthOfParameterMetaDataListException(
-					executable,
-					executable.getParameterTypes().length,
+					callable,
+					callable.getParameterTypes().length,
 					parameterMetaData.size()
 			);
 		}
@@ -125,7 +123,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		this.crossParameterConstraints = CollectionHelper.toImmutableSet( crossParameterConstraints );
 		this.parameterMetaData = CollectionHelper.toImmutableList( parameterMetaData );
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData ) || !crossParameterConstraints.isEmpty();
-		this.isGetterMethod = ReflectionHelper.isGetterMethod( executable );
+		this.isGetterMethod =  callable instanceof Property;
 	}
 
 	/**
@@ -142,7 +140,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	public ConstrainedParameter getParameterMetaData(int parameterIndex) {
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
 			throw LOG.getInvalidExecutableParameterIndexException(
-					executable,
+					callable,
 					parameterIndex
 			);
 		}
@@ -202,13 +200,13 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		return isGetterMethod;
 	}
 
-	public Executable getExecutable() {
-		return executable;
+	public Callable getCallable() {
+		return callable;
 	}
 
 	@Override
 	public String toString() {
-		return "ConstrainedExecutable [executable=" + StringHelper.toShortString( executable )
+		return "ConstrainedExecutable [executable=" + callable
 				+ ", parameterMetaData=" + parameterMetaData
 				+ ", hasParameterConstraints=" + hasParameterConstraints + "]";
 	}
@@ -284,7 +282,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 
 		return new ConstrainedExecutable(
 				mergedSource,
-				executable,
+				callable,
 				mergedParameterMetaData,
 				mergedCrossParameterConstraints,
 				mergedReturnValueConstraints,
@@ -307,8 +305,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result
-				+ ( ( executable == null ) ? 0 : executable.hashCode() );
+		result = prime * result + callable.hashCode();
 		return result;
 	}
 
@@ -324,12 +321,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			return false;
 		}
 		ConstrainedExecutable other = (ConstrainedExecutable) obj;
-		if ( executable == null ) {
-			if ( other.executable != null ) {
-				return false;
-			}
-		}
-		else if ( !executable.equals( other.executable ) ) {
+		 if ( !callable.equals( other.callable ) ) {
 			return false;
 		}
 		return true;

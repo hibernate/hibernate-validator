@@ -7,10 +7,6 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.annotation.ElementType;
-import java.lang.reflect.Executable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
@@ -24,8 +20,10 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedProperty;
+import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
@@ -42,19 +40,14 @@ final class PropertyConstraintMappingContextImpl
 	private final TypeConstraintMappingContextImpl<?> typeContext;
 
 	// either Field or Method
-	private final Member member;
+	private final Property property;
 	private final ConstraintLocation location;
 
-	PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Member member) {
-		super( typeContext.getConstraintMapping(), ReflectionHelper.typeOf( member ) );
+	PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Property property) {
+		super( typeContext.getConstraintMapping(), property.getType() );
 		this.typeContext = typeContext;
-		this.member = member;
-		if ( member instanceof Field ) {
-			this.location = ConstraintLocation.forField( (Field) member );
-		}
-		else {
-			this.location = ConstraintLocation.forGetter( (Method) member );
-		}
+		this.property = property;
+		this.location = ConstraintLocation.forProperty( property );
 	}
 
 	@Override
@@ -64,17 +57,17 @@ final class PropertyConstraintMappingContextImpl
 
 	@Override
 	public PropertyConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		if ( member instanceof Field ) {
+		if ( property instanceof JavaBeanField ) {
 			super.addConstraint(
 					ConfiguredConstraint.forProperty(
-							definition, member
+							definition, property
 					)
 			);
 		}
 		else {
 			super.addConstraint(
 					ConfiguredConstraint.forExecutable(
-							definition, (Method) member
+							definition, property.as( Callable.class )
 					)
 			);
 		}
@@ -88,7 +81,7 @@ final class PropertyConstraintMappingContextImpl
 
 	@Override
 	public PropertyConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
-		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsOnMember( member, ignoreAnnotations );
+		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsOnMember( property, ignoreAnnotations );
 		return this;
 	}
 
@@ -118,10 +111,10 @@ final class PropertyConstraintMappingContextImpl
 	}
 
 	ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
-		if ( member instanceof Field ) {
-			return new ConstrainedField(
+		if ( property instanceof JavaBeanField ) {
+			return ConstrainedProperty.forField(
 					ConfigurationSource.API,
-					(Field) member,
+					property,
 					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					getCascadingMetaDataBuilder()
@@ -130,7 +123,7 @@ final class PropertyConstraintMappingContextImpl
 		else {
 			return new ConstrainedExecutable(
 					ConfigurationSource.API,
-					(Executable) member,
+					property.as( Callable.class ),
 					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					getCascadingMetaDataBuilder()

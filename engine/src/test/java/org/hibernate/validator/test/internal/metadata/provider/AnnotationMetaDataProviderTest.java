@@ -38,8 +38,9 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedProperty;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.joda.time.DateMidnight;
@@ -101,11 +102,13 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		assertThat( createEvent.getConstraints() ).as( "No return value constraints expected" ).isEmpty();
 		assertThat( createEvent.getCrossParameterConstraints() ).hasSize( 1 );
 
-		assertThat( createEvent.getExecutable() ).isEqualTo(
-				Calendar.class.getMethod(
-						"createEvent",
-						DateMidnight.class,
-						DateMidnight.class
+		assertThat( createEvent.getCallable() ).isEqualTo(
+				JavaBeanExecutable.of(
+						Calendar.class.getMethod(
+								"createEvent",
+								DateMidnight.class,
+								DateMidnight.class
+						)
 				)
 		);
 
@@ -129,7 +132,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	public void noGroupConversionOnField() throws Exception {
 		//when
 		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
-		ConstrainedField field = findConstrainedField( beanConfiguration, User.class, "mail" );
+		ConstrainedProperty field = findConstrainedField( beanConfiguration, User.class, "mail" );
 
 		//then
 		assertThat( field.getCascadingMetaDataBuilder().getGroupConversions() ).isEmpty();
@@ -139,7 +142,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	public void singleGroupConversionOnField() throws Exception {
 		//when
 		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
-		ConstrainedField field = findConstrainedField( beanConfiguration, User.class, "phone" );
+		ConstrainedProperty field = findConstrainedField( beanConfiguration, User.class, "phone" );
 
 		//then
 		Map<Class<?>, Class<?>> expected = newHashMap();
@@ -152,7 +155,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	public void multipleGroupConversionsOnField() throws Exception {
 		//when
 		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
-		ConstrainedField field = findConstrainedField( beanConfiguration, User.class, "address" );
+		ConstrainedProperty field = findConstrainedField( beanConfiguration, User.class, "address" );
 
 		//then
 		Map<Class<?>, Class<?>> expected = newHashMap();
