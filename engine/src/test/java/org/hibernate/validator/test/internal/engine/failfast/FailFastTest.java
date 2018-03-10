@@ -162,8 +162,9 @@ public class FailFastTest {
 			fail();
 		}
 		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotBlank.class )
+			assertThat( e.getConstraintViolations() ).containsOneOfViolations(
+					violationOf( NotBlank.class ),
+					violationOf( Min.class )
 			);
 		}
 	}
@@ -212,8 +213,9 @@ public class FailFastTest {
 			fail();
 		}
 		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotBlank.class )
+			assertThat( e.getConstraintViolations() ).containsOneOfViolations(
+					violationOf( NotBlank.class ),
+					violationOf( Min.class )
 			);
 		}
 	}

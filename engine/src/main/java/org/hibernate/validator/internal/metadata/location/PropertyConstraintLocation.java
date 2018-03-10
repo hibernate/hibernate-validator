@@ -9,79 +9,80 @@ package org.hibernate.validator.internal.metadata.location;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
+import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
- * Executable return value constraint location.
+ * Property constraint location.
  *
- * @author Hardy Ferentschik
- * @author Gunnar Morling
  * @author Marko Bekhta
  */
-class ReturnValueConstraintLocation implements ConstraintLocation {
+public class PropertyConstraintLocation implements ConstraintLocation {
 
-	private final Callable callable;
+	/**
+	 * The member the constraint was defined on.
+	 */
+	private final Property property;
 
-	ReturnValueConstraintLocation(Callable callable) {
-		this.callable = callable;
+	PropertyConstraintLocation(Property property) {
+		this.property = property;
 	}
 
 	@Override
 	public Class<?> getDeclaringClass() {
-		return callable.getDeclaringClass();
+		return property.getDeclaringClass();
 	}
 
 	@Override
 	public Constrainable getConstrainable() {
-		return callable;
+		return property;
+	}
+
+	public String getPropertyName() {
+		return property.getPropertyName();
 	}
 
 	@Override
 	public Type getTypeForValidatorResolution() {
-		return callable.getTypeForValidatorResolution();
+		return property.getTypeForValidatorResolution();
 	}
 
 	@Override
 	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path) {
-		path.addReturnValueNode();
+		path.addPropertyNode( property.getPropertyName() );
 	}
 
 	@Override
 	public Object getValue(Object parent) {
-		return parent;
+		return property.getValueFrom( parent );
 	}
 
 	@Override
 	public String toString() {
-		return "ReturnValueConstraintLocation [executable=" + callable + "]";
+		return "PropertyConstraintLocation [property=" + property + "]";
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + callable.hashCode();
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if ( this == obj ) {
+	public boolean equals(Object o) {
+		if ( this == o ) {
 			return true;
 		}
-		if ( obj == null ) {
+		if ( o == null || getClass() != o.getClass() ) {
 			return false;
 		}
-		if ( getClass() != obj.getClass() ) {
-			return false;
-		}
-		ReturnValueConstraintLocation other = (ReturnValueConstraintLocation) obj;
-		if ( !callable.equals( other.callable ) ) {
+
+		PropertyConstraintLocation that = (PropertyConstraintLocation) o;
+
+		if ( !property.equals( that.property ) ) {
 			return false;
 		}
 
 		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return property.hashCode();
 	}
 }

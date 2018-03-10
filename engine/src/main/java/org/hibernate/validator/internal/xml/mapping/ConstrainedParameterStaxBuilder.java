@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.xml.mapping;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.Set;
@@ -23,7 +22,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -68,10 +67,10 @@ class ConstrainedParameterStaxBuilder extends AbstractConstrainedElementStaxBuil
 		}
 	}
 
-	ConstrainedParameter build(Executable executable, int index) {
+	ConstrainedParameter build(Callable callable, int index) {
 
-		ConstraintLocation constraintLocation = ConstraintLocation.forParameter( executable, index );
-		Type type = ReflectionHelper.typeOf( executable, index );
+		ConstraintLocation constraintLocation = ConstraintLocation.forParameter( callable, index );
+		Type type = callable.getTypeOfParameter( index );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
 				.map( builder -> builder.build( constraintLocation, java.lang.annotation.ElementType.PARAMETER, null ) )
@@ -82,7 +81,7 @@ class ConstrainedParameterStaxBuilder extends AbstractConstrainedElementStaxBuil
 		// ignore annotations
 		if ( ignoreAnnotations.isPresent() ) {
 			annotationProcessingOptions.ignoreConstraintAnnotationsOnParameter(
-					executable,
+					callable,
 					index,
 					ignoreAnnotations.get()
 			);
@@ -90,7 +89,7 @@ class ConstrainedParameterStaxBuilder extends AbstractConstrainedElementStaxBuil
 
 		ConstrainedParameter constrainedParameter = new ConstrainedParameter(
 				ConfigurationSource.XML,
-				executable,
+				callable,
 				type,
 				index,
 				metaConstraints,

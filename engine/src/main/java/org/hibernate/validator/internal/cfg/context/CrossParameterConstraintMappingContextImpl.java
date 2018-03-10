@@ -32,14 +32,14 @@ final class CrossParameterConstraintMappingContextImpl
 
 	@Override
 	public CrossParameterConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		super.addConstraint( ConfiguredConstraint.forCrossParameter( definition, executableContext.getExecutable() ) );
+		super.addConstraint( ConfiguredConstraint.forCrossParameter( definition, executableContext.getCallable() ) );
 		return this;
 	}
 
 	@Override
 	public CrossParameterConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
 		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsForCrossParameterConstraint(
-				executableContext.getExecutable(), ignoreAnnotations
+				executableContext.getCallable(), ignoreAnnotations
 		);
 		return this;
 	}

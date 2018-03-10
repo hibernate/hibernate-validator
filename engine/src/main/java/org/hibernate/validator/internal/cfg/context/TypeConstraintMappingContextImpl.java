@@ -12,7 +12,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Member;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -33,6 +33,12 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Constrainable;
+import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -64,7 +70,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	private final Set<ExecutableConstraintMappingContextImpl> executableContexts = newHashSet();
 	private final Set<PropertyConstraintMappingContextImpl> propertyContexts = newHashSet();
-	private final Set<Member> configuredMembers = newHashSet();
+	private final Set<Constrainable> configuredMembers = newHashSet();
 
 	private List<Class<?>> defaultGroupSequence;
 	private Class<? extends DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass;
@@ -116,7 +122,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		Contracts.assertNotNull( elementType, "The element type must not be null." );
 		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
 
-		Member member = getMember(
+		Property member = getProperty(
 				beanClass, property, elementType
 		);
 
@@ -148,15 +154,17 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			throw LOG.getBeanDoesNotContainMethodException( beanClass, name, parameterTypes );
 		}
 
-		if ( configuredMembers.contains( method ) ) {
-			throw LOG.getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(
+		Callable callable = JavaBeanExecutable.of( method );
+
+		if ( configuredMembers.contains( callable ) ) {
+			throw LOG.getMethodHasAlreadyBeenConfiguredViaProgrammaticApiException(
 					beanClass,
 					ExecutableHelper.getExecutableAsString( name, parameterTypes )
 			);
 		}
 
-		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, method );
-		configuredMembers.add( method );
+		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, callable );
+		configuredMembers.add( callable );
 		executableContexts.add( context );
 
 		return context;
@@ -173,7 +181,9 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			);
 		}
 
-		if ( configuredMembers.contains( constructor ) ) {
+		Callable callable = JavaBeanExecutable.of( constructor );
+
+		if ( configuredMembers.contains( callable ) ) {
 			throw LOG.getConstructorHasAlreadyBeConfiguredViaProgrammaticApiException(
 					beanClass,
 					ExecutableHelper.getExecutableAsString( beanClass.getSimpleName(), parameterTypes )
@@ -182,9 +192,9 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 		ConstructorConstraintMappingContextImpl context = new ConstructorConstraintMappingContextImpl(
 				this,
-				constructor
+				callable
 		);
-		configuredMembers.add( constructor );
+		configuredMembers.add( callable );
 		executableContexts.add( context );
 
 		return context;
@@ -246,15 +256,15 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	}
 
 	/**
-	 * Returns the member with the given name and type.
+	 * Returns the property with the given name and type.
 	 *
-	 * @param clazz The class from which to retrieve the member. Cannot be {@code null}.
+	 * @param clazz The class from which to retrieve the property. Cannot be {@code null}.
 	 * @param property The property name without "is", "get" or "has". Cannot be {@code null} or empty.
 	 * @param elementType The element type. Either {@code ElementType.FIELD} or {@code ElementType METHOD}.
 	 *
-	 * @return the member which matching the name and type or {@code null} if no such member exists.
+	 * @return the property which matches the name and type or {@code null} if no such property exists.
 	 */
-	private Member getMember(Class<?> clazz, String property, ElementType elementType) {
+	private Property getProperty(Class<?> clazz, String property, ElementType elementType) {
 		Contracts.assertNotNull( clazz, MESSAGES.classCannotBeNull() );
 
 		if ( property == null || property.length() == 0 ) {
@@ -265,20 +275,21 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			throw LOG.getElementTypeHasToBeFieldOrMethodException();
 		}
 
-		Member member = null;
 		if ( ElementType.FIELD.equals( elementType ) ) {
-			member = run( GetDeclaredField.action( clazz, property ) );
+			Field field = run( GetDeclaredField.action( clazz, property ) );
+			return field == null ? null : new JavaBeanField( field );
 		}
 		else {
+			Method method = null;
 			String methodName = property.substring( 0, 1 ).toUpperCase( Locale.ROOT ) + property.substring( 1 );
 			for ( String prefix : ReflectionHelper.PROPERTY_ACCESSOR_PREFIXES ) {
-				member = run( GetMethod.action( clazz, prefix + methodName ) );
-				if ( member != null ) {
+				method = run( GetMethod.action( clazz, prefix + methodName ) );
+				if ( method != null ) {
 					break;
 				}
 			}
+			return method == null ? null : new JavaBeanGetter( method );
 		}
-		return member;
 	}
 
 	/**

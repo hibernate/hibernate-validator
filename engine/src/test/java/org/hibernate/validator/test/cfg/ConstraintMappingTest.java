@@ -556,7 +556,7 @@ public class ConstraintMappingTest {
 	private ConstrainedField getConstrainedField(BeanConfiguration<?> beanConfiguration, String fieldName) {
 		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
 			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD &&
-					( (ConstrainedField) constrainedElement ).getField().getName().equals( fieldName ) ) {
+					( (ConstrainedField) constrainedElement ).getProperty().getPropertyName().equals( fieldName ) ) {
 				return (ConstrainedField) constrainedElement;
 			}
 		}
@@ -567,7 +567,7 @@ public class ConstraintMappingTest {
 	private ConstrainedExecutable getConstrainedExecutable(BeanConfiguration<?> beanConfiguration, String executableName) {
 		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
 			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
-					( (ConstrainedExecutable) constrainedElement ).getExecutable().getName().equals( executableName ) ) {
+					( (ConstrainedExecutable) constrainedElement ).getCallable().getName().equals( executableName ) ) {
 				return (ConstrainedExecutable) constrainedElement;
 			}
 		}

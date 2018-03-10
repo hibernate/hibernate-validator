@@ -24,6 +24,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -69,17 +70,19 @@ class ConstrainedFieldStaxBuilder extends AbstractConstrainedElementStaxBuilder 
 			alreadyProcessedFieldNames.add( mainAttributeValue );
 		}
 		Field field = findField( beanClass, mainAttributeValue );
-		ConstraintLocation constraintLocation = ConstraintLocation.forField( field );
+		JavaBeanField property = new JavaBeanField( field );
+		ConstraintLocation constraintLocation = ConstraintLocation.forProperty( property );
+
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
 				.map( builder -> builder.build( constraintLocation, java.lang.annotation.ElementType.FIELD, null ) )
 				.collect( Collectors.toSet() );
 
 		ContainerElementTypeConfiguration containerElementTypeConfiguration = getContainerElementTypeConfiguration(
-				ReflectionHelper.typeOf( field ), constraintLocation );
+				property.getType(), constraintLocation );
 
 		ConstrainedField constrainedField = new ConstrainedField(
 				ConfigurationSource.XML,
-				field,
+				property,
 				metaConstraints,
 				containerElementTypeConfiguration.getMetaConstraints(),
 				getCascadingMetaData( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), ReflectionHelper.typeOf( field ) )
@@ -88,7 +91,7 @@ class ConstrainedFieldStaxBuilder extends AbstractConstrainedElementStaxBuilder 
 		// ignore annotations
 		if ( ignoreAnnotations.isPresent() ) {
 			annotationProcessingOptions.ignoreConstraintAnnotationsOnMember(
-					field,
+					property,
 					ignoreAnnotations.get()
 			);
 		}

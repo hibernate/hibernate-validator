@@ -39,7 +39,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	private final Map<String, Object> messageParameters;
 	private final Map<String, Object> expressionVariables;
 	private final Class<T> rootBeanClass;
-	private final ElementType elementType;
 	private final Object[] executableParameters;
 	private final Object executableReturnValue;
 	private final Object dynamicPayload;
@@ -161,7 +160,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		this.leafBeanInstance = leafBeanInstance;
 		this.constraintDescriptor = constraintDescriptor;
 		this.rootBeanClass = rootBeanClass;
-		this.elementType = elementType;
 		this.executableParameters = executableParameters;
 		this.executableReturnValue = executableReturnValue;
 		this.dynamicPayload = dynamicPayload;
@@ -296,10 +294,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		if ( constraintDescriptor != null ? !constraintDescriptor.equals( that.constraintDescriptor ) : that.constraintDescriptor != null ) {
 			return false;
 		}
-		if ( elementType != null ? !elementType.equals( that.elementType ) : that.elementType != null ) {
-			return false;
-		}
-
 		return true;
 	}
 
@@ -331,7 +325,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		result = 31 * result + System.identityHashCode( value );
 		result = 31 * result + ( constraintDescriptor != null ? constraintDescriptor.hashCode() : 0 );
 		result = 31 * result + ( messageTemplate != null ? messageTemplate.hashCode() : 0 );
-		result = 31 * result + ( elementType != null ? elementType.hashCode() : 0 );
 		return result;
 	}
 }

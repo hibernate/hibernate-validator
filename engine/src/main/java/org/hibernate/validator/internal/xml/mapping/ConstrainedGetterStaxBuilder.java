@@ -26,6 +26,9 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -71,7 +74,8 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 			alreadyProcessedGetterNames.add( mainAttributeValue );
 		}
 		Method getter = findGetter( beanClass, mainAttributeValue );
-		ConstraintLocation constraintLocation = ConstraintLocation.forGetter( beanClass, getter );
+		Property property = new JavaBeanGetter( beanClass, getter );
+		ConstraintLocation constraintLocation = ConstraintLocation.forProperty( property );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
 				.map( builder -> builder.build( constraintLocation, java.lang.annotation.ElementType.METHOD, null ) )
@@ -82,7 +86,7 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 
 		ConstrainedExecutable constrainedGetter = new ConstrainedExecutable(
 				ConfigurationSource.XML,
-				getter,
+				property.as( Callable.class ),
 				Collections.<ConstrainedParameter>emptyList(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				metaConstraints,
@@ -93,7 +97,7 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 		// ignore annotations
 		if ( ignoreAnnotations.isPresent() ) {
 			annotationProcessingOptions.ignoreConstraintAnnotationsOnMember(
-					getter,
+					property,
 					ignoreAnnotations.get()
 			);
 		}

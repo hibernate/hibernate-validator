@@ -237,7 +237,7 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<>(
 				constraintHelper,
-				config.getLocation().getMember(),
+				config.getLocation().getConstrainable(),
 				config.createAnnotationDescriptor(),
 				config.getElementType(),
 				getConstraintType()
