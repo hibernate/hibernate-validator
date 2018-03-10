@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
-import java.lang.reflect.Executable;
-import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
@@ -22,24 +22,24 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  */
 public class ParameterConstraintLocation implements ConstraintLocation {
 
-	private final Executable executable;
+	private final Callable callable;
 	private final int index;
 	private final Type typeForValidatorResolution;
 
-	ParameterConstraintLocation(Executable executable, int index) {
-		this.executable = executable;
+	public ParameterConstraintLocation(Callable callable, int index) {
+		this.callable = callable;
 		this.index = index;
-		this.typeForValidatorResolution = ReflectionHelper.boxedType( ReflectionHelper.typeOf( executable, index ) );
+		this.typeForValidatorResolution = ReflectionHelper.boxedType( callable.getTypeOfParameter( index ) );
 	}
 
 	@Override
 	public Class<?> getDeclaringClass() {
-		return executable.getDeclaringClass();
+		return callable.getDeclaringClass();
 	}
 
 	@Override
-	public Member getMember() {
-		return executable;
+	public Constrainable getConstrainable() {
+		return callable;
 	}
 
 	@Override
@@ -53,8 +53,7 @@ public class ParameterConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path) {
-		String name = parameterNameProvider.getParameterNames( executable ).get( index );
-		path.addParameterNode( name, index );
+		path.addParameterNode( callable.getParameterName( parameterNameProvider, index ), index );
 	}
 
 	@Override
@@ -64,15 +63,14 @@ public class ParameterConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public String toString() {
-		return "ParameterConstraintLocation [executable=" + executable + ", index=" + index
-				+ ", typeForValidatorResolution=" + typeForValidatorResolution + "]";
+		return "ParameterConstraintLocation [executable=" + callable + ", index=" + index + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ( ( executable == null ) ? 0 : executable.hashCode() );
+		result = prime * result + callable.hashCode();
 		result = prime * result + index;
 		return result;
 	}
@@ -89,12 +87,7 @@ public class ParameterConstraintLocation implements ConstraintLocation {
 			return false;
 		}
 		ParameterConstraintLocation other = (ParameterConstraintLocation) obj;
-		if ( executable == null ) {
-			if ( other.executable != null ) {
-				return false;
-			}
-		}
-		else if ( !executable.equals( other.executable ) ) {
+		if ( !callable.equals( other.callable ) ) {
 			return false;
 		}
 		if ( index != other.index ) {

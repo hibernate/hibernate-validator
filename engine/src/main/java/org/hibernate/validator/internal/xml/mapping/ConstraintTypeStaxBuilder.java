@@ -148,8 +148,8 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 
 		// we set initially ConstraintOrigin.DEFINED_LOCALLY for all xml configured constraints
 		// later we will make copies of this constraint descriptor when needed and adjust the ConstraintOrigin
-		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				constraintHelper, constraintLocation.getMember(), annotationDescriptor, type, constraintType
+		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<>(
+				constraintHelper, constraintLocation.getConstrainable(), annotationDescriptor, type, constraintType
 		);
 
 		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor, constraintLocation );

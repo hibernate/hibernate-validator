@@ -6,9 +6,8 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import java.lang.reflect.Method;
-
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
+import org.hibernate.validator.internal.properties.Callable;
 
 /**
  * Constraint mapping creational context representing a method.
@@ -17,15 +16,15 @@ import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
  */
 class MethodConstraintMappingContextImpl extends ExecutableConstraintMappingContextImpl implements MethodConstraintMappingContext {
 
-	MethodConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Method method) {
-		super( typeContext, method );
+	MethodConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Callable callable) {
+		super( typeContext, callable );
 	}
 
 	@Override
 	public MethodConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
 		typeContext.mapping
 				.getAnnotationProcessingOptions()
-				.ignoreConstraintAnnotationsOnMember( executable, ignoreAnnotations );
+				.ignoreConstraintAnnotationsOnMember( callable, ignoreAnnotations );
 
 		return this;
 	}

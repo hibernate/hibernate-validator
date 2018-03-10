@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.xml.mapping;
 
-import java.lang.reflect.Executable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +23,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.AbstractStaxBuilder;
 
@@ -83,9 +83,9 @@ class CrossParameterStaxBuilder extends AbstractStaxBuilder {
 		return new ConstraintTypeStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder );
 	}
 
-	Set<MetaConstraint<?>> build(Executable executable) {
+	Set<MetaConstraint<?>> build(Callable callable) {
 
-		ConstraintLocation constraintLocation = ConstraintLocation.forCrossParameter( executable );
+		ConstraintLocation constraintLocation = ConstraintLocation.forCrossParameter( callable );
 
 		Set<MetaConstraint<?>> crossParameterConstraints = constraintTypeStaxBuilders.stream()
 				.map( builder -> builder.build( constraintLocation, java.lang.annotation.ElementType.METHOD, ConstraintType.CROSS_PARAMETER ) )
@@ -94,7 +94,7 @@ class CrossParameterStaxBuilder extends AbstractStaxBuilder {
 		// ignore annotations
 		if ( ignoreAnnotations.isPresent() ) {
 			annotationProcessingOptions.ignoreConstraintAnnotationsForCrossParameterConstraint(
-					executable,
+					callable,
 					ignoreAnnotations.get()
 			);
 		}

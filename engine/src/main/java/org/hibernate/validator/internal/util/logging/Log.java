@@ -48,10 +48,13 @@ import javax.xml.stream.XMLStreamException;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.logging.formatter.ArrayOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ClassObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfObjectsToStringFormatter;
+import org.hibernate.validator.internal.util.logging.formatter.ConstrainableFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.DurationFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ObjectArrayFormatter;
@@ -248,14 +251,13 @@ public interface Log extends BasicLogger {
 	GroupDefinitionException getWrongDefaultGroupSequenceProviderTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
 
 	@Message(id = 56, value = "Method or constructor %1$s doesn't have a parameter with index %2$d.")
-	IllegalArgumentException getInvalidExecutableParameterIndexException(@FormatWith(ExecutableFormatter.class) Executable executable, int index);
+	IllegalArgumentException getInvalidExecutableParameterIndexException(@FormatWith(ConstrainableFormatter.class) Callable callable, int index);
 
 	@Message(id = 59, value = "Unable to retrieve annotation parameter value.")
 	ValidationException getUnableToRetrieveAnnotationParameterValueException(@Cause Exception e);
 
-	@Message(id = 62,
-			value = "Method or constructor %1$s has %2$s parameters, but the passed list of parameter meta data has a size of %3$s.")
-	IllegalArgumentException getInvalidLengthOfParameterMetaDataListException(@FormatWith(ExecutableFormatter.class) Executable executable, int nbParameters, int listSize);
+	@Message(id = 62, value = "Method or constructor %1$s has %2$s parameters, but the passed list of parameter meta data has a size of %3$s.")
+	IllegalArgumentException getInvalidLengthOfParameterMetaDataListException(@FormatWith(ConstrainableFormatter.class) Callable callable, int nbParameters, int listSize);
 
 	@Message(id = 63, value = "Unable to instantiate %s.")
 	ValidationException getUnableToInstantiateException(@FormatWith(ClassObjectFormatter.class) Class<?> clazz, @Cause Exception e);
@@ -461,11 +463,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 131,
 			value = "A method return value must not be marked for cascaded validation more than once in a class hierarchy, but the following two methods are marked as such: %s, %s.")
-	ConstraintDeclarationException getMethodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidationException(@FormatWith(ExecutableFormatter.class) Executable executable1, @FormatWith(ExecutableFormatter.class) Executable executable2);
+	ConstraintDeclarationException getMethodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidationException(Callable callable1, Callable callable2);
 
 	@Message(id = 132,
 			value = "Void methods must not be constrained or marked for cascaded validation, but method %s is.")
-	ConstraintDeclarationException getVoidMethodsMustNotBeConstrainedException(@FormatWith(ExecutableFormatter.class) Executable executable);
+	ConstraintDeclarationException getVoidMethodsMustNotBeConstrainedException(@FormatWith(ConstrainableFormatter.class) Callable callable);
 
 	@Message(id = 133, value = "%1$s does not contain a constructor with the parameter types %2$s.")
 	ValidationException getBeanDoesNotContainConstructorException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass,
@@ -500,7 +502,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 142,
 			value = "Cross parameter constraint %1$s is illegally placed on a parameterless method or constructor '%2$s'.")
 	ConstraintDeclarationException getCrossParameterConstraintOnMethodWithoutParametersException(
-			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint, @FormatWith(ExecutableFormatter.class) Executable executable);
+			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint, @FormatWith(ConstrainableFormatter.class) Constrainable executable);
 
 	@Message(id = 143,
 			value = "Cross parameter constraint %1$s is illegally placed on class level.")
@@ -509,7 +511,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 144,
 			value = "Cross parameter constraint %1$s is illegally placed on field '%2$s'.")
 	ConstraintDeclarationException getCrossParameterConstraintOnFieldException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint,
-			Member field);
+			@FormatWith(ConstrainableFormatter.class) Constrainable field);
 
 	@Message(id = 146,
 			value = "No parameter nodes may be added since path %s doesn't refer to a cross-parameter constraint.")
@@ -535,11 +537,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 151,
 			value = "A method overriding another method must not redefine the parameter constraint configuration, but method %2$s redefines the configuration of %1$s.")
-	ConstraintDeclarationException getParameterConfigurationAlteredInSubTypeException(@FormatWith(ExecutableFormatter.class) Executable superMethod, @FormatWith(ExecutableFormatter.class) Executable subMethod);
+	ConstraintDeclarationException getParameterConfigurationAlteredInSubTypeException(@FormatWith(ConstrainableFormatter.class) Callable superMethod, @FormatWith(ConstrainableFormatter.class) Callable subMethod);
 
 	@Message(id = 152,
 			value = "Two methods defined in parallel types must not declare parameter constraints, if they are overridden by the same method, but methods %s and %s both define parameter constraints.")
-	ConstraintDeclarationException getParameterConstraintsDefinedInMethodsFromParallelTypesException(@FormatWith(ExecutableFormatter.class) Executable method1, @FormatWith(ExecutableFormatter.class) Executable method2);
+	ConstraintDeclarationException getParameterConstraintsDefinedInMethodsFromParallelTypesException(@FormatWith(ConstrainableFormatter.class) Callable method1, @FormatWith(ConstrainableFormatter.class) Callable method2);
 
 	@Message(id = 153,
 			value = "The constraint %1$s used ConstraintTarget#%2$s but is not specified on a method or constructor.")
@@ -581,7 +583,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 161,
 			value = "Two methods defined in parallel types must not define group conversions for a cascaded method return value, if they are overridden by the same method, but methods %s and %s both define parameter constraints.")
-	ConstraintDeclarationException getMethodsFromParallelTypesMustNotDefineGroupConversionsForCascadedReturnValueException(@FormatWith(ExecutableFormatter.class) Executable method1, @FormatWith(ExecutableFormatter.class) Executable method2);
+	ConstraintDeclarationException getMethodsFromParallelTypesMustNotDefineGroupConversionsForCascadedReturnValueException(@FormatWith(ConstrainableFormatter.class) Callable method1, @FormatWith(ConstrainableFormatter.class) Callable method2);
 
 	@Message(id = 162,
 			value = "The validated type %1$s does not specify the constructor/method: %2$s")
@@ -625,15 +627,15 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 173,
 			value = "Method %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
-	ValidationException getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String method);
+	ValidationException getMethodHasAlreadyBeenConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String method);
 
 	@Message(id = 174,
 			value = "Parameter %3$s of method or constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
-	ValidationException getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, @FormatWith(ExecutableFormatter.class) Executable executable, int parameterIndex);
+	ValidationException getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, @FormatWith(ConstrainableFormatter.class) Callable callable, int parameterIndex);
 
 	@Message(id = 175,
 			value = "The return value of method or constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
-	ValidationException getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, @FormatWith(ExecutableFormatter.class) Executable executable);
+	ValidationException getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, @FormatWith(ConstrainableFormatter.class) Callable callable);
 
 	@Message(id = 176,
 			value = "Constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
@@ -641,7 +643,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 177,
 			value = "Cross-parameter constraints for the method or constructor %2$s of type %1$s are declared more than once via the programmatic constraint declaration API.")
-	ValidationException getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, @FormatWith(ExecutableFormatter.class) Executable executable);
+	ValidationException getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, @FormatWith(ConstrainableFormatter.class) Callable callable);
 
 	@Message(id = 178, value = "Multiplier cannot be negative: %d.")
 	IllegalArgumentException getMultiplierCannotBeNegativeException(int multiplier);
@@ -714,7 +716,7 @@ public interface Log extends BasicLogger {
 	ValueExtractorDefinitionException getValueExtractorDeclaresExtractedValueMultipleTimesException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorType);
 
 	@Message(id = 205, value = "Invalid unwrapping configuration for constraint %2$s on %1$s. You can only define one of 'Unwrapping.Skip' or 'Unwrapping.Unwrap'.")
-	ConstraintDeclarationException getInvalidUnwrappingConfigurationForConstraintException(Member member, @FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint);
+	ConstraintDeclarationException getInvalidUnwrappingConfigurationForConstraintException(@FormatWith(ConstrainableFormatter.class) Constrainable constrainable, @FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint);
 
 	@Message(id = 206, value = "Unable to instantiate value extractor class %s.")
 	ValidationException getUnableToInstantiateValueExtractorClassException(String valueExtractorClassName, @Cause ValidationException e);

@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
-import java.lang.reflect.Executable;
-import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
@@ -21,20 +21,20 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
  */
 class CrossParameterConstraintLocation implements ConstraintLocation {
 
-	private final Executable executable;
+	private final Callable callable;
 
-	CrossParameterConstraintLocation(Executable executable) {
-		this.executable = executable;
+	CrossParameterConstraintLocation(Callable executable) {
+		this.callable = executable;
 	}
 
 	@Override
 	public Class<?> getDeclaringClass() {
-		return executable.getDeclaringClass();
+		return callable.getDeclaringClass();
 	}
 
 	@Override
-	public Member getMember() {
-		return executable;
+	public Constrainable getConstrainable() {
+		return callable;
 	}
 
 	@Override
@@ -54,15 +54,12 @@ class CrossParameterConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public String toString() {
-		return "CrossParameterConstraintLocation [executable=" + executable + "]";
+		return "CrossParameterConstraintLocation [callable=" + callable + "]";
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ( ( executable == null ) ? 0 : executable.hashCode() );
-		return result;
+		return callable.hashCode();
 	}
 
 	@Override
@@ -77,12 +74,7 @@ class CrossParameterConstraintLocation implements ConstraintLocation {
 			return false;
 		}
 		CrossParameterConstraintLocation other = (CrossParameterConstraintLocation) obj;
-		if ( executable == null ) {
-			if ( other.executable != null ) {
-				return false;
-			}
-		}
-		else if ( !executable.equals( other.executable ) ) {
+		if ( !callable.equals( other.callable ) ) {
 			return false;
 		}
 

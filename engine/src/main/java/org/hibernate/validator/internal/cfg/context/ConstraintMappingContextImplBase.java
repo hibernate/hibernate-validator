@@ -73,7 +73,7 @@ abstract class ConstraintMappingContextImplBase extends ConstraintContextImplBas
 			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
 				constraintHelper,
-				config.getLocation().getMember(),
+				config.getLocation().getConstrainable(),
 				config.createAnnotationDescriptor(),
 				config.getElementType(),
 				getConstraintType()

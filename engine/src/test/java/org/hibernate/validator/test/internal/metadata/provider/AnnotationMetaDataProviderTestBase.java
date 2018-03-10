@@ -16,6 +16,9 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.properties.Constrainable;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 
 /**
  * @author Gunnar Morling
@@ -59,14 +62,22 @@ public abstract class AnnotationMetaDataProviderTestBase {
 	protected ConstrainedElement findConstrainedElement(BeanConfiguration<?> beanConfiguration,
 														Member member) {
 
+		Constrainable constrainable;
+		if ( member instanceof Field ) {
+			constrainable = new JavaBeanField( (Field) member );
+		}
+		else {
+			constrainable = JavaBeanExecutable.of( (Executable) member );
+		}
+
 		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
 			if ( member instanceof Executable && constrainedElement instanceof ConstrainedExecutable ) {
-				if ( member.equals( ( (ConstrainedExecutable) constrainedElement ).getExecutable() ) ) {
+				if ( constrainable.equals( ( (ConstrainedExecutable) constrainedElement ).getCallable() ) ) {
 					return constrainedElement;
 				}
 			}
-			else if ( member instanceof Field && constrainedElement instanceof ConstrainedField ) {
-				if ( member.equals( ( (ConstrainedField) constrainedElement ).getField() ) ) {
+			else if ( constrainedElement instanceof ConstrainedField ) {
+				if ( constrainable.equals( ( (ConstrainedField) constrainedElement ).getProperty() ) ) {
 					return constrainedElement;
 				}
 			}
