@@ -1,0 +1,275 @@
+/*
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
+package org.hibernate.validator.test.properties;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.spi.properties.ConstrainableExecutable;
+import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
+import org.hibernate.validator.testutil.ConstraintViolationAssert;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.ValidatorUtil;
+
+import org.testng.annotations.Test;
+
+/**
+ * @author Marko Bekhta
+ */
+public class GetterPropertySelectionStrategyTest {
+
+	@Test
+	public void testGetterPropertySelectionStrategy() throws Exception {
+		GetterPropertySelectionStrategy filter = new FooGetterPropertySelectionStrategy();
+
+		ConstrainableExecutableImpl fooMethod = new ConstrainableExecutableImpl( Foo.class.getDeclaredMethod( "fooMethod" ) );
+		ConstrainableExecutableImpl getMethod = new ConstrainableExecutableImpl( Foo.class.getDeclaredMethod( "getMethod" ) );
+
+		assertThat( filter.isGetter( fooMethod ) ).isTrue();
+		assertThat( filter.isGetter( getMethod ) ).isFalse();
+
+		assertThat( filter.getPropertyName( fooMethod ) ).isEqualTo( "method" );
+	}
+
+	@Test
+	public void testConfigureGetterPropertySelectionStrategy() throws Exception {
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.getterPropertySelectionStrategy( new FooGetterPropertySelectionStrategy() )
+				.buildValidatorFactory()
+				.getValidator();
+		Set<ConstraintViolation<Foo>> violations = validator.validate( new Foo() );
+
+		ConstraintViolationAssert.assertThat( violations ).containsOnlyViolations(
+				violationOf( Min.class )
+		);
+	}
+
+	@Test
+	public void testConfigureGetterPropertySelectionStrategyWithProperty() throws Exception {
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.addProperty( HibernateValidatorConfiguration.GETTER_PROPERTY_SELECTION_STRATEGY_CLASSNAME, FooGetterPropertySelectionStrategy.class.getName() )
+				.buildValidatorFactory()
+				.getValidator();
+		Set<ConstraintViolation<Foo>> violations = validator.validate( new Foo() );
+
+		ConstraintViolationAssert.assertThat( violations ).containsOnlyViolations(
+				violationOf( Min.class )
+		);
+	}
+
+	@Test
+	public void testNoPrefixGetterPropertySelectionStrategy() {
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.getterPropertySelectionStrategy( new NoPrefixGetterPropertySelectionStrategy() )
+				.buildValidatorFactory()
+				.getValidator();
+		Set<ConstraintViolation<NoPrefixFoo>> violations = validator.validate( new NoPrefixFoo() );
+
+		ConstraintViolationAssert.assertThat( violations ).containsOnlyViolations(
+				violationOf( Min.class ).withProperty( "test" ),
+				violationOf( NotBlank.class ).withProperty( "name" )
+		);
+	}
+
+	@Test
+	public void testGetterAndFieldWithSamePropertyNameButDifferentTypes() {
+		Validator validator = ValidatorUtil.getValidator();
+
+		Set<ConstraintViolation<Bar>> violations = validator.validate( new Bar() );
+
+		ConstraintViolationAssert.assertThat( violations ).containsOnlyViolations(
+				violationOf( NotEmpty.class ).withProperty( "tags" ),
+				violationOf( Size.class ).withProperty( "tags" )
+		);
+	}
+
+	@Test
+	public void testStrangePropertyNames() {
+		class StrangeProeprties {
+			@AssertTrue
+			public boolean isHasGet() {
+				return false;
+			}
+
+			@AssertTrue
+			public boolean hasIsGet() {
+				return false;
+			}
+
+			@NotNull
+			public String getHasIs() {
+				return null;
+			}
+		}
+
+		Validator validator = ValidatorUtil.getValidator();
+
+		Set<ConstraintViolation<StrangeProeprties>> violations = validator.validate( new StrangeProeprties() );
+
+		ConstraintViolationAssert.assertThat( violations ).containsOnlyViolations(
+				violationOf( AssertTrue.class ).withProperty( "hasGet" ),
+				violationOf( AssertTrue.class ).withProperty( "isGet" ),
+				violationOf( NotNull.class ).withProperty( "hasIs" )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-622")
+	public void testIsGetterMethod() throws Exception {
+		class Bar {
+			@NotNull
+			public String getBar() {
+				return null;
+			}
+
+			@NotEmpty
+			public String getBar(String param) {
+				return null;
+			}
+		}
+		Validator validator = ValidatorUtil.getValidator();
+
+		Set<ConstraintViolation<Bar>> violations = validator.validate( new Bar() );
+
+		ConstraintViolationAssert.assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "bar" )
+		);
+	}
+
+	private static class Bar {
+
+		@Size(min = 10, max = 100)
+		private final String tags = "";
+
+		@NotEmpty
+		public List<String> getTags() {
+			return Arrays.stream( tags.split( "," ) )
+					.filter( tag -> !tag.trim().isEmpty() )
+					.collect( Collectors.toList() );
+		}
+	}
+
+	private static class Foo {
+
+		@Min(10)
+		public int fooMethod() {
+			return 1;
+		}
+
+		@Max(-10)
+		public int getMethod() {
+			return 1;
+		}
+	}
+
+	private static class NoPrefixFoo {
+
+		@Min(10)
+		public int test() {
+			return 1;
+		}
+
+		@NotBlank
+		public String name() {
+			return "";
+		}
+
+		@NotBlank
+		public String getName() {
+			return "";
+		}
+
+		@AssertTrue
+		public boolean isTest() {
+			return false;
+		}
+
+		@Max(-10)
+		public int getTest() {
+			return 1;
+		}
+	}
+
+	public static class NoPrefixGetterPropertySelectionStrategy implements GetterPropertySelectionStrategy {
+
+		@Override
+		public boolean isGetter(ConstrainableExecutable executable) {
+			String name = executable.getName();
+			return executable.getParameterTypes().length == 0
+					&& !name.startsWith( "is" )
+					&& !name.startsWith( "get" );
+		}
+
+		@Override
+		public String getPropertyName(ConstrainableExecutable method) {
+			return method.getName();
+		}
+	}
+
+	public static class FooGetterPropertySelectionStrategy implements GetterPropertySelectionStrategy {
+
+		@Override
+		public boolean isGetter(ConstrainableExecutable executable) {
+			return executable.getParameterTypes().length == 0
+					&& executable.getName().startsWith( "foo" );
+		}
+
+		@Override
+		public String getPropertyName(ConstrainableExecutable method) {
+			char[] chars = method.getName().substring( 3 ).toCharArray();
+			chars[0] = Character.toLowerCase( chars[0] );
+			return new String( chars );
+		}
+	}
+
+	private static class ConstrainableExecutableImpl implements ConstrainableExecutable {
+
+		private final Method method;
+
+		private ConstrainableExecutableImpl(Method method) {
+			this.method = method;
+		}
+
+		@Override
+		public Class<?> getReturnType() {
+			return method.getReturnType();
+		}
+
+		@Override
+		public String getName() {
+			return method.getName();
+		}
+
+		@Override
+		public Type[] getParameterTypes() {
+			return method.getParameterTypes();
+		}
+	}
+}

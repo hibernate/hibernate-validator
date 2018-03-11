@@ -13,10 +13,8 @@ import static org.jboss.logging.Logger.Level.WARN;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles.Lookup;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.time.Duration;
@@ -51,6 +49,8 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanConstructor;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanMethod;
 import org.hibernate.validator.internal.util.logging.formatter.ArrayOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ClassObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfClassesObjectFormatter;
@@ -60,6 +60,7 @@ import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatt
 import org.hibernate.validator.internal.util.logging.formatter.ObjectArrayFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
 import org.hibernate.validator.internal.xml.mapping.ContainerElementTypePath;
+import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
@@ -485,10 +486,10 @@ public interface Log extends BasicLogger {
 	ValidationException getUnableToLoadConstraintAnnotationClassException(String constraintAnnotationClassName, @Cause Exception e);
 
 	@Message(id = 137, value = "The method '%1$s' is defined twice in the mapping xml for bean %2$s.")
-	ValidationException getMethodIsDefinedTwiceInMappingXmlForBeanException(Method name, @FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
+	ValidationException getMethodIsDefinedTwiceInMappingXmlForBeanException(JavaBeanMethod javaBeanMethod, @FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
 
 	@Message(id = 138, value = "The constructor '%1$s' is defined twice in the mapping xml for bean %2$s.")
-	ValidationException getConstructorIsDefinedTwiceInMappingXmlForBeanException(Constructor<?> name, @FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
+	ValidationException getConstructorIsDefinedTwiceInMappingXmlForBeanException(JavaBeanConstructor javaBeanConstructor, @FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
 
 	@Message(id = 139,
 			value = "The constraint '%1$s' defines multiple cross parameter validators. Only one is allowed.")
@@ -864,4 +865,14 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 245, value = "Allowed constraint element types are FIELD and GETTER, but instead received %1$s.")
 	AssertionError getUnsupportedConstraintElementType(ConstrainedElement.ConstrainedElementKind kind);
+
+	@LogMessage(level = INFO)
+	@Message(id = 246, value = "Using %s as getter property selection strategy.")
+	void usingGetterPropertySelectionStrategy(@FormatWith(ClassObjectFormatter.class) Class<? extends GetterPropertySelectionStrategy> getterPropertySelectionStrategyClass);
+
+	@Message(id = 247, value = "Unable to instantiate getter property selection strategy class %s.")
+	ValidationException getUnableToInstantiateGetterPropertySelectionStrategyClassException(String getterPropertySelectionStrategyClassName, @Cause Exception e);
+
+	@Message(id = 248, value = "Unable to access field %3$s of class %2$s using lookup %1$s.")
+	ValidationException getUnableToAccessFieldException(Lookup lookup, @FormatWith(ClassObjectFormatter.class) Class<?> clazz, String property, @Cause Throwable e);
 }

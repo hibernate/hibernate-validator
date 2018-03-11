@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.properties.javabean;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -44,22 +43,6 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( type );
 		this.hasReturnValue = hasReturnValue;
 		this.parameters = getParameters( executable );
-	}
-
-	public static JavaBeanExecutable<?> of(Executable executable) {
-		if ( executable instanceof Constructor ) {
-			return new JavaBeanConstructor( (Constructor<?>) executable );
-		}
-
-		return of( ( (Method) executable ) );
-	}
-
-	public static JavaBeanMethod of(Method method) {
-		if ( ReflectionHelper.isGetterMethod( method ) ) {
-			return new JavaBeanGetter( method );
-		}
-
-		return new JavaBeanMethod( method );
 	}
 
 	@Override

@@ -4,13 +4,9 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.properties;
 
 /**
- * A type that can be constrained. Will represent a Java class for a JavaBean or a named type for JSON.
- *
- * @author Marko Bekhta
+ * <p>This package provides support for customization of the JavaBeans property detection logic.</p>
+ * <p>This package is part of the public Hibernate Validator SPI.</p>
  */
-public interface ConstrainableType {
-
-}
+package org.hibernate.validator.spi.properties;

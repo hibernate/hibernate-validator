@@ -65,6 +65,7 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanAnnotatedCon
 import org.hibernate.validator.internal.properties.javabean.JavaBeanAnnotatedElement;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanParameter;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -94,16 +95,19 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private final TypeResolutionHelper typeResolutionHelper;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 	private final ValueExtractorManager valueExtractorManager;
+	private final JavaBeanHelper javaBeanHelper;
 
 	private final BeanConfiguration<Object> objectBeanConfiguration;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager,
+			JavaBeanHelper javaBeanHelper,
 			AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
+		this.javaBeanHelper = javaBeanHelper;
 		this.annotationProcessingOptions = annotationProcessingOptions;
 
 		this.objectBeanConfiguration = retrieveBeanConfiguration( Object.class );
@@ -301,7 +305,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * given element.
 	 */
 	private ConstrainedExecutable findExecutableMetaData(Executable executable) {
-		JavaBeanExecutable<?> javaBeanExecutable = JavaBeanExecutable.of( executable );
+		JavaBeanExecutable<?> javaBeanExecutable = javaBeanHelper.executable( executable );
 		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( javaBeanExecutable );
 
 		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = findConstraints(

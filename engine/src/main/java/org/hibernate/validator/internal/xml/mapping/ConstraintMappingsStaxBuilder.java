@@ -19,6 +19,7 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.AbstractStaxBuilder;
 
@@ -37,6 +38,7 @@ class ConstraintMappingsStaxBuilder extends AbstractStaxBuilder {
 	private final TypeResolutionHelper typeResolutionHelper;
 	private final ValueExtractorManager valueExtractorManager;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
+	private final JavaBeanHelper javaBeanHelper;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 
 	private final DefaultPackageStaxBuilder defaultPackageStaxBuilder;
@@ -44,12 +46,13 @@ class ConstraintMappingsStaxBuilder extends AbstractStaxBuilder {
 	private final List<ConstraintDefinitionStaxBuilder> constraintDefinitionStaxBuilders;
 
 	public ConstraintMappingsStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
-			AnnotationProcessingOptionsImpl annotationProcessingOptions, Map<Class<?>, List<Class<?>>> defaultSequences) {
+			AnnotationProcessingOptionsImpl annotationProcessingOptions, JavaBeanHelper javaBeanHelper, Map<Class<?>, List<Class<?>>> defaultSequences) {
 		this.classLoadingHelper = classLoadingHelper;
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
 		this.annotationProcessingOptions = annotationProcessingOptions;
+		this.javaBeanHelper = javaBeanHelper;
 		this.defaultSequences = defaultSequences;
 
 		this.defaultPackageStaxBuilder = new DefaultPackageStaxBuilder();
@@ -91,6 +94,6 @@ class ConstraintMappingsStaxBuilder extends AbstractStaxBuilder {
 
 	public void build(Set<Class<?>> processedClasses, Map<Class<?>, Set<ConstrainedElement>> constrainedElementsByType, Set<String> alreadyProcessedConstraintDefinitions) {
 		constraintDefinitionStaxBuilders.forEach( builder -> builder.build( alreadyProcessedConstraintDefinitions ) );
-		beanStaxBuilders.forEach( builder -> builder.build( processedClasses, constrainedElementsByType ) );
+		beanStaxBuilders.forEach( builder -> builder.build( javaBeanHelper, processedClasses, constrainedElementsByType ) );
 	}
 }

@@ -27,6 +27,8 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -46,6 +48,7 @@ public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProvi
 				new ConstraintHelper(),
 				new TypeResolutionHelper(),
 				new ValueExtractorManager( Collections.emptySet() ),
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
 				new AnnotationProcessingOptionsImpl()
 		);
 	}

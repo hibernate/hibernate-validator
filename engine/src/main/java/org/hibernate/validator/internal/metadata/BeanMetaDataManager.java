@@ -29,6 +29,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.Contracts;
@@ -121,6 +122,7 @@ public class BeanMetaDataManager {
 			TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ValueExtractorManager valueExtractorManager,
+			JavaBeanHelper javaBeanHelper,
 			ValidationOrderGenerator validationOrderGenerator,
 			List<MetaDataProvider> optionalMetaDataProviders,
 			MethodValidationConfiguration methodValidationConfiguration) {
@@ -147,6 +149,7 @@ public class BeanMetaDataManager {
 				constraintHelper,
 				typeResolutionHelper,
 				valueExtractorManager,
+				javaBeanHelper,
 				annotationProcessingOptions
 		);
 		List<MetaDataProvider> tmpMetaDataProviders = new ArrayList<>( optionalMetaDataProviders.size() + 1 );

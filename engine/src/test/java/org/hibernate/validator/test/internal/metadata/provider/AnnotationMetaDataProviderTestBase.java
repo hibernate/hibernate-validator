@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.test.internal.metadata.provider;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -17,8 +18,8 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.properties.Constrainable;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
+import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 
 /**
  * @author Gunnar Morling
@@ -59,15 +60,18 @@ public abstract class AnnotationMetaDataProviderTestBase {
 		throw new RuntimeException( "Found no constrained element for type " + type );
 	}
 
-	protected ConstrainedElement findConstrainedElement(BeanConfiguration<?> beanConfiguration,
-														Member member) {
-
+	protected ConstrainedElement findConstrainedElement(BeanConfiguration<?> beanConfiguration, Member member) {
+		JavaBeanHelper javaBeanHelper = new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() );
 		Constrainable constrainable;
 		if ( member instanceof Field ) {
-			constrainable = new JavaBeanField( (Field) member );
+			constrainable = javaBeanHelper.findDeclaredField( member.getDeclaringClass(), member.getName() ).get();
+		}
+		else if ( member instanceof Constructor ) {
+			constrainable = javaBeanHelper.findDeclaredConstructor( member.getDeclaringClass(), ( (Constructor) member ).getParameterTypes() ).get();
 		}
 		else {
-			constrainable = JavaBeanExecutable.of( (Executable) member );
+			Executable executable = (Executable) member;
+			constrainable = javaBeanHelper.findDeclaredMethod( member.getDeclaringClass(), executable.getName(), executable.getParameterTypes() ).get();
 		}
 
 		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {

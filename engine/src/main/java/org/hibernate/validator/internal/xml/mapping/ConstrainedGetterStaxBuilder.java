@@ -7,9 +7,6 @@
 package org.hibernate.validator.internal.xml.mapping;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -27,12 +24,11 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation.Con
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromPropertyName;
 import org.hibernate.validator.internal.xml.mapping.ContainerElementTypeConfigurationBuilder.ContainerElementTypeConfiguration;
 
 /**
@@ -65,15 +61,14 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 		return GETTER_QNAME_LOCAL_PART;
 	}
 
-	ConstrainedExecutable build(Class<?> beanClass, List<String> alreadyProcessedGetterNames) {
+	ConstrainedExecutable build(JavaBeanHelper javaBeanHelper, Class<?> beanClass, List<String> alreadyProcessedGetterNames) {
 		if ( alreadyProcessedGetterNames.contains( mainAttributeValue ) ) {
 			throw LOG.getIsDefinedTwiceInMappingXmlForBeanException( mainAttributeValue, beanClass );
 		}
 		else {
 			alreadyProcessedGetterNames.add( mainAttributeValue );
 		}
-		Method getter = findGetter( beanClass, mainAttributeValue );
-		JavaBeanGetter javaBeanGetter = new JavaBeanGetter( beanClass, getter );
+		JavaBeanGetter javaBeanGetter = findGetter( javaBeanHelper, beanClass, mainAttributeValue );
 		ConstraintLocation constraintLocation = ConstraintLocation.forGetter( javaBeanGetter );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
@@ -81,7 +76,7 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 				.collect( Collectors.toSet() );
 
 		ContainerElementTypeConfiguration containerElementTypeConfiguration = getContainerElementTypeConfiguration(
-				ReflectionHelper.typeOf( getter ), constraintLocation );
+				javaBeanGetter.getType(), constraintLocation );
 
 		ConstrainedExecutable constrainedGetter = new ConstrainedExecutable(
 				ConfigurationSource.XML,
@@ -90,7 +85,7 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 				Collections.<MetaConstraint<?>>emptySet(),
 				metaConstraints,
 				containerElementTypeConfiguration.getMetaConstraints(),
-				getCascadingMetaData( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), ReflectionHelper.typeOf( getter ) )
+				getCascadingMetaData( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), javaBeanGetter.getType() )
 		);
 
 		// ignore annotations
@@ -104,23 +99,9 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 		return constrainedGetter;
 	}
 
-	private static Method findGetter(Class<?> beanClass, String getterName) {
-		final Method method = run( GetMethodFromPropertyName.action( beanClass, getterName ) );
-		if ( method == null ) {
-			throw LOG.getBeanDoesNotContainThePropertyException( beanClass, getterName );
-		}
+	private static JavaBeanGetter findGetter(JavaBeanHelper javaBeanHelper, Class<?> beanClass, String getterName) {
+		Optional<JavaBeanGetter> property = javaBeanHelper.findGetter( beanClass, getterName );
 
-		return method;
+		return property.orElseThrow( () -> LOG.getBeanDoesNotContainThePropertyException( beanClass, getterName ) );
 	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 *
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
-
 }

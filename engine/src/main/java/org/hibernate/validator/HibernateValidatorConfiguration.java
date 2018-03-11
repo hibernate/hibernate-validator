@@ -20,6 +20,7 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -106,6 +107,15 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	@Incubating
 	String TEMPORAL_VALIDATION_TOLERANCE = "hibernate.validator.temporal_validation_tolerance";
+
+	/**
+	 * Property for configuring the getter property selection strategy, allowing to set which rules will be applied
+	 * to determine if a method is a valid JavaBean getter.
+	 *
+	 * @since 6.1.0
+	 */
+	@Incubating
+	String GETTER_PROPERTY_SELECTION_STRATEGY_CLASSNAME = "hibernate.validator.getter_property_selection_strategy";
 
 	/**
 	 * <p>
@@ -311,4 +321,16 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	@Incubating
 	HibernateValidatorConfiguration constraintValidatorPayload(Object constraintValidatorPayload);
+
+	/**
+	 * Allows to set a getter property selection strategy defining if a given method is a getter or not.
+	 *
+	 * @param getterPropertySelectionStrategy the {@link GetterPropertySelectionStrategy} to be used
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.1.0
+	 */
+	@Incubating
+	HibernateValidatorConfiguration getterPropertySelectionStrategy(GetterPropertySelectionStrategy getterPropertySelectionStrategy);
 }

@@ -24,6 +24,7 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -40,13 +41,15 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
+	private final JavaBeanHelper javaBeanHelper;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 	private final Set<Class<?>> configuredTypes;
 	private final Set<TypeConstraintMappingContextImpl<?>> typeContexts;
 	private final Set<Class<?>> definedConstraints;
 	private final Set<ConstraintDefinitionContextImpl<?>> constraintContexts;
 
-	public DefaultConstraintMapping() {
+	public DefaultConstraintMapping(JavaBeanHelper javaBeanHelper) {
+		this.javaBeanHelper = javaBeanHelper;
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 		this.configuredTypes = newHashSet();
 		this.typeContexts = newHashSet();
@@ -62,7 +65,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 			throw LOG.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( type );
 		}
 
-		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<>( this, type );
+		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<>( this, type, javaBeanHelper );
 		typeContexts.add( typeContext );
 		configuredTypes.add( type );
 
