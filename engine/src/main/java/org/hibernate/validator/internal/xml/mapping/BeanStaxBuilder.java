@@ -9,8 +9,6 @@ package org.hibernate.validator.internal.xml.mapping;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,6 +27,9 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanConstructor;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanMethod;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -140,7 +141,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 		return new ConstrainedConstructorStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder, annotationProcessingOptions );
 	}
 
-	void build(Set<Class<?>> processedClasses, Map<Class<?>, Set<ConstrainedElement>> constrainedElementsByType) {
+	void build(JavaBeanHelper javaBeanHelper, Set<Class<?>> processedClasses, Map<Class<?>, Set<ConstrainedElement>> constrainedElementsByType) {
 		Class<?> beanClass = classLoadingHelper.loadClass( className, defaultPackageStaxBuilder.build().orElse( "" ) );
 
 		checkClassHasNotBeenProcessed( processedClasses, beanClass );
@@ -165,7 +166,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 		addConstrainedElements(
 				constrainedElementsByType,
 				beanClass, constrainedFieldStaxBuilders.stream()
-						.map( builder -> builder.build( beanClass, alreadyProcessedFieldNames ) )
+						.map( builder -> builder.build( javaBeanHelper, beanClass, alreadyProcessedFieldNames ) )
 						.collect( Collectors.toList() )
 		);
 
@@ -174,25 +175,25 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 				constrainedElementsByType,
 				beanClass,
 				constrainedGetterStaxBuilders.stream()
-						.map( builder -> builder.build( beanClass, alreadyProcessedGetterNames ) )
+						.map( builder -> builder.build( javaBeanHelper, beanClass, alreadyProcessedGetterNames ) )
 						.collect( Collectors.toList() )
 		);
 
-		List<Method> alreadyProcessedMethods = new ArrayList<>( constrainedMethodStaxBuilders.size() );
+		List<JavaBeanMethod> alreadyProcessedMethods = new ArrayList<>( constrainedMethodStaxBuilders.size() );
 		addConstrainedElements(
 				constrainedElementsByType,
 				beanClass,
 				constrainedMethodStaxBuilders.stream()
-						.map( builder -> builder.build( beanClass, alreadyProcessedMethods ) )
+						.map( builder -> builder.build( javaBeanHelper, beanClass, alreadyProcessedMethods ) )
 						.collect( Collectors.toList() )
 		);
 
-		List<Constructor<?>> alreadyProcessedConstructors = new ArrayList<>( constrainedConstructorStaxBuilders.size() );
+		List<JavaBeanConstructor> alreadyProcessedConstructors = new ArrayList<>( constrainedConstructorStaxBuilders.size() );
 		addConstrainedElements(
 				constrainedElementsByType,
 				beanClass,
 				constrainedConstructorStaxBuilders.stream()
-						.map( builder -> builder.build( beanClass, alreadyProcessedConstructors ) )
+						.map( builder -> builder.build( javaBeanHelper, beanClass, alreadyProcessedConstructors ) )
 						.collect( Collectors.toList() )
 		);
 	}

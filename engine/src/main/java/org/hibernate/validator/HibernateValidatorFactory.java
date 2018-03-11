@@ -13,6 +13,7 @@ import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -46,6 +47,16 @@ public interface HibernateValidatorFactory extends ValidatorFactory {
 	 */
 	@Incubating
 	Duration getTemporalValidationTolerance();
+
+	/**
+	 * Returns the getter property selection strategy defining if a given method is a getter or not.
+	 *
+	 * @return the getter property selection strategy of the current {@link ValidatorFactory}
+	 *
+	 * @since 6.1.0
+	 */
+	@Incubating
+	GetterPropertySelectionStrategy getGetterPropertySelectionStrategy();
 
 	/**
 	 * Returns a context for validator configuration via options from the

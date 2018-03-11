@@ -31,6 +31,7 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -38,6 +39,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.internal.xml.CloseIgnoringInputStream;
 import org.hibernate.validator.internal.xml.XmlParserHelper;
+
 import org.xml.sax.SAXException;
 
 /**
@@ -55,6 +57,7 @@ public class MappingXmlParser {
 	private final TypeResolutionHelper typeResolutionHelper;
 	private final ValueExtractorManager valueExtractorManager;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
+	private final JavaBeanHelper javaBeanHelper;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 	private final Map<Class<?>, Set<ConstrainedElement>> constrainedElements;
 
@@ -75,11 +78,12 @@ public class MappingXmlParser {
 	}
 
 	public MappingXmlParser(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
-			ClassLoader externalClassLoader) {
+			JavaBeanHelper javaBeanHelper, ClassLoader externalClassLoader) {
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
+		this.javaBeanHelper = javaBeanHelper;
 		this.defaultSequences = newHashMap();
 		this.constrainedElements = newHashMap();
 		this.xmlParserHelper = new XmlParserHelper();
@@ -120,7 +124,7 @@ public class MappingXmlParser {
 
 				ConstraintMappingsStaxBuilder constraintMappingsStaxBuilder = new ConstraintMappingsStaxBuilder(
 						classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager,
-						annotationProcessingOptions, defaultSequences
+						annotationProcessingOptions, javaBeanHelper, defaultSequences
 				);
 
 				xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", new CloseIgnoringInputStream( in ) );

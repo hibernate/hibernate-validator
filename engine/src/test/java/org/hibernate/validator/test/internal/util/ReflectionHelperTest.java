@@ -12,7 +12,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +24,7 @@ import java.util.SortedMap;
 import java.util.TreeSet;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 /**
@@ -159,16 +158,6 @@ public class ReflectionHelperTest {
 	public void testGetIndexedValueForNull() {
 		Object value = ReflectionHelper.getIndexedValue( null, 0 );
 		assertNull( value );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-622")
-	public void testIsGetterMethod() throws Exception {
-		Method method = Bar.class.getMethod( "getBar" );
-		assertTrue( ReflectionHelper.isGetterMethod( method ) );
-
-		method = Bar.class.getMethod( "getBar", String.class );
-		assertFalse( ReflectionHelper.isGetterMethod( method ) );
 	}
 
 	private void doTestGetIndexedValueForArray(Object array, Object firstValue, Object secondValue) {

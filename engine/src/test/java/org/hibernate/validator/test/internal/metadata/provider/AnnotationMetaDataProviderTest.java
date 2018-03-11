@@ -41,7 +41,8 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
+import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 
@@ -63,6 +64,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 				new ConstraintHelper(),
 				new TypeResolutionHelper(),
 				new ValueExtractorManager( Collections.emptySet() ),
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
 				new AnnotationProcessingOptionsImpl()
 		);
 	}
@@ -104,13 +106,9 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		assertThat( createEvent.getCrossParameterConstraints() ).hasSize( 1 );
 
 		assertThat( createEvent.getCallable() ).isEqualTo(
-				JavaBeanExecutable.of(
-						Calendar.class.getMethod(
-								"createEvent",
-								LocalDate.class,
-								LocalDate.class
-						)
-				)
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() )
+						.findDeclaredMethod( Calendar.class, "createEvent", LocalDate.class, LocalDate.class )
+						.get()
 		);
 
 		MetaConstraint<?> constraint = createEvent.getCrossParameterConstraints().iterator().next();

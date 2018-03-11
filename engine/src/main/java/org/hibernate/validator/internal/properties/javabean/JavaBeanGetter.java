@@ -23,7 +23,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
  */
 public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 
-	private final String name;
+	private final String propertyName;
 
 	/**
 	 * The class of the method for which the constraint was defined.
@@ -33,21 +33,15 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 	 */
 	private final Class<?> declaringClass;
 
-	public JavaBeanGetter(Method method) {
+	public JavaBeanGetter(Class<?> declaringClass, Method method, String propertyName) {
 		super( method );
-		this.name = ReflectionHelper.getPropertyName( method );
-		this.declaringClass = method.getDeclaringClass();
-	}
-
-	public JavaBeanGetter(Class<?> declaringClass, Method method) {
-		super( method );
-		this.name = ReflectionHelper.getPropertyName( method );
 		this.declaringClass = declaringClass;
+		this.propertyName = propertyName;
 	}
 
 	@Override
 	public String getPropertyName() {
-		return name;
+		return propertyName;
 	}
 
 	@Override
@@ -96,13 +90,13 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 
 		JavaBeanGetter that = (JavaBeanGetter) o;
 
-		return this.name.equals( that.name );
+		return this.propertyName.equals( that.propertyName );
 	}
 
 	@Override
 	public int hashCode() {
 		int result = super.hashCode();
-		result = 31 * result + this.name.hashCode();
+		result = 31 * result + this.propertyName.hashCode();
 		return result;
 	}
 

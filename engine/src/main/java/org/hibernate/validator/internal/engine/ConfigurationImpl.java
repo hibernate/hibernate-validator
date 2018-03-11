@@ -42,6 +42,8 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -53,6 +55,7 @@ import org.hibernate.validator.internal.xml.config.ValidationBootstrapParameters
 import org.hibernate.validator.internal.xml.config.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -103,6 +106,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private ScriptEvaluatorFactory scriptEvaluatorFactory;
 	private Duration temporalValidationTolerance;
 	private Object constraintValidatorPayload;
+	private GetterPropertySelectionStrategy getterPropertySelectionStrategy;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -294,6 +298,14 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
+	@Override
+	public HibernateValidatorConfiguration getterPropertySelectionStrategy(GetterPropertySelectionStrategy getterPropertySelectionStrategy) {
+		Contracts.assertNotNull( getterPropertySelectionStrategy, MESSAGES.parameterMustNotBeNull( "getterPropertySelectionStrategy" ) );
+
+		this.getterPropertySelectionStrategy = getterPropertySelectionStrategy;
+		return this;
+	}
+
 	public boolean isAllowParallelMethodsDefineParameterConstraints() {
 		return this.methodValidationConfigurationBuilder.isAllowParallelMethodsDefineParameterConstraints();
 	}
@@ -304,7 +316,15 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final DefaultConstraintMapping createConstraintMapping() {
-		return new DefaultConstraintMapping();
+		GetterPropertySelectionStrategy getterPropertySelectionStrategyToUse = null;
+		if ( getterPropertySelectionStrategy == null ) {
+			getterPropertySelectionStrategyToUse = new DefaultGetterPropertySelectionStrategy();
+		}
+		else {
+			getterPropertySelectionStrategyToUse = getterPropertySelectionStrategy;
+		}
+
+		return new DefaultConstraintMapping( new JavaBeanHelper( getterPropertySelectionStrategyToUse ) );
 	}
 
 	@Override
@@ -448,6 +468,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public Object getConstraintValidatorPayload() {
 		return constraintValidatorPayload;
+	}
+
+	public GetterPropertySelectionStrategy getGetterPropertySelectionStrategy() {
+		return getterPropertySelectionStrategy;
 	}
 
 	@Override

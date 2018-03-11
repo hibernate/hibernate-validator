@@ -7,9 +7,6 @@
 package org.hibernate.validator.internal.xml.mapping;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -26,12 +23,12 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanMethod;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
 
 /**
  * Builder for constrained methods.
@@ -68,41 +65,26 @@ class ConstrainedMethodStaxBuilder extends AbstractConstrainedExecutableElementS
 		return mainAttributeValue;
 	}
 
-	ConstrainedExecutable build(Class<?> beanClass, List<Method> alreadyProcessedMethods) {
+	ConstrainedExecutable build(JavaBeanHelper javaBeanHelper, Class<?> beanClass, List<JavaBeanMethod> alreadyProcessedMethods) {
 		Class<?>[] parameterTypes = constrainedParameterStaxBuilders.stream()
 				.map( builder -> builder.getParameterType( beanClass ) )
 				.toArray( Class[]::new );
 
 		String methodName = getMethodName();
 
-		final Method method = run(
-				GetDeclaredMethod.action(
-						beanClass,
-						methodName,
-						parameterTypes
-				)
-		);
+		JavaBeanMethod javaBeanMethod = findMethod( javaBeanHelper, beanClass, methodName, parameterTypes );
 
-		if ( method == null ) {
-			throw LOG.getBeanDoesNotContainMethodException(
-					beanClass,
-					methodName,
-					parameterTypes
-			);
-		}
-
-		if ( alreadyProcessedMethods.contains( method ) ) {
-			throw LOG.getMethodIsDefinedTwiceInMappingXmlForBeanException( method, beanClass );
+		if ( alreadyProcessedMethods.contains( javaBeanMethod ) ) {
+			throw LOG.getMethodIsDefinedTwiceInMappingXmlForBeanException( javaBeanMethod, beanClass );
 		}
 		else {
-			alreadyProcessedMethods.add( method );
+			alreadyProcessedMethods.add( javaBeanMethod );
 		}
-		JavaBeanExecutable<?> executable = JavaBeanExecutable.of( method );
 
 		// ignore annotations
 		if ( ignoreAnnotations.isPresent() ) {
 			annotationProcessingOptions.ignoreConstraintAnnotationsOnMember(
-					executable,
+					javaBeanMethod,
 					ignoreAnnotations.get()
 			);
 		}
@@ -110,21 +92,21 @@ class ConstrainedMethodStaxBuilder extends AbstractConstrainedExecutableElementS
 		List<ConstrainedParameter> constrainedParameters = CollectionHelper.newArrayList( constrainedParameterStaxBuilders.size() );
 		for ( int index = 0; index < constrainedParameterStaxBuilders.size(); index++ ) {
 			ConstrainedParameterStaxBuilder builder = constrainedParameterStaxBuilders.get( index );
-			constrainedParameters.add( builder.build( executable, index ) );
+			constrainedParameters.add( builder.build( javaBeanMethod, index ) );
 		}
 
 		Set<MetaConstraint<?>> crossParameterConstraints = getCrossParameterStaxBuilder()
-				.map( builder -> builder.build( executable ) ).orElse( Collections.emptySet() );
+				.map( builder -> builder.build( javaBeanMethod ) ).orElse( Collections.emptySet() );
 
 		// parse the return value
 		Set<MetaConstraint<?>> returnValueConstraints = new HashSet<>();
 		Set<MetaConstraint<?>> returnValueTypeArgumentConstraints = new HashSet<>();
-		CascadingMetaDataBuilder cascadingMetaDataBuilder = getReturnValueStaxBuilder().map( builder -> builder.build( executable, returnValueConstraints, returnValueTypeArgumentConstraints ) )
+		CascadingMetaDataBuilder cascadingMetaDataBuilder = getReturnValueStaxBuilder().map( builder -> builder.build( javaBeanMethod, returnValueConstraints, returnValueTypeArgumentConstraints ) )
 				.orElse( CascadingMetaDataBuilder.nonCascading() );
 
 		return new ConstrainedExecutable(
 				ConfigurationSource.XML,
-				executable,
+				javaBeanMethod,
 				constrainedParameters,
 				crossParameterConstraints,
 				returnValueConstraints,
@@ -133,13 +115,8 @@ class ConstrainedMethodStaxBuilder extends AbstractConstrainedExecutableElementS
 		);
 	}
 
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 *
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	private JavaBeanMethod findMethod(JavaBeanHelper javaBeanHelper, Class<?> beanClass, String methodName, Class<?>[] parameterTypes) {
+		return javaBeanHelper.findDeclaredMethod( beanClass, methodName, parameterTypes )
+				.orElseThrow( () -> LOG.getBeanDoesNotContainMethodException( beanClass, methodName, parameterTypes ) );
 	}
 }

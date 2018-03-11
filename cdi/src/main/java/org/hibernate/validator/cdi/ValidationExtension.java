@@ -51,9 +51,9 @@ import org.hibernate.validator.cdi.internal.ValidatorBean;
 import org.hibernate.validator.cdi.internal.ValidatorFactoryBean;
 import org.hibernate.validator.cdi.internal.interceptor.ValidationEnabledAnnotatedType;
 import org.hibernate.validator.cdi.internal.interceptor.ValidationInterceptor;
+import org.hibernate.validator.cdi.internal.util.GetterPropertySelectionStrategyHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -99,6 +99,7 @@ public class ValidationExtension implements Extension {
 	 */
 	private final Validator validator;
 	private final ValidatorFactory validatorFactory;
+	private final GetterPropertySelectionStrategyHelper getterPropertySelectionStrategyHelper;
 	private final Set<ExecutableType> globalExecutableTypes;
 	private final boolean isExecutableValidationEnabled;
 
@@ -119,6 +120,7 @@ public class ValidationExtension implements Extension {
 		isExecutableValidationEnabled = bootstrap.isExecutableValidationEnabled();
 		validatorFactory = config.buildValidatorFactory();
 		validator = validatorFactory.getValidator();
+		getterPropertySelectionStrategyHelper = GetterPropertySelectionStrategyHelper.forValidationFactory( validatorFactory );
 
 		executableHelper = new ExecutableHelper( new TypeResolutionHelper() );
 	}
@@ -263,7 +265,7 @@ public class ValidationExtension implements Extension {
 		for ( AnnotatedMethod<? super T> annotatedMethod : type.getMethods() ) {
 			Method method = annotatedMethod.getJavaMember();
 
-			boolean isGetter = ReflectionHelper.isGetterMethod( method );
+			boolean isGetter = getterPropertySelectionStrategyHelper.isGetter( method );
 
 			// obtain @ValidateOnExecution from the top-most method in the hierarchy
 			Method methodForExecutableTypeRetrieval = replaceWithOverriddenOrInterfaceMethod( method, overriddenAndImplementedMethods );
@@ -316,7 +318,7 @@ public class ValidationExtension implements Extension {
 	}
 
 	private boolean isGetterConstrained(Method method, BeanDescriptor beanDescriptor) {
-		String propertyName = ReflectionHelper.getPropertyName( method );
+		String propertyName = getterPropertySelectionStrategyHelper.getPropertyName( method );
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( propertyName );
 		return propertyDescriptor != null && propertyDescriptor.findConstraints()
 				.declaredOn( ElementType.METHOD )
