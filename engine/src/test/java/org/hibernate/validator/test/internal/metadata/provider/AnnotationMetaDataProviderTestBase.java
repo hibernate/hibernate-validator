@@ -17,6 +17,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedProperty;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.properties.Constrainable;
+import org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 
@@ -67,7 +68,7 @@ public abstract class AnnotationMetaDataProviderTestBase {
 			constrainable = new JavaBeanField( (Field) member );
 		}
 		else {
-			constrainable = JavaBeanExecutable.of( (Executable) member );
+			constrainable = JavaBeanExecutable.of( new DefaultGetterPropertyMatcher(), (Executable) member );
 		}
 
 		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {

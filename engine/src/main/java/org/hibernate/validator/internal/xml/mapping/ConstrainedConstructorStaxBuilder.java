@@ -32,6 +32,7 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
+import org.hibernate.validator.properties.GetterPropertyMatcher;
 
 /**
  * Builder for constrained constructors.
@@ -67,7 +68,7 @@ class ConstrainedConstructorStaxBuilder extends AbstractConstrainedExecutableEle
 		return mainAttributeValue;
 	}
 
-	ConstrainedExecutable build(Class<?> beanClass, List<Constructor<?>> alreadyProcessedConstructors) {
+	ConstrainedExecutable build(Class<?> beanClass, GetterPropertyMatcher getterPropertyMatcher, List<Constructor<?>> alreadyProcessedConstructors) {
 		Class<?>[] parameterTypes = constrainedParameterStaxBuilders.stream()
 				.map( builder -> builder.getParameterType( beanClass ) )
 				.toArray( Class[]::new );
@@ -85,7 +86,7 @@ class ConstrainedConstructorStaxBuilder extends AbstractConstrainedExecutableEle
 					parameterTypes
 			);
 		}
-		JavaBeanExecutable executable = JavaBeanExecutable.of( constructor );
+		JavaBeanExecutable executable = JavaBeanExecutable.of( getterPropertyMatcher, constructor );
 
 		if ( alreadyProcessedConstructors.contains( constructor ) ) {
 			throw LOG.getConstructorIsDefinedTwiceInMappingXmlForBeanException( constructor, beanClass );

@@ -37,6 +37,7 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
+import org.hibernate.validator.properties.GetterPropertyMatcher;
 
 /**
  * This manager is in charge of providing all constraint related meta data
@@ -121,6 +122,7 @@ public class BeanMetaDataManager {
 			TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ValueExtractorManager valueExtractorManager,
+			GetterPropertyMatcher getterPropertyMatcher,
 			ValidationOrderGenerator validationOrderGenerator,
 			List<MetaDataProvider> optionalMetaDataProviders,
 			MethodValidationConfiguration methodValidationConfiguration) {
@@ -147,6 +149,7 @@ public class BeanMetaDataManager {
 				constraintHelper,
 				typeResolutionHelper,
 				valueExtractorManager,
+				getterPropertyMatcher,
 				annotationProcessingOptions
 		);
 		List<MetaDataProvider> tmpMetaDataProviders = new ArrayList<>( optionalMetaDataProviders.size() + 1 );

@@ -33,6 +33,7 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.xml.AbstractStaxBuilder;
+import org.hibernate.validator.properties.GetterPropertyMatcher;
 
 /**
  * Builder for definition of all bean constraints.
@@ -53,6 +54,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 	private final ValueExtractorManager valueExtractorManager;
 	private final DefaultPackageStaxBuilder defaultPackageStaxBuilder;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
+	private final GetterPropertyMatcher getterPropertyMatcher;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 
 	protected String className;
@@ -66,7 +68,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 	BeanStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
 			DefaultPackageStaxBuilder defaultPackageStaxBuilder, AnnotationProcessingOptionsImpl annotationProcessingOptions,
-			Map<Class<?>, List<Class<?>>> defaultSequences) {
+			GetterPropertyMatcher getterPropertyMatcher, Map<Class<?>, List<Class<?>>> defaultSequences) {
 		this.classLoadingHelper = classLoadingHelper;
 		this.defaultPackageStaxBuilder = defaultPackageStaxBuilder;
 		this.constraintHelper = constraintHelper;
@@ -74,6 +76,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 		this.valueExtractorManager = valueExtractorManager;
 
 		this.annotationProcessingOptions = annotationProcessingOptions;
+		this.getterPropertyMatcher = getterPropertyMatcher;
 		this.defaultSequences = defaultSequences;
 
 		this.constrainedFieldStaxBuilders = new ArrayList<>();
@@ -174,7 +177,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 				constrainedElementsByType,
 				beanClass,
 				constrainedGetterStaxBuilders.stream()
-						.map( builder -> builder.build( beanClass, alreadyProcessedGetterNames ) )
+						.map( builder -> builder.build( beanClass, getterPropertyMatcher, alreadyProcessedGetterNames ) )
 						.collect( Collectors.toList() )
 		);
 
@@ -183,7 +186,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 				constrainedElementsByType,
 				beanClass,
 				constrainedMethodStaxBuilders.stream()
-						.map( builder -> builder.build( beanClass, alreadyProcessedMethods ) )
+						.map( builder -> builder.build( beanClass, getterPropertyMatcher, alreadyProcessedMethods ) )
 						.collect( Collectors.toList() )
 		);
 
@@ -192,7 +195,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 				constrainedElementsByType,
 				beanClass,
 				constrainedConstructorStaxBuilders.stream()
-						.map( builder -> builder.build( beanClass, alreadyProcessedConstructors ) )
+						.map( builder -> builder.build( beanClass, getterPropertyMatcher, alreadyProcessedConstructors ) )
 						.collect( Collectors.toList() )
 		);
 	}

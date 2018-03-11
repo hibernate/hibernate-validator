@@ -79,6 +79,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredFields
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.properties.GetterPropertyMatcher;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 /**
@@ -98,16 +99,19 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private final TypeResolutionHelper typeResolutionHelper;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 	private final ValueExtractorManager valueExtractorManager;
+	private final GetterPropertyMatcher getterPropertyMatcher;
 
 	private final BeanConfiguration<Object> objectBeanConfiguration;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager,
+			GetterPropertyMatcher getterPropertyMatcher,
 			AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
+		this.getterPropertyMatcher = getterPropertyMatcher;
 		this.annotationProcessingOptions = annotationProcessingOptions;
 
 		this.objectBeanConfiguration = retrieveBeanConfiguration( Object.class );
@@ -302,7 +306,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * given element.
 	 */
 	private ConstrainedExecutable findExecutableMetaData(Executable executable) {
-		Callable callable = JavaBeanExecutable.of( executable );
+		Callable callable = JavaBeanExecutable.of( getterPropertyMatcher, executable );
 		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( executable, callable );
 
 		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = findConstraints(
@@ -797,7 +801,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 */
 	private <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(ConstraintDescriptorImpl<A> descriptor, TypeArgumentLocation location,
 			TypeVariable<?> typeVariable, Type type) {
-		ConstraintLocation constraintLocation = ConstraintLocation.forTypeArgument( location.toConstraintLocation(), typeVariable, type );
+		ConstraintLocation constraintLocation = ConstraintLocation.forTypeArgument( location.toConstraintLocation( getterPropertyMatcher ), typeVariable, type );
 		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, descriptor, constraintLocation );
 	}
 
@@ -815,7 +819,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * which might not be possible (for instance for {@code java.util} classes).
 	 */
 	private interface TypeArgumentLocation {
-		ConstraintLocation toConstraintLocation();
+		ConstraintLocation toConstraintLocation(GetterPropertyMatcher getterPropertyMatcher);
 	}
 
 	private static class TypeArgumentExecutableParameterLocation implements TypeArgumentLocation {
@@ -829,8 +833,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		@Override
-		public ConstraintLocation toConstraintLocation() {
-			return ConstraintLocation.forParameter( JavaBeanExecutable.of( executable ), index );
+		public ConstraintLocation toConstraintLocation(GetterPropertyMatcher getterPropertyMatcher) {
+			return ConstraintLocation.forParameter( JavaBeanExecutable.of( getterPropertyMatcher, executable ), index );
 		}
 	}
 
@@ -842,7 +846,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		@Override
-		public ConstraintLocation toConstraintLocation() {
+		public ConstraintLocation toConstraintLocation(GetterPropertyMatcher getterPropertyMatcher) {
 			return ConstraintLocation.forProperty( new JavaBeanField( field ) );
 		}
 	}
@@ -855,8 +859,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		@Override
-		public ConstraintLocation toConstraintLocation() {
-			return ConstraintLocation.forReturnValue( JavaBeanExecutable.of( executable ) );
+		public ConstraintLocation toConstraintLocation(GetterPropertyMatcher getterPropertyMatcher) {
+			return ConstraintLocation.forReturnValue( JavaBeanExecutable.of( getterPropertyMatcher, executable ) );
 		}
 	}
 
@@ -872,8 +876,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		@Override
-		public ConstraintLocation toConstraintLocation() {
-			return ConstraintLocation.forTypeArgument( parentLocation.toConstraintLocation(), typeParameter, typeOfAnnotatedElement );
+		public ConstraintLocation toConstraintLocation(GetterPropertyMatcher getterPropertyMatcher) {
+			return ConstraintLocation.forTypeArgument( parentLocation.toConstraintLocation( getterPropertyMatcher ), typeParameter, typeOfAnnotatedElement );
 		}
 
 	}

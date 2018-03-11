@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.util;
 
+import static org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher.PROPERTY_ACCESSOR_PREFIXES;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 import java.lang.invoke.MethodHandles;
@@ -24,8 +25,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.properties.GetterPropertyMatcher;
 
 /**
  * Some reflection utility methods. Where necessary calls will be performed as {@code PrivilegedAction} which is necessary
@@ -37,15 +40,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Guillaume Smet
  */
 public final class ReflectionHelper {
-
-	private static final String PROPERTY_ACCESSOR_PREFIX_GET = "get";
-	private static final String PROPERTY_ACCESSOR_PREFIX_IS = "is";
-	private static final String PROPERTY_ACCESSOR_PREFIX_HAS = "has";
-	public static final String[] PROPERTY_ACCESSOR_PREFIXES = {
-			PROPERTY_ACCESSOR_PREFIX_GET,
-			PROPERTY_ACCESSOR_PREFIX_IS,
-			PROPERTY_ACCESSOR_PREFIX_HAS
-	};
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -113,6 +107,7 @@ public final class ReflectionHelper {
 	 *         member is neither a field nor a getter method according to the
 	 *         JavaBeans standard.
 	 */
+	@Deprecated
 	public static String getPropertyName(Member member) {
 		String name = null;
 
@@ -131,6 +126,8 @@ public final class ReflectionHelper {
 		return name;
 	}
 
+	private static final GetterPropertyMatcher PROPERTY_FILTER = new DefaultGetterPropertyMatcher();
+
 	/**
 	 * Checks whether the given executable is a valid JavaBeans getter method, which
 	 * is the case if
@@ -147,33 +144,9 @@ public final class ReflectionHelper {
 	 * @return {@code true}, if the given executable is a JavaBeans getter method,
 	 *         {@code false} otherwise.
 	 */
+	@Deprecated
 	public static boolean isGetterMethod(Executable executable) {
-		if ( !( executable instanceof Method ) ) {
-			return false;
-		}
-
-		Method method = (Method) executable;
-
-		if ( method.getParameterTypes().length != 0 ) {
-			return false;
-		}
-
-		String methodName = method.getName();
-
-		//<PropertyType> get<PropertyName>()
-		if ( methodName.startsWith( PROPERTY_ACCESSOR_PREFIX_GET ) && method.getReturnType() != void.class ) {
-			return true;
-		}
-		//boolean is<PropertyName>()
-		else if ( methodName.startsWith( PROPERTY_ACCESSOR_PREFIX_IS ) && method.getReturnType() == boolean.class ) {
-			return true;
-		}
-		//boolean has<PropertyName>()
-		else if ( methodName.startsWith( PROPERTY_ACCESSOR_PREFIX_HAS ) && method.getReturnType() == boolean.class ) {
-			return true;
-		}
-
-		return false;
+		return PROPERTY_FILTER.isProperty( executable );
 	}
 
 	/**

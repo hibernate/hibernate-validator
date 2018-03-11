@@ -17,19 +17,20 @@ import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
+import org.hibernate.validator.properties.ExecutableProperty;
 
 /**
  * @author Marko Bekhta
  */
-public class JavaBeanGetter extends JavaBeanExecutable implements Property {
+public class JavaBeanGetter extends JavaBeanExecutable implements Property, ExecutableProperty {
 
 	private static final Class<?>[] PARAMETER_TYPES = new Class[0];
 
 	private final String name;
 
-	public JavaBeanGetter(Method method) {
+	public JavaBeanGetter(Method method, String name) {
 		super( getAccessible( method ) );
-		this.name = ReflectionHelper.getPropertyName( method );
+		this.name = name;
 	}
 
 	@Override

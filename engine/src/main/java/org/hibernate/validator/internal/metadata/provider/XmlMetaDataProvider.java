@@ -21,6 +21,7 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.xml.mapping.MappingXmlParser;
+import org.hibernate.validator.properties.GetterPropertyMatcher;
 
 /**
  * A {@link MetaDataProvider} providing constraint related meta data based on
@@ -40,11 +41,12 @@ public class XmlMetaDataProvider implements MetaDataProvider {
 	public XmlMetaDataProvider(ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager,
+			GetterPropertyMatcher getterPropertyMatcher,
 			Set<InputStream> mappingStreams,
 			ClassLoader externalClassLoader) {
 
 		MappingXmlParser mappingParser = new MappingXmlParser( constraintHelper, typeResolutionHelper, valueExtractorManager,
-				externalClassLoader );
+				getterPropertyMatcher, externalClassLoader );
 		mappingParser.parse( mappingStreams );
 
 		configuredBeans = CollectionHelper.toImmutableMap( createBeanConfigurations( mappingParser ) );

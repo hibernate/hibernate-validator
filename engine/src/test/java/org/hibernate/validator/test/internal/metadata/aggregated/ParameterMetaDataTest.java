@@ -33,6 +33,7 @@ import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -61,6 +62,7 @@ public class ParameterMetaDataTest {
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptySet() ),
+				new DefaultGetterPropertyMatcher(),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
 				new MethodValidationConfiguration.Builder().build()
@@ -131,6 +133,7 @@ public class ParameterMetaDataTest {
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new SkewedParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptySet() ),
+				new DefaultGetterPropertyMatcher(),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
 				new MethodValidationConfiguration.Builder().build()

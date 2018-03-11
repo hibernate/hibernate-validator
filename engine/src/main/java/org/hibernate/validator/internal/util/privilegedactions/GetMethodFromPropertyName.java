@@ -9,41 +9,41 @@ package org.hibernate.validator.internal.util.privilegedactions;
 import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
 
+import org.hibernate.validator.properties.GetterPropertyMatcher;
+
 /**
  * Returns the method with the specified property name or {@code null} if it does not exist. This method will prepend
  * 'is' and 'get' to the property name and capitalize the first letter.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Marko Bekhta
  */
 public final class GetMethodFromPropertyName implements PrivilegedAction<Method> {
 	private final Class<?> clazz;
+	private final GetterPropertyMatcher getterPropertyMatcher;
 	private final String property;
 
-	public static GetMethodFromPropertyName action(Class<?> clazz, String property) {
-		return new GetMethodFromPropertyName( clazz, property );
+	public static GetMethodFromPropertyName action(Class<?> clazz, GetterPropertyMatcher getterPropertyMatcher, String property) {
+		return new GetMethodFromPropertyName( clazz, getterPropertyMatcher, property );
 	}
 
-	private GetMethodFromPropertyName(Class<?> clazz, String property) {
+	private GetMethodFromPropertyName(Class<?> clazz, GetterPropertyMatcher getterPropertyMatcher, String property) {
 		this.clazz = clazz;
+		this.getterPropertyMatcher = getterPropertyMatcher;
 		this.property = property;
 	}
 
 	@Override
 	public Method run() {
-		try {
-			char[] string = property.toCharArray();
-			string[0] = Character.toUpperCase( string[0] );
-			String fullMethodName = new String( string );
+		for ( String possibleName : getterPropertyMatcher.getPossibleMethodNamesForProperty( property ) ) {
 			try {
-				return clazz.getMethod( "get" + fullMethodName );
+				return clazz.getMethod( possibleName );
 			}
 			catch (NoSuchMethodException e) {
-				return clazz.getMethod( "is" + fullMethodName );
+				// silently ignore the exception
 			}
 		}
-		catch (NoSuchMethodException e) {
-			return null;
-		}
+		return null;
 	}
 }

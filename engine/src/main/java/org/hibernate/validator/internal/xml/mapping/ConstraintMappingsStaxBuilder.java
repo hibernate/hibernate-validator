@@ -21,6 +21,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.AbstractStaxBuilder;
+import org.hibernate.validator.properties.GetterPropertyMatcher;
 
 /**
  * Top level builder for constraint mappings. Reads the whole mapping file and builds the constraint definitions defined
@@ -37,6 +38,7 @@ class ConstraintMappingsStaxBuilder extends AbstractStaxBuilder {
 	private final TypeResolutionHelper typeResolutionHelper;
 	private final ValueExtractorManager valueExtractorManager;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
+	private final GetterPropertyMatcher getterPropertyMatcher;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 
 	private final DefaultPackageStaxBuilder defaultPackageStaxBuilder;
@@ -44,12 +46,13 @@ class ConstraintMappingsStaxBuilder extends AbstractStaxBuilder {
 	private final List<ConstraintDefinitionStaxBuilder> constraintDefinitionStaxBuilders;
 
 	public ConstraintMappingsStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
-			AnnotationProcessingOptionsImpl annotationProcessingOptions, Map<Class<?>, List<Class<?>>> defaultSequences) {
+			AnnotationProcessingOptionsImpl annotationProcessingOptions, GetterPropertyMatcher getterPropertyMatcher, Map<Class<?>, List<Class<?>>> defaultSequences) {
 		this.classLoadingHelper = classLoadingHelper;
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
 		this.annotationProcessingOptions = annotationProcessingOptions;
+		this.getterPropertyMatcher = getterPropertyMatcher;
 		this.defaultSequences = defaultSequences;
 
 		this.defaultPackageStaxBuilder = new DefaultPackageStaxBuilder();
@@ -82,7 +85,7 @@ class ConstraintMappingsStaxBuilder extends AbstractStaxBuilder {
 	}
 
 	private BeanStaxBuilder getNewBeanStaxBuilder() {
-		return new BeanStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder, annotationProcessingOptions, defaultSequences );
+		return new BeanStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder, annotationProcessingOptions, getterPropertyMatcher, defaultSequences );
 	}
 
 	private ConstraintDefinitionStaxBuilder getNewConstraintDefinitionStaxBuilder() {
