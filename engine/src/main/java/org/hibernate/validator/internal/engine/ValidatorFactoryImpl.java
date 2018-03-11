@@ -47,6 +47,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
+import org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -59,6 +60,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
+import org.hibernate.validator.properties.GetterPropertyMatcher;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -132,12 +134,15 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private final ValueExtractorManager valueExtractorManager;
 
+	private final GetterPropertyMatcher getterPropertyMatcher;
+
 	private final ValidationOrderGenerator validationOrderGenerator;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		ClassLoader externalClassLoader = getExternalClassLoader( configurationState );
 
 		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
+		this.getterPropertyMatcher = new DefaultGetterPropertyMatcher();
 		this.beanMetaDataManagers = new ConcurrentHashMap<>();
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
@@ -154,7 +159,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 		else {
 			this.xmlMetaDataProvider = new XmlMetaDataProvider(
-					constraintHelper, typeResolutionHelper, valueExtractorManager, configurationState.getMappingStreams(), externalClassLoader
+					constraintHelper, typeResolutionHelper, valueExtractorManager, getterPropertyMatcher, configurationState.getMappingStreams(), externalClassLoader
 			);
 		}
 
@@ -347,11 +352,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						typeResolutionHelper,
 						validatorFactoryScopedContext.getParameterNameProvider(),
 						valueExtractorManager,
+						getterPropertyMatcher,
 						validationOrderGenerator,
 						buildDataProviders(),
 						methodValidationConfiguration
 				)
-		 );
+		);
 
 		return new ValidatorImpl(
 				constraintValidatorFactory,

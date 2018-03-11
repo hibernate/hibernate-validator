@@ -37,18 +37,17 @@ import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
+import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromPropertyName;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.properties.GetterPropertyMatcher;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 /**
@@ -74,9 +73,12 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	private List<Class<?>> defaultGroupSequence;
 	private Class<? extends DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass;
 
-	TypeConstraintMappingContextImpl(DefaultConstraintMapping mapping, Class<C> beanClass) {
+	private final GetterPropertyMatcher getterPropertyMatcher;
+
+	TypeConstraintMappingContextImpl(DefaultConstraintMapping mapping, Class<C> beanClass, GetterPropertyMatcher getterPropertyMatcher) {
 		super( mapping );
 		this.beanClass = beanClass;
+		this.getterPropertyMatcher = getterPropertyMatcher;
 		mapping.getAnnotationProcessingOptions().ignoreAnnotationConstraintForClass( beanClass, Boolean.FALSE );
 	}
 
@@ -153,7 +155,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			throw LOG.getBeanDoesNotContainMethodException( beanClass, name, parameterTypes );
 		}
 
-		Callable callable = JavaBeanExecutable.of( method );
+		Callable callable = JavaBeanExecutable.of( getterPropertyMatcher, method );
 
 		if ( configuredMembers.contains( callable ) ) {
 			throw LOG.getMethodHasAlreadyBeenConfiguredViaProgrammaticApiException(
@@ -180,7 +182,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			);
 		}
 
-		Callable callable = JavaBeanExecutable.of( constructor );
+		Callable callable = JavaBeanExecutable.of( getterPropertyMatcher, constructor );
 
 		if ( configuredMembers.contains( callable ) ) {
 			throw LOG.getConstructorHasAlreadyBeConfiguredViaProgrammaticApiException(
@@ -279,15 +281,9 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			return field == null ? null : new JavaBeanField( field );
 		}
 		else {
-			Method method = null;
-			String methodName = property.substring( 0, 1 ).toUpperCase() + property.substring( 1 );
-			for ( String prefix : ReflectionHelper.PROPERTY_ACCESSOR_PREFIXES ) {
-				method = run( GetMethod.action( clazz, prefix + methodName ) );
-				if ( method != null ) {
-					break;
-				}
-			}
-			return method == null ? null : new JavaBeanGetter( method );
+			Method method = GetMethodFromPropertyName.action( clazz, getterPropertyMatcher, property ).run();
+
+			return method == null ? null : JavaBeanExecutable.of( getterPropertyMatcher, method ).as( Property.class );
 		}
 	}
 

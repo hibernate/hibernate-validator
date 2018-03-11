@@ -32,6 +32,7 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
+import org.hibernate.validator.properties.GetterPropertyMatcher;
 
 /**
  * Builder for constrained methods.
@@ -68,7 +69,7 @@ class ConstrainedMethodStaxBuilder extends AbstractConstrainedExecutableElementS
 		return mainAttributeValue;
 	}
 
-	ConstrainedExecutable build(Class<?> beanClass, List<Method> alreadyProcessedMethods) {
+	ConstrainedExecutable build(Class<?> beanClass, GetterPropertyMatcher getterPropertyMatcher, List<Method> alreadyProcessedMethods) {
 		Class<?>[] parameterTypes = constrainedParameterStaxBuilders.stream()
 				.map( builder -> builder.getParameterType( beanClass ) )
 				.toArray( Class[]::new );
@@ -97,7 +98,7 @@ class ConstrainedMethodStaxBuilder extends AbstractConstrainedExecutableElementS
 		else {
 			alreadyProcessedMethods.add( method );
 		}
-		JavaBeanExecutable executable = JavaBeanExecutable.of( method );
+		JavaBeanExecutable executable = JavaBeanExecutable.of( getterPropertyMatcher, method );
 
 		// ignore annotations
 		if ( ignoreAnnotations.isPresent() ) {

@@ -18,6 +18,7 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
+import org.hibernate.validator.properties.GetterPropertyMatcher;
 
 /**
  * @author Marko Bekhta
@@ -40,9 +41,10 @@ public class JavaBeanExecutable implements Callable {
 		this.hasReturnValue = hasReturnValue( executable );
 	}
 
-	public static JavaBeanExecutable of(Executable executable) {
-		if ( ReflectionHelper.isGetterMethod( executable ) ) {
-			return new JavaBeanGetter( (Method) executable );
+	public static JavaBeanExecutable of(GetterPropertyMatcher getterPropertyMatcher, Executable executable) {
+		if ( getterPropertyMatcher.isProperty( executable ) ) {
+			Method method = (Method) executable;
+			return new JavaBeanGetter( method, getterPropertyMatcher.getPropertyName( method ) );
 		}
 		else {
 			return new JavaBeanExecutable( executable );

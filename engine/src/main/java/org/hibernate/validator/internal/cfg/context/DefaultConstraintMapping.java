@@ -24,6 +24,7 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -62,7 +63,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 			throw LOG.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( type );
 		}
 
-		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<>( this, type );
+		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<>( this, type, new DefaultGetterPropertyMatcher() );
 		typeContexts.add( typeContext );
 		configuredTypes.add( type );
 

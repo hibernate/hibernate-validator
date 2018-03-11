@@ -38,6 +38,8 @@ import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.internal.xml.CloseIgnoringInputStream;
 import org.hibernate.validator.internal.xml.XmlParserHelper;
+import org.hibernate.validator.properties.GetterPropertyMatcher;
+
 import org.xml.sax.SAXException;
 
 /**
@@ -55,6 +57,7 @@ public class MappingXmlParser {
 	private final TypeResolutionHelper typeResolutionHelper;
 	private final ValueExtractorManager valueExtractorManager;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
+	private final GetterPropertyMatcher getterPropertyMatcher;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 	private final Map<Class<?>, Set<ConstrainedElement>> constrainedElements;
 
@@ -75,11 +78,12 @@ public class MappingXmlParser {
 	}
 
 	public MappingXmlParser(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
-			ClassLoader externalClassLoader) {
+			GetterPropertyMatcher getterPropertyMatcher, ClassLoader externalClassLoader) {
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
+		this.getterPropertyMatcher = getterPropertyMatcher;
 		this.defaultSequences = newHashMap();
 		this.constrainedElements = newHashMap();
 		this.xmlParserHelper = new XmlParserHelper();
@@ -120,7 +124,7 @@ public class MappingXmlParser {
 
 				ConstraintMappingsStaxBuilder constraintMappingsStaxBuilder = new ConstraintMappingsStaxBuilder(
 						classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager,
-						annotationProcessingOptions, defaultSequences
+						annotationProcessingOptions, getterPropertyMatcher, defaultSequences
 				);
 
 				xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", new CloseIgnoringInputStream( in ) );

@@ -35,6 +35,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromPropertyName;
 import org.hibernate.validator.internal.xml.mapping.ContainerElementTypeConfigurationBuilder.ContainerElementTypeConfiguration;
+import org.hibernate.validator.properties.GetterPropertyMatcher;
 
 /**
  * Builder for constrained getters.
@@ -66,15 +67,19 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 		return GETTER_QNAME_LOCAL_PART;
 	}
 
-	ConstrainedExecutable build(Class<?> beanClass, List<String> alreadyProcessedGetterNames) {
-		if ( alreadyProcessedGetterNames.contains( mainAttributeValue ) ) {
-			throw LOG.getIsDefinedTwiceInMappingXmlForBeanException( mainAttributeValue, beanClass );
+	private String getPropertyName(){
+		return mainAttributeValue;
+	}
+
+	ConstrainedExecutable build(Class<?> beanClass, GetterPropertyMatcher getterPropertyMatcher, List<String> alreadyProcessedGetterNames) {
+		if ( alreadyProcessedGetterNames.contains( getPropertyName() ) ) {
+			throw LOG.getIsDefinedTwiceInMappingXmlForBeanException( getPropertyName(), beanClass );
 		}
 		else {
-			alreadyProcessedGetterNames.add( mainAttributeValue );
+			alreadyProcessedGetterNames.add( getPropertyName() );
 		}
-		Method getter = findGetter( beanClass, mainAttributeValue );
-		Property property = new JavaBeanGetter( getter );
+		Method getter = findGetter( beanClass, getterPropertyMatcher, getPropertyName() );
+		Property property = new JavaBeanGetter( getter, getPropertyName() );
 		ConstraintLocation constraintLocation = ConstraintLocation.forProperty( property );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
@@ -105,8 +110,8 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 		return constrainedGetter;
 	}
 
-	private static Method findGetter(Class<?> beanClass, String getterName) {
-		final Method method = run( GetMethodFromPropertyName.action( beanClass, getterName ) );
+	private static Method findGetter(Class<?> beanClass, GetterPropertyMatcher getterPropertyMatcher, String getterName) {
+		final Method method = run( GetMethodFromPropertyName.action( beanClass, getterPropertyMatcher, getterName ) );
 		if ( method == null ) {
 			throw LOG.getBeanDoesNotContainThePropertyException( beanClass, getterName );
 		}
