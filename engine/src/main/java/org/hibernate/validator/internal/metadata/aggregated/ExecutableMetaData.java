@@ -60,10 +60,15 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
 public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 	private final Class<?>[] parameterTypes;
+
 	@Immutable
 	private final List<ParameterMetaData> parameterMetaDataList;
+
+	private final ValidatableParametersMetaData validatableParametersMetaData;
+
 	@Immutable
 	private final Set<MetaConstraint<?>> crossParameterConstraints;
+
 	private final boolean isGetter;
 
 	/**
@@ -75,8 +80,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 	private final ReturnValueMetaData returnValueMetaData;
 	private final ElementKind kind;
-
-	private final boolean hasCascadingParameters;
 
 	private ExecutableMetaData(
 			String name,
@@ -102,6 +105,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 		this.parameterTypes = parameterTypes;
 		this.parameterMetaDataList = CollectionHelper.toImmutableList( parameterMetaDataList );
+		this.validatableParametersMetaData = new ValidatableParametersMetaData( parameterMetaDataList );
 		this.crossParameterConstraints = CollectionHelper.toImmutableSet( crossParameterConstraints );
 		this.signatures = signatures;
 		this.returnValueMetaData = new ReturnValueMetaData(
@@ -112,8 +116,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		);
 		this.isGetter = isGetter;
 		this.kind = kind;
-
-		this.hasCascadingParameters = buildHasCascadingParameters( parameterMetaDataList );
 	}
 
 	/**
@@ -156,7 +158,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	}
 
 	public ValidatableParametersMetaData getValidatableParametersMetaData() {
-		return new ValidatableParametersMetaData( parameterMetaDataList );
+		return validatableParametersMetaData;
 	}
 
 	public ReturnValueMetaData getReturnValueMetaData() {
@@ -242,19 +244,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			return false;
 		}
 		return true;
-	}
-
-	public boolean hasCascadingParameters() {
-		return hasCascadingParameters;
-	}
-
-	private boolean buildHasCascadingParameters(List<ParameterMetaData> parameterMetaDataList) {
-		for ( ParameterMetaData parameterMetaData : parameterMetaDataList ) {
-			if ( parameterMetaData.isCascading() ) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**

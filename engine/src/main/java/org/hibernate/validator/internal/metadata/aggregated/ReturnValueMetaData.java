@@ -62,6 +62,11 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	}
 
 	@Override
+	public boolean hasCascadables() {
+		return !cascadables.isEmpty();
+	}
+
+	@Override
 	public ElementType getElementType() {
 		return ElementType.METHOD;
 	}

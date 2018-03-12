@@ -135,11 +135,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final Set<Cascadable> cascadedProperties;
 
 	/**
-	 * Indicates if the bean has at least one cascading property.
-	 */
-	private final boolean hasCascadingProperties;
-
-	/**
 	 * The bean descriptor for this bean.
 	 */
 	private final BeanDescriptor beanDescriptor;
@@ -221,7 +216,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		this.hasConstraints = hasConstraints;
 		this.cascadedProperties = CollectionHelper.toImmutableSet( cascadedProperties );
-		this.hasCascadingProperties = cascadedProperties.size() > 0;
 		this.allMetaConstraints = CollectionHelper.toImmutableSet( allMetaConstraints );
 
 		this.classHierarchyWithoutInterfaces = CollectionHelper.toImmutableList( ClassHierarchyHelper.getHierarchy(
@@ -292,8 +286,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	@Override
-	public boolean hasCascadingProperties() {
-		return hasCascadingProperties;
+	public boolean hasCascadables() {
+		return !cascadedProperties.isEmpty();
 	}
 
 	@Override

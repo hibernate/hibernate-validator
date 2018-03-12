@@ -23,4 +23,8 @@ public interface Validatable {
 	 */
 	Iterable<Cascadable> getCascadables();
 
+	/**
+	 * Returns {@code true} if this validatable has at least one cascadable element, {@code false} otherwise.
+	 */
+	boolean hasCascadables();
 }
