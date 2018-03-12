@@ -569,6 +569,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					// validate cascading on the annotated object
 					if ( effectiveCascadingMetaData.isCascading() ) {
 						validateCascadedAnnotatedObjectForCurrentGroup( value, validationContext, valueContext, effectiveCascadingMetaData );
+
+						if ( shouldFailFast( validationContext ) ) {
+							break;
+						}
 					}
 
 					if ( effectiveCascadingMetaData.isContainer() ) {
@@ -578,6 +582,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 							// validate cascading on the container elements
 							validateCascadedContainerElementsForCurrentGroup( value, validationContext, valueContext,
 									containerCascadingMetaData.getContainerElementTypesCascadingMetaData() );
+
+							if ( shouldFailFast( validationContext ) ) {
+								break;
+							}
 						}
 					}
 				}
