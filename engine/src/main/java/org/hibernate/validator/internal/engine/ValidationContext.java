@@ -41,6 +41,7 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -415,6 +416,7 @@ public class ValidationContext<T> {
 
 	private static boolean buildDisableAlreadyValidatedBeanTracking(ValidationOperation validationOperation, BeanMetaData<?> rootBeanMetaData,
 			Optional<ExecutableMetaData> executableMetaData) {
+		Validatable validatable;
 		switch ( validationOperation ) {
 			case BEAN_VALIDATION:
 			case PROPERTY_VALIDATION:
@@ -422,22 +424,27 @@ public class ValidationContext<T> {
 				// note that in the case of property and value validation, we are considering the root bean, whereas we
 				// could consider the bean of the property or the value. We don't really have the info here though so it
 				// will do for now.
-				return !rootBeanMetaData.hasCascadingProperties();
+				validatable = rootBeanMetaData;
+				break;
 			case PARAMETER_VALIDATION:
 				if ( !executableMetaData.isPresent() ) {
 					// the method is unconstrained so there's no need to worry about the tracking
 					return false;
 				}
-				return !executableMetaData.get().hasCascadingParameters();
+				validatable = executableMetaData.get().getValidatableParametersMetaData();
+				break;
 			case RETURN_VALUE_VALIDATION:
 				if ( !executableMetaData.isPresent() ) {
 					// the method is unconstrained so there's no need to worry about the tracking
 					return false;
 				}
-				return !executableMetaData.get().getReturnValueMetaData().isCascading();
+				validatable = executableMetaData.get().getReturnValueMetaData();
+				break;
 			default:
 				return false;
 		}
+
+		return !validatable.hasCascadables();
 	}
 
 	private String interpolate(String messageTemplate,

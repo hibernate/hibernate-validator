@@ -24,8 +24,9 @@ public class ValidatableParametersMetaData implements Validatable {
 
 	@Immutable
 	private final List<ParameterMetaData> parameterMetaData;
+
 	@Immutable
-	private final Iterable<Cascadable> cascadables;
+	private final List<Cascadable> cascadables;
 
 	public ValidatableParametersMetaData(List<ParameterMetaData> parameterMetaData) {
 		this.parameterMetaData = CollectionHelper.toImmutableList( parameterMetaData );
@@ -39,4 +40,8 @@ public class ValidatableParametersMetaData implements Validatable {
 		return cascadables;
 	}
 
+	@Override
+	public boolean hasCascadables() {
+		return !cascadables.isEmpty();
+	}
 }
