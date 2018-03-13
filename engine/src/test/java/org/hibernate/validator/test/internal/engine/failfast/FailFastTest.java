@@ -42,9 +42,10 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.test.internal.engine.failfast.FailFastTest.FooBar;
+import org.hibernate.validator.test.internal.engine.failfast.FailFastTest.FooConstraint;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
 import org.testng.annotations.Test;
 
 /**
@@ -263,6 +264,41 @@ public class FailFastTest {
 		);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1588")
+	public void testFailFastCascadingMethodValidation() {
+		// Default mode
+
+		TestService service = getValidatingProxy( new TestServiceImpl(), ValidatorUtil.getValidator() );
+
+		try {
+			A a = new A();
+			a.b = "test";
+			a.c = "not an email";
+
+			B b = new B();
+
+			service.cascadingMethod( a, b );
+			fail();
+		}
+		catch (ConstraintViolationException e) {
+			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+					violationOf( Email.class ),
+					violationOf( NotNull.class )
+			);
+		}
+
+		// Fail fast
+
+		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
+		final ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
+
+		final Validator validator = factory.getValidator();
+		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
+		// we cannot test the constraints any further as the execution order is not deterministic
+		assertThat( constraintViolations ).hasSize( 1 );
+	}
+
 	public void testFailSafePerformance() {
 		final Validator regularValidator = ValidatorUtil.getConfiguration().buildValidatorFactory().getValidator();
 		final Validator failFastValidator = ValidatorUtil.getConfiguration()
@@ -343,11 +379,17 @@ public class FailFastTest {
 
 	interface TestService {
 		void testMethod(@Min(2) @NotBlank String param1, @NotNull String param2);
+
+		void cascadingMethod(@Valid A param1, @Valid B param2);
 	}
 
 	class TestServiceImpl implements TestService {
 		@Override
 		public void testMethod(String param1, String param2) {
+		}
+
+		@Override
+		public void cascadingMethod(@Valid A param1, @Valid B param2) {
 		}
 	}
 
