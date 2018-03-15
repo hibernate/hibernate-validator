@@ -20,6 +20,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -120,7 +121,13 @@ public abstract class ConstraintTree<A extends Annotation> {
 					validator = constraintValidatorForDefaultConstraintValidatorFactory;
 					if ( validator == null ) {
 						validator = getInitializedConstraintValidator( validationContext );
-						constraintValidatorForDefaultConstraintValidatorFactory = validator;
+
+						// HibernateConstraintValidator instances should not be cached within this constraint tree instance, only ConstraintValidatorManager
+						// should handle their caching. That's because the HibernateConstraintValidatorInitializationContext influences their caching behaviour.
+						// (HibernateConstraintValidatorInitializationContext could have changed during a ValidatorFactory lifetime - via usingContext())
+						if ( !( validator instanceof HibernateConstraintValidator ) ) {
+							constraintValidatorForDefaultConstraintValidatorFactory = validator;
+						}
 					}
 				}
 			}
