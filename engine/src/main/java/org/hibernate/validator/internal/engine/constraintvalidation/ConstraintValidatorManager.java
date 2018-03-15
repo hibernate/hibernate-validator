@@ -110,7 +110,7 @@ public class ConstraintValidatorManager {
 		Contracts.assertNotNull( constraintValidatorFactory );
 		Contracts.assertNotNull( initializationContext );
 
-		CacheKey key = new CacheKey( descriptor.getAnnotationDescriptor(), validatedValueType, constraintValidatorFactory );
+		CacheKey key = new CacheKey( descriptor.getAnnotationDescriptor(), validatedValueType, constraintValidatorFactory, initializationContext );
 
 		@SuppressWarnings("unchecked")
 		ConstraintValidator<A, ?> constraintValidator = (ConstraintValidator<A, ?>) constraintValidatorCache.get( key );
@@ -281,12 +281,14 @@ public class ConstraintValidatorManager {
 		private final ConstraintAnnotationDescriptor<?> annotationDescriptor;
 		private final Type validatedType;
 		private final ConstraintValidatorFactory constraintValidatorFactory;
+		private final HibernateConstraintValidatorInitializationContext initializationContext;
 		private final int hashCode;
 
-		private CacheKey(ConstraintAnnotationDescriptor<?> annotationDescriptor, Type validatorType, ConstraintValidatorFactory constraintValidatorFactory) {
+		private CacheKey(ConstraintAnnotationDescriptor<?> annotationDescriptor, Type validatorType, ConstraintValidatorFactory constraintValidatorFactory, HibernateConstraintValidatorInitializationContext initializationContext) {
 			this.annotationDescriptor = annotationDescriptor;
 			this.validatedType = validatorType;
 			this.constraintValidatorFactory = constraintValidatorFactory;
+			this.initializationContext = initializationContext;
 			this.hashCode = createHashCode();
 		}
 
@@ -314,6 +316,9 @@ public class ConstraintValidatorManager {
 			if ( !constraintValidatorFactory.equals( cacheKey.constraintValidatorFactory ) ) {
 				return false;
 			}
+			if ( !initializationContext.equals( cacheKey.initializationContext ) ) {
+				return false;
+			}
 
 			return true;
 		}
@@ -327,6 +332,7 @@ public class ConstraintValidatorManager {
 			int result = annotationDescriptor.hashCode();
 			result = 31 * result + validatedType.hashCode();
 			result = 31 * result + constraintValidatorFactory.hashCode();
+			result = 31 * result + initializationContext.hashCode();
 			return result;
 		}
 	}

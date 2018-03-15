@@ -27,12 +27,15 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 
 	private final Object constraintValidatorPayload;
 
+	private final int hashCode;
+
 	public HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider,
 			Duration temporalValidationTolerance, Object constraintValidatorPayload) {
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.clockProvider = clockProvider;
 		this.temporalValidationTolerance = temporalValidationTolerance;
 		this.constraintValidatorPayload = constraintValidatorPayload;
+		this.hashCode = createHashCode();
 	}
 
 	@Override
@@ -58,5 +61,44 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		else {
 			return null;
 		}
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+
+		HibernateConstraintValidatorInitializationContextImpl hibernateConstraintValidatorInitializationContextImpl = (HibernateConstraintValidatorInitializationContextImpl) o;
+
+		if ( scriptEvaluatorFactory != hibernateConstraintValidatorInitializationContextImpl.scriptEvaluatorFactory ) {
+			return false;
+		}
+		if ( clockProvider != hibernateConstraintValidatorInitializationContextImpl.clockProvider ) {
+			return false;
+		}
+		if ( !temporalValidationTolerance.equals( hibernateConstraintValidatorInitializationContextImpl.temporalValidationTolerance ) ) {
+			return false;
+		}
+		if ( constraintValidatorPayload != hibernateConstraintValidatorInitializationContextImpl.constraintValidatorPayload ) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return hashCode;
+	}
+
+	private int createHashCode() {
+		int result = System.identityHashCode( scriptEvaluatorFactory );
+		result = 31 * result + System.identityHashCode( clockProvider );
+		result = 31 * result + ( temporalValidationTolerance != null ? temporalValidationTolerance.hashCode() : 0 );
+		result = 31 * result + System.identityHashCode( constraintValidatorPayload );
+		return result;
 	}
 }
