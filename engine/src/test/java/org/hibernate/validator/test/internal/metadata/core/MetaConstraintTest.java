@@ -50,15 +50,15 @@ public class MetaConstraintTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-930")
 	public void two_meta_constraints_for_the_same_constraint_should_be_equal() throws Exception {
-		DefaultGetterPropertyMatcher propertyFilter = new DefaultGetterPropertyMatcher();
+		DefaultGetterPropertyMatcher getterPropertyMatcher = new DefaultGetterPropertyMatcher();
 		ConstraintDescriptorImpl<NotNull> constraintDescriptor1 = new ConstraintDescriptorImpl<>(
-				constraintHelper, JavaBean.toJavaBeanExecutable( propertyFilter, barMethod ), constraintAnnotationDescriptor, METHOD
+				constraintHelper, JavaBean.toJavaBeanExecutable( getterPropertyMatcher, barMethod ), constraintAnnotationDescriptor, METHOD
 		);
 		ConstraintLocation location1 = ConstraintLocation.forClass( Foo.class );
 		MetaConstraint<NotNull> metaConstraint1 = MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor1, location1 );
 
 		ConstraintDescriptorImpl<NotNull> constraintDescriptor2 = new ConstraintDescriptorImpl<>(
-				constraintHelper, JavaBean.toJavaBeanExecutable( propertyFilter, barMethod ), constraintAnnotationDescriptor, METHOD
+				constraintHelper, JavaBean.toJavaBeanExecutable( getterPropertyMatcher, barMethod ), constraintAnnotationDescriptor, METHOD
 		);
 		ConstraintLocation location2 = ConstraintLocation.forClass( Foo.class );
 		MetaConstraint<NotNull> metaConstraint2 = MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor2, location2 );

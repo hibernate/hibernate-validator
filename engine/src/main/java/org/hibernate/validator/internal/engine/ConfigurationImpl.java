@@ -42,6 +42,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -53,6 +54,7 @@ import org.hibernate.validator.internal.xml.config.ValidationBootstrapParameters
 import org.hibernate.validator.internal.xml.config.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.spi.properties.GetterPropertyMatcher;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -103,6 +105,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private ScriptEvaluatorFactory scriptEvaluatorFactory;
 	private Duration temporalValidationTolerance;
 	private Object constraintValidatorPayload;
+	private GetterPropertyMatcher getterPropertyMatcher;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -294,6 +297,14 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
+	@Override
+	public HibernateValidatorConfiguration getterPropertyMatcher(GetterPropertyMatcher getterPropertyMatcher) {
+		Contracts.assertNotNull( getterPropertyMatcher, MESSAGES.parameterMustNotBeNull( "getterPropertyMatcher" ) );
+
+		this.getterPropertyMatcher = getterPropertyMatcher;
+		return this;
+	}
+
 	public boolean isAllowParallelMethodsDefineParameterConstraints() {
 		return this.methodValidationConfigurationBuilder.isAllowParallelMethodsDefineParameterConstraints();
 	}
@@ -304,7 +315,17 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final DefaultConstraintMapping createConstraintMapping() {
-		return new DefaultConstraintMapping();
+		GetterPropertyMatcher getterPropertyMatcherToUse = null;
+		if ( getterPropertyMatcher == null ) {
+			getterPropertyMatcherToUse = new DefaultGetterPropertyMatcher();
+			LOG.creatingConstraintMappingPriorToBuildingFactoryWithoutDefinedFilter();
+		}
+		else {
+			getterPropertyMatcherToUse = getterPropertyMatcher;
+		}
+		LOG.creatingConstraintMappingPriorToBuildingFactory( getterPropertyMatcherToUse.getClass() );
+
+		return new DefaultConstraintMapping( getterPropertyMatcherToUse );
 	}
 
 	@Override
@@ -448,6 +469,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public Object getConstraintValidatorPayload() {
 		return constraintValidatorPayload;
+	}
+
+	public GetterPropertyMatcher getGetterPropertyMatcher() {
+		return getterPropertyMatcher;
 	}
 
 	@Override
