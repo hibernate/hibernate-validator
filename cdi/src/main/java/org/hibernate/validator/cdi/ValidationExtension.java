@@ -259,7 +259,8 @@ public class ValidationExtension implements Extension {
 		for ( AnnotatedMethod<? super T> annotatedMethod : type.getMethods() ) {
 			Method method = annotatedMethod.getJavaMember();
 
-			boolean isGetter = ReflectionHelper.isGetterMethod( method );
+			//TODO: need to update the getter logic here:
+			boolean isGetter = false/*ReflectionHelper.isGetterMethod( method )*/;
 
 			// obtain @ValidateOnExecution from the top-most method in the hierarchy
 			Method methodForExecutableTypeRetrieval = replaceWithOverriddenOrInterfaceMethod( method, overriddenAndImplementedMethods );

@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.xml.mapping;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.Set;
@@ -24,7 +23,7 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.properties.Callable;
-import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.properties.javabean.JavaBean;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -60,12 +59,12 @@ class ConstrainedParameterStaxBuilder extends AbstractConstrainedElementStaxBuil
 		return PARAMETER_QNAME_LOCAL_PART;
 	}
 
-	public Class<?> getParameterType(Class<?> beanClass) {
+	public Class<?> getParameterType(JavaBean javaBean) {
 		try {
 			return classLoadingHelper.loadClass( mainAttributeValue, defaultPackageStaxBuilder.build().orElse( "" ) );
 		}
 		catch (ValidationException e) {
-			throw LOG.getInvalidParameterTypeException( mainAttributeValue, beanClass );
+			throw LOG.getInvalidParameterTypeException( mainAttributeValue, javaBean );
 		}
 	}
 

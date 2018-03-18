@@ -38,7 +38,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.internal.xml.CloseIgnoringInputStream;
 import org.hibernate.validator.internal.xml.XmlParserHelper;
-import org.hibernate.validator.properties.GetterPropertyMatcher;
+import org.hibernate.validator.spi.properties.GetterPropertyMatcher;
 
 import org.xml.sax.SAXException;
 

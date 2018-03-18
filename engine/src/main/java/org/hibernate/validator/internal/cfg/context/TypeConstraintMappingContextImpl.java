@@ -11,13 +11,11 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -35,20 +33,15 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.properties.Property;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
+import org.hibernate.validator.internal.properties.javabean.JavaBean;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromPropertyName;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
-import org.hibernate.validator.properties.GetterPropertyMatcher;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.spi.properties.GetterPropertyMatcher;
 
 /**
  * Constraint mapping creational context which allows to configure the class-level constraints for one bean.
@@ -58,6 +51,7 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
+ * @author Marko Bekhta
  */
 public final class TypeConstraintMappingContextImpl<C> extends ConstraintMappingContextImplBase
 		implements TypeConstraintMappingContext<C> {
@@ -65,6 +59,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Class<C> beanClass;
+	private final JavaBean javaBean;
 
 	private final Set<ExecutableConstraintMappingContextImpl> executableContexts = newHashSet();
 	private final Set<PropertyConstraintMappingContextImpl> propertyContexts = newHashSet();
@@ -73,12 +68,10 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	private List<Class<?>> defaultGroupSequence;
 	private Class<? extends DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass;
 
-	private final GetterPropertyMatcher getterPropertyMatcher;
-
 	TypeConstraintMappingContextImpl(DefaultConstraintMapping mapping, Class<C> beanClass, GetterPropertyMatcher getterPropertyMatcher) {
 		super( mapping );
 		this.beanClass = beanClass;
-		this.getterPropertyMatcher = getterPropertyMatcher;
+		this.javaBean = new JavaBean( getterPropertyMatcher, beanClass );
 		mapping.getAnnotationProcessingOptions().ignoreAnnotationConstraintForClass( beanClass, Boolean.FALSE );
 	}
 
@@ -123,24 +116,24 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		Contracts.assertNotNull( elementType, "The element type must not be null." );
 		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
 
-		Property member = getProperty(
+		Optional<Property> member = getProperty(
 				beanClass, property, elementType
 		);
 
-		if ( member == null || member.getDeclaringClass() != beanClass ) {
+		if ( !member.isPresent() || member.get().getDeclaringClass() != beanClass ) {
 			throw LOG.getUnableToFindPropertyWithAccessException( beanClass, property, elementType );
 		}
-
-		if ( configuredMembers.contains( member ) ) {
+		Property constrainable = member.get();
+		if ( configuredMembers.contains( constrainable ) ) {
 			throw LOG.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass, property );
 		}
 
 		PropertyConstraintMappingContextImpl context = new PropertyConstraintMappingContextImpl(
 				this,
-				member
+				constrainable
 		);
 
-		configuredMembers.add( member );
+		configuredMembers.add( constrainable );
 		propertyContexts.add( context );
 		return context;
 	}
@@ -149,14 +142,13 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
 		Contracts.assertNotNull( name, MESSAGES.methodNameMustNotBeNull() );
 
-		Method method = run( GetDeclaredMethod.action( beanClass, name, parameterTypes ) );
+		Optional<Callable> method = javaBean.getCallableByNameAndParameters( name, parameterTypes );
 
-		if ( method == null || method.getDeclaringClass() != beanClass ) {
-			throw LOG.getBeanDoesNotContainMethodException( beanClass, name, parameterTypes );
+		if ( !method.isPresent() || method.get().getDeclaringClass() != beanClass ) {
+			throw LOG.getBeanDoesNotContainMethodException( javaBean, name, parameterTypes );
 		}
 
-		Callable callable = JavaBeanExecutable.of( getterPropertyMatcher, method );
-
+		Callable callable = method.get();
 		if ( configuredMembers.contains( callable ) ) {
 			throw LOG.getMethodHasAlreadyBeenConfiguredViaProgrammaticApiException(
 					beanClass,
@@ -173,16 +165,16 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	@Override
 	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
-		Constructor<C> constructor = run( GetDeclaredConstructor.action( beanClass, parameterTypes ) );
+		Optional<Callable> constructor = javaBean.getConstructorByParameters( parameterTypes );
 
-		if ( constructor == null || constructor.getDeclaringClass() != beanClass ) {
+		if ( !constructor.isPresent() || constructor.get().getDeclaringClass() != beanClass ) {
 			throw LOG.getBeanDoesNotContainConstructorException(
-					beanClass,
+					javaBean,
 					parameterTypes
 			);
 		}
 
-		Callable callable = JavaBeanExecutable.of( getterPropertyMatcher, constructor );
+		Callable callable = constructor.get();
 
 		if ( configuredMembers.contains( callable ) ) {
 			throw LOG.getConstructorHasAlreadyBeConfiguredViaProgrammaticApiException(
@@ -263,9 +255,9 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	 * @param property The property name without "is", "get" or "has". Cannot be {@code null} or empty.
 	 * @param elementType The element type. Either {@code ElementType.FIELD} or {@code ElementType METHOD}.
 	 *
-	 * @return the member which matching the name and type or {@code null} if no such member exists.
+	 * @return the member which matching the name and type or {@link Optional#empty()} if no such member exists.
 	 */
-	private Property getProperty(Class<?> clazz, String property, ElementType elementType) {
+	private Optional<Property> getProperty(Class<?> clazz, String property, ElementType elementType) {
 		Contracts.assertNotNull( clazz, MESSAGES.classCannotBeNull() );
 
 		if ( property == null || property.length() == 0 ) {
@@ -277,13 +269,10 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		}
 
 		if ( ElementType.FIELD.equals( elementType ) ) {
-			Field field = run( GetDeclaredField.action( clazz, property ) );
-			return field == null ? null : new JavaBeanField( field );
+			return javaBean.getFieldPropertyByName( property );
 		}
 		else {
-			Method method = GetMethodFromPropertyName.action( clazz, getterPropertyMatcher, property ).run();
-
-			return method == null ? null : JavaBeanExecutable.of( getterPropertyMatcher, method ).as( Property.class );
+			return javaBean.getCallablePropertyByName( property );
 		}
 	}
 

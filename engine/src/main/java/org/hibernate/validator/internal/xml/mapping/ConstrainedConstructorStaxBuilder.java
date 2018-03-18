@@ -7,9 +7,6 @@
 package org.hibernate.validator.internal.xml.mapping;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -26,13 +23,12 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
+import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.javabean.JavaBean;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
-import org.hibernate.validator.properties.GetterPropertyMatcher;
 
 /**
  * Builder for constrained constructors.
@@ -68,28 +64,15 @@ class ConstrainedConstructorStaxBuilder extends AbstractConstrainedExecutableEle
 		return mainAttributeValue;
 	}
 
-	ConstrainedExecutable build(Class<?> beanClass, GetterPropertyMatcher getterPropertyMatcher, List<Constructor<?>> alreadyProcessedConstructors) {
+	ConstrainedExecutable build(JavaBean javaBean, List<Callable> alreadyProcessedConstructors) {
 		Class<?>[] parameterTypes = constrainedParameterStaxBuilders.stream()
-				.map( builder -> builder.getParameterType( beanClass ) )
+				.map( builder -> builder.getParameterType( javaBean ) )
 				.toArray( Class[]::new );
 
-		final Constructor<?> constructor = run(
-				GetDeclaredConstructor.action(
-						beanClass,
-						parameterTypes
-				)
-		);
-
-		if ( constructor == null ) {
-			throw LOG.getBeanDoesNotContainConstructorException(
-					beanClass,
-					parameterTypes
-			);
-		}
-		JavaBeanExecutable executable = JavaBeanExecutable.of( getterPropertyMatcher, constructor );
+		final Callable constructor = findConstructor( javaBean, parameterTypes );
 
 		if ( alreadyProcessedConstructors.contains( constructor ) ) {
-			throw LOG.getConstructorIsDefinedTwiceInMappingXmlForBeanException( constructor, beanClass );
+			throw LOG.getConstructorIsDefinedTwiceInMappingXmlForBeanException( constructor, javaBean );
 		}
 		else {
 			alreadyProcessedConstructors.add( constructor );
@@ -98,7 +81,7 @@ class ConstrainedConstructorStaxBuilder extends AbstractConstrainedExecutableEle
 		// ignore annotations
 		if ( ignoreAnnotations.isPresent() ) {
 			annotationProcessingOptions.ignoreConstraintAnnotationsOnMember(
-					executable,
+					constructor,
 					ignoreAnnotations.get()
 			);
 		}
@@ -106,21 +89,21 @@ class ConstrainedConstructorStaxBuilder extends AbstractConstrainedExecutableEle
 		List<ConstrainedParameter> constrainedParameters = CollectionHelper.newArrayList( constrainedParameterStaxBuilders.size() );
 		for ( int index = 0; index < constrainedParameterStaxBuilders.size(); index++ ) {
 			ConstrainedParameterStaxBuilder builder = constrainedParameterStaxBuilders.get( index );
-			constrainedParameters.add( builder.build( executable, index ) );
+			constrainedParameters.add( builder.build( constructor, index ) );
 		}
 
 		Set<MetaConstraint<?>> crossParameterConstraints = getCrossParameterStaxBuilder()
-				.map( builder -> builder.build( executable ) ).orElse( Collections.emptySet() );
+				.map( builder -> builder.build( constructor ) ).orElse( Collections.emptySet() );
 
 		// parse the return value
 		Set<MetaConstraint<?>> returnValueConstraints = new HashSet<>();
 		Set<MetaConstraint<?>> returnValueTypeArgumentConstraints = new HashSet<>();
-		CascadingMetaDataBuilder cascadingMetaDataBuilder = getReturnValueStaxBuilder().map( builder -> builder.build( executable, returnValueConstraints, returnValueTypeArgumentConstraints ) )
+		CascadingMetaDataBuilder cascadingMetaDataBuilder = getReturnValueStaxBuilder().map( builder -> builder.build( constructor, returnValueConstraints, returnValueTypeArgumentConstraints ) )
 				.orElse( CascadingMetaDataBuilder.nonCascading() );
 
 		return new ConstrainedExecutable(
 				ConfigurationSource.XML,
-				executable,
+				constructor,
 				constrainedParameters,
 				crossParameterConstraints,
 				returnValueConstraints,
@@ -129,13 +112,8 @@ class ConstrainedConstructorStaxBuilder extends AbstractConstrainedExecutableEle
 		);
 	}
 
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 *
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	private Callable findConstructor(JavaBean javaBean, Class<?>[] parameterTypes) {
+		return javaBean.getConstructorByParameters( parameterTypes )
+				.orElseThrow( () -> LOG.getBeanDoesNotContainConstructorException( javaBean, parameterTypes ) );
 	}
 }
