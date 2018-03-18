@@ -871,7 +871,7 @@ public interface Log extends BasicLogger {
 	void creatingConstraintMappingPriorToBuildingFactory(@FormatWith(ClassObjectFormatter.class) Class<? extends GetterPropertyMatcher> getterPropertyMatcherClass);
 
 	@LogMessage(level = WARN)
-	@Message(id = 247, value = "As no property filter was defined for current configuration a default one will be used.")
+	@Message(id = 247, value = "As no getter property matcher was defined for current configuration a default one will be used.")
 	void creatingConstraintMappingPriorToBuildingFactoryWithoutDefinedFilter();
 
 	@Message(id = 248, value = "Unable to access field %3$s of class %2$s using lookup %1$s.")

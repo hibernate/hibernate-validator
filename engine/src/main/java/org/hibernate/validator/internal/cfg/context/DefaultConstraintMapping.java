@@ -24,11 +24,11 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
-import org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.properties.GetterPropertyMatcher;
 
 /**
  * Default implementation of {@link ConstraintMapping}.
@@ -41,13 +41,15 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
+	private final GetterPropertyMatcher getterPropertyMatcher;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 	private final Set<Class<?>> configuredTypes;
 	private final Set<TypeConstraintMappingContextImpl<?>> typeContexts;
 	private final Set<Class<?>> definedConstraints;
 	private final Set<ConstraintDefinitionContextImpl<?>> constraintContexts;
 
-	public DefaultConstraintMapping() {
+	public DefaultConstraintMapping(GetterPropertyMatcher getterPropertyMatcher) {
+		this.getterPropertyMatcher = getterPropertyMatcher;
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 		this.configuredTypes = newHashSet();
 		this.typeContexts = newHashSet();
@@ -63,7 +65,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 			throw LOG.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( type );
 		}
 
-		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<>( this, type, new DefaultGetterPropertyMatcher() );
+		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<>( this, type, getterPropertyMatcher );
 		typeContexts.add( typeContext );
 		configuredTypes.add( type );
 
