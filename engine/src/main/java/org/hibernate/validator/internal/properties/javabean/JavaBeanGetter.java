@@ -17,12 +17,11 @@ import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.properties.ExecutableProperty;
 
 /**
  * @author Marko Bekhta
  */
-public class JavaBeanGetter extends JavaBeanExecutable implements Property, ExecutableProperty {
+public class JavaBeanGetter extends JavaBeanExecutable implements Property {
 
 	private static final Class<?>[] PARAMETER_TYPES = new Class[0];
 

@@ -21,7 +21,7 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.xml.mapping.MappingXmlParser;
-import org.hibernate.validator.properties.GetterPropertyMatcher;
+import org.hibernate.validator.spi.properties.GetterPropertyMatcher;
 
 /**
  * A {@link MetaDataProvider} providing constraint related meta data based on

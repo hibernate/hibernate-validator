@@ -25,10 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.properties.GetterPropertyMatcher;
 
 /**
  * Some reflection utility methods. Where necessary calls will be performed as {@code PrivilegedAction} which is necessary
@@ -124,29 +122,6 @@ public final class ReflectionHelper {
 			}
 		}
 		return name;
-	}
-
-	private static final GetterPropertyMatcher PROPERTY_FILTER = new DefaultGetterPropertyMatcher();
-
-	/**
-	 * Checks whether the given executable is a valid JavaBeans getter method, which
-	 * is the case if
-	 * <ul>
-	 * <li>its name starts with "get" and it has a return type but no parameter or</li>
-	 * <li>its name starts with "is", it has no parameter and is returning
-	 * {@code boolean} or</li>
-	 * <li>its name starts with "has", it has no parameter and is returning
-	 * {@code boolean} (HV-specific, not mandated by JavaBeans spec).</li>
-	 * </ul>
-	 *
-	 * @param executable The executable of interest.
-	 *
-	 * @return {@code true}, if the given executable is a JavaBeans getter method,
-	 *         {@code false} otherwise.
-	 */
-	@Deprecated
-	public static boolean isGetterMethod(Executable executable) {
-		return PROPERTY_FILTER.isProperty( executable );
 	}
 
 	/**

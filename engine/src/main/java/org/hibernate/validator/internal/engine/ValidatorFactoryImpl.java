@@ -60,7 +60,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
-import org.hibernate.validator.properties.GetterPropertyMatcher;
+import org.hibernate.validator.spi.properties.GetterPropertyMatcher;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 

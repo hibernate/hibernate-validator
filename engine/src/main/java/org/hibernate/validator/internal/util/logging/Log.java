@@ -13,10 +13,8 @@ import static org.jboss.logging.Logger.Level.WARN;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles.Lookup;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.time.Duration;
@@ -50,16 +48,19 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
+import org.hibernate.validator.internal.properties.ConstrainableType;
 import org.hibernate.validator.internal.util.logging.formatter.ArrayOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ClassObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfObjectsToStringFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ConstrainableFormatter;
+import org.hibernate.validator.internal.util.logging.formatter.ConstrainableTypeObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.DurationFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ObjectArrayFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
 import org.hibernate.validator.internal.xml.mapping.ContainerElementTypePath;
+import org.hibernate.validator.spi.properties.GetterPropertyMatcher;
 import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
@@ -385,13 +386,13 @@ public interface Log extends BasicLogger {
 	ValidationException getBeanClassHasAlreadyBeenConfiguredInXmlException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
 
 	@Message(id = 104, value = "%1$s is defined twice in mapping xml for bean %2$s.")
-	ValidationException getIsDefinedTwiceInMappingXmlForBeanException(String name, @FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
+	ValidationException getIsDefinedTwiceInMappingXmlForBeanException(String name, @FormatWith(ConstrainableTypeObjectFormatter.class) ConstrainableType constrainableType);
 
 	@Message(id = 105, value = "%1$s does not contain the fieldType %2$s.")
-	ValidationException getBeanDoesNotContainTheFieldException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String fieldName);
+	ValidationException getBeanDoesNotContainTheFieldException(@FormatWith(ConstrainableTypeObjectFormatter.class) ConstrainableType constrainableType, String fieldName);
 
 	@Message(id = 106, value = "%1$s does not contain the property %2$s.")
-	ValidationException getBeanDoesNotContainThePropertyException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String getterName);
+	ValidationException getBeanDoesNotContainThePropertyException(@FormatWith(ConstrainableTypeObjectFormatter.class) ConstrainableType constrainableType, String getterName);
 
 	@Message(id = 107, value = "Annotation of type %1$s does not contain a parameter %2$s.")
 	ValidationException getAnnotationDoesNotContainAParameterException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass,
@@ -470,24 +471,24 @@ public interface Log extends BasicLogger {
 	ConstraintDeclarationException getVoidMethodsMustNotBeConstrainedException(@FormatWith(ConstrainableFormatter.class) Callable callable);
 
 	@Message(id = 133, value = "%1$s does not contain a constructor with the parameter types %2$s.")
-	ValidationException getBeanDoesNotContainConstructorException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass,
+	ValidationException getBeanDoesNotContainConstructorException(@FormatWith(ConstrainableTypeObjectFormatter.class) ConstrainableType constrainableType,
 			@FormatWith(ArrayOfClassesObjectFormatter.class) Class<?>[] parameterTypes);
 
 	@Message(id = 134, value = "Unable to load parameter of type '%1$s' in %2$s.")
-	ValidationException getInvalidParameterTypeException(String type, @FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
+	ValidationException getInvalidParameterTypeException(String type, @FormatWith(ConstrainableTypeObjectFormatter.class) ConstrainableType constrainableType);
 
 	@Message(id = 135, value = "%1$s does not contain a method with the name '%2$s' and parameter types %3$s.")
-	ValidationException getBeanDoesNotContainMethodException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String methodName,
+	ValidationException getBeanDoesNotContainMethodException(@FormatWith(ConstrainableTypeObjectFormatter.class) ConstrainableType constrainableType, String methodName,
 			@FormatWith(ArrayOfClassesObjectFormatter.class) Class<?>[] parameterTypes);
 
 	@Message(id = 136, value = "The specified constraint annotation class %1$s cannot be loaded.")
 	ValidationException getUnableToLoadConstraintAnnotationClassException(String constraintAnnotationClassName, @Cause Exception e);
 
 	@Message(id = 137, value = "The method '%1$s' is defined twice in the mapping xml for bean %2$s.")
-	ValidationException getMethodIsDefinedTwiceInMappingXmlForBeanException(Method name, @FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
+	ValidationException getMethodIsDefinedTwiceInMappingXmlForBeanException(Callable callable, @FormatWith(ConstrainableTypeObjectFormatter.class) ConstrainableType constrainableType);
 
 	@Message(id = 138, value = "The constructor '%1$s' is defined twice in the mapping xml for bean %2$s.")
-	ValidationException getConstructorIsDefinedTwiceInMappingXmlForBeanException(Constructor<?> name, @FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
+	ValidationException getConstructorIsDefinedTwiceInMappingXmlForBeanException(Callable constructor, @FormatWith(ConstrainableTypeObjectFormatter.class) ConstrainableType constrainableType);
 
 	@Message(id = 139,
 			value = "The constraint '%1$s' defines multiple cross parameter validators. Only one is allowed.")
@@ -857,4 +858,22 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidator<?, ?>> constraintValidatorImplementationType,
 			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> registeredConstraintAnnotationType,
 			@FormatWith(TypeFormatter.class) Type declaredConstraintAnnotationType);
+
+	@LogMessage(level = INFO)
+	@Message(id = 244, value = "Using %s as getter property matcher.")
+	void usingGetterPropertyMatcher(@FormatWith(ClassObjectFormatter.class) Class<? extends GetterPropertyMatcher> getterPropertyMatcherClass);
+
+	@Message(id = 245, value = "Unable to instantiate getter property matcher class %s.")
+	ValidationException getUnableToInstantiateGetterPropertyMatcherClassException(String getterPropertyMatcherClassName, @Cause Exception e);
+
+	@LogMessage(level = WARN)
+	@Message(id = 246, value = "Note that constraint mappings will be build with %s getter property matcher.")
+	void creatingConstraintMappingPriorToBuildingFactory(@FormatWith(ClassObjectFormatter.class) Class<? extends GetterPropertyMatcher> getterPropertyMatcherClass);
+
+	@LogMessage(level = WARN)
+	@Message(id = 247, value = "As no property filter was defined for current configuration a default one will be used.")
+	void creatingConstraintMappingPriorToBuildingFactoryWithoutDefinedFilter();
+
+	@Message(id = 248, value = "Unable to access field %3$s of class %2$s using lookup %1$s.")
+	ValidationException getUnableToAccessFieldException(Lookup lookup, @FormatWith(ClassObjectFormatter.class) Class<?> clazz, String property, @Cause Throwable e);
 }

@@ -37,7 +37,7 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
-import org.hibernate.validator.properties.GetterPropertyMatcher;
+import org.hibernate.validator.spi.properties.GetterPropertyMatcher;
 
 /**
  * This manager is in charge of providing all constraint related meta data
