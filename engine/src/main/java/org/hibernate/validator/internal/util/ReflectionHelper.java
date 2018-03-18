@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.util;
 
-import static org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher.PROPERTY_ACCESSOR_PREFIXES;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 import java.lang.invoke.MethodHandles;
@@ -81,47 +80,6 @@ public final class ReflectionHelper {
 	 * Private constructor in order to avoid instantiation.
 	 */
 	private ReflectionHelper() {
-	}
-
-	/**
-	 * Returns the JavaBeans property name of the given member.
-	 * <p>
-	 * For fields, the field name will be returned. For getter methods, the
-	 * decapitalized property name will be returned, with the "get", "is" or "has"
-	 * prefix stripped off. Getter methods are methods
-	 * </p>
-	 * <ul>
-	 * <li>whose name start with "get" and who have a return type but no parameter
-	 * or</li>
-	 * <li>whose name starts with "is" and who have no parameter and return
-	 * {@code boolean} or</li>
-	 * <li>whose name starts with "has" and who have no parameter and return
-	 * {@code boolean} (HV-specific, not mandated by JavaBeans spec).</li>
-	 * </ul>
-	 *
-	 * @param member The member for which to get the property name.
-	 *
-	 * @return The property name for the given member or {@code null} if the
-	 *         member is neither a field nor a getter method according to the
-	 *         JavaBeans standard.
-	 */
-	@Deprecated
-	public static String getPropertyName(Member member) {
-		String name = null;
-
-		if ( member instanceof Field ) {
-			name = member.getName();
-		}
-
-		if ( member instanceof Method ) {
-			String methodName = member.getName();
-			for ( String prefix : PROPERTY_ACCESSOR_PREFIXES ) {
-				if ( methodName.startsWith( prefix ) ) {
-					name = StringHelper.decapitalize( methodName.substring( prefix.length() ) );
-				}
-			}
-		}
-		return name;
 	}
 
 	/**

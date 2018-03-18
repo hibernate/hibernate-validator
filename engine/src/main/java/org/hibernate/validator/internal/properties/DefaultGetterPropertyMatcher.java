@@ -18,7 +18,7 @@ public class DefaultGetterPropertyMatcher implements GetterPropertyMatcher {
 	private static final String PROPERTY_ACCESSOR_PREFIX_GET = "get";
 	private static final String PROPERTY_ACCESSOR_PREFIX_IS = "is";
 	private static final String PROPERTY_ACCESSOR_PREFIX_HAS = "has";
-	public static final String[] PROPERTY_ACCESSOR_PREFIXES = {
+	private static final String[] PROPERTY_ACCESSOR_PREFIXES = {
 			PROPERTY_ACCESSOR_PREFIX_GET,
 			PROPERTY_ACCESSOR_PREFIX_IS,
 			PROPERTY_ACCESSOR_PREFIX_HAS
