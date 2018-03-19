@@ -113,7 +113,8 @@ public class OsgiIntegrationTest {
 						"featuresBoot",
 						"system"
 				),
-				features( hibernateValidatorFeature, "hibernate-validator" )
+				features( hibernateValidatorFeature, "hibernate-validator", "hibernate-validator-jsoup", "hibernate-validator-joda-time",
+						"hibernate-validator-javax-money", "hibernate-validator-groovy" )
 		);
 	}
 

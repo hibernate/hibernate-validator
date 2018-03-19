@@ -106,6 +106,30 @@ public class KarafFeaturesAreInstallableTest {
 	}
 
 	@Test
+	public void canInstallFeatureHibernateValidatorJsoup() throws Exception {
+		featuresService.addRepository( new URI( System.getProperty( "validatorRepositoryUrl" ) ) );
+		canInstallFeature( "hibernate-validator-jsoup" );
+	}
+
+	@Test
+	public void canInstallFeatureHibernateValidatorJodaTime() throws Exception {
+		featuresService.addRepository( new URI( System.getProperty( "validatorRepositoryUrl" ) ) );
+		canInstallFeature( "hibernate-validator-joda-time" );
+	}
+
+	@Test
+	public void canInstallFeatureHibernateValidatorJavaxMoney() throws Exception {
+		featuresService.addRepository( new URI( System.getProperty( "validatorRepositoryUrl" ) ) );
+		canInstallFeature( "hibernate-validator-javax-money" );
+	}
+
+	@Test
+	public void canInstallFeatureHibernateValidatorGroovy() throws Exception {
+		featuresService.addRepository( new URI( System.getProperty( "validatorRepositoryUrl" ) ) );
+		canInstallFeature( "hibernate-validator-groovy" );
+	}
+
+	@Test
 	public void canInstallFeatureHibernateValidatorParanamer() throws Exception {
 		featuresService.addRepository( new URI( System.getProperty( "validatorRepositoryUrl" ) ) );
 		canInstallFeature( "hibernate-validator-paranamer" );
