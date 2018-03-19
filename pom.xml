@@ -153,6 +153,8 @@
         <!-- JavaMoney dependencies -->
         <javax-money.version>1.0.1</javax-money.version>
         <moneta.version>1.1</moneta.version>
+        <!-- Used in the Karaf features file: it is a dependency of Moneta -->
+        <javax-annotation-api.version>1.2</javax-annotation-api.version>
 
         <!-- WildFly patching infrastructure -->
         <wildfly-patch-gen-maven-plugin.version>2.0.1.Alpha5</wildfly-patch-gen-maven-plugin.version>
