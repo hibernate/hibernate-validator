@@ -17,10 +17,22 @@
         <bundle>mvn:org.jboss.logging/jboss-logging/${jboss.logging.version}</bundle>
         <bundle>mvn:com.fasterxml/classmate/${classmate.version}</bundle>
         <bundle>mvn:org.glassfish/javax.el/${javax.el.version}</bundle>
+    </feature>
+    <feature name="hibernate-validator-jsoup" version="${project.version}">
+        <feature>hibernate-validator</feature>
         <bundle>mvn:org.jsoup/jsoup/${jsoup.version}</bundle>
+    </feature>
+    <feature name="hibernate-validator-joda-time" version="${project.version}">
+        <feature>hibernate-validator</feature>
         <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
+    </feature>
+    <feature name="hibernate-validator-javax-money" version="${project.version}">
+        <feature>hibernate-validator</feature>
         <bundle>mvn:javax.money/money-api/${javax-money.version}</bundle>
         <bundle>mvn:org.javamoney/moneta/${moneta.version}</bundle>
+    </feature>
+    <feature name="hibernate-validator-groovy" version="${project.version}">
+        <feature>hibernate-validator</feature>
         <bundle>mvn:org.codehaus.groovy/groovy-all/${groovy.version}</bundle>
     </feature>
     <feature name="hibernate-validator-paranamer" version="${project.version}">
