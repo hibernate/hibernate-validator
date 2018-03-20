@@ -7,6 +7,7 @@
 package org.hibernate.validator.test.internal.engine.constraintvalidation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getConstraintValidatorInitializationContext;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintValidatorInitializationContext;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
@@ -15,21 +16,30 @@ import static org.testng.Assert.assertNotSame;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
+import java.time.Clock;
+import java.time.Duration;
 import java.util.Set;
 
+import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.HibernateValidatorFactory;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
+import org.hibernate.validator.internal.engine.DefaultClockProvider;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
+import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -256,6 +266,196 @@ public class ConstraintValidatorManagerTest {
 
 		assertThat( sizeValidatorForMiddleName ).isNotSameAs( sizeValidatorForAddress1 );
 		assertThat( sizeValidatorForAddress1 ).isSameAs( sizeValidatorForAddress2 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1589")
+	public void testValidatorsAreCachedPerConstraintAndAnnotationMembersAndScriptEvaluatorFactory() {
+		Validator validator = getConfiguration()
+				.addMapping(
+						ConstraintValidatorManagerTest.class.getResourceAsStream(
+								"hv-1589-mapping.xml"
+						)
+				)
+				.buildValidatorFactory()
+				.getValidator();
+
+		ConstraintDescriptorImpl<?> sizeOnMiddleNameDescriptor = getSingleConstraintDescriptorForProperty(
+				validator, User.class, "middleName"
+		);
+		ConstraintDescriptorImpl<?> sizeOnAddress1Descriptor = getSingleConstraintDescriptorForProperty(
+				validator, User.class, "address1"
+		);
+		ConstraintDescriptorImpl<?> sizeOnAddress2Descriptor = getSingleConstraintDescriptorForProperty(
+				validator, User.class, "address2"
+		);
+
+		ScriptEvaluatorFactory scriptEvaluatorFactory1 = new DefaultScriptEvaluatorFactory( null );
+		ScriptEvaluatorFactory scriptEvaluatorFactory2 = new DefaultScriptEvaluatorFactory( null );
+
+		HibernateConstraintValidatorInitializationContext initializationContext1 = getConstraintValidatorInitializationContext(
+				scriptEvaluatorFactory1, DefaultClockProvider.INSTANCE, Duration.ZERO, null );
+		HibernateConstraintValidatorInitializationContext initializationContext2 = getConstraintValidatorInitializationContext(
+				scriptEvaluatorFactory2, DefaultClockProvider.INSTANCE, Duration.ZERO, null );
+
+		ConstraintValidator<?, ?> sizeValidatorForMiddleNameCtx1 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnMiddleNameDescriptor, constraintValidatorFactory, initializationContext1
+		);
+		ConstraintValidator<?, ?> sizeValidatorForAddress1Ctx1 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnAddress1Descriptor, constraintValidatorFactory, initializationContext1
+		);
+		ConstraintValidator<?, ?> sizeValidatorForAddress2Ctx1 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnAddress2Descriptor, constraintValidatorFactory, initializationContext1
+		);
+		ConstraintValidator<?, ?> sizeValidatorForAddress2Ctx2 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnAddress2Descriptor, constraintValidatorFactory, initializationContext2
+		);
+		ConstraintValidator<?, ?> sizeValidatorForAddress1Ctx2 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnAddress1Descriptor, constraintValidatorFactory, initializationContext2
+		);
+
+		assertThat( sizeValidatorForMiddleNameCtx1 ).isNotSameAs( sizeValidatorForAddress1Ctx1 );
+		assertThat( sizeValidatorForAddress1Ctx1 ).isSameAs( sizeValidatorForAddress2Ctx1 );
+		assertThat( sizeValidatorForAddress1Ctx1 ).isNotSameAs( sizeValidatorForAddress2Ctx2 );
+		assertThat( sizeValidatorForAddress2Ctx2 ).isSameAs( sizeValidatorForAddress1Ctx2 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1589")
+	public void testValidatorsAreCachedPerConstraintAndAnnotationMembersAndClockProvider() {
+		Validator validator = getConfiguration()
+				.addMapping(
+						ConstraintValidatorManagerTest.class.getResourceAsStream(
+								"hv-1589-mapping.xml"
+						)
+				)
+				.buildValidatorFactory()
+				.getValidator();
+
+		ConstraintDescriptorImpl<?> sizeOnMiddleNameDescriptor = getSingleConstraintDescriptorForProperty(
+				validator, User.class, "middleName"
+		);
+		ConstraintDescriptorImpl<?> sizeOnAddress1Descriptor = getSingleConstraintDescriptorForProperty(
+				validator, User.class, "address1"
+		);
+		ConstraintDescriptorImpl<?> sizeOnAddress2Descriptor = getSingleConstraintDescriptorForProperty(
+				validator, User.class, "address2"
+		);
+
+		ScriptEvaluatorFactory scriptEvaluatorFactory = new DefaultScriptEvaluatorFactory( null );
+
+		ClockProvider clockProvider1 = new ClockProvider() {
+			@Override
+			public Clock getClock() {
+				return null;
+			}
+		};
+		ClockProvider clockProvider2 = new ClockProvider() {
+			@Override
+			public Clock getClock() {
+				return null;
+			}
+		};
+
+		HibernateConstraintValidatorInitializationContext initializationContext1 = getConstraintValidatorInitializationContext(
+				scriptEvaluatorFactory, clockProvider1, Duration.ZERO, null );
+		HibernateConstraintValidatorInitializationContext initializationContext2 = getConstraintValidatorInitializationContext(
+				scriptEvaluatorFactory, clockProvider2, Duration.ZERO, null );
+
+		ConstraintValidator<?, ?> sizeValidatorForMiddleNameCtx1 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnMiddleNameDescriptor, constraintValidatorFactory, initializationContext1
+		);
+		ConstraintValidator<?, ?> sizeValidatorForAddress1Ctx1 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnAddress1Descriptor, constraintValidatorFactory, initializationContext1
+		);
+		ConstraintValidator<?, ?> sizeValidatorForAddress2Ctx1 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnAddress2Descriptor, constraintValidatorFactory, initializationContext1
+		);
+		ConstraintValidator<?, ?> sizeValidatorForAddress2Ctx2 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnAddress2Descriptor, constraintValidatorFactory, initializationContext2
+		);
+		ConstraintValidator<?, ?> sizeValidatorForAddress1Ctx2 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnAddress1Descriptor, constraintValidatorFactory, initializationContext2
+		);
+
+		assertThat( sizeValidatorForMiddleNameCtx1 ).isNotSameAs( sizeValidatorForAddress1Ctx1 );
+		assertThat( sizeValidatorForAddress1Ctx1 ).isSameAs( sizeValidatorForAddress2Ctx1 );
+		assertThat( sizeValidatorForAddress1Ctx1 ).isNotSameAs( sizeValidatorForAddress2Ctx2 );
+		assertThat( sizeValidatorForAddress2Ctx2 ).isSameAs( sizeValidatorForAddress1Ctx2 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1589")
+	public void testValidatorsAreCachedPerConstraintAndAnnotationMembersAndTemporalValidationTolerance() {
+		Validator validator = getConfiguration()
+				.addMapping(
+						ConstraintValidatorManagerTest.class.getResourceAsStream(
+								"hv-1589-mapping.xml"
+						)
+				)
+				.buildValidatorFactory()
+				.getValidator();
+
+		ConstraintDescriptorImpl<?> sizeOnMiddleNameDescriptor = getSingleConstraintDescriptorForProperty(
+				validator, User.class, "middleName"
+		);
+		ConstraintDescriptorImpl<?> sizeOnAddress1Descriptor = getSingleConstraintDescriptorForProperty(
+				validator, User.class, "address1"
+		);
+		ConstraintDescriptorImpl<?> sizeOnAddress2Descriptor = getSingleConstraintDescriptorForProperty(
+				validator, User.class, "address2"
+		);
+
+		ScriptEvaluatorFactory scriptEvaluatorFactory = new DefaultScriptEvaluatorFactory( null );
+
+		HibernateConstraintValidatorInitializationContext initializationContext1 = getConstraintValidatorInitializationContext(
+				scriptEvaluatorFactory, DefaultClockProvider.INSTANCE, Duration.ofDays( 1 ), null );
+		HibernateConstraintValidatorInitializationContext initializationContext2 = getConstraintValidatorInitializationContext(
+				scriptEvaluatorFactory, DefaultClockProvider.INSTANCE, Duration.ofDays( 999 ), null );
+
+		ConstraintValidator<?, ?> sizeValidatorForMiddleNameCtx1 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnMiddleNameDescriptor, constraintValidatorFactory, initializationContext1
+		);
+		ConstraintValidator<?, ?> sizeValidatorForAddress1Ctx1 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnAddress1Descriptor, constraintValidatorFactory, initializationContext1
+		);
+		ConstraintValidator<?, ?> sizeValidatorForAddress2Ctx1 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnAddress2Descriptor, constraintValidatorFactory, initializationContext1
+		);
+		ConstraintValidator<?, ?> sizeValidatorForAddress2Ctx2 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnAddress2Descriptor, constraintValidatorFactory, initializationContext2
+		);
+		ConstraintValidator<?, ?> sizeValidatorForAddress1Ctx2 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnAddress1Descriptor, constraintValidatorFactory, initializationContext2
+		);
+
+		assertThat( sizeValidatorForMiddleNameCtx1 ).isNotSameAs( sizeValidatorForAddress1Ctx1 );
+		assertThat( sizeValidatorForAddress1Ctx1 ).isSameAs( sizeValidatorForAddress2Ctx1 );
+		assertThat( sizeValidatorForAddress1Ctx1 ).isNotSameAs( sizeValidatorForAddress2Ctx2 );
+		assertThat( sizeValidatorForAddress2Ctx2 ).isSameAs( sizeValidatorForAddress1Ctx2 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1589")
+	public void testHibernateConstraintValidatorsAreNotCachedByConstraintTree() {
+		try ( ValidatorFactory factory = getConfiguration().buildValidatorFactory() ) {
+
+			// Let's validate with different initialization contexts to make sure the ConstraintTree instance
+			// doesn't cache a HibernateConstraintValidator instance
+
+			assertThat( factory
+					.getValidator().validate( new Company() ).iterator().next().getMessage() ).isEqualTo( "PT0S" );
+
+			assertThat( factory
+					.unwrap( HibernateValidatorFactory.class ).usingContext()
+					.temporalValidationTolerance( Duration.ofHours( 7 ) )
+					.getValidator().validate( new Company() ).iterator().next().getMessage() ).isEqualTo( "PT7H" );
+
+			assertThat( factory
+					.unwrap( HibernateValidatorFactory.class ).usingContext()
+					.temporalValidationTolerance( Duration.ofDays( 5 ) )
+					.getValidator().validate( new Company() ).iterator().next().getMessage() ).isEqualTo( "PT120H" );
+		}
 	}
 
 	private ConstraintDescriptorImpl<?> getConstraintDescriptorForProperty(String propertyName) {
