@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<constraint-mappings
+        xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation=
+                "http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.0.xsd">
+
+    <bean class="org.hibernate.validator.test.internal.engine.constraintvalidation.User" ignore-annotations="false">
+        <field name="firstName">
+            <constraint annotation="javax.validation.constraints.NotNull"/>
+        </field>
+        <field name="middleName">
+            <constraint annotation="javax.validation.constraints.Size">
+                <element name="min">5</element>
+                <element name="min">10</element>
+            </constraint>
+        </field>
+        <field name="address2">
+            <constraint annotation="javax.validation.constraints.Size">
+                <element name="min">5</element>
+                <element name="max">50</element>
+            </constraint>
+        </field>
+    </bean>
+</constraint-mappings>

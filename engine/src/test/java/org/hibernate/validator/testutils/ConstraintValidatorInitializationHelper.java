@@ -87,4 +87,32 @@ public class ConstraintValidatorInitializationHelper {
 	public static HibernateConstraintValidatorInitializationContext getDummyConstraintValidatorInitializationContext() {
 		return DUMMY_CONSTRAINT_VALIDATOR_INITIALIZATION_CONTEXT;
 	}
+
+	public static HibernateConstraintValidatorInitializationContext getConstraintValidatorInitializationContext(
+			ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider, Duration duration, Class<?> payload
+	) {
+		return new HibernateConstraintValidatorInitializationContext() {
+
+			@Override
+			public ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) {
+				return scriptEvaluatorFactory.getScriptEvaluatorByLanguageName( languageName );
+			}
+
+			@Override
+			public ClockProvider getClockProvider() {
+				return clockProvider;
+			}
+
+			@Override
+			public Duration getTemporalValidationTolerance() {
+				return duration;
+			}
+
+			@Override
+			@SuppressWarnings("unchecked")
+			public <C> C getConstraintValidatorPayload(Class<C> type) {
+				return (C) payload;
+			}
+		};
+	}
 }
