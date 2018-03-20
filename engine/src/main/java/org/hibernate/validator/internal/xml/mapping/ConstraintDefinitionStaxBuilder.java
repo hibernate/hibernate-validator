@@ -140,7 +140,7 @@ class ConstraintDefinitionStaxBuilder extends AbstractStaxBuilder {
 					.map( value -> classLoadingHelper.loadClass( value, defaultPackage ) )
 					.peek( this::checkValidatorAssignability )
 					.map( clazz -> (Class<? extends ConstraintValidator<A, ?>>) clazz )
-					.map( ConstraintValidatorDescriptor::forClass )
+					.map( validatorClass -> ConstraintValidatorDescriptor.forClass( validatorClass, annotation ) )
 					.collect( Collectors.toList() );
 		}
 

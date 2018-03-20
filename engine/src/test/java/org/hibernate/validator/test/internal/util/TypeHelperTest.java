@@ -858,7 +858,7 @@ public class TypeHelperTest {
 	@Test
 	public void testTypeDiscovery() {
 		List<ConstraintValidatorDescriptor<Positive>> validatorDescriptors = new ArrayList<>();
-		validatorDescriptors.add( ConstraintValidatorDescriptor.forClass( PositiveConstraintValidator.class ) );
+		validatorDescriptors.add( ConstraintValidatorDescriptor.forClass( PositiveConstraintValidator.class, Positive.class ) );
 		Map<Type, ConstraintValidatorDescriptor<Positive>> validatorsTypes = TypeHelper
 				.getValidatorTypes( Positive.class, validatorDescriptors );
 
