@@ -319,7 +319,7 @@ public class MappingXmlParser {
 				throw LOG.getIsNotAConstraintValidatorClassException( validatorClass );
 			}
 
-			constraintValidatorDescriptors.add( ConstraintValidatorDescriptor.forClass( validatorClass ) );
+			constraintValidatorDescriptors.add( ConstraintValidatorDescriptor.forClass( validatorClass, annotationClass ) );
 		}
 		constraintHelper.putValidatorDescriptors(
 				annotationClass,

@@ -47,7 +47,7 @@ class ConstraintDefinitionContextImpl<A extends Annotation>
 
 	@Override
 	public ConstraintDefinitionContext<A> validatedBy(Class<? extends ConstraintValidator<A, ?>> validator) {
-		validatorDescriptors.add( ConstraintValidatorDescriptor.forClass( validator ) );
+		validatorDescriptors.add( ConstraintValidatorDescriptor.forClass( validator, this.annotationType ) );
 		return this;
 	}
 

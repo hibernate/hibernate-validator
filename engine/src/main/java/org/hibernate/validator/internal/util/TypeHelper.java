@@ -31,6 +31,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public final class TypeHelper {
 
 	private static final Map<Class<?>, Set<Class<?>>> SUBTYPES_BY_PRIMITIVE;
+	private static final int CONSTRAINT_TYPE_INDEX = 0;
 	private static final int VALIDATOR_TYPE_INDEX = 1;
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -324,24 +326,32 @@ public final class TypeHelper {
 		return validatorsTypes;
 	}
 
-	public static Type extractType(Class<? extends ConstraintValidator<?, ?>> validator) {
-		Map<Type, Type> resolvedTypes = newHashMap();
+	public static Type extractValidatedType(Class<? extends ConstraintValidator<?, ?>> validator) {
+		return extractConstraintValidatorTypeArgumentType( validator, VALIDATOR_TYPE_INDEX );
+	}
+
+	public static Type extractConstraintType(Class<? extends ConstraintValidator<?, ?>> validator) {
+		return extractConstraintValidatorTypeArgumentType( validator, CONSTRAINT_TYPE_INDEX );
+	}
+
+	public static Type extractConstraintValidatorTypeArgumentType(Class<? extends ConstraintValidator<?, ?>> validator, int typeArgumentIndex) {
+		Map<Type, Type> resolvedTypes = new HashMap<>();
 		Type constraintValidatorType = resolveTypes( resolvedTypes, validator );
 
 		//we now have all bind from a type to its resolution at one level
-		Type validatorType = ( (ParameterizedType) constraintValidatorType ).getActualTypeArguments()[VALIDATOR_TYPE_INDEX];
-		if ( validatorType == null ) {
+		Type type = ( (ParameterizedType) constraintValidatorType ).getActualTypeArguments()[typeArgumentIndex];
+		if ( type == null ) {
 			throw LOG.getNullIsAnInvalidTypeForAConstraintValidatorException();
 		}
-		else if ( validatorType instanceof GenericArrayType ) {
-			validatorType = TypeHelper.getArrayType( TypeHelper.getComponentType( validatorType ) );
+		else if ( type instanceof GenericArrayType ) {
+			type = TypeHelper.getArrayType( TypeHelper.getComponentType( type ) );
 		}
 
-		while ( resolvedTypes.containsKey( validatorType ) ) {
-			validatorType = resolvedTypes.get( validatorType );
+		while ( resolvedTypes.containsKey( type ) ) {
+			type = resolvedTypes.get( type );
 		}
 		//FIXME raise an exception if validatorType is not a class
-		return validatorType;
+		return type;
 	}
 
 	public static boolean isUnboundWildcard(Type type) {

@@ -25,28 +25,38 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * Represents an implementation of {@link ConstraintValidator}.
  *
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 class ClassBasedValidatorDescriptor<A extends Annotation> implements ConstraintValidatorDescriptor<A> {
 
-	private static final long serialVersionUID = -8207687559460098548L;
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Class<? extends ConstraintValidator<A, ?>> validatorClass;
 	private final Type validatedType;
 	private final EnumSet<ValidationTarget> validationTargets;
 
-	public ClassBasedValidatorDescriptor(Class<? extends ConstraintValidator<A, ?>> validatorClass) {
+	private ClassBasedValidatorDescriptor(Class<? extends ConstraintValidator<A, ?>> validatorClass) {
 		this.validatorClass = validatorClass;
-		this.validatedType = TypeHelper.extractType( validatorClass );
+		this.validatedType = TypeHelper.extractValidatedType( validatorClass );
 		this.validationTargets = determineValidationTargets( validatorClass );
+	}
+
+	public static <T extends Annotation> ClassBasedValidatorDescriptor<T> of(Class<? extends ConstraintValidator<T, ?>> validatorClass,
+			Class<? extends Annotation> registeredConstraintAnnotationType) {
+		Type definedConstraintAnnotationType = TypeHelper.extractConstraintType( validatorClass );
+		if ( !registeredConstraintAnnotationType.equals( definedConstraintAnnotationType ) ) {
+			throw LOG.getConstraintValidatorDefinitionConstraintMismatchException( validatorClass, registeredConstraintAnnotationType,
+					definedConstraintAnnotationType );
+		}
+
+		return new ClassBasedValidatorDescriptor<T>( validatorClass );
 	}
 
 	private static EnumSet<ValidationTarget> determineValidationTargets(Class<? extends ConstraintValidator<?, ?>> validatorClass) {
 		SupportedValidationTarget supportedTargetAnnotation = validatorClass.getAnnotation(
-				SupportedValidationTarget.class
-		);
+				SupportedValidationTarget.class );
 
-		//by default constraints target the annotated element
+		// by default constraints target the annotated element
 		if ( supportedTargetAnnotation == null ) {
 			return EnumSet.of( ValidationTarget.ANNOTATED_ELEMENT );
 		}
