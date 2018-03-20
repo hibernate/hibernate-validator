@@ -849,4 +849,10 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = 242, value = "Unable to load or instantiate JPA aware resolver %1$s. All properties will per default be traversable.")
 	void logUnableToLoadOrInstantiateJPAAwareResolver(String traversableResolverClassName);
+
+	@Message(id = 243, value = "Constraint %2$s references constraint validator type %1$s, but this validator is defined for constraint type %3$s.")
+	ConstraintDefinitionException getConstraintValidatorDefinitionConstraintMismatchException(
+			@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidator<?, ?>> constraintValidatorImplementationType,
+			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> registeredConstraintAnnotationType,
+			@FormatWith(TypeFormatter.class) Type declaredConstraintAnnotationType);
 }
