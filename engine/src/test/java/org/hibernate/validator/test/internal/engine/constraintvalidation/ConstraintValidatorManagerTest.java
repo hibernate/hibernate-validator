@@ -56,7 +56,7 @@ public class ConstraintValidatorManagerTest {
 	@BeforeMethod
 	public void setUp() {
 		constraintValidatorFactory = new ConstraintValidatorFactoryImpl();
-		constraintValidatorManager = new ConstraintValidatorManager( constraintValidatorFactory );
+		constraintValidatorManager = new ConstraintValidatorManager( constraintValidatorFactory, getDummyConstraintValidatorInitializationContext() );
 		validator = getValidator();
 	}
 

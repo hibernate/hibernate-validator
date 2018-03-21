@@ -56,12 +56,21 @@ public class ConstraintValidatorManager {
 	};
 
 	/**
-	 * The explicit or implicit default constraint validator factory. We always cache {@code ConstraintValidator} instances
-	 * if they are created via the default instance. Constraint validator instances created via other factory
-	 * instances (specified eg via {@code ValidatorFactory#usingContext()} are only cached for the least recently used
-	 * factory
+	 * The explicit or implicit default constraint validator factory. We always cache {@code ConstraintValidator}
+	 * instances if they are created via the default instance and with the default initialization context. Constraint
+	 * validator instances created via other factory instances (specified eg via {@code ValidatorFactory#usingContext()}
+	 * or initialization context are only cached for the most recently used factory and context.
 	 */
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
+
+	/**
+	 * The explicit or implicit default constraint validator initialization context. We always cache
+	 * {@code ConstraintValidator} instances if they are created via the default instance and with the default context.
+	 * Constraint validator instances created via other factory instances (specified eg via
+	 * {@code ValidatorFactory#usingContext()} or initialization context are only cached for the most recently used
+	 * factory and context.
+	 */
+	private final  HibernateConstraintValidatorInitializationContext defaultConstraintValidatorInitializationContext;
 
 	/**
 	 * The most recently used non default constraint validator factory.
@@ -69,24 +78,32 @@ public class ConstraintValidatorManager {
 	private volatile ConstraintValidatorFactory mostRecentlyUsedNonDefaultConstraintValidatorFactory;
 
 	/**
+	 * The most recently used non default constraint validator initialization context.
+	 */
+	private volatile HibernateConstraintValidatorInitializationContext mostRecentlyUsedNonDefaultConstraintValidatorInitializationContext;
+
+	/**
 	 * Used for synchronizing access to {@link #mostRecentlyUsedNonDefaultConstraintValidatorFactory} (which can be
 	 * null itself).
 	 */
-	private final Object mostRecentlyUsedNonDefaultConstraintValidatorFactoryMutex = new Object();
+	private final Object mostRecentlyUsedNonDefaultConstraintValidatorFactoryAndInitializationContextMutex = new Object();
 
 	/**
-	 * Cache of initialized {@code ConstraintValidator} instances keyed against validates type, annotation and
-	 * constraint validator factory ({@code CacheKey}).
+	 * Cache of initialized {@code ConstraintValidator} instances keyed against validated type, annotation,
+	 * constraint validator factory and constraint validator initialization context ({@code CacheKey}).
 	 */
 	private final ConcurrentHashMap<CacheKey, ConstraintValidator<?, ?>> constraintValidatorCache;
 
 	/**
 	 * Creates a new {@code ConstraintValidatorManager}.
 	 *
-	 * @param constraintValidatorFactory the validator factory
+	 * @param defaultConstraintValidatorFactory the default validator factory
+	 * @param defaultConstraintValidatorInitializationContext the default initialization context
 	 */
-	public ConstraintValidatorManager(ConstraintValidatorFactory constraintValidatorFactory) {
-		this.defaultConstraintValidatorFactory = constraintValidatorFactory;
+	public ConstraintValidatorManager(ConstraintValidatorFactory defaultConstraintValidatorFactory,
+			HibernateConstraintValidatorInitializationContext defaultConstraintValidatorInitializationContext) {
+		this.defaultConstraintValidatorFactory = defaultConstraintValidatorFactory;
+		this.defaultConstraintValidatorInitializationContext = defaultConstraintValidatorInitializationContext;
 		this.constraintValidatorCache = new ConcurrentHashMap<>();
 	}
 
@@ -129,12 +146,17 @@ public class ConstraintValidatorManager {
 	private <A extends Annotation> ConstraintValidator<A, ?> cacheValidator(CacheKey key,
 			ConstraintValidator<A, ?> constraintValidator) {
 		// we only cache constraint validator instances for the default and most recently used factory
-		if ( key.constraintValidatorFactory != defaultConstraintValidatorFactory && key.constraintValidatorFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) {
+		if ( ( key.getConstraintValidatorFactory() != defaultConstraintValidatorFactory
+				&& key.getConstraintValidatorFactory() != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) ||
+				( key.getConstraintValidatorInitializationContext() != defaultConstraintValidatorInitializationContext
+						&& key.getConstraintValidatorInitializationContext() != mostRecentlyUsedNonDefaultConstraintValidatorInitializationContext ) ) {
 
-			synchronized ( mostRecentlyUsedNonDefaultConstraintValidatorFactoryMutex ) {
-				if ( key.constraintValidatorFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) {
-					clearEntriesForFactory( mostRecentlyUsedNonDefaultConstraintValidatorFactory );
-					mostRecentlyUsedNonDefaultConstraintValidatorFactory = key.constraintValidatorFactory;
+			synchronized ( mostRecentlyUsedNonDefaultConstraintValidatorFactoryAndInitializationContextMutex ) {
+				if ( key.constraintValidatorFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ||
+						key.constraintValidatorInitializationContext != mostRecentlyUsedNonDefaultConstraintValidatorInitializationContext ) {
+					clearEntries( mostRecentlyUsedNonDefaultConstraintValidatorFactory, mostRecentlyUsedNonDefaultConstraintValidatorInitializationContext );
+					mostRecentlyUsedNonDefaultConstraintValidatorFactory = key.getConstraintValidatorFactory();
+					mostRecentlyUsedNonDefaultConstraintValidatorInitializationContext = key.getConstraintValidatorInitializationContext();
 				}
 			}
 		}
@@ -166,12 +188,13 @@ public class ConstraintValidatorManager {
 		return constraintValidator;
 	}
 
-	private void clearEntriesForFactory(ConstraintValidatorFactory constraintValidatorFactory) {
+	private void clearEntries(ConstraintValidatorFactory constraintValidatorFactory, HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext) {
 		Iterator<Entry<CacheKey, ConstraintValidator<?, ?>>> cacheEntries = constraintValidatorCache.entrySet().iterator();
 
 		while ( cacheEntries.hasNext() ) {
 			Entry<CacheKey, ConstraintValidator<?, ?>> cacheEntry = cacheEntries.next();
-			if ( cacheEntry.getKey().getConstraintValidatorFactory() == constraintValidatorFactory ) {
+			if ( cacheEntry.getKey().getConstraintValidatorFactory() == constraintValidatorFactory &&
+					cacheEntry.getKey().getConstraintValidatorInitializationContext() == constraintValidatorInitializationContext ) {
 				constraintValidatorFactory.releaseInstance( cacheEntry.getValue() );
 				cacheEntries.remove();
 			}
@@ -187,6 +210,10 @@ public class ConstraintValidatorManager {
 
 	public ConstraintValidatorFactory getDefaultConstraintValidatorFactory() {
 		return defaultConstraintValidatorFactory;
+	}
+
+	public HibernateConstraintValidatorInitializationContext getDefaultConstraintValidatorInitializationContext() {
+		return defaultConstraintValidatorInitializationContext;
 	}
 
 	public int numberOfCachedConstraintValidatorInstances() {
@@ -281,19 +308,24 @@ public class ConstraintValidatorManager {
 		private final ConstraintAnnotationDescriptor<?> annotationDescriptor;
 		private final Type validatedType;
 		private final ConstraintValidatorFactory constraintValidatorFactory;
-		private final HibernateConstraintValidatorInitializationContext initializationContext;
+		private final HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext;
 		private final int hashCode;
 
-		private CacheKey(ConstraintAnnotationDescriptor<?> annotationDescriptor, Type validatorType, ConstraintValidatorFactory constraintValidatorFactory, HibernateConstraintValidatorInitializationContext initializationContext) {
+		private CacheKey(ConstraintAnnotationDescriptor<?> annotationDescriptor, Type validatorType, ConstraintValidatorFactory constraintValidatorFactory,
+				HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext) {
 			this.annotationDescriptor = annotationDescriptor;
 			this.validatedType = validatorType;
 			this.constraintValidatorFactory = constraintValidatorFactory;
-			this.initializationContext = initializationContext;
+			this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
 			this.hashCode = createHashCode();
 		}
 
 		public ConstraintValidatorFactory getConstraintValidatorFactory() {
 			return constraintValidatorFactory;
+		}
+
+		public HibernateConstraintValidatorInitializationContext getConstraintValidatorInitializationContext() {
+			return constraintValidatorInitializationContext;
 		}
 
 		@Override
@@ -305,18 +337,18 @@ public class ConstraintValidatorManager {
 				return false;
 			}
 
-			CacheKey cacheKey = (CacheKey) o;
+			CacheKey other = (CacheKey) o;
 
-			if ( !annotationDescriptor.equals( cacheKey.annotationDescriptor ) ) {
+			if ( !annotationDescriptor.equals( other.annotationDescriptor ) ) {
 				return false;
 			}
-			if ( !validatedType.equals( cacheKey.validatedType ) ) {
+			if ( !validatedType.equals( other.validatedType ) ) {
 				return false;
 			}
-			if ( !constraintValidatorFactory.equals( cacheKey.constraintValidatorFactory ) ) {
+			if ( !constraintValidatorFactory.equals( other.constraintValidatorFactory ) ) {
 				return false;
 			}
-			if ( !initializationContext.equals( cacheKey.initializationContext ) ) {
+			if ( !constraintValidatorInitializationContext.equals( other.constraintValidatorInitializationContext ) ) {
 				return false;
 			}
 
@@ -332,7 +364,7 @@ public class ConstraintValidatorManager {
 			int result = annotationDescriptor.hashCode();
 			result = 31 * result + validatedType.hashCode();
 			result = 31 * result + constraintValidatorFactory.hashCode();
-			result = 31 * result + initializationContext.hashCode();
+			result = 31 * result + constraintValidatorInitializationContext.hashCode();
 			return result;
 		}
 	}

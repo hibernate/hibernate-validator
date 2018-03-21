@@ -40,7 +40,6 @@ import org.hibernate.validator.internal.engine.ValidationContext.ValidationConte
 import org.hibernate.validator.internal.engine.ValidationContext.ValidatorScopedContext;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl.ValidatorFactoryScopedContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
-import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.GroupWithInheritance;
 import org.hibernate.validator.internal.engine.groups.Sequence;
@@ -145,9 +144,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.validationOrderGenerator = validationOrderGenerator;
 		this.validatorScopedContext = new ValidatorScopedContext( validatorFactoryScopedContext );
 		this.traversableResolver = validatorFactoryScopedContext.getTraversableResolver();
-		this.constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl(
-				validatorScopedContext.getScriptEvaluatorFactory(), validatorScopedContext.getClockProvider(),
-				validatorScopedContext.getTemporalValidationTolerance(), validatorScopedContext.getConstraintValidatorPayload() );
+		this.constraintValidatorInitializationContext = validatorFactoryScopedContext.getConstraintValidatorInitializationContext();
 	}
 
 	@Override

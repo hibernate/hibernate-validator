@@ -20,7 +20,6 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -53,7 +52,7 @@ public abstract class ConstraintTree<A extends Annotation> {
 	 * Either the initialized constraint validator for the default constraint validator factory or
 	 * {@link ConstraintValidatorManager#DUMMY_CONSTRAINT_VALIDATOR}.
 	 */
-	private volatile ConstraintValidator<A, ?> constraintValidatorForDefaultConstraintValidatorFactory;
+	private volatile ConstraintValidator<A, ?> constraintValidatorForDefaultConstraintValidatorFactoryAndInitializationContext;
 
 	protected ConstraintTree(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
 		this.descriptor = descriptor;
@@ -113,21 +112,18 @@ public abstract class ConstraintTree<A extends Annotation> {
 	protected final <T> ConstraintValidator<A, ?> getInitializedConstraintValidator(ValidationContext<T> validationContext, ValueContext<?, ?> valueContext) {
 		ConstraintValidator<A, ?> validator;
 
-		if ( validationContext.getConstraintValidatorFactory() == validationContext.getConstraintValidatorManager().getDefaultConstraintValidatorFactory() ) {
-			validator = constraintValidatorForDefaultConstraintValidatorFactory;
+		if ( validationContext.getConstraintValidatorFactory() == validationContext.getConstraintValidatorManager().getDefaultConstraintValidatorFactory()
+				&& validationContext.getConstraintValidatorInitializationContext() == validationContext.getConstraintValidatorManager()
+						.getDefaultConstraintValidatorInitializationContext() ) {
+			validator = constraintValidatorForDefaultConstraintValidatorFactoryAndInitializationContext;
 
 			if ( validator == null ) {
 				synchronized ( this ) {
-					validator = constraintValidatorForDefaultConstraintValidatorFactory;
+					validator = constraintValidatorForDefaultConstraintValidatorFactoryAndInitializationContext;
 					if ( validator == null ) {
 						validator = getInitializedConstraintValidator( validationContext );
 
-						// HibernateConstraintValidator instances should not be cached within this constraint tree instance, only ConstraintValidatorManager
-						// should handle their caching. That's because the HibernateConstraintValidatorInitializationContext influences their caching behaviour.
-						// (HibernateConstraintValidatorInitializationContext could have changed during a ValidatorFactory lifetime - via usingContext())
-						if ( !( validator instanceof HibernateConstraintValidator ) ) {
-							constraintValidatorForDefaultConstraintValidatorFactory = validator;
-						}
+						constraintValidatorForDefaultConstraintValidatorFactoryAndInitializationContext = validator;
 					}
 				}
 			}

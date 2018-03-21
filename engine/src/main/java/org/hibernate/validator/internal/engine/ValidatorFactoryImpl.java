@@ -34,9 +34,11 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
+import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
@@ -177,8 +179,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						getAllowParallelMethodsDefineParameterConstraints( hibernateSpecificConfig, properties )
 				).build();
 
-		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
-
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
 				configurationState.getMessageInterpolator(),
 				configurationState.getTraversableResolver(),
@@ -189,6 +189,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				getFailFast( hibernateSpecificConfig, properties ),
 				getTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
 				getConstraintValidatorPayload( hibernateSpecificConfig )
+		);
+
+		this.constraintValidatorManager = new ConstraintValidatorManager(
+				configurationState.getConstraintValidatorFactory(),
+				this.validatorFactoryScopedContext.getConstraintValidatorInitializationContext()
 		);
 
 		this.validationOrderGenerator = new ValidationOrderGenerator();
@@ -702,7 +707,15 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		 */
 		private final boolean traversableResolverResultCacheEnabled;
 
+		/**
+		 * The constraint validator payload.
+		 */
 		private final Object constraintValidatorPayload;
+
+		/**
+		 * The constraint validator initialization context.
+		 */
+		private final HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
 
 		private ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
 				TraversableResolver traversableResolver,
@@ -713,6 +726,22 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				boolean failFast,
 				boolean traversableResolverResultCacheEnabled,
 				Object constraintValidatorPayload) {
+			this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
+					traversableResolverResultCacheEnabled, constraintValidatorPayload,
+					new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
+							temporalValidationTolerance, constraintValidatorPayload ) );
+		}
+
+		private ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
+				TraversableResolver traversableResolver,
+				ExecutableParameterNameProvider parameterNameProvider,
+				ClockProvider clockProvider,
+				Duration temporalValidationTolerance,
+				ScriptEvaluatorFactory scriptEvaluatorFactory,
+				boolean failFast,
+				boolean traversableResolverResultCacheEnabled,
+				Object constraintValidatorPayload,
+				HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext) {
 			this.messageInterpolator = messageInterpolator;
 			this.traversableResolver = traversableResolver;
 			this.parameterNameProvider = parameterNameProvider;
@@ -722,6 +751,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			this.failFast = failFast;
 			this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
 			this.constraintValidatorPayload = constraintValidatorPayload;
+			this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
 		}
 
 		public MessageInterpolator getMessageInterpolator() {
@@ -760,6 +790,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			return this.constraintValidatorPayload;
 		}
 
+		public HibernateConstraintValidatorInitializationContext getConstraintValidatorInitializationContext() {
+			return this.constraintValidatorInitializationContext;
+		}
+
 		static class Builder {
 			private final ValidatorFactoryScopedContext defaultContext;
 
@@ -772,6 +806,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			private boolean failFast;
 			private boolean traversableResolverResultCacheEnabled;
 			private Object constraintValidatorPayload;
+			private HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
 
 			Builder(ValidatorFactoryScopedContext defaultContext) {
 				Contracts.assertNotNull( defaultContext, "Default context cannot be null." );
@@ -786,6 +821,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				this.failFast = defaultContext.failFast;
 				this.traversableResolverResultCacheEnabled = defaultContext.traversableResolverResultCacheEnabled;
 				this.constraintValidatorPayload = defaultContext.constraintValidatorPayload;
+				this.constraintValidatorInitializationContext = defaultContext.constraintValidatorInitializationContext;
 			}
 
 			public Builder setMessageInterpolator(MessageInterpolator messageInterpolator) {
@@ -874,7 +910,14 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						scriptEvaluatorFactory,
 						failFast,
 						traversableResolverResultCacheEnabled,
-						constraintValidatorPayload
+						constraintValidatorPayload,
+						HibernateConstraintValidatorInitializationContextImpl.of(
+								constraintValidatorInitializationContext,
+								scriptEvaluatorFactory,
+								clockProvider,
+								temporalValidationTolerance,
+								constraintValidatorPayload
+						)
 				);
 			}
 		}
