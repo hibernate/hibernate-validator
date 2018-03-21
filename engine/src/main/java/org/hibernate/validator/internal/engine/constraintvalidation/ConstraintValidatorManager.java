@@ -305,11 +305,12 @@ public class ConstraintValidatorManager {
 	}
 
 	private static final class CacheKey {
-		private final ConstraintAnnotationDescriptor<?> annotationDescriptor;
-		private final Type validatedType;
-		private final ConstraintValidatorFactory constraintValidatorFactory;
-		private final HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext;
-		private final int hashCode;
+		// These members are not final for optimization purposes
+		private ConstraintAnnotationDescriptor<?> annotationDescriptor;
+		private Type validatedType;
+		private ConstraintValidatorFactory constraintValidatorFactory;
+		private HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext;
+		private int hashCode;
 
 		private CacheKey(ConstraintAnnotationDescriptor<?> annotationDescriptor, Type validatorType, ConstraintValidatorFactory constraintValidatorFactory,
 				HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext) {
@@ -333,7 +334,8 @@ public class ConstraintValidatorManager {
 			if ( this == o ) {
 				return true;
 			}
-			if ( o == null || getClass() != o.getClass() ) {
+			// no need to check for the type here considering it's only used in a typed map
+			if ( o == null ) {
 				return false;
 			}
 
