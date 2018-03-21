@@ -38,6 +38,19 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		this.hashCode = createHashCode();
 	}
 
+	public static HibernateConstraintValidatorInitializationContextImpl of(HibernateConstraintValidatorInitializationContextImpl defaultContext,
+			ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider, Duration temporalValidationTolerance,
+			Object constraintValidatorPayload) {
+		if ( scriptEvaluatorFactory == defaultContext.scriptEvaluatorFactory && clockProvider == defaultContext.clockProvider
+				&& temporalValidationTolerance.equals( defaultContext.temporalValidationTolerance )
+				&& constraintValidatorPayload == defaultContext.constraintValidatorPayload ) {
+			return defaultContext;
+		}
+
+		return new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider, temporalValidationTolerance,
+				constraintValidatorPayload );
+	}
+
 	@Override
 	public ScriptEvaluator getScriptEvaluatorForLanguage(String languageName) {
 		return scriptEvaluatorFactory.getScriptEvaluatorByLanguageName( languageName );

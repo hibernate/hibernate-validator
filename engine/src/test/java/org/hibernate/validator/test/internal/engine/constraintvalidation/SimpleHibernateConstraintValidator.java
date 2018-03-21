@@ -16,7 +16,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 
 public class SimpleHibernateConstraintValidator implements HibernateConstraintValidator<SimpleHibernateConstraintValidatorConstraint, String> {
 
-	Duration duration;
+	private Duration duration;
 
 	@Override
 	public void initialize(ConstraintDescriptor<SimpleHibernateConstraintValidatorConstraint> constraintDescriptor,
