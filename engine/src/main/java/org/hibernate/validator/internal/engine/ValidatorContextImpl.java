@@ -40,13 +40,13 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private final ValidatorFactoryImpl validatorFactory;
 
 	private ConstraintValidatorFactory constraintValidatorFactory;
-	private final ValidatorFactoryScopedContext.Builder validatorFactoryContextBuilder;
+	private final ValidatorFactoryScopedContext.Builder validatorFactoryScopedContextBuilder;
 	private final ValueExtractorManager valueExtractorManager;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder;
 	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors;
 
 	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory) {
-		this.validatorFactoryContextBuilder = new ValidatorFactoryScopedContext.Builder( validatorFactory.getValidatorFactoryScopedContext() );
+		this.validatorFactoryScopedContextBuilder = new ValidatorFactoryScopedContext.Builder( validatorFactory.getValidatorFactoryScopedContext() );
 		this.validatorFactory = validatorFactory;
 		this.constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
 		this.methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder( validatorFactory.getMethodValidationConfiguration() );
@@ -56,13 +56,13 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 
 	@Override
 	public HibernateValidatorContext messageInterpolator(MessageInterpolator messageInterpolator) {
-		validatorFactoryContextBuilder.setMessageInterpolator( messageInterpolator );
+		validatorFactoryScopedContextBuilder.setMessageInterpolator( messageInterpolator );
 		return this;
 	}
 
 	@Override
 	public HibernateValidatorContext traversableResolver(TraversableResolver traversableResolver) {
-		validatorFactoryContextBuilder.setTraversableResolver( traversableResolver );
+		validatorFactoryScopedContextBuilder.setTraversableResolver( traversableResolver );
 		return this;
 	}
 
@@ -79,13 +79,13 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 
 	@Override
 	public HibernateValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider) {
-		validatorFactoryContextBuilder.setParameterNameProvider( parameterNameProvider );
+		validatorFactoryScopedContextBuilder.setParameterNameProvider( parameterNameProvider );
 		return this;
 	}
 
 	@Override
 	public HibernateValidatorContext clockProvider(ClockProvider clockProvider) {
-		validatorFactoryContextBuilder.setClockProvider( clockProvider );
+		validatorFactoryScopedContextBuilder.setClockProvider( clockProvider );
 		return this;
 	}
 
@@ -103,7 +103,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 
 	@Override
 	public HibernateValidatorContext failFast(boolean failFast) {
-		validatorFactoryContextBuilder.setFailFast( failFast );
+		validatorFactoryScopedContextBuilder.setFailFast( failFast );
 		return this;
 	}
 
@@ -127,19 +127,19 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 
 	@Override
 	public HibernateValidatorContext enableTraversableResolverResultCache(boolean enabled) {
-		validatorFactoryContextBuilder.setTraversableResolverResultCacheEnabled( enabled );
+		validatorFactoryScopedContextBuilder.setTraversableResolverResultCacheEnabled( enabled );
 		return this;
 	}
 
 	@Override
 	public HibernateValidatorContext temporalValidationTolerance(Duration temporalValidationTolerance) {
-		validatorFactoryContextBuilder.setTemporalValidationTolerance( temporalValidationTolerance );
+		validatorFactoryScopedContextBuilder.setTemporalValidationTolerance( temporalValidationTolerance );
 		return this;
 	}
 
 	@Override
 	public HibernateValidatorContext constraintValidatorPayload(Object dynamicPayload) {
-		validatorFactoryContextBuilder.setConstraintValidatorPayload( dynamicPayload );
+		validatorFactoryScopedContextBuilder.setConstraintValidatorPayload( dynamicPayload );
 		return this;
 	}
 
@@ -148,7 +148,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		return validatorFactory.createValidator(
 				constraintValidatorFactory,
 				valueExtractorDescriptors.isEmpty() ? valueExtractorManager : new ValueExtractorManager( valueExtractorManager, valueExtractorDescriptors ),
-				validatorFactoryContextBuilder.build(),
+				validatorFactoryScopedContextBuilder.build(),
 				methodValidationConfigurationBuilder.build()
 		);
 	}
