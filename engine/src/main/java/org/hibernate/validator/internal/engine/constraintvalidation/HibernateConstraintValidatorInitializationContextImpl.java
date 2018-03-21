@@ -110,7 +110,7 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 	private int createHashCode() {
 		int result = System.identityHashCode( scriptEvaluatorFactory );
 		result = 31 * result + System.identityHashCode( clockProvider );
-		result = 31 * result + ( temporalValidationTolerance != null ? temporalValidationTolerance.hashCode() : 0 );
+		result = 31 * result + temporalValidationTolerance.hashCode();
 		result = 31 * result + System.identityHashCode( constraintValidatorPayload );
 		return result;
 	}
