@@ -16,6 +16,7 @@ import java.util.Set;
 import javax.validation.BootstrapConfiguration;
 import javax.validation.executable.ExecutableType;
 
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -113,15 +114,23 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		if ( validatedExecutableTypes == null ) {
 			return DEFAULT_VALIDATED_EXECUTABLE_TYPES;
 		}
+
 		if ( validatedExecutableTypes.contains( ExecutableType.ALL ) ) {
 			return ALL_VALIDATED_EXECUTABLE_TYPES;
 		}
-		else if ( validatedExecutableTypes.contains( ExecutableType.NONE ) ) {
-			return EnumSet.noneOf( ExecutableType.class );
+
+		if ( validatedExecutableTypes.contains( ExecutableType.NONE ) ) {
+			if ( validatedExecutableTypes.size() == 1 ) {
+				return Collections.emptySet();
+			}
+			else {
+				EnumSet<ExecutableType> preparedValidatedExecutableTypes = EnumSet.copyOf( validatedExecutableTypes );
+				preparedValidatedExecutableTypes.remove( ExecutableType.NONE );
+				return CollectionHelper.toImmutableSet( preparedValidatedExecutableTypes );
+			}
 		}
-		else {
-			return validatedExecutableTypes;
-		}
+
+		return CollectionHelper.toImmutableSet( validatedExecutableTypes );
 	}
 
 	@Override
