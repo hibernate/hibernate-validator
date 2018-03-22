@@ -8,6 +8,9 @@ package org.hibernate.validator.constraintvalidation;
 
 import javax.validation.ConstraintValidatorContext;
 
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.Incubating;
+
 /**
  * A custom {@link ConstraintValidatorContext} which allows to set additional message parameters for
  * interpolation.
@@ -106,5 +109,19 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 * @since 5.3
 	 */
 	HibernateConstraintValidatorContext withDynamicPayload(Object payload);
+
+	/**
+	 * Returns an instance of the specified type or {@code null} if the current constraint validator payload isn't of
+	 * the given type.
+	 *
+	 * @param type the type of payload to retrieve
+	 * @return an instance of the specified type or {@code null} if the current constraint validator payload isn't of
+	 * the given type
+	 *
+	 * @since 6.0.9
+	 * @see HibernateValidatorConfiguration#constraintValidatorPayload(Object)
+	 */
+	@Incubating
+	<C> C getConstraintValidatorPayload(Class<C> type);
 
 }

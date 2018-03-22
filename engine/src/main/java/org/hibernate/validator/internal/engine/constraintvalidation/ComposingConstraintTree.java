@@ -93,7 +93,8 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 					validationContext.getParameterNames(),
 					validationContext.getClockProvider(),
 					valueContext.getPropertyPath(),
-					descriptor
+					descriptor,
+					validationContext.getConstraintValidatorPayload()
 			);
 
 			// validate

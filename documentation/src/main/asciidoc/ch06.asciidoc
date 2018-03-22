@@ -189,7 +189,7 @@ The `initialize()` method of `HibernateConstraintValidator` takes two parameters
  * The `ConstraintDescriptor` of the constraint at hand.
    You can get access to the annotation using `ConstraintDescriptor#getAnnotation()`.
  * The `HibernateConstraintValidatorInitializationContext` which provides useful helpers and contextual
-   information, such as the clock provider, the temporal validation tolerance or the constraint validator payload.
+   information, such as the clock provider or the temporal validation tolerance.
 
 This extension is marked as incubating so it might be subject to change.
 The plan is to standardize it and to include it in Bean Validation in the future.
@@ -221,7 +221,7 @@ Another requirement could be to have different behaviors on specific environment
 access to some external production resources necessary for the correct functioning of a validator.
 
 The notion of constraint validator payload was introduced for all these use cases.
-It is an object passed from the `Validator` instance to each constraint validator via the `HibernateConstraintValidatorInitializationContext`.
+It is an object passed from the `Validator` instance to each constraint validator via the `HibernateConstraintValidatorContext`.
 
 The example below shows how to set a constraint validator payload during the `ValidatorFactory` initialization.
 Unless you override this default value, all the ``Validator``s created by this `ValidatorFactory` will have this
@@ -258,7 +258,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraint
 ----
 ====
 
-`HibernateConstraintValidatorInitializationContext#getConstraintValidatorPayload()` has a type parameter
+`HibernateConstraintValidatorContext#getConstraintValidatorPayload()` has a type parameter
 and returns the payload only if the payload is of the given type.
 
 [NOTE]

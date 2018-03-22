@@ -226,7 +226,7 @@ public class ConstraintValidatorContextImplTest {
 		PathImpl path = PathImpl.createRootPath();
 		path.addBeanNode();
 
-		ConstraintValidatorContextImpl context = new ConstraintValidatorContextImpl( null, null, path, null );
+		ConstraintValidatorContextImpl context = new ConstraintValidatorContextImpl( null, null, path, null, null );
 		context.disableDefaultConstraintViolation();
 		return context;
 	}

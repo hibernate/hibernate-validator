@@ -52,13 +52,15 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private List<ConstraintViolationCreationContext> constraintViolationCreationContexts;
 	private boolean defaultDisabled;
 	private Object dynamicPayload;
+	private final Object constraintValidatorPayload;
 
 	public ConstraintValidatorContextImpl(List<String> methodParameterNames, ClockProvider clockProvider,
-			PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor) {
+			PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor, Object constraintValidatorPayload) {
 		this.methodParameterNames = methodParameterNames;
 		this.clockProvider = clockProvider;
 		this.basePath = propertyPath;
 		this.constraintDescriptor = constraintDescriptor;
+		this.constraintValidatorPayload = constraintValidatorPayload;
 	}
 
 	@Override
@@ -122,6 +124,16 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	public HibernateConstraintValidatorContext withDynamicPayload(Object violationContext) {
 		this.dynamicPayload = violationContext;
 		return this;
+	}
+
+	@Override
+	public <C> C getConstraintValidatorPayload(Class<C> type) {
+		if ( constraintValidatorPayload != null && type.isAssignableFrom( constraintValidatorPayload.getClass() ) ) {
+			return type.cast( constraintValidatorPayload );
+		}
+		else {
+			return null;
+		}
 	}
 
 	public final ConstraintDescriptor<?> getConstraintDescriptor() {

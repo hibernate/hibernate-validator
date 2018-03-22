@@ -11,7 +11,6 @@ import java.time.Duration;
 
 import javax.validation.ClockProvider;
 
-import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -56,17 +55,4 @@ public interface HibernateConstraintValidatorInitializationContext {
 	 * @return the tolerance
 	 */
 	Duration getTemporalValidationTolerance();
-
-	/**
-	 * Returns an instance of the specified type or {@code null} if the current constraint validator payload isn't of
-	 * the given type.
-	 *
-	 * @param type the type of payload to retrieve
-	 * @return an instance of the specified type or {@code null} if the current constraint validator payload isn't of
-	 * the given type
-	 *
-	 * @since 6.0.8
-	 * @see HibernateValidatorConfiguration#constraintValidatorPayload(Object)
-	 */
-	<C> C getConstraintValidatorPayload(Class<C> type);
 }

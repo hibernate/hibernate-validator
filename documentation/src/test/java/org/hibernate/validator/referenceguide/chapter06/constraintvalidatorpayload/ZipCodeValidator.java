@@ -4,22 +4,14 @@ package org.hibernate.validator.referenceguide.chapter06.constraintvalidatorpayl
 //end::include[]
 
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.ConstraintValidator;
 
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 
 //tag::include[]
-public class ZipCodeValidator implements HibernateConstraintValidator<ZipCode, String> {
+public class ZipCodeValidator implements ConstraintValidator<ZipCode, String> {
 
 	public String countryCode;
-
-	@Override
-	public void initialize(ConstraintDescriptor<ZipCode> constraintDescriptor,
-			HibernateConstraintValidatorInitializationContext initializationContext) {
-		this.countryCode = initializationContext
-				.getConstraintValidatorPayload( String.class );
-	}
 
 	@Override
 	public boolean isValid(String object, ConstraintValidatorContext constraintContext) {
@@ -28,6 +20,9 @@ public class ZipCodeValidator implements HibernateConstraintValidator<ZipCode, S
 		}
 
 		boolean isValid = false;
+
+		String countryCode = constraintContext.unwrap( HibernateConstraintValidatorContext.class )
+				.getConstraintValidatorPayload( String.class );
 
 		if ( "US".equals( countryCode ) ) {
 			// checks specific to the United States

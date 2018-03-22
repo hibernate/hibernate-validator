@@ -264,6 +264,10 @@ public class ValidationContext<T> {
 		return validatorScopedContext.getClockProvider();
 	}
 
+	public Object getConstraintValidatorPayload() {
+		return validatorScopedContext.getConstraintValidatorPayload();
+	}
+
 	public HibernateConstraintValidatorInitializationContext getConstraintValidatorInitializationContext() {
 		return constraintValidatorInitializationContext;
 	}

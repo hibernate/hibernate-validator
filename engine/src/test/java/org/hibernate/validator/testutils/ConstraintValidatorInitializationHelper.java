@@ -30,7 +30,7 @@ public class ConstraintValidatorInitializationHelper {
 	private static final ConstraintHelper CONSTRAINT_HELPER = new ConstraintHelper();
 
 	private static final HibernateConstraintValidatorInitializationContext DUMMY_CONSTRAINT_VALIDATOR_INITIALIZATION_CONTEXT =
-			getConstraintValidatorInitializationContext( new DefaultScriptEvaluatorFactory( null ), DefaultClockProvider.INSTANCE, Duration.ZERO, null );
+			getConstraintValidatorInitializationContext( new DefaultScriptEvaluatorFactory( null ), DefaultClockProvider.INSTANCE, Duration.ZERO );
 
 	private ConstraintValidatorInitializationHelper() {
 	}
@@ -66,7 +66,7 @@ public class ConstraintValidatorInitializationHelper {
 	}
 
 	public static HibernateConstraintValidatorInitializationContext getConstraintValidatorInitializationContext(
-			ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider, Duration duration, Class<?> payload
+			ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider, Duration duration
 	) {
 		return new HibernateConstraintValidatorInitializationContext() {
 
@@ -83,12 +83,6 @@ public class ConstraintValidatorInitializationHelper {
 			@Override
 			public Duration getTemporalValidationTolerance() {
 				return duration;
-			}
-
-			@Override
-			@SuppressWarnings("unchecked")
-			public <C> C getConstraintValidatorPayload(Class<C> type) {
-				return (C) payload;
 			}
 		};
 	}

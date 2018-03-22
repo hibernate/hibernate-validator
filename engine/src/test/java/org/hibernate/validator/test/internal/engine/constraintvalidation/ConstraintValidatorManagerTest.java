@@ -294,9 +294,9 @@ public class ConstraintValidatorManagerTest {
 		ScriptEvaluatorFactory scriptEvaluatorFactory2 = new DefaultScriptEvaluatorFactory( null );
 
 		HibernateConstraintValidatorInitializationContext initializationContext1 = getConstraintValidatorInitializationContext(
-				scriptEvaluatorFactory1, DefaultClockProvider.INSTANCE, Duration.ZERO, null );
+				scriptEvaluatorFactory1, DefaultClockProvider.INSTANCE, Duration.ZERO );
 		HibernateConstraintValidatorInitializationContext initializationContext2 = getConstraintValidatorInitializationContext(
-				scriptEvaluatorFactory2, DefaultClockProvider.INSTANCE, Duration.ZERO, null );
+				scriptEvaluatorFactory2, DefaultClockProvider.INSTANCE, Duration.ZERO );
 
 		ConstraintValidator<?, ?> sizeValidatorForMiddleNameCtx1 = constraintValidatorManager.getInitializedValidator(
 				String.class, sizeOnMiddleNameDescriptor, constraintValidatorFactory, initializationContext1
@@ -358,9 +358,9 @@ public class ConstraintValidatorManagerTest {
 		};
 
 		HibernateConstraintValidatorInitializationContext initializationContext1 = getConstraintValidatorInitializationContext(
-				scriptEvaluatorFactory, clockProvider1, Duration.ZERO, null );
+				scriptEvaluatorFactory, clockProvider1, Duration.ZERO );
 		HibernateConstraintValidatorInitializationContext initializationContext2 = getConstraintValidatorInitializationContext(
-				scriptEvaluatorFactory, clockProvider2, Duration.ZERO, null );
+				scriptEvaluatorFactory, clockProvider2, Duration.ZERO );
 
 		ConstraintValidator<?, ?> sizeValidatorForMiddleNameCtx1 = constraintValidatorManager.getInitializedValidator(
 				String.class, sizeOnMiddleNameDescriptor, constraintValidatorFactory, initializationContext1
@@ -409,9 +409,9 @@ public class ConstraintValidatorManagerTest {
 		ScriptEvaluatorFactory scriptEvaluatorFactory = new DefaultScriptEvaluatorFactory( null );
 
 		HibernateConstraintValidatorInitializationContext initializationContext1 = getConstraintValidatorInitializationContext(
-				scriptEvaluatorFactory, DefaultClockProvider.INSTANCE, Duration.ofDays( 1 ), null );
+				scriptEvaluatorFactory, DefaultClockProvider.INSTANCE, Duration.ofDays( 1 ) );
 		HibernateConstraintValidatorInitializationContext initializationContext2 = getConstraintValidatorInitializationContext(
-				scriptEvaluatorFactory, DefaultClockProvider.INSTANCE, Duration.ofDays( 999 ), null );
+				scriptEvaluatorFactory, DefaultClockProvider.INSTANCE, Duration.ofDays( 999 ) );
 
 		ConstraintValidator<?, ?> sizeValidatorForMiddleNameCtx1 = constraintValidatorManager.getInitializedValidator(
 				String.class, sizeOnMiddleNameDescriptor, constraintValidatorFactory, initializationContext1

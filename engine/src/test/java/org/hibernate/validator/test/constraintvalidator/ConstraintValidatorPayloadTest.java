@@ -20,16 +20,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 import javax.validation.Validator;
-import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
@@ -106,19 +105,12 @@ public class ConstraintValidatorPayloadTest {
 		Class<? extends Payload>[] payload() default { };
 	}
 
-	public static class PayloadContraintValidator implements HibernateConstraintValidator<PayloadConstraint, Class<?>> {
-
-		private Class<?> payload;
-
-		@Override
-		public void initialize(ConstraintDescriptor<PayloadConstraint> constraintDescriptor,
-				HibernateConstraintValidatorInitializationContext initializationContext) {
-			this.payload = initializationContext.getConstraintValidatorPayload( Class.class );
-		}
+	public static class PayloadContraintValidator implements ConstraintValidator<PayloadConstraint, Class<?>> {
 
 		@Override
 		public boolean isValid(Class<?> value, ConstraintValidatorContext context) {
-			if ( value != null && value.equals( this.payload ) ) {
+			Class<?> payload = context.unwrap( HibernateConstraintValidatorContext.class ).getConstraintValidatorPayload( Class.class );
+			if ( value != null && value.equals( payload ) ) {
 				return true;
 			}
 			return false;

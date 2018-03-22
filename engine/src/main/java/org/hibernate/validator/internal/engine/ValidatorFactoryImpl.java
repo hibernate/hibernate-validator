@@ -729,7 +729,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
 					traversableResolverResultCacheEnabled, constraintValidatorPayload,
 					new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
-							temporalValidationTolerance, constraintValidatorPayload ) );
+							temporalValidationTolerance ) );
 		}
 
 		private ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
@@ -915,8 +915,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 								constraintValidatorInitializationContext,
 								scriptEvaluatorFactory,
 								clockProvider,
-								temporalValidationTolerance,
-								constraintValidatorPayload
+								temporalValidationTolerance
 						)
 				);
 			}
