@@ -891,12 +891,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			}
 
 			public Builder setConstraintValidatorPayload(Object constraintValidatorPayload) {
-				if ( constraintValidatorPayload == null ) {
-					this.constraintValidatorPayload = defaultContext.constraintValidatorPayload;
-				}
-				else {
-					this.constraintValidatorPayload = constraintValidatorPayload;
-				}
+				this.constraintValidatorPayload = constraintValidatorPayload;
 				return this;
 			}
 
