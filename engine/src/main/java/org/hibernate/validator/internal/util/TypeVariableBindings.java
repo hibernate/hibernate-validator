@@ -84,6 +84,7 @@ public class TypeVariableBindings {
 		}
 		else if ( genericSuperType instanceof Class ) {
 			allBindings.put( (Class<?>) genericSuperType, Collections.emptyMap() );
+			collectTypeBindings( (Class<?>) genericSuperType, allBindings, new HashMap<>() );
 		}
 		else {
 			throw new IllegalArgumentException( "Unexpected type: " + genericSuperType );
