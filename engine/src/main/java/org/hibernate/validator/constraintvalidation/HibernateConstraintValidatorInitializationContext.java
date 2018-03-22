@@ -53,6 +53,9 @@ public interface HibernateConstraintValidatorInitializationContext {
 	 * temporal constraints.
 	 *
 	 * @return the tolerance
+	 *
+	 * @since 6.0.5
 	 */
+	@Incubating
 	Duration getTemporalValidationTolerance();
 }
