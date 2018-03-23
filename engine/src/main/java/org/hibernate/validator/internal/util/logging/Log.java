@@ -841,4 +841,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = DEBUG)
 	@Message(id = 240, value = "Constraint validator payload set to %1$s.")
 	void logConstraintValidatorPayload(Object payload);
+
+	@Message(id = 241, value = "Encountered unsupported element %1$s while parsing the XML configuration.")
+	ValidationException logUnknownElementInXmlConfiguration(String tag);
 }

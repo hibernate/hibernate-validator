@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.xml;
+package org.hibernate.validator.internal.xml.config;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -23,7 +23,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  *
  * @author Hardy Ferentschik
  */
-public class BootstrapConfigurationImpl implements BootstrapConfiguration {
+class BootstrapConfigurationImpl implements BootstrapConfiguration {
 
 	/**
 	 * The executable types validated by default.
