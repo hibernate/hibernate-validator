@@ -17,7 +17,7 @@ import java.io.InputStream;
  *
  * @author Guillaume Smet
  */
-class CloseIgnoringInputStream extends FilterInputStream {
+public class CloseIgnoringInputStream extends FilterInputStream {
 
 	public CloseIgnoringInputStream(InputStream in) {
 		super( in );

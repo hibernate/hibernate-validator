@@ -143,7 +143,7 @@ public class XmlParserHelper {
 	 * @return the schema identified by the given resource name or {@code null} if the resource was not found or could
 	 *         not be loaded.
 	 */
-	Schema getSchema(String schemaResource) {
+	public Schema getSchema(String schemaResource) {
 		Schema schema = schemaCache.get( schemaResource );
 
 		if ( schema != null ) {
