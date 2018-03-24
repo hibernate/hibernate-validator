@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.xml;
+package org.hibernate.validator.internal.xml.mapping;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
@@ -21,7 +21,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
  *
  * @author Gunnar Morling
  */
-/*package*/ class ClassLoadingHelper {
+class ClassLoadingHelper {
 
 	private static final String PACKAGE_SEPARATOR = ".";
 	private static final String ARRAY_CLASS_NAME_PREFIX = "[L";
@@ -51,7 +51,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 		this.externalClassLoader = externalClassLoader;
 	}
 
-	/*package*/ Class<?> loadClass(String className, String defaultPackage) {
+	Class<?> loadClass(String className, String defaultPackage) {
 		if ( PRIMITIVE_NAME_TO_PRIMITIVE.containsKey( className ) ) {
 			return PRIMITIVE_NAME_TO_PRIMITIVE.get( className );
 		}

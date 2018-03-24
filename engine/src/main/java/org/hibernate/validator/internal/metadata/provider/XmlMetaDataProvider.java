@@ -20,7 +20,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
-import org.hibernate.validator.internal.xml.MappingXmlParser;
+import org.hibernate.validator.internal.xml.mapping.MappingXmlParser;
 
 /**
  * A {@link MetaDataProvider} providing constraint related meta data based on

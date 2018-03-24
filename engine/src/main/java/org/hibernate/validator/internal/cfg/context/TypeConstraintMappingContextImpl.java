@@ -145,7 +145,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		Method method = run( GetDeclaredMethod.action( beanClass, name, parameterTypes ) );
 
 		if ( method == null || method.getDeclaringClass() != beanClass ) {
-			throw LOG.getBeanDoesNotContainMethodException( beanClass, name, Arrays.asList( parameterTypes ) );
+			throw LOG.getBeanDoesNotContainMethodException( beanClass, name, parameterTypes );
 		}
 
 		if ( configuredMembers.contains( method ) ) {
@@ -169,7 +169,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		if ( constructor == null || constructor.getDeclaringClass() != beanClass ) {
 			throw LOG.getBeanDoesNotContainConstructorException(
 					beanClass,
-					Arrays.asList( parameterTypes )
+					parameterTypes
 			);
 		}
 
