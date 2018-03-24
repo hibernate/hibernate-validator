@@ -58,7 +58,6 @@ class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	private final String traversableResolverClassName;
 	private final String parameterNameProviderClassName;
 	private final String clockProviderClassName;
-	private final String scriptEvaluatorFactoryClassName;
 	private final Set<String> valueExtractorClassNames;
 	private final Set<String> constraintMappingResourcePaths;
 	private final Map<String, String> properties;
@@ -72,7 +71,6 @@ class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.traversableResolverClassName = null;
 		this.parameterNameProviderClassName = null;
 		this.clockProviderClassName = null;
-		this.scriptEvaluatorFactoryClassName = null;
 		this.valueExtractorClassNames = new HashSet<>();
 		this.validatedExecutableTypes = DEFAULT_VALIDATED_EXECUTABLE_TYPES;
 		this.isExecutableValidationEnabled = true;
@@ -86,7 +84,6 @@ class BootstrapConfigurationImpl implements BootstrapConfiguration {
 									  String traversableResolverClassName,
 									  String parameterNameProviderClassName,
 									  String clockProviderClassName,
-									  String scriptEvaluatorFactoryClassName,
 									  Set<String> valueExtractorClassNames,
 									  EnumSet<ExecutableType> validatedExecutableTypes,
 									  boolean isExecutableValidationEnabled,
@@ -98,7 +95,6 @@ class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.traversableResolverClassName = traversableResolverClassName;
 		this.parameterNameProviderClassName = parameterNameProviderClassName;
 		this.clockProviderClassName = clockProviderClassName;
-		this.scriptEvaluatorFactoryClassName = scriptEvaluatorFactoryClassName;
 		this.valueExtractorClassNames = valueExtractorClassNames;
 		this.validatedExecutableTypes = prepareValidatedExecutableTypes( validatedExecutableTypes );
 		this.isExecutableValidationEnabled = isExecutableValidationEnabled;
@@ -163,10 +159,6 @@ class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		return clockProviderClassName;
 	}
 
-	public String getScriptEvaluatorFactoryClassName() {
-		return scriptEvaluatorFactoryClassName;
-	}
-
 	@Override
 	public Set<String> getValueExtractorClassNames() {
 		return new HashSet<>( valueExtractorClassNames );
@@ -204,7 +196,6 @@ class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		sb.append( ", traversableResolverClassName='" ).append( traversableResolverClassName ).append( '\'' );
 		sb.append( ", parameterNameProviderClassName='" ).append( parameterNameProviderClassName ).append( '\'' );
 		sb.append( ", clockProviderClassName='" ).append( clockProviderClassName ).append( '\'' );
-		sb.append( ", scriptEvaluatorFactoryClassName='" ).append( scriptEvaluatorFactoryClassName ).append( '\'' );
 		sb.append( ", validatedExecutableTypes='" ).append( validatedExecutableTypes ).append( '\'' );
 		sb.append( ", constraintMappingResourcePaths=" ).append( constraintMappingResourcePaths ).append( '\'' );
 		sb.append( ", properties=" ).append( properties );
