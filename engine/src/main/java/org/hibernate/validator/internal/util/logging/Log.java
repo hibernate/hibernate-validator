@@ -48,6 +48,7 @@ import javax.xml.stream.XMLStreamException;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.logging.formatter.ArrayOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ClassObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfObjectsToStringFormatter;
@@ -468,14 +469,14 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 133, value = "%1$s does not contain a constructor with the parameter types %2$s.")
 	ValidationException getBeanDoesNotContainConstructorException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass,
-			@FormatWith(CollectionOfClassesObjectFormatter.class) List<Class<?>> parameterTypes);
+			@FormatWith(ArrayOfClassesObjectFormatter.class) Class<?>[] parameterTypes);
 
 	@Message(id = 134, value = "Unable to load parameter of type '%1$s' in %2$s.")
 	ValidationException getInvalidParameterTypeException(String type, @FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
 
 	@Message(id = 135, value = "%1$s does not contain a method with the name '%2$s' and parameter types %3$s.")
 	ValidationException getBeanDoesNotContainMethodException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String methodName,
-			@FormatWith(CollectionOfClassesObjectFormatter.class) List<Class<?>> parameterTypes);
+			@FormatWith(ArrayOfClassesObjectFormatter.class) Class<?>[] parameterTypes);
 
 	@Message(id = 136, value = "The specified constraint annotation class %1$s cannot be loaded.")
 	ValidationException getUnableToLoadConstraintAnnotationClassException(String constraintAnnotationClassName, @Cause Exception e);

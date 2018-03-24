@@ -102,7 +102,7 @@ class ConstrainedExecutableBuilder {
 				throw LOG.getBeanDoesNotContainMethodException(
 						beanClass,
 						methodName,
-						parameterTypes
+						parameterTypes.toArray( new Class[parameterTypes.size()] )
 				);
 			}
 
@@ -157,7 +157,7 @@ class ConstrainedExecutableBuilder {
 			if ( constructor == null ) {
 				throw LOG.getBeanDoesNotContainConstructorException(
 						beanClass,
-						constructorParameterTypes
+						constructorParameterTypes.toArray( new Class[constructorParameterTypes.size()] )
 				);
 			}
 			if ( alreadyProcessedConstructors.contains( constructor ) ) {

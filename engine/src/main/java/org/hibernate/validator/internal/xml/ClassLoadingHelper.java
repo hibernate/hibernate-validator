@@ -21,7 +21,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
  *
  * @author Gunnar Morling
  */
-/*package*/ class ClassLoadingHelper {
+public class ClassLoadingHelper {
 
 	private static final String PACKAGE_SEPARATOR = ".";
 	private static final String ARRAY_CLASS_NAME_PREFIX = "[L";
@@ -51,7 +51,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 		this.externalClassLoader = externalClassLoader;
 	}
 
-	/*package*/ Class<?> loadClass(String className, String defaultPackage) {
+	public Class<?> loadClass(String className, String defaultPackage) {
 		if ( PRIMITIVE_NAME_TO_PRIMITIVE.containsKey( className ) ) {
 			return PRIMITIVE_NAME_TO_PRIMITIVE.get( className );
 		}
