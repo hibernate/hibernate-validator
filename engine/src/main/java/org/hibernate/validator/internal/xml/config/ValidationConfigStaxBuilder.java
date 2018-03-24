@@ -22,7 +22,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -96,7 +95,6 @@ class ValidationConfigStaxBuilder extends AbstractStaxBuilder {
 				simpleConfigurationsStaxBuilder.getTraversableResolver(),
 				simpleConfigurationsStaxBuilder.getParameterNameProvider(),
 				simpleConfigurationsStaxBuilder.getClockProvider(),
-				properties.get( HibernateValidatorConfiguration.SCRIPT_EVALUATOR_FACTORY_CLASSNAME ),
 				valueExtractorsStaxBuilder.build(),
 				executableValidationStaxBuilder.build(),
 				executableValidationStaxBuilder.isEnabled(),
