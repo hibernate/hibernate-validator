@@ -21,7 +21,8 @@ public class ZipCodeValidator implements ConstraintValidator<ZipCode, String> {
 
 		boolean isValid = false;
 
-		String countryCode = constraintContext.unwrap( HibernateConstraintValidatorContext.class )
+		String countryCode = constraintContext
+				.unwrap( HibernateConstraintValidatorContext.class )
 				.getConstraintValidatorPayload( String.class );
 
 		if ( "US".equals( countryCode ) ) {
