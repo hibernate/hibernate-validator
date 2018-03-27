@@ -1,6 +1,25 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.9.Final (27-03-2018)
+-------------------------
+
+** Bug
+    * HV-1596 - engine      - NPE upon upgrade from HV 5.x to 6.0.8
+    * HV-1594 - integration - Add javax.annotation:javax.annotation-api to the hibernate-validator-javax-money Karaf feature
+    * HV-1589 - engine      - HibernateConstraintValidators are not correctly cached
+
+** Improvement
+    * HV-1597 - engine      - Allow overriding the constraint validator payload at the Validator level with null
+    * HV-1595 - engine      - Move ConstraintValidatorPayload to ConstraintValidatorContext
+    * HV-1593 - integration - Split the hibernate-validator Karaf feature in several smaller features
+    * HV-1587 - engine      - Reduce the already processed work units tracking impact
+    * HV-1586 - performance - Various improvements to performance tests
+    * HV-1585 - engine      - Omit the cache lookup in AbstractMessageInterpolator for the simple text messages
+
+** Task
+    * HV-1578 - build       - Disable the generation of @Generated annotation for JBoss Logging
+
 6.0.8.Final (07-03-2018)
 -------------------------
 
