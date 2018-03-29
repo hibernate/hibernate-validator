@@ -32,7 +32,7 @@ import org.hibernate.validator.internal.xml.XmlParserHelper;
 import org.xml.sax.SAXException;
 
 /**
- * Parser for <i>validation.xml</i> using JAXB.
+ * Parser for <i>validation.xml</i>.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling

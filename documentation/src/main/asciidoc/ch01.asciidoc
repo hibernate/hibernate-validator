@@ -206,9 +206,6 @@ These are the module names as declared using the `Automatic-Module-Name` header:
 
 These module names are preliminary and may be changed when providing real module descriptors in a future release.
 
-When using Bean Validation XML descriptors (_META-INF/validation.xml_ and/or constraint mapping files), the `java.xml.bind` module must be enabled.
-Do so by appending `--add-modules java.xml.bind` to your _java_ invocation.
-
 [WARNING]
 ====
 When using Hibernate Validator with CDI, be careful to not enable the `java.xml.ws.annotation` module of the JDK.

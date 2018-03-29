@@ -26,3 +26,7 @@ org.assertj.core.api.Assertions#fail()
 java.lang.StringBuffer
 
 org.jboss.logging.processor.util.Objects
+
+################################################################################################################
+# JAXB shouldn't be used anymore as it is targeted to be removed from the JDK
+javax.xml.bind.**
