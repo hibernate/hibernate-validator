@@ -12,6 +12,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -32,8 +34,9 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.internal.xml.stax.mapping.ConstraintMappingsStaxBuilder;
-
 import org.xml.sax.SAXException;
 
 /**
@@ -79,7 +82,7 @@ public class MappingXmlParser {
 		this.defaultSequences = newHashMap();
 		this.constrainedElements = newHashMap();
 		this.xmlParserHelper = new XmlParserHelper();
-		this.classLoadingHelper = new ClassLoadingHelper( externalClassLoader );
+		this.classLoadingHelper = new ClassLoadingHelper( externalClassLoader, run( GetClassLoader.fromContext() ) );
 	}
 
 	/**
@@ -89,7 +92,11 @@ public class MappingXmlParser {
 	 * @param mappingStreams The streams to parse. Must support the mark/reset contract.
 	 */
 	public final void parse(Set<InputStream> mappingStreams) {
+		ClassLoader previousTccl = run( GetClassLoader.fromContext() );
+
 		try {
+			run( SetContextClassLoader.action( MappingXmlParser.class.getClassLoader() ) );
+
 			Set<String> alreadyProcessedConstraintDefinitions = newHashSet();
 			for ( InputStream in : mappingStreams ) {
 				// the InputStreams passed in parameters support mark and reset
@@ -128,6 +135,9 @@ public class MappingXmlParser {
 		catch (IOException | XMLStreamException | SAXException e) {
 			throw LOG.getErrorParsingMappingFileException( e );
 		}
+		finally {
+			run( SetContextClassLoader.action( previousTccl ) );
+		}
 	}
 
 	public final Set<Class<?>> getXmlConfiguredClasses() {
@@ -159,5 +169,15 @@ public class MappingXmlParser {
 		}
 
 		return schemaResource;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

@@ -26,6 +26,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public final class LoadClass implements PrivilegedAction<Class<?>> {
 
@@ -37,22 +38,32 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 
 	private final ClassLoader classLoader;
 
+	private final ClassLoader initialThreadContextClassLoader;
+
 	/**
 	 * when true, it will check the Thread Context ClassLoader when the class is not found in the provided one
 	 */
 	private final boolean fallbackOnTCCL;
 
 	public static LoadClass action(String className, ClassLoader classLoader) {
-		return new LoadClass( className, classLoader, true );
+		return action( className, classLoader, true );
 	}
 
 	public static LoadClass action(String className, ClassLoader classLoader, boolean fallbackOnTCCL) {
-		return new LoadClass( className, classLoader, fallbackOnTCCL );
+		return new LoadClass( className, classLoader, null, fallbackOnTCCL );
 	}
 
-	private LoadClass(String className, ClassLoader classLoader, boolean fallbackOnTCCL) {
+	/**
+	 * in some cases, the TCCL has been overridden so we need to pass it explicitly.
+	 */
+	public static LoadClass action(String className, ClassLoader classLoader, ClassLoader initialThreadContextClassLoader) {
+		return new LoadClass( className, classLoader, initialThreadContextClassLoader, true );
+	}
+
+	private LoadClass(String className, ClassLoader classLoader, ClassLoader initialThreadContextClassLoader, boolean fallbackOnTCCL) {
 		this.className = className;
 		this.classLoader = classLoader;
+		this.initialThreadContextClassLoader = initialThreadContextClassLoader;
 		this.fallbackOnTCCL = fallbackOnTCCL;
 	}
 
@@ -80,7 +91,9 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 			exception = e;
 		}
 		if ( fallbackOnTCCL ) {
-			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+			ClassLoader contextClassLoader = initialThreadContextClassLoader != null
+					? initialThreadContextClassLoader
+					: Thread.currentThread().getContextClassLoader();
 			if ( contextClassLoader != null ) {
 				try {
 					return Class.forName( className, false, contextClassLoader );
@@ -100,20 +113,22 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 
 	private Class<?> loadNonValidatorClass() {
 		Exception exception = null;
-		try {
-			if ( classLoader != null ) {
+		if ( classLoader != null ) {
+			try {
 				return Class.forName( className, false, classLoader );
 			}
-		}
-		catch (ClassNotFoundException e) {
-			exception = e;
-		}
-		catch (RuntimeException e) {
-			exception = e;
+			catch (ClassNotFoundException e) {
+				exception = e;
+			}
+			catch (RuntimeException e) {
+				exception = e;
+			}
 		}
 		if ( fallbackOnTCCL ) {
 			try {
-				ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+				ClassLoader contextClassLoader = initialThreadContextClassLoader != null
+						? initialThreadContextClassLoader
+						: Thread.currentThread().getContextClassLoader();
 				if ( contextClassLoader != null ) {
 					return Class.forName( className, false, contextClassLoader );
 				}
