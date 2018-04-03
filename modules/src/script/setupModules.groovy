@@ -17,6 +17,10 @@ def appendDependency(File file, String dependencyToAppend, boolean optional) {
     file.write( file.text.replaceAll( /<\/dependencies>/, '  <module name="' + dependencyToAppend + '"' + ( optional ? ' optional="true"' : '' ) + '/>\n  </dependencies>' ) )
 }
 
+def removeDependency(File file, String dependencyToRemove) {
+    file.write( file.text.replaceAll( /<module name="${dependencyToRemove}"[^\/]*\/>/, '' ) )
+}
+
 // BV API
 bvModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/javax/validation/api/main/module.xml' )
 def bvArtifactName = 'validation-api-' + project.properties['bv.api.version'] + '.jar';
@@ -34,6 +38,11 @@ println "[INFO] Using HV version " + hvArtifactName;
 processFileInplace( hvModuleXml ) { text ->
     text.replaceAll( /hibernate-validator.*jar/, hvArtifactName )
 }
+
+removeDependency( hvModuleXml, "org.apache.xerces" )
+appendDependency( hvModuleXml, "javax.xml.stream.api", false )
+appendDependency( hvModuleXml, "javax.api", false )
+
 appendDependency( hvModuleXml, "javax.money.api", true )
 appendDependency( hvModuleXml, "javafx.api", true )
 
