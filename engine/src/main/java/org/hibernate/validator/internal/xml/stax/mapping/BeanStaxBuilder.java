@@ -11,8 +11,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -190,7 +188,7 @@ public class BeanStaxBuilder extends AbstractStaxBuilder {
 						.collect( Collectors.toList() )
 		);
 
-		List<Constructor> alreadyProcessedConstructors = new ArrayList<>( constrainedConstructorStaxBuilders.size() );
+		List<Constructor<?>> alreadyProcessedConstructors = new ArrayList<>( constrainedConstructorStaxBuilders.size() );
 		addConstrainedElements(
 				constrainedElementsByType,
 				beanClass,
@@ -224,18 +222,8 @@ public class BeanStaxBuilder extends AbstractStaxBuilder {
 
 	private void checkClassHasNotBeenProcessed(Set<Class<?>> processedClasses, Class<?> beanClass) {
 		if ( processedClasses.contains( beanClass ) ) {
-			throw LOG.getBeanClassHasAlreadyBeConfiguredInXmlException( beanClass );
+			throw LOG.getBeanClassHasAlreadyBeenConfiguredInXmlException( beanClass );
 		}
 		processedClasses.add( beanClass );
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 *
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

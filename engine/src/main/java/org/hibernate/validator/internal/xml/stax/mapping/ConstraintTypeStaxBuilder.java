@@ -112,6 +112,7 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	<A extends Annotation> MetaConstraint<A> build(ConstraintLocation constraintLocation, java.lang.annotation.ElementType type, ConstraintDescriptorImpl.ConstraintType constraintType) {
 		String defaultPackage = defaultPackageStaxBuilder.build().orElse( "" );
 
@@ -351,6 +352,7 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 			}
 		}
 
+		@SuppressWarnings("unchecked")
 		protected <A extends Annotation> Object getAnnotationElementValue(List<AnnotationParameterStaxBuilder> parameters, Class<A> annotationClass, String name, String defaultPackage) {
 			Class<?> returnType = getAnnotationParameterType( annotationClass, name );
 			boolean isArray = returnType.isArray();
@@ -382,6 +384,7 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 			return m.getReturnType();
 		}
 
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		private Object convertStringToReturnType(String value, Class<?> returnType, String defaultPackage) {
 			Object returnValue;
 			if ( returnType == byte.class ) {
@@ -449,7 +452,6 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 			}
 			else {
 				try {
-					@SuppressWarnings("unchecked")
 					Class<Enum> enumClass = (Class<Enum>) returnType;
 					returnValue = Enum.valueOf( enumClass, value );
 				}

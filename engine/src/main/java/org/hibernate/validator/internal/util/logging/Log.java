@@ -380,7 +380,7 @@ public interface Log extends BasicLogger {
 	ValidationException getIsNotAConstraintValidatorClassException(@FormatWith(ClassObjectFormatter.class) Class<?> validatorClass);
 
 	@Message(id = 103, value = "%s is configured at least twice in xml.")
-	ValidationException getBeanClassHasAlreadyBeConfiguredInXmlException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
+	ValidationException getBeanClassHasAlreadyBeenConfiguredInXmlException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
 
 	@Message(id = 104, value = "%1$s is defined twice in mapping xml for bean %2$s.")
 	ValidationException getIsDefinedTwiceInMappingXmlForBeanException(String name, @FormatWith(ClassObjectFormatter.class) Class<?> beanClass);

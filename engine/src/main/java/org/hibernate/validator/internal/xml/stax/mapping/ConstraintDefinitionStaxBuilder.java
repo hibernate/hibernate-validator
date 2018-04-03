@@ -67,6 +67,7 @@ public class ConstraintDefinitionStaxBuilder extends AbstractStaxBuilder {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	void build(Set<String> alreadyProcessedConstraintDefinitions) {
 		checkProcessedAnnotations( alreadyProcessedConstraintDefinitions );
 		String defaultPackage = defaultPackageStaxBuilder.build().orElse( "" );
@@ -132,6 +133,7 @@ public class ConstraintDefinitionStaxBuilder extends AbstractStaxBuilder {
 			}
 		}
 
+		@SuppressWarnings("unchecked")
 		<A extends Annotation> List<ConstraintValidatorDescriptor<A>> build(Class<A> annotation) {
 			String defaultPackage = defaultPackageStaxBuilder.build().orElse( "" );
 

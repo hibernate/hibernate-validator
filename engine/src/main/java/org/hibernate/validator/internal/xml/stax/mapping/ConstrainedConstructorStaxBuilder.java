@@ -45,7 +45,6 @@ public class ConstrainedConstructorStaxBuilder extends AbstractConstrainedExecut
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String METHOD_QNAME_LOCAL_PART = "constructor";
-	private static final QName NAME_QNAME = new QName( "name" );
 
 	ConstrainedConstructorStaxBuilder(
 			ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
@@ -68,7 +67,7 @@ public class ConstrainedConstructorStaxBuilder extends AbstractConstrainedExecut
 		return mainAttributeValue;
 	}
 
-	ConstrainedExecutable build(Class<?> beanClass, List<Constructor> alreadyProcessedConstructors) {
+	ConstrainedExecutable build(Class<?> beanClass, List<Constructor<?>> alreadyProcessedConstructors) {
 		Class<?>[] parameterTypes = constrainedParameterStaxBuilders.stream()
 				.map( builder -> builder.getParameterType( beanClass ) )
 				.toArray( Class[]::new );

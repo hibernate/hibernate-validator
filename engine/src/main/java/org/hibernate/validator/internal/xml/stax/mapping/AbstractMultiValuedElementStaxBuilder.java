@@ -25,7 +25,7 @@ abstract class AbstractMultiValuedElementStaxBuilder extends AbstractStaxBuilder
 
 	private static final String VALUE_QNAME_LOCAL_PART = "value";
 
-	private static final Class[] EMPTY_CLASSES_ARRAY = new Class[0];
+	private static final Class<?>[] EMPTY_CLASSES_ARRAY = new Class<?>[0];
 
 	private final ClassLoadingHelper classLoadingHelper;
 	private final DefaultPackageStaxBuilder defaultPackageStaxBuilder;
