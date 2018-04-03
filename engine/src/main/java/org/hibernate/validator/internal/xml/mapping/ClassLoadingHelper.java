@@ -20,6 +20,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
  * types, qualified names or unqualified names (in which case a given default package will be assumed).
  *
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 class ClassLoadingHelper {
 
@@ -47,8 +48,11 @@ class ClassLoadingHelper {
 
 	private final ClassLoader externalClassLoader;
 
-	ClassLoadingHelper(ClassLoader externalClassLoader) {
+	private final ClassLoader threadContextClassLoader;
+
+	ClassLoadingHelper(ClassLoader externalClassLoader, ClassLoader threadContextClassLoader) {
 		this.externalClassLoader = externalClassLoader;
+		this.threadContextClassLoader = threadContextClassLoader;
 	}
 
 	Class<?> loadClass(String className, String defaultPackage) {
@@ -80,7 +84,7 @@ class ClassLoadingHelper {
 	}
 
 	private Class<?> loadClass(String className) {
-		return run( LoadClass.action( className, externalClassLoader ) );
+		return run( LoadClass.action( className, externalClassLoader, threadContextClassLoader ) );
 	}
 
 	private static boolean isArrayClassName(String className) {
