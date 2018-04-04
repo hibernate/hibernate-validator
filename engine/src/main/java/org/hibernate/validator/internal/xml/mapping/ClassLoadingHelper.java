@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.xml;
+package org.hibernate.validator.internal.xml.mapping;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
@@ -20,8 +20,9 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
  * types, qualified names or unqualified names (in which case a given default package will be assumed).
  *
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
-/*package*/ class ClassLoadingHelper {
+class ClassLoadingHelper {
 
 	private static final String PACKAGE_SEPARATOR = ".";
 	private static final String ARRAY_CLASS_NAME_PREFIX = "[L";
@@ -47,11 +48,14 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 
 	private final ClassLoader externalClassLoader;
 
-	ClassLoadingHelper(ClassLoader externalClassLoader) {
+	private final ClassLoader threadContextClassLoader;
+
+	ClassLoadingHelper(ClassLoader externalClassLoader, ClassLoader threadContextClassLoader) {
 		this.externalClassLoader = externalClassLoader;
+		this.threadContextClassLoader = threadContextClassLoader;
 	}
 
-	/*package*/ Class<?> loadClass(String className, String defaultPackage) {
+	public Class<?> loadClass(String className, String defaultPackage) {
 		if ( PRIMITIVE_NAME_TO_PRIMITIVE.containsKey( className ) ) {
 			return PRIMITIVE_NAME_TO_PRIMITIVE.get( className );
 		}
@@ -80,7 +84,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 	}
 
 	private Class<?> loadClass(String className) {
-		return run( LoadClass.action( className, externalClassLoader ) );
+		return run( LoadClass.action( className, externalClassLoader, threadContextClassLoader ) );
 	}
 
 	private static boolean isArrayClassName(String className) {

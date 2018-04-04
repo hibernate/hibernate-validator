@@ -48,6 +48,7 @@ import javax.xml.stream.XMLStreamException;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.logging.formatter.ArrayOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ClassObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfObjectsToStringFormatter;
@@ -55,7 +56,7 @@ import org.hibernate.validator.internal.util.logging.formatter.DurationFormatter
 import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ObjectArrayFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
-import org.hibernate.validator.internal.xml.ContainerElementTypePath;
+import org.hibernate.validator.internal.xml.mapping.ContainerElementTypePath;
 import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
@@ -379,7 +380,7 @@ public interface Log extends BasicLogger {
 	ValidationException getIsNotAConstraintValidatorClassException(@FormatWith(ClassObjectFormatter.class) Class<?> validatorClass);
 
 	@Message(id = 103, value = "%s is configured at least twice in xml.")
-	ValidationException getBeanClassHasAlreadyBeConfiguredInXmlException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
+	ValidationException getBeanClassHasAlreadyBeenConfiguredInXmlException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
 
 	@Message(id = 104, value = "%1$s is defined twice in mapping xml for bean %2$s.")
 	ValidationException getIsDefinedTwiceInMappingXmlForBeanException(String name, @FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
@@ -468,14 +469,14 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 133, value = "%1$s does not contain a constructor with the parameter types %2$s.")
 	ValidationException getBeanDoesNotContainConstructorException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass,
-			@FormatWith(CollectionOfClassesObjectFormatter.class) List<Class<?>> parameterTypes);
+			@FormatWith(ArrayOfClassesObjectFormatter.class) Class<?>[] parameterTypes);
 
 	@Message(id = 134, value = "Unable to load parameter of type '%1$s' in %2$s.")
 	ValidationException getInvalidParameterTypeException(String type, @FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
 
 	@Message(id = 135, value = "%1$s does not contain a method with the name '%2$s' and parameter types %3$s.")
 	ValidationException getBeanDoesNotContainMethodException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String methodName,
-			@FormatWith(CollectionOfClassesObjectFormatter.class) List<Class<?>> parameterTypes);
+			@FormatWith(ArrayOfClassesObjectFormatter.class) Class<?>[] parameterTypes);
 
 	@Message(id = 136, value = "The specified constraint annotation class %1$s cannot be loaded.")
 	ValidationException getUnableToLoadConstraintAnnotationClassException(String constraintAnnotationClassName, @Cause Exception e);
@@ -841,4 +842,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = DEBUG)
 	@Message(id = 240, value = "Constraint validator payload set to %1$s.")
 	void logConstraintValidatorPayload(Object payload);
+
+	@Message(id = 241, value = "Encountered unsupported element %1$s while parsing the xml.")
+	IllegalStateException logUnknownElementInXmlConfig(String tag);
 }

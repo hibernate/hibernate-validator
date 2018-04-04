@@ -14,14 +14,10 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -54,28 +50,15 @@ public class XmlParserHelper {
 	 */
 	private static final int NUMBER_OF_SCHEMAS = 4;
 	private static final String DEFAULT_VERSION = "1.0";
-
-	private static final Map<String, String> NAMESPACE_NORMALIZATION_MAPPING;
+	private static final QName VERSION_QNAME = new QName( "version" );
 
 	// xmlInputFactory used to be static in order to cache the factory, but that introduced a leakage of
 	// class loader in WildFly. See HV-842
 	private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
-	// xmlEventFactory should not be static either.
-	private final XMLEventFactory xmlEventFactory = XMLEventFactory.newInstance();
-
 	private static final ConcurrentMap<String, Schema> schemaCache = new ConcurrentHashMap<String, Schema>(
 			NUMBER_OF_SCHEMAS
 	);
-
-	static {
-		Map<String, String> namespaceNormalizationMapping = new HashMap<>();
-		namespaceNormalizationMapping.put( LocalNamespace.VALIDATION_1_CONFIGURATION.getNamespaceURI(),
-				LocalNamespace.VALIDATION_2_CONFIGURATION.getNamespaceURI() );
-		namespaceNormalizationMapping.put( LocalNamespace.VALIDATION_1_MAPPING.getNamespaceURI(),
-				LocalNamespace.VALIDATION_2_MAPPING.getNamespaceURI() );
-		NAMESPACE_NORMALIZATION_MAPPING = Collections.unmodifiableMap( namespaceNormalizationMapping );
-	}
 
 	/**
 	 * Retrieves the schema version applying for the given XML input stream as
@@ -105,11 +88,7 @@ public class XmlParserHelper {
 
 	public synchronized XMLEventReader createXmlEventReader(String resourceName, InputStream xmlStream) {
 		try {
-			return new NamespaceNormalizingXMLEventReaderDelegate(
-					xmlInputFactory.createXMLEventReader( xmlStream ),
-					xmlEventFactory,
-					NAMESPACE_NORMALIZATION_MAPPING
-			);
+			return xmlInputFactory.createXMLEventReader( xmlStream );
 		}
 		catch (Exception e) {
 			throw LOG.getUnableToCreateXMLEventReader( resourceName, e );
@@ -121,7 +100,7 @@ public class XmlParserHelper {
 			return null;
 		}
 
-		Attribute versionAttribute = startElement.getAttributeByName( new QName( "version" ) );
+		Attribute versionAttribute = startElement.getAttributeByName( VERSION_QNAME );
 		return versionAttribute != null ? versionAttribute.getValue() : DEFAULT_VERSION;
 	}
 
@@ -143,7 +122,7 @@ public class XmlParserHelper {
 	 * @return the schema identified by the given resource name or {@code null} if the resource was not found or could
 	 *         not be loaded.
 	 */
-	Schema getSchema(String schemaResource) {
+	public Schema getSchema(String schemaResource) {
 		Schema schema = schemaCache.get( schemaResource );
 
 		if ( schema != null ) {
