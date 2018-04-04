@@ -7,9 +7,6 @@
 package org.hibernate.validator.internal.xml.mapping;
 
 import java.lang.reflect.Executable;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -75,14 +72,6 @@ class ReturnValueStaxBuilder extends AbstractConstrainedElementStaxBuilder {
 			);
 		}
 
-		return getCascadingMetaDataForReturnValue( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), executable );
-	}
-
-	//TODO: next method seems to repeat (if pass type into it). can be moved so that it can be reused
-	private CascadingMetaDataBuilder getCascadingMetaDataForReturnValue(Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Executable executable) {
-		Type type = ReflectionHelper.typeOf( executable );
-		Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.build();
-
-		return CascadingMetaDataBuilder.annotatedObject( type, validStaxBuilder.build(), containerElementTypesCascadingMetaData, groupConversions );
+		return getCascadingMetaData( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), ReflectionHelper.typeOf( executable ) );
 	}
 }

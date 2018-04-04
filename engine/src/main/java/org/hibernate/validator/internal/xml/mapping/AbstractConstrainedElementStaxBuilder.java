@@ -7,8 +7,10 @@
 package org.hibernate.validator.internal.xml.mapping;
 
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.namespace.QName;
@@ -17,6 +19,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -102,4 +105,7 @@ abstract class AbstractConstrainedElementStaxBuilder extends AbstractStaxBuilder
 		return containerElementTypeConfigurationBuilder.build( constraintLocation, type );
 	}
 
+	protected CascadingMetaDataBuilder getCascadingMetaData(Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Type type) {
+		return CascadingMetaDataBuilder.annotatedObject( type, validStaxBuilder.build(), containerElementTypesCascadingMetaData, groupConversionBuilder.build() );
+	}
 }

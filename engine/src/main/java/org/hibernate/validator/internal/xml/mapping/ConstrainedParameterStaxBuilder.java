@@ -9,8 +9,6 @@ package org.hibernate.validator.internal.xml.mapping;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,7 +17,6 @@ import javax.validation.ValidationException;
 import javax.xml.namespace.QName;
 
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -98,14 +95,8 @@ class ConstrainedParameterStaxBuilder extends AbstractConstrainedElementStaxBuil
 				index,
 				metaConstraints,
 				containerElementTypeConfiguration.getMetaConstraints(),
-				getCascadingMetaDataForParameter( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), type )
+				getCascadingMetaData( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), type )
 		);
 		return constrainedParameter;
-	}
-
-	private CascadingMetaDataBuilder getCascadingMetaDataForParameter(Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Type type) {
-		Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.build();
-
-		return CascadingMetaDataBuilder.annotatedObject( type, validStaxBuilder.build(), containerElementTypesCascadingMetaData, groupConversions );
 	}
 }

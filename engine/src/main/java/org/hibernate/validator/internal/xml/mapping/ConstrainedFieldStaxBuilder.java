@@ -8,12 +8,9 @@ package org.hibernate.validator.internal.xml.mapping;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,7 +18,6 @@ import java.util.stream.Collectors;
 import javax.xml.namespace.QName;
 
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -86,7 +82,7 @@ class ConstrainedFieldStaxBuilder extends AbstractConstrainedElementStaxBuilder 
 				field,
 				metaConstraints,
 				containerElementTypeConfiguration.getMetaConstraints(),
-				getCascadingMetaDataForField( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), field )
+				getCascadingMetaData( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), ReflectionHelper.typeOf( field ) )
 		);
 
 		// ignore annotations
@@ -98,11 +94,6 @@ class ConstrainedFieldStaxBuilder extends AbstractConstrainedElementStaxBuilder 
 		}
 
 		return constrainedField;
-	}
-
-	private CascadingMetaDataBuilder getCascadingMetaDataForField(Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Field field) {
-		Type type = ReflectionHelper.typeOf( field );
-		return CascadingMetaDataBuilder.annotatedObject( type, validStaxBuilder.build(), containerElementTypesCascadingMetaData, groupConversionBuilder.build() );
 	}
 
 	private static Field findField(Class<?> beanClass, String fieldName) {
