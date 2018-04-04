@@ -26,7 +26,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.internal.xml.MappingXmlParser;
+import org.hibernate.validator.internal.xml.mapping.MappingXmlParser;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

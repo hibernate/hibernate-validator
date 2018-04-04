@@ -56,7 +56,7 @@ import org.hibernate.validator.internal.util.logging.formatter.DurationFormatter
 import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ObjectArrayFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
-import org.hibernate.validator.internal.xml.ContainerElementTypePath;
+import org.hibernate.validator.internal.xml.mapping.ContainerElementTypePath;
 import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
