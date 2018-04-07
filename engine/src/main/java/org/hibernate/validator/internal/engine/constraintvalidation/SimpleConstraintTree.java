@@ -9,10 +9,9 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
-import java.util.Set;
+import java.util.Collection;
 
 import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintViolation;
 
 import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
@@ -41,7 +40,7 @@ class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 	@Override
 	protected <T> void validateConstraints(ValidationContext<T> validationContext,
 			ValueContext<?, ?> valueContext,
-			Set<ConstraintViolation<T>> constraintViolations) {
+			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts) {
 
 		if ( LOG.isTraceEnabled() ) {
 			LOG.tracef(
@@ -64,13 +63,8 @@ class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 		);
 
 		// validate
-		constraintViolations.addAll(
-				validateSingleConstraint(
-						validationContext,
-						valueContext,
-						constraintValidatorContext,
-						validator
-				)
-		);
+		if ( validateSingleConstraint( valueContext, constraintValidatorContext, validator ).isPresent() ) {
+			violatedConstraintValidatorContexts.add( constraintValidatorContext );
+		}
 	}
 }

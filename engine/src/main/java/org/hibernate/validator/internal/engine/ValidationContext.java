@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
@@ -33,7 +32,6 @@ import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl.ValidatorFactoryScopedContext;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
@@ -272,14 +270,6 @@ public class ValidationContext<T> {
 		return constraintValidatorInitializationContext;
 	}
 
-	public Set<ConstraintViolation<T>> createConstraintViolations(ValueContext<?, ?> localContext,
-			ConstraintValidatorContextImpl constraintValidatorContext) {
-
-		return constraintValidatorContext.getConstraintViolationCreationContexts().stream()
-			.map( c -> createConstraintViolation( localContext, c, constraintValidatorContext.getConstraintDescriptor() ) )
-			.collect( Collectors.toSet() );
-	}
-
 	public ConstraintValidatorFactory getConstraintValidatorFactory() {
 		return constraintValidatorFactory;
 	}
@@ -308,16 +298,19 @@ public class ValidationContext<T> {
 		markCurrentBeanAsProcessedForCurrentPath( valueContext.getCurrentBean(), valueContext.getPropertyPath() );
 	}
 
-	public void addConstraintFailures(Set<ConstraintViolation<T>> failingConstraintViolations) {
-		this.failingConstraintViolations.addAll( failingConstraintViolations );
+	public void addConstraintFailure(ConstraintViolation<T> failingConstraintViolation) {
+		this.failingConstraintViolations.add( failingConstraintViolation );
 	}
 
 	public Set<ConstraintViolation<T>> getFailingConstraints() {
 		return failingConstraintViolations;
 	}
 
-
-	public ConstraintViolation<T> createConstraintViolation(ValueContext<?, ?> localContext, ConstraintViolationCreationContext constraintViolationCreationContext, ConstraintDescriptor<?> descriptor) {
+	public ConstraintViolation<T> createConstraintViolation(
+			ValueContext<?, ?> localContext,
+			ConstraintViolationCreationContext constraintViolationCreationContext,
+			ConstraintDescriptor<?> descriptor
+	) {
 		String messageTemplate = constraintViolationCreationContext.getMessage();
 		String interpolatedMessage = interpolate(
 				messageTemplate,
