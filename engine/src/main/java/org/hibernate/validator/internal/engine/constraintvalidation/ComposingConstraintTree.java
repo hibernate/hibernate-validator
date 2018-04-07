@@ -9,18 +9,17 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 import static org.hibernate.validator.constraints.CompositionType.AND;
 import static org.hibernate.validator.constraints.CompositionType.OR;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintViolation;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.internal.engine.ValidationContext;
@@ -67,15 +66,15 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 	@Override
 	protected <T> void validateConstraints(ValidationContext<T> validationContext,
 			ValueContext<?, ?> valueContext,
-			Set<ConstraintViolation<T>> constraintViolations) {
+			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts) {
 		CompositionResult compositionResult = validateComposingConstraints(
-				validationContext, valueContext, constraintViolations
+				validationContext, valueContext, violatedConstraintValidatorContexts
 		);
 
-		Set<ConstraintViolation<T>> localViolations;
+		Optional<ConstraintValidatorContextImpl> localConstraintValidatorContext;
 
 		// After all children are validated the actual ConstraintValidator of the constraint itself is executed
-		if ( mainConstraintNeedsEvaluation( validationContext, constraintViolations ) ) {
+		if ( mainConstraintNeedsEvaluation( validationContext, violatedConstraintValidatorContexts ) ) {
 
 			if ( LOG.isTraceEnabled() ) {
 				LOG.tracef(
@@ -98,8 +97,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 			);
 
 			// validate
-			localViolations = validateSingleConstraint(
-					validationContext,
+			localConstraintValidatorContext = validateSingleConstraint(
 					valueContext,
 					constraintValidatorContext,
 					validator
@@ -107,7 +105,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 
 			// We re-evaluate the boolean composition by taking into consideration also the violations
 			// from the local constraintValidator
-			if ( localViolations.isEmpty() ) {
+			if ( !localConstraintValidatorContext.isPresent() ) {
 				compositionResult.setAtLeastOneTrue( true );
 			}
 			else {
@@ -115,24 +113,24 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 			}
 		}
 		else {
-			localViolations = Collections.emptySet();
+			localConstraintValidatorContext = Optional.empty();
 		}
 
-		if ( !passesCompositionTypeRequirement( constraintViolations, compositionResult ) ) {
+		if ( !passesCompositionTypeRequirement( violatedConstraintValidatorContexts, compositionResult ) ) {
 			prepareFinalConstraintViolations(
-					validationContext, valueContext, constraintViolations, localViolations
+					validationContext, valueContext, violatedConstraintValidatorContexts, localConstraintValidatorContext
 			);
 		}
 	}
 
-	private <T> boolean mainConstraintNeedsEvaluation(ValidationContext<T> executionContext,
-			Set<ConstraintViolation<T>> constraintViolations) {
+	private <T> boolean mainConstraintNeedsEvaluation(ValidationContext<T> validationContext,
+			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts) {
 		// we are dealing with a composing constraint with no validator for the main constraint
 		if ( !descriptor.getComposingConstraints().isEmpty() && descriptor.getMatchingConstraintValidatorDescriptors().isEmpty() ) {
 			return false;
 		}
 
-		if ( constraintViolations.isEmpty() ) {
+		if ( violatedConstraintValidatorContexts.isEmpty() ) {
 			return true;
 		}
 
@@ -142,7 +140,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 		}
 
 		// explicit fail fast mode
-		if ( executionContext.isFailFastModeEnabled() ) {
+		if ( validationContext.isFailFastModeEnabled() ) {
 			return false;
 		}
 
@@ -153,33 +151,32 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 	 * Before the final constraint violations can be reported back we need to check whether we have a composing
 	 * constraint whose result should be reported as single violation.
 	 *
-	 * @param executionContext meta data about top level validation
+	 * @param validationContext meta data about top level validation
 	 * @param valueContext meta data for currently validated value
-	 * @param constraintViolations used to accumulate constraint violations
-	 * @param localViolations set of constraint violations of top level constraint
+	 * @param violatedConstraintValidatorContexts used to accumulate constraint validator contexts that cause constraint violations
+	 * @param localConstraintValidatorContext an optional of constraint violations of top level constraint
+	 *
 	 */
-	private <T> void prepareFinalConstraintViolations(ValidationContext<T> executionContext,
+	private <T> void prepareFinalConstraintViolations(ValidationContext<T> validationContext,
 			ValueContext<?, ?> valueContext,
-			Set<ConstraintViolation<T>> constraintViolations,
-			Set<ConstraintViolation<T>> localViolations) {
+			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts,
+			Optional<ConstraintValidatorContextImpl> localConstraintValidatorContext) {
 		if ( reportAsSingleViolation() ) {
 			// We clear the current violations list anyway
-			constraintViolations.clear();
+			violatedConstraintValidatorContexts.clear();
 
 			// But then we need to distinguish whether the local ConstraintValidator has reported
 			// violations or not (or if there is no local ConstraintValidator at all).
 			// If not we create a violation
 			// using the error message in the annotation declaration at top level.
-			if ( localViolations.isEmpty() ) {
-				final String message = getDescriptor().getMessageTemplate();
-				ConstraintViolationCreationContext constraintViolationCreationContext = new ConstraintViolationCreationContext(
-						message,
-						valueContext.getPropertyPath()
-				);
-				ConstraintViolation<T> violation = executionContext.createConstraintViolation(
-						valueContext, constraintViolationCreationContext, descriptor
-				);
-				constraintViolations.add( violation );
+			if ( !localConstraintValidatorContext.isPresent() ) {
+				violatedConstraintValidatorContexts.add( new ConstraintValidatorContextImpl(
+						validationContext.getParameterNames(),
+						validationContext.getClockProvider(),
+						valueContext.getPropertyPath(),
+						descriptor,
+						validationContext.getConstraintValidatorPayload()
+				) );
 			}
 		}
 
@@ -191,28 +188,30 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 		// as checked in test CustomErrorMessage.java
 		// If no violations have been reported from the local ConstraintValidator, or no such validator exists,
 		// then we just add an empty list.
-		constraintViolations.addAll( localViolations );
+		if ( localConstraintValidatorContext.isPresent() ) {
+			violatedConstraintValidatorContexts.add( localConstraintValidatorContext.get() );
+		}
 	}
 
 	/**
 	 * Validates all composing constraints recursively.
 	 *
-	 * @param executionContext Meta data about top level validation
+	 * @param validationContext Meta data about top level validation
 	 * @param valueContext Meta data for currently validated value
-	 * @param constraintViolations Used to accumulate constraint violations
+	 * @param violatedConstraintValidatorContexts Used to accumulate constraint validator contexts that cause constraint violations
 	 *
 	 * @return Returns an instance of {@code CompositionResult} relevant for boolean composition of constraints
 	 */
-	private <T> CompositionResult validateComposingConstraints(ValidationContext<T> executionContext,
+	private <T> CompositionResult validateComposingConstraints(ValidationContext<T> validationContext,
 			ValueContext<?, ?> valueContext,
-			Set<ConstraintViolation<T>> constraintViolations) {
+			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts) {
 		CompositionResult compositionResult = new CompositionResult( true, false );
 		for ( ConstraintTree<?> tree : children ) {
-			Set<ConstraintViolation<T>> tmpViolations = newHashSet( 5 );
-			tree.validateConstraints( executionContext, valueContext, tmpViolations );
-			constraintViolations.addAll( tmpViolations );
+			List<ConstraintValidatorContextImpl> tmpConstraintValidatorContexts = new ArrayList<>( 5 );
+			tree.validateConstraints( validationContext, valueContext, tmpConstraintValidatorContexts );
+			violatedConstraintValidatorContexts.addAll( tmpConstraintValidatorContexts );
 
-			if ( tmpViolations.isEmpty() ) {
+			if ( tmpConstraintValidatorContexts.isEmpty() ) {
 				compositionResult.setAtLeastOneTrue( true );
 				// no need to further validate constraints, because at least one validation passed
 				if ( descriptor.getCompositionType() == OR ) {
@@ -222,7 +221,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 			else {
 				compositionResult.setAllTrue( false );
 				if ( descriptor.getCompositionType() == AND
-						&& ( executionContext.isFailFastModeEnabled() || descriptor.isReportAsSingleViolation() ) ) {
+						&& ( validationContext.isFailFastModeEnabled() || descriptor.isReportAsSingleViolation() ) ) {
 					break;
 				}
 			}
@@ -230,7 +229,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 		return compositionResult;
 	}
 
-	private boolean passesCompositionTypeRequirement(Set<?> constraintViolations, CompositionResult compositionResult) {
+	private boolean passesCompositionTypeRequirement(Collection<?> constraintViolations, CompositionResult compositionResult) {
 		CompositionType compositionType = getDescriptor().getCompositionType();
 		boolean passedValidation = false;
 		switch ( compositionType ) {
