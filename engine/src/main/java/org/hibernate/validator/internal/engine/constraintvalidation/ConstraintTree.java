@@ -7,17 +7,17 @@
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import static org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager.DUMMY_CONSTRAINT_VALIDATOR;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 
 import org.hibernate.validator.internal.engine.ValidationContext;
@@ -68,17 +68,23 @@ public abstract class ConstraintTree<A extends Annotation> {
 		}
 	}
 
-	public final <T> boolean validateConstraints(ValidationContext<T> executionContext, ValueContext<?, ?> valueContext) {
-		Set<ConstraintViolation<T>> constraintViolations = newHashSet( 5 );
-		validateConstraints( executionContext, valueContext, constraintViolations );
-		if ( !constraintViolations.isEmpty() ) {
-			executionContext.addConstraintFailures( constraintViolations );
+	public final <T> boolean validateConstraints(ValidationContext<T> validationContext, ValueContext<?, ?> valueContext) {
+		List<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts = new ArrayList( 5 );
+		validateConstraints( validationContext, valueContext, violatedConstraintValidatorContexts );
+		if ( !violatedConstraintValidatorContexts.isEmpty() ) {
+			for ( ConstraintValidatorContextImpl constraintValidatorContext : violatedConstraintValidatorContexts ) {
+				for ( ConstraintViolationCreationContext constraintViolationCreationContext : constraintValidatorContext.getConstraintViolationCreationContexts() ) {
+					validationContext.addConstraintFailure(
+							validationContext.createConstraintViolation( valueContext, constraintViolationCreationContext, ( (ConstraintValidatorContextImpl) constraintValidatorContext ).getConstraintDescriptor() )
+					);
+				}
+			}
 			return false;
 		}
 		return true;
 	}
 
-	protected abstract <T> void validateConstraints(ValidationContext<T> executionContext, ValueContext<?, ?> valueContext, Set<ConstraintViolation<T>> constraintViolations);
+	protected abstract <T> void validateConstraints(ValidationContext<T> executionContext, ValueContext<?, ?> valueContext, Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts);
 
 	public final ConstraintDescriptorImpl<A> getDescriptor() {
 		return descriptor;
@@ -160,7 +166,11 @@ public abstract class ConstraintTree<A extends Annotation> {
 		}
 	}
 
-	protected final <T, V> Set<ConstraintViolation<T>> validateSingleConstraint(ValidationContext<T> executionContext,
+	/**
+	 * @return an {@link Optional#empty()} if there is no violation or a corresponding {@link ConstraintValidatorContextImpl}
+	 * 		otherwise.
+	 */
+	protected final <V> Optional<ConstraintValidatorContextImpl> validateSingleConstraint(
 			ValueContext<?, ?> valueContext,
 			ConstraintValidatorContextImpl constraintValidatorContext,
 			ConstraintValidator<A, V> validator) {
@@ -179,11 +189,9 @@ public abstract class ConstraintTree<A extends Annotation> {
 		if ( !isValid ) {
 			//We do not add these violations yet, since we don't know how they are
 			//going to influence the final boolean evaluation
-			return executionContext.createConstraintViolations(
-					valueContext, constraintValidatorContext
-			);
+			return Optional.of( constraintValidatorContext );
 		}
-		return Collections.emptySet();
+		return Optional.empty();
 	}
 
 	@Override
