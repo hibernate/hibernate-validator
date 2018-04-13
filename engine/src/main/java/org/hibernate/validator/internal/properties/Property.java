@@ -11,14 +11,7 @@ package org.hibernate.validator.internal.properties;
  */
 public interface Property extends Constrainable {
 
-	enum Kind {
-		FIELD,
-		GETTER,
-	}
-
 	Object getValueFrom(Object bean);
-
-	Kind getKind();
 
 	String getPropertyName();
 }

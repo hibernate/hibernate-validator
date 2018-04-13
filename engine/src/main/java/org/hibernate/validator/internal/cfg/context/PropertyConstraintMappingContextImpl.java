@@ -23,6 +23,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedProperty;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
@@ -56,7 +57,7 @@ final class PropertyConstraintMappingContextImpl
 
 	@Override
 	public PropertyConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		if ( property.getKind() == Property.Kind.FIELD ) {
+		if ( property instanceof JavaBeanField ) {
 			super.addConstraint(
 					ConfiguredConstraint.forProperty(
 							definition, property
@@ -110,7 +111,7 @@ final class PropertyConstraintMappingContextImpl
 	}
 
 	ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
-		if ( property.getKind() == Property.Kind.FIELD ) {
+		if ( property instanceof JavaBeanField ) {
 			return ConstrainedProperty.forField(
 					ConfigurationSource.API,
 					property,

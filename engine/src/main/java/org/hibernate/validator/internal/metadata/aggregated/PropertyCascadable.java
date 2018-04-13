@@ -13,6 +13,7 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 
 /**
  * A {@link Cascadable} backed by a field of a Java bean.
@@ -31,7 +32,7 @@ public class PropertyCascadable implements Cascadable {
 		this.property = property;
 		this.cascadableType = property.getType();
 		this.cascadingMetaData = cascadingMetaData;
-		this.elementType = property.getKind() == Property.Kind.FIELD ? ElementType.FIELD : ElementType.METHOD;
+		this.elementType = property instanceof JavaBeanField ? ElementType.FIELD : ElementType.METHOD;
 	}
 
 	@Override

@@ -59,11 +59,6 @@ public class JavaBeanField implements Property {
 	}
 
 	@Override
-	public Kind getKind() {
-		return Kind.FIELD;
-	}
-
-	@Override
 	public String getPropertyName() {
 		return getName();
 	}
@@ -121,7 +116,7 @@ public class JavaBeanField implements Property {
 
 	/**
 	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
+	 *
 	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
 	 * privileged actions within HV's protection domain.
 	 */
