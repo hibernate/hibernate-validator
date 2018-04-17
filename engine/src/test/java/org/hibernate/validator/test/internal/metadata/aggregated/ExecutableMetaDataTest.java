@@ -31,6 +31,7 @@ import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.ProgrammaticJsonMetaDataProvider;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -56,15 +57,19 @@ public class ExecutableMetaDataTest {
 
 	@BeforeMethod
 	public void setupBeanMetaData() {
+		ConstraintHelper constraintHelper = new ConstraintHelper();
+		TypeResolutionHelper typeResolutionHelper = new TypeResolutionHelper();
+		ValueExtractorManager valueExtractorManager = new ValueExtractorManager( Collections.emptySet() );
 		beanMetaDataManager = new BeanMetaDataManager(
-				new ConstraintHelper(),
-				new ExecutableHelper( new TypeResolutionHelper() ),
-				new TypeResolutionHelper(),
+				constraintHelper,
+				new ExecutableHelper( typeResolutionHelper ),
+				typeResolutionHelper,
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new ValueExtractorManager( Collections.emptySet() ),
+				valueExtractorManager,
 				new DefaultGetterPropertyMatcher(),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
+				new ProgrammaticJsonMetaDataProvider( constraintHelper, typeResolutionHelper, valueExtractorManager, Collections.emptySet() ),
 				new MethodValidationConfiguration.Builder().build()
 		);
 

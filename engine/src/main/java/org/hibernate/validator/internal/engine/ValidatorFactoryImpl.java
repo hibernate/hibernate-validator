@@ -36,6 +36,7 @@ import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.cfg.json.JsonConstraintMappingImpl;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
@@ -45,6 +46,7 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.ProgrammaticJsonMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher;
@@ -60,8 +62,8 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
-import org.hibernate.validator.spi.properties.GetterPropertyMatcher;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
+import org.hibernate.validator.spi.properties.GetterPropertyMatcher;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
@@ -96,6 +98,13 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 */
 	@Immutable
 	private final Set<DefaultConstraintMapping> constraintMappings;
+
+	/**
+	 * Programmatic constraints passed via the Hibernate Validator specific API. Empty if there are
+	 * no programmatic constraints
+	 */
+	@Immutable
+	private final Set<JsonConstraintMappingImpl> jsonConstraintMappings;
 
 	/**
 	 * Helper for dealing with built-in validators and determining custom constraint annotations.
@@ -174,6 +183,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				)
 		);
 
+		this.jsonConstraintMappings = Collections.unmodifiableSet(
+				getJsonConstraintMappings( configurationState )
+		);
+
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
 
 		this.methodValidationConfiguration = new MethodValidationConfiguration.Builder()
@@ -241,6 +254,17 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		for ( ConstraintMappingContributor contributor : contributors ) {
 			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( getterPropertyMatcher, constraintMappings );
 			contributor.createConstraintMappings( builder );
+		}
+
+		return constraintMappings;
+	}
+
+	private static Set<JsonConstraintMappingImpl> getJsonConstraintMappings(ConfigurationState configurationState) {
+		Set<JsonConstraintMappingImpl> constraintMappings = newHashSet();
+
+		if ( configurationState instanceof ConfigurationImpl ) {
+			ConfigurationImpl hibernateConfiguration = (ConfigurationImpl) configurationState;
+			constraintMappings.addAll( hibernateConfiguration.getJsonProgrammaticMappings() );
 		}
 
 		return constraintMappings;
@@ -361,6 +385,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						getterPropertyMatcher,
 						validationOrderGenerator,
 						buildDataProviders(),
+						new ProgrammaticJsonMetaDataProvider( constraintHelper, typeResolutionHelper, valueExtractorManager, jsonConstraintMappings ),
 						methodValidationConfiguration
 				)
 		);

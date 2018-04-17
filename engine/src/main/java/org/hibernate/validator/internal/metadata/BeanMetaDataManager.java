@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import javax.json.JsonObject;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
@@ -23,12 +24,15 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.JsonMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.ProgrammaticJsonMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.metadata.raw.JsonConfiguration;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.Contracts;
@@ -81,6 +85,8 @@ public class BeanMetaDataManager {
 	@Immutable
 	private final List<MetaDataProvider> metaDataProviders;
 
+	private final ProgrammaticJsonMetaDataProvider jsonMetaDataProvider;
+
 	/**
 	 * Helper for builtin constraints and their validator implementations
 	 */
@@ -125,6 +131,7 @@ public class BeanMetaDataManager {
 			GetterPropertyMatcher getterPropertyMatcher,
 			ValidationOrderGenerator validationOrderGenerator,
 			List<MetaDataProvider> optionalMetaDataProviders,
+			ProgrammaticJsonMetaDataProvider jsonMetaDataProvider,
 			MethodValidationConfiguration methodValidationConfiguration) {
 		this.constraintHelper = constraintHelper;
 		this.executableHelper = executableHelper;
@@ -132,6 +139,7 @@ public class BeanMetaDataManager {
 		this.valueExtractorManager = valueExtractorManager;
 		this.parameterNameProvider = parameterNameProvider;
 		this.validationOrderGenerator = validationOrderGenerator;
+		this.jsonMetaDataProvider = jsonMetaDataProvider;
 
 		this.methodValidationConfiguration = methodValidationConfiguration;
 
@@ -173,6 +181,12 @@ public class BeanMetaDataManager {
 		return beanMetaData;
 	}
 
+	public BeanMetaData<JsonObject> getJsonMetaData(Class<?> typeToValidate) {
+		Contracts.assertNotNull( typeToValidate, MESSAGES.beanTypeCannotBeNull() );
+
+		return createJsonMetaData( typeToValidate );
+	}
+
 	public void clear() {
 		beanMetaDataCache.clear();
 	}
@@ -198,6 +212,17 @@ public class BeanMetaDataManager {
 			for ( BeanConfiguration<? super T> beanConfiguration : getBeanConfigurationForHierarchy( provider, clazz ) ) {
 				builder.add( beanConfiguration );
 			}
+		}
+
+		return builder.build();
+	}
+
+	private BeanMetaDataImpl<JsonObject> createJsonMetaData(Class<?> typeToValidate) {
+		JsonMetaDataBuilder builder = JsonMetaDataBuilder.getInstance(
+				constraintHelper, executableHelper, typeResolutionHelper, valueExtractorManager, parameterNameProvider, validationOrderGenerator, methodValidationConfiguration );
+
+		for ( JsonConfiguration<?> beanConfiguration : getJsonConfigurationForHierarchy( jsonMetaDataProvider, typeToValidate ) ) {
+			builder.add( beanConfiguration );
 		}
 
 		return builder.build();
@@ -229,6 +254,19 @@ public class BeanMetaDataManager {
 
 		for ( Class<? super T> clazz : ClassHierarchyHelper.getHierarchy( beanClass ) ) {
 			BeanConfiguration<? super T> configuration = provider.getBeanConfiguration( clazz );
+			if ( configuration != null ) {
+				configurations.add( configuration );
+			}
+		}
+
+		return configurations;
+	}
+
+	private  List<JsonConfiguration<?>> getJsonConfigurationForHierarchy(ProgrammaticJsonMetaDataProvider provider, Class<?> beanClass) {
+		List<JsonConfiguration<?>> configurations = newArrayList();
+
+		for ( Class<?> clazz : ClassHierarchyHelper.getHierarchy( beanClass ) ) {
+			JsonConfiguration<?> configuration = provider.getBeanConfiguration( clazz );
 			if ( configuration != null ) {
 				configurations.add( configuration );
 			}

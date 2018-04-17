@@ -33,6 +33,7 @@ import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.ProgrammaticJsonMetaDataProvider;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -56,15 +57,19 @@ public class ParameterMetaDataTest {
 
 	@BeforeMethod
 	public void setupBeanMetaData() {
+		ConstraintHelper constraintHelper = new ConstraintHelper();
+		TypeResolutionHelper typeResolutionHelper = new TypeResolutionHelper();
+		ValueExtractorManager valueExtractorManager = new ValueExtractorManager( Collections.emptySet() );
 		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
-				new ConstraintHelper(),
-				new ExecutableHelper( new TypeResolutionHelper() ),
-				new TypeResolutionHelper(),
+				constraintHelper,
+				new ExecutableHelper( typeResolutionHelper ),
+				typeResolutionHelper,
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new ValueExtractorManager( Collections.emptySet() ),
+				valueExtractorManager,
 				new DefaultGetterPropertyMatcher(),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
+				new ProgrammaticJsonMetaDataProvider( constraintHelper, typeResolutionHelper, valueExtractorManager, Collections.emptySet() ),
 				new MethodValidationConfiguration.Builder().build()
 		);
 
@@ -127,15 +132,19 @@ public class ParameterMetaDataTest {
 		//
 		// The failure rate on my current VM before fixing the bug is 50%.
 		// Running it in a loop does not improve the odds of failure: all tests will pass or fail for all loop run.
+		ConstraintHelper constraintHelper = new ConstraintHelper();
+		TypeResolutionHelper typeResolutionHelper = new TypeResolutionHelper();
+		ValueExtractorManager valueExtractorManager = new ValueExtractorManager( Collections.emptySet() );
 		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
-				new ConstraintHelper(),
-				new ExecutableHelper( new TypeResolutionHelper() ),
-				new TypeResolutionHelper(),
+				constraintHelper,
+				new ExecutableHelper( typeResolutionHelper ),
+				typeResolutionHelper,
 				new ExecutableParameterNameProvider( new SkewedParameterNameProvider() ),
-				new ValueExtractorManager( Collections.emptySet() ),
+				valueExtractorManager,
 				new DefaultGetterPropertyMatcher(),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
+				new ProgrammaticJsonMetaDataProvider( constraintHelper, typeResolutionHelper, valueExtractorManager, Collections.emptySet() ),
 				new MethodValidationConfiguration.Builder().build()
 		);
 		BeanMetaData<ServiceImpl> localBeanMetaData = beanMetaDataManager.getBeanMetaData( ServiceImpl.class );

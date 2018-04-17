@@ -18,6 +18,7 @@ import javax.validation.constraints.PastOrPresent;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.json.JsonConstraintMapping;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.spi.properties.GetterPropertyMatcher;
@@ -333,4 +334,9 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	@Incubating
 	HibernateValidatorConfiguration getterPropertyMatcher(GetterPropertyMatcher getterPropertyMatcher);
+
+	@Incubating
+	HibernateValidatorConfiguration addJsonMapping(JsonConstraintMapping mapping);
+
+	JsonConstraintMapping createJsonConstraintMapping();
 }

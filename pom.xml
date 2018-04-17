@@ -224,6 +224,7 @@
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
 
         <hibernate-validator-parent.path>.</hibernate-validator-parent.path>
+        <javax.json.version>1.1</javax.json.version>
     </properties>
 
     <dependencyManagement>
@@ -306,6 +307,16 @@
                 <groupId>org.javamoney</groupId>
                 <artifactId>moneta</artifactId>
                 <version>${moneta.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.json</groupId>
+                <artifactId>javax.json-api</artifactId>
+                <version>${javax.json.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish</groupId>
+                <artifactId>javax.json</artifactId>
+                <version>${javax.json.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>

@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.json.JsonObject;
 import javax.validation.ElementKind;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
@@ -46,6 +47,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedProperty;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.metadata.raw.JsonConfiguration;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
@@ -649,6 +651,120 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			return new BeanMetaDataImpl<>(
 					beanClass,
+					defaultGroupSequence,
+					defaultGroupSequenceProvider,
+					aggregatedElements,
+					validationOrderGenerator
+			);
+		}
+	}
+
+	public static class JsonMetaDataBuilder {
+
+		private final ConstraintHelper constraintHelper;
+		private final ValidationOrderGenerator validationOrderGenerator;
+		private final Set<BuilderDelegate> builders = newHashSet();
+		private final ExecutableHelper executableHelper;
+		private final TypeResolutionHelper typeResolutionHelper;
+		private final ValueExtractorManager valueExtractorManager;
+		private final ExecutableParameterNameProvider parameterNameProvider;
+		private final MethodValidationConfiguration methodValidationConfiguration;
+
+		private ConfigurationSource sequenceSource;
+		private ConfigurationSource providerSource;
+		private List<Class<?>> defaultGroupSequence;
+		private DefaultGroupSequenceProvider<JsonObject> defaultGroupSequenceProvider;
+
+
+		private JsonMetaDataBuilder(
+				ConstraintHelper constraintHelper,
+				ExecutableHelper executableHelper,
+				TypeResolutionHelper typeResolutionHelper,
+				ValueExtractorManager valueExtractorManager,
+				ExecutableParameterNameProvider parameterNameProvider,
+				ValidationOrderGenerator validationOrderGenerator,
+				MethodValidationConfiguration methodValidationConfiguration) {
+			this.constraintHelper = constraintHelper;
+			this.validationOrderGenerator = validationOrderGenerator;
+			this.executableHelper = executableHelper;
+			this.typeResolutionHelper = typeResolutionHelper;
+			this.valueExtractorManager = valueExtractorManager;
+			this.parameterNameProvider = parameterNameProvider;
+			this.methodValidationConfiguration = methodValidationConfiguration;
+		}
+
+		public static JsonMetaDataBuilder getInstance(
+				ConstraintHelper constraintHelper,
+				ExecutableHelper executableHelper,
+				TypeResolutionHelper typeResolutionHelper,
+				ValueExtractorManager valueExtractorManager,
+				ExecutableParameterNameProvider parameterNameProvider,
+				ValidationOrderGenerator validationOrderGenerator,
+				MethodValidationConfiguration methodValidationConfiguration) {
+			return new JsonMetaDataBuilder(
+					constraintHelper,
+					executableHelper,
+					typeResolutionHelper,
+					valueExtractorManager,
+					parameterNameProvider,
+					validationOrderGenerator,
+					methodValidationConfiguration );
+		}
+
+		public void add(JsonConfiguration<?> configuration) {
+			if ( configuration.getDefaultGroupSequence() != null
+					&& ( sequenceSource == null || configuration.getSource()
+					.getPriority() >= sequenceSource.getPriority() ) ) {
+
+				sequenceSource = configuration.getSource();
+				defaultGroupSequence = configuration.getDefaultGroupSequence();
+			}
+
+			if ( configuration.getDefaultGroupSequenceProvider() != null
+					&& ( providerSource == null || configuration.getSource()
+					.getPriority() >= providerSource.getPriority() ) ) {
+
+				providerSource = configuration.getSource();
+				defaultGroupSequenceProvider = configuration.getDefaultGroupSequenceProvider();
+			}
+
+			for ( ConstrainedElement constrainedElement : configuration.getConstrainedElements() ) {
+				addMetaDataToBuilder( constrainedElement, builders );
+			}
+		}
+
+		private void addMetaDataToBuilder(ConstrainedElement constrainableElement, Set<BuilderDelegate> builders) {
+			for ( BuilderDelegate builder : builders ) {
+				boolean foundBuilder = builder.add( constrainableElement );
+
+				if ( foundBuilder ) {
+					return;
+				}
+			}
+
+			builders.add(
+					new BuilderDelegate(
+							JsonObject.class,
+							constrainableElement,
+							constraintHelper,
+							executableHelper,
+							typeResolutionHelper,
+							valueExtractorManager,
+							parameterNameProvider,
+							methodValidationConfiguration
+					)
+			);
+		}
+
+		public BeanMetaDataImpl<JsonObject> build() {
+			Set<ConstraintMetaData> aggregatedElements = newHashSet();
+
+			for ( BuilderDelegate builder : builders ) {
+				aggregatedElements.addAll( builder.build() );
+			}
+
+			return new BeanMetaDataImpl<>(
+					JsonObject.class,
 					defaultGroupSequence,
 					defaultGroupSequenceProvider,
 					aggregatedElements,

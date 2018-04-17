@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.json.JsonObject;
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
@@ -564,6 +565,24 @@ public class ValidationContext<T> {
 					rootBean,
 					rootBeanClass,
 					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
+					null, //executable
+					null, //executable parameters
+					null, //executable return value
+					null //executable metadata
+			);
+		}
+
+		public ValidationContext<JsonObject> forValidateJson(JsonObject jsonObject, Class<?> typeToValidate) {
+			return new ValidationContext<>(
+					ValidationOperation.BEAN_VALIDATION,
+					constraintValidatorManager,
+					constraintValidatorFactory,
+					validatorScopedContext,
+					traversableResolver,
+					constraintValidatorInitializationContext,
+					jsonObject,
+					JsonObject.class,
+					beanMetaDataManager.getJsonMetaData( typeToValidate ),
 					null, //executable
 					null, //executable parameters
 					null, //executable return value

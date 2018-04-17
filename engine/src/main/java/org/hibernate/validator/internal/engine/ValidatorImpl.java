@@ -129,6 +129,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * initialize a new constraint validator as, for now, it only contains Validator scoped objects.
 	 */
 	private final HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext;
+	private final JsonValidatorImpl jsonValidator;
 
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
 			BeanMetaDataManager beanMetaDataManager,
@@ -144,6 +145,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.validatorScopedContext = new ValidatorScopedContext( validatorFactoryScopedContext );
 		this.traversableResolver = validatorFactoryScopedContext.getTraversableResolver();
 		this.constraintValidatorInitializationContext = validatorFactoryScopedContext.getConstraintValidatorInitializationContext();
+
+		this.jsonValidator = new JsonValidatorImpl( constraintValidatorFactory, beanMetaDataManager, valueExtractorManager, constraintValidatorManager, validationOrderGenerator, validatorFactoryScopedContext );
 	}
 
 	@Override
@@ -308,6 +311,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	@Override
 	public ExecutableValidator forExecutables() {
 		return this;
+	}
+
+	public JsonValidatorImpl forJson() {
+		return jsonValidator;
 	}
 
 	private ValidationContextBuilder getValidationContextBuilder() {
