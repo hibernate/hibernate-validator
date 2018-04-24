@@ -75,7 +75,7 @@ public abstract class ConstraintTree<A extends Annotation> {
 			for ( ConstraintValidatorContextImpl constraintValidatorContext : violatedConstraintValidatorContexts ) {
 				for ( ConstraintViolationCreationContext constraintViolationCreationContext : constraintValidatorContext.getConstraintViolationCreationContexts() ) {
 					validationContext.addConstraintFailure(
-							validationContext.createConstraintViolation( valueContext, constraintViolationCreationContext, constraintValidatorContext.getConstraintDescriptor() )
+							valueContext, constraintViolationCreationContext, constraintValidatorContext.getConstraintDescriptor()
 					);
 				}
 			}

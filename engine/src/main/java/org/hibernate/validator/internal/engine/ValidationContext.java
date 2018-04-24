@@ -294,15 +294,11 @@ public class ValidationContext<T> {
 		markCurrentBeanAsProcessedForCurrentPath( valueContext.getCurrentBean(), valueContext.getPropertyPath() );
 	}
 
-	public void addConstraintFailure(ConstraintViolation<T> failingConstraintViolation) {
-		this.failingConstraintViolations.add( failingConstraintViolation );
-	}
-
 	public Set<ConstraintViolation<T>> getFailingConstraints() {
 		return failingConstraintViolations;
 	}
 
-	public ConstraintViolation<T> createConstraintViolation(
+	public void addConstraintFailure(
 			ValueContext<?, ?> localContext,
 			ConstraintViolationCreationContext constraintViolationCreationContext,
 			ConstraintDescriptor<?> descriptor
@@ -318,10 +314,10 @@ public class ValidationContext<T> {
 		// at this point we make a copy of the path to avoid side effects
 		Path path = PathImpl.createCopy( constraintViolationCreationContext.getPath() );
 		Object dynamicPayload = constraintViolationCreationContext.getDynamicPayload();
-
+		ConstraintViolation<T> violation;
 		switch ( validationOperation ) {
 			case PARAMETER_VALIDATION:
-				return ConstraintViolationImpl.forParameterValidation(
+				violation = ConstraintViolationImpl.forParameterValidation(
 						messageTemplate,
 						constraintViolationCreationContext.getMessageParameters(),
 						constraintViolationCreationContext.getExpressionVariables(),
@@ -336,8 +332,9 @@ public class ValidationContext<T> {
 						executableParameters,
 						dynamicPayload
 				);
+				break;
 			case RETURN_VALUE_VALIDATION:
-				return ConstraintViolationImpl.forReturnValueValidation(
+				violation = ConstraintViolationImpl.forReturnValueValidation(
 						messageTemplate,
 						constraintViolationCreationContext.getMessageParameters(),
 						constraintViolationCreationContext.getExpressionVariables(),
@@ -352,8 +349,9 @@ public class ValidationContext<T> {
 						executableReturnValue,
 						dynamicPayload
 				);
+				break;
 			default:
-				return ConstraintViolationImpl.forBeanValidation(
+				violation = ConstraintViolationImpl.forBeanValidation(
 						messageTemplate,
 						constraintViolationCreationContext.getMessageParameters(),
 						constraintViolationCreationContext.getExpressionVariables(),
@@ -368,6 +366,7 @@ public class ValidationContext<T> {
 						dynamicPayload
 				);
 		}
+		this.failingConstraintViolations.add( violation );
 	}
 
 	public boolean hasMetaConstraintBeenProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint) {
