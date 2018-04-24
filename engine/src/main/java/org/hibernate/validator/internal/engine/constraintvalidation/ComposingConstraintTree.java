@@ -88,12 +88,8 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 			ConstraintValidator<B, ?> validator = getInitializedConstraintValidator( validationContext, valueContext );
 
 			// create a constraint validator context
-			ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
-					validationContext.getParameterNames(),
-					validationContext.getClockProvider(),
-					valueContext.getPropertyPath(),
-					descriptor,
-					validationContext.getConstraintValidatorPayload()
+			ConstraintValidatorContextImpl constraintValidatorContext = validationContext.createConstraintValidatorContextFor(
+					descriptor, valueContext.getPropertyPath()
 			);
 
 			// validate
@@ -170,13 +166,11 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 			// If not we create a violation
 			// using the error message in the annotation declaration at top level.
 			if ( !localConstraintValidatorContext.isPresent() ) {
-				violatedConstraintValidatorContexts.add( new ConstraintValidatorContextImpl(
-						validationContext.getParameterNames(),
-						validationContext.getClockProvider(),
-						valueContext.getPropertyPath(),
-						descriptor,
-						validationContext.getConstraintValidatorPayload()
-				) );
+				violatedConstraintValidatorContexts.add(
+						validationContext.createConstraintValidatorContextFor(
+								descriptor, valueContext.getPropertyPath()
+						)
+				);
 			}
 		}
 
