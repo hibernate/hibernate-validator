@@ -45,7 +45,6 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 	private Map<String, Object> messageParameters;
 	private Map<String, Object> expressionVariables;
-	private final List<String> methodParameterNames;
 	private final ClockProvider clockProvider;
 	private final PathImpl basePath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
@@ -54,9 +53,11 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private Object dynamicPayload;
 	private final Object constraintValidatorPayload;
 
-	public ConstraintValidatorContextImpl(List<String> methodParameterNames, ClockProvider clockProvider,
-			PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor, Object constraintValidatorPayload) {
-		this.methodParameterNames = methodParameterNames;
+	public ConstraintValidatorContextImpl(
+			ClockProvider clockProvider,
+			PathImpl propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor,
+			Object constraintValidatorPayload) {
 		this.clockProvider = clockProvider;
 		this.basePath = propertyPath;
 		this.constraintDescriptor = constraintDescriptor;
@@ -74,11 +75,10 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	}
 
 	@Override
-	public final ConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
+	public ConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
 		return new ConstraintViolationBuilderImpl(
-				methodParameterNames,
 				messageTemplate,
-				PathImpl.createCopy( basePath )
+				getCopyOfBasePath()
 		);
 	}
 
@@ -161,6 +161,10 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		return CollectionHelper.toImmutableList( returnedConstraintViolationCreationContexts );
 	}
 
+	protected final PathImpl getCopyOfBasePath() {
+		return PathImpl.createCopy( basePath );
+	}
+
 	private ConstraintViolationCreationContext getDefaultConstraintViolationCreationContext() {
 		return new ConstraintViolationCreationContext(
 				getDefaultConstraintMessageTemplate(),
@@ -169,10 +173,6 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 				expressionVariables != null ? new HashMap<>( expressionVariables ) : Collections.emptyMap(),
 				dynamicPayload
 		);
-	}
-
-	public List<String> getMethodParameterNames() {
-		return methodParameterNames;
 	}
 
 	private abstract class NodeBuilderBase {
@@ -202,13 +202,10 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		}
 	}
 
-	private class ConstraintViolationBuilderImpl extends NodeBuilderBase implements ConstraintViolationBuilder {
+	protected class ConstraintViolationBuilderImpl extends NodeBuilderBase implements ConstraintViolationBuilder {
 
-		private final List<String> methodParameterNames;
-
-		private ConstraintViolationBuilderImpl(List<String> methodParameterNames, String template, PathImpl path) {
+		protected ConstraintViolationBuilderImpl(String template, PathImpl path) {
 			super( template, path );
-			this.methodParameterNames = methodParameterNames;
 		}
 
 		@Override
@@ -233,14 +230,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		@Override
 		public NodeBuilderDefinedContext addParameterNode(int index) {
-			if ( propertyPath.getLeafNode().getKind() != ElementKind.CROSS_PARAMETER ) {
-				throw LOG.getParameterNodeAddedForNonCrossParameterConstraintException( propertyPath );
-			}
-
-			dropLeafNodeIfRequired();
-			propertyPath.addParameterNode( methodParameterNames.get( index ), index );
-
-			return new NodeBuilder( messageTemplate, propertyPath );
+			throw LOG.getParameterNodeAddedForNonCrossParameterConstraintException( propertyPath );
 		}
 
 		@Override
@@ -255,18 +245,18 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		 * constraint, the node representing the constraint element will be
 		 * dropped. inIterable(), getKey() etc.
 		 */
-		private void dropLeafNodeIfRequired() {
-			if ( propertyPath.getLeafNode().getKind() == ElementKind.BEAN || propertyPath.getLeafNode()
-					.getKind() == ElementKind.CROSS_PARAMETER ) {
+		protected final void dropLeafNodeIfRequired() {
+			if ( propertyPath.getLeafNode().getKind() == ElementKind.BEAN
+					|| propertyPath.getLeafNode().getKind() == ElementKind.CROSS_PARAMETER ) {
 				propertyPath = propertyPath.getPathWithoutLeafNode();
 			}
 		}
 	}
 
-	private class NodeBuilder extends NodeBuilderBase
+	protected class NodeBuilder extends NodeBuilderBase
 			implements NodeBuilderDefinedContext, LeafNodeBuilderDefinedContext, ContainerElementNodeBuilderDefinedContext {
 
-		private NodeBuilder(String template, PathImpl path) {
+		protected NodeBuilder(String template, PathImpl path) {
 			super( template, path );
 		}
 
