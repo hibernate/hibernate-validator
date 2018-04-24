@@ -35,12 +35,14 @@ import org.hibernate.validator.internal.engine.ValidatorFactoryImpl.ValidatorFac
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
+import org.hibernate.validator.internal.engine.constraintvalidation.CrossParameterConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -252,7 +254,7 @@ public class ValidationContext<T> {
 	 * @return The current executable's parameter names,if this context was
 	 * created for parameter validation, {@code null} otherwise.
 	 */
-	public List<String> getParameterNames() {
+	private List<String> getParameterNames() {
 		if ( !ValidationOperation.PARAMETER_VALIDATION.equals( validationOperation ) ) {
 			return null;
 		}
@@ -397,8 +399,17 @@ public class ValidationContext<T> {
 	}
 
 	public ConstraintValidatorContextImpl createConstraintValidatorContextFor(ConstraintDescriptorImpl<?> constraintDescriptor, PathImpl path) {
+		if ( ConstraintType.CROSS_PARAMETER.equals( constraintDescriptor.getConstraintType() ) ) {
+			return new CrossParameterConstraintValidatorContextImpl(
+					getParameterNames(),
+					validatorScopedContext.getClockProvider(),
+					path,
+					constraintDescriptor,
+					validatorScopedContext.getConstraintValidatorPayload()
+			);
+		}
+
 		return new ConstraintValidatorContextImpl(
-				getParameterNames(),
 				validatorScopedContext.getClockProvider(),
 				path,
 				constraintDescriptor,
