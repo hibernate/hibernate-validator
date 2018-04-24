@@ -54,12 +54,8 @@ class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 		ConstraintValidator<B, ?> validator = getInitializedConstraintValidator( validationContext, valueContext );
 
 		// create a constraint validator context
-		ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
-				validationContext.getParameterNames(),
-				validationContext.getClockProvider(),
-				valueContext.getPropertyPath(),
-				descriptor,
-				validationContext.getConstraintValidatorPayload()
+		ConstraintValidatorContextImpl constraintValidatorContext = validationContext.createConstraintValidatorContextFor(
+				descriptor, valueContext.getPropertyPath()
 		);
 
 		// validate

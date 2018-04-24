@@ -32,6 +32,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl.ValidatorFactoryScopedContext;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
@@ -39,6 +40,7 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -258,14 +260,6 @@ public class ValidationContext<T> {
 		return validatorScopedContext.getParameterNameProvider().getParameterNames( executable );
 	}
 
-	public ClockProvider getClockProvider() {
-		return validatorScopedContext.getClockProvider();
-	}
-
-	public Object getConstraintValidatorPayload() {
-		return validatorScopedContext.getConstraintValidatorPayload();
-	}
-
 	public HibernateConstraintValidatorInitializationContext getConstraintValidatorInitializationContext() {
 		return constraintValidatorInitializationContext;
 	}
@@ -400,6 +394,16 @@ public class ValidationContext<T> {
 
 	public void setValidatedProperty(String validatedProperty) {
 		this.validatedProperty = validatedProperty;
+	}
+
+	public ConstraintValidatorContextImpl createConstraintValidatorContextFor(ConstraintDescriptorImpl<?> constraintDescriptor, PathImpl path) {
+		return new ConstraintValidatorContextImpl(
+				getParameterNames(),
+				validatorScopedContext.getClockProvider(),
+				path,
+				constraintDescriptor,
+				validatorScopedContext.getConstraintValidatorPayload()
+		);
 	}
 
 	@Override
