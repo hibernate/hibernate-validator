@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 import javax.validation.ConstraintValidator;
 
 import org.hibernate.validator.constraints.CompositionType;
-import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
+import org.hibernate.validator.internal.engine.validationcontext.ValidationContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
