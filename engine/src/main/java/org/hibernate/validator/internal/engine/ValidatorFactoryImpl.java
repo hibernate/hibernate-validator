@@ -664,7 +664,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 	}
 
-	static class ValidatorFactoryScopedContext {
+	public static class ValidatorFactoryScopedContext {
 		/**
 		 * The default message interpolator for this factory.
 		 */
