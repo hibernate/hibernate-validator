@@ -8,42 +8,35 @@ package org.hibernate.validator.internal.engine.validationcontext;
 
 import java.util.Set;
 
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 
 /**
- * Interface that exposes contextual information required for a validation call.
+ * Context object interface keeping track of all required data for operations inside {@link ConstraintTree}
+ * and its subclasses.
  * <p>
- * Provides ability to collect failing constraints and gives access to resources like
- * constraint validator factory, traversable resolver, etc.
+ * Allows to collect all failing constraints, creates {@link ConstraintValidatorContext}s based on the constraint
+ * descriptors, and exposes other resources needed to initialize a new {@link ConstraintValidator}.
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  * @author Gunnar Morling
  * @author Guillaume Smet
+ * @author Marko Bekhta
  */
 public interface ValidationContext<T> {
-
-	T getRootBean();
-
-	Class<T> getRootBeanClass();
-
-	BeanMetaData<T> getRootBeanMetaData();
-
-	TraversableResolver getTraversableResolver();
 
 	boolean isFailFastModeEnabled();
 
@@ -53,25 +46,13 @@ public interface ValidationContext<T> {
 
 	ConstraintValidatorFactory getConstraintValidatorFactory();
 
-	boolean isBeanAlreadyValidated(Object value, Class<?> group, PathImpl path);
-
-	void markCurrentBeanAsProcessed(ValueContext<?, ?> valueContext);
-
-	Set<ConstraintViolation<T>> getFailingConstraints();
-
 	void addConstraintFailure(
-			ValueContext<?, ?> localContext,
+			ValueContext<?, ?> valueContext,
 			ConstraintViolationCreationContext constraintViolationCreationContext,
 			ConstraintDescriptor<?> descriptor
 	);
 
-	boolean hasMetaConstraintBeenProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint);
-
-	void markConstraintProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint);
-
-	default boolean appliesTo(MetaConstraint<?> metaConstraint) {
-		return true;
-	}
+	Set<ConstraintViolation<T>> getFailingConstraints();
 
 	ConstraintValidatorContextImpl createConstraintValidatorContextFor(ConstraintDescriptorImpl<?> constraintDescriptor, PathImpl path);
 }

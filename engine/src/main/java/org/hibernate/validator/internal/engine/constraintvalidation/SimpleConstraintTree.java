@@ -38,7 +38,7 @@ class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 	}
 
 	@Override
-	protected <T> void validateConstraints(ValidationContext<T> validationContext,
+	protected void validateConstraints(ValidationContext<?> validationContext,
 			ValueContext<?, ?> valueContext,
 			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts) {
 

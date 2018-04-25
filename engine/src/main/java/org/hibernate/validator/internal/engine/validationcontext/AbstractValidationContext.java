@@ -48,7 +48,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-abstract class AbstractValidationContext<T> implements ValidationContext<T> {
+abstract class AbstractValidationContext<T> implements BaseBeanValidationContext<T> {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
