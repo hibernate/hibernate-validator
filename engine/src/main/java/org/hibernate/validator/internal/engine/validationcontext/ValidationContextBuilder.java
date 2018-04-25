@@ -47,7 +47,7 @@ public class ValidationContextBuilder {
 		this.validatorScopedContext = validatorScopedContext;
 	}
 
-	public <T> ValidationContext<T> forValidate(T rootBean) {
+	public <T> BaseBeanValidationContext<T> forValidate(T rootBean) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 		return new BeanValidationContext<>(
@@ -62,7 +62,7 @@ public class ValidationContextBuilder {
 		);
 	}
 
-	public <T> ValidationContext<T> forValidateProperty(T rootBean, PathImpl propertyPath) {
+	public <T> BaseBeanValidationContext<T> forValidateProperty(T rootBean, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 		return new PropertyValidationContext<>(
@@ -78,7 +78,7 @@ public class ValidationContextBuilder {
 		);
 	}
 
-	public <T> ValidationContext<T> forValidateValue(Class<T> rootBeanClass, PathImpl propertyPath) {
+	public <T> BaseBeanValidationContext<T> forValidateValue(Class<T> rootBeanClass, PathImpl propertyPath) {
 		return new PropertyValidationContext<>(
 				constraintValidatorManager,
 				constraintValidatorFactory,

@@ -45,8 +45,8 @@ import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
+import org.hibernate.validator.internal.engine.validationcontext.BaseBeanValidationContext;
 import org.hibernate.validator.internal.engine.validationcontext.ExecutableValidationContext;
-import org.hibernate.validator.internal.engine.validationcontext.ValidationContext;
 import org.hibernate.validator.internal.engine.validationcontext.ValidationContextBuilder;
 import org.hibernate.validator.internal.engine.validationcontext.ValidatorScopedContext;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
@@ -149,7 +149,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 		sanityCheckGroups( groups );
 
-		ValidationContext<T> validationContext = getValidationContextBuilder().forValidate( object );
+		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidate( object );
 
 		if ( !validationContext.getRootBeanMetaData().hasConstraints() ) {
 			return Collections.emptySet();
@@ -173,7 +173,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		sanityCheckGroups( groups );
 
 		PathImpl propertyPath = PathImpl.createPathFromString( propertyName );
-		ValidationContext<T> validationContext = getValidationContextBuilder().forValidateProperty( object, propertyPath );
+		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidateProperty( object, propertyPath );
 
 		if ( !validationContext.getRootBeanMetaData().hasConstraints() ) {
 			return Collections.emptySet();
@@ -197,7 +197,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		sanityCheckGroups( groups );
 
 		PathImpl propertyPath = PathImpl.createPathFromString( propertyName );
-		ValidationContext<T> validationContext = getValidationContextBuilder().forValidateValue( beanType, propertyPath );
+		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidateValue( beanType, propertyPath );
 
 		if ( !validationContext.getRootBeanMetaData().hasConstraints() ) {
 			return Collections.emptySet();
@@ -357,7 +357,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 *
 	 * @return Set of constraint violations or the empty set if there were no violations.
 	 */
-	private <T, U> Set<ConstraintViolation<T>> validateInContext(ValidationContext<T> validationContext, ValueContext<U, Object> valueContext,
+	private <T, U> Set<ConstraintViolation<T>> validateInContext(BaseBeanValidationContext<T> validationContext, ValueContext<U, Object> valueContext,
 			ValidationOrder validationOrder) {
 		if ( valueContext.getCurrentBean() == null ) {
 			return Collections.emptySet();
@@ -417,7 +417,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return validationContext.getFailingConstraints();
 	}
 
-	private void validateConstraintsForCurrentGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
+	private void validateConstraintsForCurrentGroup(BaseBeanValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		// we are not validating the default group there is nothing special to consider. If we are validating the default
 		// group sequence we have to consider that a class in the hierarchy could redefine the default group sequence.
 		if ( !valueContext.validatingDefault() ) {
@@ -428,7 +428,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private <U> void validateConstraintsForDefaultGroup(ValidationContext<?> validationContext, ValueContext<U, Object> valueContext) {
+	private <U> void validateConstraintsForDefaultGroup(BaseBeanValidationContext<?> validationContext, ValueContext<U, Object> valueContext) {
 		final BeanMetaData<U> beanMetaData = valueContext.getCurrentBeanMetaData();
 		final Map<Class<?>, Class<?>> validatedInterfaces = new HashMap<>();
 
@@ -472,7 +472,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private <U> boolean validateConstraintsForSingleDefaultGroupElement(ValidationContext<?> validationContext, ValueContext<U, Object> valueContext, final Map<Class<?>, Class<?>> validatedInterfaces,
+	private <U> boolean validateConstraintsForSingleDefaultGroupElement(BaseBeanValidationContext<?> validationContext, ValueContext<U, Object> valueContext, final Map<Class<?>, Class<?>> validatedInterfaces,
 			Class<? super U> clazz, Set<MetaConstraint<?>> metaConstraints, Group defaultSequenceMember) {
 		boolean validationSuccessful = true;
 
@@ -500,12 +500,12 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return validationSuccessful;
 	}
 
-	private void validateConstraintsForNonDefaultGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
+	private void validateConstraintsForNonDefaultGroup(BaseBeanValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		validateMetaConstraints( validationContext, valueContext, valueContext.getCurrentBean(), valueContext.getCurrentBeanMetaData().getMetaConstraints() );
 		validationContext.markCurrentBeanAsProcessed( valueContext );
 	}
 
-	private void validateMetaConstraints(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent,
+	private void validateMetaConstraints(BaseBeanValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent,
 			Iterable<MetaConstraint<?>> constraints) {
 
 		for ( MetaConstraint<?> metaConstraint : constraints ) {
@@ -516,7 +516,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private boolean validateMetaConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, MetaConstraint<?> metaConstraint) {
+	private boolean validateMetaConstraint(BaseBeanValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, MetaConstraint<?> metaConstraint) {
 		ValueContext.ValueState<Object> originalValueState = valueContext.getCurrentValueState();
 		valueContext.appendNode( metaConstraint.getLocation() );
 		boolean success = true;
@@ -545,7 +545,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @param validationContext The execution context
 	 * @param valueContext Collected information for single validation
 	 */
-	private void validateCascadedConstraints(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
+	private void validateCascadedConstraints(BaseBeanValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		Validatable validatable = valueContext.getCurrentValidatable();
 		ValueContext.ValueState<Object> originalValueState = valueContext.getCurrentValueState();
 
@@ -582,7 +582,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private void validateCascadedAnnotatedObjectForCurrentGroup(Object value, ValidationContext<?> validationContext, ValueContext<?, Object> valueContext,
+	private void validateCascadedAnnotatedObjectForCurrentGroup(Object value, BaseBeanValidationContext<?> validationContext, ValueContext<?, Object> valueContext,
 			CascadingMetaData cascadingMetaData) {
 		if ( validationContext.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath() ) ||
 				shouldFailFast( validationContext ) ) {
@@ -602,7 +602,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		validateInContext( validationContext, cascadedValueContext, validationOrder );
 	}
 
-	private void validateCascadedContainerElementsForCurrentGroup(Object value, ValidationContext<?> validationContext, ValueContext<?, ?> valueContext,
+	private void validateCascadedContainerElementsForCurrentGroup(Object value, BaseBeanValidationContext<?> validationContext, ValueContext<?, ?> valueContext,
 			List<ContainerCascadingMetaData> containerElementTypesCascadingMetaData) {
 		for ( ContainerCascadingMetaData cascadingMetaData : containerElementTypesCascadingMetaData ) {
 			if ( !cascadingMetaData.isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ) {
@@ -627,11 +627,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private class CascadingValueReceiver implements ValueExtractor.ValueReceiver {
 
-		private final ValidationContext<?> validationContext;
+		private final BaseBeanValidationContext<?> validationContext;
 		private final ValueContext<?, ?> valueContext;
 		private final ContainerCascadingMetaData cascadingMetaData;
 
-		public CascadingValueReceiver(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext, ContainerCascadingMetaData cascadingMetaData) {
+		public CascadingValueReceiver(BaseBeanValidationContext<?> validationContext, ValueContext<?, ?> valueContext, ContainerCascadingMetaData cascadingMetaData) {
 			this.validationContext = validationContext;
 			this.valueContext = valueContext;
 			this.cascadingMetaData = cascadingMetaData;
@@ -702,7 +702,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private void validateCascadedContainerElementsInContext(Object value, ValidationContext<?> validationContext, ValueContext<?, ?> valueContext,
+	private void validateCascadedContainerElementsInContext(Object value, BaseBeanValidationContext<?> validationContext, ValueContext<?, ?> valueContext,
 			ContainerCascadingMetaData cascadingMetaData, ValidationOrder validationOrder) {
 		Iterator<Group> groupIterator = validationOrder.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
@@ -760,7 +760,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return newValueContext;
 	}
 
-	private <T> Set<ConstraintViolation<T>> validateValueInContext(ValidationContext<T> validationContext, Object value, PathImpl propertyPath,
+	private <T> Set<ConstraintViolation<T>> validateValueInContext(BaseBeanValidationContext<T> validationContext, Object value, PathImpl propertyPath,
 			ValidationOrder validationOrder) {
 		ValueContext<?, Object> valueContext = getValueContextForValueValidation( validationContext.getRootBeanClass(), propertyPath );
 		valueContext.setCurrentValidatedValue( value );
@@ -1080,7 +1080,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	//TODO GM: if possible integrate with validateParameterForGroup()
-	private <T> void validateReturnValueForGroup(ValidationContext<T> validationContext, ExecutableMetaData executableMetaData, T bean, Object value,
+	private <T> void validateReturnValueForGroup(BaseBeanValidationContext<T> validationContext, ExecutableMetaData executableMetaData, T bean, Object value,
 			Group group) {
 		Contracts.assertNotNull( executableMetaData, "executableMetaData may not be null" );
 
@@ -1118,7 +1118,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private <T> void validateReturnValueForSingleGroup(ValidationContext<T> validationContext, ExecutableMetaData executableMetaData, T bean, Object value, Class<?> oneGroup) {
+	private <T> void validateReturnValueForSingleGroup(BaseBeanValidationContext<T> validationContext, ExecutableMetaData executableMetaData, T bean, Object value, Class<?> oneGroup) {
 		// validate constraints at return value itself
 		ValueContext<?, Object> valueContext = getExecutableValueContext(
 				executableMetaData.getKind() == ElementKind.CONSTRUCTOR ? value : bean,
@@ -1142,7 +1142,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to
 	 * 		the given property path.
 	 */
-	private <V> ValueContext<?, V> getValueContextForPropertyValidation(ValidationContext<?> validationContext, PathImpl propertyPath) {
+	private <V> ValueContext<?, V> getValueContextForPropertyValidation(BaseBeanValidationContext<?> validationContext, PathImpl propertyPath) {
 		Class<?> clazz = validationContext.getRootBeanClass();
 		BeanMetaData<?> beanMetaData = validationContext.getRootBeanMetaData();
 		Object value = validationContext.getRootBean();
@@ -1259,7 +1259,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return ValueContext.getLocalExecutionContext( validatorScopedContext.getParameterNameProvider(), clazz, beanMetaData, propertyPath );
 	}
 
-	private boolean isValidationRequired(ValidationContext<?> validationContext,
+	private boolean isValidationRequired(BaseBeanValidationContext<?> validationContext,
 			ValueContext<?, ?> valueContext,
 			MetaConstraint<?> metaConstraint) {
 		// check if this validation context is qualified to validate the current meta constraint.
@@ -1287,7 +1287,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		);
 	}
 
-	private boolean isReachable(ValidationContext<?> validationContext, Object traversableObject, PathImpl path, ElementType type) {
+	private boolean isReachable(BaseBeanValidationContext<?> validationContext, Object traversableObject, PathImpl path, ElementType type) {
 		if ( needToCallTraversableResolver( path, type ) ) {
 			return true;
 		}
@@ -1318,7 +1318,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				|| isReturnValueValidation( path );
 	}
 
-	private boolean isCascadeRequired(ValidationContext<?> validationContext, Object traversableObject, PathImpl path, ElementType type) {
+	private boolean isCascadeRequired(BaseBeanValidationContext<?> validationContext, Object traversableObject, PathImpl path, ElementType type) {
 		if ( needToCallTraversableResolver( path, type ) ) {
 			return true;
 		}
@@ -1359,7 +1359,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return path.getLeafNode().getKind() == ElementKind.RETURN_VALUE;
 	}
 
-	private boolean shouldFailFast(ValidationContext<?> validationContext) {
+	private boolean shouldFailFast(BaseBeanValidationContext<?> validationContext) {
 		return validationContext.isFailFastModeEnabled() && !validationContext.getFailingConstraints().isEmpty();
 	}
 
@@ -1371,7 +1371,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return beanMetaData.getMetaDataFor( propertyNode.getName() );
 	}
 
-	private Object getCascadableValue(ValidationContext<?> validationContext, Object object, Cascadable cascadable) {
+	private Object getCascadableValue(BaseBeanValidationContext<?> validationContext, Object object, Cascadable cascadable) {
 		return cascadable.getValue( object );
 	}
 }

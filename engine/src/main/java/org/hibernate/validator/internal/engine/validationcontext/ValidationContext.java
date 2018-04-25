@@ -8,70 +8,74 @@ package org.hibernate.validator.internal.engine.validationcontext;
 
 import java.util.Set;
 
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 
 /**
- * Interface that expose contextual information required for a validation call.
+ * Context object interface keeping track of all required data for operations inside {@link ConstraintTree}
+ * and its subclasses.
  * <p>
- * Provides ability to collect failing constrains, as well as gives access to resources like
- * constraint validator factory, traversable resolver, etc.
+ * Allows to collect all failing constraints, creates {@link ConstraintValidatorContext}s based on the constraint
+ * descriptors, and exposes other resources needed to initialize a new {@link ConstraintValidator}.
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  * @author Gunnar Morling
  * @author Guillaume Smet
+ * @author Marko Bekhta
  */
 public interface ValidationContext<T> {
 
-	T getRootBean();
-
-	Class<T> getRootBeanClass();
-
-	BeanMetaData<T> getRootBeanMetaData();
-
-	TraversableResolver getTraversableResolver();
-
+	/**
+	 * @return {@code true} if the fail fast mode is enabled, {@code false} otherwise.
+	 */
 	boolean isFailFastModeEnabled();
 
+	/**
+	 * @return the {@link ConstraintValidatorManager} that caches and manages
+	 * 		life cycle of constraint validator instances.
+	 */
 	ConstraintValidatorManager getConstraintValidatorManager();
 
+	/**
+	 * @return constraint validator initialization context.
+	 */
 	HibernateConstraintValidatorInitializationContext getConstraintValidatorInitializationContext();
 
+	/**
+	 * @return constraint validator factory which should be used in this context.
+	 */
 	ConstraintValidatorFactory getConstraintValidatorFactory();
 
-	boolean isBeanAlreadyValidated(Object value, Class<?> group, PathImpl path);
-
-	void markCurrentBeanAsProcessed(ValueContext<?, ?> valueContext);
-
-	Set<ConstraintViolation<T>> getFailingConstraints();
-
+	/**
+	 * Creates a {@link ConstraintViolation} based on passed parameters and adds it
+	 * to the set of failed constraints.
+	 */
 	void addConstraintFailure(
-			ValueContext<?, ?> localContext,
+			ValueContext<?, ?> valueContext,
 			ConstraintViolationCreationContext constraintViolationCreationContext,
 			ConstraintDescriptor<?> descriptor
 	);
 
-	boolean hasMetaConstraintBeenProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint);
+	/**
+	 * @return a set of constraint violations created with {@link ValidationContext#addConstraintFailure(ValueContext, ConstraintViolationCreationContext, ConstraintDescriptor)}.
+	 */
+	Set<ConstraintViolation<T>> getFailingConstraints();
 
-	void markConstraintProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint);
-
-	default boolean canProcess(MetaConstraint<?> metaConstraint) {
-		return true;
-	}
-
+	/**
+	 * @return a newly created constraint validator context based on passed constraint descriptor and path.
+	 */
 	ConstraintValidatorContextImpl createConstraintValidatorContextFor(ConstraintDescriptorImpl<?> constraintDescriptor, PathImpl path);
 }

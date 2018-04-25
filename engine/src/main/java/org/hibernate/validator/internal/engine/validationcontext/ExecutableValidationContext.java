@@ -12,11 +12,11 @@ import java.util.Optional;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 
 /**
- * Extension of {@link ValidationContext} for executable validation.
+ * Extension of {@link BaseBeanValidationContext} for executable validation.
  *
  * @author Marko Bekhta
  */
-public interface ExecutableValidationContext<T> extends ValidationContext<T> {
+public interface ExecutableValidationContext<T> extends BaseBeanValidationContext<T> {
 
 	Executable getExecutable();
 
