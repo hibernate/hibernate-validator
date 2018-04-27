@@ -241,13 +241,11 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		}
 
 		/**
-		 * In case nodes are added from within a class-level or cross-parameter
-		 * constraint, the node representing the constraint element will be
-		 * dropped. inIterable(), getKey() etc.
+		 * In case nodes are added from within a class-level constraint, the node representing
+		 * the constraint element will be dropped. inIterable(), getKey() etc.
 		 */
-		protected final void dropLeafNodeIfRequired() {
-			if ( propertyPath.getLeafNode().getKind() == ElementKind.BEAN
-					|| propertyPath.getLeafNode().getKind() == ElementKind.CROSS_PARAMETER ) {
+		private void dropLeafNodeIfRequired() {
+			if ( propertyPath.getLeafNode().getKind() == ElementKind.BEAN ) {
 				propertyPath = propertyPath.getPathWithoutLeafNode();
 			}
 		}

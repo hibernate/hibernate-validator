@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import javax.validation.ClockProvider;
@@ -16,15 +15,11 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.constraintvalidation.HibernateCrossParameterConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * @author Marko Bekhta
  */
 public class CrossParameterConstraintValidatorContext extends ConstraintValidatorContextImpl implements HibernateCrossParameterConstraintValidatorContext {
-
-	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final List<String> methodParameterNames;
 
@@ -68,15 +63,14 @@ public class CrossParameterConstraintValidatorContext extends ConstraintValidato
 
 		@Override
 		public NodeBuilderDefinedContext addParameterNode(int index) {
-			if ( propertyPath.getLeafNode().getKind() != ElementKind.CROSS_PARAMETER ) {
-				throw LOG.getParameterNodeAddedForNonCrossParameterConstraintException( propertyPath );
-			}
-
-			dropLeafNodeIfRequired();
+			dropLeafNode();
 			propertyPath.addParameterNode( methodParameterNames.get( index ), index );
 
 			return new NodeBuilder( messageTemplate, propertyPath );
 		}
 
+		private void dropLeafNode() {
+			propertyPath = propertyPath.getPathWithoutLeafNode();
+		}
 	}
 }
