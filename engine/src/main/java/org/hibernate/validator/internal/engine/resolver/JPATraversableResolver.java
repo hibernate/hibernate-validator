@@ -21,11 +21,13 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * query the reachability of a property.
  * This resolver will be automatically enabled if JPA 2 is on the classpath and the default {@code TraversableResolver} is
  * used.
+ * <p>
+ * This class needs to be public as it's instantiated via a privileged action that is not in this package.
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
-class JPATraversableResolver implements TraversableResolver {
+public class JPATraversableResolver implements TraversableResolver {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 

@@ -845,4 +845,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 241, value = "Encountered unsupported element %1$s while parsing the XML configuration.")
 	ValidationException logUnknownElementInXmlConfiguration(String tag);
+
+	@LogMessage(level = WARN)
+	@Message(id = 242, value = "Unable to load or instantiate JPA aware resolver %1$s. All properties will per default be traversable.")
+	void logUnableToLoadOrInstantiateJPAAwareResolver(String traversableResolverClassName);
 }

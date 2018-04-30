@@ -14,7 +14,7 @@ import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
-import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
+import org.hibernate.validator.internal.engine.resolver.JPATraversableResolver;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeTest;
@@ -32,7 +32,7 @@ public class JpaTraversableResolverTest {
 	@BeforeTest
 	public void setUp() {
 		Configuration<?> configuration = ValidatorUtil.getConfiguration();
-		configuration.traversableResolver( TraversableResolvers.getDefault() );
+		configuration.traversableResolver( new JPATraversableResolver() );
 		validator = configuration.buildValidatorFactory().getValidator();
 	}
 
@@ -55,5 +55,3 @@ public class JpaTraversableResolverTest {
 		assertTrue( results.isEmpty() );
 	}
 }
-
-
