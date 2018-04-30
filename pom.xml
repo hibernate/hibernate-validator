@@ -203,7 +203,7 @@
         <bv.api-docs.base-url>http://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api</bv.api-docs.base-url>
         <javamoney.api-docs.base-url>http://javamoney.github.io/apidocs</javamoney.api-docs.base-url>
 
-        <maven-surefire-plugin.version>2.20.1</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
 
         <!-- Used to add further arguments to the arg line for specific sub-modules and profiles -->
         <maven-surefire-plugin.argLine></maven-surefire-plugin.argLine>
