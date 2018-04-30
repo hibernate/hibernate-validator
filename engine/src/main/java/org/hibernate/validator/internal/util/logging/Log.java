@@ -841,4 +841,8 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = DEBUG)
 	@Message(id = 240, value = "Constraint validator payload set to %1$s.")
 	void logConstraintValidatorPayload(Object payload);
+
+	@LogMessage(level = WARN)
+	@Message(id = 242, value = "Unable to load or instantiate JPA aware resolver %1$s. All properties will per default be traversable.")
+	void logUnableToLoadOrInstantiateJPAAwareResolver(String traversableResolverClassName);
 }

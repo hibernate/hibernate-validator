@@ -106,10 +106,7 @@ public class TraversableResolvers {
 			return run( NewInstance.action( jpaAwareResolverClass, "" ) );
 		}
 		catch (ValidationException e) {
-			LOG.debugf(
-					"Unable to load or instantiate JPA aware resolver %s. All properties will per default be traversable.",
-					JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
-			);
+			LOG.logUnableToLoadOrInstantiateJPAAwareResolver( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME );
 			return getTraverseAllTraversableResolver();
 		}
 	}
