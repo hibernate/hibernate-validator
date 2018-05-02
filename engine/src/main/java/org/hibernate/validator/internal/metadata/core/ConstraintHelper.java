@@ -679,21 +679,24 @@ public class ConstraintHelper {
 		this.builtinConstraints = Collections.unmodifiableMap( tmpConstraints );
 	}
 
-	private static <A extends Annotation> void putConstraint(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators, Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType) {
-		validators.put( constraintType, Collections.singletonList( ConstraintValidatorDescriptor.forClass( validatorType ) ) );
+	private static <A extends Annotation> void putConstraint(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
+			Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType) {
+		validators.put( constraintType, Collections.singletonList( ConstraintValidatorDescriptor.forClass( validatorType, constraintType ) ) );
 	}
 
-	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators, Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType1, Class<? extends ConstraintValidator<A, ?>> validatorType2) {
+	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
+			Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType1, Class<? extends ConstraintValidator<A, ?>> validatorType2) {
 		List<ConstraintValidatorDescriptor<?>> descriptors = Stream.of( validatorType1, validatorType2 )
-				.map( ConstraintValidatorDescriptor::forClass )
+				.map( vt -> ConstraintValidatorDescriptor.forClass( vt, constraintType ) )
 				.collect( Collectors.toList() );
 
 		validators.put( constraintType, CollectionHelper.toImmutableList( descriptors ) );
 	}
 
-	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators, Class<A> constraintType, List<Class<? extends ConstraintValidator<A, ?>>> validatorDescriptors) {
+	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
+			Class<A> constraintType, List<Class<? extends ConstraintValidator<A, ?>>> validatorDescriptors) {
 		List<ConstraintValidatorDescriptor<?>> descriptors = validatorDescriptors.stream()
-				.map( ConstraintValidatorDescriptor::forClass )
+				.map( vt -> ConstraintValidatorDescriptor.forClass( vt, constraintType ) )
 				.collect( Collectors.toList() );
 
 		validators.put( constraintType, CollectionHelper.toImmutableList( descriptors ) );
@@ -995,8 +998,8 @@ public class ConstraintHelper {
 				.validatedBy();
 
 		return Stream.of( validatedBy )
-			.map( c -> ConstraintValidatorDescriptor.forClass( c ) )
-			.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) );
+				.map( c -> ConstraintValidatorDescriptor.forClass( c, annotationType ) )
+				.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) );
 	}
 
 	private static boolean isClassPresent(String className) {
