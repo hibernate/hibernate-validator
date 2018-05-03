@@ -6,14 +6,31 @@
  */
 package org.hibernate.validator.test.cdi.internal;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.Serializable;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 
+import javax.validation.Constraint;
+import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import javax.validation.executable.ExecutableType;
 import javax.validation.executable.ValidateOnExecution;
 
@@ -69,6 +86,53 @@ public class ValidateableBeanFilterTest {
 
 		// 8. Class with annotated constructor
 		assertTrue( predicate.test( AnnotatedConstructor.class ) );
+
+		// 9. Annotated type arguments
+		assertTrue( predicate.test( TypeArgumentField.class ) );
+		assertTrue( predicate.test( TypeArgumentReturnValue.class ) );
+		assertTrue( predicate.test( TypeArgumentMethodParameter.class ) );
+		assertTrue( predicate.test( TypeArgumentConstructorParameter.class ) );
+		assertTrue( predicate.test( NestedTypeArgumentField.class ) );
+		assertTrue( predicate.test( DeepNestedAnnotatedMethodParameter.class ) );
+
+		// 10. Custom user constraint:
+		assertTrue( predicate.test( BeanWithCustomConstraintOnParameter.class ) );
+		assertTrue( predicate.test( BeanWithCustomConstraintOnField.class ) );
+		assertTrue( predicate.test( BeanWithCustomConstraintOnReturnValue.class ) );
+	}
+
+	private static class AnnotatedMethodParameter {
+		void doSomething(@NotNull String string) {
+		}
+	}
+
+	private static class DeepNestedAnnotatedMethodParameter {
+		void doSomethinf(List<Map<String, List<Optional<Map<String, @NotNull String>>>>> strings) {
+		}
+	}
+
+	private static class TypeArgumentField {
+		private List<@NotNull String> strings;
+	}
+
+	private static class NestedTypeArgumentField {
+		private List<Map<String, @NotNull String>> strings;
+	}
+
+	private static class TypeArgumentReturnValue {
+		List<@NotNull String> strings() {
+			return null;
+		}
+	}
+
+	private static class TypeArgumentMethodParameter {
+		void strings(List<@NotNull String> strings) {
+		}
+	}
+
+	private static class TypeArgumentConstructorParameter {
+		TypeArgumentConstructorParameter(List<@NotNull String> strings) {
+		}
 	}
 
 	private static class AnnotatedConstructor {
@@ -158,5 +222,45 @@ public class ValidateableBeanFilterTest {
 		public int bar() {
 			return 0;
 		}
+	}
+
+	/**
+	 * This class and {@link ValidNumber} is taken from Felix tests, where the issue was initially
+	 * discovered.
+	 */
+	public static class BeanWithCustomConstraintOnParameter {
+
+		public void doDefault(@ValidNumber String number) {
+		}
+	}
+
+	public static class BeanWithCustomConstraintOnField {
+		private @ValidNumber String number;
+	}
+
+
+	public static class BeanWithCustomConstraintOnReturnValue {
+		@ValidNumber
+		String number() {
+			return null;
+		}
+	}
+
+	@Documented
+	@Target({ ANNOTATION_TYPE, METHOD, FIELD, CONSTRUCTOR, PARAMETER })
+	@Retention(RUNTIME)
+	@Constraint(validatedBy = {})
+	@Size(min = 3, message = "Must be 3 at least")
+	@Pattern(regexp = "[0-9]*")
+	@NotNull(message = "Cannot be null")
+	public @interface ValidNumber {
+
+		String message() default "invalid number";
+
+		Class<?>[] groups() default {};
+
+		Class<? extends Payload>[] payload() default {};
+
+		String value() default "";
 	}
 }

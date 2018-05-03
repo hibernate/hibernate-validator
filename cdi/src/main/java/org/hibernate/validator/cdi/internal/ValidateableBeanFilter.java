@@ -7,6 +7,8 @@
 package org.hibernate.validator.cdi.internal;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedParameterizedType;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
@@ -68,6 +70,9 @@ public class ValidateableBeanFilter implements Predicate<Class<?>> {
 
 		// 2. Or on a field level
 		for ( Field field : clazz.getDeclaredFields() ) {
+			if ( isAnnotationPresent( field.getAnnotatedType(), processedAnnotations ) ) {
+				return true;
+			}
 			if ( isAnnotationPresentIn( field.getDeclaredAnnotations(), processedAnnotations ) ) {
 				return true;
 			}
@@ -98,12 +103,37 @@ public class ValidateableBeanFilter implements Predicate<Class<?>> {
 		return false;
 	}
 
+	private boolean isAnnotationPresent(AnnotatedType annotatedType, Set<Annotation> processedAnnotations) {
+		if ( isAnnotationPresentIn( annotatedType.getDeclaredAnnotations(), processedAnnotations ) ) {
+			return true;
+		}
+		if ( annotatedType instanceof AnnotatedParameterizedType ) {
+			for ( AnnotatedType type : ( (AnnotatedParameterizedType) annotatedType ).getAnnotatedActualTypeArguments() ) {
+				if ( isAnnotationPresent( type, processedAnnotations ) ) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	private boolean isAnnotationPresentOn(Executable executable, Set<Annotation> processedAnnotations) {
 		// Check the executable itself first:
 		if ( isAnnotationPresentIn( executable.getDeclaredAnnotations(), processedAnnotations ) ) {
 			return true;
 		}
+		if ( isAnnotationPresent( executable.getAnnotatedReturnType(), processedAnnotations ) ) {
+			return true;
+		}
 		// Then check its parameters:
+		for ( AnnotatedType annotatedParameterType : executable.getAnnotatedParameterTypes() ) {
+			if ( isAnnotationPresent( annotatedParameterType, processedAnnotations ) ) {
+				return true;
+			}
+		}
+		// NOTE: this check looks to be redundant BUT without it test on BeanWithCustomConstraintOnParameter
+		// will fail as executable.getAnnotatedParameterTypes() on BeanWithCustomConstraintOnParameter#doDefault()
+		// will not contain annotations
 		for ( Annotation[] annotations : executable.getParameterAnnotations() ) {
 			if ( isAnnotationPresentIn( annotations, processedAnnotations ) ) {
 				return true;
