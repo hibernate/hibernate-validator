@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Default;
@@ -32,12 +33,9 @@ import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.ProcessBean;
-import javax.enterprise.inject.spi.WithAnnotations;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.BootstrapConfiguration;
 import javax.validation.Configuration;
-import javax.validation.Constraint;
-import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -47,6 +45,7 @@ import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.cdi.internal.InheritedMethodsHelper;
+import org.hibernate.validator.cdi.internal.ValidateableBeanFilter;
 import org.hibernate.validator.cdi.internal.ValidationProviderHelper;
 import org.hibernate.validator.cdi.internal.ValidatorBean;
 import org.hibernate.validator.cdi.internal.ValidatorFactoryBean;
@@ -83,6 +82,7 @@ public class ValidationExtension implements Extension {
 			EnumSet.of( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS, ExecutableType.GETTER_METHODS );
 	private static final EnumSet<ExecutableType> DEFAULT_EXECUTABLE_TYPES =
 			EnumSet.of( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS );
+	private static final Predicate<Class<?>> VALIDATEABLE_BEAN_FILTER = new ValidateableBeanFilter();
 
 	@SuppressWarnings("serial")
 	private final Annotation defaultQualifier = new AnnotationLiteral<Default>() {
@@ -219,19 +219,23 @@ public class ValidationExtension implements Extension {
 	 * @param processAnnotatedTypeEvent event fired for each annotated type
 	 * @param <T> the annotated type
 	 */
-	public <T> void processAnnotatedType(@Observes @WithAnnotations({
-			Constraint.class,
-			Valid.class,
-			ValidateOnExecution.class
-	}) ProcessAnnotatedType<T> processAnnotatedTypeEvent) {
+	public <T> void processAnnotatedType(@Observes ProcessAnnotatedType<T> processAnnotatedTypeEvent) {
+		// NOTE: it is important to said here that we cannot use @WithAnnotations for filtering purposes here.
+		// This annotation does not consider checking implemented interfaces and super classes for annotations.
+		// Hence clean beans, without any annotation on them, that implement interfaces that have any annotation
+		// that is of iterest to us (@Valid, @Constraint, @ValidateOnExecution) will not be pushed to this method
+		// if @WithAnnotations is used.
+		// To prevent filling memory with unneeded metadata and redundant work in HV we have a custom VALIDATEABLE_BEAN_FILTER
+		// that checks for annotation presense in the way that we need.
 		Contracts.assertNotNull( processAnnotatedTypeEvent, "The ProcessAnnotatedType event cannot be null" );
 
-		// validation globally disabled
-		if ( !isExecutableValidationEnabled ) {
+		AnnotatedType<T> type = processAnnotatedTypeEvent.getAnnotatedType();
+
+		// validation globally disabled or annotated type has none of needed annotations:
+		if ( !isExecutableValidationEnabled || !VALIDATEABLE_BEAN_FILTER.test( type.getJavaClass() ) ) {
 			return;
 		}
 
-		AnnotatedType<T> type = processAnnotatedTypeEvent.getAnnotatedType();
 		Set<AnnotatedCallable<? super T>> constrainedCallables = determineConstrainedCallables( type );
 
 		if ( !constrainedCallables.isEmpty() ) {
