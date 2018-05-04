@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.constraintvalidators.hv;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +19,8 @@ import javax.validation.constraintvalidation.ValidationTarget;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.hibernate.validator.constraintvalidation.HibernateCrossParameterConstraintValidatorContext;
 import org.hibernate.validator.internal.util.Contracts;
 
 /**
@@ -42,14 +42,17 @@ public class ParameterScriptAssertValidator extends AbstractScriptAssertValidato
 
 	@Override
 	public boolean isValid(Object[] arguments, ConstraintValidatorContext constraintValidatorContext) {
-		if ( constraintValidatorContext instanceof HibernateConstraintValidatorContext ) {
-			constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class ).addMessageParameter( "script", escapedScript );
+		Map<String, Object> bindings;
+		if ( constraintValidatorContext instanceof HibernateCrossParameterConstraintValidatorContext ) {
+			HibernateCrossParameterConstraintValidatorContext crossParameterConstraintValidatorContext = constraintValidatorContext.unwrap( HibernateCrossParameterConstraintValidatorContext.class );
+			crossParameterConstraintValidatorContext.addMessageParameter( "script", escapedScript );
+
+			List<String> parameterNames = crossParameterConstraintValidatorContext.getMethodParameterNames();
+			bindings = getBindings( arguments, parameterNames );
 		}
-
-		List<String> parameterNames = ( (ConstraintValidatorContextImpl) constraintValidatorContext )
-				.getMethodParameterNames();
-
-		Map<String, Object> bindings = getBindings( arguments, parameterNames );
+		else {
+			bindings = Collections.emptyMap();
+		}
 
 		return scriptAssertContext.evaluateScriptAssertExpression( bindings );
 	}

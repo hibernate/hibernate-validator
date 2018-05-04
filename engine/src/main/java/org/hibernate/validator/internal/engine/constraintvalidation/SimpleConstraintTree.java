@@ -13,8 +13,8 @@ import java.util.Collection;
 
 import javax.validation.ConstraintValidator;
 
-import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
+import org.hibernate.validator.internal.engine.validationcontext.ValidationContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -38,7 +38,7 @@ class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 	}
 
 	@Override
-	protected <T> void validateConstraints(ValidationContext<T> validationContext,
+	protected void validateConstraints(ValidationContext<?> validationContext,
 			ValueContext<?, ?> valueContext,
 			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts) {
 
@@ -54,12 +54,8 @@ class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 		ConstraintValidator<B, ?> validator = getInitializedConstraintValidator( validationContext, valueContext );
 
 		// create a constraint validator context
-		ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
-				validationContext.getParameterNames(),
-				validationContext.getClockProvider(),
-				valueContext.getPropertyPath(),
-				descriptor,
-				validationContext.getConstraintValidatorPayload()
+		ConstraintValidatorContextImpl constraintValidatorContext = validationContext.createConstraintValidatorContextFor(
+				descriptor, valueContext.getPropertyPath()
 		);
 
 		// validate

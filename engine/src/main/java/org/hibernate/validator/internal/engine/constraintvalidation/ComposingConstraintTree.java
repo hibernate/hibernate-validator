@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 import javax.validation.ConstraintValidator;
 
 import org.hibernate.validator.constraints.CompositionType;
-import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
+import org.hibernate.validator.internal.engine.validationcontext.ValidationContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -64,7 +64,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 	}
 
 	@Override
-	protected <T> void validateConstraints(ValidationContext<T> validationContext,
+	protected void validateConstraints(ValidationContext<?> validationContext,
 			ValueContext<?, ?> valueContext,
 			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts) {
 		CompositionResult compositionResult = validateComposingConstraints(
@@ -88,12 +88,8 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 			ConstraintValidator<B, ?> validator = getInitializedConstraintValidator( validationContext, valueContext );
 
 			// create a constraint validator context
-			ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
-					validationContext.getParameterNames(),
-					validationContext.getClockProvider(),
-					valueContext.getPropertyPath(),
-					descriptor,
-					validationContext.getConstraintValidatorPayload()
+			ConstraintValidatorContextImpl constraintValidatorContext = validationContext.createConstraintValidatorContextFor(
+					descriptor, valueContext.getPropertyPath()
 			);
 
 			// validate
@@ -123,7 +119,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 		}
 	}
 
-	private <T> boolean mainConstraintNeedsEvaluation(ValidationContext<T> validationContext,
+	private boolean mainConstraintNeedsEvaluation(ValidationContext<?> validationContext,
 			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts) {
 		// we are dealing with a composing constraint with no validator for the main constraint
 		if ( !descriptor.getComposingConstraints().isEmpty() && descriptor.getMatchingConstraintValidatorDescriptors().isEmpty() ) {
@@ -155,9 +151,8 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 	 * @param valueContext meta data for currently validated value
 	 * @param violatedConstraintValidatorContexts used to accumulate constraint validator contexts that cause constraint violations
 	 * @param localConstraintValidatorContext an optional of constraint violations of top level constraint
-	 *
 	 */
-	private <T> void prepareFinalConstraintViolations(ValidationContext<T> validationContext,
+	private void prepareFinalConstraintViolations(ValidationContext<?> validationContext,
 			ValueContext<?, ?> valueContext,
 			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts,
 			Optional<ConstraintValidatorContextImpl> localConstraintValidatorContext) {
@@ -170,13 +165,11 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 			// If not we create a violation
 			// using the error message in the annotation declaration at top level.
 			if ( !localConstraintValidatorContext.isPresent() ) {
-				violatedConstraintValidatorContexts.add( new ConstraintValidatorContextImpl(
-						validationContext.getParameterNames(),
-						validationContext.getClockProvider(),
-						valueContext.getPropertyPath(),
-						descriptor,
-						validationContext.getConstraintValidatorPayload()
-				) );
+				violatedConstraintValidatorContexts.add(
+						validationContext.createConstraintValidatorContextFor(
+								descriptor, valueContext.getPropertyPath()
+						)
+				);
 			}
 		}
 
@@ -202,7 +195,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 	 *
 	 * @return Returns an instance of {@code CompositionResult} relevant for boolean composition of constraints
 	 */
-	private <T> CompositionResult validateComposingConstraints(ValidationContext<T> validationContext,
+	private CompositionResult validateComposingConstraints(ValidationContext<?> validationContext,
 			ValueContext<?, ?> valueContext,
 			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts) {
 		CompositionResult compositionResult = new CompositionResult( true, false );
