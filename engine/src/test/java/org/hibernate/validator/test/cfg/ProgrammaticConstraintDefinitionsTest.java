@@ -61,10 +61,10 @@ public class ProgrammaticConstraintDefinitionsTest {
 				"invalid Brazilian corporate taxpayer registry number (CNPJ)"
 		);
 
-		doProgrammaticTest( REGON.class, new REGONDef(), "49905531368510", "49905531368512", "Invalid Polish Taxpayer Identification Number (REGON)" );
-		doProgrammaticTest( REGON.class, new REGONDef(), "858336997", "691657185", "Invalid Polish Taxpayer Identification Number (REGON)" );
-		doProgrammaticTest( PESEL.class, new PESELDef(), "12252918020", "44051401358", "Invalid Polish National Identification Number (PESEL)" );
-		doProgrammaticTest( NIP.class, new NIPDef(), "1786052059", "2596048505", "Invalid VAT Identification Number (NIP)" );
+		doProgrammaticTest( REGON.class, new REGONDef(), "49905531368510", "49905531368512", "invalid Polish Taxpayer Identification Number (REGON)" );
+		doProgrammaticTest( REGON.class, new REGONDef(), "858336997", "691657185", "invalid Polish Taxpayer Identification Number (REGON)" );
+		doProgrammaticTest( PESEL.class, new PESELDef(), "12252918020", "44051401358", "invalid Polish National Identification Number (PESEL)" );
+		doProgrammaticTest( NIP.class, new NIPDef(), "1786052059", "2596048505", "invalid VAT Identification Number (NIP)" );
 
 	}
 
