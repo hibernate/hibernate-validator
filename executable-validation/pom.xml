@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator-parent</artifactId>
+        <version>6.0.9-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>hibernate-validator-executable-validation</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Hibernate Validator Executable Validation</name>
+    <description>Hibernate Validator Executable Validation modules aggregator</description>
+
+    <properties>
+        <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+
+        <aspectj.version>1.8.13</aspectj.version>
+    </properties>
+
+    <modules>
+        <module>aspectj-validation</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjrt</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjtools</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>

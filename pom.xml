@@ -90,6 +90,7 @@
         <module>modules</module>
         <module>tck-runner</module>
         <module>annotation-processor</module>
+        <module>executable-validation</module>
         <module>integration</module>
         <module>performance</module>
     </modules>
