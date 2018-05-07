@@ -388,7 +388,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 105, value = "%1$s does not contain the fieldType %2$s.")
 	ValidationException getBeanDoesNotContainTheFieldException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String fieldName);
 
-	@Message(id = 106, value = "%1$s does not contain the property %2$s.")
+	@Message(id = 106, value = "%1$s does not define the property %2$s.")
 	ValidationException getBeanDoesNotContainThePropertyException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String getterName);
 
 	@Message(id = 107, value = "Annotation of type %1$s does not contain a parameter %2$s.")
