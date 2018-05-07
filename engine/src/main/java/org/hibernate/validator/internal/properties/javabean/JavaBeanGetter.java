@@ -23,7 +23,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
  */
 public class JavaBeanGetter extends JavaBeanExecutable implements Property {
 
-	private static final Class[] PARAMETER_TYPES = new Class[0];
+	private static final Class<?>[] PARAMETER_TYPES = new Class[0];
 
 	private final String name;
 

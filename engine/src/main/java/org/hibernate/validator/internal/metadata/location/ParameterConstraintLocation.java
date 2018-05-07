@@ -29,7 +29,7 @@ public class ParameterConstraintLocation implements ConstraintLocation {
 	public ParameterConstraintLocation(Callable executable, int index) {
 		this.executable = executable;
 		this.index = index;
-		this.typeForValidatorResolution = ReflectionHelper.boxedType( executable.typeOfParameter( index ) );
+		this.typeForValidatorResolution = ReflectionHelper.boxedType( executable.getTypeOfParameter( index ) );
 	}
 
 	@Override

@@ -110,7 +110,7 @@ public class JavaBeanExecutable implements Callable {
 	}
 
 	@Override
-	public Type typeOfParameter(int parameterIndex) {
+	public Type getTypeOfParameter(int parameterIndex) {
 		Type[] genericParameterTypes = executable.getGenericParameterTypes();
 
 		// getGenericParameterTypes() doesn't return synthetic parameters; in this case fall back to getParameterTypes()

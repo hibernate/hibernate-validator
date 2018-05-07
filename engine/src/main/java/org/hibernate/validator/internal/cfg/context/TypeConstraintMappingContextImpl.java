@@ -255,13 +255,13 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	}
 
 	/**
-	 * Returns the member with the given name and type.
+	 * Returns the property with the given name and type.
 	 *
-	 * @param clazz The class from which to retrieve the member. Cannot be {@code null}.
+	 * @param clazz The class from which to retrieve the property. Cannot be {@code null}.
 	 * @param property The property name without "is", "get" or "has". Cannot be {@code null} or empty.
 	 * @param elementType The element type. Either {@code ElementType.FIELD} or {@code ElementType METHOD}.
 	 *
-	 * @return the member which matching the name and type or {@code null} if no such member exists.
+	 * @return the property which matches the name and type or {@code null} if no such property exists.
 	 */
 	private Property getProperty(Class<?> clazz, String property, ElementType elementType) {
 		Contracts.assertNotNull( clazz, MESSAGES.classCannotBeNull() );

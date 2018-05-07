@@ -130,7 +130,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 						new ConstrainedParameter(
 								ConfigurationSource.API,
 								callable,
-								callable.typeOfParameter( i ),
+								callable.getTypeOfParameter( i ),
 								i
 						)
 				);

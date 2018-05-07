@@ -24,8 +24,8 @@ class ReturnValueConstraintLocation implements ConstraintLocation {
 
 	private final Callable callable;
 
-	ReturnValueConstraintLocation(Callable executable) {
-		this.callable = executable;
+	ReturnValueConstraintLocation(Callable callable) {
+		this.callable = callable;
 	}
 
 	@Override

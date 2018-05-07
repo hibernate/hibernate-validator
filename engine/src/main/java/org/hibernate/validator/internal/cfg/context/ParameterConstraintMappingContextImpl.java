@@ -121,7 +121,7 @@ final class ParameterConstraintMappingContextImpl
 
 	public ConstrainedParameter build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager) {
-		Type parameterType = executableContext.getCallable().typeOfParameter( parameterIndex );
+		Type parameterType = executableContext.getCallable().getTypeOfParameter( parameterIndex );
 
 		return new ConstrainedParameter(
 				ConfigurationSource.API,

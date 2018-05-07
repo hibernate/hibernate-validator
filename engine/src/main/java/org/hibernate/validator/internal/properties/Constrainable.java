@@ -21,6 +21,7 @@ public interface Constrainable {
 
 	Type getType();
 
+	@SuppressWarnings("unchecked")
 	default <T> T as(Class<T> clazz) {
 		return ( (T) this );
 	}

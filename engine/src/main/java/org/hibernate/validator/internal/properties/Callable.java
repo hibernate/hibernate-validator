@@ -32,7 +32,7 @@ public interface Callable extends Constrainable {
 
 	String getSignature();
 
-	Type typeOfParameter(int parameterIndex);
+	Type getTypeOfParameter(int parameterIndex);
 
 	boolean overrides(ExecutableHelper executableHelper, Callable superTypeMethod);
 

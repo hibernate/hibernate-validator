@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.properties.Property;
 
 /**
- * Represents a property of a Java type (either field or getter) and all its associated meta-data relevant
+ * Represents a property of a Java type (either field or getter) and all its associated metadata relevant
  * in the context of bean validation, for instance its constraints.
  *
  * @author Marko Bekhta
