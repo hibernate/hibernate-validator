@@ -44,7 +44,11 @@ public interface ConstraintLocation {
 	}
 
 	static ConstraintLocation forGetter(Method getter) {
-		return new GetterConstraintLocation( getter );
+		return new GetterConstraintLocation( getter , getter.getDeclaringClass() );
+	}
+
+	static ConstraintLocation forGetterOfClass(Method getter, Class<?> declaringClass) {
+		return new GetterConstraintLocation( getter, declaringClass );
 	}
 
 	static ConstraintLocation forTypeArgument(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type typeOfAnnotatedElement) {

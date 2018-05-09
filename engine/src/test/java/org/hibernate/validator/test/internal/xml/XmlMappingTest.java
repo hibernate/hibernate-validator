@@ -376,4 +376,29 @@ public class XmlMappingTest {
 				violationOf( NotNull.class )
 		);
 	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1534")
+	public void test_constraint_is_applied_to_inherited_getter() {
+		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
+		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "hv-1534-mapping.xml" ) );
+
+		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
+		final Validator validator = validatorFactory.getValidator();
+
+		Parent parent = new Parent( null );
+
+		Set<ConstraintViolation<Parent>> parentViolations = validator.validate( parent );
+
+		assertNoViolations( parentViolations );
+
+		Child child = new Child( null, null );
+
+		Set<ConstraintViolation<Child>> childViolations = validator.validate( child );
+
+		assertThat( childViolations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "parentAttribute" )
+		);
+	}
+
 }

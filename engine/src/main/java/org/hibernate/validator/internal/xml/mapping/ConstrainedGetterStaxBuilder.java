@@ -71,7 +71,7 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 			alreadyProcessedGetterNames.add( mainAttributeValue );
 		}
 		Method getter = findGetter( beanClass, mainAttributeValue );
-		ConstraintLocation constraintLocation = ConstraintLocation.forGetter( getter );
+		ConstraintLocation constraintLocation = ConstraintLocation.forGetterOfClass( getter, beanClass );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
 				.map( builder -> builder.build( constraintLocation, java.lang.annotation.ElementType.METHOD, null ) )

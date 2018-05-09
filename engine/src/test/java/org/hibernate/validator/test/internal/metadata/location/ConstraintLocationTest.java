@@ -38,8 +38,32 @@ public class ConstraintLocationTest {
 		assertEquals( location1, location2, "Two constraint locations for the same type should be equal" );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1534")
+	public void owning_class_of_member_is_declaring_class() throws Exception {
+		Method getter = Bar.class.getMethod( "getBar" );
+		ConstraintLocation location = ConstraintLocation.forGetter( getter );
+
+		assertEquals( location.getDeclaringClass(), Foo.class, "The owning class of a member should be the declaring class" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1534")
+	public void bean_class_is_declaring_class() throws Exception {
+		Method getter = Bar.class.getMethod( "getBar" );
+		ConstraintLocation location = ConstraintLocation.forGetterOfClass( getter, Bar.class );
+
+		assertEquals( location.getDeclaringClass(), Bar.class, "The bean class should be the declaring class" );
+	}
+
 	public static class Foo {
 		public String getBar() {
+			return null;
+		}
+	}
+
+	public static class Bar extends Foo {
+		public String getFoo() {
 			return null;
 		}
 	}

@@ -262,7 +262,14 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 			// fast track if it's a regular constraint
 			if ( !(constraint.getLocation() instanceof TypeArgumentConstraintLocation) ) {
-				converted = getterConstraintLocation;
+				// If the declaring class is a sub-class that has inherited the getter, ensure the location is preserved during conversion.
+				// RD: This is to address HV-1534
+				if ( requiresConversionToGetterLocation( getterConstraintLocation, constraint ) ) {
+					converted = getterConstraintLocation;
+				}
+				else {
+					converted = constraint.getLocation();
+				}
 			}
 			else {
 				Deque<ConstraintLocation> locationStack = new ArrayDeque<>();
@@ -296,6 +303,19 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			}
 
 			return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraint.getDescriptor(), converted );
+		}
+
+		/**
+		 * Used to determine if the location of the given constraint requires conversion to the given {@link ConstraintLocation getterConstraintLocation}.
+		 *
+		 * @param getterConstraintLocation The ConstraintLocation intended for converting the location of the existing constraint.
+		 * @param constraint The constraint to be converted for use by this PropertyMetaData
+		 * @return true if the constraint location requires conversion, otherwise false.
+		 */
+		private static boolean requiresConversionToGetterLocation(final ConstraintLocation getterConstraintLocation, final MetaConstraint<?> constraint) {
+			// If we're dealing with a getter constraint location for a different declaring class, do not convert a new getter location.
+			return !( getterConstraintLocation.getMember().equals( constraint.getLocation().getMember() )
+					&& !getterConstraintLocation.getDeclaringClass().equals( constraint.getLocation().getDeclaringClass() ) );
 		}
 
 		private String getPropertyName(ConstrainedElement constrainedElement) {
