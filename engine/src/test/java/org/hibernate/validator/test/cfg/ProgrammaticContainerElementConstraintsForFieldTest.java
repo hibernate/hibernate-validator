@@ -30,9 +30,11 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.LengthDef;
 import org.hibernate.validator.cfg.defs.MinDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeMethod;
@@ -139,6 +141,29 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( NotNull.class ).withMessage( "must not be null" )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1614")
+	public void canDeclareDeeplyNestedContainerElementConstraintsOnMultipleDifferentTypeArgumentsForFieldProgrammatically() {
+		ConstraintMapping newMapping = config.createConstraintMapping();
+		newMapping
+				.type( FishTank.class )
+				.property( "tagsOfFishOfTheMonth", FIELD )
+					.containerElementType( 0, 0 )
+						.constraint( new LengthDef().min( 10 ).max( 20 ) )
+					.containerElementType( 0, 1, 0 )
+						.constraint( new NotNullDef() );
+
+		config.addMapping( newMapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
+
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withMessage( "must not be null" ),
+				violationOf( Length.class ).withMessage( "length must be between 10 and 20" )
 		);
 	}
 
