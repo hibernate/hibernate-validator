@@ -130,11 +130,14 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 			);
 		}
 
-		ContainerElementConstraintMappingContextImpl containerElementContext = new ContainerElementConstraintMappingContextImpl(
-			typeContext, parent, location, index
-		);
-
-		containerElementContexts.put( index, containerElementContext );
+		// As we already checked that the specific path was not yet configured we should not worry about returning the same context here,
+		// as it means that there are some nested indexes which make a difference, And at the end a new context will be returned by call
+		// to containerElementContext#nestedContainerElement().
+		ContainerElementConstraintMappingContextImpl containerElementContext = containerElementContexts.get( index );
+		if ( containerElementContext == null ) {
+			containerElementContext = new ContainerElementConstraintMappingContextImpl( typeContext, parent, location, index );
+			containerElementContexts.put( index, containerElementContext );
+		}
 
 		if ( nestedIndexes.length > 0 ) {
 			return containerElementContext.nestedContainerElement( nestedIndexes );
