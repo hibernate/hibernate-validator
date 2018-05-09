@@ -44,17 +44,26 @@ public class GetterConstraintLocation implements ConstraintLocation {
 	 */
 	private final Type typeForValidatorResolution;
 
+	/**
+	 * The class of the method for which the constraint was defined.
+	 * <p>
+	 * It is usually the same as the declaring class of the method itself, except in the XML case when a user could
+	 * declare a constraint for a specific subclass.
+	 */
+	private final Class<?> declaringClass;
 
-	GetterConstraintLocation(Method method) {
+
+	GetterConstraintLocation( Class<?> declaringClass, Method method ) {
 		this.method = method;
 		this.accessibleMethod = getAccessible( method );
 		this.propertyName = ReflectionHelper.getPropertyName( method );
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( ReflectionHelper.typeOf( method ) );
+		this.declaringClass = declaringClass;
 	}
 
 	@Override
 	public Class<?> getDeclaringClass() {
-		return method.getDeclaringClass();
+		return declaringClass;
 	}
 
 	@Override

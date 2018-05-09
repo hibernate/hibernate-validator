@@ -33,6 +33,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.PropertyDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.GetterConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
@@ -262,7 +263,13 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 			// fast track if it's a regular constraint
 			if ( !(constraint.getLocation() instanceof TypeArgumentConstraintLocation) ) {
-				converted = getterConstraintLocation;
+				// Change the constraint location to a GetterConstraintLocation if it is not already one
+				if ( constraint.getLocation() instanceof GetterConstraintLocation ) {
+					converted = constraint.getLocation();
+				}
+				else {
+					converted = getterConstraintLocation;
+				}
 			}
 			else {
 				Deque<ConstraintLocation> locationStack = new ArrayDeque<>();
@@ -283,7 +290,13 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				// 2. beginning at the root, transform each location so it references the transformed delegate
 				for ( ConstraintLocation location : locationStack ) {
 					if ( !(location instanceof TypeArgumentConstraintLocation) ) {
-						converted = getterConstraintLocation;
+						// Change the constraint location to a GetterConstraintLocation if it is not already one
+						if ( location instanceof GetterConstraintLocation ) {
+							converted = location;
+						}
+						else {
+							converted = getterConstraintLocation;
+						}
 					}
 					else {
 						converted = ConstraintLocation.forTypeArgument(

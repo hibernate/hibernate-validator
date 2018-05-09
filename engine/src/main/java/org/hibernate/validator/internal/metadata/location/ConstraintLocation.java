@@ -43,8 +43,29 @@ public interface ConstraintLocation {
 		return new FieldConstraintLocation( field );
 	}
 
+	/**
+	 * Create a new {@link GetterConstraintLocation} for the given getter method.
+	 *
+	 * @param getter The getter method being constrained
+	 * @return A new GetterConstraintLocation
+	 */
 	static ConstraintLocation forGetter(Method getter) {
-		return new GetterConstraintLocation( getter );
+		return new GetterConstraintLocation( getter.getDeclaringClass(), getter );
+	}
+
+	/**
+	 * Create a new {@link GetterConstraintLocation} for the given declaring class and getter method.
+	 * <p>
+	 * This provides an alternative to {@link ConstraintLocation#forGetter(Method)} where the given declaring class is usually a sub-class of the
+	 * actual class on which the getter method is declared. This is provided to support XML mapping configurations used to specify constraints on
+	 * subclasses for inherited getter methods.
+	 *
+	 * @param declaringClass The class on which the constraint is defined.
+	 * @param getter The getter method being constrained.
+	 * @return A new GetterConstraintLocation
+	 */
+	static ConstraintLocation forGetter(Class<?> declaringClass, Method getter ) {
+		return new GetterConstraintLocation( declaringClass, getter );
 	}
 
 	static ConstraintLocation forTypeArgument(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type typeOfAnnotatedElement) {
