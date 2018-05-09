@@ -168,14 +168,16 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 			throw LOG.getTypeIsNotAParameterizedNorArrayTypeException( configuredType );
 		}
 
-		ContainerElementConstraintMappingContextImpl nestedContext = new ContainerElementConstraintMappingContextImpl(
-			typeContext,
-			parentContainerElementTarget,
-			ConstraintLocation.forTypeArgument( parentLocation, typeParameter, getContainerElementType() ),
-			nestedIndexes[0]
-		);
-
-		nestedContainerElementContexts.put( nestedIndexes[0], nestedContext );
+		ContainerElementConstraintMappingContextImpl nestedContext = nestedContainerElementContexts.get( nestedIndexes[0] );
+		if ( nestedContext == null ) {
+			nestedContext = new ContainerElementConstraintMappingContextImpl(
+					typeContext,
+					parentContainerElementTarget,
+					ConstraintLocation.forTypeArgument( parentLocation, typeParameter, getContainerElementType() ),
+					nestedIndexes[0]
+			);
+			nestedContainerElementContexts.put( nestedIndexes[0], nestedContext );
+		}
 
 		if ( nestedIndexes.length > 1 ) {
 			return nestedContext.nestedContainerElement( Arrays.copyOfRange( nestedIndexes, 1, nestedIndexes.length ) );
