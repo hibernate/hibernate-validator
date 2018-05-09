@@ -9,18 +9,11 @@ package org.hibernate.validator.test.internal.xml;
 /**
  * Test class for HV-1534.
  *
- * @author robd
+ * @author Rob Dickinson
  */
 public class Child extends Parent {
 
-	String childAttribute;
-
-	Child( String parentAttribute, String childAttribute ) {
+	public Child( String parentAttribute ) {
 		super( parentAttribute );
-		this.childAttribute = childAttribute;
-	}
-
-	public final String getChildAttribute() {
-		return childAttribute;
 	}
 }

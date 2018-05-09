@@ -9,8 +9,10 @@ package org.hibernate.validator.test.internal.xml;
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertEquals;
+
 
 import java.io.InputStream;
 import java.lang.annotation.ElementType;
@@ -392,12 +394,42 @@ public class XmlMappingTest {
 
 		assertNoViolations( parentViolations );
 
-		Child child = new Child( null, null );
+		Child child = new Child( null );
 
 		Set<ConstraintViolation<Child>> childViolations = validator.validate( child );
 
 		assertThat( childViolations ).containsOnlyViolations(
 				violationOf( NotNull.class ).withProperty( "parentAttribute" )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1534")
+	public void test_constraint_is_applied_to_type_argument_of_inherited_getter() {
+		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
+		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "hv-1534-mapping.xml" ) );
+
+		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
+		final Validator validator = validatorFactory.getValidator();
+
+		Parent parent = new Parent( "someValue" );
+		parent.addToListAttribute( null );
+
+		Set<ConstraintViolation<Parent>> parentViolations = validator.validate( parent );
+
+		assertNoViolations( parentViolations );
+
+		Child child = new Child( "someValue" );
+		child.addToListAttribute( null );
+
+		Set<ConstraintViolation<Child>> childViolations = validator.validate( child );
+
+		assertThat( childViolations ).containsOnlyViolations(
+				violationOf( NotNull.class )
+					.withPropertyPath(
+						pathWith()
+							.property( "parentListAttribute" )
+							.containerElement( "<list element>", true, null, 0, List.class, 0 ) )
 		);
 	}
 

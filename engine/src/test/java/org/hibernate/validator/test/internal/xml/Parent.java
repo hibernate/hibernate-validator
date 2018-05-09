@@ -6,20 +6,32 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Test class for HV-1534.
  *
- * @author robd
+ * @author Rob Dickinson
  */
 public class Parent {
 
-	String parentAttribute = null;
+	private String parentAttribute = null;
+	private List<String> parentListAttribute = new ArrayList<>();
 
-	Parent( String parentAttribute ) {
+	public Parent( String parentAttribute ) {
 		this.parentAttribute = parentAttribute;
 	}
 
 	public final String getParentAttribute() {
 		return parentAttribute;
+	}
+
+	public void addToListAttribute(String element) {
+		parentListAttribute.add( element );
+	}
+
+	public final List<String> getParentListAttribute() {
+		return parentListAttribute;
 	}
 }

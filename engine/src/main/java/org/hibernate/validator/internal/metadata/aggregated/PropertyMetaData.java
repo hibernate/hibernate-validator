@@ -33,6 +33,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.PropertyDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.GetterConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
@@ -264,11 +265,11 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			if ( !(constraint.getLocation() instanceof TypeArgumentConstraintLocation) ) {
 				// If the declaring class is a sub-class that has inherited the getter, ensure the location is preserved during conversion.
 				// RD: This is to address HV-1534
-				if ( requiresConversionToGetterLocation( getterConstraintLocation, constraint ) ) {
-					converted = getterConstraintLocation;
+				if ( constraint.getLocation() instanceof GetterConstraintLocation ) {
+					converted = constraint.getLocation();
 				}
 				else {
-					converted = constraint.getLocation();
+					converted = getterConstraintLocation;
 				}
 			}
 			else {
@@ -290,7 +291,14 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				// 2. beginning at the root, transform each location so it references the transformed delegate
 				for ( ConstraintLocation location : locationStack ) {
 					if ( !(location instanceof TypeArgumentConstraintLocation) ) {
-						converted = getterConstraintLocation;
+						// If the declaring class is a sub-class that has inherited the getter, ensure the location is preserved during conversion.
+						// RD: This is to address HV-1534
+						if ( location instanceof GetterConstraintLocation ) {
+							converted = location;
+						}
+						else {
+							converted = getterConstraintLocation;
+						}
 					}
 					else {
 						converted = ConstraintLocation.forTypeArgument(
@@ -303,19 +311,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			}
 
 			return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraint.getDescriptor(), converted );
-		}
-
-		/**
-		 * Used to determine if the location of the given constraint requires conversion to the given {@link ConstraintLocation getterConstraintLocation}.
-		 *
-		 * @param getterConstraintLocation The ConstraintLocation intended for converting the location of the existing constraint.
-		 * @param constraint The constraint to be converted for use by this PropertyMetaData
-		 * @return true if the constraint location requires conversion, otherwise false.
-		 */
-		private static boolean requiresConversionToGetterLocation(final ConstraintLocation getterConstraintLocation, final MetaConstraint<?> constraint) {
-			// If we're dealing with a getter constraint location for a different declaring class, do not convert a new getter location.
-			return !( getterConstraintLocation.getMember().equals( constraint.getLocation().getMember() )
-					&& !getterConstraintLocation.getDeclaringClass().equals( constraint.getLocation().getDeclaringClass() ) );
 		}
 
 		private String getPropertyName(ConstrainedElement constrainedElement) {
