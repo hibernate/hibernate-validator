@@ -25,8 +25,9 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedProperty;
+import org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -46,6 +47,7 @@ public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProvi
 				new ConstraintHelper(),
 				new TypeResolutionHelper(),
 				new ValueExtractorManager( Collections.emptySet() ),
+				new DefaultGetterPropertyMatcher(),
 				new AnnotationProcessingOptionsImpl()
 		);
 	}
@@ -54,7 +56,7 @@ public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProvi
 	public void testFieldTypeArgument() throws Exception {
 		BeanConfiguration<A> beanConfiguration = provider.getBeanConfiguration( A.class );
 
-		ConstrainedField field = findConstrainedField( beanConfiguration, A.class, "names" );
+		ConstrainedProperty field = findConstrainedField( beanConfiguration, A.class, "names" );
 		assertThat( field.getTypeArgumentConstraints().size() ).isEqualTo( 2 );
 		assertThat( getAnnotationsTypes( field.getTypeArgumentConstraints() ) ).contains(
 				NotNull.class, NotBlank.class

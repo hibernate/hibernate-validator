@@ -6,14 +6,14 @@
  */
 package org.hibernate.validator.internal.metadata.core;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Member;
 import java.util.Map;
 
+import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * An  {@code AnnotationProcessingOptions} instance keeps track of annotations which should be ignored as configuration source.
@@ -40,17 +40,17 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 	/**
 	 * Keeps track of explicitly excluded members (fields and properties).
 	 */
-	private final Map<Member, Boolean> annotationIgnoredForMembers = newHashMap();
+	private final Map<Constrainable, Boolean> annotationIgnoredForMembers = newHashMap();
 
 	/**
 	 * Keeps track of explicitly excluded return value constraints for methods/constructors.
 	 */
-	private final Map<Member, Boolean> annotationIgnoresForReturnValues = newHashMap();
+	private final Map<Constrainable, Boolean> annotationIgnoresForReturnValues = newHashMap();
 
 	/**
 	 * Keeps track of explicitly excluded cross parameter constraints for methods/constructors.
 	 */
-	private final Map<Member, Boolean> annotationIgnoresForCrossParameter = newHashMap();
+	private final Map<Constrainable, Boolean> annotationIgnoresForCrossParameter = newHashMap();
 
 	/**
 	 * Keeps track whether the 'ignore-annotations' flag is set on a method/constructor parameter
@@ -58,7 +58,7 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 	private final Map<ExecutableParameterKey, Boolean> annotationIgnoresForMethodParameter = newHashMap();
 
 	@Override
-	public boolean areMemberConstraintsIgnoredFor(Member member) {
+	public boolean areMemberConstraintsIgnoredFor(Constrainable member) {
 		Class<?> clazz = member.getDeclaringClass();
 		if ( annotationIgnoredForMembers.containsKey( member ) ) {
 			return annotationIgnoredForMembers.get( member );
@@ -69,7 +69,7 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 	}
 
 	@Override
-	public boolean areReturnValueConstraintsIgnoredFor(Member member) {
+	public boolean areReturnValueConstraintsIgnoredFor(Constrainable member) {
 		if ( annotationIgnoresForReturnValues.containsKey( member ) ) {
 			return annotationIgnoresForReturnValues.get( member );
 		}
@@ -79,7 +79,7 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 	}
 
 	@Override
-	public boolean areCrossParameterConstraintsIgnoredFor(Member member) {
+	public boolean areCrossParameterConstraintsIgnoredFor(Constrainable member) {
 		if ( annotationIgnoresForCrossParameter.containsKey( member ) ) {
 			return annotationIgnoresForCrossParameter.get( member );
 		}
@@ -89,7 +89,7 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 	}
 
 	@Override
-	public boolean areParameterConstraintsIgnoredFor(Member member, int index) {
+	public boolean areParameterConstraintsIgnoredFor(Constrainable member, int index) {
 		ExecutableParameterKey key = new ExecutableParameterKey( member, index );
 		if ( annotationIgnoresForMethodParameter.containsKey( key ) ) {
 			return annotationIgnoresForMethodParameter.get( key );
@@ -138,19 +138,19 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 		}
 	}
 
-	public void ignoreConstraintAnnotationsOnMember(Member member, Boolean b) {
+	public void ignoreConstraintAnnotationsOnMember(Constrainable member, Boolean b) {
 		annotationIgnoredForMembers.put( member, b );
 	}
 
-	public void ignoreConstraintAnnotationsForReturnValue(Member member, Boolean b) {
+	public void ignoreConstraintAnnotationsForReturnValue(Constrainable member, Boolean b) {
 		annotationIgnoresForReturnValues.put( member, b );
 	}
 
-	public void ignoreConstraintAnnotationsForCrossParameterConstraint(Member member, Boolean b) {
+	public void ignoreConstraintAnnotationsForCrossParameterConstraint(Constrainable member, Boolean b) {
 		annotationIgnoresForCrossParameter.put( member, b );
 	}
 
-	public void ignoreConstraintAnnotationsOnParameter(Member member, int index, Boolean b) {
+	public void ignoreConstraintAnnotationsOnParameter(Constrainable member, int index, Boolean b) {
 		ExecutableParameterKey key = new ExecutableParameterKey( member, index );
 		annotationIgnoresForMethodParameter.put( key, b );
 	}
@@ -164,10 +164,10 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 	}
 
 	public class ExecutableParameterKey {
-		private final Member member;
+		private final Constrainable member;
 		private final int index;
 
-		public ExecutableParameterKey(Member member, int index) {
+		public ExecutableParameterKey(Constrainable member, int index) {
 			this.member = member;
 			this.index = index;
 		}

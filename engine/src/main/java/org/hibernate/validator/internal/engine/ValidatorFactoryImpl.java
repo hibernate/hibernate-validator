@@ -47,6 +47,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
+import org.hibernate.validator.internal.properties.DefaultGetterPropertyMatcher;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -59,6 +60,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
+import org.hibernate.validator.spi.properties.GetterPropertyMatcher;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -132,6 +134,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private final ValueExtractorManager valueExtractorManager;
 
+	private final GetterPropertyMatcher getterPropertyMatcher;
+
 	private final ValidationOrderGenerator validationOrderGenerator;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
@@ -147,6 +151,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if ( configurationState instanceof ConfigurationImpl ) {
 			hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 		}
+		Map<String, String> properties = configurationState.getProperties();
+
+		this.getterPropertyMatcher = getGetterPropertyMatcher( hibernateSpecificConfig, properties, externalClassLoader );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( configurationState.getMappingStreams().isEmpty() ) {
@@ -154,7 +161,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 		else {
 			this.xmlMetaDataProvider = new XmlMetaDataProvider(
-					constraintHelper, typeResolutionHelper, valueExtractorManager, configurationState.getMappingStreams(), externalClassLoader
+					constraintHelper, typeResolutionHelper, valueExtractorManager, getterPropertyMatcher, configurationState.getMappingStreams(), externalClassLoader
 			);
 		}
 
@@ -162,13 +169,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				getConstraintMappings(
 						typeResolutionHelper,
 						configurationState,
+						getterPropertyMatcher,
 						externalClassLoader
 				)
 		);
 
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
-
-		Map<String, String> properties = configurationState.getProperties();
 
 		this.methodValidationConfiguration = new MethodValidationConfiguration.Builder()
 				.allowOverridingMethodAlterParameterConstraint(
@@ -208,7 +214,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	private static Set<DefaultConstraintMapping> getConstraintMappings(TypeResolutionHelper typeResolutionHelper,
-			ConfigurationState configurationState, ClassLoader externalClassLoader) {
+			ConfigurationState configurationState, GetterPropertyMatcher getterPropertyMatcher, ClassLoader externalClassLoader) {
 		Set<DefaultConstraintMapping> constraintMappings = newHashSet();
 
 		if ( configurationState instanceof ConfigurationImpl ) {
@@ -224,7 +230,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ConstraintMappingContributor serviceLoaderBasedContributor = new ServiceLoaderBasedConstraintMappingContributor(
 					typeResolutionHelper,
 					externalClassLoader != null ? externalClassLoader : run( GetClassLoader.fromContext() ) );
-			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
+			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( getterPropertyMatcher, constraintMappings );
 			serviceLoaderBasedContributor.createConstraintMappings( builder );
 		}
 
@@ -233,7 +239,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				externalClassLoader );
 
 		for ( ConstraintMappingContributor contributor : contributors ) {
-			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
+			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( getterPropertyMatcher, constraintMappings );
 			contributor.createConstraintMappings( builder );
 		}
 
@@ -287,6 +293,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	@Override
 	public Duration getTemporalValidationTolerance() {
 		return validatorFactoryScopedContext.getTemporalValidationTolerance();
+	}
+
+	@Override
+	public GetterPropertyMatcher getGetterPropertyMatcher() {
+		return getterPropertyMatcher;
 	}
 
 	public boolean isFailFast() {
@@ -347,11 +358,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						typeResolutionHelper,
 						validatorFactoryScopedContext.getParameterNameProvider(),
 						valueExtractorManager,
+						getterPropertyMatcher,
 						validationOrderGenerator,
 						buildDataProviders(),
 						methodValidationConfiguration
 				)
-		 );
+		);
 
 		return new ValidatorImpl(
 				constraintValidatorFactory,
@@ -549,6 +561,32 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return null;
 	}
 
+	private static GetterPropertyMatcher getGetterPropertyMatcher(ConfigurationImpl hibernateSpecificConfig, Map<String, String> properties, ClassLoader externalClassLoader) {
+		if ( hibernateSpecificConfig.getGetterPropertyMatcher() != null ) {
+			LOG.usingGetterPropertyMatcher( hibernateSpecificConfig.getGetterPropertyMatcher().getClass() );
+			return hibernateSpecificConfig.getGetterPropertyMatcher();
+		}
+
+		String getterPropertyMatcherFqcn = properties.get( HibernateValidatorConfiguration.GETTER_PROPERTY_MATCHER_CLASSNAME );
+		if ( getterPropertyMatcherFqcn != null ) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<? extends GetterPropertyMatcher> clazz = (Class<? extends GetterPropertyMatcher>) run(
+						LoadClass.action( getterPropertyMatcherFqcn, externalClassLoader )
+				);
+				GetterPropertyMatcher getterPropertyMatcher = run( NewInstance.action( clazz, "getter property matcher class" ) );
+				LOG.usingGetterPropertyMatcher( clazz );
+
+				return getterPropertyMatcher;
+			}
+			catch (Exception e) {
+				throw LOG.getUnableToInstantiateGetterPropertyMatcherClassException( getterPropertyMatcherFqcn, e );
+			}
+		}
+
+		return new DefaultGetterPropertyMatcher();
+	}
+
 	private static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,
 			ConstraintHelper constraintHelper) {
 		Set<Class<?>> definedConstraints = newHashSet();
@@ -597,16 +635,18 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 */
 	private static class DefaultConstraintMappingBuilder
 			implements ConstraintMappingContributor.ConstraintMappingBuilder {
+
+		private final GetterPropertyMatcher getterPropertyMatcher;
 		private final Set<DefaultConstraintMapping> mappings;
 
-		public DefaultConstraintMappingBuilder(Set<DefaultConstraintMapping> mappings) {
-			super();
+		public DefaultConstraintMappingBuilder(GetterPropertyMatcher getterPropertyMatcher, Set<DefaultConstraintMapping> mappings) {
+			this.getterPropertyMatcher = getterPropertyMatcher;
 			this.mappings = mappings;
 		}
 
 		@Override
 		public ConstraintMapping addConstraintMapping() {
-			DefaultConstraintMapping mapping = new DefaultConstraintMapping();
+			DefaultConstraintMapping mapping = new DefaultConstraintMapping( getterPropertyMatcher );
 			mappings.add( mapping );
 			return mapping;
 		}

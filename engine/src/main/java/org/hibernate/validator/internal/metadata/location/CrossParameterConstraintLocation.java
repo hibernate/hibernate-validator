@@ -6,11 +6,10 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
-import java.lang.reflect.Executable;
-import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
@@ -21,9 +20,9 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
  */
 class CrossParameterConstraintLocation implements ConstraintLocation {
 
-	private final Executable executable;
+	private final Constrainable executable;
 
-	CrossParameterConstraintLocation(Executable executable) {
+	CrossParameterConstraintLocation(Constrainable executable) {
 		this.executable = executable;
 	}
 
@@ -33,7 +32,7 @@ class CrossParameterConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
-	public Member getMember() {
+	public Constrainable getMember() {
 		return executable;
 	}
 
@@ -59,10 +58,7 @@ class CrossParameterConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ( ( executable == null ) ? 0 : executable.hashCode() );
-		return result;
+		return executable.hashCode();
 	}
 
 	@Override
@@ -77,12 +73,7 @@ class CrossParameterConstraintLocation implements ConstraintLocation {
 			return false;
 		}
 		CrossParameterConstraintLocation other = (CrossParameterConstraintLocation) obj;
-		if ( executable == null ) {
-			if ( other.executable != null ) {
-				return false;
-			}
-		}
-		else if ( !executable.equals( other.executable ) ) {
+		if ( !executable.equals( other.executable ) ) {
 			return false;
 		}
 

@@ -13,6 +13,7 @@ import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.spi.properties.GetterPropertyMatcher;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -46,6 +47,16 @@ public interface HibernateValidatorFactory extends ValidatorFactory {
 	 */
 	@Incubating
 	Duration getTemporalValidationTolerance();
+
+	/**
+	 * Returns the getter property matcher which defines what rules of what a JavaBeans getter is.
+	 *
+	 * @return the getter property matcher of current {@link ValidatorFactory}
+	 *
+	 * @since 6.1.0
+	 */
+	@Incubating
+	GetterPropertyMatcher getGetterPropertyMatcher();
 
 	/**
 	 * Returns a context for validator configuration via options from the

@@ -24,7 +24,6 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -37,8 +36,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
@@ -60,21 +61,26 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedProperty;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Constrainable;
+import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.javabean.JavaBean;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructors;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredFields;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
+import org.hibernate.validator.internal.util.privilegedactions.GetJavaBeanExecutableProperty;
+import org.hibernate.validator.internal.util.privilegedactions.GetJavaBeanFieldProperty;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.spi.properties.GetterPropertyMatcher;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 /**
@@ -94,16 +100,19 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private final TypeResolutionHelper typeResolutionHelper;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 	private final ValueExtractorManager valueExtractorManager;
+	private final GetterPropertyMatcher getterPropertyMatcher;
 
 	private final BeanConfiguration<Object> objectBeanConfiguration;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager,
+			GetterPropertyMatcher getterPropertyMatcher,
 			AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
+		this.getterPropertyMatcher = getterPropertyMatcher;
 		this.annotationProcessingOptions = annotationProcessingOptions;
 
 		this.objectBeanConfiguration = retrieveBeanConfiguration( Object.class );
@@ -130,22 +139,32 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * @return Retrieves constraint related meta data from the annotations of the given type.
 	 */
 	private <T> BeanConfiguration<T> retrieveBeanConfiguration(Class<T> beanClass) {
-		Set<ConstrainedElement> constrainedElements = getFieldMetaData( beanClass );
-		constrainedElements.addAll( getMethodMetaData( beanClass ) );
-		constrainedElements.addAll( getConstructorMetaData( beanClass ) );
+		JavaBean javaBean = new JavaBean( getterPropertyMatcher, beanClass );
 
+		Stream<ConstrainedElement> classLevelStream;
 		//TODO GM: currently class level constraints are represented by a PropertyMetaData. This
 		//works but seems somewhat unnatural
 		Set<MetaConstraint<?>> classLevelConstraints = getClassLevelConstraints( beanClass );
 		if ( !classLevelConstraints.isEmpty() ) {
-			ConstrainedType classLevelMetaData =
+			classLevelStream = Stream.of(
 					new ConstrainedType(
 							ConfigurationSource.ANNOTATION,
 							beanClass,
 							classLevelConstraints
-					);
-			constrainedElements.add( classLevelMetaData );
+					)
+			);
 		}
+		else {
+			classLevelStream = Stream.empty();
+		}
+
+		Set<ConstrainedElement> constrainedElements = Stream.concat(
+				classLevelStream,
+				javaBean.getAllConstrainables()
+						.map( this::toConstrainedElement )
+						.filter( Optional::isPresent )
+						.map( Optional::get )
+		).collect( Collectors.toSet() );
 
 		return new BeanConfiguration<>(
 				ConfigurationSource.ANNOTATION,
@@ -154,6 +173,19 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				getDefaultGroupSequence( beanClass ),
 				getDefaultGroupSequenceProvider( beanClass )
 		);
+	}
+
+	private Optional<ConstrainedElement> toConstrainedElement(Constrainable constrainable) {
+		if ( constrainable instanceof JavaBeanField ) {
+			if ( annotationProcessingOptions.areMemberConstraintsIgnoredFor( constrainable ) ) {
+				return Optional.empty();
+			}
+			return Optional.of( findPropertyMetaData( constrainable.as( Property.class ) ) );
+		}
+		else if ( constrainable instanceof JavaBeanExecutable ) {
+			return Optional.of( findExecutableMetaData( constrainable.as( Callable.class ) ) );
+		}
+		throw new IllegalStateException( String.format( "Received unknown constrainable '%s' of type %s", constrainable.getName(), constrainable.getClass() ) );
 	}
 
 	private List<Class<?>> getDefaultGroupSequence(Class<?> beanClass) {
@@ -210,49 +242,33 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return classLevelConstraints;
 	}
 
-	private Set<ConstrainedElement> getFieldMetaData(Class<?> beanClass) {
-		Set<ConstrainedElement> propertyMetaData = newHashSet();
-
-		for ( Field field : run( GetDeclaredFields.action( beanClass ) ) ) {
-			// HV-172
-			if ( Modifier.isStatic( field.getModifiers() ) ||
-					annotationProcessingOptions.areMemberConstraintsIgnoredFor( field ) ||
-					field.isSynthetic() ) {
-
-				continue;
-			}
-
-			propertyMetaData.add( findPropertyMetaData( field ) );
-		}
-		return propertyMetaData;
-	}
-
-	private ConstrainedField findPropertyMetaData(Field field) {
+	private ConstrainedProperty findPropertyMetaData(Property property) {
+		Field field = run( GetJavaBeanFieldProperty.action( property.as( JavaBeanField.class ) ) );
 		Set<MetaConstraint<?>> constraints = convertToMetaConstraints(
-				findConstraints( field, ElementType.FIELD ),
-				field
+				findConstraints( field, ElementType.FIELD, property ),
+				property
 		);
 
 		CascadingMetaDataBuilder cascadingMetaDataBuilder = findCascadingMetaData( field );
-		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraints( field );
+		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraints( field, property );
 
-		return new ConstrainedField(
+		return ConstrainedProperty.forField(
 				ConfigurationSource.ANNOTATION,
-				field,
+				property,
 				constraints,
 				typeArgumentsConstraints,
 				cascadingMetaDataBuilder
 		);
 	}
 
-	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Field field) {
+	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Property property) {
 		if ( constraintDescriptors.isEmpty() ) {
 			return Collections.emptySet();
 		}
 
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
-		ConstraintLocation location = ConstraintLocation.forField( field );
+		ConstraintLocation location = ConstraintLocation.forProperty( property );
 
 		for ( ConstraintDescriptorImpl<?> constraintDescription : constraintDescriptors ) {
 			constraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescription, location ) );
@@ -260,57 +276,33 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return constraints;
 	}
 
-	private Set<ConstrainedExecutable> getConstructorMetaData(Class<?> clazz) {
-		Executable[] declaredConstructors = run( GetDeclaredConstructors.action( clazz ) );
-
-		return getMetaData( declaredConstructors );
-	}
-
-	private Set<ConstrainedExecutable> getMethodMetaData(Class<?> clazz) {
-		Executable[] declaredMethods = run( GetDeclaredMethods.action( clazz ) );
-
-		return getMetaData( declaredMethods );
-	}
-
-	private Set<ConstrainedExecutable> getMetaData(Executable[] executableElements) {
-		Set<ConstrainedExecutable> executableMetaData = newHashSet();
-
-		for ( Executable executable : executableElements ) {
-			// HV-172; ignoring synthetic methods (inserted by the compiler), as they can't have any constraints
-			// anyway and possibly hide the actual method with the same signature in the built meta model
-			if ( Modifier.isStatic( executable.getModifiers() ) || executable.isSynthetic() ) {
-				continue;
-			}
-
-			executableMetaData.add( findExecutableMetaData( executable ) );
-		}
-
-		return executableMetaData;
-	}
-
 	/**
 	 * Finds all constraint annotations defined for the given method or constructor.
 	 *
-	 * @param executable The executable element to check for constraints annotations.
+	 * @param callable The executable element to check for constraints annotations.
 	 *
 	 * @return A meta data object describing the constraints specified for the
-	 * given element.
+	 * 		given element.
 	 */
-	private ConstrainedExecutable findExecutableMetaData(Executable executable) {
-		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( executable );
+	private ConstrainedExecutable findExecutableMetaData(Callable callable) {
+		Executable executable = run( GetJavaBeanExecutableProperty.action( callable.as( JavaBeanExecutable.class ) ) );
 
-		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = findConstraints( executable, ExecutableHelper.getElementType( executable ) )
-			.stream()
-			.collect( Collectors.groupingBy( ConstraintDescriptorImpl::getConstraintType ) );
+		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( executable, callable );
+
+		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = findConstraints(
+				executable,
+				callable.isConstructor() ? ElementType.CONSTRUCTOR : ElementType.METHOD,
+				callable
+		).stream().collect( Collectors.groupingBy( ConstraintDescriptorImpl::getConstraintType ) );
 
 		Set<MetaConstraint<?>> crossParameterConstraints;
-		if ( annotationProcessingOptions.areCrossParameterConstraintsIgnoredFor( executable ) ) {
+		if ( annotationProcessingOptions.areCrossParameterConstraintsIgnoredFor( callable ) ) {
 			crossParameterConstraints = Collections.emptySet();
 		}
 		else {
 			crossParameterConstraints = convertToMetaConstraints(
 					executableConstraints.get( ConstraintType.CROSS_PARAMETER ),
-					executable
+					callable
 			);
 		}
 
@@ -318,7 +310,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		Set<MetaConstraint<?>> typeArgumentsConstraints;
 		CascadingMetaDataBuilder cascadingMetaDataBuilder;
 
-		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( executable ) ) {
+		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( callable ) ) {
 			returnValueConstraints = Collections.emptySet();
 			typeArgumentsConstraints = Collections.emptySet();
 			cascadingMetaDataBuilder = CascadingMetaDataBuilder.nonCascading();
@@ -326,17 +318,17 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		else {
 			AnnotatedType annotatedReturnType = executable.getAnnotatedReturnType();
 
-			typeArgumentsConstraints = findTypeAnnotationConstraints( executable, annotatedReturnType );
+			typeArgumentsConstraints = findTypeAnnotationConstraints( executable, callable, annotatedReturnType );
 			returnValueConstraints = convertToMetaConstraints(
 					executableConstraints.get( ConstraintType.GENERIC ),
-					executable
+					callable
 			);
 			cascadingMetaDataBuilder = findCascadingMetaData( executable, annotatedReturnType );
 		}
 
 		return new ConstrainedExecutable(
 				ConfigurationSource.ANNOTATION,
-				executable,
+				callable,
 				parameterConstraints,
 				crossParameterConstraints,
 				returnValueConstraints,
@@ -345,15 +337,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 	}
 
-	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, Executable executable) {
+	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, Callable callable) {
 		if ( constraintsDescriptors == null ) {
 			return Collections.emptySet();
 		}
 
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
-		ConstraintLocation returnValueLocation = ConstraintLocation.forReturnValue( executable );
-		ConstraintLocation crossParameterLocation = ConstraintLocation.forCrossParameter( executable );
+		ConstraintLocation returnValueLocation = ConstraintLocation.forReturnValue( callable );
+		ConstraintLocation crossParameterLocation = ConstraintLocation.forCrossParameter( callable );
 
 		for ( ConstraintDescriptorImpl<?> constraintDescriptor : constraintsDescriptors ) {
 			ConstraintLocation location = constraintDescriptor.getConstraintType() == ConstraintType.GENERIC ? returnValueLocation : crossParameterLocation;
@@ -369,9 +361,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @param executable The executable of interest.
 	 *
+	 * @param callable
 	 * @return A list with parameter meta data for the given executable.
 	 */
-	private List<ConstrainedParameter> getParameterMetaData(Executable executable) {
+	private List<ConstrainedParameter> getParameterMetaData(Executable executable, Callable callable) {
 		if ( executable.getParameterCount() == 0 ) {
 			return Collections.emptyList();
 		}
@@ -393,12 +386,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 			Set<MetaConstraint<?>> parameterConstraints = newHashSet();
 
-			if ( annotationProcessingOptions.areParameterConstraintsIgnoredFor( executable, i ) ) {
+			if ( annotationProcessingOptions.areParameterConstraintsIgnoredFor( callable, i ) ) {
 				Type type = ReflectionHelper.typeOf( executable, i );
 				metaData.add(
 						new ConstrainedParameter(
 								ConfigurationSource.ANNOTATION,
-								executable,
+								callable,
 								type,
 								i,
 								parameterConstraints,
@@ -410,12 +403,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				continue;
 			}
 
-			ConstraintLocation location = ConstraintLocation.forParameter( executable, i );
+			ConstraintLocation location = ConstraintLocation.forParameter( callable, i );
 
 			for ( Annotation parameterAnnotation : parameterAnnotations ) {
 				// collect constraints if this annotation is a constraint annotation
 				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
-						executable, parameterAnnotation, ElementType.PARAMETER
+						callable, parameterAnnotation, ElementType.PARAMETER
 				);
 				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
 					parameterConstraints.add(
@@ -426,13 +419,13 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 			AnnotatedType parameterAnnotatedType = parameter.getAnnotatedType();
 
-			Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable, i, parameterAnnotatedType );
+			Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable, callable, i, parameterAnnotatedType );
 			CascadingMetaDataBuilder cascadingMetaData = findCascadingMetaData( executable, parameters, i, parameterAnnotatedType );
 
 			metaData.add(
 					new ConstrainedParameter(
 							ConfigurationSource.ANNOTATION,
-							executable,
+							callable,
 							ReflectionHelper.typeOf( executable, i ),
 							i,
 							parameterConstraints,
@@ -455,10 +448,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @return A list of constraint descriptors for all constraint specified for the given member.
 	 */
-	private List<ConstraintDescriptorImpl<?>> findConstraints(Member member, ElementType type) {
+	private List<ConstraintDescriptorImpl<?>> findConstraints(Member member, ElementType type, Constrainable constrainable) {
 		List<ConstraintDescriptorImpl<?>> metaData = newArrayList();
 		for ( Annotation annotation : ( (AccessibleObject) member ).getDeclaredAnnotations() ) {
-			metaData.addAll( findConstraintAnnotations( member, annotation, type ) );
+			metaData.addAll( findConstraintAnnotations( constrainable, annotation, type ) );
 		}
 
 		return metaData;
@@ -483,7 +476,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Examines the given annotation to see whether it is a single- or multi-valued constraint annotation.
 	 *
-	 * @param member The member to check for constraints annotations
+	 * @param constrainable The member to check for constraints annotations
 	 * @param annotation The annotation to examine
 	 * @param type the element type on which the annotation/constraint is placed on
 	 * @param <A> the annotation type
@@ -491,7 +484,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * @return A list of constraint descriptors or the empty list in case {@code annotation} is neither a
 	 * single nor multi-valued annotation.
 	 */
-	protected <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,
+	protected <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(
+			Constrainable constrainable,
 			A annotation,
 			ElementType type) {
 
@@ -512,7 +506,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		return constraints.stream()
-				.map( c -> buildConstraintDescriptor( member, c, type ) )
+				.map( c -> buildConstraintDescriptor( constrainable, c, type ) )
 				.collect( Collectors.toList() );
 	}
 
@@ -549,12 +543,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return groupConversions;
 	}
 
-	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Member member,
+	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Constrainable constrainable,
 			A annotation,
 			ElementType type) {
 		return new ConstraintDescriptorImpl<>(
 				constraintHelper,
-				member,
+				constrainable,
 				new ConstraintAnnotationDescriptor<>( annotation ),
 				type
 		);
@@ -573,22 +567,22 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Finds type arguments constraints for fields.
 	 */
-	protected Set<MetaConstraint<?>> findTypeAnnotationConstraints(Field field) {
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraints(Field field, Property property) {
 		return findTypeArgumentsConstraints(
-			field,
-			new TypeArgumentFieldLocation( field ),
-			field.getAnnotatedType()
+				property,
+				new TypeArgumentFieldLocation( field ),
+				field.getAnnotatedType()
 		);
 	}
 
 	/**
 	 * Finds type arguments constraints for method return values.
 	 */
-	protected Set<MetaConstraint<?>> findTypeAnnotationConstraints(Executable executable, AnnotatedType annotatedReturnType) {
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraints(Executable executable, Callable callable, AnnotatedType annotatedReturnType) {
 		return findTypeArgumentsConstraints(
-			executable,
-			new TypeArgumentReturnValueLocation( executable ),
-			annotatedReturnType
+				callable,
+				new TypeArgumentReturnValueLocation( executable ),
+				annotatedReturnType
 		);
 	}
 
@@ -707,10 +701,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @return a set of type arguments constraints, or an empty set if no constrained type arguments are found
 	 */
-	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(Executable executable, int i, AnnotatedType parameterAnnotatedType) {
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(Executable executable, Callable callable, int i, AnnotatedType parameterAnnotatedType) {
 		try {
 			return findTypeArgumentsConstraints(
-					executable,
+					callable,
 					new TypeArgumentExecutableParameterLocation( executable, i ),
 					parameterAnnotatedType
 			);
@@ -721,7 +715,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 	}
 
-	private Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, TypeArgumentLocation location, AnnotatedType annotatedType) {
+	private Set<MetaConstraint<?>> findTypeArgumentsConstraints(Constrainable member, TypeArgumentLocation location, AnnotatedType annotatedType) {
 		// HV-1428 Container element support is disabled for arrays
 		if ( !(annotatedType instanceof AnnotatedParameterizedType) ) {
 			return Collections.emptySet();
@@ -773,9 +767,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Finds type use annotation constraints defined on the type argument.
 	 */
-	private Set<MetaConstraint<?>> findTypeUseConstraints(Member member, AnnotatedType typeArgument, TypeVariable<?> typeVariable, TypeArgumentLocation location, Type type) {
+	private Set<MetaConstraint<?>> findTypeUseConstraints(Constrainable constrainable, AnnotatedType typeArgument, TypeVariable<?> typeVariable, TypeArgumentLocation location, Type type) {
 		Set<MetaConstraint<?>> constraints = Arrays.stream( typeArgument.getAnnotations() )
-				.flatMap( a -> findConstraintAnnotations( member, a, ElementType.TYPE_USE ).stream() )
+				.flatMap( a -> findConstraintAnnotations( constrainable, a, ElementType.TYPE_USE ).stream() )
 				.map( d -> createTypeArgumentMetaConstraint( d, location, typeVariable, type ) )
 				.collect( Collectors.toSet() );
 
@@ -787,7 +781,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 */
 	private <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(ConstraintDescriptorImpl<A> descriptor, TypeArgumentLocation location,
 			TypeVariable<?> typeVariable, Type type) {
-		ConstraintLocation constraintLocation = ConstraintLocation.forTypeArgument( location.toConstraintLocation(), typeVariable, type );
+		ConstraintLocation constraintLocation = ConstraintLocation.forTypeArgument( location.toConstraintLocation( getterPropertyMatcher ), typeVariable, type );
 		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, descriptor, constraintLocation );
 	}
 
@@ -801,11 +795,11 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * The location of a type argument before it is really considered a constraint location.
 	 * <p>
 	 * It avoids initializing a constraint location if we did not find any constraints. This is especially useful in
-	 * a Java 9 environment as {@link ConstraintLocation#forProperty(Member) tries to make the {@code Member} accessible
+	 * a Java 9 environment as {@link ConstraintLocation#forProperty(Property)} tries to make the {@code Member} accessible
 	 * which might not be possible (for instance for {@code java.util} classes).
 	 */
 	private interface TypeArgumentLocation {
-		ConstraintLocation toConstraintLocation();
+		ConstraintLocation toConstraintLocation(GetterPropertyMatcher getterPropertyMatcher);
 	}
 
 	private static class TypeArgumentExecutableParameterLocation implements TypeArgumentLocation {
@@ -819,8 +813,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		@Override
-		public ConstraintLocation toConstraintLocation() {
-			return ConstraintLocation.forParameter( executable, index );
+		public ConstraintLocation toConstraintLocation(GetterPropertyMatcher getterPropertyMatcher) {
+			return ConstraintLocation.forParameter( JavaBean.toJavaBeanExecutable( getterPropertyMatcher, executable ), index );
 		}
 	}
 
@@ -832,8 +826,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		@Override
-		public ConstraintLocation toConstraintLocation() {
-			return ConstraintLocation.forField( field );
+		public ConstraintLocation toConstraintLocation(GetterPropertyMatcher getterPropertyMatcher) {
+			return ConstraintLocation.forProperty( new JavaBeanField( field ) );
 		}
 	}
 
@@ -845,8 +839,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		@Override
-		public ConstraintLocation toConstraintLocation() {
-			return ConstraintLocation.forReturnValue( executable );
+		public ConstraintLocation toConstraintLocation(GetterPropertyMatcher getterPropertyMatcher) {
+			return ConstraintLocation.forReturnValue( JavaBean.toJavaBeanExecutable( getterPropertyMatcher, executable ) );
 		}
 	}
 
@@ -862,8 +856,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		@Override
-		public ConstraintLocation toConstraintLocation() {
-			return ConstraintLocation.forTypeArgument( parentLocation.toConstraintLocation(), typeParameter, typeOfAnnotatedElement );
+		public ConstraintLocation toConstraintLocation(GetterPropertyMatcher getterPropertyMatcher) {
+			return ConstraintLocation.forTypeArgument( parentLocation.toConstraintLocation( getterPropertyMatcher ), typeParameter, typeOfAnnotatedElement );
 		}
 
 	}

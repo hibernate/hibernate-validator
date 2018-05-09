@@ -38,15 +38,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public final class ReflectionHelper {
 
-	private static final String PROPERTY_ACCESSOR_PREFIX_GET = "get";
-	private static final String PROPERTY_ACCESSOR_PREFIX_IS = "is";
-	private static final String PROPERTY_ACCESSOR_PREFIX_HAS = "has";
-	public static final String[] PROPERTY_ACCESSOR_PREFIXES = {
-			PROPERTY_ACCESSOR_PREFIX_GET,
-			PROPERTY_ACCESSOR_PREFIX_IS,
-			PROPERTY_ACCESSOR_PREFIX_HAS
-	};
-
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPES;
@@ -89,91 +80,6 @@ public final class ReflectionHelper {
 	 * Private constructor in order to avoid instantiation.
 	 */
 	private ReflectionHelper() {
-	}
-
-	/**
-	 * Returns the JavaBeans property name of the given member.
-	 * <p>
-	 * For fields, the field name will be returned. For getter methods, the
-	 * decapitalized property name will be returned, with the "get", "is" or "has"
-	 * prefix stripped off. Getter methods are methods
-	 * </p>
-	 * <ul>
-	 * <li>whose name start with "get" and who have a return type but no parameter
-	 * or</li>
-	 * <li>whose name starts with "is" and who have no parameter and return
-	 * {@code boolean} or</li>
-	 * <li>whose name starts with "has" and who have no parameter and return
-	 * {@code boolean} (HV-specific, not mandated by JavaBeans spec).</li>
-	 * </ul>
-	 *
-	 * @param member The member for which to get the property name.
-	 *
-	 * @return The property name for the given member or {@code null} if the
-	 *         member is neither a field nor a getter method according to the
-	 *         JavaBeans standard.
-	 */
-	public static String getPropertyName(Member member) {
-		String name = null;
-
-		if ( member instanceof Field ) {
-			name = member.getName();
-		}
-
-		if ( member instanceof Method ) {
-			String methodName = member.getName();
-			for ( String prefix : PROPERTY_ACCESSOR_PREFIXES ) {
-				if ( methodName.startsWith( prefix ) ) {
-					name = StringHelper.decapitalize( methodName.substring( prefix.length() ) );
-				}
-			}
-		}
-		return name;
-	}
-
-	/**
-	 * Checks whether the given executable is a valid JavaBeans getter method, which
-	 * is the case if
-	 * <ul>
-	 * <li>its name starts with "get" and it has a return type but no parameter or</li>
-	 * <li>its name starts with "is", it has no parameter and is returning
-	 * {@code boolean} or</li>
-	 * <li>its name starts with "has", it has no parameter and is returning
-	 * {@code boolean} (HV-specific, not mandated by JavaBeans spec).</li>
-	 * </ul>
-	 *
-	 * @param executable The executable of interest.
-	 *
-	 * @return {@code true}, if the given executable is a JavaBeans getter method,
-	 *         {@code false} otherwise.
-	 */
-	public static boolean isGetterMethod(Executable executable) {
-		if ( !( executable instanceof Method ) ) {
-			return false;
-		}
-
-		Method method = (Method) executable;
-
-		if ( method.getParameterTypes().length != 0 ) {
-			return false;
-		}
-
-		String methodName = method.getName();
-
-		//<PropertyType> get<PropertyName>()
-		if ( methodName.startsWith( PROPERTY_ACCESSOR_PREFIX_GET ) && method.getReturnType() != void.class ) {
-			return true;
-		}
-		//boolean is<PropertyName>()
-		else if ( methodName.startsWith( PROPERTY_ACCESSOR_PREFIX_IS ) && method.getReturnType() == boolean.class ) {
-			return true;
-		}
-		//boolean has<PropertyName>()
-		else if ( methodName.startsWith( PROPERTY_ACCESSOR_PREFIX_HAS ) && method.getReturnType() == boolean.class ) {
-			return true;
-		}
-
-		return false;
 	}
 
 	/**

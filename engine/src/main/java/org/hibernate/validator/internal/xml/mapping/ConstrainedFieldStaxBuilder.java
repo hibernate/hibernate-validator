@@ -7,9 +7,6 @@
 package org.hibernate.validator.internal.xml.mapping;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -23,12 +20,12 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedProperty;
+import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.javabean.JavaBean;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.xml.mapping.ContainerElementTypeConfigurationBuilder.ContainerElementTypeConfiguration;
 
 /**
@@ -61,34 +58,35 @@ class ConstrainedFieldStaxBuilder extends AbstractConstrainedElementStaxBuilder 
 		return FIELD_QNAME_LOCAL_PART;
 	}
 
-	ConstrainedField build(Class<?> beanClass, List<String> alreadyProcessedFieldNames) {
+	ConstrainedProperty build(JavaBean javaBean, List<String> alreadyProcessedFieldNames) {
 		if ( alreadyProcessedFieldNames.contains( mainAttributeValue ) ) {
-			throw LOG.getIsDefinedTwiceInMappingXmlForBeanException( mainAttributeValue, beanClass );
+			throw LOG.getIsDefinedTwiceInMappingXmlForBeanException( mainAttributeValue, javaBean );
 		}
 		else {
 			alreadyProcessedFieldNames.add( mainAttributeValue );
 		}
-		Field field = findField( beanClass, mainAttributeValue );
-		ConstraintLocation constraintLocation = ConstraintLocation.forField( field );
+		Property property = findField( javaBean, mainAttributeValue );
+		ConstraintLocation constraintLocation = ConstraintLocation.forProperty( property );
+
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
 				.map( builder -> builder.build( constraintLocation, java.lang.annotation.ElementType.FIELD, null ) )
 				.collect( Collectors.toSet() );
 
 		ContainerElementTypeConfiguration containerElementTypeConfiguration = getContainerElementTypeConfiguration(
-				ReflectionHelper.typeOf( field ), constraintLocation );
+				property.getType(), constraintLocation );
 
-		ConstrainedField constrainedField = new ConstrainedField(
+		ConstrainedProperty constrainedField = ConstrainedProperty.forField(
 				ConfigurationSource.XML,
-				field,
+				property,
 				metaConstraints,
 				containerElementTypeConfiguration.getMetaConstraints(),
-				getCascadingMetaData( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), ReflectionHelper.typeOf( field ) )
+				getCascadingMetaData( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), property.getType() )
 		);
 
 		// ignore annotations
 		if ( ignoreAnnotations.isPresent() ) {
 			annotationProcessingOptions.ignoreConstraintAnnotationsOnMember(
-					field,
+					property,
 					ignoreAnnotations.get()
 			);
 		}
@@ -96,21 +94,8 @@ class ConstrainedFieldStaxBuilder extends AbstractConstrainedElementStaxBuilder 
 		return constrainedField;
 	}
 
-	private static Field findField(Class<?> beanClass, String fieldName) {
-		final Field field = run( GetDeclaredField.action( beanClass, fieldName ) );
-		if ( field == null ) {
-			throw LOG.getBeanDoesNotContainTheFieldException( beanClass, fieldName );
-		}
-		return field;
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 *
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	private static Property findField(JavaBean javaBean, String fieldName) {
+		return javaBean.getFieldPropertyByName( fieldName )
+				.orElseThrow( () -> LOG.getBeanDoesNotContainTheFieldException( javaBean, fieldName ) );
 	}
 }

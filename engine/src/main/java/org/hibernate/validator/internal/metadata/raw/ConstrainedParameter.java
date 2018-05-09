@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.metadata.raw;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
-import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashSet;
@@ -16,6 +15,7 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.properties.Callable;
 
 /**
  * Contains constraint-related meta-data for one method parameter.
@@ -25,17 +25,17 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
  */
 public class ConstrainedParameter extends AbstractConstrainedElement {
 
-	private final Executable executable;
+	private final Callable callable;
 	private final Type type;
 	private final int index;
 
 	public ConstrainedParameter(ConfigurationSource source,
-								Executable executable,
+								Callable callable,
 								Type type,
 								int index) {
 		this(
 				source,
-				executable,
+				callable,
 				type,
 				index,
 				Collections.<MetaConstraint<?>>emptySet(),
@@ -48,7 +48,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * Creates a new parameter meta data object.
 	 *
 	 * @param source The source of meta data.
-	 * @param  executable The executable of the represented method parameter.
+	 * @param callable The executable of the represented method parameter.
 	 * @param type the parameter type
 	 * @param index the index of the parameter
 	 * @param constraints The constraints of the represented method parameter, if
@@ -57,7 +57,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * @param cascadingMetaDataBuilder The cascaded validation metadata for this element and its container elements.
 	 */
 	public ConstrainedParameter(ConfigurationSource source,
-								Executable executable,
+								Callable callable,
 								Type type,
 								int index,
 								Set<MetaConstraint<?>> constraints,
@@ -71,7 +71,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				cascadingMetaDataBuilder
 		);
 
-		this.executable = executable;
+		this.callable = callable;
 		this.type = type;
 		this.index = index;
 	}
@@ -80,8 +80,8 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		return type;
 	}
 
-	public Executable getExecutable() {
-		return executable;
+	public Callable getCallable() {
+		return callable;
 	}
 
 	public int getIndex() {
@@ -109,7 +109,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 		return new ConstrainedParameter(
 				mergedSource,
-				executable,
+				callable,
 				type,
 				index,
 				mergedConstraints,
@@ -130,7 +130,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 		String constraintsAsString = sb.length() > 0 ? sb.substring( 0, sb.length() - 2 ) : sb.toString();
 
-		return "ParameterMetaData [executable=" + executable + ", index=" + index + "], constraints=["
+		return "ParameterMetaData [callable=" + callable + ", index=" + index + "], constraints=["
 				+ constraintsAsString + "]";
 	}
 
@@ -139,7 +139,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + index;
-		result = prime * result + ( ( executable == null ) ? 0 : executable.hashCode() );
+		result = prime * result + callable.hashCode();
 		return result;
 	}
 
@@ -158,12 +158,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		if ( index != other.index ) {
 			return false;
 		}
-		if ( executable == null ) {
-			if ( other.executable != null ) {
-				return false;
-			}
-		}
-		else if ( !executable.equals( other.executable ) ) {
+		else if ( !callable.equals( other.callable ) ) {
 			return false;
 		}
 		return true;

@@ -7,9 +7,6 @@
 package org.hibernate.validator.internal.xml.mapping;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +23,12 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.javabean.JavaBean;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromPropertyName;
 import org.hibernate.validator.internal.xml.mapping.ContainerElementTypeConfigurationBuilder.ContainerElementTypeConfiguration;
 
 /**
@@ -63,37 +61,41 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 		return GETTER_QNAME_LOCAL_PART;
 	}
 
-	ConstrainedExecutable build(Class<?> beanClass, List<String> alreadyProcessedGetterNames) {
-		if ( alreadyProcessedGetterNames.contains( mainAttributeValue ) ) {
-			throw LOG.getIsDefinedTwiceInMappingXmlForBeanException( mainAttributeValue, beanClass );
+	private String getPropertyName() {
+		return mainAttributeValue;
+	}
+
+	ConstrainedExecutable build(JavaBean javaBean, List<String> alreadyProcessedGetterNames) {
+		if ( alreadyProcessedGetterNames.contains( getPropertyName() ) ) {
+			throw LOG.getIsDefinedTwiceInMappingXmlForBeanException( getPropertyName(), javaBean );
 		}
 		else {
-			alreadyProcessedGetterNames.add( mainAttributeValue );
+			alreadyProcessedGetterNames.add( getPropertyName() );
 		}
-		Method getter = findGetter( beanClass, mainAttributeValue );
-		ConstraintLocation constraintLocation = ConstraintLocation.forGetter( getter );
+		Property property = findGetter( javaBean, getPropertyName() );
+		ConstraintLocation constraintLocation = ConstraintLocation.forProperty( property );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
 				.map( builder -> builder.build( constraintLocation, java.lang.annotation.ElementType.METHOD, null ) )
 				.collect( Collectors.toSet() );
 
 		ContainerElementTypeConfiguration containerElementTypeConfiguration = getContainerElementTypeConfiguration(
-				ReflectionHelper.typeOf( getter ), constraintLocation );
+				property.getType(), constraintLocation );
 
 		ConstrainedExecutable constrainedGetter = new ConstrainedExecutable(
 				ConfigurationSource.XML,
-				getter,
+				property.as( Callable.class ),
 				Collections.<ConstrainedParameter>emptyList(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				metaConstraints,
 				containerElementTypeConfiguration.getMetaConstraints(),
-				getCascadingMetaData( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), ReflectionHelper.typeOf( getter ) )
+				getCascadingMetaData( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), property.getType() )
 		);
 
 		// ignore annotations
 		if ( ignoreAnnotations.isPresent() ) {
 			annotationProcessingOptions.ignoreConstraintAnnotationsOnMember(
-					getter,
+					property,
 					ignoreAnnotations.get()
 			);
 		}
@@ -101,23 +103,9 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 		return constrainedGetter;
 	}
 
-	private static Method findGetter(Class<?> beanClass, String getterName) {
-		final Method method = run( GetMethodFromPropertyName.action( beanClass, getterName ) );
-		if ( method == null ) {
-			throw LOG.getBeanDoesNotContainThePropertyException( beanClass, getterName );
-		}
+	private static Property findGetter(JavaBean javaBean, String getterName) {
+		Optional<Property> property = javaBean.getCallablePropertyByName( getterName );
 
-		return method;
+		return property.orElseThrow( () -> LOG.getBeanDoesNotContainThePropertyException( javaBean, getterName ) );
 	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 *
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
-
 }

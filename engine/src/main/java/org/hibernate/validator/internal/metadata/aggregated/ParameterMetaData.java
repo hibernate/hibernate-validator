@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.annotation.ElementType;
-import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +23,7 @@ import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
@@ -112,7 +112,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		private final ExecutableParameterNameProvider parameterNameProvider;
 		private final Type parameterType;
 		private final int parameterIndex;
-		private Executable executableForNameRetrieval;
+		private Callable executableForNameRetrieval;
 		private CascadingMetaDataBuilder cascadingMetaDataBuilder;
 
 		public Builder(Class<?> beanClass,
@@ -157,8 +157,8 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 			// Worse case, we are consistent, best case parameters from parents are more meaningful.
 			// See HV-887 and the associated unit test
 			if ( executableForNameRetrieval == null ||
-					newConstrainedParameter.getExecutable().getDeclaringClass().isAssignableFrom( executableForNameRetrieval.getDeclaringClass() ) ) {
-				executableForNameRetrieval = newConstrainedParameter.getExecutable();
+					newConstrainedParameter.getCallable().getDeclaringClass().isAssignableFrom( executableForNameRetrieval.getDeclaringClass() ) ) {
+				executableForNameRetrieval = newConstrainedParameter.getCallable();
 			}
 		}
 
@@ -166,7 +166,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		public ParameterMetaData build() {
 			return new ParameterMetaData(
 					parameterIndex,
-					parameterNameProvider.getParameterNames( executableForNameRetrieval ).get( parameterIndex ),
+					executableForNameRetrieval.getParameterName( parameterNameProvider, parameterIndex ),
 					parameterType,
 					adaptOriginsAndImplicitGroups( getDirectConstraints() ),
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
