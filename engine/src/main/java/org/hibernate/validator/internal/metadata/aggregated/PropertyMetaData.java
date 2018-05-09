@@ -33,6 +33,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.PropertyDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.GetterConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
@@ -262,7 +263,14 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 			// fast track if it's a regular constraint
 			if ( !(constraint.getLocation() instanceof TypeArgumentConstraintLocation) ) {
-				converted = getterConstraintLocation;
+				// If the declaring class is a sub-class that has inherited the getter, ensure the location is preserved during conversion.
+				// RD: This is to address HV-1534
+				if ( constraint.getLocation() instanceof GetterConstraintLocation ) {
+					converted = constraint.getLocation();
+				}
+				else {
+					converted = getterConstraintLocation;
+				}
 			}
 			else {
 				Deque<ConstraintLocation> locationStack = new ArrayDeque<>();
@@ -283,7 +291,14 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				// 2. beginning at the root, transform each location so it references the transformed delegate
 				for ( ConstraintLocation location : locationStack ) {
 					if ( !(location instanceof TypeArgumentConstraintLocation) ) {
-						converted = getterConstraintLocation;
+						// If the declaring class is a sub-class that has inherited the getter, ensure the location is preserved during conversion.
+						// RD: This is to address HV-1534
+						if ( location instanceof GetterConstraintLocation ) {
+							converted = location;
+						}
+						else {
+							converted = getterConstraintLocation;
+						}
 					}
 					else {
 						converted = ConstraintLocation.forTypeArgument(
