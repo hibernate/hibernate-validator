@@ -51,6 +51,7 @@ Nicola Ferraro
 Nicolas François
 Paolo Perrotta
 Pete Muir
+Rob Dickinson
 Sanne Grinovero
 Sebastian Bayerl
 Shahram Goodarzi
