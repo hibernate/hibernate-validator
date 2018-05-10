@@ -9,9 +9,11 @@ package org.hibernate.validator.internal.util.privilegedactions;
 import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
 
+import org.hibernate.validator.internal.util.ReflectionHelper;
+
 /**
- * Returns the method with the specified property name or {@code null} if it does not exist. This method will prepend
- * 'is' and 'get' to the property name and capitalize the first letter.
+ * Returns the method with the specified property name or {@code null} if it is not declared in the specified class.
+ * This method will prepend 'is' and 'get' to the property name and capitalize the first letter.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -31,19 +33,18 @@ public final class GetMethodFromPropertyName implements PrivilegedAction<Method>
 
 	@Override
 	public Method run() {
-		try {
-			char[] string = property.toCharArray();
-			string[0] = Character.toUpperCase( string[0] );
-			String fullMethodName = new String( string );
+		char[] string = property.toCharArray();
+		string[0] = Character.toUpperCase( string[0] );
+		String fullMethodName = new String( string );
+
+		for ( String prefix : ReflectionHelper.PROPERTY_ACCESSOR_PREFIXES ) {
 			try {
-				return clazz.getMethod( "get" + fullMethodName );
+				return clazz.getDeclaredMethod( prefix + fullMethodName );
 			}
 			catch (NoSuchMethodException e) {
-				return clazz.getMethod( "is" + fullMethodName );
+				// silenlty ignore the exception. Will return null in the end if nothing is found
 			}
 		}
-		catch (NoSuchMethodException e) {
-			return null;
-		}
+		return null;
 	}
 }
