@@ -166,8 +166,8 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${hibernate-validator-cdi.bundle-name}</Bundle-SymbolicName>
-                        <Fragment-Host>${hibernate-validator.bundle-name}</Fragment-Host>
+                        <Bundle-SymbolicName>${hibernate-validator-cdi.module-name}</Bundle-SymbolicName>
+                        <Fragment-Host>${hibernate-validator.module-name}</Fragment-Host>
                         <Import-Package>
                             javax.validation.*;version="[2.0,3.0)",
                             javax.annotation.*;version="[1.2,2.0)",
