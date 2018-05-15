@@ -1,6 +1,26 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.10.Final (15-05-2018)
+-------------------------
+
+** Bug
+    * HV-1614 - engine       - Unable to specify constraints at more than 1 nested parameter of a typed container
+    * HV-1609 - integration  - CDI extension should not rely on @WithAnnotations filtering
+    * HV-1604 - engine       - Initializing JPATraversableResolver fails with IllegalAccessException
+    * HV-1598 - engine       - Fix the behavior of XML default-validated-executable-types
+
+** Improvement
+    * HV-1612 - translations - Add Dutch translation of the validation messages
+    * HV-1611 - translations - Be consistent in the case of the validation messages
+    * HV-1592 - engine       - Make ConstraintValidator declaration stricter
+    * HV-1534 - engine       - Allow getter constraints to be specified for subclasses in XML configuration
+
+** Task
+    * HV-1607 - build        - Have the build work with JDK 10
+    * HV-1606 - tck-runner   - Update TCK to 2.0.3.Final
+    * HV-1605 - build        - Update Surefire to 2.21.0 for JDK 10 support
+
 6.0.9.Final (27-03-2018)
 -------------------------
 
