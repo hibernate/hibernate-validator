@@ -41,6 +41,7 @@ import javax.validation.Validator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
+import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.GroupWithInheritance;
 import org.hibernate.validator.internal.engine.groups.Sequence;
@@ -1424,6 +1425,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		if ( member != null ) {
 			return member;
+		}
+
+		SecurityManager sm = System.getSecurityManager();
+		if ( sm != null ) {
+			sm.checkPermission( HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS );
 		}
 
 		Class<?> clazz = original.getDeclaringClass();
