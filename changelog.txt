@@ -1,6 +1,13 @@
 Hibernate Validator Changelog
 =============================
 
+
+4.3.4.Final (29.05.2018)
+------------------------
+
+** Bug
+    * [HV-1498] - Privilege escalation when running under the security manager
+
 4.3.3.Final (19.05.2016)
 ------------------------
 

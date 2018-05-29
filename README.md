@@ -1,6 +1,6 @@
 # Hibernate Validator
 
-*Version: 4.3.3.Final, 19.05.2016*
+*Version: 4.3.4.Final, 29.05.2018*
 
 
 ## What is it?
@@ -40,7 +40,7 @@ Logging will delegate any log requests to that provider.
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>4.3.3.Final</version>
+            <version>4.3.4.Final</version>
         </dependency>
 
 
@@ -70,7 +70,7 @@ There are more build options available as well. For more information refer to [C
 ## Hibernate Validator URLs
 
 * [Home Page](http://hibernate.org/validator/)
-* [Downloads](http://www.hibernate.org/subprojects/validator/download.html)
+* [Downloads](http://hibernate.org/validator/releases/4.3/)
 * [Community Info](http://hibernate.org/community/)
 * [Source Code](git://github.com/hibernate/hibernate-validator.git)
 * [Issue Tracking](https://hibernate.atlassian.net/projects/HV)
