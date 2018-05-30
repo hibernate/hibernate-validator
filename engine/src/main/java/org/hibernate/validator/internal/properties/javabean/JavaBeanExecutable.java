@@ -176,6 +176,14 @@ public class JavaBeanExecutable implements Callable {
 		return result;
 	}
 
+	@Override
+	public String toString() {
+		return ExecutableHelper.getExecutableAsString(
+				getDeclaringClass().getSimpleName() + "#" + name,
+				getParameterTypes()
+		);
+	}
+
 	private boolean hasReturnValue(Executable executable) {
 		if ( executable instanceof Constructor ) {
 			return true;
