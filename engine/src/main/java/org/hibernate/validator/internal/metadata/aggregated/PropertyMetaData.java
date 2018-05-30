@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.Collections;
@@ -40,6 +41,8 @@ import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -59,6 +62,8 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Guillaume Smet
  */
 public class PropertyMetaData extends AbstractConstraintMetaData {
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Immutable
 	private final Set<Cascadable> cascadables;
@@ -221,10 +226,20 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 		private Optional<Constrainable> getConstrainableFromConstrainedElement(ConstrainedElement constrainedElement) {
 			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
-				return Optional.of( ( (ConstrainedField) constrainedElement ).getProperty() );
+				if ( constrainedElement instanceof ConstrainedField ) {
+					return Optional.of( ( (ConstrainedField) constrainedElement ).getProperty() );
+				}
+				else {
+					LOG.getUnexpectedConstraintElementType( ConstrainedField.class, constrainedElement.getClass() );
+				}
 			}
 			else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
-				return Optional.of( ( (ConstrainedExecutable) constrainedElement ).getCallable() );
+				if ( constrainedElement instanceof ConstrainedExecutable ) {
+					return Optional.of( ( (ConstrainedExecutable) constrainedElement ).getCallable() );
+				}
+				else {
+					LOG.getUnexpectedConstraintElementType( ConstrainedExecutable.class, constrainedElement.getClass() );
+				}
 			}
 			return Optional.empty();
 		}

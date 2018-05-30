@@ -63,6 +63,7 @@ import org.hibernate.validator.internal.xml.mapping.ContainerElementTypePath;
 import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
+
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
@@ -857,4 +858,7 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidator<?, ?>> constraintValidatorImplementationType,
 			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> registeredConstraintAnnotationType,
 			@FormatWith(TypeFormatter.class) Type declaredConstraintAnnotationType);
+
+	@Message(id = 244, value = "ConstrainedElement expected class was %1$s, but instead received %2$s.")
+	AssertionError getUnexpectedConstraintElementType(@FormatWith(ClassObjectFormatter.class) Class<?> expecting, @FormatWith(ClassObjectFormatter.class) Class<?> got);
 }
