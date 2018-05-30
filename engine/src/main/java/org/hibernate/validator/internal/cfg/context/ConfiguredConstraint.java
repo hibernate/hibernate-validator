@@ -21,9 +21,7 @@ import org.hibernate.validator.cfg.AnnotationDef;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.properties.Callable;
-import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -57,13 +55,11 @@ class ConfiguredConstraint<A extends Annotation> {
 		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forClass( beanType ), ElementType.TYPE );
 	}
 
-	static <A extends Annotation> ConfiguredConstraint<A> forProperty(ConstraintDef<?, A> constraint, Property property) {
+	static <A extends Annotation> ConfiguredConstraint<A> forFieldProperty(ConstraintDef<?, A> constraint, JavaBeanField javaBeanField) {
 		return new ConfiguredConstraint<>(
 				constraint,
-				property instanceof JavaBeanField
-						? ConstraintLocation.forField( property.as( JavaBeanField.class ) )
-						: ConstraintLocation.forGetter( property.as( JavaBeanGetter.class ) ),
-				property instanceof JavaBeanField ? ElementType.FIELD : ElementType.METHOD
+				ConstraintLocation.forField( javaBeanField ),
+				ElementType.FIELD
 		);
 	}
 
