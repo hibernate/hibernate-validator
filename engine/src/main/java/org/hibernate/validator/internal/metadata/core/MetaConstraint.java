@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.metadata.core;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.List;
@@ -23,6 +22,7 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDes
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
@@ -100,8 +100,8 @@ public class MetaConstraint<A extends Annotation> {
 		return constraintTree.getDescriptor();
 	}
 
-	public final ElementType getElementType() {
-		return constraintTree.getDescriptor().getElementType();
+	public final ConstraintLocationKind getConstraintLocationKind() {
+		return constraintTree.getDescriptor().getConstraintLocationKind();
 	}
 
 	public boolean validateConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
@@ -123,7 +123,7 @@ public class MetaConstraint<A extends Annotation> {
 	}
 
 	private boolean doValidateConstraint(ValidationContext<?> executionContext, ValueContext<?, ?> valueContext) {
-		valueContext.setElementType( getElementType() );
+		valueContext.setElementType( getConstraintLocationKind().getElementType() );
 		boolean validationResult = constraintTree.validateConstraints( executionContext, valueContext );
 
 		return validationResult;

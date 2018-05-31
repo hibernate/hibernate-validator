@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
@@ -95,4 +96,24 @@ public interface ConstraintLocation {
 	 * object array for a {@link ParameterConstraintLocation}.
 	 */
 	Object getValue(Object parent);
+
+	enum ConstraintLocationKind {
+		TYPE( ElementType.TYPE ),
+		CONSTRUCTOR( ElementType.CONSTRUCTOR ),
+		METHOD( ElementType.METHOD ),
+		PARAMETER( ElementType.PARAMETER ),
+		FIELD( ElementType.FIELD ),
+		TYPE_USE( ElementType.TYPE_USE ),
+		;
+
+		private final ElementType elementType;
+
+		ConstraintLocationKind(ElementType elementType) {
+			this.elementType = elementType;
+		}
+
+		public ElementType getElementType() {
+			return elementType;
+		}
+	}
 }

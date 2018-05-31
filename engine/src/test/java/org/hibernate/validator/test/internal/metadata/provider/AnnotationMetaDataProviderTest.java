@@ -12,7 +12,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -33,6 +32,7 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -43,6 +43,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.joda.time.DateMidnight;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -79,7 +80,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 
 		MetaConstraint<?> constraint = constructor.getConstraints().iterator().next();
 		assertThat( constraint.getDescriptor().getAnnotation().annotationType() ).isEqualTo( NotNull.class );
-		assertThat( constraint.getElementType() ).isEqualTo( ElementType.CONSTRUCTOR );
+		assertThat( constraint.getConstraintLocationKind() ).isEqualTo( ConstraintLocationKind.CONSTRUCTOR );
 	}
 
 	@Test

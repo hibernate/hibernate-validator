@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
-import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Executable;
 import java.util.ArrayList;
@@ -39,6 +38,7 @@ import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -399,7 +399,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private static Set<ConstraintDescriptorImpl<?>> getClassLevelConstraintsAsDescriptors(Set<MetaConstraint<?>> constraints) {
 		return constraints.stream()
-				.filter( c -> c.getElementType() == ElementType.TYPE )
+				.filter( c -> c.getConstraintLocationKind() == ConstraintLocationKind.TYPE )
 				.map( MetaConstraint::getDescriptor )
 				.collect( Collectors.toSet() );
 	}

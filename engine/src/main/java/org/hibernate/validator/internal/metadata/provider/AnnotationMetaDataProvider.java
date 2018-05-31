@@ -12,7 +12,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedArrayType;
@@ -56,6 +55,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -234,7 +234,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private ConstrainedField findPropertyMetaData(Field field, JavaBeanField javaBeanField) {
 		Set<MetaConstraint<?>> constraints = convertToMetaConstraints(
-				findConstraints( field, ElementType.FIELD, javaBeanField ),
+				findConstraints( field, ConstraintLocationKind.FIELD, javaBeanField ),
 				javaBeanField
 		);
 
@@ -307,7 +307,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = findConstraints(
 				executable,
-				callable.isConstructor() ? ElementType.CONSTRUCTOR : ElementType.METHOD,
+				callable.getConstrainedElementKind() == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR
+						? ConstraintLocationKind.CONSTRUCTOR
+						: ConstraintLocationKind.METHOD,
 				callable
 		).stream().collect( Collectors.groupingBy( ConstraintDescriptorImpl::getConstraintType ) );
 
@@ -424,7 +426,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			for ( Annotation parameterAnnotation : parameterAnnotations ) {
 				// collect constraints if this annotation is a constraint annotation
 				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
-						callable, parameterAnnotation, ElementType.PARAMETER
+						callable, parameterAnnotation, ConstraintLocationKind.PARAMETER
 				);
 				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
 					parameterConstraints.add(
@@ -464,7 +466,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @return A list of constraint descriptors for all constraint specified for the given member.
 	 */
-	private List<ConstraintDescriptorImpl<?>> findConstraints(Member member, ElementType type, Constrainable constrainable) {
+	private List<ConstraintDescriptorImpl<?>> findConstraints(Member member, ConstraintLocationKind type, Constrainable constrainable) {
 		List<ConstraintDescriptorImpl<?>> metaData = newArrayList();
 		for ( Annotation annotation : ( (AccessibleObject) member ).getDeclaredAnnotations() ) {
 			metaData.addAll( findConstraintAnnotations( constrainable, annotation, type ) );
@@ -484,7 +486,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private List<ConstraintDescriptorImpl<?>> findClassLevelConstraints(Class<?> beanClass) {
 		List<ConstraintDescriptorImpl<?>> metaData = newArrayList();
 		for ( Annotation annotation : beanClass.getDeclaredAnnotations() ) {
-			metaData.addAll( findConstraintAnnotations( null, annotation, ElementType.TYPE ) );
+			metaData.addAll( findConstraintAnnotations( null, annotation, ConstraintLocationKind.TYPE ) );
 		}
 		return metaData;
 	}
@@ -503,7 +505,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	protected <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(
 			Constrainable constrainable,
 			A annotation,
-			ElementType type) {
+			ConstraintLocationKind type) {
 
 		// HV-1049 and HV-1311 - Ignore annotations from the JDK (jdk.internal.* and java.*); They cannot be constraint
 		// annotations so skip them right here, as for the proper check we'd need package access permission for
@@ -561,7 +563,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Constrainable constrainable,
 			A annotation,
-			ElementType type) {
+			ConstraintLocationKind type) {
 		return new ConstraintDescriptorImpl<>(
 				constraintHelper,
 				constrainable,
@@ -785,7 +787,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 */
 	private Set<MetaConstraint<?>> findTypeUseConstraints(Constrainable constrainable, AnnotatedType typeArgument, TypeVariable<?> typeVariable, TypeArgumentLocation location, Type type) {
 		Set<MetaConstraint<?>> constraints = Arrays.stream( typeArgument.getAnnotations() )
-				.flatMap( a -> findConstraintAnnotations( constrainable, a, ElementType.TYPE_USE ).stream() )
+				.flatMap( a -> findConstraintAnnotations( constrainable, a, ConstraintLocationKind.TYPE_USE ).stream() )
 				.map( d -> createTypeArgumentMetaConstraint( d, location, typeVariable, type ) )
 				.collect( Collectors.toSet() );
 

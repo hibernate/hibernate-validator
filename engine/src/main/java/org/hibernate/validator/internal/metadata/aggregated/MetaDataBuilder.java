@@ -131,7 +131,7 @@ public abstract class MetaDataBuilder {
 				constraintHelper,
 				constraint.getLocation().getConstrainable(),
 				constraint.getDescriptor().getAnnotationDescriptor(),
-				constraint.getElementType(),
+				constraint.getConstraintLocationKind(),
 				constraintClass.isInterface() ? constraintClass : null,
 				definedIn,
 				constraint.getDescriptor().getConstraintType()

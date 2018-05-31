@@ -104,7 +104,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 		super(
 				source,
-				callable.isConstructor() ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
+				callable.getConstrainedElementKind(),
 				returnValueConstraints,
 				typeArgumentConstraints,
 				cascadingMetaDataBuilder

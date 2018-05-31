@@ -13,6 +13,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -30,6 +31,7 @@ public class JavaBeanExecutable implements Callable {
 	private final boolean hasParameters;
 	private final boolean hasReturnValue;
 	private final Type type;
+	private final ConstrainedElementKind kind;
 
 	JavaBeanExecutable(Executable executable) {
 		this.executable = executable;
@@ -38,6 +40,7 @@ public class JavaBeanExecutable implements Callable {
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( type );
 		this.hasParameters = executable.getParameterTypes().length > 0;
 		this.hasReturnValue = hasReturnValue( executable );
+		this.kind = executable instanceof Constructor ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD;
 	}
 
 	public static JavaBeanExecutable of(Executable executable) {
@@ -100,8 +103,8 @@ public class JavaBeanExecutable implements Callable {
 	}
 
 	@Override
-	public boolean isConstructor() {
-		return executable instanceof Constructor;
+	public ConstrainedElementKind getConstrainedElementKind() {
+		return kind;
 	}
 
 	@Override

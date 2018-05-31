@@ -18,6 +18,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -44,7 +45,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 				new ConstraintHelper(),
 				null,
 				notNullAnnotationDescriptorBuilder.build(),
-				java.lang.annotation.ElementType.FIELD
+				ConstraintLocationKind.FIELD
 		);
 
 		ConstraintAnnotationDescriptor.Builder<Size> sizeAnnotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Size.class );
@@ -52,7 +53,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 				new ConstraintHelper(),
 				null,
 				sizeAnnotationDescriptorBuilder.build(),
-				java.lang.annotation.ElementType.FIELD
+				ConstraintLocationKind.FIELD
 		);
 
 		interpolatorUnderTest = new ResourceBundleMessageInterpolator();

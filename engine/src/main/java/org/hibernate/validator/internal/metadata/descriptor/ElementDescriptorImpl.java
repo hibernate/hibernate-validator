@@ -142,7 +142,7 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 
 		private void addMatchingDescriptorsForGroup(Class<?> group, Set<ConstraintDescriptor<?>> matchingDescriptors) {
 			for ( ConstraintDescriptorImpl<?> descriptor : constraintDescriptors ) {
-				if ( definedInSet.contains( descriptor.getDefinedOn() ) && elementTypes.contains( descriptor.getElementType() )
+				if ( definedInSet.contains( descriptor.getDefinedOn() ) && elementTypes.contains( descriptor.getConstraintLocationKind().getElementType() )
 						&& descriptor.getGroups().contains( group ) ) {
 					matchingDescriptors.add( descriptor );
 				}
@@ -160,7 +160,7 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 			}
 			else {
 				for ( ConstraintDescriptorImpl<?> descriptor : constraintDescriptors ) {
-					if ( definedInSet.contains( descriptor.getDefinedOn() ) && elementTypes.contains( descriptor.getElementType() ) ) {
+					if ( definedInSet.contains( descriptor.getDefinedOn() ) && elementTypes.contains( descriptor.getConstraintLocationKind().getElementType() ) ) {
 						matchingDescriptors.add( descriptor );
 					}
 				}

@@ -22,6 +22,7 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
@@ -74,7 +75,7 @@ class ConstrainedFieldStaxBuilder extends AbstractConstrainedElementStaxBuilder 
 		ConstraintLocation constraintLocation = ConstraintLocation.forField( javaBeanField );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
-				.map( builder -> builder.build( constraintLocation, java.lang.annotation.ElementType.FIELD, null ) )
+				.map( builder -> builder.build( constraintLocation, ConstraintLocationKind.FIELD, null ) )
 				.collect( Collectors.toSet() );
 
 		ContainerElementTypeConfiguration containerElementTypeConfiguration = getContainerElementTypeConfiguration(
