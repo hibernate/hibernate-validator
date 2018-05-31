@@ -24,6 +24,7 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -103,7 +104,7 @@ class ClassConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 		ConstraintLocation constraintLocation = ConstraintLocation.forClass( beanClass );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
-				.map( builder -> builder.build( constraintLocation, java.lang.annotation.ElementType.TYPE, null ) )
+				.map( builder -> builder.build( constraintLocation, ConstraintLocationKind.TYPE, null ) )
 				.collect( Collectors.toSet() );
 
 		// ignore annotation

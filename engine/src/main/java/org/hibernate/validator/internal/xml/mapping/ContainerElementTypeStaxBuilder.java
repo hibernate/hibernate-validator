@@ -163,7 +163,7 @@ class ContainerElementTypeStaxBuilder extends AbstractStaxBuilder {
 								.map(
 										builder -> builder.build(
 												containerElementTypeConstraintLocation,
-												java.lang.annotation.ElementType.TYPE_USE,
+												ConstraintLocation.ConstraintLocationKind.TYPE_USE,
 												null
 										)
 								),

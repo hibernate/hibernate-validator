@@ -12,7 +12,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -45,6 +44,7 @@ import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.properties.Property;
@@ -132,7 +132,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * Describes on which level ({@code TYPE}, {@code METHOD}, {@code FIELD}) the constraint was
 	 * defined on.
 	 */
-	private final ElementType elementType;
+	private final ConstraintLocationKind constraintLocationKind;
 
 	/**
 	 * The origin of the constraint. Defined on the actual root class or somewhere in the class hierarchy
@@ -165,12 +165,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	public ConstraintDescriptorImpl(ConstraintHelper constraintHelper,
 			Constrainable constrainable,
 			ConstraintAnnotationDescriptor<T> annotationDescriptor,
-			ElementType type,
+			ConstraintLocationKind kind,
 			Class<?> implicitGroup,
 			ConstraintOrigin definedOn,
 			ConstraintType externalConstraintType) {
 		this.annotationDescriptor = annotationDescriptor;
-		this.elementType = type;
+		this.constraintLocationKind = kind;
 		this.definedOn = definedOn;
 		this.isReportAsSingleInvalidConstraint = annotationDescriptor.getType().isAnnotationPresent(
 				ReportAsSingleViolation.class
@@ -206,7 +206,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this.constraintType = determineConstraintType(
 				annotationDescriptor.getType(),
 				constrainable,
-				type,
 				!genericValidatorDescriptors.isEmpty(),
 				!crossParameterValidatorDescriptors.isEmpty(),
 				externalConstraintType
@@ -228,16 +227,16 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	public ConstraintDescriptorImpl(ConstraintHelper constraintHelper,
 			Constrainable constrainable,
 			ConstraintAnnotationDescriptor<T> annotationDescriptor,
-			ElementType type) {
-		this( constraintHelper, constrainable, annotationDescriptor, type, null, ConstraintOrigin.DEFINED_LOCALLY, null );
+			ConstraintLocationKind kind) {
+		this( constraintHelper, constrainable, annotationDescriptor, kind, null, ConstraintOrigin.DEFINED_LOCALLY, null );
 	}
 
 	public ConstraintDescriptorImpl(ConstraintHelper constraintHelper,
 			Constrainable constrainable,
 			ConstraintAnnotationDescriptor<T> annotationDescriptor,
-			ElementType type,
+			ConstraintLocationKind kind,
 			ConstraintType constraintType) {
-		this( constraintHelper, constrainable, annotationDescriptor, type, null, ConstraintOrigin.DEFINED_LOCALLY, constraintType );
+		this( constraintHelper, constrainable, annotationDescriptor, kind, null, ConstraintOrigin.DEFINED_LOCALLY, constraintType );
 	}
 
 	public ConstraintAnnotationDescriptor<T> getAnnotationDescriptor() {
@@ -313,8 +312,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return isReportAsSingleInvalidConstraint;
 	}
 
-	public ElementType getElementType() {
-		return elementType;
+	public ConstraintLocationKind getConstraintLocationKind() {
+		return constraintLocationKind;
 	}
 
 	public ConstraintOrigin getDefinedOn() {
@@ -361,7 +360,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		sb.append( ", payloads=" ).append( payloads );
 		sb.append( ", hasComposingConstraints=" ).append( composingConstraints.isEmpty() );
 		sb.append( ", isReportAsSingleInvalidConstraint=" ).append( isReportAsSingleInvalidConstraint );
-		sb.append( ", elementType=" ).append( elementType );
+		sb.append( ", constraintLocationKind=" ).append( constraintLocationKind );
 		sb.append( ", definedOn=" ).append( definedOn );
 		sb.append( ", groups=" ).append( groups );
 		sb.append( ", attributes=" ).append( annotationDescriptor.getAttributes() );
@@ -389,7 +388,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * </ul>
 	 *
 	 * @param constrainable The annotated member
-	 * @param elementType The type of the annotated element
 	 * @param hasGenericValidators Whether the constraint has at least one generic validator or
 	 * not
 	 * @param hasCrossParameterValidator Whether the constraint has a cross-parameter validator
@@ -400,13 +398,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 */
 	private ConstraintType determineConstraintType(Class<? extends Annotation> constraintAnnotationType,
 			Constrainable constrainable,
-			ElementType elementType,
 			boolean hasGenericValidators,
 			boolean hasCrossParameterValidator,
 			ConstraintType externalConstraintType) {
 		ConstraintTarget constraintTarget = validationAppliesTo;
 		ConstraintType constraintType = null;
-		boolean isExecutable = isExecutable( elementType );
+		boolean isExecutable = isExecutable( constraintLocationKind );
 
 		//target explicitly set to RETURN_VALUE
 		if ( constraintTarget == ConstraintTarget.RETURN_VALUE ) {
@@ -533,8 +530,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 	}
 
-	private boolean isExecutable(ElementType elementType) {
-		return elementType == ElementType.METHOD || elementType == ElementType.CONSTRUCTOR;
+	private boolean isExecutable(ConstraintLocationKind locationKind) {
+		return locationKind == ConstraintLocationKind.METHOD || locationKind == ConstraintLocationKind.CONSTRUCTOR;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -744,7 +741,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 
 		return new ConstraintDescriptorImpl<>(
-				constraintHelper, constrainable, annotationDescriptorBuilder.build(), elementType, null, definedOn, constraintType
+				constraintHelper, constrainable, annotationDescriptorBuilder.build(), constraintLocationKind, null, definedOn, constraintType
 		);
 	}
 

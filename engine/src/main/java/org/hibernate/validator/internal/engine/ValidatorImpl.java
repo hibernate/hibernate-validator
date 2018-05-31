@@ -1283,7 +1283,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				validationContext,
 				valueContext.getCurrentBean(),
 				valueContext.getPropertyPath(),
-				metaConstraint.getElementType()
+				metaConstraint.getConstraintLocationKind().getElementType()
 		);
 	}
 

@@ -20,6 +20,7 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.properties.Callable;
@@ -73,7 +74,7 @@ class ConstrainedParameterStaxBuilder extends AbstractConstrainedElementStaxBuil
 		Type type = callable.getTypeOfParameter( index );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
-				.map( builder -> builder.build( constraintLocation, java.lang.annotation.ElementType.PARAMETER, null ) )
+				.map( builder -> builder.build( constraintLocation, ConstraintLocationKind.PARAMETER, null ) )
 				.collect( Collectors.toSet() );
 
 		ContainerElementTypeConfiguration containerElementTypeConfiguration = getContainerElementTypeConfiguration( type, constraintLocation );

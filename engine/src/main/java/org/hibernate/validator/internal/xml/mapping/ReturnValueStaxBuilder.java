@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.xml.mapping;
 
-import java.lang.annotation.ElementType;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,6 +19,8 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.mapping.ContainerElementTypeConfigurationBuilder.ContainerElementTypeConfiguration;
@@ -56,7 +57,7 @@ class ReturnValueStaxBuilder extends AbstractConstrainedElementStaxBuilder {
 
 		ConstraintLocation constraintLocation = ConstraintLocation.forReturnValue( callable );
 		returnValueConstraints.addAll( constraintTypeStaxBuilders.stream()
-				.map( builder -> builder.build( constraintLocation, callable.isConstructor() ? ElementType.CONSTRUCTOR : ElementType.METHOD, ConstraintDescriptorImpl.ConstraintType.GENERIC ) )
+				.map( builder -> builder.build( constraintLocation, callable.getConstrainedElementKind() == ConstrainedElementKind.CONSTRUCTOR ? ConstraintLocationKind.CONSTRUCTOR : ConstraintLocationKind.METHOD, ConstraintDescriptorImpl.ConstraintType.GENERIC ) )
 				.collect( Collectors.toSet() ) );
 
 		ContainerElementTypeConfiguration containerElementTypeConfiguration = getContainerElementTypeConfiguration( callable.getType(), constraintLocation );

@@ -28,6 +28,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.properties.Callable;
@@ -255,7 +256,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		/**
 		 * Either CONSTRUCTOR or METHOD.
 		 */
-		private final ConstrainedElement.ConstrainedElementKind kind;
+		private final ConstrainedElementKind kind;
 		private final Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		private Callable callable;
 		private final boolean isGetterMethod;
@@ -311,7 +312,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		}
 
 		private boolean isResolvedToSameMethodInHierarchy(Callable first, Callable other) {
-			if ( first.isConstructor() || other.isConstructor() ) {
+			if ( isConstructor( first ) || isConstructor( other ) ) {
 				return first.equals( other );
 			}
 
@@ -319,11 +320,15 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		}
 
 		private boolean overrides(Callable first, Callable other) {
-			if ( first.isConstructor() || other.isConstructor() ) {
+			if ( isConstructor( first ) || isConstructor( other ) ) {
 				return false;
 			}
 
 			return executableHelper.overrides( first, other );
+		}
+
+		private boolean isConstructor(Callable callable) {
+			return callable.getConstrainedElementKind() == ConstrainedElementKind.CONSTRUCTOR;
 		}
 
 		@Override
@@ -380,11 +385,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			assertCorrectnessOfConfiguration();
 
 			return new ExecutableMetaData(
-					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? callable.getDeclaringClass().getSimpleName() : callable.getName(),
+					kind == ConstrainedElementKind.CONSTRUCTOR ? callable.getDeclaringClass().getSimpleName() : callable.getName(),
 					callable.getType(),
 					callable.getParameterTypes(),
-					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
-					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? Collections.singleton( callable.getSignature() ) :
+					kind == ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
+					kind == ConstrainedElementKind.CONSTRUCTOR ? Collections.singleton( callable.getSignature() ) :
 							CollectionHelper.toImmutableSet( signatures ),
 					adaptOriginsAndImplicitGroups( getDirectConstraints() ),
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),

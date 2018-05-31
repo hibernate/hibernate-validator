@@ -35,6 +35,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
@@ -112,7 +113,7 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 	}
 
 	@SuppressWarnings("unchecked")
-	<A extends Annotation> MetaConstraint<A> build(ConstraintLocation constraintLocation, java.lang.annotation.ElementType type, ConstraintDescriptorImpl.ConstraintType constraintType) {
+	<A extends Annotation> MetaConstraint<A> build(ConstraintLocation constraintLocation, ConstraintLocationKind kind, ConstraintDescriptorImpl.ConstraintType constraintType) {
 		String defaultPackage = defaultPackageStaxBuilder.build().orElse( "" );
 
 		Class<A> annotationClass;
@@ -149,7 +150,7 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 		// we set initially ConstraintOrigin.DEFINED_LOCALLY for all xml configured constraints
 		// later we will make copies of this constraint descriptor when needed and adjust the ConstraintOrigin
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<>(
-				constraintHelper, constraintLocation.getConstrainable(), annotationDescriptor, type, constraintType
+				constraintHelper, constraintLocation.getConstrainable(), annotationDescriptor, kind, constraintType
 		);
 
 		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor, constraintLocation );
