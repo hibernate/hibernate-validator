@@ -135,11 +135,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final Set<Cascadable> cascadedProperties;
 
 	/**
-	 * The bean descriptor for this bean.
-	 */
-	private final BeanDescriptor beanDescriptor;
-
-	/**
 	 * The default groups sequence for this bean class.
 	 */
 	@Immutable
@@ -161,6 +156,22 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	@Immutable
 	private final List<Class<? super T>> classHierarchyWithoutInterfaces;
+
+	/**
+	 * {code true} if the default group sequence is redefined, either via a group sequence redefinition or a group
+	 * sequence provider.
+	 */
+	private final boolean defaultGroupSequenceRedefined;
+
+	/**
+	 * The resolved default group sequence.
+	 */
+	private final List<Class<?>> resolvedDefaultGroupSequence;
+
+	/**
+	 * The bean descriptor for this bean. Lazily created.
+	 */
+	private volatile BeanDescriptor beanDescriptor;
 
 	/**
 	 * Creates a new {@link BeanMetaDataImpl}
@@ -233,36 +244,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.executableMetaDataMap = CollectionHelper.toImmutableMap( bySignature( executableMetaDataSet ) );
 		this.unconstrainedExecutables = CollectionHelper.toImmutableSet( tmpUnconstrainedExecutables );
 
-		boolean defaultGroupSequenceIsRedefined = defaultGroupSequenceIsRedefined();
-		List<Class<?>> resolvedDefaultGroupSequence = getDefaultGroupSequence( null );
-
-		Map<String, PropertyDescriptor> propertyDescriptors = getConstrainedPropertiesAsDescriptors(
-				propertyMetaDataMap,
-				defaultGroupSequenceIsRedefined,
-				resolvedDefaultGroupSequence
-		);
-
-		Map<String, ExecutableDescriptorImpl> methodsDescriptors = getConstrainedMethodsAsDescriptors(
-				executableMetaDataMap,
-				defaultGroupSequenceIsRedefined,
-				resolvedDefaultGroupSequence
-		);
-
-		Map<String, ConstructorDescriptor> constructorsDescriptors = getConstrainedConstructorsAsDescriptors(
-				executableMetaDataMap,
-				defaultGroupSequenceIsRedefined,
-				resolvedDefaultGroupSequence
-		);
-
-		this.beanDescriptor = new BeanDescriptorImpl(
-				beanClass,
-				getClassLevelConstraintsAsDescriptors( allMetaConstraints ),
-				propertyDescriptors,
-				methodsDescriptors,
-				constructorsDescriptors,
-				defaultGroupSequenceIsRedefined,
-				resolvedDefaultGroupSequence
-		);
+		// We initialize those elements eagerly so that any eventual error is thrown when bootstrapping the bean metadata
+		this.defaultGroupSequenceRedefined = this.defaultGroupSequence.size() > 1 || hasDefaultGroupSequenceProvider();
+		this.resolvedDefaultGroupSequence = getDefaultGroupSequence( null );
 	}
 
 	@Override
@@ -277,6 +261,21 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	@Override
 	public BeanDescriptor getBeanDescriptor() {
+		BeanDescriptor beanDescriptor = this.beanDescriptor;
+
+		if ( beanDescriptor == null ) {
+			synchronized ( this ) {
+				beanDescriptor = this.beanDescriptor;
+
+				if ( beanDescriptor == null ) {
+					beanDescriptor = createBeanDescriptor( beanClass, allMetaConstraints, propertyMetaDataMap, executableMetaDataMap,
+							defaultGroupSequenceRedefined, resolvedDefaultGroupSequence );
+
+					this.beanDescriptor = beanDescriptor;
+				}
+			}
+		}
+
 		return beanDescriptor;
 	}
 
@@ -359,12 +358,44 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	@Override
 	public boolean defaultGroupSequenceIsRedefined() {
-		return defaultGroupSequence.size() > 1 || hasDefaultGroupSequenceProvider();
+		return defaultGroupSequenceRedefined;
 	}
 
 	@Override
 	public List<Class<? super T>> getClassHierarchy() {
 		return classHierarchyWithoutInterfaces;
+	}
+
+	private static BeanDescriptor createBeanDescriptor(Class<?> beanClass, Set<MetaConstraint<?>> allMetaConstraints,
+			Map<String, PropertyMetaData> propertyMetaDataMap, Map<String, ExecutableMetaData> executableMetaDataMap, boolean defaultGroupSequenceRedefined,
+			List<Class<?>> resolvedDefaultGroupSequence) {
+		Map<String, PropertyDescriptor> propertyDescriptors = getConstrainedPropertiesAsDescriptors(
+				propertyMetaDataMap,
+				defaultGroupSequenceRedefined,
+				resolvedDefaultGroupSequence
+		);
+
+		Map<String, ExecutableDescriptorImpl> methodsDescriptors = getConstrainedMethodsAsDescriptors(
+				executableMetaDataMap,
+				defaultGroupSequenceRedefined,
+				resolvedDefaultGroupSequence
+		);
+
+		Map<String, ConstructorDescriptor> constructorsDescriptors = getConstrainedConstructorsAsDescriptors(
+				executableMetaDataMap,
+				defaultGroupSequenceRedefined,
+				resolvedDefaultGroupSequence
+		);
+
+		return new BeanDescriptorImpl(
+				beanClass,
+				getClassLevelConstraintsAsDescriptors( allMetaConstraints ),
+				propertyDescriptors,
+				methodsDescriptors,
+				constructorsDescriptors,
+				defaultGroupSequenceRedefined,
+				resolvedDefaultGroupSequence
+		);
 	}
 
 	private static Set<ConstraintDescriptorImpl<?>> getClassLevelConstraintsAsDescriptors(Set<MetaConstraint<?>> constraints) {
