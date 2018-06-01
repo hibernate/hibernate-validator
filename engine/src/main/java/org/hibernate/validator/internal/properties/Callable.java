@@ -14,6 +14,7 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
 public interface Callable extends Constrainable {
 
@@ -21,9 +22,11 @@ public interface Callable extends Constrainable {
 
 	boolean hasParameters();
 
-	Class<?>[] getParameterTypes();
+	int getParameterCount();
 
-	Type[] getGenericParameterTypes();
+	Type getParameterGenericType(int index);
+
+	Class<?>[] getParameterTypes();
 
 	String getParameterName(ExecutableParameterNameProvider parameterNameProvider, int parameterIndex);
 
@@ -32,8 +35,6 @@ public interface Callable extends Constrainable {
 	ConstrainedElementKind getConstrainedElementKind();
 
 	String getSignature();
-
-	Type getTypeOfParameter(int parameterIndex);
 
 	boolean overrides(ExecutableHelper executableHelper, Callable superTypeMethod);
 

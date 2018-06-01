@@ -6,8 +6,11 @@
  */
 package org.hibernate.validator.internal.properties.javabean;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -19,7 +22,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 /**
  * @author Marko Bekhta
  */
-public class JavaBeanField implements Property {
+public class JavaBeanField implements Property, JavaBeanAnnotatedConstrainable {
 
 	private final Field field;
 	private final String name;
@@ -61,6 +64,31 @@ public class JavaBeanField implements Property {
 	@Override
 	public String getPropertyName() {
 		return getName();
+	}
+
+	@Override
+	public AnnotatedType getAnnotatedType() {
+		return field.getAnnotatedType();
+	}
+
+	@Override
+	public Annotation[] getDeclaredAnnotations() {
+		return field.getDeclaredAnnotations();
+	}
+
+	@Override
+	public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
+		return field.getAnnotation( annotationClass );
+	}
+
+	@Override
+	public Type getGenericType() {
+		return ReflectionHelper.typeOf( field );
+	}
+
+	@Override
+	public TypeVariable<?>[] getTypeParameters() {
+		return field.getType().getTypeParameters();
 	}
 
 	@Override

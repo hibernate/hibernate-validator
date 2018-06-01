@@ -97,7 +97,7 @@ class ConstrainedMethodStaxBuilder extends AbstractConstrainedExecutableElementS
 		else {
 			alreadyProcessedMethods.add( method );
 		}
-		JavaBeanExecutable executable = JavaBeanExecutable.of( method );
+		JavaBeanExecutable<?> executable = JavaBeanExecutable.of( method );
 
 		// ignore annotations
 		if ( ignoreAnnotations.isPresent() ) {
