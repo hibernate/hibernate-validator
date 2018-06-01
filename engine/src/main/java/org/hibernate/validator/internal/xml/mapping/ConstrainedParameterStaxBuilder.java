@@ -71,7 +71,7 @@ class ConstrainedParameterStaxBuilder extends AbstractConstrainedElementStaxBuil
 	ConstrainedParameter build(Callable callable, int index) {
 
 		ConstraintLocation constraintLocation = ConstraintLocation.forParameter( callable, index );
-		Type type = callable.getTypeOfParameter( index );
+		Type type = callable.getParameterGenericType( index );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
 				.map( builder -> builder.build( constraintLocation, ConstraintLocationKind.PARAMETER, null ) )

@@ -112,10 +112,10 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 
 		this.callable = callable;
 
-		if ( parameterMetaData.size() != callable.getParameterTypes().length ) {
+		if ( parameterMetaData.size() != callable.getParameterCount() ) {
 			throw LOG.getInvalidLengthOfParameterMetaDataListException(
 					callable,
-					callable.getParameterTypes().length,
+					callable.getParameterCount(),
 					parameterMetaData.size()
 			);
 		}

@@ -13,18 +13,13 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedArrayType;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.AnnotatedType;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -66,8 +61,11 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanAnnotatedConstrainable;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanAnnotatedElement;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanParameter;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -227,19 +225,19 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				continue;
 			}
 
-			propertyMetaData.add( findPropertyMetaData( field, javaBeanField ) );
+			propertyMetaData.add( findPropertyMetaData( javaBeanField ) );
 		}
 		return propertyMetaData;
 	}
 
-	private ConstrainedField findPropertyMetaData(Field field, JavaBeanField javaBeanField) {
+	private ConstrainedField findPropertyMetaData(JavaBeanField javaBeanField) {
 		Set<MetaConstraint<?>> constraints = convertToMetaConstraints(
-				findConstraints( field, ConstraintLocationKind.FIELD, javaBeanField ),
+				findConstraints( javaBeanField, ConstraintLocationKind.FIELD ),
 				javaBeanField
 		);
 
-		CascadingMetaDataBuilder cascadingMetaDataBuilder = findCascadingMetaData( field );
-		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraints( field, javaBeanField );
+		CascadingMetaDataBuilder cascadingMetaDataBuilder = findCascadingMetaData( javaBeanField );
+		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraints( javaBeanField );
 
 		return new ConstrainedField(
 				ConfigurationSource.ANNOTATION,
@@ -302,25 +300,24 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * given element.
 	 */
 	private ConstrainedExecutable findExecutableMetaData(Executable executable) {
-		Callable callable = JavaBeanExecutable.of( executable );
-		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( executable, callable );
+		JavaBeanExecutable<?> javaBeanExecutable = JavaBeanExecutable.of( executable );
+		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( javaBeanExecutable );
 
 		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = findConstraints(
-				executable,
-				callable.getConstrainedElementKind() == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR
+				javaBeanExecutable,
+				javaBeanExecutable.getConstrainedElementKind() == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR
 						? ConstraintLocationKind.CONSTRUCTOR
-						: ConstraintLocationKind.METHOD,
-				callable
+						: ConstraintLocationKind.METHOD
 		).stream().collect( Collectors.groupingBy( ConstraintDescriptorImpl::getConstraintType ) );
 
 		Set<MetaConstraint<?>> crossParameterConstraints;
-		if ( annotationProcessingOptions.areCrossParameterConstraintsIgnoredFor( callable ) ) {
+		if ( annotationProcessingOptions.areCrossParameterConstraintsIgnoredFor( javaBeanExecutable ) ) {
 			crossParameterConstraints = Collections.emptySet();
 		}
 		else {
 			crossParameterConstraints = convertToMetaConstraints(
 					executableConstraints.get( ConstraintType.CROSS_PARAMETER ),
-					callable
+					javaBeanExecutable
 			);
 		}
 
@@ -328,25 +325,23 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		Set<MetaConstraint<?>> typeArgumentsConstraints;
 		CascadingMetaDataBuilder cascadingMetaDataBuilder;
 
-		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( callable ) ) {
+		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( javaBeanExecutable ) ) {
 			returnValueConstraints = Collections.emptySet();
 			typeArgumentsConstraints = Collections.emptySet();
 			cascadingMetaDataBuilder = CascadingMetaDataBuilder.nonCascading();
 		}
 		else {
-			AnnotatedType annotatedReturnType = executable.getAnnotatedReturnType();
-
-			typeArgumentsConstraints = findTypeAnnotationConstraints( executable, callable, annotatedReturnType );
+			typeArgumentsConstraints = findTypeAnnotationConstraints( javaBeanExecutable );
 			returnValueConstraints = convertToMetaConstraints(
 					executableConstraints.get( ConstraintType.GENERIC ),
-					callable
+					javaBeanExecutable
 			);
-			cascadingMetaDataBuilder = findCascadingMetaData( executable, annotatedReturnType );
+			cascadingMetaDataBuilder = findCascadingMetaData( javaBeanExecutable );
 		}
 
 		return new ConstrainedExecutable(
 				ConfigurationSource.ANNOTATION,
-				callable,
+				javaBeanExecutable,
 				parameterConstraints,
 				crossParameterConstraints,
 				returnValueConstraints,
@@ -377,25 +372,24 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * Retrieves constraint related meta data for the parameters of the given
 	 * executable.
 	 *
-	 * @param executable The executable of interest.
+	 * @param javaBeanExecutable The executable of interest.
 	 *
-	 * @param callable
 	 * @return A list with parameter meta data for the given executable.
 	 */
-	private List<ConstrainedParameter> getParameterMetaData(Executable executable, Callable callable) {
-		if ( executable.getParameterCount() == 0 ) {
+	private List<ConstrainedParameter> getParameterMetaData(JavaBeanExecutable<?> javaBeanExecutable) {
+		if ( !javaBeanExecutable.hasParameters() ) {
 			return Collections.emptyList();
 		}
 
-		Parameter[] parameters = executable.getParameters();
+		List<JavaBeanParameter> parameters = javaBeanExecutable.getParameters();
 
-		List<ConstrainedParameter> metaData = new ArrayList<>( parameters.length );
+		List<ConstrainedParameter> metaData = new ArrayList<>( parameters.size() );
 
 		int i = 0;
-		for ( Parameter parameter : parameters ) {
+		for ( JavaBeanParameter parameter : parameters ) {
 			Annotation[] parameterAnnotations;
 			try {
-				parameterAnnotations = parameter.getAnnotations();
+				parameterAnnotations = parameter.getDeclaredAnnotations();
 			}
 			catch (ArrayIndexOutOfBoundsException ex) {
 				LOG.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
@@ -404,13 +398,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 			Set<MetaConstraint<?>> parameterConstraints = newHashSet();
 
-			if ( annotationProcessingOptions.areParameterConstraintsIgnoredFor( callable, i ) ) {
-				Type type = ReflectionHelper.typeOf( executable, i );
+			if ( annotationProcessingOptions.areParameterConstraintsIgnoredFor( javaBeanExecutable, i ) ) {
 				metaData.add(
 						new ConstrainedParameter(
 								ConfigurationSource.ANNOTATION,
-								callable,
-								type,
+								javaBeanExecutable,
+								parameter.getGenericType(),
 								i,
 								parameterConstraints,
 								Collections.emptySet(),
@@ -421,12 +414,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				continue;
 			}
 
-			ConstraintLocation location = ConstraintLocation.forParameter( callable, i );
+			ConstraintLocation location = ConstraintLocation.forParameter( javaBeanExecutable, i );
 
 			for ( Annotation parameterAnnotation : parameterAnnotations ) {
 				// collect constraints if this annotation is a constraint annotation
 				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
-						callable, parameterAnnotation, ConstraintLocationKind.PARAMETER
+						javaBeanExecutable, parameterAnnotation, ConstraintLocationKind.PARAMETER
 				);
 				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
 					parameterConstraints.add(
@@ -435,16 +428,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				}
 			}
 
-			AnnotatedType parameterAnnotatedType = parameter.getAnnotatedType();
-
-			Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable, callable, i, parameterAnnotatedType );
-			CascadingMetaDataBuilder cascadingMetaData = findCascadingMetaData( executable, parameters, i, parameterAnnotatedType );
+			Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( parameter );
+			CascadingMetaDataBuilder cascadingMetaData = findCascadingMetaData( parameter );
 
 			metaData.add(
 					new ConstrainedParameter(
 							ConfigurationSource.ANNOTATION,
-							callable,
-							ReflectionHelper.typeOf( executable, i ),
+							javaBeanExecutable,
+							parameter.getGenericType(),
 							i,
 							parameterConstraints,
 							typeArgumentsConstraints,
@@ -461,14 +452,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * Finds all constraint annotations defined for the given member and returns them in a list of
 	 * constraint descriptors.
 	 *
-	 * @param member The member to check for constraints annotations.
+	 * @param constrainable The constrainable to check for constraint annotations.
 	 * @param type The element type the constraint/annotation is placed on.
 	 *
 	 * @return A list of constraint descriptors for all constraint specified for the given member.
 	 */
-	private List<ConstraintDescriptorImpl<?>> findConstraints(Member member, ConstraintLocationKind type, Constrainable constrainable) {
+	private List<ConstraintDescriptorImpl<?>> findConstraints(JavaBeanAnnotatedConstrainable constrainable, ConstraintLocationKind type) {
 		List<ConstraintDescriptorImpl<?>> metaData = newArrayList();
-		for ( Annotation annotation : ( (AccessibleObject) member ).getDeclaredAnnotations() ) {
+		for ( Annotation annotation : constrainable.getDeclaredAnnotations() ) {
 			metaData.addAll( findConstraintAnnotations( constrainable, annotation, type ) );
 		}
 
@@ -528,10 +519,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				.collect( Collectors.toList() );
 	}
 
-	private Map<Class<?>, Class<?>> getGroupConversions(AnnotatedElement annotatedElement) {
+	private Map<Class<?>, Class<?>> getGroupConversions(AnnotatedType annotatedType) {
 		return getGroupConversions(
-				annotatedElement.getAnnotation( ConvertGroup.class ),
-				annotatedElement.getAnnotation( ConvertGroup.List.class )
+				annotatedType.getAnnotation( ConvertGroup.class ),
+				annotatedType.getAnnotation( ConvertGroup.List.class )
 		);
 	}
 
@@ -585,35 +576,31 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Finds type arguments constraints for fields.
 	 */
-	protected Set<MetaConstraint<?>> findTypeAnnotationConstraints(Field field, Property property) {
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraints(JavaBeanField javaBeanField) {
 		return findTypeArgumentsConstraints(
-				property,
-				new TypeArgumentFieldLocation( field ),
-				field.getAnnotatedType()
+				javaBeanField,
+				new TypeArgumentFieldLocation( javaBeanField ),
+				javaBeanField.getAnnotatedType()
 		);
 	}
 
 	/**
 	 * Finds type arguments constraints for method return values.
 	 */
-	protected Set<MetaConstraint<?>> findTypeAnnotationConstraints(Executable executable, Callable callable, AnnotatedType annotatedReturnType) {
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraints(JavaBeanExecutable<?> javaBeanExecutable) {
 		return findTypeArgumentsConstraints(
-				callable,
-				new TypeArgumentReturnValueLocation( executable ),
-				annotatedReturnType
+				javaBeanExecutable,
+				new TypeArgumentReturnValueLocation( javaBeanExecutable ),
+				javaBeanExecutable.getAnnotatedType()
 		);
 	}
 
-	private CascadingMetaDataBuilder findCascadingMetaData(Executable executable, Parameter[] parameters, int i, AnnotatedType parameterAnnotatedType) {
-		Parameter parameter = parameters[i];
-		TypeVariable<?>[] typeParameters = parameter.getType().getTypeParameters();
-
-		Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( parameterAnnotatedType,
-				typeParameters );
+	private CascadingMetaDataBuilder findCascadingMetaData(JavaBeanParameter javaBeanParameter) {
+		Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( javaBeanParameter.getAnnotatedType(),
+				javaBeanParameter.getTypeParameters() );
 
 		try {
-			return getCascadingMetaData( ReflectionHelper.typeOf( parameter.getDeclaringExecutable(), i ),
-					parameter, containerElementTypesCascadingMetaData );
+			return getCascadingMetaData( javaBeanParameter, containerElementTypesCascadingMetaData );
 		}
 		catch (ArrayIndexOutOfBoundsException ex) {
 			LOG.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
@@ -621,29 +608,19 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 	}
 
-	private CascadingMetaDataBuilder findCascadingMetaData(Field field) {
-		TypeVariable<?>[] typeParameters = field.getType().getTypeParameters();
-		AnnotatedType annotatedType = field.getAnnotatedType();
+	private CascadingMetaDataBuilder findCascadingMetaData(JavaBeanField javaBeanField) {
+		Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata(
+				javaBeanField.getAnnotatedType(),
+				javaBeanField.getTypeParameters() );
 
-		Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( annotatedType, typeParameters );
-
-		return getCascadingMetaData( ReflectionHelper.typeOf( field ), field, containerElementTypesCascadingMetaData );
+		return getCascadingMetaData( javaBeanField, containerElementTypesCascadingMetaData );
 	}
 
-	private CascadingMetaDataBuilder findCascadingMetaData(Executable executable, AnnotatedType annotatedReturnType) {
-		TypeVariable<?>[] typeParameters;
+	private CascadingMetaDataBuilder findCascadingMetaData(JavaBeanExecutable<?> javaBeanExecutable) {
+		Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( javaBeanExecutable.getAnnotatedType(),
+				javaBeanExecutable.getTypeParameters() );
 
-		if ( executable instanceof Method ) {
-			typeParameters = ( (Method) executable ).getReturnType().getTypeParameters();
-		}
-		else {
-			typeParameters = ( (Constructor<?>) executable ).getDeclaringClass().getTypeParameters();
-		}
-
-		Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData = getTypeParametersCascadingMetadata( annotatedReturnType,
-				typeParameters );
-
-		return getCascadingMetaData( ReflectionHelper.typeOf( executable ), executable, containerElementTypesCascadingMetaData );
+		return getCascadingMetaData( javaBeanExecutable, containerElementTypesCascadingMetaData );
 	}
 
 	private Map<TypeVariable<?>, CascadingMetaDataBuilder> getTypeParametersCascadingMetadata(AnnotatedType annotatedType,
@@ -714,17 +691,16 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Finds type arguments constraints for parameters.
 	 *
-	 * @param executable the executable
-	 * @param i the parameter index
+	 * @param javaBeanParameter the parameter
 	 *
 	 * @return a set of type arguments constraints, or an empty set if no constrained type arguments are found
 	 */
-	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(Executable executable, Callable callable, int i, AnnotatedType parameterAnnotatedType) {
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(JavaBeanParameter javaBeanParameter) {
 		try {
 			return findTypeArgumentsConstraints(
-					callable,
-					new TypeArgumentExecutableParameterLocation( executable, i ),
-					parameterAnnotatedType
+					javaBeanParameter.getExecutable(),
+					new TypeArgumentExecutableParameterLocation( javaBeanParameter.getExecutable(), javaBeanParameter.getIndex() ),
+					javaBeanParameter.getAnnotatedType()
 			);
 		}
 		catch (ArrayIndexOutOfBoundsException ex) {
@@ -803,10 +779,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, descriptor, constraintLocation );
 	}
 
-	private CascadingMetaDataBuilder getCascadingMetaData(Type type, AnnotatedElement annotatedElement,
+	private CascadingMetaDataBuilder getCascadingMetaData(JavaBeanAnnotatedElement annotatedElement,
 			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData) {
-		return CascadingMetaDataBuilder.annotatedObject( type, annotatedElement.isAnnotationPresent( Valid.class ), containerElementTypesCascadingMetaData,
-						getGroupConversions( annotatedElement ) );
+		return CascadingMetaDataBuilder.annotatedObject( annotatedElement.getType(), annotatedElement.isAnnotationPresent( Valid.class ),
+				containerElementTypesCascadingMetaData, getGroupConversions( annotatedElement.getAnnotatedType() ) );
 	}
 
 	/**
@@ -821,44 +797,44 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private static class TypeArgumentExecutableParameterLocation implements TypeArgumentLocation {
-		private final Executable executable;
+		private final JavaBeanExecutable<?> javaBeanExecutable;
 
 		private final int index;
 
-		private TypeArgumentExecutableParameterLocation(Executable executable, int index) {
-			this.executable = executable;
+		private TypeArgumentExecutableParameterLocation(JavaBeanExecutable<?> javaBeanExecutable, int index) {
+			this.javaBeanExecutable = javaBeanExecutable;
 			this.index = index;
 		}
 
 		@Override
 		public ConstraintLocation toConstraintLocation() {
-			return ConstraintLocation.forParameter( JavaBeanExecutable.of( executable ), index );
+			return ConstraintLocation.forParameter( javaBeanExecutable, index );
 		}
 	}
 
 	private static class TypeArgumentFieldLocation implements TypeArgumentLocation {
-		private final Field field;
+		private final JavaBeanField javaBeanField;
 
-		private TypeArgumentFieldLocation(Field field) {
-			this.field = field;
+		private TypeArgumentFieldLocation(JavaBeanField javaBeanField) {
+			this.javaBeanField = javaBeanField;
 		}
 
 		@Override
 		public ConstraintLocation toConstraintLocation() {
-			return ConstraintLocation.forField( new JavaBeanField( field ) );
+			return ConstraintLocation.forField( javaBeanField );
 		}
 	}
 
 	private static class TypeArgumentReturnValueLocation implements TypeArgumentLocation {
-		private final Executable executable;
+		private final JavaBeanExecutable<?> javaBeanExecutable;
 
-		private TypeArgumentReturnValueLocation(Executable executable) {
-			this.executable = executable;
+		private TypeArgumentReturnValueLocation(JavaBeanExecutable<?> javaBeanExecutable) {
+			this.javaBeanExecutable = javaBeanExecutable;
 		}
 
 		@Override
 		public ConstraintLocation toConstraintLocation() {
-			return ConstraintLocation.forReturnValue( JavaBeanExecutable.of( executable ) );
+			return ConstraintLocation.forReturnValue( javaBeanExecutable );
 		}
 	}
 

@@ -40,7 +40,7 @@ final class ParameterConstraintMappingContextImpl
 	ParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext, int parameterIndex) {
 		super(
 			executableContext.getTypeContext().getConstraintMapping(),
-			executableContext.callable.getGenericParameterTypes()[parameterIndex]
+			executableContext.callable.getParameterGenericType( parameterIndex )
 		);
 
 		this.executableContext = executableContext;
@@ -121,7 +121,7 @@ final class ParameterConstraintMappingContextImpl
 
 	public ConstrainedParameter build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager) {
-		Type parameterType = executableContext.getCallable().getTypeOfParameter( parameterIndex );
+		Type parameterType = executableContext.getCallable().getParameterGenericType( parameterIndex );
 
 		return new ConstrainedParameter(
 				ConfigurationSource.API,

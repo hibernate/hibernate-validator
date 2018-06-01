@@ -33,9 +33,9 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanConstructor;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
@@ -154,17 +154,17 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			throw LOG.getBeanDoesNotContainMethodException( beanClass, name, parameterTypes );
 		}
 
-		Callable callable = JavaBeanExecutable.of( method );
+		JavaBeanExecutable<?> javaBeanExecutable = JavaBeanExecutable.of( method );
 
-		if ( configuredMembers.contains( callable ) ) {
+		if ( configuredMembers.contains( javaBeanExecutable ) ) {
 			throw LOG.getMethodHasAlreadyBeenConfiguredViaProgrammaticApiException(
 					beanClass,
 					ExecutableHelper.getExecutableAsString( name, parameterTypes )
 			);
 		}
 
-		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, callable );
-		configuredMembers.add( callable );
+		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, javaBeanExecutable );
+		configuredMembers.add( javaBeanExecutable );
 		executableContexts.add( context );
 
 		return context;
@@ -181,9 +181,9 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			);
 		}
 
-		Callable callable = JavaBeanExecutable.of( constructor );
+		JavaBeanConstructor javaBeanConstructor = new JavaBeanConstructor( constructor );
 
-		if ( configuredMembers.contains( callable ) ) {
+		if ( configuredMembers.contains( javaBeanConstructor ) ) {
 			throw LOG.getConstructorHasAlreadyBeConfiguredViaProgrammaticApiException(
 					beanClass,
 					ExecutableHelper.getExecutableAsString( beanClass.getSimpleName(), parameterTypes )
@@ -192,9 +192,9 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 		ConstructorConstraintMappingContextImpl context = new ConstructorConstraintMappingContextImpl(
 				this,
-				callable
+				javaBeanConstructor
 		);
-		configuredMembers.add( callable );
+		configuredMembers.add( javaBeanConstructor );
 		executableContexts.add( context );
 
 		return context;

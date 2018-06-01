@@ -6,15 +6,21 @@
  */
 package org.hibernate.validator.internal.properties.javabean;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -22,34 +28,52 @@ import org.hibernate.validator.internal.util.TypeHelper;
 
 /**
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
-public class JavaBeanExecutable implements Callable {
+public abstract class JavaBeanExecutable<T extends Executable> implements Callable, JavaBeanAnnotatedConstrainable {
 
-	protected final Executable executable;
+	protected final T executable;
 	private final Type typeForValidatorResolution;
 	private final String name;
-	private final boolean hasParameters;
 	private final boolean hasReturnValue;
 	private final Type type;
-	private final ConstrainedElementKind kind;
+	private final List<JavaBeanParameter> parameters;
 
-	JavaBeanExecutable(Executable executable) {
+	JavaBeanExecutable(T executable, boolean hasReturnValue) {
 		this.executable = executable;
 		this.name = executable.getName();
 		this.type = ReflectionHelper.typeOf( executable );
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( type );
-		this.hasParameters = executable.getParameterTypes().length > 0;
-		this.hasReturnValue = hasReturnValue( executable );
-		this.kind = executable instanceof Constructor ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD;
+		this.hasReturnValue = hasReturnValue;
+
+		if ( executable.getParameterCount() > 0 ) {
+			List<JavaBeanParameter> parameters = new ArrayList<>( executable.getParameterCount() );
+
+			Parameter[] parameterArray = executable.getParameters();
+			Class<?>[] parameterTypes = executable.getParameterTypes();
+			Type[] genericParameterTypes = executable.getGenericParameterTypes();
+
+			for ( int i = 0; i < parameterArray.length; i++ ) {
+				parameters.add( new JavaBeanParameter( this, i, parameterArray[i], parameterTypes[i],
+						getParameterGenericType( parameterTypes, genericParameterTypes, i ) ) );
+			}
+			this.parameters = CollectionHelper.toImmutableList( parameters );
+		}
+		else {
+			this.parameters = Collections.emptyList();
+		}
 	}
 
-	public static JavaBeanExecutable of(Executable executable) {
+	public static JavaBeanExecutable<?> of(Executable executable) {
+		if ( executable instanceof Constructor ) {
+			return new JavaBeanConstructor( (Constructor<?>) executable );
+		}
+
 		if ( ReflectionHelper.isGetterMethod( executable ) ) {
 			return new JavaBeanGetter( (Method) executable );
 		}
-		else {
-			return new JavaBeanExecutable( executable );
-		}
+
+		return new JavaBeanMethod( (Method) executable );
 	}
 
 	@Override
@@ -59,7 +83,7 @@ public class JavaBeanExecutable implements Callable {
 
 	@Override
 	public boolean hasParameters() {
-		return hasParameters;
+		return !parameters.isEmpty();
 	}
 
 	@Override
@@ -83,16 +107,6 @@ public class JavaBeanExecutable implements Callable {
 	}
 
 	@Override
-	public Class<?>[] getParameterTypes() {
-		return executable.getParameterTypes();
-	}
-
-	@Override
-	public Type[] getGenericParameterTypes() {
-		return executable.getGenericParameterTypes();
-	}
-
-	@Override
 	public String getParameterName(ExecutableParameterNameProvider parameterNameProvider, int parameterIndex) {
 		return parameterNameProvider.getParameterNames( executable ).get( parameterIndex );
 	}
@@ -103,40 +117,57 @@ public class JavaBeanExecutable implements Callable {
 	}
 
 	@Override
-	public ConstrainedElementKind getConstrainedElementKind() {
-		return kind;
-	}
-
-	@Override
 	public String getSignature() {
 		return ExecutableHelper.getSignature( executable );
 	}
 
 	@Override
-	public Type getTypeOfParameter(int parameterIndex) {
-		Type[] genericParameterTypes = executable.getGenericParameterTypes();
-
-		// getGenericParameterTypes() doesn't return synthetic parameters; in this case fall back to getParameterTypes()
-		if ( parameterIndex >= genericParameterTypes.length ) {
-			genericParameterTypes = executable.getParameterTypes();
-		}
-
-		Type type = genericParameterTypes[parameterIndex];
-
-		if ( type instanceof TypeVariable ) {
-			type = TypeHelper.getErasedType( type );
-		}
-		return type;
+	public Annotation[] getDeclaredAnnotations() {
+		return executable.getDeclaredAnnotations();
 	}
 
 	@Override
 	public boolean overrides(ExecutableHelper executableHelper, Callable superTypeMethod) {
-		return executableHelper.overrides( ( (Method) this.executable ), ( (Method) ( (JavaBeanExecutable) superTypeMethod ).executable ) );
+		return executableHelper.overrides( ( (Method) this.executable ), ( (Method) ( (JavaBeanExecutable<?>) superTypeMethod ).executable ) );
 	}
 
 	@Override
 	public boolean isResolvedToSameMethodInHierarchy(ExecutableHelper executableHelper, Class<?> mainSubType, Callable superTypeMethod) {
-		return executableHelper.isResolvedToSameMethodInHierarchy( mainSubType, ( (Method) this.executable ), ( (Method) ( (JavaBeanExecutable) superTypeMethod ).executable ) );
+		return executableHelper.isResolvedToSameMethodInHierarchy( mainSubType, ( (Method) this.executable ), ( (Method) ( (JavaBeanExecutable<?>) superTypeMethod ).executable ) );
+	}
+
+	@Override
+	public Type getGenericType() {
+		return ReflectionHelper.typeOf( executable );
+	}
+
+	@Override
+	public AnnotatedType getAnnotatedType() {
+		return executable.getAnnotatedReturnType();
+	}
+
+	@Override
+	public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
+		return executable.getAnnotation( annotationClass );
+	}
+
+	public List<JavaBeanParameter> getParameters() {
+		return parameters;
+	}
+
+	@Override
+	public Type getParameterGenericType(int index) {
+		return parameters.get( index ).getGenericType();
+	}
+
+	@Override
+	public int getParameterCount() {
+		return parameters.size();
+	}
+
+	@Override
+	public Class<?>[] getParameterTypes() {
+		return executable.getParameterTypes();
 	}
 
 	@Override
@@ -148,11 +179,8 @@ public class JavaBeanExecutable implements Callable {
 			return false;
 		}
 
-		JavaBeanExecutable that = (JavaBeanExecutable) o;
+		JavaBeanExecutable<?> that = (JavaBeanExecutable<?>) o;
 
-		if ( this.hasParameters != that.hasParameters ) {
-			return false;
-		}
 		if ( this.hasReturnValue != that.hasReturnValue ) {
 			return false;
 		}
@@ -173,7 +201,6 @@ public class JavaBeanExecutable implements Callable {
 		int result = this.executable.hashCode();
 		result = 31 * result + this.typeForValidatorResolution.hashCode();
 		result = 31 * result + this.name.hashCode();
-		result = 31 * result + ( this.hasParameters ? 1 : 0 );
 		result = 31 * result + ( this.hasReturnValue ? 1 : 0 );
 		result = 31 * result + this.type.hashCode();
 		return result;
@@ -183,16 +210,25 @@ public class JavaBeanExecutable implements Callable {
 	public String toString() {
 		return ExecutableHelper.getExecutableAsString(
 				getDeclaringClass().getSimpleName() + "#" + name,
-				getParameterTypes()
+				executable.getParameterTypes()
 		);
 	}
 
-	private boolean hasReturnValue(Executable executable) {
-		if ( executable instanceof Constructor ) {
-			return true;
+	private static Type getParameterGenericType(Type[] parameterTypes, Type[] genericParameterTypes, int parameterIndex) {
+		// getGenericParameterTypes() doesn't return synthetic parameters; in this case fall back to getParameterTypes()
+		Type[] typesToConsider;
+		if ( parameterIndex >= genericParameterTypes.length ) {
+			typesToConsider = parameterTypes;
 		}
 		else {
-			return ( (Method) executable ).getGenericReturnType() != void.class;
+			typesToConsider = genericParameterTypes;
 		}
+
+		Type type = typesToConsider[parameterIndex];
+
+		if ( type instanceof TypeVariable ) {
+			type = TypeHelper.getErasedType( type );
+		}
+		return type;
 	}
 }
