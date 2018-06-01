@@ -364,7 +364,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		BeanMetaData<U> beanMetaData = valueContext.getCurrentBeanMetaData();
-		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
+		if ( beanMetaData.isDefaultGroupSequenceRedefined() ) {
 			validationOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() ) );
 		}
 
@@ -435,7 +435,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		// evaluating the constraints of a bean per class in hierarchy, this is necessary to detect potential default group re-definitions
 		for ( Class<? super U> clazz : beanMetaData.getClassHierarchy() ) {
 			BeanMetaData<? super U> hostingBeanMetaData = beanMetaDataManager.getBeanMetaData( clazz );
-			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
+			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.isDefaultGroupSequenceRedefined();
 
 			// if the current class redefined the default group sequence, this sequence has to be applied to all the class hierarchy.
 			if ( defaultGroupSequenceIsRedefined ) {
@@ -766,7 +766,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		valueContext.setCurrentValidatedValue( value );
 
 		BeanMetaData<?> beanMetaData = valueContext.getCurrentBeanMetaData();
-		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
+		if ( beanMetaData.isDefaultGroupSequenceRedefined() ) {
 			validationOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( null ) );
 		}
 
@@ -828,7 +828,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			);
 		}
 
-		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
+		if ( beanMetaData.isDefaultGroupSequenceRedefined() ) {
 			validationOrder.assertDefaultGroupSequenceIsExpandable(
 					beanMetaData.getDefaultGroupSequence(
 							validationContext.getRootBean()
@@ -1014,7 +1014,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		ExecutableMetaData executableMetaData = executableMetaDataOptional.get();
 
-		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
+		if ( beanMetaData.isDefaultGroupSequenceRedefined() ) {
 			validationOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( bean ) );
 		}
 

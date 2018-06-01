@@ -357,7 +357,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	@Override
-	public boolean defaultGroupSequenceIsRedefined() {
+	public boolean isDefaultGroupSequenceRedefined() {
 		return defaultGroupSequenceRedefined;
 	}
 
