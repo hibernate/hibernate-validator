@@ -79,7 +79,7 @@ public interface BeanMetaData<T> extends Validatable {
 	/**
 	 * @return {@code true} if the entity redefines the default group sequence, {@code false} otherwise.
 	 */
-	boolean defaultGroupSequenceIsRedefined();
+	boolean isDefaultGroupSequenceRedefined();
 
 	/**
 	 * @return A set of {@code MetaConstraint} instances encapsulating the information of all the constraints
