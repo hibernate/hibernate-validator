@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.internal.metadata.facets;
 
-import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 
 /**
  * Provides a unified view on cascadable elements of all kinds, be it properties
@@ -24,11 +24,11 @@ import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBui
 public interface Cascadable {
 
 	/**
-	 * Returns the element type of the cascadable.
+	 * Returns the constraint location kind of the cascadable.
 	 *
-	 * @return Returns the element type of the cascadable.
+	 * @return Returns the constraint location kind of the cascadable.
 	 */
-	ElementType getElementType();
+	ConstraintLocationKind getConstraintLocationKind();
 
 	/**
 	 * Returns the data type of this cascadable, e.g. the type of a bean property or the

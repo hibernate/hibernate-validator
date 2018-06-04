@@ -6,10 +6,9 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import java.lang.annotation.ElementType;
-
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.properties.Property;
 
 /**
@@ -25,8 +24,8 @@ public class GetterCascadable extends PropertyCascadable {
 	}
 
 	@Override
-	public ElementType getElementType() {
-		return ElementType.METHOD;
+	public ConstraintLocationKind getConstraintLocationKind() {
+		return ConstraintLocationKind.METHOD;
 	}
 
 	public static class Builder extends PropertyCascadable.Builder {

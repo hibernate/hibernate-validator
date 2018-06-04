@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.engine;
 
 import java.io.Serializable;
-import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
@@ -45,17 +44,16 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	private final int hashCode;
 
 	public static <T> ConstraintViolation<T> forBeanValidation(String messageTemplate,
-															   Map<String, Object> messageParameters,
-															   Map<String, Object> expressionVariables,
-															   String interpolatedMessage,
-															   Class<T> rootBeanClass,
-															   T rootBean,
-															   Object leafBeanInstance,
-															   Object value,
-															   Path propertyPath,
-															   ConstraintDescriptor<?> constraintDescriptor,
-															   ElementType elementType,
-															   Object dynamicPayload) {
+			Map<String, Object> messageParameters,
+			Map<String, Object> expressionVariables,
+			String interpolatedMessage,
+			Class<T> rootBeanClass,
+			T rootBean,
+			Object leafBeanInstance,
+			Object value,
+			Path propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor,
+			Object dynamicPayload) {
 		return new ConstraintViolationImpl<>(
 				messageTemplate,
 				messageParameters,
@@ -67,7 +65,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 				value,
 				propertyPath,
 				constraintDescriptor,
-				elementType,
 				null,
 				null,
 				dynamicPayload
@@ -75,18 +72,17 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	}
 
 	public static <T> ConstraintViolation<T> forParameterValidation(String messageTemplate,
-																	Map<String, Object> messageParameters,
-																	Map<String, Object> expressionVariables,
-																	String interpolatedMessage,
-																	Class<T> rootBeanClass,
-																	T rootBean,
-																	Object leafBeanInstance,
-																	Object value,
-																	Path propertyPath,
-																	ConstraintDescriptor<?> constraintDescriptor,
-																	ElementType elementType,
-																	Object[] executableParameters,
-																	Object dynamicPayload) {
+			Map<String, Object> messageParameters,
+			Map<String, Object> expressionVariables,
+			String interpolatedMessage,
+			Class<T> rootBeanClass,
+			T rootBean,
+			Object leafBeanInstance,
+			Object value,
+			Path propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor,
+			Object[] executableParameters,
+			Object dynamicPayload) {
 		return new ConstraintViolationImpl<>(
 				messageTemplate,
 				messageParameters,
@@ -98,7 +94,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 				value,
 				propertyPath,
 				constraintDescriptor,
-				elementType,
 				executableParameters,
 				null,
 				dynamicPayload
@@ -106,18 +101,17 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	}
 
 	public static <T> ConstraintViolation<T> forReturnValueValidation(String messageTemplate,
-																	  Map<String, Object> messageParameters,
-																	  Map<String, Object> expressionVariables,
-																	  String interpolatedMessage,
-																	  Class<T> rootBeanClass,
-																	  T rootBean,
-																	  Object leafBeanInstance,
-																	  Object value,
-																	  Path propertyPath,
-																	  ConstraintDescriptor<?> constraintDescriptor,
-																	  ElementType elementType,
-																	  Object executableReturnValue,
-																	  Object dynamicPayload) {
+			Map<String, Object> messageParameters,
+			Map<String, Object> expressionVariables,
+			String interpolatedMessage,
+			Class<T> rootBeanClass,
+			T rootBean,
+			Object leafBeanInstance,
+			Object value,
+			Path propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor,
+			Object executableReturnValue,
+			Object dynamicPayload) {
 		return new ConstraintViolationImpl<>(
 				messageTemplate,
 				messageParameters,
@@ -129,7 +123,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 				value,
 				propertyPath,
 				constraintDescriptor,
-				elementType,
 				null,
 				executableReturnValue,
 				dynamicPayload
@@ -146,7 +139,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 			Object value,
 			Path propertyPath,
 			ConstraintDescriptor<?> constraintDescriptor,
-			ElementType elementType,
 			Object[] executableParameters,
 			Object executableReturnValue,
 			Object dynamicPayload) {

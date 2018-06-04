@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import java.lang.annotation.ElementType;
 import java.lang.reflect.TypeVariable;
 
 import javax.validation.groups.Default;
@@ -19,6 +18,7 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeVariables;
 
@@ -67,9 +67,9 @@ public class ValueContext<T, V> {
 	private final Validatable currentValidatable;
 
 	/**
-	 * The {@code ElementType} the constraint was defined on
+	 * The {@code ConstraintLocationKind} the constraint was defined on
 	 */
-	private ElementType elementType;
+	private ConstraintLocationKind constraintLocationKind;
 
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(BeanMetaDataManager beanMetaDataManager,
 			ExecutableParameterNameProvider parameterNameProvider, T value, Validatable validatable, PathImpl propertyPath) {
@@ -199,12 +199,12 @@ public class ValueContext<T, V> {
 		return getCurrentGroup() != null && getCurrentGroup().getName().equals( Default.class.getName() );
 	}
 
-	public final ElementType getElementType() {
-		return elementType;
+	public final ConstraintLocationKind getConstraintLocationKind() {
+		return constraintLocationKind;
 	}
 
-	public final void setElementType(ElementType elementType) {
-		this.elementType = elementType;
+	public final void setConstraintLocationKind(ConstraintLocationKind constraintLocationKind) {
+		this.constraintLocationKind = constraintLocationKind;
 	}
 
 	public final ValueState<V> getCurrentValueState() {
@@ -225,7 +225,7 @@ public class ValueContext<T, V> {
 		sb.append( ", propertyPath=" ).append( propertyPath );
 		sb.append( ", currentGroup=" ).append( currentGroup );
 		sb.append( ", currentValue=" ).append( currentValue );
-		sb.append( ", elementType=" ).append( elementType );
+		sb.append( ", constraintLocationKind=" ).append( constraintLocationKind );
 		sb.append( '}' );
 		return sb.toString();
 	}
