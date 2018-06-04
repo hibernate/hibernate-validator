@@ -196,6 +196,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Set<String> tmpUnconstrainedExecutables = newHashSet();
 
 		boolean hasConstraints = false;
+		Set<MetaConstraint<?>> allMetaConstraints = newHashSet();
 
 		for ( ConstraintMetaData constraintMetaData : constraintMetaDataSet ) {
 			boolean elementHasConstraints = constraintMetaData.isCascading() || constraintMetaData.isConstrained();
@@ -203,6 +204,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			if ( constraintMetaData.getKind() == ElementKind.PROPERTY ) {
 				propertyMetaDataSet.add( (PropertyMetaData) constraintMetaData );
+			}
+			else if ( constraintMetaData.getKind() == ElementKind.BEAN ) {
+				allMetaConstraints.addAll( ( (ClassMetaData) constraintMetaData ).getAllConstraints() );
 			}
 			else {
 				ExecutableMetaData executableMetaData = (ExecutableMetaData) constraintMetaData;
@@ -216,7 +220,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		Set<Cascadable> cascadedProperties = newHashSet();
-		Set<MetaConstraint<?>> allMetaConstraints = newHashSet();
 
 		for ( PropertyMetaData propertyMetaData : propertyMetaDataSet ) {
 			propertyMetaDataMap.put( propertyMetaData.getName(), propertyMetaData );
@@ -696,7 +699,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		private final TypeResolutionHelper typeResolutionHelper;
 		private final ValueExtractorManager valueExtractorManager;
 		private final ExecutableParameterNameProvider parameterNameProvider;
-		private MetaDataBuilder propertyBuilder;
+		private MetaDataBuilder metaDataBuilder;
 		private ExecutableMetaData.Builder methodBuilder;
 		private final MethodValidationConfiguration methodValidationConfiguration;
 		private final int hashCode;
@@ -723,7 +726,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			switch ( constrainedElement.getKind() ) {
 				case FIELD:
 					ConstrainedField constrainedField = (ConstrainedField) constrainedElement;
-					propertyBuilder = new PropertyMetaData.Builder(
+					metaDataBuilder = new PropertyMetaData.Builder(
 							beanClass,
 							constrainedField,
 							constraintHelper,
@@ -752,7 +755,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					}
 
 					if ( constrainedExecutable.isGetterMethod() ) {
-						propertyBuilder = new PropertyMetaData.Builder(
+						metaDataBuilder = new PropertyMetaData.Builder(
 								beanClass,
 								constrainedExecutable,
 								constraintHelper,
@@ -763,7 +766,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					break;
 				case TYPE:
 					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
-					propertyBuilder = new PropertyMetaData.Builder(
+					metaDataBuilder = new ClassMetaData.Builder(
 							beanClass,
 							constrainedType,
 							constraintHelper,
@@ -784,8 +787,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				added = true;
 			}
 
-			if ( propertyBuilder != null && propertyBuilder.accepts( constrainedElement ) ) {
-				propertyBuilder.add( constrainedElement );
+			if ( metaDataBuilder != null && metaDataBuilder.accepts( constrainedElement ) ) {
+				metaDataBuilder.add( constrainedElement );
 
 				if ( !added && constrainedElement.getKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
 					ConstrainedExecutable constrainedMethod = (ConstrainedExecutable) constrainedElement;
@@ -810,8 +813,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		public Set<ConstraintMetaData> build() {
 			Set<ConstraintMetaData> metaDataSet = newHashSet();
 
-			if ( propertyBuilder != null ) {
-				metaDataSet.add( propertyBuilder.build() );
+			if ( metaDataBuilder != null ) {
+				metaDataSet.add( metaDataBuilder.build() );
 			}
 
 			if ( methodBuilder != null ) {

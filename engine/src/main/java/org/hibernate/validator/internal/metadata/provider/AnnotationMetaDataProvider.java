@@ -136,8 +136,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		constrainedElements.addAll( getMethodMetaData( beanClass ) );
 		constrainedElements.addAll( getConstructorMetaData( beanClass ) );
 
-		//TODO GM: currently class level constraints are represented by a PropertyMetaData. This
-		//works but seems somewhat unnatural
 		Set<MetaConstraint<?>> classLevelConstraints = getClassLevelConstraints( beanClass );
 		if ( !classLevelConstraints.isEmpty() ) {
 			ConstrainedType classLevelMetaData =

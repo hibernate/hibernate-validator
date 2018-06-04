@@ -35,7 +35,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
@@ -151,7 +150,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 	public static class Builder extends MetaDataBuilder {
 
 		private static final EnumSet<ConstrainedElementKind> SUPPORTED_ELEMENT_KINDS = EnumSet.of(
-				ConstrainedElementKind.TYPE,
 				ConstrainedElementKind.FIELD,
 				ConstrainedElementKind.METHOD
 		);
@@ -167,15 +165,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			this.propertyName = constrainedProperty.getProperty().getName();
 			this.propertyType = constrainedProperty.getProperty().getType();
 			add( constrainedProperty );
-		}
-
-		public Builder(Class<?> beanClass, ConstrainedType constrainedType, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-				ValueExtractorManager valueExtractorManager) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
-
-			this.propertyName = null;
-			this.propertyType = null;
-			add( constrainedType );
 		}
 
 		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedMethod, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
