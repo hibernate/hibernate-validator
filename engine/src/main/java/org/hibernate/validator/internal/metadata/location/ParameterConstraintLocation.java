@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.location;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -19,17 +20,22 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class ParameterConstraintLocation implements ConstraintLocation {
 
 	private final Callable callable;
 	private final int index;
 	private final Type typeForValidatorResolution;
+	private final ConstraintLocationKind kind;
 
 	public ParameterConstraintLocation(Callable callable, int index) {
 		this.callable = callable;
 		this.index = index;
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( callable.getParameterGenericType( index ) );
+		this.kind = callable.getConstrainedElementKind() == ConstrainedElementKind.CONSTRUCTOR
+				? ConstraintLocationKind.CONSTRUCTOR
+				: ConstraintLocationKind.METHOD;
 	}
 
 	@Override
@@ -62,8 +68,13 @@ public class ParameterConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
+	public ConstraintLocationKind getKind() {
+		return kind;
+	}
+
+	@Override
 	public String toString() {
-		return "ParameterConstraintLocation [executable=" + callable + ", index=" + index + "]";
+		return "ParameterConstraintLocation [callable=" + callable + ", index=" + index + "]";
 	}
 
 	@Override

@@ -88,6 +88,11 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
+	public ConstraintLocationKind getKind() {
+		return ConstraintLocationKind.TYPE_USE;
+	}
+
+	@Override
 	public String toString() {
 		return "TypeArgumentValueConstraintLocation [typeForValidatorResolution=" + StringHelper.toShortString( typeForValidatorResolution )
 				+ ", delegate=" + delegate + "]";

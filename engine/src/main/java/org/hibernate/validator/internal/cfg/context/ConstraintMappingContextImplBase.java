@@ -75,7 +75,7 @@ abstract class ConstraintMappingContextImplBase extends ConstraintContextImplBas
 				constraintHelper,
 				config.getLocation().getConstrainable(),
 				config.createAnnotationDescriptor(),
-				config.getConstraintLocationKind(),
+				config.getLocation().getKind(),
 				getConstraintType()
 		);
 

@@ -19,8 +19,6 @@ import javax.validation.ValidationException;
 import org.hibernate.validator.cfg.AnnotationDef;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
@@ -34,6 +32,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
  * related to its location (bean type etc.).
  *
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 class ConfiguredConstraint<A extends Annotation> {
 
@@ -44,49 +43,36 @@ class ConfiguredConstraint<A extends Annotation> {
 
 	private final ConstraintDef<?, A> constraint;
 	private final ConstraintLocation location;
-	private final ConstraintLocationKind kind;
 
-	private ConfiguredConstraint(ConstraintDef<?, A> constraint, ConstraintLocation location, ConstraintLocationKind kind) {
+	private ConfiguredConstraint(ConstraintDef<?, A> constraint, ConstraintLocation location) {
 		this.constraint = constraint;
 		this.location = location;
-		this.kind = kind;
 	}
 
 	static <A extends Annotation> ConfiguredConstraint<A> forType(ConstraintDef<?, A> constraint, Class<?> beanType) {
-		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forClass( beanType ), ConstraintLocationKind.TYPE );
+		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forClass( beanType ) );
 	}
 
 	static <A extends Annotation> ConfiguredConstraint<A> forFieldProperty(ConstraintDef<?, A> constraint, JavaBeanField javaBeanField) {
-		return new ConfiguredConstraint<>(
-				constraint,
-				ConstraintLocation.forField( javaBeanField ),
-				ConstraintLocationKind.FIELD
-		);
+		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forField( javaBeanField ) );
 	}
 
 	public static <A extends Annotation> ConfiguredConstraint<A> forParameter(ConstraintDef<?, A> constraint, Callable callable, int parameterIndex) {
-		return new ConfiguredConstraint<>(
-				constraint, ConstraintLocation.forParameter( callable, parameterIndex ), getConstraintLocationKindFromCallable( callable )
-		);
+		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forParameter( callable, parameterIndex ) );
 	}
 
 	public static <A extends Annotation> ConfiguredConstraint<A> forExecutable(ConstraintDef<?, A> constraint, Callable callable) {
-		return new ConfiguredConstraint<>(
-				constraint, ConstraintLocation.forReturnValue( callable ), getConstraintLocationKindFromCallable( callable )
-		);
+		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forReturnValue( callable ) );
 	}
 
 	public static <A extends Annotation> ConfiguredConstraint<A> forCrossParameter(ConstraintDef<?, A> constraint, Callable callable) {
-		return new ConfiguredConstraint<>(
-				constraint, ConstraintLocation.forCrossParameter( callable ), getConstraintLocationKindFromCallable( callable )
-		);
+		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forCrossParameter( callable ) );
 	}
 
 	public static <A extends Annotation> ConfiguredConstraint<A> forTypeArgument(ConstraintDef<?, A> constraint, ConstraintLocation delegate, TypeVariable<?> typeArgument, Type typeOfAnnotatedElement) {
 		return new ConfiguredConstraint<>(
 				constraint,
-				ConstraintLocation.forTypeArgument( delegate, typeArgument, typeOfAnnotatedElement ),
-				ConstraintLocationKind.TYPE_USE
+				ConstraintLocation.forTypeArgument( delegate, typeArgument, typeOfAnnotatedElement )
 		);
 	}
 
@@ -114,16 +100,6 @@ class ConfiguredConstraint<A extends Annotation> {
 	@Override
 	public String toString() {
 		return constraint.toString();
-	}
-
-	public ConstraintLocationKind getConstraintLocationKind() {
-		return kind;
-	}
-
-	private static ConstraintLocationKind getConstraintLocationKindFromCallable(Callable callable) {
-		return callable.getConstrainedElementKind() == ConstrainedElementKind.CONSTRUCTOR
-				? ConstraintLocationKind.CONSTRUCTOR
-				: ConstraintLocationKind.METHOD;
 	}
 
 	/**

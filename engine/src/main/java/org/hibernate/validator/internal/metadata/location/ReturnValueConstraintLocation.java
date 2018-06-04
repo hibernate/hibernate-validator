@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.location;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -19,13 +20,19 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
 class ReturnValueConstraintLocation implements ConstraintLocation {
 
 	private final Callable callable;
 
+	private final ConstraintLocationKind kind;
+
 	ReturnValueConstraintLocation(Callable callable) {
 		this.callable = callable;
+		this.kind = callable.getConstrainedElementKind() == ConstrainedElementKind.CONSTRUCTOR
+				? ConstraintLocationKind.CONSTRUCTOR
+				: ConstraintLocationKind.METHOD;
 	}
 
 	@Override
@@ -54,8 +61,13 @@ class ReturnValueConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
+	public ConstraintLocationKind getKind() {
+		return kind;
+	}
+
+	@Override
 	public String toString() {
-		return "ReturnValueConstraintLocation [executable=" + callable + "]";
+		return "ReturnValueConstraintLocation [callable=" + callable + "]";
 	}
 
 	@Override

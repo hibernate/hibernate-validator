@@ -239,7 +239,7 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 				constraintHelper,
 				config.getLocation().getConstrainable(),
 				config.createAnnotationDescriptor(),
-				config.getConstraintLocationKind(),
+				config.getLocation().getKind(),
 				getConstraintType()
 		);
 
