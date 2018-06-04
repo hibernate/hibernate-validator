@@ -18,4 +18,9 @@ public class FieldPropertyConstraintLocation extends PropertyConstraintLocation<
 	FieldPropertyConstraintLocation(JavaBeanField javaBeanGetter) {
 		super( javaBeanGetter );
 	}
+
+	@Override
+	public ConstraintLocationKind getKind() {
+		return ConstraintLocationKind.FIELD;
+	}
 }

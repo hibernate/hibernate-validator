@@ -97,6 +97,11 @@ public interface ConstraintLocation {
 	 */
 	Object getValue(Object parent);
 
+	/**
+	 * Returns the nature of the constraint location.
+	 */
+	ConstraintLocationKind getKind();
+
 	enum ConstraintLocationKind {
 		TYPE( ElementType.TYPE ),
 		CONSTRUCTOR( ElementType.CONSTRUCTOR ),

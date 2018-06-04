@@ -18,6 +18,7 @@ import org.hibernate.validator.internal.util.TypeHelper;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 class BeanConstraintLocation implements ConstraintLocation {
 
@@ -64,6 +65,11 @@ class BeanConstraintLocation implements ConstraintLocation {
 	@Override
 	public Object getValue(Object parent) {
 		return parent;
+	}
+
+	@Override
+	public ConstraintLocationKind getKind() {
+		return ConstraintLocationKind.TYPE;
 	}
 
 	@Override

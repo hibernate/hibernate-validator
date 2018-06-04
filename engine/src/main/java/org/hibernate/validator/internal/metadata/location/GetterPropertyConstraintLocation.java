@@ -18,4 +18,9 @@ public class GetterPropertyConstraintLocation extends PropertyConstraintLocation
 	GetterPropertyConstraintLocation(JavaBeanGetter javaBeanGetter) {
 		super( javaBeanGetter );
 	}
+
+	@Override
+	public ConstraintLocationKind getKind() {
+		return ConstraintLocationKind.METHOD;
+	}
 }

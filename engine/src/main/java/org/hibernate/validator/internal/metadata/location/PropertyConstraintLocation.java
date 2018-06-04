@@ -16,6 +16,7 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
  * An abstract property constraint location.
  *
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
 public abstract class PropertyConstraintLocation<T extends Property> implements ConstraintLocation {
 
