@@ -123,7 +123,7 @@ public class MetaConstraint<A extends Annotation> {
 	}
 
 	private boolean doValidateConstraint(ValidationContext<?> executionContext, ValueContext<?, ?> valueContext) {
-		valueContext.setElementType( getConstraintLocationKind().getElementType() );
+		valueContext.setConstraintLocationKind( getConstraintLocationKind() );
 		boolean validationResult = constraintTree.validateConstraints( executionContext, valueContext );
 
 		return validationResult;

@@ -94,7 +94,6 @@ class PropertyValidationContext<T> extends AbstractValidationContext<T> {
 				localContext.getCurrentValidatedValue(),
 				propertyPath,
 				constraintDescriptor,
-				localContext.getElementType(),
 				constraintViolationCreationContext.getDynamicPayload()
 		);
 	}

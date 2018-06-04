@@ -129,7 +129,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private final boolean isReportAsSingleInvalidConstraint;
 
 	/**
-	 * Describes on which level ({@code TYPE}, {@code METHOD}, {@code FIELD}) the constraint was
+	 * Describes on which level ({@code TYPE}, {@code METHOD}, {@code FIELD}...) the constraint was
 	 * defined on.
 	 */
 	private final ConstraintLocationKind constraintLocationKind;
@@ -165,12 +165,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	public ConstraintDescriptorImpl(ConstraintHelper constraintHelper,
 			Constrainable constrainable,
 			ConstraintAnnotationDescriptor<T> annotationDescriptor,
-			ConstraintLocationKind kind,
+			ConstraintLocationKind constraintLocationKind,
 			Class<?> implicitGroup,
 			ConstraintOrigin definedOn,
 			ConstraintType externalConstraintType) {
 		this.annotationDescriptor = annotationDescriptor;
-		this.constraintLocationKind = kind;
+		this.constraintLocationKind = constraintLocationKind;
 		this.definedOn = definedOn;
 		this.isReportAsSingleInvalidConstraint = annotationDescriptor.getType().isAnnotationPresent(
 				ReportAsSingleViolation.class
@@ -227,16 +227,16 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	public ConstraintDescriptorImpl(ConstraintHelper constraintHelper,
 			Constrainable constrainable,
 			ConstraintAnnotationDescriptor<T> annotationDescriptor,
-			ConstraintLocationKind kind) {
-		this( constraintHelper, constrainable, annotationDescriptor, kind, null, ConstraintOrigin.DEFINED_LOCALLY, null );
+			ConstraintLocationKind constraintLocationKind) {
+		this( constraintHelper, constrainable, annotationDescriptor, constraintLocationKind, null, ConstraintOrigin.DEFINED_LOCALLY, null );
 	}
 
 	public ConstraintDescriptorImpl(ConstraintHelper constraintHelper,
 			Constrainable constrainable,
 			ConstraintAnnotationDescriptor<T> annotationDescriptor,
-			ConstraintLocationKind kind,
+			ConstraintLocationKind constraintLocationKind,
 			ConstraintType constraintType) {
-		this( constraintHelper, constrainable, annotationDescriptor, kind, null, ConstraintOrigin.DEFINED_LOCALLY, constraintType );
+		this( constraintHelper, constrainable, annotationDescriptor, constraintLocationKind, null, ConstraintOrigin.DEFINED_LOCALLY, constraintType );
 	}
 
 	public ConstraintAnnotationDescriptor<T> getAnnotationDescriptor() {

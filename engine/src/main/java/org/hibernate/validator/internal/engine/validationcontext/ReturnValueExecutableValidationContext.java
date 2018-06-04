@@ -101,7 +101,6 @@ public class ReturnValueExecutableValidationContext<T> extends AbstractValidatio
 				valueContext.getCurrentValidatedValue(),
 				propertyPath,
 				constraintDescriptor,
-				valueContext.getElementType(),
 				executableReturnValue,
 				constraintViolationCreationContext.getDynamicPayload()
 		);

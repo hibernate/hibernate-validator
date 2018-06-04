@@ -129,7 +129,6 @@ public class ParameterExecutableValidationContext<T> extends AbstractValidationC
 				valueContext.getCurrentValidatedValue(),
 				propertyPath,
 				constraintDescriptor,
-				valueContext.getElementType(),
 				executableParameters,
 				constraintViolationCreationContext.getDynamicPayload()
 		);
