@@ -7,7 +7,7 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
-import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanConstructor;
 
 /**
  * Constraint mapping creational context representing a constructor.
@@ -16,7 +16,7 @@ import org.hibernate.validator.internal.properties.Callable;
  */
 class ConstructorConstraintMappingContextImpl extends ExecutableConstraintMappingContextImpl implements ConstructorConstraintMappingContext {
 
-	<T> ConstructorConstraintMappingContextImpl(TypeConstraintMappingContextImpl<T> typeContext, Callable constructor) {
+	<T> ConstructorConstraintMappingContextImpl(TypeConstraintMappingContextImpl<T> typeContext, JavaBeanConstructor constructor) {
 		super( typeContext, constructor );
 	}
 

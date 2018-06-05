@@ -69,11 +69,15 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 			return new JavaBeanConstructor( (Constructor<?>) executable );
 		}
 
-		if ( ReflectionHelper.isGetterMethod( executable ) ) {
-			return new JavaBeanGetter( (Method) executable );
+		return of( ( (Method) executable ) );
+	}
+
+	public static JavaBeanMethod of(Method method) {
+		if ( ReflectionHelper.isGetterMethod( method ) ) {
+			return new JavaBeanGetter( method );
 		}
 
-		return new JavaBeanMethod( (Method) executable );
+		return new JavaBeanMethod( method );
 	}
 
 	@Override
