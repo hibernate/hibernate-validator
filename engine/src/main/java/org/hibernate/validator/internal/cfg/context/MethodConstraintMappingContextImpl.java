@@ -7,7 +7,7 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
-import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanMethod;
 
 /**
  * Constraint mapping creational context representing a method.
@@ -16,7 +16,7 @@ import org.hibernate.validator.internal.properties.Callable;
  */
 class MethodConstraintMappingContextImpl extends ExecutableConstraintMappingContextImpl implements MethodConstraintMappingContext {
 
-	MethodConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Callable callable) {
+	MethodConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, JavaBeanMethod callable) {
 		super( typeContext, callable );
 	}
 

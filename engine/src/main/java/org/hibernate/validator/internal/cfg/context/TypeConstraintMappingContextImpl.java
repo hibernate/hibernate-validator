@@ -39,6 +39,7 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanConstructor;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanMethod;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -150,17 +151,17 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			throw LOG.getBeanDoesNotContainMethodException( beanClass, name, parameterTypes );
 		}
 
-		JavaBeanExecutable<?> javaBeanExecutable = JavaBeanExecutable.of( method );
+		JavaBeanMethod javaBeanMethod = JavaBeanExecutable.of( method );
 
-		if ( configuredMembers.contains( javaBeanExecutable ) ) {
+		if ( configuredMembers.contains( javaBeanMethod ) ) {
 			throw LOG.getMethodHasAlreadyBeenConfiguredViaProgrammaticApiException(
 					beanClass,
 					ExecutableHelper.getExecutableAsString( name, parameterTypes )
 			);
 		}
 
-		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, javaBeanExecutable );
-		configuredMembers.add( javaBeanExecutable );
+		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, javaBeanMethod );
+		configuredMembers.add( javaBeanMethod );
 		executableContexts.add( context );
 
 		return context;
