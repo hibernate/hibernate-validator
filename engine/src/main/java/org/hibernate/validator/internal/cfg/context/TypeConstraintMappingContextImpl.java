@@ -122,24 +122,20 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		Contracts.assertNotNull( elementType, "The element type must not be null." );
 		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
 
-		Property member = getProperty(
+		Property foundProperty = getProperty(
 				beanClass, property, elementType
 		);
 
-		if ( member == null || member.getDeclaringClass() != beanClass ) {
+		if ( foundProperty == null || foundProperty.getDeclaringClass() != beanClass ) {
 			throw LOG.getUnableToFindPropertyWithAccessException( beanClass, property, elementType );
 		}
 
-		if ( configuredMembers.contains( member ) ) {
+		if ( configuredMembers.contains( foundProperty ) ) {
 			throw LOG.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass, property );
 		}
 
-		PropertyConstraintMappingContextImpl context = new PropertyConstraintMappingContextImpl(
-				this,
-				member
-		);
-
-		configuredMembers.add( member );
+		PropertyConstraintMappingContextImpl context = PropertyConstraintMappingContextImpl.context( elementType, this, foundProperty );
+		configuredMembers.add( foundProperty );
 		propertyContexts.add( context );
 		return context;
 	}

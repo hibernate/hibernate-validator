@@ -7,8 +7,8 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
 
-import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
@@ -17,15 +17,13 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one bean property.
@@ -33,47 +31,47 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
+ * @author Marko Bekhta
  */
-final class PropertyConstraintMappingContextImpl
+abstract class PropertyConstraintMappingContextImpl<T extends Property>
 		extends CascadableConstraintMappingContextImplBase<PropertyConstraintMappingContext>
 		implements PropertyConstraintMappingContext {
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final TypeConstraintMappingContextImpl<?> typeContext;
 
 	// either Field or Method
-	private final Property property;
+	private final T property;
 	private final ConstraintLocation location;
 
-	PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Property property) {
+	static PropertyConstraintMappingContextImpl context(ElementType elementType, TypeConstraintMappingContextImpl<?> typeContext, Property property) {
+		if ( elementType == ElementType.FIELD ) {
+			return new FieldPropertyConstraintMappingContextImpl(
+					typeContext,
+					property.as( JavaBeanField.class )
+			);
+		}
+		else if ( elementType == ElementType.METHOD ) {
+			return new GetterPropertyConstraintMappingContextImpl(
+					typeContext,
+					property.as( JavaBeanGetter.class )
+			);
+		}
+		else {
+			throw LOG.getUnexpectedElementType( elementType, ElementType.FIELD, ElementType.METHOD );
+		}
+	}
+
+	protected PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, T property, ConstraintLocation location) {
 		super( typeContext.getConstraintMapping(), property.getType() );
 		this.typeContext = typeContext;
 		this.property = property;
-		this.location = property instanceof JavaBeanField
-				? ConstraintLocation.forField( property.as( JavaBeanField.class ) )
-				: ConstraintLocation.forGetter( property.as( JavaBeanGetter.class ) );
+		this.location = location;
 	}
 
 	@Override
 	protected PropertyConstraintMappingContextImpl getThis() {
-		return this;
-	}
-
-	@Override
-	public PropertyConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		if ( property instanceof JavaBeanField ) {
-			super.addConstraint(
-					ConfiguredConstraint.forFieldProperty(
-							definition, property.as( JavaBeanField.class )
-					)
-			);
-		}
-		else {
-			super.addConstraint(
-					ConfiguredConstraint.forExecutable(
-							definition, property.as( Callable.class )
-					)
-			);
-		}
 		return this;
 	}
 
@@ -113,29 +111,14 @@ final class PropertyConstraintMappingContextImpl
 		return super.containerElement( this, typeContext, location, index, nestedIndexes );
 	}
 
-	ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
-		if ( property instanceof JavaBeanField ) {
-			return new ConstrainedField(
-					ConfigurationSource.API,
-					property,
-					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-					getCascadingMetaDataBuilder()
-			);
-		}
-		else {
-			return new ConstrainedExecutable(
-					ConfigurationSource.API,
-					property.as( Callable.class ),
-					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-					getCascadingMetaDataBuilder()
-			);
-		}
-	}
+	abstract ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager);
 
 	@Override
 	protected ConstraintType getConstraintType() {
 		return ConstraintType.GENERIC;
+	}
+
+	protected T getProperty() {
+		return property;
 	}
 }
