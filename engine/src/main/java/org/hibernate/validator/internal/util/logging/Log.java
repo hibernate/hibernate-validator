@@ -860,4 +860,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 244, value = "ConstrainedElement expected class was %1$s, but instead received %2$s.")
 	AssertionError getUnexpectedConstraintElementType(@FormatWith(ClassObjectFormatter.class) Class<?> expecting, @FormatWith(ClassObjectFormatter.class) Class<?> got);
+
+	@Message(id = 245, value = "Allowed ElementTypes are %2$s, but instead received %1$s.")
+	AssertionError getUnexpectedElementType(ElementType received, @FormatWith(ObjectArrayFormatter.class) ElementType... got);
 }
