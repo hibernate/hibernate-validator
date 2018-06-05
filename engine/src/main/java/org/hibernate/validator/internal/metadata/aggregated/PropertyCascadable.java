@@ -6,14 +6,13 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Property;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 
 /**
  * A {@link Cascadable} backed by a field of a Java bean.
@@ -21,23 +20,16 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
  * @author Gunnar Morling
  * @author Marko Bekhta
  */
-public class PropertyCascadable implements Cascadable {
+public abstract class PropertyCascadable implements Cascadable {
 
 	private final Property property;
 	private final Type cascadableType;
 	private final CascadingMetaData cascadingMetaData;
-	private final ElementType elementType;
 
 	PropertyCascadable(Property property, CascadingMetaData cascadingMetaData) {
 		this.property = property;
 		this.cascadableType = property.getType();
 		this.cascadingMetaData = cascadingMetaData;
-		this.elementType = property instanceof JavaBeanField ? ElementType.FIELD : ElementType.METHOD;
-	}
-
-	@Override
-	public ElementType getElementType() {
-		return elementType;
 	}
 
 	@Override
@@ -60,13 +52,13 @@ public class PropertyCascadable implements Cascadable {
 		return cascadingMetaData;
 	}
 
-	public static class Builder implements Cascadable.Builder {
+	public abstract static class Builder implements Cascadable.Builder {
 
 		private final ValueExtractorManager valueExtractorManager;
 		private final Property property;
 		private CascadingMetaDataBuilder cascadingMetaDataBuilder;
 
-		public Builder(ValueExtractorManager valueExtractorManager, Property property, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+		protected Builder(ValueExtractorManager valueExtractorManager, Property property, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 			this.valueExtractorManager = valueExtractorManager;
 			this.property = property;
 			this.cascadingMetaDataBuilder = cascadingMetaDataBuilder;
@@ -78,8 +70,20 @@ public class PropertyCascadable implements Cascadable {
 		}
 
 		@Override
-		public PropertyCascadable build() {
-			return new PropertyCascadable( property, cascadingMetaDataBuilder.build( valueExtractorManager, property ) );
+		public Cascadable build() {
+			return create( property, cascadingMetaDataBuilder.build( valueExtractorManager, property ) );
+		}
+
+		protected abstract Cascadable create(Property property, CascadingMetaData build);
+
+		public static Cascadable.Builder builder(ConstrainedElementKind constrainedElementKind, ValueExtractorManager valueExtractorManager, Property property, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+			if ( ConstrainedElementKind.FIELD == constrainedElementKind ) {
+				return new FieldCascadable.Builder( valueExtractorManager, property, cascadingMetaDataBuilder );
+			}
+			else if ( ConstrainedElementKind.METHOD == constrainedElementKind ) {
+				return new GetterCascadable.Builder( valueExtractorManager, property, cascadingMetaDataBuilder );
+			}
+			throw new IllegalStateException( "It should either be field or method." );
 		}
 	}
 }

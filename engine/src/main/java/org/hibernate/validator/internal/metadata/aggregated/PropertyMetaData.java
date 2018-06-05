@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,7 +39,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
@@ -211,31 +211,31 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 			if ( constrainedElement.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ||
 					constrainedElement.getCascadingMetaDataBuilder().hasGroupConversionsOnAnnotatedObjectOrContainerElements() ) {
-				if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
-					Property property = ( (ConstrainedField) constrainedElement ).getProperty();
-					Cascadable.Builder builder = cascadableBuilders.get( property );
 
+				Optional<Constrainable> constrainable = getConstrainableFromConstrainedElement( constrainedElement );
+
+				if ( constrainable.isPresent() ) {
+					Property property = constrainable.get().as( Property.class );
+					Cascadable.Builder builder = cascadableBuilders.get( property );
 					if ( builder == null ) {
-						builder = new PropertyCascadable.Builder( valueExtractorManager, property, constrainedElement.getCascadingMetaDataBuilder() );
+						builder = PropertyCascadable.Builder.builder( constrainedElement.getKind(), valueExtractorManager, property, constrainedElement.getCascadingMetaDataBuilder() );
 						cascadableBuilders.put( property, builder );
 					}
 					else {
 						builder.mergeCascadingMetaData( constrainedElement.getCascadingMetaDataBuilder() );
 					}
 				}
-				else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
-					Callable method = ( (ConstrainedExecutable) constrainedElement ).getCallable();
-					Cascadable.Builder builder = cascadableBuilders.get( method );
-
-					if ( builder == null ) {
-						builder = new PropertyCascadable.Builder( valueExtractorManager, method.as( Property.class ), constrainedElement.getCascadingMetaDataBuilder() );
-						cascadableBuilders.put( method, builder );
-					}
-					else {
-						builder.mergeCascadingMetaData( constrainedElement.getCascadingMetaDataBuilder() );
-					}
-				}
 			}
+		}
+
+		private Optional<Constrainable> getConstrainableFromConstrainedElement(ConstrainedElement constrainedElement) {
+			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
+				return Optional.of( ( (ConstrainedField) constrainedElement ).getProperty() );
+			}
+			else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
+				return Optional.of( ( (ConstrainedExecutable) constrainedElement ).getCallable() );
+			}
+			return Optional.empty();
 		}
 
 		@Override
@@ -256,7 +256,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			ConstraintLocation converted = null;
 
 			// fast track if it's a regular constraint
-			if ( !(constraint.getLocation() instanceof TypeArgumentConstraintLocation) ) {
+			if ( !( constraint.getLocation() instanceof TypeArgumentConstraintLocation ) ) {
 				// Change the constraint location to a GetterConstraintLocation if it is not already one
 				if ( constraint.getLocation() instanceof GetterPropertyConstraintLocation ) {
 					converted = constraint.getLocation();
