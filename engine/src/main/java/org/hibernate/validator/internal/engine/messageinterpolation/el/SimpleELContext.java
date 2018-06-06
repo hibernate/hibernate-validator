@@ -15,7 +15,6 @@ import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 import javax.el.ResourceBundleELResolver;
 import javax.el.StandardELContext;
-import javax.el.StaticFieldELResolver;
 
 /**
  * @author Hardy Ferentschik
@@ -25,7 +24,6 @@ public class SimpleELContext extends StandardELContext {
 	private static final ELResolver DEFAULT_RESOLVER = new CompositeELResolver() {
 		{
 			add( new RootResolver() );
-			add( new StaticFieldELResolver() );
 			add( new ArrayELResolver( true ) );
 			add( new ListELResolver( true ) );
 			add( new MapELResolver( true ) );
