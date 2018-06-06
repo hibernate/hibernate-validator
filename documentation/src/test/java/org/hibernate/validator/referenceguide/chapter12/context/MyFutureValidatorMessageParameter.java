@@ -10,7 +10,7 @@ import javax.validation.constraints.Future;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 
 //tag::include[]
-public class MyFutureValidator implements ConstraintValidator<Future, Instant> {
+public class MyFutureValidatorMessageParameter implements ConstraintValidator<Future, Instant> {
 
 	@Override
 	public void initialize(Future constraintAnnotation) {
@@ -31,8 +31,8 @@ public class MyFutureValidator implements ConstraintValidator<Future, Instant> {
 		if ( !value.isAfter( now ) ) {
 			hibernateContext.disableDefaultConstraintViolation();
 			hibernateContext
-					.addExpressionVariable( "now", now )
-					.buildConstraintViolationWithTemplate( "Must be after ${now}" )
+					.addMessageParameter( "now", now )
+					.buildConstraintViolationWithTemplate( "Must be after {now}" )
 					.addConstraintViolation();
 
 			return false;

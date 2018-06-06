@@ -456,10 +456,11 @@ custom extensions for both of these interfaces.
 `HibernateConstraintValidatorContext` is a subtype of `ConstraintValidatorContext` which allows you to:
 
 * set arbitrary parameters for interpolation via the Expression Language message interpolation
-facility using `HibernateConstraintValidatorContext#addExpressionVariable(String, Object)`.
+facility using `HibernateConstraintValidatorContext#addExpressionVariable(String, Object)`
+or `HibernateConstraintValidatorContext#addMessageParameter(String, Object)`.
 +
-[[example-custom-message-parameter]]
-.Custom `@Future` validator with message parameters
+[[example-custom-expression-variable]]
+.Custom `@Future` validator injecting an expression variable
 ====
 [source, JAVA, indent=0]
 ----
@@ -467,12 +468,29 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/context/My
 ----
 ====
 +
+[[example-custom-message-parameter]]
+.Custom `@Future` validator injecting a message parameter
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/context/MyFutureValidatorMessageParameter.java[tags=include]
+----
+====
++
 [NOTE]
 ====
-Note that the parameters specified via `addExpressionVariable(String, Object)` are global and apply
-to all constraint violations created by this `isValid()` invocation. This includes the default
-constraint violation, but also all violations created by the `ConstraintViolationBuilder`. You can,
-however, update the parameters between invocations of
+Apart from the syntax, the main difference between message parameters and expression variables is that message parameters
+are simply interpolated whereas expression variables are interpreted using the expression language engine.
+In practice, it should not change anything.
+====
++
+[NOTE]
+====
+Note that the parameters specified via `addExpressionVariable(String, Object)` and
+`addMessageParameter(String, Object)` are global and apply to all constraint violations created by
+this `isValid()` invocation.
+This includes the default constraint violation, but also all violations created by the `ConstraintViolationBuilder`.
+You can, however, update the parameters between invocations of
 `ConstraintViolationBuilder#addConstraintViolation()`.
 ====
 * set an arbitrary dynamic payload - see <<section-dynamic-payload>>
