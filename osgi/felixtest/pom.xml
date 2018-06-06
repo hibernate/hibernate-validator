@@ -28,7 +28,7 @@
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
-                <version>${arquillian.version}</version>
+                <version>${version.org.jboss.arquillian}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -76,7 +76,7 @@
         <dependency>
             <groupId>fish.payara.arquillian</groupId>
             <artifactId>arquillian-payara-server-4-managed</artifactId> 
-            <version>${payara-arquillian.version}</version>
+            <version>${version.fish.payara.arquillian}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -131,7 +131,7 @@
                                 <artifactItem>
                                     <groupId>fish.payara.distributions</groupId>
                                     <artifactId>payara</artifactId>
-                                    <version>${payara.version}</version>
+                                    <version>${version.fish.payara}</version>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}</outputDirectory>

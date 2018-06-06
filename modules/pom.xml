@@ -23,21 +23,18 @@
 
     <properties>
         <module.xml.targetdir>${project.build.directory}/modules</module.xml.targetdir>
-        <hibernate.validator.module.slot>main</hibernate.validator.module.slot>
-        <hibernate.validator.cdi.module.slot>main</hibernate.validator.cdi.module.slot>
-        <javax.validation.api.module.slot>main</javax.validation.api.module.slot>
 
         <!-- WildFly current -->
-        <wildfly-main.original.target-dir>${project.build.directory}/wildfly-original/wildfly-${wildfly.version}</wildfly-main.original.target-dir>
-        <wildfly-main.patched.target-dir>${project.build.directory}/wildfly-patched/wildfly-${wildfly.version}</wildfly-main.patched.target-dir>
+        <wildfly-main.original.target-dir>${project.build.directory}/wildfly-original/wildfly-${version.wildfly}</wildfly-main.original.target-dir>
+        <wildfly-main.patched.target-dir>${project.build.directory}/wildfly-patched/wildfly-${version.wildfly}</wildfly-main.patched.target-dir>
         <wildfly-main.patch-file>${project.build.directory}/wildfly-current-hv-patch.zip</wildfly-main.patch-file>
 
         <!-- WildFly secondary version -->
-        <wildfly-secondary.original.target-dir>${project.build.directory}/wildfly-original/wildfly-${wildfly-secondary.version}</wildfly-secondary.original.target-dir>
-        <wildfly-secondary.patched.target-dir>${project.build.directory}/wildfly-patched/wildfly-${wildfly-secondary.version}</wildfly-secondary.patched.target-dir>
+        <wildfly-secondary.original.target-dir>${project.build.directory}/wildfly-original/wildfly-${version.wildfly.secondary}</wildfly-secondary.original.target-dir>
+        <wildfly-secondary.patched.target-dir>${project.build.directory}/wildfly-patched/wildfly-${version.wildfly.secondary}</wildfly-secondary.patched.target-dir>
         <wildfly-secondary.patch-file>${project.build.directory}/wildfly-secondary-hv-patch.zip</wildfly-secondary.patch-file>
 
-        <patch-gen-maven-plugin.argLine.add-opens></patch-gen-maven-plugin.argLine.add-opens>
+        <patch-gen.system.args></patch-gen.system.args>
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
@@ -105,13 +102,13 @@
                                 <artifact>
                                     <file>${wildfly-main.patch-file}</file>
                                     <type>zip</type>
-                                    <classifier>wildfly-${wildfly.version}-patch</classifier>
+                                    <classifier>wildfly-${version.wildfly}-patch</classifier>
                                 </artifact>
                                 <!-- WildFly secondary version -->
                                 <artifact>
                                     <file>${wildfly-secondary.patch-file}</file>
                                     <type>zip</type>
-                                    <classifier>wildfly-${wildfly-secondary.version}-patch</classifier>
+                                    <classifier>wildfly-${version.wildfly.secondary}-patch</classifier>
                                 </artifact>
                             </artifacts>
                         </configuration>
@@ -173,7 +170,7 @@
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
                                     <artifactId>wildfly-dist</artifactId>
-                                    <version>${wildfly.version}</version>
+                                    <version>${version.wildfly}</version>
                                     <type>tar.gz</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/wildfly-original</outputDirectory>
@@ -181,7 +178,7 @@
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
                                     <artifactId>wildfly-dist</artifactId>
-                                    <version>${wildfly.version}</version>
+                                    <version>${version.wildfly}</version>
                                     <type>tar.gz</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/wildfly-patched</outputDirectory>
@@ -190,7 +187,7 @@
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
                                     <artifactId>wildfly-dist</artifactId>
-                                    <version>${wildfly-secondary.version}</version>
+                                    <version>${version.wildfly.secondary}</version>
                                     <type>tar.gz</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/wildfly-original</outputDirectory>
@@ -198,7 +195,7 @@
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
                                     <artifactId>wildfly-dist</artifactId>
-                                    <version>${wildfly-secondary.version}</version>
+                                    <version>${version.wildfly.secondary}</version>
                                     <type>tar.gz</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/wildfly-patched</outputDirectory>
@@ -219,11 +216,11 @@
                                 <artifactItem>
                                     <groupId>javax.validation</groupId>
                                     <artifactId>validation-api</artifactId>
-                                    <version>${bv.api.version}</version>
+                                    <version>${version.javax.validation}</version>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${wildfly-main.patched.target-dir}/modules/system/layers/base/javax/validation/api/main</outputDirectory>
                                     <!-- Specifying name to avoid timestamp in version on CI -->
-                                    <destFileName>validation-api-${bv.api.version}.jar</destFileName>
+                                    <destFileName>validation-api-${version.javax.validation}.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
@@ -245,11 +242,11 @@
                                 <artifactItem>
                                     <groupId>javax.validation</groupId>
                                     <artifactId>validation-api</artifactId>
-                                    <version>${bv.api.version}</version>
+                                    <version>${version.javax.validation}</version>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${wildfly-secondary.patched.target-dir}/modules/system/layers/base/javax/validation/api/main</outputDirectory>
                                     <!-- Specifying name to avoid timestamp in version on CI -->
-                                    <destFileName>validation-api-${bv.api.version}.jar</destFileName>
+                                    <destFileName>validation-api-${version.javax.validation}.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
@@ -284,7 +281,7 @@
                             <goal>generate-patch</goal>
                         </goals>
                         <configuration>
-                            <argLine>${patch-gen-maven-plugin.argLine.add-opens}</argLine>
+                            <argLine>${patch-gen.system.args}</argLine>
                             <appliesToDist>${wildfly-main.original.target-dir}</appliesToDist>
                             <patchConfig>${module.xml.targetdir}/wildfly-current-patch.xml</patchConfig>
                             <updatedDist>${wildfly-main.patched.target-dir}</updatedDist>
@@ -298,7 +295,7 @@
                             <goal>generate-patch</goal>
                         </goals>
                         <configuration>
-                            <argLine>${patch-gen-maven-plugin.argLine.add-opens}</argLine>
+                            <argLine>${patch-gen.system.args}</argLine>
                             <appliesToDist>${wildfly-secondary.original.target-dir}</appliesToDist>
                             <patchConfig>${module.xml.targetdir}/wildfly-secondary-patch.xml</patchConfig>
                             <updatedDist>${wildfly-secondary.patched.target-dir}</updatedDist>
@@ -317,7 +314,7 @@
                 <jdk>[9,)</jdk>
             </activation>
             <properties>
-                <patch-gen-maven-plugin.argLine.add-opens>--add-opens=java.base/java.lang=ALL-UNNAMED</patch-gen-maven-plugin.argLine.add-opens>
+                <patch-gen.system.args>--add-opens=java.base/java.lang=ALL-UNNAMED</patch-gen.system.args>
             </properties>
         </profile>
     </profiles>

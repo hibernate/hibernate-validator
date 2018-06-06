@@ -77,13 +77,13 @@
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-container-karaf</artifactId>
-            <version>${pax.exam.version}</version>
+            <version>${version.org.ops4j.pax.exam}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf</groupId>
             <artifactId>apache-karaf</artifactId>
-            <version>${apache.karaf.version}</version>
+            <version>${version.org.apache.karaf}</version>
             <type>tar.gz</type>
             <scope>test</scope>
             <!-- We just need the archive, without downloading its gazillion of dependencies.
@@ -98,31 +98,31 @@
         <dependency>
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>org.apache.karaf.features.core</artifactId>
-            <version>${apache.karaf.version}</version>
+            <version>${version.org.apache.karaf}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-junit4</artifactId>
-            <version>${pax.exam.version}</version>
+            <version>${version.org.ops4j.pax.exam}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam</artifactId>
-            <version>${pax.exam.version}</version>
+            <version>${version.org.ops4j.pax.exam}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
-            <version>${pax.url.version}</version>
+            <version>${version.org.ops4j.pax.url}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>${osgi-core.version}</version>
+            <version>${version.org.osgi.core}</version>
             <scope>test</scope>
         </dependency>
 

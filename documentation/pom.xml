@@ -40,7 +40,7 @@
 
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
-        <maven-surefire-plugin.argLine>-Duser.language=en</maven-surefire-plugin.argLine>
+        <surefire.jvm.args>-Duser.language=en</surefire.jvm.args>
 
         <forbiddenapis-junit.path>forbidden-allow-junit.txt</forbiddenapis-junit.path>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
@@ -126,7 +126,7 @@
                                 <artifactItem>
                                     <groupId>org.hibernate.infra</groupId>
                                     <artifactId>hibernate-asciidoctor-theme</artifactId>
-                                    <version>${hibernate-asciidoctor-theme.version}</version>
+                                    <version>${version.org.hibernate.infra.hibernate-asciidoctor-theme}</version>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/</outputDirectory>
@@ -250,13 +250,13 @@
                         <osgi-integrationtest-sourcedir>${asciidoctor.osgi-integrationtest-source-dir}</osgi-integrationtest-sourcedir>
 
                         <hvVersion>${project.version}</hvVersion>
-                        <bvVersion>${bv.api.version}</bvVersion>
-                        <jbossLoggingVersion>${jboss.logging.version}</jbossLoggingVersion>
-                        <classmateVersion>${classmate.version}</classmateVersion>
-                        <javaxElVersion>${javax.el.version}</javaxElVersion>
+                        <bvVersion>${version.javax.validation}</bvVersion>
+                        <jbossLoggingVersion>${version.org.jboss.logging.jboss-logging}</jbossLoggingVersion>
+                        <classmateVersion>${version.com.fasterxml.classmate}</classmateVersion>
+                        <javaxElVersion>${version.org.glassfish.javax.el}</javaxElVersion>
 
-                        <wildflyVersion>${wildfly.version}</wildflyVersion>
-                        <wildflySecondaryVersion>${wildfly-secondary.version}</wildflySecondaryVersion>
+                        <wildflyVersion>${version.wildfly}</wildflyVersion>
+                        <wildflySecondaryVersion>${version.wildfly.secondary}</wildflySecondaryVersion>
 
                         <!-- URLs -->
                         <javaApiDocsUrl>${java.api-docs.base-url}/</javaApiDocsUrl>

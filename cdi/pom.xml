@@ -214,7 +214,7 @@
             </activation>
             <properties>
                 <!-- required by Weld -->
-                <maven-surefire-plugin.argLine.add-opens>--add-opens java.base/java.lang=ALL-UNNAMED</maven-surefire-plugin.argLine.add-opens>
+                <surefire.jvm.add-opens>--add-opens java.base/java.lang=ALL-UNNAMED</surefire.jvm.add-opens>
             </properties>
         </profile>
     </profiles>

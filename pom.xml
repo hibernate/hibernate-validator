@@ -95,102 +95,12 @@
     </modules>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-
-        <!-- Module names used for Java 9 modules and OSGi bundles -->
-        <hibernate-validator.module-name>org.hibernate.validator</hibernate-validator.module-name>
-        <hibernate-validator-cdi.module-name>org.hibernate.validator.cdi</hibernate-validator-cdi.module-name>
-
-        <!-- see http://maven.apache.org/general.html -->
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <!-- No need to build the javadocs per module. Aggregated javadocs are build in the distribution module. See also HV-894 -->
-        <maven.javadoc.skip>true</maven.javadoc.skip>
-
-        <bv.api.version>2.0.1.Final</bv.api.version>
-        <tck.version>2.0.3.Final</tck.version>
-
         <!-- Version to be used as baseline for API/SPI change reports -->
+
         <previous.stable>6.0.9.Final</previous.stable>
 
-        <paranamer.version>2.8</paranamer.version>
-        <javax.el.version>3.0.1-b09</javax.el.version>
-        <jboss.logging.version>3.3.2.Final</jboss.logging.version>
-        <jboss.logging.processor.version>2.1.0.Final</jboss.logging.processor.version>
-
-        <!-- Currently supported version of WildFly -->
-        <wildfly.version>12.0.0.Final</wildfly.version>
-        <!-- Used to create a patch file for the second version of WildFly we support -->
-        <wildfly-secondary.version>11.0.0.Final</wildfly-secondary.version>
-        <!-- Version used to run the TCK in incontainer mode -->
-        <wildfly-tck.version>${wildfly.version}</wildfly-tck.version>
-
-        <!--
-            These dependencies should be aligned with the ones from the WildFly version we support
-            See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
-        -->
-        <classmate.version>1.3.4</classmate.version>
-        <jsoup.version>1.8.3</jsoup.version>
-        <joda-time.version>2.9.7</joda-time.version>
-        <slf4j.version>1.7.22</slf4j.version>
-        <javax.persistence-api.version>2.2</javax.persistence-api.version>
-
-        <!--
-            These dependencies are used for integration tests with WildFly.
-            They should be aligned with the ones from the Wildfly version we support
-            See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
-        -->
-        <cdi-api.version>2.0</cdi-api.version>
-        <weld.version>3.0.3.Final</weld.version>
-        <wildfly-arquillian.version>2.1.0.Final</wildfly-arquillian.version>
-        <jboss-ejb-api_3.2_spec.version>1.0.1.Final</jboss-ejb-api_3.2_spec.version>
-
-        <!-- JavaMoney dependencies -->
-        <javax-money.version>1.0.1</javax-money.version>
-        <moneta.version>1.1</moneta.version>
-        <!-- Used in the Karaf features file: it is a dependency of Moneta -->
-        <javax-annotation-api.version>1.2</javax-annotation-api.version>
-
-        <!-- WildFly patching infrastructure -->
-        <wildfly-patch-gen-maven-plugin.version>2.0.1.Alpha5</wildfly-patch-gen-maven-plugin.version>
-        <wildfly-patch-gen-maven-plugin.woodstox.version>5.0.3</wildfly-patch-gen-maven-plugin.woodstox.version>
-        <wildfly-maven-plugin.version>1.2.1.Final</wildfly-maven-plugin.version>
-        <wildfly-core.version>4.0.0.Final</wildfly-core.version>
-
-        <!-- Test dependencies -->
-        <arquillian.version>1.1.11.Final</arquillian.version>
-        <testng.version>6.8</testng.version>
-        <!-- it must be the exact same version than the one used in the Bean Validation TCK -->
-        <assertj-core.version>3.8.0</assertj-core.version>
-        <junit.version>4.12</junit.version>
-        <easymock.version>3.4</easymock.version>
-
-        <!-- OSGi dependencies -->
-        <pax.exam.version>4.11.0</pax.exam.version>
-        <pax.url.version>2.5.2</pax.url.version>
-        <apache.karaf.version>4.1.1</apache.karaf.version>
-        <osgi-core.version>6.0.0</osgi-core.version>
-        <payara.version>5.Beta1</payara.version>
-        <payara-arquillian.version>1.0.Beta2</payara-arquillian.version>
-
-        <puppycrawl.checkstyle.version>8.1</puppycrawl.checkstyle.version>
-
-        <groovy.version>2.4.12</groovy.version>
-
-        <guava.version>23.0</guava.version>
-
-        <spring-expression.version>4.3.10.RELEASE</spring-expression.version>
-
-        <!-- Asciidoctor -->
-        <hibernate-asciidoctor-theme.version>1.0.1.Final</hibernate-asciidoctor-theme.version>
-        <hibernate-asciidoctor-extensions.version>1.0.3.Final</hibernate-asciidoctor-extensions.version>
-        <asciidoctor-maven-plugin.version>1.5.5</asciidoctor-maven-plugin.version>
-        <jruby.version>9.1.8.0</jruby.version>
-        <asciidoctorj.version>1.6.0-alpha.5</asciidoctorj.version>
-        <asciidoctorj-pdf.version>1.5.0-alpha.16</asciidoctorj-pdf.version>
-
         <!-- URLs used in javadoc and documentation generation -->
+
         <bv.spec.url>http://beanvalidation.org/2.0/spec/</bv.spec.url>
         <java.api-docs.base-url>http://docs.oracle.com/javase/8/docs/api</java.api-docs.base-url>
         <java.technotes.base-url>http://docs.oracle.com/javase/8/docs/technotes</java.technotes.base-url>
@@ -199,27 +109,172 @@
         <bv.api-docs.base-url>http://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api</bv.api-docs.base-url>
         <javamoney.api-docs.base-url>http://javamoney.github.io/apidocs</javamoney.api-docs.base-url>
 
-        <maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
+        <!-- Module names used for Java 9 modules and OSGi bundles -->
 
-        <!-- Used to add further arguments to the arg line for specific sub-modules and profiles -->
-        <maven-surefire-plugin.argLine></maven-surefire-plugin.argLine>
-        <maven-surefire-plugin.argLine.add-modules></maven-surefire-plugin.argLine.add-modules>
-        <maven-surefire-plugin.argLine.add-opens></maven-surefire-plugin.argLine.add-opens>
+        <hibernate-validator.module-name>org.hibernate.validator</hibernate-validator.module-name>
+        <hibernate-validator-cdi.module-name>org.hibernate.validator.cdi</hibernate-validator-cdi.module-name>
+
+        <!-- Dependencies versions -->
+
+        <version.javax.validation>2.0.1.Final</version.javax.validation>
+        <version.org.hibernate.beanvalidation.tck>2.0.3.Final</version.org.hibernate.beanvalidation.tck>
+
+        <version.com.thoughtworks.paranamer>2.8</version.com.thoughtworks.paranamer>
+        <version.org.glassfish.javax.el>3.0.1-b09</version.org.glassfish.javax.el>
+        <version.org.jboss.logging.jboss-logging>3.3.2.Final</version.org.jboss.logging.jboss-logging>
+        <version.org.jboss.logging.jboss-logging-tools>2.1.0.Final</version.org.jboss.logging.jboss-logging-tools>
+
+        <!-- Currently supported version of WildFly -->
+        <version.wildfly>12.0.0.Final</version.wildfly>
+        <!-- Used to create a patch file for the second version of WildFly we support -->
+        <version.wildfly.secondary>11.0.0.Final</version.wildfly.secondary>
+        <!-- Version used to run the TCK in incontainer mode -->
+        <version.wildfly.tck>${version.wildfly}</version.wildfly.tck>
 
         <!--
-        Names of modules to be passed via "add-modules" option when forking java through Surefire and javadoc
-        plugins on Java 9
+            These dependencies should be aligned with the ones from the WildFly version we support
+            See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
-        <maven-surefire-plugin.jigsaw.modules>java.xml.bind</maven-surefire-plugin.jigsaw.modules>
-        <maven-javadoc-plugin.jigsaw.modules>java.xml.bind</maven-javadoc-plugin.jigsaw.modules>
+        <version.com.fasterxml.classmate>1.3.4</version.com.fasterxml.classmate>
+        <version.jsoup>1.8.3</version.jsoup>
+        <version.joda-time>2.9.7</version.joda-time>
+        <version.org.slf4j>1.7.22</version.org.slf4j>
+        <version.log4j>1.2.17</version.log4j>
+        <version.javax.persistence>2.2</version.javax.persistence>
 
-        <!-- add-opens options required for Arquillian and WildFly -->
-        <arquillian.javaVmArguments.add-opens></arquillian.javaVmArguments.add-opens>
+        <!--
+            These dependencies are used for integration tests with WildFly.
+            They should be aligned with the ones from the Wildfly version we support
+            See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
+        -->
+        <version.javax.enterprise>2.0</version.javax.enterprise>
+        <version.org.jboss.weld.weld>3.0.4.Final</version.org.jboss.weld.weld>
+        <version.org.wildfly.arquillian>2.1.0.Final</version.org.wildfly.arquillian>
+        <version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec>1.0.1.Final</version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec>
+        <version.org.jboss.spec.javax.interceptor.jboss-interceptors-api_1.2_spec>1.0.0.Final</version.org.jboss.spec.javax.interceptor.jboss-interceptors-api_1.2_spec>
+
+        <!-- JavaMoney dependencies -->
+        <version.javax.money>1.0.1</version.javax.money>
+        <version.org.javamoney.moneta>1.1</version.org.javamoney.moneta>
+        <!-- Used in the Karaf features file: it is a dependency of Moneta -->
+        <version.javax.annotation>1.2</version.javax.annotation>
+
+        <!-- Test dependencies -->
+        <version.org.jboss.arquillian>1.1.11.Final</version.org.jboss.arquillian>
+        <version.org.testng>6.8</version.org.testng>
+        <!-- it must be the exact same version than the one used in the Bean Validation TCK -->
+        <version.org.assertj.assertj-core>3.8.0</version.org.assertj.assertj-core>
+        <version.junit>4.12</version.junit>
+        <version.org.easymock>3.4</version.org.easymock>
+        <version.org.codehaus.groovy>2.4.12</version.org.codehaus.groovy>
+        <version.com.google.guava>23.0</version.com.google.guava>
+        <version.org.springframework.spring-expression>4.3.10.RELEASE</version.org.springframework.spring-expression>
+        <version.org.jboss.arquillian.container.arquillian-weld-se-embedded-1.1>1.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-se-embedded-1.1>
+
+        <!-- OSGi dependencies -->
+        <version.org.apache.karaf>4.1.2</version.org.apache.karaf>
+        <version.org.ops4j.pax.exam>4.11.0</version.org.ops4j.pax.exam>
+        <version.org.ops4j.pax.url>2.5.2</version.org.ops4j.pax.url>
+        <version.org.osgi.core>6.0.0</version.org.osgi.core>
+        <version.fish.payara>5.181</version.fish.payara>
+        <version.fish.payara.arquillian>1.0.Beta3</version.fish.payara.arquillian>
+
+        <!--
+            Please don't change the name of this property, it may be used and
+            overridden by a CI job of the Checkstyle project so that they can
+            check for regressions. Which is obviously good for us, too.
+         -->
+        <puppycrawl.checkstyle.version>8.1</puppycrawl.checkstyle.version>
+
+        <!-- Asciidoctor -->
+
+        <version.asciidoctor.plugin>1.5.6</version.asciidoctor.plugin>
+        <version.org.hibernate.infra.hibernate-asciidoctor-theme>1.0.2.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
+        <version.org.hibernate.infra.hibernate-asciidoctor-extensions>1.0.3.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
+        <version.org.jruby>9.1.15.0</version.org.jruby>
+        <version.org.asciidoctor.asciidoctorj>1.6.0-alpha.5</version.org.asciidoctor.asciidoctorj>
+        <version.org.asciidoctor.asciidoctorj-pdf>1.5.0-alpha.16</version.org.asciidoctor.asciidoctorj-pdf>
+
+        <!-- Maven plugins versions -->
+
+        <version.antrun.plugin>1.8</version.antrun.plugin>
+        <version.assembly.plugin>3.1.0</version.assembly.plugin>
+        <version.buildhelper.plugin>3.0.0</version.buildhelper.plugin>
+        <version.bundle.plugin>3.5.0</version.bundle.plugin>
+        <version.checkstyle.plugin>2.17</version.checkstyle.plugin>
+        <version.clean.plugin>3.0.0</version.clean.plugin>
+        <version.compiler.plugin>3.7.0</version.compiler.plugin>
+        <version.copy.plugin>0.0.6</version.copy.plugin>
+        <version.dependency.plugin>3.0.2</version.dependency.plugin>
+        <version.depends.plugin>1.4.0</version.depends.plugin>
+        <version.deploy.plugin>2.8.2</version.deploy.plugin>
+        <version.enforcer.plugin>3.0.0-M1</version.enforcer.plugin>
+        <version.forbiddenapis.plugin>2.5</version.forbiddenapis.plugin>
+        <version.gmavenplus.plugin>1.6</version.gmavenplus.plugin>
+        <version.install.plugin>2.5.2</version.install.plugin>
+        <version.japicmp.plugin>0.11.0</version.japicmp.plugin>
+        <version.jar.plugin>3.0.2</version.jar.plugin>
+        <version.jqassistant.plugin>1.3.0</version.jqassistant.plugin>
+        <version.javadoc.plugin>3.0.0</version.javadoc.plugin>
+        <version.license.plugin>3.0</version.license.plugin>
+        <version.release.plugin>2.5.3</version.release.plugin>
+        <version.resources.plugin>3.0.2</version.resources.plugin>
+        <version.shade.plugin>3.1.0</version.shade.plugin>
+        <version.sigtest.plugin>1.0</version.sigtest.plugin>
+        <version.source.plugin>3.0.1</version.source.plugin>
+        <version.surefire.plugin>2.21.0</version.surefire.plugin>
+        <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
+        <version.wildfly.plugin>1.2.1.Final</version.wildfly.plugin>
+        <version.org.wildfly.core>5.0.0.Final</version.org.wildfly.core>
+        <version.wildfly-patch-gen.plugin>2.0.1.Alpha5</version.wildfly-patch-gen.plugin>
+        <version.wildfly-patch-gen.plugin.woodstox>5.0.3</version.wildfly-patch-gen.plugin.woodstox>
+
+        <!-- JVM options required for Arquillian and WildFly -->
+        <arquillian.jvm.args></arquillian.jvm.args>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
 
+        <!-- Repository Deployment URLs -->
+
+        <jboss.releases.repo.id>jboss-releases-repository</jboss.releases.repo.id>
+        <jboss.releases.repo.url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</jboss.releases.repo.url>
+        <jboss.snapshots.repo.id>jboss-snapshots-repository</jboss.snapshots.repo.id>
+        <jboss.snapshots.repo.url>https://repository.jboss.org/nexus/content/repositories/snapshots/</jboss.snapshots.repo.url>
+
+        <!-- Build settings -->
+
         <hibernate-validator-parent.path>.</hibernate-validator-parent.path>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- No need to build the javadocs per module. Aggregated javadocs are build in the distribution module. See also HV-894 -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.testTarget>${maven.compiler.target}</maven.compiler.testTarget>
+        <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
+        <!--
+                Options to override the compiler arguments directly on the compiler argument line to separate between what
+                the IDE understands as the source level and what the Maven compiler actually use.
+        -->
+        <maven.compiler.argument.target>${maven.compiler.target}</maven.compiler.argument.target>
+        <maven.compiler.argument.source>${maven.compiler.source}</maven.compiler.argument.source>
+        <maven.compiler.argument.testTarget>${maven.compiler.testTarget}</maven.compiler.argument.testTarget>
+        <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
+
+        <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
+        <surefire.jvm.args></surefire.jvm.args>
+        <surefire.jvm.add-opens></surefire.jvm.add-opens>
+        <arquillian.jvm.args></arquillian.jvm.args>
+        <surefire.system.args>${surefire.jvm.args} ${surefire.jvm.add-opens}</surefire.system.args>
+        <failsafe.system.args>${surefire.jvm.args} ${surefire.jvm.add-opens}</failsafe.system.args>
+
+        <!-- JDK version required for the build -->
+        <jdk.min.version>${maven.compiler.argument.source}</jdk.min.version>
+        <maven.min.version>3.3.1</maven.min.version>
     </properties>
 
     <dependencyManagement>
@@ -248,120 +303,120 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-validator-modules</artifactId>
                 <version>${project.version}</version>
-                <classifier>wildfly-${wildfly.version}-patch</classifier>
+                <classifier>wildfly-${version.wildfly}-patch</classifier>
                 <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-validator-modules</artifactId>
                 <version>${project.version}</version>
-                <classifier>wildfly-${wildfly-secondary.version}-patch</classifier>
+                <classifier>wildfly-${version.wildfly.secondary}-patch</classifier>
                 <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>javax.validation</groupId>
                 <artifactId>validation-api</artifactId>
-                <version>${bv.api.version}</version>
+                <version>${version.javax.validation}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
-                <version>${jboss.logging.version}</version>
+                <version>${version.org.jboss.logging.jboss-logging}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging-processor</artifactId>
-                <version>${jboss.logging.processor.version}</version>
+                <version>${version.org.jboss.logging.jboss-logging-tools}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging-annotations</artifactId>
-                <version>${jboss.logging.processor.version}</version>
+                <version>${version.org.jboss.logging.jboss-logging-tools}</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish</groupId>
                 <artifactId>javax.el</artifactId>
-                <version>${javax.el.version}</version>
+                <version>${version.org.glassfish.javax.el}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml</groupId>
                 <artifactId>classmate</artifactId>
-                <version>${classmate.version}</version>
+                <version>${version.com.fasterxml.classmate}</version>
             </dependency>
             <dependency>
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
-                <version>${joda-time.version}</version>
+                <version>${version.joda-time}</version>
             </dependency>
             <dependency>
                 <groupId>javax.money</groupId>
                 <artifactId>money-api</artifactId>
-                <version>${javax-money.version}</version>
+                <version>${version.javax.money}</version>
             </dependency>
             <dependency>
                 <groupId>org.javamoney</groupId>
                 <artifactId>moneta</artifactId>
-                <version>${moneta.version}</version>
+                <version>${version.org.javamoney.moneta}</version>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>org.osgi.core</artifactId>
-                <version>${osgi-core.version}</version>
+                <version>${version.org.osgi.core}</version>
             </dependency>
             <dependency>
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
-                <version>${jsoup.version}</version>
+                <version>${version.jsoup}</version>
             </dependency>
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
-                <version>1.2.17</version>
+                <version>${version.log4j}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
+                <version>${version.org.slf4j}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
+                <version>${version.org.slf4j}</version>
             </dependency>
             <dependency>
                 <groupId>javax.persistence</groupId>
                 <artifactId>javax.persistence-api</artifactId>
-                <version>${javax.persistence-api.version}</version>
+                <version>${version.javax.persistence}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
+                <version>${version.junit}</version>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>${testng.version}</version>
+                <version>${version.org.testng}</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-jsr223</artifactId>
-                <version>${groovy.version}</version>
+                <version>${version.org.codehaus.groovy}</version>
             </dependency>
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
-                <version>${easymock.version}</version>
+                <version>${version.org.easymock}</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>${assertj-core.version}</version>
+                <version>${version.org.assertj.assertj-core}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
-                <version>${arquillian.version}</version>
+                <version>${version.org.jboss.arquillian}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -373,17 +428,17 @@
             <dependency>
                 <groupId>org.jboss.spec.javax.interceptor</groupId>
                 <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
-                <version>1.0.0.Final</version>
+                <version>${version.org.jboss.spec.javax.interceptor.jboss-interceptors-api_1.2_spec}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.spec.javax.ejb</groupId>
                 <artifactId>jboss-ejb-api_3.2_spec</artifactId>
-                <version>${jboss-ejb-api_3.2_spec.version}</version>
+                <version>${version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec}</version>
             </dependency>
             <dependency>
                 <groupId>javax.enterprise</groupId>
                 <artifactId>cdi-api</artifactId>
-                <version>${cdi-api.version}</version>
+                <version>${version.javax.enterprise}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.interceptor</groupId>
@@ -398,12 +453,12 @@
             <dependency>
                 <groupId>org.jboss.weld</groupId>
                 <artifactId>weld-core-impl</artifactId>
-                <version>${weld.version}</version>
+                <version>${version.org.jboss.weld.weld}</version>
             </dependency>
             <dependency>
                 <groupId>org.wildfly.arquillian</groupId>
                 <artifactId>wildfly-arquillian-container-managed</artifactId>
-                <version>${wildfly-arquillian.version}</version>
+                <version>${version.org.wildfly.arquillian}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>sun.jdk</groupId>
@@ -414,22 +469,25 @@
             <dependency>
                 <groupId>org.jboss.arquillian.container</groupId>
                 <artifactId>arquillian-weld-se-embedded-1.1</artifactId>
-                <version>1.0.0.Final</version>
+                <version>${version.org.jboss.arquillian.container.arquillian-weld-se-embedded-1.1}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.thoughtworks.paranamer</groupId>
                 <artifactId>paranamer</artifactId>
-                <version>${paranamer.version}</version>
+                <version>${version.com.thoughtworks.paranamer}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
+                <version>${version.com.google.guava}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-expression</artifactId>
-                <version>${spring-expression.version}</version>
+                <version>${version.org.springframework.spring-expression}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -438,7 +496,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M1</version>
+                <version>${version.enforcer.plugin}</version>
                 <executions>
                     <execution>
                         <id>enforce-java</id>
@@ -448,10 +506,10 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>[1.8.0-20,)</version>
+                                    <version>[${jdk.min.version},)</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
-                                    <version>3.3.1</version>
+                                    <version>${maven.min.version}</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
@@ -467,15 +525,15 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>1.8</version>
+                    <version>${version.antrun.plugin}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>${version.clean.plugin}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>${version.jar.plugin}</version>
                     <configuration>
                         <archive>
                             <manifestEntries>
@@ -490,8 +548,12 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.7.0</version>
+                    <version>${version.compiler.plugin}</version>
                     <configuration>
+                        <source>${maven.compiler.argument.source}</source>
+                        <target>${maven.compiler.argument.target}</target>
+                        <testSource>${maven.compiler.argument.testSource}</testSource>
+                        <testTarget>${maven.compiler.argument.testTarget}</testTarget>
                         <compilerArgs>
                             <compilerArg>-Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArg>
                         </compilerArgs>
@@ -500,7 +562,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>2.17</version>
+                    <version>${version.checkstyle.plugin}</version>
                     <dependencies>
                         <dependency>
                             <groupId>${project.groupId}</groupId>
@@ -521,12 +583,12 @@
                         <dependency>
                             <groupId>org.slf4j</groupId>
                             <artifactId>jcl-over-slf4j</artifactId>
-                            <version>${slf4j.version}</version>
+                            <version>${version.org.slf4j}</version>
                         </dependency>
                         <dependency>
                             <groupId>org.slf4j</groupId>
                             <artifactId>slf4j-jdk14</artifactId>
-                            <version>${slf4j.version}</version>
+                            <version>${version.org.slf4j}</version>
                         </dependency>
                     </dependencies>
                     <configuration>
@@ -562,7 +624,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>2.5</version>
+                    <version>${version.forbiddenapis.plugin}</version>
                     <configuration>
                         <!-- if the Java version used is too new, don't fail, just do nothing -->
                         <failOnUnsupportedJava>false</failOnUnsupportedJava>
@@ -626,7 +688,7 @@
                 <plugin>
                     <groupId>com.mycila</groupId>
                     <artifactId>license-maven-plugin</artifactId>
-                    <version>3.0</version>
+                    <version>${version.license.plugin}</version>
                     <configuration>
                         <header>${hibernate-validator-parent.path}/build-config/src/main/resources/license.header</header>
                         <strictCheck>true</strictCheck>
@@ -664,19 +726,19 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
+                    <version>${version.surefire.plugin}</version>
                     <configuration>
                         <forkMode>once</forkMode>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>
-                        <argLine>${maven-surefire-plugin.argLine}</argLine>
+                        <argLine>${surefire.system.args}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-report-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
+                    <version>${version.surefire.plugin}</version>
                     <executions>
                         <execution>
                             <id>generate-test-report</id>
@@ -693,22 +755,22 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
+                    <version>${version.failsafe.plugin}</version>
                     <configuration>
-                        <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.argLine.add-modules} ${maven-surefire-plugin.argLine.add-opens}</argLine>
+                        <argLine>${failsafe.system.args}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>${version.dependency.plugin}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>2.5.2</version>
+                    <version>${version.install.plugin}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>${version.assembly.plugin}</version>
                     <dependencies>
                         <!--
                         We need to use a more recent version of the plexus-archiver to support JDK 9
@@ -728,7 +790,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.3</version>
+                    <version>${version.release.plugin}</version>
                     <configuration>
                         <preparationGoals>clean install</preparationGoals>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
@@ -742,47 +804,47 @@
                 <plugin>
                     <groupId>org.asciidoctor</groupId>
                     <artifactId>asciidoctor-maven-plugin</artifactId>
-                    <version>${asciidoctor-maven-plugin.version}</version>
+                    <version>${version.asciidoctor.plugin}</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.jruby</groupId>
                             <artifactId>jruby-complete</artifactId>
-                            <version>${jruby.version}</version>
+                            <version>${version.org.jruby}</version>
                         </dependency>
                          <dependency>
                             <groupId>org.asciidoctor</groupId>
                             <artifactId>asciidoctorj</artifactId>
-                            <version>${asciidoctorj.version}</version>
+                            <version>${version.org.asciidoctor.asciidoctorj}</version>
                         </dependency>
                         <dependency>
                             <groupId>org.asciidoctor</groupId>
                             <artifactId>asciidoctorj-pdf</artifactId>
-                            <version>${asciidoctorj-pdf.version}</version>
+                            <version>${version.org.asciidoctor.asciidoctorj-pdf}</version>
                         </dependency>
                         <dependency>
                             <groupId>org.hibernate.infra</groupId>
                             <artifactId>hibernate-asciidoctor-extensions</artifactId>
-                            <version>${hibernate-asciidoctor-extensions.version}</version>
+                            <version>${version.org.hibernate.infra.hibernate-asciidoctor-extensions}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>ch.mfrey.maven.plugin</groupId>
                     <artifactId>copy-maven-plugin</artifactId>
-                    <version>0.0.6</version>
+                    <version>${version.copy.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>${version.bundle.plugin}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>${version.source.plugin}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>${version.javadoc.plugin}</version>
                     <configuration>
                         <quiet>true</quiet>
                         <docfilessubdirs>true</docfilessubdirs>
@@ -792,11 +854,11 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
+                    <version>${version.deploy.plugin}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>${version.resources.plugin}</version>
                     <configuration>
                         <!-- By default the "@" character is a delimiter, causing files containing
                              that character to not be filtered properly -->
@@ -809,24 +871,24 @@
                 <plugin>
                     <groupId>org.codehaus.gmavenplus</groupId>
                     <artifactId>gmavenplus-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>${version.gmavenplus.plugin}</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.codehaus.groovy</groupId>
                             <artifactId>groovy-all</artifactId>
-                            <version>${groovy.version}</version>
+                            <version>${version.org.codehaus.groovy}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.servicemix.tooling</groupId>
                     <artifactId>depends-maven-plugin</artifactId>
-                    <version>1.4.0</version>
+                    <version>${version.depends.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>1.12</version>
+                    <version>${version.buildhelper.plugin}</version>
                 </plugin>
                 <plugin>
                     <!--
@@ -835,7 +897,7 @@
                     -->
                     <groupId>com.github.siom79.japicmp</groupId>
                     <artifactId>japicmp-maven-plugin</artifactId>
-                    <version>0.11.0</version>
+                    <version>${version.japicmp.plugin}</version>
                     <configuration>
                         <oldVersion>
                             <dependency>
@@ -863,50 +925,43 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>${version.shade.plugin}</version>
                 </plugin>
                 <!-- WildFly patching infrastructure plugins -->
                 <plugin>
                     <groupId>org.jboss.as</groupId>
                     <artifactId>patch-gen-maven-plugin</artifactId>
-                    <version>${wildfly-patch-gen-maven-plugin.version}</version>
+                    <version>${version.wildfly-patch-gen.plugin}</version>
                     <dependencies>
                         <dependency>
                             <groupId>com.fasterxml.woodstox</groupId>
                             <artifactId>woodstox-core</artifactId>
-                            <version>${wildfly-patch-gen-maven-plugin.woodstox.version}</version>
+                            <version>${version.wildfly-patch-gen.plugin.woodstox}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.wildfly.plugins</groupId>
                     <artifactId>wildfly-maven-plugin</artifactId>
-                    <version>${wildfly-maven-plugin.version}</version>
+                    <version>${version.wildfly.plugin}</version>
                     <dependencies>
                         <!-- Contains the patch command -->
                         <dependency>
                             <groupId>org.wildfly.core</groupId>
                             <artifactId>wildfly-patching</artifactId>
-                            <version>${wildfly-core.version}</version>
+                            <version>${version.org.wildfly.core}</version>
                         </dependency>
-                        <!-- The exclusion is needed to have the build work with JDK 9 -->
                         <dependency>
                             <groupId>org.wildfly.core</groupId>
                             <artifactId>wildfly-cli</artifactId>
-                            <version>${wildfly-core.version}</version>
-                            <exclusions>
-                                <exclusion>
-                                    <groupId>sun.jdk</groupId>
-                                    <artifactId>jconsole</artifactId>
-                                </exclusion>
-                            </exclusions>
+                            <version>${version.org.wildfly.core}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.netbeans.tools</groupId>
                     <artifactId>sigtest-maven-plugin</artifactId>
-                    <version>1.0</version>
+                    <version>${version.sigtest.plugin}</version>
                 </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>
@@ -1035,18 +1090,18 @@
         <developerConnection>scm:git:git@github.com:hibernate/hibernate-validator.git</developerConnection>
         <url>http://github.com/hibernate/hibernate-validator</url>
         <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <distributionManagement>
         <repository>
-            <id>jboss-releases-repository</id>
+            <id>${jboss.releases.repo.id}</id>
             <name>JBoss Releases Repository</name>
-            <url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</url>
+            <url>${jboss.releases.repo.url}</url>
         </repository>
         <snapshotRepository>
-            <id>jboss-snapshots-repository</id>
+            <id>${jboss.snapshots.repo.id}</id>
             <name>JBoss Snapshots Repository</name>
-            <url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
+            <url>${jboss.snapshots.repo.url}</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -1120,12 +1175,11 @@
                 <jdk>[9,)</jdk>
             </activation>
             <properties>
-                <maven-surefire-plugin.argLine.add-modules>--add-modules=${maven-surefire-plugin.jigsaw.modules}</maven-surefire-plugin.argLine.add-modules>
                 <!--
                 All these add-opens are probably not necessary for our WildFly usage but add the ones defined in
                 https://github.com/ctomc/wildfly/commit/d8c4f55a1f900d931c224049c8a118ba4a5bcb45 to be on the safe side.
                 -->
-                <arquillian.javaVmArguments.add-opens>
+                <arquillian.jvm.args>
                     --add-opens=java.base/java.lang=ALL-UNNAMED
                     --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
                     --add-opens=java.base/java.security=ALL-UNNAMED
@@ -1140,7 +1194,7 @@
                     --add-opens=java.management/javax.management=ALL-UNNAMED
                     --add-opens=java.management/javax.management.openmbean=ALL-UNNAMED
                     --add-opens=java.naming/javax.naming=ALL-UNNAMED
-                </arquillian.javaVmArguments.add-opens>
+                </arquillian.jvm.args>
             </properties>
             <build>
                 <pluginManagement>
@@ -1149,13 +1203,6 @@
                             <artifactId>maven-compiler-plugin</artifactId>
                             <configuration>
                                 <fork>true</fork>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <version>${maven-surefire-plugin.version}</version>
-                            <configuration>
-                                <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.argLine.add-modules} ${maven-surefire-plugin.argLine.add-opens}</argLine>
                             </configuration>
                         </plugin>
                         <plugin>
@@ -1187,7 +1234,7 @@
                     <plugin>
                         <groupId>com.buschmais.jqassistant</groupId>
                         <artifactId>jqassistant-maven-plugin</artifactId>
-                        <version>1.3.0</version>
+                        <version>${version.jqassistant.plugin}</version>
                         <executions>
                             <execution>
                                 <goals>
