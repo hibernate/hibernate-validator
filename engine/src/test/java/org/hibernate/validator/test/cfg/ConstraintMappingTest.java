@@ -60,6 +60,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -532,6 +533,28 @@ public class ConstraintMappingTest {
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( Size.class ).withMessage( "size must be between 3 and 10" ),
 				violationOf( Size.class ).withMessage( "size must be between 4 and 10" )
+		);
+	}
+
+	@Test
+	public void testFieldAndGetterMethodsForProgrammaticConstraintDefinition() {
+		mapping.type( Marathon.class )
+				.getter( "name" )
+					.constraint( new SizeDef().min( 5 ) )
+					.constraint( new SizeDef().min( 10 ) )
+				.field( "runners" )
+					.constraint( new SizeDef().max( 10 ).min( 1 ) );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Marathon marathon = new Marathon();
+		marathon.setName( "Foo" );
+
+		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "size must be between 10 and 2147483647" ),
+				violationOf( Size.class ).withMessage( "size must be between 5 and 2147483647" ),
+				violationOf( Size.class ).withMessage( "size must be between 1 and 10" )
 		);
 	}
 
