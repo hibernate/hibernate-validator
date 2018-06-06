@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.annotation.ElementType;
-import java.lang.invoke.MethodHandles;
 
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
@@ -19,11 +18,7 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.properties.Property;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one bean property.
@@ -37,31 +32,11 @@ abstract class PropertyConstraintMappingContextImpl<T extends Property>
 		extends CascadableConstraintMappingContextImplBase<PropertyConstraintMappingContext>
 		implements PropertyConstraintMappingContext {
 
-	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
-
 	private final TypeConstraintMappingContextImpl<?> typeContext;
 
 	// either Field or Method
 	private final T property;
 	private final ConstraintLocation location;
-
-	static PropertyConstraintMappingContextImpl context(ElementType elementType, TypeConstraintMappingContextImpl<?> typeContext, Property property) {
-		if ( elementType == ElementType.FIELD ) {
-			return new FieldPropertyConstraintMappingContextImpl(
-					typeContext,
-					property.as( JavaBeanField.class )
-			);
-		}
-		else if ( elementType == ElementType.METHOD ) {
-			return new GetterPropertyConstraintMappingContextImpl(
-					typeContext,
-					property.as( JavaBeanGetter.class )
-			);
-		}
-		else {
-			throw LOG.getUnexpectedElementType( elementType, ElementType.FIELD, ElementType.METHOD );
-		}
-	}
 
 	protected PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, T property, ConstraintLocation location) {
 		super( typeContext.getConstraintMapping(), property.getType() );
@@ -89,6 +64,16 @@ abstract class PropertyConstraintMappingContextImpl<T extends Property>
 	@Override
 	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
 		return typeContext.property( property, elementType );
+	}
+
+	@Override
+	public PropertyConstraintMappingContext field(String property) {
+		return typeContext.field( property );
+	}
+
+	@Override
+	public PropertyConstraintMappingContext getter(String property) {
+		return typeContext.getter( property );
 	}
 
 	@Override

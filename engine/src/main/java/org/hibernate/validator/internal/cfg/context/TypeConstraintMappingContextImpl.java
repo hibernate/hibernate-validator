@@ -34,7 +34,6 @@ import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.properties.Constrainable;
-import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanConstructor;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
@@ -119,24 +118,58 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	@Override
 	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
-		Contracts.assertNotNull( property, "The property name must not be null." );
 		Contracts.assertNotNull( elementType, "The element type must not be null." );
-		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
 
-		Property foundProperty = getProperty(
-				beanClass, property, elementType
-		);
-
-		if ( foundProperty == null || foundProperty.getDeclaringClass() != beanClass ) {
-			throw LOG.getUnableToFindPropertyWithAccessException( beanClass, property, elementType );
+		if ( !( ElementType.FIELD.equals( elementType ) || ElementType.METHOD.equals( elementType ) ) ) {
+			throw LOG.getElementTypeHasToBeFieldOrMethodException();
 		}
 
-		if ( configuredMembers.contains( foundProperty ) ) {
+		if ( ElementType.FIELD == elementType ) {
+			return field( property );
+		}
+		else {
+			return getter( property );
+		}
+	}
+
+	@Override
+	public PropertyConstraintMappingContext field(String property) {
+		Contracts.assertNotNull( property, "The property name must not be null." );
+		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
+
+		JavaBeanField javaBeanField = getFieldProperty( beanClass, property );
+
+		if ( javaBeanField == null || javaBeanField.getDeclaringClass() != beanClass ) {
+			throw LOG.getUnableToFindPropertyWithAccessException( beanClass, property, ElementType.FIELD );
+		}
+
+		if ( configuredMembers.contains( javaBeanField ) ) {
 			throw LOG.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass, property );
 		}
 
-		PropertyConstraintMappingContextImpl context = PropertyConstraintMappingContextImpl.context( elementType, this, foundProperty );
-		configuredMembers.add( foundProperty );
+		PropertyConstraintMappingContextImpl context = new FieldPropertyConstraintMappingContextImpl( this, javaBeanField );
+		configuredMembers.add( javaBeanField );
+		propertyContexts.add( context );
+		return context;
+	}
+
+	@Override
+	public PropertyConstraintMappingContext getter(String property) {
+		Contracts.assertNotNull( property, "The property name must not be null." );
+		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
+
+		JavaBeanGetter javaBeanGetter = getGetterProperty( beanClass, property );
+
+		if ( javaBeanGetter == null || javaBeanGetter.getDeclaringClass() != beanClass ) {
+			throw LOG.getUnableToFindPropertyWithAccessException( beanClass, property, ElementType.METHOD );
+		}
+
+		if ( configuredMembers.contains( javaBeanGetter ) ) {
+			throw LOG.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass, property );
+		}
+
+		PropertyConstraintMappingContextImpl context = new GetterPropertyConstraintMappingContextImpl( this, javaBeanGetter );
+		configuredMembers.add( javaBeanGetter );
 		propertyContexts.add( context );
 		return context;
 	}
@@ -252,41 +285,25 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		return ConstraintType.GENERIC;
 	}
 
-	/**
-	 * Returns the property with the given name and type.
-	 *
-	 * @param clazz The class from which to retrieve the property. Cannot be {@code null}.
-	 * @param property The property name without "is", "get" or "has". Cannot be {@code null} or empty.
-	 * @param elementType The element type. Either {@code ElementType.FIELD} or {@code ElementType METHOD}.
-	 *
-	 * @return the property which matches the name and type or {@code null} if no such property exists.
-	 */
-	private Property getProperty(Class<?> clazz, String property, ElementType elementType) {
+	private JavaBeanField getFieldProperty(Class<?> clazz, String property) {
 		Contracts.assertNotNull( clazz, MESSAGES.classCannotBeNull() );
 
-		if ( property == null || property.length() == 0 ) {
-			throw LOG.getPropertyNameCannotBeNullOrEmptyException();
-		}
+		Field field = run( GetDeclaredField.action( clazz, property ) );
+		return field == null ? null : new JavaBeanField( field );
+	}
 
-		if ( !( ElementType.FIELD.equals( elementType ) || ElementType.METHOD.equals( elementType ) ) ) {
-			throw LOG.getElementTypeHasToBeFieldOrMethodException();
-		}
+	private JavaBeanGetter getGetterProperty(Class<?> clazz, String property) {
+		Contracts.assertNotNull( clazz, MESSAGES.classCannotBeNull() );
 
-		if ( ElementType.FIELD.equals( elementType ) ) {
-			Field field = run( GetDeclaredField.action( clazz, property ) );
-			return field == null ? null : new JavaBeanField( field );
-		}
-		else {
-			Method method = null;
-			String methodName = property.substring( 0, 1 ).toUpperCase( Locale.ROOT ) + property.substring( 1 );
-			for ( String prefix : ReflectionHelper.PROPERTY_ACCESSOR_PREFIXES ) {
-				method = run( GetMethod.action( clazz, prefix + methodName ) );
-				if ( method != null ) {
-					break;
-				}
+		Method method = null;
+		String methodName = property.substring( 0, 1 ).toUpperCase( Locale.ROOT ) + property.substring( 1 );
+		for ( String prefix : ReflectionHelper.PROPERTY_ACCESSOR_PREFIXES ) {
+			method = run( GetMethod.action( clazz, prefix + methodName ) );
+			if ( method != null ) {
+				break;
 			}
-			return method == null ? null : new JavaBeanGetter( method );
 		}
+		return method == null ? null : new JavaBeanGetter( method );
 	}
 
 	/**

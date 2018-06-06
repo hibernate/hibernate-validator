@@ -124,6 +124,16 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 	}
 
 	@Override
+	public PropertyConstraintMappingContext field(String property) {
+		return typeContext.field( property );
+	}
+
+	@Override
+	public PropertyConstraintMappingContext getter(String property) {
+		return typeContext.getter( property );
+	}
+
+	@Override
 	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
 		return typeContext.constructor( parameterTypes );
 	}
