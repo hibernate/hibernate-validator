@@ -7,7 +7,7 @@
 package org.hibernate.validator.cfg.context;
 
 /**
- * Facet of a constraint mapping creational context which allows to the select a method or constructor parameter to
+ * Facet of a constraint mapping creational context which allows to select a method or constructor parameter to
  * which the next operations shall apply.
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
