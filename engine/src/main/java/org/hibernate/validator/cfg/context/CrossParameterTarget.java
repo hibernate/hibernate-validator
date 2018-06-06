@@ -7,7 +7,7 @@
 package org.hibernate.validator.cfg.context;
 
 /**
- * Facet of a constraint mapping creational context which allows to the select the cross-parameter element of a method
+ * Facet of a constraint mapping creational context which allows to select the cross-parameter element of a method
  * or constructor as target of the next operations.
  *
  * @author Gunnar Morling

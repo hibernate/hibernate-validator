@@ -9,7 +9,7 @@ package org.hibernate.validator.cfg.context;
 import java.lang.annotation.ElementType;
 
 /**
- * Facet of a constraint mapping creational context which allows to the select the bean
+ * Facet of a constraint mapping creational context which allows to select the bean
  * property to which the next operations shall apply.
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI

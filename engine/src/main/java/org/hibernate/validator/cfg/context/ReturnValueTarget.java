@@ -7,7 +7,7 @@
 package org.hibernate.validator.cfg.context;
 
 /**
- * Facet of a constraint mapping creational context which allows to the select the current method's or constructor's
+ * Facet of a constraint mapping creational context which allows to select the current method's or constructor's
  * return value as target for the next operations.
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI

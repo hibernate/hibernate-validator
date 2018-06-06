@@ -9,7 +9,7 @@ package org.hibernate.validator.cfg.context;
 import java.lang.annotation.Annotation;
 
 /**
- * Facet of a constraint definition creational context which allows to the select the constraint (annotation type) to
+ * Facet of a constraint definition creational context which allows to select the constraint (annotation type) to
  * which the next operations shall apply.
  *
  * @author Yoann Rodiere
