@@ -279,7 +279,7 @@
                 <jdk>[9,)</jdk>
             </activation>
             <properties>
-                <maven-surefire-plugin.argLine>--illegal-access=deny</maven-surefire-plugin.argLine>
+                <surefire.jvm.args.illegal-access>--illegal-access=deny</surefire.jvm.args.illegal-access>
             </properties>
         </profile>
         <profile>
@@ -301,7 +301,7 @@
                                         <artifactItem>
                                             <groupId>org.hibernate.beanvalidation.tck</groupId>
                                             <artifactId>beanvalidation-tck-tests</artifactId>
-                                            <version>${tck.version}</version>
+                                            <version>${version.org.hibernate.beanvalidation.tck}</version>
                                             <type>jar</type>
                                             <overWrite>true</overWrite>
                                         </artifactItem>

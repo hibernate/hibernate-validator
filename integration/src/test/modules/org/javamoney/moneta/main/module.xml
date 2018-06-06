@@ -7,7 +7,7 @@
   -->
 <module xmlns="urn:jboss:module:1.3" name="org.javamoney.moneta" slot="main">
     <resources>
-        <resource-root path="moneta-${moneta.version}.jar" />
+        <resource-root path="moneta-${version.org.javamoney.moneta}.jar" />
     </resources>
 
     <dependencies>

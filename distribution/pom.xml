@@ -93,13 +93,13 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-validator-modules</artifactId>
-            <classifier>wildfly-${wildfly.version}-patch</classifier>
+            <classifier>wildfly-${version.wildfly}-patch</classifier>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-validator-modules</artifactId>
-            <classifier>wildfly-${wildfly-secondary.version}-patch</classifier>
+            <classifier>wildfly-${version.wildfly.secondary}-patch</classifier>
             <type>zip</type>
         </dependency>
     </dependencies>
