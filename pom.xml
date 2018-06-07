@@ -134,7 +134,7 @@
         <jsoup.version>1.8.3</jsoup.version>
         <joda-time.version>2.9.7</joda-time.version>
         <slf4j.version>1.7.22</slf4j.version>
-        <hibernate-jpa-2.1-api.version>1.0.2.Final</hibernate-jpa-2.1-api.version>
+        <javax.persistence-api.version>2.2</javax.persistence-api.version>
 
         <!--
             These dependencies are used for integration tests with WildFly.
@@ -329,9 +329,9 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.hibernate.javax.persistence</groupId>
-                <artifactId>hibernate-jpa-2.1-api</artifactId>
-                <version>${hibernate-jpa-2.1-api.version}</version>
+                <groupId>javax.persistence</groupId>
+                <artifactId>javax.persistence-api</artifactId>
+                <version>${javax.persistence-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
