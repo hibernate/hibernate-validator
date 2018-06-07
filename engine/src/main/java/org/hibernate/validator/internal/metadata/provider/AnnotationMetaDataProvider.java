@@ -218,46 +218,46 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		Set<ConstrainedElement> propertyMetaData = newHashSet();
 
 		for ( Field field : run( GetDeclaredFields.action( beanClass ) ) ) {
-			Property property = new JavaBeanField( field );
+			JavaBeanField javaBeanField = new JavaBeanField( field );
 			// HV-172
 			if ( Modifier.isStatic( field.getModifiers() ) ||
-					annotationProcessingOptions.areMemberConstraintsIgnoredFor( property ) ||
+					annotationProcessingOptions.areMemberConstraintsIgnoredFor( javaBeanField ) ||
 					field.isSynthetic() ) {
 
 				continue;
 			}
 
-			propertyMetaData.add( findPropertyMetaData( field, property ) );
+			propertyMetaData.add( findPropertyMetaData( field, javaBeanField ) );
 		}
 		return propertyMetaData;
 	}
 
-	private ConstrainedField findPropertyMetaData(Field field, Property property) {
+	private ConstrainedField findPropertyMetaData(Field field, JavaBeanField javaBeanField) {
 		Set<MetaConstraint<?>> constraints = convertToMetaConstraints(
-				findConstraints( field, ElementType.FIELD, property ),
-				property
+				findConstraints( field, ElementType.FIELD, javaBeanField ),
+				javaBeanField
 		);
 
 		CascadingMetaDataBuilder cascadingMetaDataBuilder = findCascadingMetaData( field );
-		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraints( field, property );
+		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraints( field, javaBeanField );
 
 		return new ConstrainedField(
 				ConfigurationSource.ANNOTATION,
-				property,
+				javaBeanField,
 				constraints,
 				typeArgumentsConstraints,
 				cascadingMetaDataBuilder
 		);
 	}
 
-	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Property property) {
+	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, JavaBeanField javaBeanField) {
 		if ( constraintDescriptors.isEmpty() ) {
 			return Collections.emptySet();
 		}
 
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
-		ConstraintLocation location = ConstraintLocation.forProperty( property );
+		ConstraintLocation location = ConstraintLocation.forField( javaBeanField );
 
 		for ( ConstraintDescriptorImpl<?> constraintDescription : constraintDescriptors ) {
 			constraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescription, location ) );
@@ -843,7 +843,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		@Override
 		public ConstraintLocation toConstraintLocation() {
-			return ConstraintLocation.forProperty( new JavaBeanField( field ) );
+			return ConstraintLocation.forField( new JavaBeanField( field ) );
 		}
 	}
 

@@ -31,7 +31,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.PropertyDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.PropertyConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.GetterPropertyConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
@@ -41,6 +41,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
@@ -243,7 +244,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				return constraints;
 			}
 
-			ConstraintLocation getterConstraintLocation = ConstraintLocation.forProperty( ( (ConstrainedExecutable) constrainedElement ).getCallable().as( Property.class ) );
+			ConstraintLocation getterConstraintLocation = ConstraintLocation.forGetter( ( (ConstrainedExecutable) constrainedElement ).getCallable().as( JavaBeanGetter.class ) );
 
 			// convert return value locations into getter locations for usage within this meta-data
 			return constraints.stream()
@@ -257,7 +258,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			// fast track if it's a regular constraint
 			if ( !(constraint.getLocation() instanceof TypeArgumentConstraintLocation) ) {
 				// Change the constraint location to a GetterConstraintLocation if it is not already one
-				if ( constraint.getLocation() instanceof PropertyConstraintLocation ) {
+				if ( constraint.getLocation() instanceof GetterPropertyConstraintLocation ) {
 					converted = constraint.getLocation();
 				}
 				else {
@@ -284,7 +285,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				for ( ConstraintLocation location : locationStack ) {
 					if ( !(location instanceof TypeArgumentConstraintLocation) ) {
 						// Change the constraint location to a GetterConstraintLocation if it is not already one
-						if ( location instanceof PropertyConstraintLocation ) {
+						if ( location instanceof GetterPropertyConstraintLocation ) {
 							converted = location;
 						}
 						else {

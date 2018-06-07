@@ -12,7 +12,8 @@ import java.lang.reflect.TypeVariable;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
-import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
@@ -38,8 +39,12 @@ public interface ConstraintLocation {
 		return new BeanConstraintLocation( declaringClass );
 	}
 
-	static ConstraintLocation forProperty(Property property) {
-		return new PropertyConstraintLocation( property );
+	static ConstraintLocation forField(JavaBeanField field) {
+		return new FieldPropertyConstraintLocation( field );
+	}
+
+	static ConstraintLocation forGetter(JavaBeanGetter getter) {
+		return new GetterPropertyConstraintLocation( getter );
 	}
 
 	static ConstraintLocation forTypeArgument(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type typeOfAnnotatedElement) {
