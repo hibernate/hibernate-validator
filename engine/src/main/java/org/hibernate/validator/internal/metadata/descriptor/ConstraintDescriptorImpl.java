@@ -403,7 +403,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			ConstraintType externalConstraintType) {
 		ConstraintTarget constraintTarget = validationAppliesTo;
 		ConstraintType constraintType = null;
-		boolean isExecutable = isExecutable( constraintLocationKind );
+		boolean isExecutable = constraintLocationKind.isExecutable();
 
 		//target explicitly set to RETURN_VALUE
 		if ( constraintTarget == ConstraintTarget.RETURN_VALUE ) {
@@ -528,10 +528,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				);
 			}
 		}
-	}
-
-	private boolean isExecutable(ConstraintLocationKind locationKind) {
-		return locationKind == ConstraintLocationKind.METHOD || locationKind == ConstraintLocationKind.CONSTRUCTOR;
 	}
 
 	@SuppressWarnings("unchecked")

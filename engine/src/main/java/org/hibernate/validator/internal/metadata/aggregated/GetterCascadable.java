@@ -25,7 +25,7 @@ public class GetterCascadable extends PropertyCascadable {
 
 	@Override
 	public ConstraintLocationKind getConstraintLocationKind() {
-		return ConstraintLocationKind.METHOD;
+		return ConstraintLocationKind.GETTER;
 	}
 
 	public static class Builder extends PropertyCascadable.Builder {
