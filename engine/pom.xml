@@ -279,7 +279,7 @@
                 <jdk>[9,)</jdk>
             </activation>
             <properties>
-                <surefire.jvm.args>--illegal-access=deny</surefire.jvm.args>
+                <surefire.jvm.args.illegal-access>--illegal-access=deny</surefire.jvm.args.illegal-access>
             </properties>
         </profile>
         <profile>

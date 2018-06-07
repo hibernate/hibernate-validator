@@ -229,9 +229,6 @@
         <version.wildfly-patch-gen.plugin>2.0.1.Alpha5</version.wildfly-patch-gen.plugin>
         <version.wildfly-patch-gen.plugin.woodstox>5.0.3</version.wildfly-patch-gen.plugin.woodstox>
 
-        <!-- JVM options required for Arquillian and WildFly -->
-        <arquillian.jvm.args></arquillian.jvm.args>
-
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
 
@@ -266,11 +263,14 @@
         <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
 
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
-        <surefire.jvm.args></surefire.jvm.args>
-        <surefire.jvm.add-opens></surefire.jvm.add-opens>
-        <arquillian.jvm.args></arquillian.jvm.args>
-        <surefire.system.args>${surefire.jvm.args} ${surefire.jvm.add-opens}</surefire.system.args>
-        <failsafe.system.args>${surefire.jvm.args} ${surefire.jvm.add-opens}</failsafe.system.args>
+        <surefire.jvm.args.additional></surefire.jvm.args.additional>
+        <surefire.jvm.args.illegal-access></surefire.jvm.args.illegal-access>
+        <surefire.jvm.args.add-opens></surefire.jvm.args.add-opens>
+        <surefire.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access}</failsafe.jvm.args>
+
+        <arquillian.wildfly.jvm.args.add-opens></arquillian.wildfly.jvm.args.add-opens>
+        <arquillian.wildfly.jvm.args>${arquillian.wildfly.jvm.args.add-opens}</arquillian.wildfly.jvm.args>
 
         <!-- JDK version required for the build -->
         <jdk.min.version>${maven.compiler.argument.source}</jdk.min.version>
@@ -733,7 +733,7 @@
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>
-                        <argLine>${surefire.system.args}</argLine>
+                        <argLine>${surefire.jvm.args}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -757,7 +757,7 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${version.failsafe.plugin}</version>
                     <configuration>
-                        <argLine>${failsafe.system.args}</argLine>
+                        <argLine>${failsafe.jvm.args}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1179,7 +1179,7 @@
                 All these add-opens are probably not necessary for our WildFly usage but add the ones defined in
                 https://github.com/ctomc/wildfly/commit/d8c4f55a1f900d931c224049c8a118ba4a5bcb45 to be on the safe side.
                 -->
-                <arquillian.jvm.args>
+                <arquillian.wildfly.jvm.args.add-opens>
                     --add-opens=java.base/java.lang=ALL-UNNAMED
                     --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
                     --add-opens=java.base/java.security=ALL-UNNAMED
@@ -1194,7 +1194,7 @@
                     --add-opens=java.management/javax.management=ALL-UNNAMED
                     --add-opens=java.management/javax.management.openmbean=ALL-UNNAMED
                     --add-opens=java.naming/javax.naming=ALL-UNNAMED
-                </arquillian.jvm.args>
+                </arquillian.wildfly.jvm.args.add-opens>
             </properties>
             <build>
                 <pluginManagement>

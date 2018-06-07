@@ -24,7 +24,7 @@
         <configuration>
             <property name="jbossHome">${basedir}/target/wildfly-${version.wildfly}</property>
             <property name="javaVmArguments">
-                -Dee8.preview.mode=true ${arquillian.jvm.args}
+                -Dee8.preview.mode=true ${arquillian.wildfly.jvm.args}
             </property>
             <!--
             To be injected in javaVmArguments to enable debug mode:
@@ -40,7 +40,7 @@
         <configuration>
             <property name="jbossHome">${basedir}/target/wildfly-${version.wildfly.secondary}</property>
             <property name="javaVmArguments">
-                -Dee8.preview.mode=true ${arquillian.jvm.args}
+                -Dee8.preview.mode=true ${arquillian.wildfly.jvm.args}
             </property>
             <!--
             To be injected in javaVmArguments to enable debug mode:

@@ -214,7 +214,7 @@
             </activation>
             <properties>
                 <!-- required by Weld -->
-                <surefire.jvm.add-opens>--add-opens java.base/java.lang=ALL-UNNAMED</surefire.jvm.add-opens>
+                <surefire.jvm.args.add-opens>--add-opens java.base/java.lang=ALL-UNNAMED</surefire.jvm.args.add-opens>
             </properties>
         </profile>
     </profiles>

@@ -365,7 +365,7 @@
                 <jdk>[9,)</jdk>
             </activation>
             <properties>
-                <surefire.jvm.add-opens>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED</surefire.jvm.add-opens>
+                <surefire.jvm.args.add-opens>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED</surefire.jvm.args.add-opens>
             </properties>
         </profile>
     </profiles>
