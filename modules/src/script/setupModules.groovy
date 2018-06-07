@@ -23,7 +23,7 @@ def removeDependency(File file, String dependencyToRemove) {
 
 // BV API
 bvModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/javax/validation/api/main/module.xml' )
-def bvArtifactName = 'validation-api-' + project.properties['bv.api.version'] + '.jar';
+def bvArtifactName = 'validation-api-' + project.properties['version.javax.validation'] + '.jar';
 println "[INFO] Using BV version " + bvArtifactName;
 processFileInplace( bvModuleXml ) { text ->
     text.replaceAll( /validation-api.*jar/, bvArtifactName )

@@ -7,6 +7,6 @@
   -->
 <module xmlns="urn:jboss:module:1.3" name="javax.money.api" slot="main">
     <resources>
-        <resource-root path="money-api-${javax-money.version}.jar" />
+        <resource-root path="money-api-${version.javax.money}.jar" />
     </resources>
 </module>

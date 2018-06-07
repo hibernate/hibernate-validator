@@ -54,8 +54,8 @@
             <artifactId>log4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>
@@ -93,13 +93,13 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-validator-modules</artifactId>
-            <classifier>wildfly-${wildfly.version}-patch</classifier>
+            <classifier>wildfly-${version.wildfly}-patch</classifier>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-validator-modules</artifactId>
-            <classifier>wildfly-${wildfly-secondary.version}-patch</classifier>
+            <classifier>wildfly-${version.wildfly.secondary}-patch</classifier>
             <type>zip</type>
         </dependency>
     </dependencies>
