@@ -134,7 +134,6 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	@Override
 	public PropertyConstraintMappingContext field(String property) {
-		Contracts.assertNotNull( property, "The property name must not be null." );
 		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
 
 		JavaBeanField javaBeanField = getFieldProperty( beanClass, property );
@@ -155,7 +154,6 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	@Override
 	public PropertyConstraintMappingContext getter(String property) {
-		Contracts.assertNotNull( property, "The property name must not be null." );
 		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
 
 		JavaBeanGetter javaBeanGetter = getGetterProperty( beanClass, property );
