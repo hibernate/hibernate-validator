@@ -21,6 +21,6 @@ public class GetterPropertyConstraintLocation extends PropertyConstraintLocation
 
 	@Override
 	public ConstraintLocationKind getKind() {
-		return ConstraintLocationKind.METHOD;
+		return ConstraintLocationKind.GETTER;
 	}
 }

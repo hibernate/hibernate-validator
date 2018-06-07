@@ -11,6 +11,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
@@ -108,6 +109,7 @@ public interface ConstraintLocation {
 		METHOD( ElementType.METHOD ),
 		PARAMETER( ElementType.PARAMETER ),
 		FIELD( ElementType.FIELD ),
+		GETTER( ElementType.METHOD ),
 		TYPE_USE( ElementType.TYPE_USE ),
 		;
 
@@ -119,6 +121,20 @@ public interface ConstraintLocation {
 
 		public ElementType getElementType() {
 			return elementType;
+		}
+
+		public boolean isExecutable() {
+			return this == CONSTRUCTOR || isMethod();
+		}
+
+		public boolean isMethod() {
+			return this == METHOD || this == GETTER;
+		}
+
+		public static ConstraintLocationKind of(Callable callable) {
+			return callable.getConstrainedElementKind() == ConstrainedElementKind.CONSTRUCTOR
+					? ConstraintLocationKind.CONSTRUCTOR
+					: callable instanceof JavaBeanGetter ? ConstraintLocationKind.GETTER : ConstraintLocationKind.METHOD;
 		}
 	}
 }

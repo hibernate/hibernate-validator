@@ -77,7 +77,7 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 		ConstraintLocation constraintLocation = ConstraintLocation.forGetter( javaBeanGetter );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
-				.map( builder -> builder.build( constraintLocation, ConstraintLocationKind.METHOD, null ) )
+				.map( builder -> builder.build( constraintLocation, ConstraintLocationKind.GETTER, null ) )
 				.collect( Collectors.toSet() );
 
 		ContainerElementTypeConfiguration containerElementTypeConfiguration = getContainerElementTypeConfiguration(

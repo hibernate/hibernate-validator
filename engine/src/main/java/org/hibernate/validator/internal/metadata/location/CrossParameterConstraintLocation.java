@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.metadata.location;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -29,9 +28,7 @@ class CrossParameterConstraintLocation implements ConstraintLocation {
 
 	CrossParameterConstraintLocation(Callable callable) {
 		this.callable = callable;
-		this.kind = callable.getConstrainedElementKind() == ConstrainedElementKind.CONSTRUCTOR
-				? ConstraintLocationKind.CONSTRUCTOR
-				: ConstraintLocationKind.METHOD;
+		this.kind = ConstraintLocationKind.of( callable );
 	}
 
 	@Override

@@ -89,7 +89,7 @@ class CrossParameterStaxBuilder extends AbstractStaxBuilder {
 		ConstraintLocation constraintLocation = ConstraintLocation.forCrossParameter( callable );
 
 		Set<MetaConstraint<?>> crossParameterConstraints = constraintTypeStaxBuilders.stream()
-				.map( builder -> builder.build( constraintLocation, ConstraintLocationKind.METHOD, ConstraintType.CROSS_PARAMETER ) )
+				.map( builder -> builder.build( constraintLocation, ConstraintLocationKind.of( callable ), ConstraintType.CROSS_PARAMETER ) )
 				.collect( Collectors.toSet() );
 
 		// ignore annotations
