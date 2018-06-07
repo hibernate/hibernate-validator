@@ -24,6 +24,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
@@ -47,7 +48,9 @@ final class PropertyConstraintMappingContextImpl
 		super( typeContext.getConstraintMapping(), property.getType() );
 		this.typeContext = typeContext;
 		this.property = property;
-		this.location = ConstraintLocation.forProperty( property );
+		this.location = property instanceof JavaBeanField
+				? ConstraintLocation.forField( property.as( JavaBeanField.class ) )
+				: ConstraintLocation.forGetter( property.as( JavaBeanGetter.class ) );
 	}
 
 	@Override

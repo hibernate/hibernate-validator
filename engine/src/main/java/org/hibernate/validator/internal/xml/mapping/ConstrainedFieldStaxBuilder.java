@@ -70,19 +70,19 @@ class ConstrainedFieldStaxBuilder extends AbstractConstrainedElementStaxBuilder 
 			alreadyProcessedFieldNames.add( mainAttributeValue );
 		}
 		Field field = findField( beanClass, mainAttributeValue );
-		JavaBeanField property = new JavaBeanField( field );
-		ConstraintLocation constraintLocation = ConstraintLocation.forProperty( property );
+		JavaBeanField javaBeanField = new JavaBeanField( field );
+		ConstraintLocation constraintLocation = ConstraintLocation.forField( javaBeanField );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
 				.map( builder -> builder.build( constraintLocation, java.lang.annotation.ElementType.FIELD, null ) )
 				.collect( Collectors.toSet() );
 
 		ContainerElementTypeConfiguration containerElementTypeConfiguration = getContainerElementTypeConfiguration(
-				property.getType(), constraintLocation );
+				javaBeanField.getType(), constraintLocation );
 
 		ConstrainedField constrainedField = new ConstrainedField(
 				ConfigurationSource.XML,
-				property,
+				javaBeanField,
 				metaConstraints,
 				containerElementTypeConfiguration.getMetaConstraints(),
 				getCascadingMetaData( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), ReflectionHelper.typeOf( field ) )
@@ -91,7 +91,7 @@ class ConstrainedFieldStaxBuilder extends AbstractConstrainedElementStaxBuilder 
 		// ignore annotations
 		if ( ignoreAnnotations.isPresent() ) {
 			annotationProcessingOptions.ignoreConstraintAnnotationsOnMember(
-					property,
+					javaBeanField,
 					ignoreAnnotations.get()
 			);
 		}

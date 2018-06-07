@@ -26,8 +26,6 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.properties.Callable;
-import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -74,8 +72,8 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 			alreadyProcessedGetterNames.add( mainAttributeValue );
 		}
 		Method getter = findGetter( beanClass, mainAttributeValue );
-		Property property = new JavaBeanGetter( beanClass, getter );
-		ConstraintLocation constraintLocation = ConstraintLocation.forProperty( property );
+		JavaBeanGetter javaBeanGetter = new JavaBeanGetter( beanClass, getter );
+		ConstraintLocation constraintLocation = ConstraintLocation.forGetter( javaBeanGetter );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()
 				.map( builder -> builder.build( constraintLocation, java.lang.annotation.ElementType.METHOD, null ) )
@@ -86,7 +84,7 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 
 		ConstrainedExecutable constrainedGetter = new ConstrainedExecutable(
 				ConfigurationSource.XML,
-				property.as( Callable.class ),
+				javaBeanGetter,
 				Collections.<ConstrainedParameter>emptyList(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				metaConstraints,
@@ -97,7 +95,7 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 		// ignore annotations
 		if ( ignoreAnnotations.isPresent() ) {
 			annotationProcessingOptions.ignoreConstraintAnnotationsOnMember(
-					property,
+					javaBeanGetter,
 					ignoreAnnotations.get()
 			);
 		}

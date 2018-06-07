@@ -9,23 +9,22 @@ package org.hibernate.validator.internal.metadata.location;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
- * Property constraint location.
+ * An abstract property constraint location.
  *
  * @author Marko Bekhta
  */
-public class PropertyConstraintLocation implements ConstraintLocation {
+public abstract class PropertyConstraintLocation<T extends Property> implements ConstraintLocation {
 
 	/**
 	 * The member the constraint was defined on.
 	 */
-	private final Property property;
+	private final T property;
 
-	PropertyConstraintLocation(Property property) {
+	PropertyConstraintLocation(T property) {
 		this.property = property;
 	}
 
@@ -35,7 +34,7 @@ public class PropertyConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
-	public Constrainable getConstrainable() {
+	public T getConstrainable() {
 		return property;
 	}
 
@@ -60,7 +59,7 @@ public class PropertyConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public String toString() {
-		return "PropertyConstraintLocation [property=" + property + "]";
+		return getClass().getSimpleName() + " [property=" + property + "]";
 	}
 
 	@Override
@@ -72,7 +71,7 @@ public class PropertyConstraintLocation implements ConstraintLocation {
 			return false;
 		}
 
-		PropertyConstraintLocation that = (PropertyConstraintLocation) o;
+		PropertyConstraintLocation<?> that = (PropertyConstraintLocation<?>) o;
 
 		if ( !property.equals( that.property ) ) {
 			return false;
