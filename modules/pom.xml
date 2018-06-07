@@ -34,9 +34,6 @@
         <wildfly-secondary.patched.target-dir>${project.build.directory}/wildfly-patched/wildfly-${version.wildfly.secondary}</wildfly-secondary.patched.target-dir>
         <wildfly-secondary.patch-file>${project.build.directory}/wildfly-secondary-hv-patch.zip</wildfly-secondary.patch-file>
 
-        <patch-gen.jvm.args.add-opens></patch-gen.jvm.args.add-opens>
-        <patch-gen.jvm.args>${patch-gen.jvm.args.add-opens}</patch-gen.jvm.args>
-
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
 
@@ -282,7 +279,6 @@
                             <goal>generate-patch</goal>
                         </goals>
                         <configuration>
-                            <argLine>${patch-gen.jvm.args}</argLine>
                             <appliesToDist>${wildfly-main.original.target-dir}</appliesToDist>
                             <patchConfig>${module.xml.targetdir}/wildfly-current-patch.xml</patchConfig>
                             <updatedDist>${wildfly-main.patched.target-dir}</updatedDist>
@@ -296,7 +292,6 @@
                             <goal>generate-patch</goal>
                         </goals>
                         <configuration>
-                            <argLine>${patch-gen.jvm.args}</argLine>
                             <appliesToDist>${wildfly-secondary.original.target-dir}</appliesToDist>
                             <patchConfig>${module.xml.targetdir}/wildfly-secondary-patch.xml</patchConfig>
                             <updatedDist>${wildfly-secondary.patched.target-dir}</updatedDist>
@@ -307,16 +302,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>jdk9</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <properties>
-                <patch-gen.jvm.args.add-opens>--add-opens=java.base/java.lang=ALL-UNNAMED</patch-gen.jvm.args.add-opens>
-            </properties>
-        </profile>
-    </profiles>
 </project>
