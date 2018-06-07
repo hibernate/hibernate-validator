@@ -75,7 +75,7 @@ public final class Contracts {
 	}
 
 	public static void assertNotEmpty(String s, String message) {
-		if ( s.length() == 0 ) {
+		if ( StringHelper.isNullOrEmptyString( s ) ) {
 			throw LOG.getIllegalArgumentException( message );
 		}
 	}
