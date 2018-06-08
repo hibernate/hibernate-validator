@@ -8,10 +8,12 @@ package org.hibernate.validator.testutil;
 
 import static org.testng.Assert.fail;
 
-import org.assertj.core.api.IterableAssert;
-
+import java.util.Locale;
 import java.util.Set;
+
 import javax.validation.metadata.GroupConversionDescriptor;
+
+import org.assertj.core.api.IterableAssert;
 
 /**
  * Provides assertion methods for testing {@link javax.validation.metadata.ElementDescriptor}
@@ -54,7 +56,7 @@ public class DescriptorAssert {
 			}
 
 			if ( !foundMatchingConversion ) {
-				fail( String.format( "<%s> does not contain a conversion from <%s> to <%s>.", actual, from, to ) );
+				fail( String.format( Locale.ROOT, "<%s> does not contain a conversion from <%s> to <%s>.", actual, from, to ) );
 			}
 		}
 	}

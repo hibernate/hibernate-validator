@@ -8,6 +8,7 @@ package org.hibernate.validator.ap.internal.util;
 
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.annotation.processing.Messager;
@@ -45,7 +46,7 @@ public class MessagerAdapter {
 		this.messager = messager;
 		this.diagnosticKind = diagnosticKind;
 
-		errorMessages = ResourceBundle.getBundle( "org.hibernate.validator.ap.ValidationProcessorMessages" );
+		errorMessages = ResourceBundle.getBundle( "org.hibernate.validator.ap.ValidationProcessorMessages", Locale.getDefault() );
 	}
 
 	/**
@@ -114,7 +115,8 @@ public class MessagerAdapter {
 		String message = errorMessages.getString( issue.getMessageKey() );
 
 		if ( issue.getMessageParameters() != null ) {
-			message = MessageFormat.format( message, issue.getMessageParameters() );
+			MessageFormat messageFormat = new MessageFormat( message, Locale.getDefault() );
+			message = messageFormat.format( issue.getMessageParameters() );
 		}
 
 		messager.printMessage(

@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
+import java.util.Locale;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -69,7 +70,7 @@ public final class Contracts {
 
 	public static void assertTrue(boolean condition, String message, Object... messageParameters) {
 		if ( !condition ) {
-			throw LOG.getIllegalArgumentException( String.format( message, messageParameters ) );
+			throw LOG.getIllegalArgumentException( String.format( Locale.ROOT, message, messageParameters ) );
 		}
 	}
 
@@ -87,7 +88,7 @@ public final class Contracts {
 
 	public static void assertNotEmpty(Collection<?> collection, String message, Object... messageParameters) {
 		if ( collection.size() == 0 ) {
-			throw LOG.getIllegalArgumentException( String.format( message, messageParameters ) );
+			throw LOG.getIllegalArgumentException( String.format( Locale.ROOT, message, messageParameters ) );
 		}
 	}
 }

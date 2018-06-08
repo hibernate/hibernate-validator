@@ -18,6 +18,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -269,7 +270,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			member = run( GetDeclaredField.action( clazz, property ) );
 		}
 		else {
-			String methodName = property.substring( 0, 1 ).toUpperCase() + property.substring( 1 );
+			String methodName = property.substring( 0, 1 ).toUpperCase( Locale.ROOT ) + property.substring( 1 );
 			for ( String prefix : ReflectionHelper.PROPERTY_ACCESSOR_PREFIXES ) {
 				member = run( GetMethod.action( clazz, prefix + methodName ) );
 				if ( member != null ) {
