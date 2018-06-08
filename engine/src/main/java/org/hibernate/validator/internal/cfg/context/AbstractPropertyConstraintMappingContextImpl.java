@@ -46,7 +46,7 @@ abstract class AbstractPropertyConstraintMappingContextImpl<T extends Property>
 	}
 
 	@Override
-	protected AbstractPropertyConstraintMappingContextImpl getThis() {
+	protected AbstractPropertyConstraintMappingContextImpl<?> getThis() {
 		return this;
 	}
 

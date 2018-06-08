@@ -72,7 +72,7 @@ class PropertyValidationContext<T> extends AbstractValidationContext<T> {
 		}
 
 		if ( location instanceof AbstractPropertyConstraintLocation ) {
-			return ( (AbstractPropertyConstraintLocation) location ).getPropertyName();
+			return ( (AbstractPropertyConstraintLocation<?>) location ).getPropertyName();
 		}
 
 		return null;

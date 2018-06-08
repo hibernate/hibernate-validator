@@ -162,8 +162,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				ValueExtractorManager valueExtractorManager) {
 			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
 
-			this.propertyName = constrainedProperty.getProperty().getName();
-			this.propertyType = constrainedProperty.getProperty().getType();
+			this.propertyName = constrainedProperty.getField().getName();
+			this.propertyType = constrainedProperty.getField().getType();
 			add( constrainedProperty );
 		}
 
@@ -198,7 +198,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					Property property = constrainable.get().as( Property.class );
 					Cascadable.Builder builder = cascadableBuilders.get( property );
 					if ( builder == null ) {
-						builder = AbstractPropertyCascadable.Builder.builder( constrainedElement.getKind(), valueExtractorManager, property, constrainedElement.getCascadingMetaDataBuilder() );
+						builder = AbstractPropertyCascadable.AbstractBuilder.builder( valueExtractorManager, property,
+								constrainedElement.getCascadingMetaDataBuilder() );
 						cascadableBuilders.put( property, builder );
 					}
 					else {
@@ -211,7 +212,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		private Optional<Constrainable> getConstrainableFromConstrainedElement(ConstrainedElement constrainedElement) {
 			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
 				if ( constrainedElement instanceof ConstrainedField ) {
-					return Optional.of( ( (ConstrainedField) constrainedElement ).getProperty() );
+					return Optional.of( ( (ConstrainedField) constrainedElement ).getField() );
 				}
 				else {
 					LOG.getUnexpectedConstraintElementType( ConstrainedField.class, constrainedElement.getClass() );
@@ -298,7 +299,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 		private String getPropertyName(ConstrainedElement constrainedElement) {
 			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
-				return ( (ConstrainedField) constrainedElement ).getProperty().getPropertyName();
+				return ( (ConstrainedField) constrainedElement ).getField().getPropertyName();
 			}
 			else if ( constrainedElement.getKind() == ConstrainedElementKind.GETTER ) {
 				return ( (ConstrainedExecutable) constrainedElement ).getCallable().as( Property.class ).getPropertyName();

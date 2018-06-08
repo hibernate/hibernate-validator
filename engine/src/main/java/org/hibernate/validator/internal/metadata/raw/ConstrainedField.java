@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.Field;
 
 /**
  * Represents a field of a Java type and all its associated meta-data relevant
@@ -22,41 +22,41 @@ import org.hibernate.validator.internal.properties.Property;
  */
 public class ConstrainedField extends AbstractConstrainedElement {
 
-	private final Property property;
+	private final Field field;
 
 	/**
 	 * Creates a new field meta data object.
 	 *
 	 * @param source The source of meta data.
-	 * @param property The represented field.
+	 * @param field The represented field.
 	 * @param constraints The constraints of the represented field, if any.
 	 * @param typeArgumentConstraints Type arguments constraints, if any.
 	 * @param cascadingMetaDataBuilder The cascaded validation metadata for this element and its container elements.
 	 */
 	public ConstrainedField(ConfigurationSource source,
-			Property property,
+			Field field,
 			Set<MetaConstraint<?>> constraints,
 			Set<MetaConstraint<?>> typeArgumentConstraints,
 			CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 
 		super( source, ConstrainedElementKind.FIELD, constraints, typeArgumentConstraints, cascadingMetaDataBuilder );
 
-		this.property = property;
+		this.field = field;
 
 	}
 
-	public Property getProperty() {
-		return property;
+	public Field getField() {
+		return field;
 	}
 	@Override
 	public String toString() {
-		return "ConstrainedField [property=" + property.getName() + "]";
+		return "ConstrainedField [field=" + field.getName() + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		int result = super.hashCode();
-		result = 31 * result + this.property.hashCode();
+		result = 31 * result + this.field.hashCode();
 		return result;
 	}
 
@@ -72,6 +72,6 @@ public class ConstrainedField extends AbstractConstrainedElement {
 			return false;
 		}
 		ConstrainedField other = (ConstrainedField) obj;
-		return this.property.equals( other.property );
+		return this.field.equals( other.field );
 	}
 }

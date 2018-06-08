@@ -579,7 +579,7 @@ public class ConstraintMappingTest {
 	private ConstrainedField getConstrainedField(BeanConfiguration<?> beanConfiguration, String fieldName) {
 		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
 			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD &&
-					( (ConstrainedField) constrainedElement ).getProperty().getPropertyName().equals( fieldName ) ) {
+					( (ConstrainedField) constrainedElement ).getField().getPropertyName().equals( fieldName ) ) {
 				return (ConstrainedField) constrainedElement;
 			}
 		}

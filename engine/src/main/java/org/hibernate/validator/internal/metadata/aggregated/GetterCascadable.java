@@ -9,7 +9,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
-import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.Getter;
 
 /**
  * A {@link Cascadable} backed by a getter of a Java bean.
@@ -17,10 +17,10 @@ import org.hibernate.validator.internal.properties.Property;
  * @author Gunnar Morling
  * @author Marko Bekhta
  */
-public class GetterCascadable extends AbstractPropertyCascadable {
+public class GetterCascadable extends AbstractPropertyCascadable<Getter> {
 
-	GetterCascadable(Property property, CascadingMetaData cascadingMetaData) {
-		super( property, cascadingMetaData );
+	GetterCascadable(Getter getter, CascadingMetaData cascadingMetaData) {
+		super( getter, cascadingMetaData );
 	}
 
 	@Override
@@ -28,15 +28,15 @@ public class GetterCascadable extends AbstractPropertyCascadable {
 		return ConstraintLocationKind.GETTER;
 	}
 
-	public static class Builder extends AbstractPropertyCascadable.Builder {
+	public static class Builder extends AbstractPropertyCascadable.AbstractBuilder<Getter> {
 
-		protected Builder(ValueExtractorManager valueExtractorManager, Property property, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
-			super( valueExtractorManager, property, cascadingMetaDataBuilder );
+		protected Builder(ValueExtractorManager valueExtractorManager, Getter getter, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+			super( valueExtractorManager, getter, cascadingMetaDataBuilder );
 		}
 
 		@Override
-		protected Cascadable create(Property property, CascadingMetaData cascadingMetaData) {
-			return new GetterCascadable( property, cascadingMetaData );
+		protected Cascadable create(Getter getter, CascadingMetaData cascadingMetaData) {
+			return new GetterCascadable( getter, cascadingMetaData );
 		}
 	}
 }
