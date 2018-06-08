@@ -116,14 +116,9 @@ public class FieldConstraintLocation implements ConstraintLocation {
 	}
 
 	/**
-	 * Returns an accessible version of the given member. Will be the given member itself in case it is accessible,
-	 * otherwise a copy which is set accessible.
+	 * Returns an accessible copy of the given member.
 	 */
 	private static Field getAccessible(Field original) {
-		if ( original.isAccessible() ) {
-			return original;
-		}
-
 		SecurityManager sm = System.getSecurityManager();
 		if ( sm != null ) {
 			sm.checkPermission( HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS );

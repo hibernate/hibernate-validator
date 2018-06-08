@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.security.AccessController;
@@ -125,14 +124,9 @@ public class GetterConstraintLocation implements ConstraintLocation {
 	}
 
 	/**
-	 * Returns an accessible version of the given method. Will be the given method itself in case it is accessible,
-	 * otherwise a copy which is set accessible.
+	 * Returns an accessible copy of the given method.
 	 */
 	private static Method getAccessible(Method original) {
-		if ( ( (AccessibleObject) original ).isAccessible() ) {
-			return original;
-		}
-
 		SecurityManager sm = System.getSecurityManager();
 		if ( sm != null ) {
 			sm.checkPermission( HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS );

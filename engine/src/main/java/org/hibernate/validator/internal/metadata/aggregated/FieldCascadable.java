@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.annotation.ElementType;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.security.AccessController;
@@ -85,14 +84,9 @@ public class FieldCascadable implements Cascadable {
 		}
 
 		/**
-		 * Returns an accessible version of the given member. Will be the given member itself in case it is accessible,
-		 * otherwise a copy which is set accessible.
+		 * Returns an accessible copy of the given member.
 		 */
 		private Field getAccessible(Field original) {
-			if ( ( (AccessibleObject) original ).isAccessible() ) {
-				return original;
-			}
-
 			SecurityManager sm = System.getSecurityManager();
 			if ( sm != null ) {
 				sm.checkPermission( HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS );
