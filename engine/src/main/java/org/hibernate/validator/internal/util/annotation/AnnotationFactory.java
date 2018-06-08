@@ -7,16 +7,11 @@
 package org.hibernate.validator.internal.util.annotation;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Proxy;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import org.hibernate.validator.internal.util.privilegedactions.ConstructorInstance;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
+import org.hibernate.validator.internal.util.privilegedactions.NewProxyInstance;
 
 /**
  * Creates live annotations (actually {@link AnnotationProxy} instances) from {@code AnnotationDescriptor}s.
@@ -32,31 +27,11 @@ public class AnnotationFactory {
 	}
 
 	public static <T extends Annotation> T create(AnnotationDescriptor<T> descriptor) {
-		@SuppressWarnings("unchecked")
-		Class<T> proxyClass = (Class<T>) Proxy.getProxyClass(
+		return run( NewProxyInstance.action(
 				run( GetClassLoader.fromClass( descriptor.getType() ) ),
-				descriptor.getType()
-		);
-		InvocationHandler handler = new AnnotationProxy( descriptor );
-		try {
-			return getProxyInstance( proxyClass, handler );
-		}
-		catch (RuntimeException e) {
-			throw e;
-		}
-		catch (Exception e) {
-			throw new RuntimeException( e );
-		}
-	}
-
-	private static <T extends Annotation> T getProxyInstance(Class<T> proxyClass, InvocationHandler handler) throws
-			SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
-			IllegalAccessException, InvocationTargetException {
-		final Constructor<T> constructor = run( GetDeclaredConstructor.action(
-				proxyClass,
-				InvocationHandler.class
+				descriptor.getType(),
+				new AnnotationProxy( descriptor )
 		) );
-		return run( ConstructorInstance.action( constructor, handler ) );
 	}
 
 	/**
