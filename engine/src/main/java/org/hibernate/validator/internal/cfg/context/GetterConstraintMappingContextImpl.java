@@ -18,13 +18,13 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
- * An implementation of {@link PropertyConstraintMappingContextImpl} for a getter property.
+ * An implementation of {@link AbstractPropertyConstraintMappingContextImpl} for a getter property.
  * Represents a constraint mapping creational context which allows to configure the constraints
  * for one of the bean's getter properties.
  *
  * @author Marko Bekhta
  */
-final class GetterConstraintMappingContextImpl extends PropertyConstraintMappingContextImpl<JavaBeanGetter> {
+final class GetterConstraintMappingContextImpl extends AbstractPropertyConstraintMappingContextImpl<JavaBeanGetter> {
 
 	GetterConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, JavaBeanGetter javaBeanGetter) {
 		super( typeContext, javaBeanGetter, ConstraintLocation.forGetter( javaBeanGetter ) );

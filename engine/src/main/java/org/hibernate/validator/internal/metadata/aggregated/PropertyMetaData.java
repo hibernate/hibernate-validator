@@ -198,7 +198,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					Property property = constrainable.get().as( Property.class );
 					Cascadable.Builder builder = cascadableBuilders.get( property );
 					if ( builder == null ) {
-						builder = PropertyCascadable.Builder.builder( constrainedElement.getKind(), valueExtractorManager, property, constrainedElement.getCascadingMetaDataBuilder() );
+						builder = AbstractPropertyCascadable.Builder.builder( constrainedElement.getKind(), valueExtractorManager, property, constrainedElement.getCascadingMetaDataBuilder() );
 						cascadableBuilders.put( property, builder );
 					}
 					else {

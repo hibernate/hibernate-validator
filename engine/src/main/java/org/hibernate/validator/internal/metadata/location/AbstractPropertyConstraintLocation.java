@@ -18,14 +18,14 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
  * @author Marko Bekhta
  * @author Guillaume Smet
  */
-public abstract class PropertyConstraintLocation implements ConstraintLocation {
+public abstract class AbstractPropertyConstraintLocation implements ConstraintLocation {
 
 	/**
 	 * The member the constraint was defined on.
 	 */
 	private final Property property;
 
-	PropertyConstraintLocation(Property property) {
+	AbstractPropertyConstraintLocation(Property property) {
 		this.property = property;
 	}
 
@@ -72,7 +72,7 @@ public abstract class PropertyConstraintLocation implements ConstraintLocation {
 			return false;
 		}
 
-		PropertyConstraintLocation that = (PropertyConstraintLocation) o;
+		AbstractPropertyConstraintLocation that = (AbstractPropertyConstraintLocation) o;
 
 		if ( !property.equals( that.property ) ) {
 			return false;

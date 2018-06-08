@@ -15,18 +15,18 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.properties.Property;
 
 /**
- * A {@link Cascadable} backed by a field of a Java bean.
+ * A {@link Cascadable} backed by a property of a Java bean.
  *
  * @author Gunnar Morling
  * @author Marko Bekhta
  */
-public abstract class PropertyCascadable implements Cascadable {
+public abstract class AbstractPropertyCascadable implements Cascadable {
 
 	private final Property property;
 	private final Type cascadableType;
 	private final CascadingMetaData cascadingMetaData;
 
-	PropertyCascadable(Property property, CascadingMetaData cascadingMetaData) {
+	AbstractPropertyCascadable(Property property, CascadingMetaData cascadingMetaData) {
 		this.property = property;
 		this.cascadableType = property.getType();
 		this.cascadingMetaData = cascadingMetaData;

@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.properties.Property;
  *
  * @author Marko Bekhta
  */
-public class FieldConstraintLocation extends PropertyConstraintLocation {
+public class FieldConstraintLocation extends AbstractPropertyConstraintLocation {
 
 	FieldConstraintLocation(Property field) {
 		super( field );

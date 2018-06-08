@@ -19,13 +19,13 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
- * An implementation of {@link PropertyConstraintMappingContextImpl} for a field property.
+ * An implementation of {@link AbstractPropertyConstraintMappingContextImpl} for a field property.
  * Represents a constraint mapping creational context which allows to configure the constraints
  * for one of the bean's field properties.
  *
  * @author Marko Bekhta
  */
-final class FieldConstraintMappingContextImpl extends PropertyConstraintMappingContextImpl<JavaBeanField> {
+final class FieldConstraintMappingContextImpl extends AbstractPropertyConstraintMappingContextImpl<JavaBeanField> {
 
 	FieldConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, JavaBeanField javaBeanField) {
 		super( typeContext, javaBeanField, ConstraintLocation.forField( javaBeanField ) );

@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.properties.Property;
  *
  * @author Marko Bekhta
  */
-public class GetterConstraintLocation extends PropertyConstraintLocation {
+public class GetterConstraintLocation extends AbstractPropertyConstraintLocation {
 
 	GetterConstraintLocation(Property getter) {
 		super( getter );
