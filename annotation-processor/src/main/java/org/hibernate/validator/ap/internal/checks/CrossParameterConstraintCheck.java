@@ -15,9 +15,9 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.util.ElementKindVisitor6;
-import javax.lang.model.util.SimpleAnnotationValueVisitor6;
-import javax.lang.model.util.TypeKindVisitor6;
+import javax.lang.model.util.ElementKindVisitor8;
+import javax.lang.model.util.SimpleAnnotationValueVisitor8;
+import javax.lang.model.util.TypeKindVisitor8;
 import javax.lang.model.util.Types;
 
 import org.hibernate.validator.ap.internal.util.AnnotationApiHelper;
@@ -61,7 +61,7 @@ public class CrossParameterConstraintCheck extends AbstractConstraintCheck {
 			return Collections.emptySet();
 		}
 
-		DeclaredType elementType = element.asType().accept( new TypeKindVisitor6<DeclaredType, Void>() {
+		DeclaredType elementType = element.asType().accept( new TypeKindVisitor8<DeclaredType, Void>() {
 
 			@Override
 			public DeclaredType visitDeclared(DeclaredType t, Void p) {
@@ -135,7 +135,7 @@ public class CrossParameterConstraintCheck extends AbstractConstraintCheck {
 		final DeclaredType constraintTargetType = annotationApiHelper.getDeclaredTypeByName( BeanValidationTypes.CONSTRAINT_TARGET );
 
 		// Check the return type
-		return validationAppliesToMethod.getReturnType().accept( new TypeKindVisitor6<Boolean, Void>() {
+		return validationAppliesToMethod.getReturnType().accept( new TypeKindVisitor8<Boolean, Void>() {
 
 			@Override
 			public Boolean visitDeclared(DeclaredType t, Void p) {
@@ -153,7 +153,7 @@ public class CrossParameterConstraintCheck extends AbstractConstraintCheck {
 		final DeclaredType constraintTargetType = annotationApiHelper.getDeclaredTypeByName( BeanValidationTypes.CONSTRAINT_TARGET );
 
 		// Check the return type
-		return validationAppliesToMethod.getDefaultValue().accept( new SimpleAnnotationValueVisitor6<Boolean, Void>() {
+		return validationAppliesToMethod.getDefaultValue().accept( new SimpleAnnotationValueVisitor8<Boolean, Void>() {
 
 			@Override
 			public Boolean visitEnumConstant(VariableElement c, Void p) {
@@ -167,7 +167,7 @@ public class CrossParameterConstraintCheck extends AbstractConstraintCheck {
 
 	private ExecutableElement getValidationAppliesToMethod(Element annotation) {
 		for ( Element e : annotation.getEnclosedElements() ) {
-			ExecutableElement method = e.accept( new ElementKindVisitor6<ExecutableElement, Void>() {
+			ExecutableElement method = e.accept( new ElementKindVisitor8<ExecutableElement, Void>() {
 
 				@Override
 				public ExecutableElement visitExecutableAsMethod(ExecutableElement e, Void p) {

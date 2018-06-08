@@ -44,9 +44,9 @@ import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.ElementKindVisitor6;
-import javax.lang.model.util.SimpleAnnotationValueVisitor6;
-import javax.lang.model.util.TypeKindVisitor6;
+import javax.lang.model.util.ElementKindVisitor8;
+import javax.lang.model.util.SimpleAnnotationValueVisitor8;
+import javax.lang.model.util.TypeKindVisitor8;
 import javax.lang.model.util.Types;
 
 import org.hibernate.validator.ap.internal.util.TypeNames.BeanValidationTypes;
@@ -394,7 +394,7 @@ public class ConstraintHelper {
 				.getAnnotationArrayValue( annotationMirror, "value" ) ) {
 
 			oneValuePart.accept(
-					new SimpleAnnotationValueVisitor6<Void, Void>() {
+					new SimpleAnnotationValueVisitor8<Void, Void>() {
 
 						@Override
 						public Void visitAnnotation(AnnotationMirror a, Void p) {
@@ -454,7 +454,7 @@ public class ConstraintHelper {
 
 		return Boolean.TRUE.equals(
 				element.asType().accept(
-						new TypeKindVisitor6<Boolean, Void>() {
+						new TypeKindVisitor8<Boolean, Void>() {
 
 							@Override
 							public Boolean visitDeclared(DeclaredType constraintValidatorImplementation, Void p) {
@@ -558,7 +558,7 @@ public class ConstraintHelper {
 			final TypeMirror objectMirror = annotationApiHelper.getMirrorForType( Object.class );
 
 			TypeMirror type = determineSupportedType( crossParameterValidator );
-			Boolean supported = type.accept( new TypeKindVisitor6<Boolean, Void>() {
+			Boolean supported = type.accept( new TypeKindVisitor8<Boolean, Void>() {
 				@Override
 				public Boolean visitArray(ArrayType t, Void p) {
 					return typeUtils.isSameType( t.getComponentType(), objectMirror );
@@ -647,7 +647,7 @@ public class ConstraintHelper {
 		for ( AnnotationValue oneAnnotationValue : annotationArrayValue ) {
 
 			Boolean isConstraintAnnotation = oneAnnotationValue.accept(
-					new SimpleAnnotationValueVisitor6<Boolean, Void>() {
+					new SimpleAnnotationValueVisitor8<Boolean, Void>() {
 
 						@Override
 						public Boolean visitAnnotation(
@@ -797,7 +797,7 @@ public class ConstraintHelper {
 
 			for ( Element e : annotation.getAnnotationType().asElement().getEnclosedElements() ) {
 
-				Boolean isValidationAppliesToMethod = e.accept( new ElementKindVisitor6<Boolean, Void>() {
+				Boolean isValidationAppliesToMethod = e.accept( new ElementKindVisitor8<Boolean, Void>() {
 					@Override
 					public Boolean visitExecutableAsMethod(ExecutableElement e, Void p) {
 						if ( e.getSimpleName().contentEquals( "validationAppliesTo" ) ) {
@@ -818,7 +818,7 @@ public class ConstraintHelper {
 		}
 
 		return validationAppliesTo.accept(
-			new SimpleAnnotationValueVisitor6<AnnotationProcessorConstraintTarget, Void>() {
+			new SimpleAnnotationValueVisitor8<AnnotationProcessorConstraintTarget, Void>() {
 
 				private final TypeMirror constraintTargetMirror = annotationApiHelper.getDeclaredTypeByName( BeanValidationTypes.CONSTRAINT_TARGET );
 
@@ -870,7 +870,7 @@ public class ConstraintHelper {
 		TypeMirror constraintValidatorImplementation = getConstraintValidatorSuperType( validatorClassReference );
 
 		return constraintValidatorImplementation.accept(
-				new TypeKindVisitor6<TypeMirror, Void>() {
+				new TypeKindVisitor8<TypeMirror, Void>() {
 
 					@Override
 					public TypeMirror visitDeclared(DeclaredType constraintValidatorImplementation, Void p) {
@@ -889,7 +889,7 @@ public class ConstraintHelper {
 	private Set<AnnotationProcessorValidationTarget> getSupportedValidationTargets(AnnotationValue oneValidatorClassReference) {
 		// determine the class that could contain the @SupportedValidationTarget annotation.
 		TypeMirror validatorClass = oneValidatorClassReference.accept(
-				new SimpleAnnotationValueVisitor6<TypeMirror, Void>() {
+				new SimpleAnnotationValueVisitor8<TypeMirror, Void>() {
 
 					@Override
 					public TypeMirror visitType(TypeMirror t, Void p) {
@@ -898,7 +898,7 @@ public class ConstraintHelper {
 				}, null
 		);
 
-		DeclaredType validatorType = validatorClass.accept( new TypeKindVisitor6<DeclaredType, Void>() {
+		DeclaredType validatorType = validatorClass.accept( new TypeKindVisitor8<DeclaredType, Void>() {
 			@Override
 			public DeclaredType visitDeclared(DeclaredType t, Void p) {
 				return t;
@@ -925,7 +925,7 @@ public class ConstraintHelper {
 		else {
 			List<? extends AnnotationValue> values = annotationApiHelper.getAnnotationArrayValue( supportedTargetDecl, "value" );
 			for ( AnnotationValue val : values ) {
-				AnnotationProcessorValidationTarget target = val.accept( new SimpleAnnotationValueVisitor6<AnnotationProcessorValidationTarget, Void>() {
+				AnnotationProcessorValidationTarget target = val.accept( new SimpleAnnotationValueVisitor8<AnnotationProcessorValidationTarget, Void>() {
 					@Override
 					public AnnotationProcessorValidationTarget visitEnumConstant(VariableElement c, Void p) {
 						return AnnotationProcessorValidationTarget.valueOf( c.getSimpleName().toString() );
@@ -944,7 +944,7 @@ public class ConstraintHelper {
 	private TypeMirror getConstraintValidatorSuperType(AnnotationValue oneValidatorClassReference) {
 
 		TypeMirror type = oneValidatorClassReference.accept(
-				new SimpleAnnotationValueVisitor6<TypeMirror, Void>() {
+				new SimpleAnnotationValueVisitor8<TypeMirror, Void>() {
 
 					@Override
 					public TypeMirror visitType(TypeMirror t, Void p) {
@@ -1009,7 +1009,7 @@ public class ConstraintHelper {
 		AnnotationValue validatedBy = annotationApiHelper.getAnnotationValue( constraintMetaAnnotation, "validatedBy" );
 
 		return validatedBy.accept(
-				new SimpleAnnotationValueVisitor6<List<? extends AnnotationValue>, Void>() {
+				new SimpleAnnotationValueVisitor8<List<? extends AnnotationValue>, Void>() {
 
 					@Override
 					public List<? extends AnnotationValue> visitArray(List<? extends AnnotationValue> values, Void p) {

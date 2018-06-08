@@ -17,8 +17,8 @@ import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.WildcardType;
-import javax.lang.model.util.SimpleAnnotationValueVisitor6;
-import javax.lang.model.util.TypeKindVisitor6;
+import javax.lang.model.util.SimpleAnnotationValueVisitor8;
+import javax.lang.model.util.TypeKindVisitor8;
 import javax.lang.model.util.Types;
 
 import org.hibernate.validator.ap.internal.util.AnnotationApiHelper;
@@ -225,13 +225,13 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 	private DeclaredType getComponentTypeOfArrayReturnType(ExecutableElement method) {
 
 		return method.getReturnType().accept(
-				new TypeKindVisitor6<DeclaredType, Void>() {
+				new TypeKindVisitor8<DeclaredType, Void>() {
 
 					@Override
 					public DeclaredType visitArray(ArrayType t, Void p) {
 
 						return t.getComponentType().accept(
-								new TypeKindVisitor6<DeclaredType, Void>() {
+								new TypeKindVisitor8<DeclaredType, Void>() {
 
 									@Override
 									public DeclaredType visitDeclared(DeclaredType t, Void p) {
@@ -259,7 +259,7 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 	private boolean validateWildcardBounds(TypeMirror type, final TypeMirror expectedExtendsBound, final TypeMirror expectedSuperBound) {
 
 		Boolean theValue = type.accept(
-				new TypeKindVisitor6<Boolean, Void>() {
+				new TypeKindVisitor8<Boolean, Void>() {
 
 					@Override
 					public Boolean visitWildcard(WildcardType t, Void p) {
@@ -289,7 +289,7 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 
 		return annotationValue != null && Boolean.TRUE.equals(
 				annotationValue.accept(
-						new SimpleAnnotationValueVisitor6<Boolean, Void>() {
+						new SimpleAnnotationValueVisitor8<Boolean, Void>() {
 
 							@Override
 							public Boolean visitArray(List<? extends AnnotationValue> values, Void p) {
