@@ -94,7 +94,7 @@ public interface ConstraintLocation {
 
 	/**
 	 * Obtains the value of this location from the parent. The type of the passed parent depends on the location type,
-	 * e.g. a bean would be passed for a {@link PropertyConstraintLocation} but an
+	 * e.g. a bean would be passed for a {@link AbstractPropertyConstraintLocation} but an
 	 * object array for a {@link ParameterConstraintLocation}.
 	 */
 	Object getValue(Object parent);

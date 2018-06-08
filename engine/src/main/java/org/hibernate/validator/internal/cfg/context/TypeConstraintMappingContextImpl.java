@@ -69,7 +69,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	private final Class<C> beanClass;
 
 	private final Set<ExecutableConstraintMappingContextImpl> executableContexts = newHashSet();
-	private final Set<PropertyConstraintMappingContextImpl> propertyContexts = newHashSet();
+	private final Set<AbstractPropertyConstraintMappingContextImpl> propertyContexts = newHashSet();
 	private final Set<Constrainable> configuredMembers = newHashSet();
 
 	private List<Class<?>> defaultGroupSequence;
@@ -146,7 +146,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			throw LOG.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass, property );
 		}
 
-		PropertyConstraintMappingContextImpl context = new FieldConstraintMappingContextImpl( this, javaBeanField );
+		AbstractPropertyConstraintMappingContextImpl context = new FieldConstraintMappingContextImpl( this, javaBeanField );
 		configuredMembers.add( javaBeanField );
 		propertyContexts.add( context );
 		return context;
@@ -166,7 +166,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			throw LOG.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass, property );
 		}
 
-		PropertyConstraintMappingContextImpl context = new GetterConstraintMappingContextImpl( this, javaBeanGetter );
+		AbstractPropertyConstraintMappingContextImpl context = new GetterConstraintMappingContextImpl( this, javaBeanGetter );
 		configuredMembers.add( javaBeanGetter );
 		propertyContexts.add( context );
 		return context;
@@ -258,7 +258,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		}
 
 		//properties
-		for ( PropertyConstraintMappingContextImpl propertyContext : propertyContexts ) {
+		for ( AbstractPropertyConstraintMappingContextImpl propertyContext : propertyContexts ) {
 			elements.add( propertyContext.build( constraintHelper, typeResolutionHelper, valueExtractorManager ) );
 		}
 

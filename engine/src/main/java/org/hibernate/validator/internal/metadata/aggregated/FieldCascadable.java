@@ -17,7 +17,7 @@ import org.hibernate.validator.internal.properties.Property;
  * @author Gunnar Morling
  * @author Marko Bekhta
  */
-public class FieldCascadable extends PropertyCascadable {
+public class FieldCascadable extends AbstractPropertyCascadable {
 
 	FieldCascadable(Property property, CascadingMetaData cascadingMetaData) {
 		super( property, cascadingMetaData );
@@ -28,7 +28,7 @@ public class FieldCascadable extends PropertyCascadable {
 		return ConstraintLocationKind.FIELD;
 	}
 
-	public static class Builder extends PropertyCascadable.Builder {
+	public static class Builder extends AbstractPropertyCascadable.Builder {
 
 		protected Builder(ValueExtractorManager valueExtractorManager, Property property, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 			super( valueExtractorManager, property, cascadingMetaDataBuilder );

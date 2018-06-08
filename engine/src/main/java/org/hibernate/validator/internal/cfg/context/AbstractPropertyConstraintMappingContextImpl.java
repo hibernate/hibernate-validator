@@ -28,7 +28,7 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Marko Bekhta
  */
-abstract class PropertyConstraintMappingContextImpl<T extends Property>
+abstract class AbstractPropertyConstraintMappingContextImpl<T extends Property>
 		extends CascadableConstraintMappingContextImplBase<PropertyConstraintMappingContext>
 		implements PropertyConstraintMappingContext {
 
@@ -38,7 +38,7 @@ abstract class PropertyConstraintMappingContextImpl<T extends Property>
 	private final T property;
 	private final ConstraintLocation location;
 
-	protected PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, T property, ConstraintLocation location) {
+	protected AbstractPropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, T property, ConstraintLocation location) {
 		super( typeContext.getConstraintMapping(), property.getType() );
 		this.typeContext = typeContext;
 		this.property = property;
@@ -46,7 +46,7 @@ abstract class PropertyConstraintMappingContextImpl<T extends Property>
 	}
 
 	@Override
-	protected PropertyConstraintMappingContextImpl getThis() {
+	protected AbstractPropertyConstraintMappingContextImpl getThis() {
 		return this;
 	}
 
