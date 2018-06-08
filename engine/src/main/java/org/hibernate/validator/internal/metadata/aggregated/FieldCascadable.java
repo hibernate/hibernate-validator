@@ -9,7 +9,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
-import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.Field;
 
 /**
  * A {@link Cascadable} backed by a field of a Java bean.
@@ -17,10 +17,10 @@ import org.hibernate.validator.internal.properties.Property;
  * @author Gunnar Morling
  * @author Marko Bekhta
  */
-public class FieldCascadable extends AbstractPropertyCascadable {
+public class FieldCascadable extends AbstractPropertyCascadable<Field> {
 
-	FieldCascadable(Property property, CascadingMetaData cascadingMetaData) {
-		super( property, cascadingMetaData );
+	FieldCascadable(Field field, CascadingMetaData cascadingMetaData) {
+		super( field, cascadingMetaData );
 	}
 
 	@Override
@@ -28,15 +28,15 @@ public class FieldCascadable extends AbstractPropertyCascadable {
 		return ConstraintLocationKind.FIELD;
 	}
 
-	public static class Builder extends AbstractPropertyCascadable.Builder {
+	public static class Builder extends AbstractPropertyCascadable.AbstractBuilder<Field> {
 
-		protected Builder(ValueExtractorManager valueExtractorManager, Property property, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
-			super( valueExtractorManager, property, cascadingMetaDataBuilder );
+		protected Builder(ValueExtractorManager valueExtractorManager, Field field, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+			super( valueExtractorManager, field, cascadingMetaDataBuilder );
 		}
 
 		@Override
-		protected Cascadable create(Property property, CascadingMetaData cascadingMetaData) {
-			return new FieldCascadable( property, cascadingMetaData );
+		protected Cascadable create(Field field, CascadingMetaData cascadingMetaData) {
+			return new FieldCascadable( field, cascadingMetaData );
 		}
 	}
 }

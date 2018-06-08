@@ -77,7 +77,7 @@ public abstract class AnnotationMetaDataProviderTestBase {
 				}
 			}
 			else if ( constrainedElement instanceof ConstrainedField ) {
-				if ( constrainable.equals( ( (ConstrainedField) constrainedElement ).getProperty() ) ) {
+				if ( constrainable.equals( ( (ConstrainedField) constrainedElement ).getField() ) ) {
 					return constrainedElement;
 				}
 			}

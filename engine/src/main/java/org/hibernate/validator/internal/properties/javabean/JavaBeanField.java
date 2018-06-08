@@ -15,14 +15,13 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.hibernate.validator.HibernateValidatorPermission;
-import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 
 /**
  * @author Marko Bekhta
  */
-public class JavaBeanField implements Property, JavaBeanAnnotatedConstrainable {
+public class JavaBeanField implements org.hibernate.validator.internal.properties.Field, JavaBeanAnnotatedConstrainable {
 
 	private final Field field;
 	private final String name;

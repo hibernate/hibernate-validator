@@ -6,27 +6,15 @@
  */
 package org.hibernate.validator.internal.properties;
 
-import java.lang.reflect.Type;
-
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 
 /**
- * @author Marko Bekhta
+ * @author Guillaume Smet
  */
-public interface Constrainable {
+public interface Getter extends Property {
 
-	String getName();
-
-	Class<?> getDeclaringClass();
-
-	Type getTypeForValidatorResolution();
-
-	Type getType();
-
-	ConstrainedElementKind getConstrainedElementKind();
-
-	@SuppressWarnings("unchecked")
-	default <T> T as(Class<T> clazz) {
-		return ( (T) this );
+	@Override
+	default ConstrainedElementKind getConstrainedElementKind() {
+		return ConstrainedElementKind.GETTER;
 	}
 }
