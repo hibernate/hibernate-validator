@@ -10,6 +10,8 @@ import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.UnwrapByDefault;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
+
 import javafx.beans.value.ObservableValue;
 
 /**
@@ -18,6 +20,7 @@ import javafx.beans.value.ObservableValue;
  * @author Gunnar Morling
  */
 @SuppressWarnings("restriction")
+@IgnoreForbiddenApisErrors(reason = "Usage of JavaFX classes")
 @UnwrapByDefault
 class ObservableValueValueExtractor implements ValueExtractor<ObservableValue<@ExtractedValue ?>> {
 
