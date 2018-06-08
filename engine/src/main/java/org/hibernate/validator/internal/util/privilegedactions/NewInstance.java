@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.util.privilegedactions;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
 import java.security.PrivilegedAction;
 
 import org.hibernate.validator.internal.util.logging.Log;
@@ -37,9 +38,9 @@ public final class NewInstance<T> implements PrivilegedAction<T> {
 	@Override
 	public T run() {
 		try {
-			return clazz.newInstance();
+			return clazz.getConstructor().newInstance();
 		}
-		catch (InstantiationException e) {
+		catch (InstantiationException | NoSuchMethodException | InvocationTargetException e) {
 			throw LOG.getUnableToInstantiateException( message, clazz, e );
 		}
 		catch (IllegalAccessException e) {
