@@ -262,6 +262,8 @@
         <maven.compiler.argument.testTarget>${maven.compiler.testTarget}</maven.compiler.argument.testTarget>
         <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
 
+        <forbiddenapis.jdk.target>10</forbiddenapis.jdk.target>
+
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
         <surefire.jvm.args.additional></surefire.jvm.args.additional>
         <surefire.jvm.args.illegal-access></surefire.jvm.args.illegal-access>
@@ -626,6 +628,7 @@
                     <artifactId>forbiddenapis</artifactId>
                     <version>${version.forbiddenapis.plugin}</version>
                     <configuration>
+                        <targetVersion>${forbiddenapis.jdk.target}</targetVersion>
                         <!-- if the Java version used is too new, don't fail, just do nothing -->
                         <failOnUnsupportedJava>false</failOnUnsupportedJava>
                         <suppressAnnotations>
@@ -657,13 +660,11 @@
                             <phase>verify</phase>
                             <configuration>
                                 <bundledSignatures>
-                                    <!--
-                                      this will automatically choose the right
-                                      signatures based on 'maven.compiler.target'
-                                    -->
+                                    <bundledSignature>jdk-unsafe</bundledSignature>
                                     <bundledSignature>jdk-deprecated</bundledSignature>
-                                    <!-- disallow printing to System.out or System.err -->
                                     <bundledSignature>jdk-system-out</bundledSignature>
+                                    <bundledSignature>jdk-non-portable</bundledSignature>
+                                    <bundledSignature>jdk-internal</bundledSignature>
                                 </bundledSignatures>
                             </configuration>
                         </execution>
@@ -675,10 +676,6 @@
                             <phase>verify</phase>
                             <configuration>
                                 <bundledSignatures>
-                                    <!--
-                                      this will automatically choose the right
-                                      signatures based on 'maven.compiler.target'
-                                    -->
                                     <bundledSignature>jdk-deprecated</bundledSignature>
                                 </bundledSignatures>
                             </configuration>
