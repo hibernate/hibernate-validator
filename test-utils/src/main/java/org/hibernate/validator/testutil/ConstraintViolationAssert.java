@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -272,7 +273,8 @@ public final class ConstraintViolationAssert {
 				referencePropertiesToTest = expectedViolations[0].propertiesToTest;
 				for ( ViolationExpectation expectedViolation : expectedViolations ) {
 					if ( !referencePropertiesToTest.equals( expectedViolation.propertiesToTest ) ) {
-						throw new IllegalArgumentException( String.format( "Expected violations passed in parameter must test the exact same properties but do not: %1$s != %2$s",
+						throw new IllegalArgumentException( String.format( Locale.ROOT,
+								"Expected violations passed in parameter must test the exact same properties but do not: %1$s != %2$s",
 								expectedViolations[0], expectedViolation ) );
 					}
 				}
@@ -309,7 +311,7 @@ public final class ConstraintViolationAssert {
 				actualPaths.add( actual );
 			}
 
-			fail( String.format( "Didn't find path <%s> in actual paths <%s>.", expectedPath, actualPaths ) );
+			fail( String.format( Locale.ROOT, "Didn't find path <%s> in actual paths <%s>.", expectedPath, actualPaths ) );
 		}
 
 		public void containsPaths(PathExpectation... expectedPaths) {

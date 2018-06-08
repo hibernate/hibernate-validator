@@ -7,9 +7,13 @@
 package org.hibernate.validator.performance.statistical;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import javax.validation.Valid;
 import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.AssertTrue;
@@ -28,7 +32,7 @@ import javax.validation.constraints.Size;
  */
 public class TestEntity {
 	public static final int MAX_DEPTH = 10;
-	private static final Calendar cal = GregorianCalendar.getInstance();
+	private static final Calendar cal = GregorianCalendar.getInstance( TimeZone.getTimeZone( ZoneId.of( "GMT" ) ), Locale.ROOT );
 
 	public TestEntity(int depth) {
 		if ( depth <= MAX_DEPTH ) {
