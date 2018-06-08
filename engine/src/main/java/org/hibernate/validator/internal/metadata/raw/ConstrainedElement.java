@@ -41,16 +41,6 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 
 	/**
-	 * The kind of a {@link ConstrainedElement}. Can be used to determine an
-	 * element's type when traversing over a collection of constrained elements.
-	 *
-	 * @author Gunnar Morling
-	 */
-	enum ConstrainedElementKind {
-		TYPE, FIELD, CONSTRUCTOR, METHOD, PARAMETER
-	}
-
-	/**
 	 * Returns the kind of this constrained element.
 	 *
 	 * @return The kind of this constrained element.
@@ -91,4 +81,28 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 * Returns the configuration source contributing this constrained element.
 	 */
 	ConfigurationSource getSource();
+
+	/**
+	 * The kind of a {@link ConstrainedElement}. Can be used to determine an
+	 * element's type when traversing over a collection of constrained elements.
+	 *
+	 * @author Gunnar Morling
+	 */
+	enum ConstrainedElementKind {
+
+		TYPE,
+		FIELD,
+		CONSTRUCTOR,
+		METHOD,
+		PARAMETER,
+		GETTER;
+
+		public boolean isExecutable() {
+			return this == CONSTRUCTOR || isMethod();
+		}
+
+		public boolean isMethod() {
+			return this == METHOD || this == GETTER;
+		}
+	}
 }

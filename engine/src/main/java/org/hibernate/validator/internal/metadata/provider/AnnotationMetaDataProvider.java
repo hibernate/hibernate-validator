@@ -303,7 +303,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = findConstraints(
 				javaBeanExecutable,
-				ConstraintLocationKind.of( javaBeanExecutable )
+				ConstraintLocationKind.of( javaBeanExecutable.getConstrainedElementKind() )
 		).stream().collect( Collectors.groupingBy( ConstraintDescriptorImpl::getConstraintType ) );
 
 		Set<MetaConstraint<?>> crossParameterConstraints;

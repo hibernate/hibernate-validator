@@ -28,7 +28,7 @@ class CrossParameterConstraintLocation implements ConstraintLocation {
 
 	CrossParameterConstraintLocation(Callable callable) {
 		this.callable = callable;
-		this.kind = ConstraintLocationKind.of( callable );
+		this.kind = ConstraintLocationKind.of( callable.getConstrainedElementKind() );
 	}
 
 	@Override

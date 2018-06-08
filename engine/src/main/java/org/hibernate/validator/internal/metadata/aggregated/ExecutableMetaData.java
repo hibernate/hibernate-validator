@@ -254,12 +254,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private final Set<String> signatures = newHashSet();
 
 		/**
-		 * Either CONSTRUCTOR or METHOD.
+		 * Either CONSTRUCTOR, METHOD or GETTER.
 		 */
 		private final ConstrainedElementKind kind;
 		private final Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		private Callable callable;
-		private final boolean isGetterMethod;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		private final Set<MethodConfigurationRule> rules;
 		private boolean isConstrained = false;
@@ -293,7 +292,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			this.kind = constrainedExecutable.getKind();
 			this.callable = constrainedExecutable.getCallable();
 			this.rules = methodValidationConfiguration.getConfiguredRuleSet();
-			this.isGetterMethod = constrainedExecutable.isGetterMethod();
 
 			add( constrainedExecutable );
 		}
@@ -397,7 +395,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
 					cascadingMetaDataBuilder.build( valueExtractorManager, callable ),
 					isConstrained,
-					isGetterMethod
+					kind == ConstrainedElementKind.GETTER
 			);
 		}
 

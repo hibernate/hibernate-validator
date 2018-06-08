@@ -20,7 +20,6 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.properties.Callable;
-import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -50,8 +49,6 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 
 	@Immutable
 	private final Set<MetaConstraint<?>> crossParameterConstraints;
-
-	private final boolean isGetterMethod;
 
 	/**
 	 * Creates a new executable meta data object for a parameter-less executable.
@@ -123,7 +120,6 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		this.crossParameterConstraints = CollectionHelper.toImmutableSet( crossParameterConstraints );
 		this.parameterMetaData = CollectionHelper.toImmutableList( parameterMetaData );
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData ) || !crossParameterConstraints.isEmpty();
-		this.isGetterMethod =  callable instanceof Property;
 	}
 
 	/**
@@ -188,16 +184,6 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	public boolean hasParameterConstraints() {
 		return hasParameterConstraints;
-	}
-
-	/**
-	 * Whether the represented executable is a JavaBeans getter executable or not.
-	 *
-	 * @return {@code True}, if this executable is a getter method, {@code false}
-	 *         otherwise.
-	 */
-	public boolean isGetterMethod() {
-		return isGetterMethod;
 	}
 
 	public Callable getCallable() {
