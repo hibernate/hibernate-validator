@@ -17,8 +17,8 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.ElementKindVisitor6;
-import javax.lang.model.util.SimpleTypeVisitor6;
+import javax.lang.model.util.ElementKindVisitor8;
+import javax.lang.model.util.SimpleTypeVisitor8;
 import javax.lang.model.util.Types;
 
 import org.hibernate.validator.ap.internal.util.AnnotationApiHelper;
@@ -150,7 +150,7 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 	 */
 	private boolean hasPublicDefaultConstructor(TypeElement element) {
 		return element.accept(
-				new ElementKindVisitor6<Boolean, Void>( Boolean.FALSE ) {
+				new ElementKindVisitor8<Boolean, Void>( Boolean.FALSE ) {
 
 					@Override
 					public Boolean visitTypeAsClass(TypeElement typeElement, Void aVoid) {
@@ -186,7 +186,7 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 	 */
 	private TypeMirror retrieveGenericProviderType(TypeMirror typeMirror) {
 		return typeMirror.accept(
-				new SimpleTypeVisitor6<TypeMirror, Void>() {
+				new SimpleTypeVisitor8<TypeMirror, Void>() {
 
 					@Override
 					public TypeMirror visitDeclared(DeclaredType declaredType, Void aVoid) {
