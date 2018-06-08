@@ -221,6 +221,7 @@
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
+        <forbiddenapis.jdk.target>10</forbiddenapis.jdk.target>
 
         <hibernate-validator-parent.path>.</hibernate-validator-parent.path>
     </properties>
@@ -574,6 +575,7 @@
                     <artifactId>forbiddenapis</artifactId>
                     <version>2.5</version>
                     <configuration>
+                        <targetVersion>${forbiddenapis.jdk.target}</targetVersion>
                         <!-- if the Java version used is too new, don't fail, just do nothing -->
                         <failOnUnsupportedJava>false</failOnUnsupportedJava>
                         <suppressAnnotations>
@@ -605,13 +607,11 @@
                             <phase>verify</phase>
                             <configuration>
                                 <bundledSignatures>
-                                    <!--
-                                      this will automatically choose the right
-                                      signatures based on 'maven.compiler.target'
-                                    -->
+                                    <bundledSignature>jdk-unsafe</bundledSignature>
                                     <bundledSignature>jdk-deprecated</bundledSignature>
-                                    <!-- disallow printing to System.out or System.err -->
                                     <bundledSignature>jdk-system-out</bundledSignature>
+                                    <bundledSignature>jdk-non-portable</bundledSignature>
+                                    <bundledSignature>jdk-internal</bundledSignature>
                                 </bundledSignatures>
                             </configuration>
                         </execution>
@@ -623,10 +623,6 @@
                             <phase>verify</phase>
                             <configuration>
                                 <bundledSignatures>
-                                    <!--
-                                      this will automatically choose the right
-                                      signatures based on 'maven.compiler.target'
-                                    -->
                                     <bundledSignature>jdk-deprecated</bundledSignature>
                                 </bundledSignatures>
                             </configuration>
