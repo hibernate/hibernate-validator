@@ -11,6 +11,7 @@ import java.util.Set;
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 import javafx.beans.property.SetProperty;
@@ -25,6 +26,7 @@ import javafx.beans.value.ObservableValue;
  * @author Guillaume Smet
  */
 @SuppressWarnings("restriction")
+@IgnoreForbiddenApisErrors(reason = "Usage of JavaFX classes")
 class SetPropertyValueExtractor implements ValueExtractor<SetProperty<@ExtractedValue ?>> {
 
 	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new SetPropertyValueExtractor() );
