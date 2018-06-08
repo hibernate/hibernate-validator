@@ -6,17 +6,17 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
-import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
+import org.hibernate.validator.internal.properties.Property;
 
 /**
  * Getter property constraint location.
  *
  * @author Marko Bekhta
  */
-public class GetterPropertyConstraintLocation extends PropertyConstraintLocation<JavaBeanGetter> {
+public class GetterConstraintLocation extends PropertyConstraintLocation {
 
-	GetterPropertyConstraintLocation(JavaBeanGetter javaBeanGetter) {
-		super( javaBeanGetter );
+	GetterConstraintLocation(Property getter) {
+		super( getter );
 	}
 
 	@Override

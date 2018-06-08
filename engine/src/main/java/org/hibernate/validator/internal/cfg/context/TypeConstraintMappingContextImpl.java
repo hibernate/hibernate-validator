@@ -146,7 +146,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			throw LOG.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass, property );
 		}
 
-		PropertyConstraintMappingContextImpl context = new FieldPropertyConstraintMappingContextImpl( this, javaBeanField );
+		PropertyConstraintMappingContextImpl context = new FieldConstraintMappingContextImpl( this, javaBeanField );
 		configuredMembers.add( javaBeanField );
 		propertyContexts.add( context );
 		return context;
@@ -166,7 +166,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			throw LOG.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass, property );
 		}
 
-		PropertyConstraintMappingContextImpl context = new GetterPropertyConstraintMappingContextImpl( this, javaBeanGetter );
+		PropertyConstraintMappingContextImpl context = new GetterConstraintMappingContextImpl( this, javaBeanGetter );
 		configuredMembers.add( javaBeanGetter );
 		propertyContexts.add( context );
 		return context;
