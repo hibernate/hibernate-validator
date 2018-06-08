@@ -32,7 +32,7 @@ public class ParameterConstraintLocation implements ConstraintLocation {
 		this.callable = callable;
 		this.index = index;
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( callable.getParameterGenericType( index ) );
-		this.kind = ConstraintLocationKind.of( callable );
+		this.kind = ConstraintLocationKind.of( callable.getConstrainedElementKind() );
 	}
 
 	@Override

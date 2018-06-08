@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.location;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.Locale;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
@@ -110,8 +111,7 @@ public interface ConstraintLocation {
 		PARAMETER( ElementType.PARAMETER ),
 		FIELD( ElementType.FIELD ),
 		GETTER( ElementType.METHOD ),
-		TYPE_USE( ElementType.TYPE_USE ),
-		;
+		TYPE_USE( ElementType.TYPE_USE );
 
 		private final ElementType elementType;
 
@@ -131,10 +131,24 @@ public interface ConstraintLocation {
 			return this == METHOD || this == GETTER;
 		}
 
-		public static ConstraintLocationKind of(Callable callable) {
-			return callable.getConstrainedElementKind() == ConstrainedElementKind.CONSTRUCTOR
-					? ConstraintLocationKind.CONSTRUCTOR
-					: callable instanceof JavaBeanGetter ? ConstraintLocationKind.GETTER : ConstraintLocationKind.METHOD;
+		public static ConstraintLocationKind of(ConstrainedElementKind constrainedElementKind) {
+			switch ( constrainedElementKind ) {
+				case CONSTRUCTOR:
+					return ConstraintLocationKind.CONSTRUCTOR;
+				case FIELD:
+					return ConstraintLocationKind.FIELD;
+				case METHOD:
+					return ConstraintLocationKind.METHOD;
+				case PARAMETER:
+					return ConstraintLocationKind.PARAMETER;
+				case TYPE:
+					return ConstraintLocationKind.TYPE;
+				case GETTER:
+					return ConstraintLocationKind.GETTER;
+				default:
+					throw new IllegalArgumentException(
+							String.format( Locale.ROOT, "Constrained element kind '%1$s' not supported.", constrainedElementKind ) );
+			}
 		}
 	}
 }

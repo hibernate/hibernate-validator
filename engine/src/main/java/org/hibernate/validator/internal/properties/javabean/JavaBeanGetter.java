@@ -11,6 +11,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.hibernate.validator.HibernateValidatorPermission;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -67,12 +68,17 @@ public class JavaBeanGetter extends JavaBeanMethod implements Property {
 
 	@Override
 	public String getParameterName(ExecutableParameterNameProvider parameterNameProvider, int parameterIndex) {
-		throw new IllegalStateException( "Getters cannot have parameters" );
+		throw new IllegalStateException( "Getters may not have parameters" );
 	}
 
 	@Override
 	public Class<?> getDeclaringClass() {
 		return declaringClass;
+	}
+
+	@Override
+	public ConstrainedElementKind getConstrainedElementKind() {
+		return ConstrainedElementKind.GETTER;
 	}
 
 	@Override

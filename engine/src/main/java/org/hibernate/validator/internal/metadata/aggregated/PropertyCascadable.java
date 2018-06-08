@@ -80,10 +80,10 @@ public abstract class PropertyCascadable implements Cascadable {
 			if ( ConstrainedElementKind.FIELD == constrainedElementKind ) {
 				return new FieldCascadable.Builder( valueExtractorManager, property, cascadingMetaDataBuilder );
 			}
-			else if ( ConstrainedElementKind.METHOD == constrainedElementKind ) {
+			else if ( ConstrainedElementKind.GETTER == constrainedElementKind ) {
 				return new GetterCascadable.Builder( valueExtractorManager, property, cascadingMetaDataBuilder );
 			}
-			throw new IllegalStateException( "It should either be field or method." );
+			throw new IllegalStateException( "It should be either a field or a getter." );
 		}
 	}
 }

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -42,10 +43,10 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation.Con
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
@@ -736,6 +737,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					break;
 				case CONSTRUCTOR:
 				case METHOD:
+				case GETTER:
 					ConstrainedExecutable constrainedExecutable = (ConstrainedExecutable) constrainedElement;
 					Callable member = constrainedExecutable.getCallable();
 
@@ -754,7 +756,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 						);
 					}
 
-					if ( constrainedExecutable.isGetterMethod() ) {
+					if ( constrainedElement.getKind() == ConstrainedElementKind.GETTER ) {
 						metaDataBuilder = new PropertyMetaData.Builder(
 								beanClass,
 								constrainedExecutable,
@@ -774,6 +776,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							valueExtractorManager
 					);
 					break;
+				default:
+					throw new IllegalStateException(
+							String.format( Locale.ROOT, "Constrained element kind '%1$s' not supported here.", constrainedElement.getKind() ) );
 			}
 
 			this.hashCode = buildHashCode();
@@ -790,7 +795,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( metaDataBuilder != null && metaDataBuilder.accepts( constrainedElement ) ) {
 				metaDataBuilder.add( constrainedElement );
 
-				if ( !added && constrainedElement.getKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
+				if ( !added && constrainedElement.getKind().isMethod() && methodBuilder == null ) {
 					ConstrainedExecutable constrainedMethod = (ConstrainedExecutable) constrainedElement;
 					methodBuilder = new ExecutableMetaData.Builder(
 							beanClass,

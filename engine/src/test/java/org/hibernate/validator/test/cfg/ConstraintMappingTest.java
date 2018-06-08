@@ -589,7 +589,7 @@ public class ConstraintMappingTest {
 
 	private ConstrainedExecutable getConstrainedExecutable(BeanConfiguration<?> beanConfiguration, String executableName) {
 		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
-			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
+			if ( constrainedElement.getKind().isMethod() &&
 					( (ConstrainedExecutable) constrainedElement ).getCallable().getName().equals( executableName ) ) {
 				return (ConstrainedExecutable) constrainedElement;
 			}

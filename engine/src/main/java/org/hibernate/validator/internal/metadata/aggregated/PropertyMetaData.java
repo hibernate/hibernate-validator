@@ -151,7 +151,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 		private static final EnumSet<ConstrainedElementKind> SUPPORTED_ELEMENT_KINDS = EnumSet.of(
 				ConstrainedElementKind.FIELD,
-				ConstrainedElementKind.METHOD
+				ConstrainedElementKind.GETTER
 		);
 
 		private final String propertyName;
@@ -179,11 +179,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		@Override
 		public boolean accepts(ConstrainedElement constrainedElement) {
 			if ( !SUPPORTED_ELEMENT_KINDS.contains( constrainedElement.getKind() ) ) {
-				return false;
-			}
-
-			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
-					!( (ConstrainedExecutable) constrainedElement ).isGetterMethod() ) {
 				return false;
 			}
 
@@ -222,7 +217,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					LOG.getUnexpectedConstraintElementType( ConstrainedField.class, constrainedElement.getClass() );
 				}
 			}
-			else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
+			else if ( constrainedElement.getKind() == ConstrainedElementKind.GETTER ) {
 				if ( constrainedElement instanceof ConstrainedExecutable ) {
 					return Optional.of( ( (ConstrainedExecutable) constrainedElement ).getCallable() );
 				}
@@ -235,7 +230,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 		@Override
 		protected Set<MetaConstraint<?>> adaptConstraints(ConstrainedElement constrainedElement, Set<MetaConstraint<?>> constraints) {
-			if ( constraints.isEmpty() || constrainedElement.getKind() != ConstrainedElementKind.METHOD ) {
+			if ( constraints.isEmpty() || constrainedElement.getKind() != ConstrainedElementKind.GETTER ) {
 				return constraints;
 			}
 
@@ -304,7 +299,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
 				return ( (ConstrainedField) constrainedElement ).getProperty().getPropertyName();
 			}
-			else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
+			else if ( constrainedElement.getKind() == ConstrainedElementKind.GETTER ) {
 				return ( (ConstrainedExecutable) constrainedElement ).getCallable().as( Property.class ).getPropertyName();
 			}
 

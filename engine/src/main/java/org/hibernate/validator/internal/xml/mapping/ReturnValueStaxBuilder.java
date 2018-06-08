@@ -56,7 +56,8 @@ class ReturnValueStaxBuilder extends AbstractConstrainedElementStaxBuilder {
 
 		ConstraintLocation constraintLocation = ConstraintLocation.forReturnValue( callable );
 		returnValueConstraints.addAll( constraintTypeStaxBuilders.stream()
-				.map( builder -> builder.build( constraintLocation, ConstraintLocationKind.of( callable ), ConstraintDescriptorImpl.ConstraintType.GENERIC ) )
+				.map( builder -> builder.build( constraintLocation, ConstraintLocationKind.of( callable.getConstrainedElementKind() ),
+						ConstraintDescriptorImpl.ConstraintType.GENERIC ) )
 				.collect( Collectors.toSet() ) );
 
 		ContainerElementTypeConfiguration containerElementTypeConfiguration = getContainerElementTypeConfiguration( callable.getType(), constraintLocation );
