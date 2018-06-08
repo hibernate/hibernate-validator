@@ -10,31 +10,30 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
- * An implementation of {@link PropertyConstraintMappingContextImpl} for a field property.
+ * An implementation of {@link PropertyConstraintMappingContextImpl} for a getter property.
  * Represents a constraint mapping creational context which allows to configure the constraints
- * for one of the bean's field properties.
+ * for one of the bean's getter properties.
  *
  * @author Marko Bekhta
  */
-final class FieldPropertyConstraintMappingContextImpl extends PropertyConstraintMappingContextImpl<JavaBeanField> {
+final class GetterConstraintMappingContextImpl extends PropertyConstraintMappingContextImpl<JavaBeanGetter> {
 
-	FieldPropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, JavaBeanField javaBeanField) {
-		super( typeContext, javaBeanField, ConstraintLocation.forField( javaBeanField ) );
+	GetterConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, JavaBeanGetter javaBeanGetter) {
+		super( typeContext, javaBeanGetter, ConstraintLocation.forGetter( javaBeanGetter ) );
 	}
 
 	@Override
 	public PropertyConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
 		super.addConstraint(
-				ConfiguredConstraint.forFieldProperty(
+				ConfiguredConstraint.forGetter(
 						definition, getProperty()
 				)
 		);
@@ -42,17 +41,12 @@ final class FieldPropertyConstraintMappingContextImpl extends PropertyConstraint
 	}
 
 	ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
-		return new ConstrainedField(
+		return new ConstrainedExecutable(
 				ConfigurationSource.API,
 				getProperty(),
 				getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 				getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 				getCascadingMetaDataBuilder()
 		);
-	}
-
-	@Override
-	protected ConstraintType getConstraintType() {
-		return ConstraintType.GENERIC;
 	}
 }

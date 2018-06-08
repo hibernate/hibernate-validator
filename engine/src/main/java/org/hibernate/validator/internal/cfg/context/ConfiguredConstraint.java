@@ -21,6 +21,7 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -53,8 +54,12 @@ class ConfiguredConstraint<A extends Annotation> {
 		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forClass( beanType ) );
 	}
 
-	static <A extends Annotation> ConfiguredConstraint<A> forFieldProperty(ConstraintDef<?, A> constraint, JavaBeanField javaBeanField) {
+	static <A extends Annotation> ConfiguredConstraint<A> forField(ConstraintDef<?, A> constraint, JavaBeanField javaBeanField) {
 		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forField( javaBeanField ) );
+	}
+
+	static <A extends Annotation> ConfiguredConstraint<A> forGetter(ConstraintDef<?, A> constraint, JavaBeanGetter javaBeanGetter) {
+		return forExecutable( constraint, javaBeanGetter );
 	}
 
 	public static <A extends Annotation> ConfiguredConstraint<A> forParameter(ConstraintDef<?, A> constraint, Callable callable, int parameterIndex) {

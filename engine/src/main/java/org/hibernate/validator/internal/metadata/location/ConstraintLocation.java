@@ -43,11 +43,11 @@ public interface ConstraintLocation {
 	}
 
 	static ConstraintLocation forField(JavaBeanField field) {
-		return new FieldPropertyConstraintLocation( field );
+		return new FieldConstraintLocation( field );
 	}
 
 	static ConstraintLocation forGetter(JavaBeanGetter getter) {
-		return new GetterPropertyConstraintLocation( getter );
+		return new GetterConstraintLocation( getter );
 	}
 
 	static ConstraintLocation forTypeArgument(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type typeOfAnnotatedElement) {

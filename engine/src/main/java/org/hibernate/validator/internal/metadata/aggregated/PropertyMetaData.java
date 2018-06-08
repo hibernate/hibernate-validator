@@ -29,7 +29,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.PropertyDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.GetterPropertyConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.GetterConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
@@ -234,7 +234,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				return constraints;
 			}
 
-			ConstraintLocation getterConstraintLocation = ConstraintLocation.forGetter( ( (ConstrainedExecutable) constrainedElement ).getCallable().as( JavaBeanGetter.class ) );
+			ConstraintLocation getterConstraintLocation = ConstraintLocation
+					.forGetter( ( (ConstrainedExecutable) constrainedElement ).getCallable().as( JavaBeanGetter.class ) );
 
 			// convert return value locations into getter locations for usage within this meta-data
 			return constraints.stream()
@@ -248,7 +249,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			// fast track if it's a regular constraint
 			if ( !( constraint.getLocation() instanceof TypeArgumentConstraintLocation ) ) {
 				// Change the constraint location to a GetterConstraintLocation if it is not already one
-				if ( constraint.getLocation() instanceof GetterPropertyConstraintLocation ) {
+				if ( constraint.getLocation() instanceof GetterConstraintLocation ) {
 					converted = constraint.getLocation();
 				}
 				else {
@@ -275,7 +276,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				for ( ConstraintLocation location : locationStack ) {
 					if ( !(location instanceof TypeArgumentConstraintLocation) ) {
 						// Change the constraint location to a GetterConstraintLocation if it is not already one
-						if ( location instanceof GetterPropertyConstraintLocation ) {
+						if ( location instanceof GetterConstraintLocation ) {
 							converted = location;
 						}
 						else {

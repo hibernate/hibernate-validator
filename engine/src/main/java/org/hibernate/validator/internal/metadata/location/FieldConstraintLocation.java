@@ -6,17 +6,17 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
-import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
+import org.hibernate.validator.internal.properties.Property;
 
 /**
  * Field property constraint location.
  *
  * @author Marko Bekhta
  */
-public class FieldPropertyConstraintLocation extends PropertyConstraintLocation<JavaBeanField> {
+public class FieldConstraintLocation extends PropertyConstraintLocation {
 
-	FieldPropertyConstraintLocation(JavaBeanField javaBeanGetter) {
-		super( javaBeanGetter );
+	FieldConstraintLocation(Property field) {
+		super( field );
 	}
 
 	@Override
