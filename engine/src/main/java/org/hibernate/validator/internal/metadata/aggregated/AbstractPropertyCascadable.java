@@ -14,6 +14,7 @@ import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.properties.Field;
 import org.hibernate.validator.internal.properties.Getter;
 import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.PropertyAccessor;
 
 /**
  * A {@link Cascadable} backed by a property of a Java bean.
@@ -24,11 +25,13 @@ import org.hibernate.validator.internal.properties.Property;
 public abstract class AbstractPropertyCascadable<T extends Property> implements Cascadable {
 
 	private final T property;
+	private final PropertyAccessor propertyAccessor;
 	private final Type cascadableType;
 	private final CascadingMetaData cascadingMetaData;
 
 	AbstractPropertyCascadable(T property, CascadingMetaData cascadingMetaData) {
 		this.property = property;
+		this.propertyAccessor = property.createAccessor();
 		this.cascadableType = property.getType();
 		this.cascadingMetaData = cascadingMetaData;
 	}
@@ -40,7 +43,7 @@ public abstract class AbstractPropertyCascadable<T extends Property> implements 
 
 	@Override
 	public Object getValue(Object parent) {
-		return property.getValueFrom( parent );
+		return propertyAccessor.getValueFrom( parent );
 	}
 
 	@Override

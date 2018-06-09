@@ -15,6 +15,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.hibernate.validator.HibernateValidatorPermission;
+import org.hibernate.validator.internal.properties.PropertyAccessor;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 
@@ -29,7 +30,7 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 	private final Type type;
 
 	public JavaBeanField(Field field) {
-		this.field = getAccessible( field );
+		this.field = field;
 		this.name = field.getName();
 		this.type = ReflectionHelper.typeOf( field );
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( this.type );
@@ -53,11 +54,6 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 	@Override
 	public Type getTypeForValidatorResolution() {
 		return typeForValidatorResolution;
-	}
-
-	@Override
-	public Object getValueFrom(Object bean) {
-		return ReflectionHelper.getValue( field, bean );
 	}
 
 	@Override
@@ -88,6 +84,11 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 	@Override
 	public TypeVariable<?>[] getTypeParameters() {
 		return field.getType().getTypeParameters();
+	}
+
+	@Override
+	public PropertyAccessor createAccessor() {
+		return new FieldAccessor( field );
 	}
 
 	@Override
@@ -125,6 +126,20 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 	@Override
 	public String toString() {
 		return getName();
+	}
+
+	private static class FieldAccessor implements PropertyAccessor {
+
+		private Field accessibleField;
+
+		private FieldAccessor(Field field) {
+			this.accessibleField = getAccessible( field );
+		}
+
+		@Override
+		public Object getValueFrom(Object bean) {
+			return ReflectionHelper.getValue( accessibleField, bean );
+		}
 	}
 
 	/**
