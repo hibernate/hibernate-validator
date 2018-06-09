@@ -48,6 +48,7 @@ import javax.xml.stream.XMLStreamException;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.logging.formatter.ArrayOfClassesObjectFormatter;
@@ -861,6 +862,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 244, value = "ConstrainedElement expected class was %1$s, but instead received %2$s.")
 	AssertionError getUnexpectedConstraintElementType(@FormatWith(ClassObjectFormatter.class) Class<?> expecting, @FormatWith(ClassObjectFormatter.class) Class<?> got);
 
-	@Message(id = 245, value = "Allowed ElementTypes are %2$s, but instead received %1$s.")
-	AssertionError getUnexpectedElementType(ElementType received, @FormatWith(ObjectArrayFormatter.class) ElementType... got);
+	@Message(id = 245, value = "Allowed constraint element types are FIELD and GETTER, but instead received %1$s.")
+	AssertionError getUnsupportedConstraintElementType(ConstrainedElement.ConstrainedElementKind kind);
 }
