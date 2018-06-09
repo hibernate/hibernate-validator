@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,7 +34,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.properties.Constrainable;
+import org.hibernate.validator.internal.properties.Getter;
 import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -192,41 +191,39 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			if ( constrainedElement.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ||
 					constrainedElement.getCascadingMetaDataBuilder().hasGroupConversionsOnAnnotatedObjectOrContainerElements() ) {
 
-				Optional<Constrainable> constrainable = getConstrainableFromConstrainedElement( constrainedElement );
+				Property property = getConstrainableFromConstrainedElement( constrainedElement );
 
-				if ( constrainable.isPresent() ) {
-					Property property = constrainable.get().as( Property.class );
-					Cascadable.Builder builder = cascadableBuilders.get( property );
-					if ( builder == null ) {
-						builder = AbstractPropertyCascadable.AbstractBuilder.builder( valueExtractorManager, property,
-								constrainedElement.getCascadingMetaDataBuilder() );
-						cascadableBuilders.put( property, builder );
-					}
-					else {
-						builder.mergeCascadingMetaData( constrainedElement.getCascadingMetaDataBuilder() );
-					}
+				Cascadable.Builder builder = cascadableBuilders.get( property );
+				if ( builder == null ) {
+					builder = AbstractPropertyCascadable.AbstractBuilder.builder( valueExtractorManager, property,
+							constrainedElement.getCascadingMetaDataBuilder() );
+					cascadableBuilders.put( property, builder );
+				}
+				else {
+					builder.mergeCascadingMetaData( constrainedElement.getCascadingMetaDataBuilder() );
 				}
 			}
 		}
 
-		private Optional<Constrainable> getConstrainableFromConstrainedElement(ConstrainedElement constrainedElement) {
-			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
-				if ( constrainedElement instanceof ConstrainedField ) {
-					return Optional.of( ( (ConstrainedField) constrainedElement ).getField() );
-				}
-				else {
-					LOG.getUnexpectedConstraintElementType( ConstrainedField.class, constrainedElement.getClass() );
-				}
+		private Property getConstrainableFromConstrainedElement(ConstrainedElement constrainedElement) {
+			switch ( constrainedElement.getKind() ) {
+				case FIELD:
+					if ( constrainedElement instanceof ConstrainedField ) {
+						return ( (ConstrainedField) constrainedElement ).getField();
+					}
+					else {
+						throw LOG.getUnexpectedConstraintElementType( ConstrainedField.class, constrainedElement.getClass() );
+					}
+				case GETTER:
+					if ( constrainedElement instanceof ConstrainedExecutable ) {
+						return ( (ConstrainedExecutable) constrainedElement ).getCallable().as( Getter.class );
+					}
+					else {
+						throw LOG.getUnexpectedConstraintElementType( ConstrainedExecutable.class, constrainedElement.getClass() );
+					}
+				default:
+					throw LOG.getUnsupportedConstraintElementType( constrainedElement.getKind() );
 			}
-			else if ( constrainedElement.getKind() == ConstrainedElementKind.GETTER ) {
-				if ( constrainedElement instanceof ConstrainedExecutable ) {
-					return Optional.of( ( (ConstrainedExecutable) constrainedElement ).getCallable() );
-				}
-				else {
-					LOG.getUnexpectedConstraintElementType( ConstrainedExecutable.class, constrainedElement.getClass() );
-				}
-			}
-			return Optional.empty();
 		}
 
 		@Override
