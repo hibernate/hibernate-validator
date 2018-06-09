@@ -10,6 +10,7 @@ import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.PropertyAccessor;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
@@ -25,8 +26,11 @@ public abstract class AbstractPropertyConstraintLocation<T extends Property> imp
 	 */
 	private final T property;
 
+	private final PropertyAccessor propertyAccessor;
+
 	AbstractPropertyConstraintLocation(T property) {
 		this.property = property;
+		this.propertyAccessor = property.createAccessor();
 	}
 
 	@Override
@@ -55,7 +59,7 @@ public abstract class AbstractPropertyConstraintLocation<T extends Property> imp
 
 	@Override
 	public Object getValue(Object parent) {
-		return property.getValueFrom( parent );
+		return propertyAccessor.getValueFrom( parent );
 	}
 
 	@Override

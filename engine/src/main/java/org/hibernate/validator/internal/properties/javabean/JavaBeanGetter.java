@@ -13,6 +13,7 @@ import java.security.PrivilegedAction;
 import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Getter;
+import org.hibernate.validator.internal.properties.PropertyAccessor;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
@@ -33,20 +34,15 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 	private final Class<?> declaringClass;
 
 	public JavaBeanGetter(Method method) {
-		super( getAccessible( method ) );
+		super( method );
 		this.name = ReflectionHelper.getPropertyName( method );
 		this.declaringClass = method.getDeclaringClass();
 	}
 
 	public JavaBeanGetter(Class<?> declaringClass, Method method) {
-		super( getAccessible( method ) );
+		super( method );
 		this.name = ReflectionHelper.getPropertyName( method );
 		this.declaringClass = declaringClass;
-	}
-
-	@Override
-	public Object getValueFrom(Object bean) {
-		return ReflectionHelper.getValue( executable, bean );
 	}
 
 	@Override
@@ -82,6 +78,11 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 	}
 
 	@Override
+	public PropertyAccessor createAccessor() {
+		return new GetterAccessor( executable );
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
@@ -103,6 +104,20 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 		int result = super.hashCode();
 		result = 31 * result + this.name.hashCode();
 		return result;
+	}
+
+	private static class GetterAccessor implements PropertyAccessor {
+
+		private Method accessibleGetter;
+
+		private GetterAccessor(Method getter) {
+			this.accessibleGetter = getAccessible( getter );
+		}
+
+		@Override
+		public Object getValueFrom(Object bean) {
+			return ReflectionHelper.getValue( accessibleGetter, bean );
+		}
 	}
 
 	/**

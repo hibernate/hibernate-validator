@@ -7,11 +7,9 @@
 package org.hibernate.validator.internal.properties;
 
 /**
- * @author Marko Bekhta
+ * @author Guillaume Smet
  */
-public interface Property extends Constrainable {
+public interface PropertyAccessor {
 
-	String getPropertyName();
-
-	PropertyAccessor createAccessor();
+	Object getValueFrom(Object bean);
 }
