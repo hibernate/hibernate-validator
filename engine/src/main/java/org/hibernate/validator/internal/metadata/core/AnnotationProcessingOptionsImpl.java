@@ -60,8 +60,9 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 	@Override
 	public boolean areMemberConstraintsIgnoredFor(Constrainable constrainable) {
 		Class<?> clazz = constrainable.getDeclaringClass();
-		if ( annotationIgnoredForMembers.containsKey( constrainable ) ) {
-			return annotationIgnoredForMembers.get( constrainable );
+		Boolean annotationIgnoredForMember = annotationIgnoredForMembers.get( constrainable );
+		if ( annotationIgnoredForMember != null ) {
+			return annotationIgnoredForMember;
 		}
 		else {
 			return areAllConstraintAnnotationsIgnoredFor( clazz );
@@ -70,8 +71,9 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 
 	@Override
 	public boolean areReturnValueConstraintsIgnoredFor(Constrainable constrainable) {
-		if ( annotationIgnoresForReturnValues.containsKey( constrainable ) ) {
-			return annotationIgnoresForReturnValues.get( constrainable );
+		Boolean annotationIgnoreForReturnValue = annotationIgnoresForReturnValues.get( constrainable );
+		if ( annotationIgnoreForReturnValue != null ) {
+			return annotationIgnoreForReturnValue;
 		}
 		else {
 			return areMemberConstraintsIgnoredFor( constrainable );
@@ -80,8 +82,9 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 
 	@Override
 	public boolean areCrossParameterConstraintsIgnoredFor(Constrainable constrainable) {
-		if ( annotationIgnoresForCrossParameter.containsKey( constrainable ) ) {
-			return annotationIgnoresForCrossParameter.get( constrainable );
+		Boolean annotationIgnoreForCrossParameter = annotationIgnoresForCrossParameter.get( constrainable );
+		if ( annotationIgnoreForCrossParameter != null ) {
+			return annotationIgnoreForCrossParameter;
 		}
 		else {
 			return areMemberConstraintsIgnoredFor( constrainable );
@@ -91,8 +94,9 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 	@Override
 	public boolean areParameterConstraintsIgnoredFor(Constrainable constrainable, int index) {
 		ExecutableParameterKey key = new ExecutableParameterKey( constrainable, index );
-		if ( annotationIgnoresForMethodParameter.containsKey( key ) ) {
-			return annotationIgnoresForMethodParameter.get( key );
+		Boolean annotationIgnoreForMethodParameter = annotationIgnoresForMethodParameter.get( key );
+		if ( annotationIgnoreForMethodParameter != null ) {
+			return annotationIgnoreForMethodParameter;
 		}
 		else {
 			return areMemberConstraintsIgnoredFor( constrainable );
@@ -102,8 +106,9 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 	@Override
 	public boolean areClassLevelConstraintsIgnoredFor(Class<?> clazz) {
 		boolean ignoreAnnotation;
-		if ( annotationIgnoresForClasses.containsKey( clazz ) ) {
-			ignoreAnnotation = annotationIgnoresForClasses.get( clazz );
+		Boolean annotationIgnoreForClass = annotationIgnoresForClasses.get( clazz );
+		if ( annotationIgnoreForClass != null ) {
+			ignoreAnnotation = annotationIgnoreForClass;
 		}
 		else {
 			ignoreAnnotation = areAllConstraintAnnotationsIgnoredFor( clazz );
