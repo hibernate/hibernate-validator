@@ -17,8 +17,6 @@ import java.lang.reflect.TypeVariable;
  */
 public class JavaBeanParameter implements JavaBeanAnnotatedElement {
 
-	private final JavaBeanExecutable<?> executable;
-
 	private final int index;
 
 	private final Parameter parameter;
@@ -27,16 +25,11 @@ public class JavaBeanParameter implements JavaBeanAnnotatedElement {
 
 	private final Type genericType;
 
-	JavaBeanParameter(JavaBeanExecutable<?> executable, int index, Parameter parameter, Class<?> type, Type genericType) {
-		this.executable = executable;
+	JavaBeanParameter(int index, Parameter parameter, Class<?> type, Type genericType) {
 		this.index = index;
 		this.parameter = parameter;
 		this.type = type;
 		this.genericType = genericType;
-	}
-
-	public JavaBeanExecutable<?> getExecutable() {
-		return executable;
 	}
 
 	public int getIndex() {
