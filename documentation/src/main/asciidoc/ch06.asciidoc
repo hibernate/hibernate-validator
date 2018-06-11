@@ -173,6 +173,19 @@ It is important to add each configured constraint violation by calling `addConst
 Only after that the new constraint violation will be created.
 ====
 
+[WARNING]
+====
+Note that the custom message template is passed directly to the Expression Language engine.
+
+Thus, you should be very careful when integrating user input in a custom message template as it will be interpreted
+by the Expression Language engine, which is usually not the behavior you expect and could cause a sensitive data leak.
+
+If you have this requirement, you should:
+
+ * either escape the user input by using the http://beanvalidation.org/2.0/spec/#validationapi-message-defaultmessageinterpolation[Bean Validation message interpolation escaping rules];
+ * or, even better, <<section-hibernateconstraintvalidatorcontext,pass the user input as message parameters or expression variables>> by unwrapping the context to `HibernateConstraintValidatorContext`.
+====
+
 Refer to <<section-custom-property-paths>> to learn how to use the `ConstraintValidatorContext` API to
 control the property path of constraint violations for class-level constraints.
 

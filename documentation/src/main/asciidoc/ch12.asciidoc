@@ -456,7 +456,8 @@ custom extensions for both of these interfaces.
 `HibernateConstraintValidatorContext` is a subtype of `ConstraintValidatorContext` which allows you to:
 
 * set arbitrary parameters for interpolation via the Expression Language message interpolation
-facility using `HibernateConstraintValidatorContext#addExpressionVariable(String, Object)`.
+facility using `HibernateConstraintValidatorContext#addExpressionVariable(String, Object)`
+or `HibernateConstraintValidatorContext#addMessageParameter(String, Object)`.
 +
 [[example-custom-message-parameter]]
 .Custom `@Future` validator with message parameters
