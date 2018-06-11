@@ -21,6 +21,11 @@ public class JavaBeanConstructor extends JavaBeanExecutable<Constructor<?>> {
 	}
 
 	@Override
+	public String getName() {
+		return getDeclaringClass().getSimpleName();
+	}
+
+	@Override
 	public ConstrainedElementKind getConstrainedElementKind() {
 		return ConstrainedElementKind.CONSTRUCTOR;
 	}

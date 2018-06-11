@@ -383,7 +383,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			assertCorrectnessOfConfiguration();
 
 			return new ExecutableMetaData(
-					kind == ConstrainedElementKind.CONSTRUCTOR ? callable.getDeclaringClass().getSimpleName() : callable.getName(),
+					callable.getName(),
 					callable.getType(),
 					callable.getParameterTypes(),
 					kind == ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
