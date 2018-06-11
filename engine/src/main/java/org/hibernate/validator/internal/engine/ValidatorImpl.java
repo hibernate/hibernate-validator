@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.engine;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
-import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -63,6 +62,7 @@ import org.hibernate.validator.internal.metadata.aggregated.ReturnValueMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -552,8 +552,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		for ( Cascadable cascadable : validatable.getCascadables() ) {
 			valueContext.appendNode( cascadable );
 
-			ElementType elementType = cascadable.getElementType();
-			if ( isCascadeRequired( validationContext, valueContext.getCurrentBean(), valueContext.getPropertyPath(), elementType ) ) {
+			if ( isCascadeRequired( validationContext, valueContext.getCurrentBean(), valueContext.getPropertyPath(),
+					cascadable.getConstraintLocationKind() ) ) {
 				Object value = getCascadableValue( validationContext, valueContext.getCurrentBean(), cascadable );
 				CascadingMetaData cascadingMetaData = cascadable.getCascadingMetaData();
 
@@ -1283,12 +1283,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				validationContext,
 				valueContext.getCurrentBean(),
 				valueContext.getPropertyPath(),
-				metaConstraint.getElementType()
+				metaConstraint.getConstraintLocationKind()
 		);
 	}
 
-	private boolean isReachable(BaseBeanValidationContext<?> validationContext, Object traversableObject, PathImpl path, ElementType type) {
-		if ( needToCallTraversableResolver( path, type ) ) {
+	private boolean isReachable(BaseBeanValidationContext<?> validationContext, Object traversableObject, PathImpl path,
+			ConstraintLocationKind constraintLocationKind) {
+		if ( needToCallTraversableResolver( path, constraintLocationKind ) ) {
 			return true;
 		}
 
@@ -1299,7 +1300,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					path.getLeafNode(),
 					validationContext.getRootBeanClass(),
 					pathToObject,
-					type
+					constraintLocationKind.getElementType()
 			);
 		}
 		catch (RuntimeException e) {
@@ -1307,23 +1308,24 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private boolean needToCallTraversableResolver(PathImpl path, ElementType type) {
+	private boolean needToCallTraversableResolver(PathImpl path, ConstraintLocationKind constraintLocationKind) {
 		// as the TraversableResolver interface is designed right now it does not make sense to call it when
 		// there is no traversable object hosting the property to be accessed. For this reason we don't call the resolver
 		// for class level constraints (ElementType.TYPE) or top level method parameters or return values.
 		// see also BV expert group discussion - http://lists.jboss.org/pipermail/beanvalidation-dev/2013-January/000722.html
-		return isClassLevelConstraint( type )
+		return isClassLevelConstraint( constraintLocationKind )
 				|| isCrossParameterValidation( path )
 				|| isParameterValidation( path )
 				|| isReturnValueValidation( path );
 	}
 
-	private boolean isCascadeRequired(BaseBeanValidationContext<?> validationContext, Object traversableObject, PathImpl path, ElementType type) {
-		if ( needToCallTraversableResolver( path, type ) ) {
+	private boolean isCascadeRequired(BaseBeanValidationContext<?> validationContext, Object traversableObject, PathImpl path,
+			ConstraintLocationKind constraintLocationKind) {
+		if ( needToCallTraversableResolver( path, constraintLocationKind ) ) {
 			return true;
 		}
 
-		boolean isReachable = isReachable( validationContext, traversableObject, path, type );
+		boolean isReachable = isReachable( validationContext, traversableObject, path, constraintLocationKind );
 		if ( !isReachable ) {
 			return false;
 		}
@@ -1335,7 +1337,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					path.getLeafNode(),
 					validationContext.getRootBeanClass(),
 					pathToObject,
-					type
+					constraintLocationKind.getElementType()
 			);
 		}
 		catch (RuntimeException e) {
@@ -1343,8 +1345,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private boolean isClassLevelConstraint(ElementType type) {
-		return ElementType.TYPE.equals( type );
+	private boolean isClassLevelConstraint(ConstraintLocationKind constraintLocationKind) {
+		return ConstraintLocationKind.TYPE.equals( constraintLocationKind );
 	}
 
 	private boolean isCrossParameterValidation(PathImpl path) {

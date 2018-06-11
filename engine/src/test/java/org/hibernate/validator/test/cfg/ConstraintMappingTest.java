@@ -60,6 +60,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -535,6 +536,28 @@ public class ConstraintMappingTest {
 		);
 	}
 
+	@Test
+	public void testFieldAndGetterMethodsForProgrammaticConstraintDefinition() {
+		mapping.type( Marathon.class )
+				.getter( "name" )
+					.constraint( new SizeDef().min( 5 ) )
+					.constraint( new SizeDef().min( 10 ) )
+				.field( "runners" )
+					.constraint( new SizeDef().max( 10 ).min( 1 ) );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Marathon marathon = new Marathon();
+		marathon.setName( "Foo" );
+
+		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "size must be between 10 and 2147483647" ),
+				violationOf( Size.class ).withMessage( "size must be between 5 and 2147483647" ),
+				violationOf( Size.class ).withMessage( "size must be between 1 and 10" )
+		);
+	}
+
 	private <T> BeanConfiguration<T> getBeanConfiguration(Class<T> type) {
 		Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations(
 				new ConstraintHelper(),
@@ -556,7 +579,7 @@ public class ConstraintMappingTest {
 	private ConstrainedField getConstrainedField(BeanConfiguration<?> beanConfiguration, String fieldName) {
 		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
 			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD &&
-					( (ConstrainedField) constrainedElement ).getField().getName().equals( fieldName ) ) {
+					( (ConstrainedField) constrainedElement ).getField().getPropertyName().equals( fieldName ) ) {
 				return (ConstrainedField) constrainedElement;
 			}
 		}
@@ -566,8 +589,8 @@ public class ConstraintMappingTest {
 
 	private ConstrainedExecutable getConstrainedExecutable(BeanConfiguration<?> beanConfiguration, String executableName) {
 		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
-			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
-					( (ConstrainedExecutable) constrainedElement ).getExecutable().getName().equals( executableName ) ) {
+			if ( constrainedElement.getKind().isMethod() &&
+					( (ConstrainedExecutable) constrainedElement ).getCallable().getName().equals( executableName ) ) {
 				return (ConstrainedExecutable) constrainedElement;
 			}
 		}

@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.cfg.context;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Executable;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,7 +23,7 @@ import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -41,20 +40,20 @@ abstract class ExecutableConstraintMappingContextImpl {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected final TypeConstraintMappingContextImpl<?> typeContext;
-	protected final Executable executable;
+	protected final Callable callable;
 	private final ParameterConstraintMappingContextImpl[] parameterContexts;
 	private ReturnValueConstraintMappingContextImpl returnValueContext;
 	private CrossParameterConstraintMappingContextImpl crossParameterContext;
 
-	protected ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Executable executable) {
+	protected ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Callable callable) {
 		this.typeContext = typeContext;
-		this.executable = executable;
-		this.parameterContexts = new ParameterConstraintMappingContextImpl[executable.getParameterTypes().length];
+		this.callable = callable;
+		this.parameterContexts = new ParameterConstraintMappingContextImpl[callable.getParameterTypes().length];
 	}
 
 	public ParameterConstraintMappingContext parameter(int index) {
-		if ( index < 0 || index >= executable.getParameterTypes().length ) {
-			throw LOG.getInvalidExecutableParameterIndexException( executable, index );
+		if ( index < 0 || index >= callable.getParameterTypes().length ) {
+			throw LOG.getInvalidExecutableParameterIndexException( callable, index );
 		}
 
 		ParameterConstraintMappingContextImpl context = parameterContexts[index];
@@ -62,7 +61,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 		if ( context != null ) {
 			throw LOG.getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass(),
-					executable,
+					callable,
 					index
 			);
 		}
@@ -76,7 +75,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 		if ( crossParameterContext != null ) {
 			throw LOG.getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass(),
-					executable
+					callable
 			);
 		}
 
@@ -88,7 +87,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 		if ( returnValueContext != null ) {
 			throw LOG.getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass(),
-					executable
+					callable
 			);
 		}
 
@@ -96,8 +95,8 @@ abstract class ExecutableConstraintMappingContextImpl {
 		return returnValueContext;
 	}
 
-	public Executable getExecutable() {
-		return executable;
+	public Callable getCallable() {
+		return callable;
 	}
 
 	public TypeConstraintMappingContextImpl<?> getTypeContext() {
@@ -108,7 +107,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 			ValueExtractorManager valueExtractorManager) {
 		return new ConstrainedExecutable(
 				ConfigurationSource.API,
-				executable,
+				callable,
 				getParameters( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ) : Collections.<MetaConstraint<?>>emptySet(),
@@ -130,8 +129,8 @@ abstract class ExecutableConstraintMappingContextImpl {
 				constrainedParameters.add(
 						new ConstrainedParameter(
 								ConfigurationSource.API,
-								executable,
-								ReflectionHelper.typeOf( executable, i ),
+								callable,
+								callable.getParameterGenericType( i ),
 								i
 						)
 				);

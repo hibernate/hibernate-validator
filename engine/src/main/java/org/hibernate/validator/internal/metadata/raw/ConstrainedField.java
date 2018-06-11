@@ -6,12 +6,11 @@
  */
 package org.hibernate.validator.internal.metadata.raw;
 
-import java.lang.reflect.Field;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.util.StringHelper;
+import org.hibernate.validator.internal.properties.Field;
 
 /**
  * Represents a field of a Java type and all its associated meta-data relevant
@@ -19,6 +18,7 @@ import org.hibernate.validator.internal.util.StringHelper;
  *
  * @author Gunnar Morling
  * @author Guillaume Smet
+ * @author Marko Bekhta
  */
 public class ConstrainedField extends AbstractConstrainedElement {
 
@@ -34,30 +34,29 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	 * @param cascadingMetaDataBuilder The cascaded validation metadata for this element and its container elements.
 	 */
 	public ConstrainedField(ConfigurationSource source,
-							Field field,
-							Set<MetaConstraint<?>> constraints,
-							Set<MetaConstraint<?>> typeArgumentConstraints,
-							CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+			Field field,
+			Set<MetaConstraint<?>> constraints,
+			Set<MetaConstraint<?>> typeArgumentConstraints,
+			CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 
 		super( source, ConstrainedElementKind.FIELD, constraints, typeArgumentConstraints, cascadingMetaDataBuilder );
 
 		this.field = field;
+
 	}
 
 	public Field getField() {
 		return field;
 	}
-
 	@Override
 	public String toString() {
-		return "ConstrainedField [field=" + StringHelper.toShortString( field ) + "]";
+		return "ConstrainedField [field=" + field.getName() + "]";
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ( ( field == null ) ? 0 : field.hashCode() );
+		result = 31 * result + this.field.hashCode();
 		return result;
 	}
 
@@ -73,14 +72,6 @@ public class ConstrainedField extends AbstractConstrainedElement {
 			return false;
 		}
 		ConstrainedField other = (ConstrainedField) obj;
-		if ( field == null ) {
-			if ( other.field != null ) {
-				return false;
-			}
-		}
-		else if ( !field.equals( other.field ) ) {
-			return false;
-		}
-		return true;
+		return this.field.equals( other.field );
 	}
 }

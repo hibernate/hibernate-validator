@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.xml.mapping;
 
-import java.lang.reflect.Executable;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,8 +19,8 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
+import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.mapping.ContainerElementTypeConfigurationBuilder.ContainerElementTypeConfiguration;
 
@@ -51,27 +50,28 @@ class ReturnValueStaxBuilder extends AbstractConstrainedElementStaxBuilder {
 	}
 
 	CascadingMetaDataBuilder build(
-			Executable executable,
+			Callable callable,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Set<MetaConstraint<?>> returnValueTypeArgumentConstraints) {
 
-		ConstraintLocation constraintLocation = ConstraintLocation.forReturnValue( executable );
+		ConstraintLocation constraintLocation = ConstraintLocation.forReturnValue( callable );
 		returnValueConstraints.addAll( constraintTypeStaxBuilders.stream()
-				.map( builder -> builder.build( constraintLocation, ExecutableHelper.getElementType( executable ), ConstraintDescriptorImpl.ConstraintType.GENERIC ) )
+				.map( builder -> builder.build( constraintLocation, ConstraintLocationKind.of( callable.getConstrainedElementKind() ),
+						ConstraintDescriptorImpl.ConstraintType.GENERIC ) )
 				.collect( Collectors.toSet() ) );
 
-		ContainerElementTypeConfiguration containerElementTypeConfiguration = getContainerElementTypeConfiguration( ReflectionHelper.typeOf( executable ), constraintLocation );
+		ContainerElementTypeConfiguration containerElementTypeConfiguration = getContainerElementTypeConfiguration( callable.getType(), constraintLocation );
 
 		returnValueTypeArgumentConstraints.addAll( containerElementTypeConfiguration.getMetaConstraints() );
 
 		// ignore annotations
 		if ( ignoreAnnotations.isPresent() ) {
 			annotationProcessingOptions.ignoreConstraintAnnotationsForReturnValue(
-					executable,
+					callable,
 					ignoreAnnotations.get()
 			);
 		}
 
-		return getCascadingMetaData( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), ReflectionHelper.typeOf( executable ) );
+		return getCascadingMetaData( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), callable.getType() );
 	}
 }

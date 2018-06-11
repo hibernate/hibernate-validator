@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +19,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -67,8 +67,8 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	}
 
 	@Override
-	public ElementType getElementType() {
-		return ElementType.METHOD;
+	public ConstraintLocationKind getConstraintLocationKind() {
+		return ConstraintLocationKind.METHOD;
 	}
 
 	@Override

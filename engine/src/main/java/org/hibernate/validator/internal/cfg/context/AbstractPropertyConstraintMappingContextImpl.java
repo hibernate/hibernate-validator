@@ -7,12 +7,7 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.annotation.ElementType;
-import java.lang.reflect.Executable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 
-import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
@@ -21,11 +16,8 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
@@ -34,50 +26,27 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
+ * @author Marko Bekhta
  */
-final class PropertyConstraintMappingContextImpl
+abstract class AbstractPropertyConstraintMappingContextImpl<T extends Property>
 		extends CascadableConstraintMappingContextImplBase<PropertyConstraintMappingContext>
 		implements PropertyConstraintMappingContext {
 
 	private final TypeConstraintMappingContextImpl<?> typeContext;
 
 	// either Field or Method
-	private final Member member;
+	private final T property;
 	private final ConstraintLocation location;
 
-	PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Member member) {
-		super( typeContext.getConstraintMapping(), ReflectionHelper.typeOf( member ) );
+	protected AbstractPropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, T property, ConstraintLocation location) {
+		super( typeContext.getConstraintMapping(), property.getType() );
 		this.typeContext = typeContext;
-		this.member = member;
-		if ( member instanceof Field ) {
-			this.location = ConstraintLocation.forField( (Field) member );
-		}
-		else {
-			this.location = ConstraintLocation.forGetter( (Method) member );
-		}
+		this.property = property;
+		this.location = location;
 	}
 
 	@Override
-	protected PropertyConstraintMappingContextImpl getThis() {
-		return this;
-	}
-
-	@Override
-	public PropertyConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		if ( member instanceof Field ) {
-			super.addConstraint(
-					ConfiguredConstraint.forProperty(
-							definition, member
-					)
-			);
-		}
-		else {
-			super.addConstraint(
-					ConfiguredConstraint.forExecutable(
-							definition, (Method) member
-					)
-			);
-		}
+	protected AbstractPropertyConstraintMappingContextImpl<?> getThis() {
 		return this;
 	}
 
@@ -88,13 +57,23 @@ final class PropertyConstraintMappingContextImpl
 
 	@Override
 	public PropertyConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
-		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsOnMember( member, ignoreAnnotations );
+		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsOnMember( property, ignoreAnnotations );
 		return this;
 	}
 
 	@Override
 	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
 		return typeContext.property( property, elementType );
+	}
+
+	@Override
+	public PropertyConstraintMappingContext field(String property) {
+		return typeContext.field( property );
+	}
+
+	@Override
+	public PropertyConstraintMappingContext getter(String property) {
+		return typeContext.getter( property );
 	}
 
 	@Override
@@ -117,29 +96,14 @@ final class PropertyConstraintMappingContextImpl
 		return super.containerElement( this, typeContext, location, index, nestedIndexes );
 	}
 
-	ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
-		if ( member instanceof Field ) {
-			return new ConstrainedField(
-					ConfigurationSource.API,
-					(Field) member,
-					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-					getCascadingMetaDataBuilder()
-			);
-		}
-		else {
-			return new ConstrainedExecutable(
-					ConfigurationSource.API,
-					(Executable) member,
-					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-					getCascadingMetaDataBuilder()
-			);
-		}
-	}
+	abstract ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager);
 
 	@Override
 	protected ConstraintType getConstraintType() {
 		return ConstraintType.GENERIC;
+	}
+
+	protected T getProperty() {
+		return property;
 	}
 }

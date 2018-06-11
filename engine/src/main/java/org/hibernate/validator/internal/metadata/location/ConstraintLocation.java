@@ -6,14 +6,17 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
-import java.lang.reflect.Executable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.Locale;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Constrainable;
+import org.hibernate.validator.internal.properties.Field;
+import org.hibernate.validator.internal.properties.Getter;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
@@ -43,45 +46,24 @@ public interface ConstraintLocation {
 		return new FieldConstraintLocation( field );
 	}
 
-	/**
-	 * Create a new {@link GetterConstraintLocation} for the given getter method.
-	 *
-	 * @param getter The getter method being constrained
-	 * @return A new GetterConstraintLocation
-	 */
-	static ConstraintLocation forGetter(Method getter) {
-		return new GetterConstraintLocation( getter.getDeclaringClass(), getter );
-	}
-
-	/**
-	 * Create a new {@link GetterConstraintLocation} for the given declaring class and getter method.
-	 * <p>
-	 * This provides an alternative to {@link ConstraintLocation#forGetter(Method)} where the given declaring class is usually a sub-class of the
-	 * actual class on which the getter method is declared. This is provided to support XML mapping configurations used to specify constraints on
-	 * subclasses for inherited getter methods.
-	 *
-	 * @param declaringClass The class on which the constraint is defined.
-	 * @param getter The getter method being constrained.
-	 * @return A new GetterConstraintLocation
-	 */
-	static ConstraintLocation forGetter(Class<?> declaringClass, Method getter ) {
-		return new GetterConstraintLocation( declaringClass, getter );
+	static ConstraintLocation forGetter(Getter getter) {
+		return new GetterConstraintLocation( getter );
 	}
 
 	static ConstraintLocation forTypeArgument(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type typeOfAnnotatedElement) {
 		return new TypeArgumentConstraintLocation( delegate, typeParameter, typeOfAnnotatedElement );
 	}
 
-	static ConstraintLocation forReturnValue(Executable executable) {
-		return new ReturnValueConstraintLocation( executable );
+	static ConstraintLocation forReturnValue(Callable callable) {
+		return new ReturnValueConstraintLocation( callable );
 	}
 
-	static ConstraintLocation forCrossParameter(Executable executable) {
-		return new CrossParameterConstraintLocation( executable );
+	static ConstraintLocation forCrossParameter(Callable callable) {
+		return new CrossParameterConstraintLocation( callable );
 	}
 
-	static ConstraintLocation forParameter(Executable executable, int index) {
-		return new ParameterConstraintLocation( executable, index );
+	static ConstraintLocation forParameter(Callable callable, int index) {
+		return new ParameterConstraintLocation( callable, index );
 	}
 
 	/**
@@ -94,7 +76,7 @@ public interface ConstraintLocation {
 	 *
 	 * @return the member represented by this location. Will be {@code null} when this location represents a type.
 	 */
-	Member getMember();
+	Constrainable getConstrainable();
 
 	/**
 	 * Returns the type to be used when resolving constraint validators for constraints at this location. Note that this
@@ -112,8 +94,61 @@ public interface ConstraintLocation {
 
 	/**
 	 * Obtains the value of this location from the parent. The type of the passed parent depends on the location type,
-	 * e.g. a bean would be passed for a {@link FieldConstraintLocation} or {@link GetterConstraintLocation} but an
+	 * e.g. a bean would be passed for a {@link AbstractPropertyConstraintLocation} but an
 	 * object array for a {@link ParameterConstraintLocation}.
 	 */
 	Object getValue(Object parent);
+
+	/**
+	 * Returns the nature of the constraint location.
+	 */
+	ConstraintLocationKind getKind();
+
+	enum ConstraintLocationKind {
+		TYPE( ElementType.TYPE ),
+		CONSTRUCTOR( ElementType.CONSTRUCTOR ),
+		METHOD( ElementType.METHOD ),
+		PARAMETER( ElementType.PARAMETER ),
+		FIELD( ElementType.FIELD ),
+		GETTER( ElementType.METHOD ),
+		TYPE_USE( ElementType.TYPE_USE );
+
+		private final ElementType elementType;
+
+		ConstraintLocationKind(ElementType elementType) {
+			this.elementType = elementType;
+		}
+
+		public ElementType getElementType() {
+			return elementType;
+		}
+
+		public boolean isExecutable() {
+			return this == CONSTRUCTOR || isMethod();
+		}
+
+		public boolean isMethod() {
+			return this == METHOD || this == GETTER;
+		}
+
+		public static ConstraintLocationKind of(ConstrainedElementKind constrainedElementKind) {
+			switch ( constrainedElementKind ) {
+				case CONSTRUCTOR:
+					return ConstraintLocationKind.CONSTRUCTOR;
+				case FIELD:
+					return ConstraintLocationKind.FIELD;
+				case METHOD:
+					return ConstraintLocationKind.METHOD;
+				case PARAMETER:
+					return ConstraintLocationKind.PARAMETER;
+				case TYPE:
+					return ConstraintLocationKind.TYPE;
+				case GETTER:
+					return ConstraintLocationKind.GETTER;
+				default:
+					throw new IllegalArgumentException(
+							String.format( Locale.ROOT, "Constrained element kind '%1$s' not supported.", constrainedElementKind ) );
+			}
+		}
+	}
 }

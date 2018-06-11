@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.core;
 
-import java.lang.reflect.Member;
+import org.hibernate.validator.internal.properties.Constrainable;
 
 /**
  * An  {@code AnnotationProcessingOptions} instance keeps track of annotations which should be ignored as configuration source.
@@ -18,13 +18,13 @@ import java.lang.reflect.Member;
 public interface AnnotationProcessingOptions {
 	boolean areClassLevelConstraintsIgnoredFor(Class<?> clazz);
 
-	boolean areMemberConstraintsIgnoredFor(Member member);
+	boolean areMemberConstraintsIgnoredFor(Constrainable constrainable);
 
-	boolean areReturnValueConstraintsIgnoredFor(Member member);
+	boolean areReturnValueConstraintsIgnoredFor(Constrainable constrainable);
 
-	boolean areCrossParameterConstraintsIgnoredFor(Member member);
+	boolean areCrossParameterConstraintsIgnoredFor(Constrainable constrainable);
 
-	boolean areParameterConstraintsIgnoredFor(Member member, int index);
+	boolean areParameterConstraintsIgnoredFor(Constrainable constrainable, int index);
 
 	void merge(AnnotationProcessingOptions annotationProcessingOptions);
 }

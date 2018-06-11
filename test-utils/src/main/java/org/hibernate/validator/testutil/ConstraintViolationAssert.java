@@ -263,6 +263,21 @@ public final class ConstraintViolationAssert {
 		public void containsOnlyViolations(ViolationExpectation... expectedViolations) {
 			isNotNull();
 
+			List<ViolationExpectation> actualViolations = getActualViolationExpectations( expectedViolations );
+
+			Assertions.assertThat( actualViolations ).containsExactlyInAnyOrder( expectedViolations );
+		}
+
+		public void containsOneOfViolations(ViolationExpectation... expectedViolations) {
+			isNotNull();
+
+			List<ViolationExpectation> actualViolations = getActualViolationExpectations( expectedViolations );
+
+			Assertions.assertThat( actualViolations ).hasSize( 1 );
+			Assertions.assertThat( expectedViolations ).contains( actualViolations.get( 0 ) );
+		}
+
+		private List<ViolationExpectation> getActualViolationExpectations(ViolationExpectation[] expectedViolations) {
 			List<ViolationExpectation> actualViolations = new ArrayList<>();
 
 			ViolationExpectationPropertiesToTest referencePropertiesToTest;
@@ -284,7 +299,7 @@ public final class ConstraintViolationAssert {
 				actualViolations.add( new ViolationExpectation( violation, referencePropertiesToTest ) );
 			}
 
-			Assertions.assertThat( actualViolations ).containsExactlyInAnyOrder( expectedViolations );
+			return actualViolations;
 		}
 
 		public void containsOnlyPaths(PathExpectation... paths) {

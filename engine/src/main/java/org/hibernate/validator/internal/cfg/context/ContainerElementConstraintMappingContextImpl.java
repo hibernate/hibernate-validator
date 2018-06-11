@@ -124,6 +124,16 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 	}
 
 	@Override
+	public PropertyConstraintMappingContext field(String property) {
+		return typeContext.field( property );
+	}
+
+	@Override
+	public PropertyConstraintMappingContext getter(String property) {
+		return typeContext.getter( property );
+	}
+
+	@Override
 	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
 		return typeContext.constructor( parameterTypes );
 	}
@@ -237,9 +247,9 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<>(
 				constraintHelper,
-				config.getLocation().getMember(),
+				config.getLocation().getConstrainable(),
 				config.createAnnotationDescriptor(),
-				config.getElementType(),
+				config.getLocation().getKind(),
 				getConstraintType()
 		);
 

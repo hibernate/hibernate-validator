@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
-import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeHelper;
 
@@ -18,6 +18,7 @@ import org.hibernate.validator.internal.util.TypeHelper;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 class BeanConstraintLocation implements ConstraintLocation {
 
@@ -47,7 +48,7 @@ class BeanConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
-	public Member getMember() {
+	public Constrainable getConstrainable() {
 		return null;
 	}
 
@@ -64,6 +65,11 @@ class BeanConstraintLocation implements ConstraintLocation {
 	@Override
 	public Object getValue(Object parent) {
 		return parent;
+	}
+
+	@Override
+	public ConstraintLocationKind getKind() {
+		return ConstraintLocationKind.TYPE;
 	}
 
 	@Override

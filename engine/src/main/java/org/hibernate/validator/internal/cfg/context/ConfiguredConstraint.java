@@ -7,13 +7,8 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Executable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
@@ -24,7 +19,9 @@ import javax.validation.ValidationException;
 import org.hibernate.validator.cfg.AnnotationDef;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -36,6 +33,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
  * related to its location (bean type etc.).
  *
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 class ConfiguredConstraint<A extends Annotation> {
 
@@ -46,58 +44,40 @@ class ConfiguredConstraint<A extends Annotation> {
 
 	private final ConstraintDef<?, A> constraint;
 	private final ConstraintLocation location;
-	private final ElementType elementType;
 
-	private ConfiguredConstraint(ConstraintDef<?, A> constraint, ConstraintLocation location, ElementType elementType) {
+	private ConfiguredConstraint(ConstraintDef<?, A> constraint, ConstraintLocation location) {
 		this.constraint = constraint;
 		this.location = location;
-		this.elementType = elementType;
 	}
 
 	static <A extends Annotation> ConfiguredConstraint<A> forType(ConstraintDef<?, A> constraint, Class<?> beanType) {
-		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forClass( beanType ), ElementType.TYPE );
+		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forClass( beanType ) );
 	}
 
-	static <A extends Annotation> ConfiguredConstraint<A> forProperty(ConstraintDef<?, A> constraint, Member member) {
-		if ( member instanceof Field ) {
-			return new ConfiguredConstraint<>(
-				constraint,
-				ConstraintLocation.forField( (Field) member ),
-				ElementType.FIELD
-			);
-		}
-		else {
-			return new ConfiguredConstraint<>(
-				constraint,
-				ConstraintLocation.forGetter( (Method) member ),
-				ElementType.METHOD
-			);
-		}
+	static <A extends Annotation> ConfiguredConstraint<A> forField(ConstraintDef<?, A> constraint, JavaBeanField javaBeanField) {
+		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forField( javaBeanField ) );
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A> forParameter(ConstraintDef<?, A> constraint, Executable executable, int parameterIndex) {
-		return new ConfiguredConstraint<>(
-				constraint, ConstraintLocation.forParameter( executable, parameterIndex ), ExecutableHelper.getElementType( executable )
-		);
+	static <A extends Annotation> ConfiguredConstraint<A> forGetter(ConstraintDef<?, A> constraint, JavaBeanGetter javaBeanGetter) {
+		return forExecutable( constraint, javaBeanGetter );
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A> forExecutable(ConstraintDef<?, A> constraint, Executable executable) {
-		return new ConfiguredConstraint<>(
-				constraint, ConstraintLocation.forReturnValue( executable ), ExecutableHelper.getElementType( executable )
-		);
+	public static <A extends Annotation> ConfiguredConstraint<A> forParameter(ConstraintDef<?, A> constraint, Callable callable, int parameterIndex) {
+		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forParameter( callable, parameterIndex ) );
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A> forCrossParameter(ConstraintDef<?, A> constraint, Executable executable) {
-		return new ConfiguredConstraint<>(
-				constraint, ConstraintLocation.forCrossParameter( executable ), ExecutableHelper.getElementType( executable )
-		);
+	public static <A extends Annotation> ConfiguredConstraint<A> forExecutable(ConstraintDef<?, A> constraint, Callable callable) {
+		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forReturnValue( callable ) );
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A> forTypeArgument(ConstraintDef<?, A> constraint,ConstraintLocation delegate, TypeVariable<?> typeArgument, Type typeOfAnnotatedElement) {
+	public static <A extends Annotation> ConfiguredConstraint<A> forCrossParameter(ConstraintDef<?, A> constraint, Callable callable) {
+		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forCrossParameter( callable ) );
+	}
+
+	public static <A extends Annotation> ConfiguredConstraint<A> forTypeArgument(ConstraintDef<?, A> constraint, ConstraintLocation delegate, TypeVariable<?> typeArgument, Type typeOfAnnotatedElement) {
 		return new ConfiguredConstraint<>(
 				constraint,
-				ConstraintLocation.forTypeArgument( delegate, typeArgument, typeOfAnnotatedElement ),
-				ElementType.TYPE_USE
+				ConstraintLocation.forTypeArgument( delegate, typeArgument, typeOfAnnotatedElement )
 		);
 	}
 
@@ -125,10 +105,6 @@ class ConfiguredConstraint<A extends Annotation> {
 	@Override
 	public String toString() {
 		return constraint.toString();
-	}
-
-	public ElementType getElementType() {
-		return elementType;
 	}
 
 	/**

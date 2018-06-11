@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
-import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
@@ -52,8 +52,8 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
-	public Member getMember() {
-		return delegate.getMember();
+	public Constrainable getConstrainable() {
+		return delegate.getConstrainable();
 	}
 
 	public TypeVariable<?> getTypeParameter() {
@@ -85,6 +85,11 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 
 	public ConstraintLocation getOuterDelegate() {
 		return outerDelegate;
+	}
+
+	@Override
+	public ConstraintLocationKind getKind() {
+		return ConstraintLocationKind.TYPE_USE;
 	}
 
 	@Override

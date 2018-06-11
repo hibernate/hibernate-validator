@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.engine;
 
 import java.io.Serializable;
-import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
@@ -39,24 +38,22 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	private final Map<String, Object> messageParameters;
 	private final Map<String, Object> expressionVariables;
 	private final Class<T> rootBeanClass;
-	private final ElementType elementType;
 	private final Object[] executableParameters;
 	private final Object executableReturnValue;
 	private final Object dynamicPayload;
 	private final int hashCode;
 
 	public static <T> ConstraintViolation<T> forBeanValidation(String messageTemplate,
-															   Map<String, Object> messageParameters,
-															   Map<String, Object> expressionVariables,
-															   String interpolatedMessage,
-															   Class<T> rootBeanClass,
-															   T rootBean,
-															   Object leafBeanInstance,
-															   Object value,
-															   Path propertyPath,
-															   ConstraintDescriptor<?> constraintDescriptor,
-															   ElementType elementType,
-															   Object dynamicPayload) {
+			Map<String, Object> messageParameters,
+			Map<String, Object> expressionVariables,
+			String interpolatedMessage,
+			Class<T> rootBeanClass,
+			T rootBean,
+			Object leafBeanInstance,
+			Object value,
+			Path propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor,
+			Object dynamicPayload) {
 		return new ConstraintViolationImpl<>(
 				messageTemplate,
 				messageParameters,
@@ -68,7 +65,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 				value,
 				propertyPath,
 				constraintDescriptor,
-				elementType,
 				null,
 				null,
 				dynamicPayload
@@ -76,18 +72,17 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	}
 
 	public static <T> ConstraintViolation<T> forParameterValidation(String messageTemplate,
-																	Map<String, Object> messageParameters,
-																	Map<String, Object> expressionVariables,
-																	String interpolatedMessage,
-																	Class<T> rootBeanClass,
-																	T rootBean,
-																	Object leafBeanInstance,
-																	Object value,
-																	Path propertyPath,
-																	ConstraintDescriptor<?> constraintDescriptor,
-																	ElementType elementType,
-																	Object[] executableParameters,
-																	Object dynamicPayload) {
+			Map<String, Object> messageParameters,
+			Map<String, Object> expressionVariables,
+			String interpolatedMessage,
+			Class<T> rootBeanClass,
+			T rootBean,
+			Object leafBeanInstance,
+			Object value,
+			Path propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor,
+			Object[] executableParameters,
+			Object dynamicPayload) {
 		return new ConstraintViolationImpl<>(
 				messageTemplate,
 				messageParameters,
@@ -99,7 +94,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 				value,
 				propertyPath,
 				constraintDescriptor,
-				elementType,
 				executableParameters,
 				null,
 				dynamicPayload
@@ -107,18 +101,17 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	}
 
 	public static <T> ConstraintViolation<T> forReturnValueValidation(String messageTemplate,
-																	  Map<String, Object> messageParameters,
-																	  Map<String, Object> expressionVariables,
-																	  String interpolatedMessage,
-																	  Class<T> rootBeanClass,
-																	  T rootBean,
-																	  Object leafBeanInstance,
-																	  Object value,
-																	  Path propertyPath,
-																	  ConstraintDescriptor<?> constraintDescriptor,
-																	  ElementType elementType,
-																	  Object executableReturnValue,
-																	  Object dynamicPayload) {
+			Map<String, Object> messageParameters,
+			Map<String, Object> expressionVariables,
+			String interpolatedMessage,
+			Class<T> rootBeanClass,
+			T rootBean,
+			Object leafBeanInstance,
+			Object value,
+			Path propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor,
+			Object executableReturnValue,
+			Object dynamicPayload) {
 		return new ConstraintViolationImpl<>(
 				messageTemplate,
 				messageParameters,
@@ -130,7 +123,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 				value,
 				propertyPath,
 				constraintDescriptor,
-				elementType,
 				null,
 				executableReturnValue,
 				dynamicPayload
@@ -147,7 +139,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 			Object value,
 			Path propertyPath,
 			ConstraintDescriptor<?> constraintDescriptor,
-			ElementType elementType,
 			Object[] executableParameters,
 			Object executableReturnValue,
 			Object dynamicPayload) {
@@ -161,7 +152,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		this.leafBeanInstance = leafBeanInstance;
 		this.constraintDescriptor = constraintDescriptor;
 		this.rootBeanClass = rootBeanClass;
-		this.elementType = elementType;
 		this.executableParameters = executableParameters;
 		this.executableReturnValue = executableReturnValue;
 		this.dynamicPayload = dynamicPayload;
@@ -296,10 +286,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		if ( constraintDescriptor != null ? !constraintDescriptor.equals( that.constraintDescriptor ) : that.constraintDescriptor != null ) {
 			return false;
 		}
-		if ( elementType != null ? !elementType.equals( that.elementType ) : that.elementType != null ) {
-			return false;
-		}
-
 		return true;
 	}
 
@@ -331,7 +317,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		result = 31 * result + System.identityHashCode( value );
 		result = 31 * result + ( constraintDescriptor != null ? constraintDescriptor.hashCode() : 0 );
 		result = 31 * result + ( messageTemplate != null ? messageTemplate.hashCode() : 0 );
-		result = 31 * result + ( elementType != null ? elementType.hashCode() : 0 );
 		return result;
 	}
 }

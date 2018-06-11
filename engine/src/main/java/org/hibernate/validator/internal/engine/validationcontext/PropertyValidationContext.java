@@ -23,8 +23,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVi
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.FieldConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.GetterConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.AbstractPropertyConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 
 /**
@@ -72,11 +71,8 @@ class PropertyValidationContext<T> extends AbstractValidationContext<T> {
 			location = ( (TypeArgumentConstraintLocation) location ).getOuterDelegate();
 		}
 
-		if ( location instanceof FieldConstraintLocation ) {
-			return ( (FieldConstraintLocation) location ).getPropertyName();
-		}
-		else if ( location instanceof GetterConstraintLocation ) {
-			return ( (GetterConstraintLocation) location ).getPropertyName();
+		if ( location instanceof AbstractPropertyConstraintLocation ) {
+			return ( (AbstractPropertyConstraintLocation<?>) location ).getPropertyName();
 		}
 
 		return null;
@@ -98,7 +94,6 @@ class PropertyValidationContext<T> extends AbstractValidationContext<T> {
 				localContext.getCurrentValidatedValue(),
 				propertyPath,
 				constraintDescriptor,
-				localContext.getElementType(),
 				constraintViolationCreationContext.getDynamicPayload()
 		);
 	}

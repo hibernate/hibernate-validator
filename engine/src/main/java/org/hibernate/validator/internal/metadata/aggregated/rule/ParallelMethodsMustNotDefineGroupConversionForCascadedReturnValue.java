@@ -25,8 +25,8 @@ public class ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue e
 
 		if ( isDefinedOnParallelType( method, otherMethod ) && isCascaded && hasGroupConversions ) {
 			throw LOG.getMethodsFromParallelTypesMustNotDefineGroupConversionsForCascadedReturnValueException(
-					method.getExecutable(),
-					otherMethod.getExecutable()
+					method.getCallable(),
+					otherMethod.getCallable()
 			);
 		}
 	}

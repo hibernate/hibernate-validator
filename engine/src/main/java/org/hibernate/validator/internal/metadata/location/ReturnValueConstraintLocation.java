@@ -6,43 +6,45 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
-import java.lang.reflect.Executable;
-import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * Executable return value constraint location.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Marko Bekhta
+ * @author Guillaume Smet
  */
 class ReturnValueConstraintLocation implements ConstraintLocation {
 
-	private final Executable executable;
-	private final Type typeForValidatorResolution;
+	private final Callable callable;
 
-	ReturnValueConstraintLocation(Executable executable) {
-		this.executable = executable;
-		this.typeForValidatorResolution = ReflectionHelper.boxedType( ReflectionHelper.typeOf( executable ) );
+	private final ConstraintLocationKind kind;
+
+	ReturnValueConstraintLocation(Callable callable) {
+		this.callable = callable;
+		this.kind = ConstraintLocationKind.of( callable.getConstrainedElementKind() );
 	}
 
 	@Override
 	public Class<?> getDeclaringClass() {
-		return executable.getDeclaringClass();
+		return callable.getDeclaringClass();
 	}
 
 	@Override
-	public Member getMember() {
-		return executable;
+	public Constrainable getConstrainable() {
+		return callable;
 	}
 
 	@Override
 	public Type getTypeForValidatorResolution() {
-		return typeForValidatorResolution;
+		return callable.getTypeForValidatorResolution();
 	}
 
 	@Override
@@ -56,15 +58,20 @@ class ReturnValueConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
+	public ConstraintLocationKind getKind() {
+		return kind;
+	}
+
+	@Override
 	public String toString() {
-		return "ReturnValueConstraintLocation [executable=" + executable + "]";
+		return "ReturnValueConstraintLocation [callable=" + callable + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ( ( executable == null ) ? 0 : executable.hashCode() );
+		result = prime * result + callable.hashCode();
 		return result;
 	}
 
@@ -80,12 +87,7 @@ class ReturnValueConstraintLocation implements ConstraintLocation {
 			return false;
 		}
 		ReturnValueConstraintLocation other = (ReturnValueConstraintLocation) obj;
-		if ( executable == null ) {
-			if ( other.executable != null ) {
-				return false;
-			}
-		}
-		else if ( !executable.equals( other.executable ) ) {
+		if ( !callable.equals( other.callable ) ) {
 			return false;
 		}
 
