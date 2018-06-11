@@ -34,14 +34,12 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 
 	protected final T executable;
 	private final Type typeForValidatorResolution;
-	private final String name;
 	private final boolean hasReturnValue;
 	private final Type type;
 	private final List<JavaBeanParameter> parameters;
 
 	JavaBeanExecutable(T executable, boolean hasReturnValue) {
 		this.executable = executable;
-		this.name = executable.getName();
 		this.type = ReflectionHelper.typeOf( executable );
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( type );
 		this.hasReturnValue = hasReturnValue;
@@ -54,7 +52,7 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 			Type[] genericParameterTypes = executable.getGenericParameterTypes();
 
 			for ( int i = 0; i < parameterArray.length; i++ ) {
-				parameters.add( new JavaBeanParameter( this, i, parameterArray[i], parameterTypes[i],
+				parameters.add( new JavaBeanParameter( i, parameterArray[i], parameterTypes[i],
 						getParameterGenericType( parameterTypes, genericParameterTypes, i ) ) );
 			}
 			this.parameters = CollectionHelper.toImmutableList( parameters );
@@ -92,7 +90,7 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 
 	@Override
 	public String getName() {
-		return name;
+		return executable.getName();
 	}
 
 	@Override
@@ -194,9 +192,6 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 		if ( !this.typeForValidatorResolution.equals( that.typeForValidatorResolution ) ) {
 			return false;
 		}
-		if ( !this.name.equals( that.name ) ) {
-			return false;
-		}
 		return this.type.equals( that.type );
 	}
 
@@ -204,7 +199,6 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 	public int hashCode() {
 		int result = this.executable.hashCode();
 		result = 31 * result + this.typeForValidatorResolution.hashCode();
-		result = 31 * result + this.name.hashCode();
 		result = 31 * result + ( this.hasReturnValue ? 1 : 0 );
 		result = 31 * result + this.type.hashCode();
 		return result;
@@ -213,7 +207,7 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 	@Override
 	public String toString() {
 		return ExecutableHelper.getExecutableAsString(
-				getDeclaringClass().getSimpleName() + "#" + name,
+				getDeclaringClass().getSimpleName() + "#" + executable.getName(),
 				executable.getParameterTypes()
 		);
 	}

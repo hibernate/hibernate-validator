@@ -424,7 +424,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				}
 			}
 
-			Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( parameter );
+			Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( javaBeanExecutable, parameter );
 			CascadingMetaDataBuilder cascadingMetaData = findCascadingMetaData( parameter );
 
 			metaData.add(
@@ -691,11 +691,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @return a set of type arguments constraints, or an empty set if no constrained type arguments are found
 	 */
-	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(JavaBeanParameter javaBeanParameter) {
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(JavaBeanExecutable<?> javaBeanExecutable,
+			JavaBeanParameter javaBeanParameter) {
 		try {
 			return findTypeArgumentsConstraints(
-					javaBeanParameter.getExecutable(),
-					new TypeArgumentExecutableParameterLocation( javaBeanParameter.getExecutable(), javaBeanParameter.getIndex() ),
+					javaBeanExecutable,
+					new TypeArgumentExecutableParameterLocation( javaBeanExecutable, javaBeanParameter.getIndex() ),
 					javaBeanParameter.getAnnotatedType()
 			);
 		}
