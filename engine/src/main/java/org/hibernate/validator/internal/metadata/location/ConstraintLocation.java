@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.metadata.location;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.Locale;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
@@ -18,6 +17,7 @@ import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.properties.Field;
 import org.hibernate.validator.internal.properties.Getter;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.StringHelper;
 
 /**
  * Represents the location (e.g. a bean, field or method parameter) of a constraint and provides logic related to it,
@@ -147,7 +147,7 @@ public interface ConstraintLocation {
 					return ConstraintLocationKind.GETTER;
 				default:
 					throw new IllegalArgumentException(
-							String.format( Locale.ROOT, "Constrained element kind '%1$s' not supported.", constrainedElementKind ) );
+							StringHelper.format( "Constrained element kind '%1$s' not supported.", constrainedElementKind ) );
 			}
 		}
 	}

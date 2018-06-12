@@ -22,6 +22,7 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.validation.ValidationException;
 
+import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.spi.scripting.AbstractCachingScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEngineScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
@@ -52,7 +53,7 @@ public class OsgiScriptEvaluatorFactory extends AbstractCachingScriptEvaluatorFa
 				.filter( Objects::nonNull )
 				.map( engine -> new ScriptEngineScriptEvaluator( engine ) )
 				.findFirst()
-				.orElseThrow( () -> new ValidationException( String.format( "Unable to find script evaluator for '%s'.", languageName ) ) );
+				.orElseThrow( () -> new ValidationException( StringHelper.format( "Unable to find script evaluator for '%s'.", languageName ) ) );
 	}
 
 	private List<ScriptEngineManager> findManagers(BundleContext context) {
