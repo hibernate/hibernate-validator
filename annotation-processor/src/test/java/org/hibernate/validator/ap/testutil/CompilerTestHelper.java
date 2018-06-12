@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.ap.testutil;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,10 +31,8 @@ import javax.tools.StandardLocation;
 
 import org.hibernate.validator.ap.internal.util.CollectionHelper;
 import org.hibernate.validator.ap.internal.util.Configuration;
+import org.hibernate.validator.ap.internal.util.StringHelper;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
 
 /**
  * Infrastructure for unit tests based on the Java Compiler API.
@@ -180,16 +181,16 @@ public class CompilerTestHelper {
 		List<String> options = new ArrayList<String>();
 
 		if ( diagnosticKind != null ) {
-			options.add( String.format( "-A%s=%s", Configuration.DIAGNOSTIC_KIND_PROCESSOR_OPTION, diagnosticKind ) );
+			options.add( StringHelper.format( "-A%s=%s", Configuration.DIAGNOSTIC_KIND_PROCESSOR_OPTION, diagnosticKind ) );
 		}
 
 		if ( verbose != null ) {
-			options.add( String.format( "-A%s=%b", Configuration.VERBOSE_PROCESSOR_OPTION, verbose ) );
+			options.add( StringHelper.format( "-A%s=%b", Configuration.VERBOSE_PROCESSOR_OPTION, verbose ) );
 		}
 
 		if ( allowMethodConstraints != null ) {
 			options.add(
-					String.format(
+					StringHelper.format(
 							"-A%s=%b",
 							Configuration.METHOD_CONSTRAINTS_SUPPORTED_PROCESSOR_OPTION,
 							allowMethodConstraints

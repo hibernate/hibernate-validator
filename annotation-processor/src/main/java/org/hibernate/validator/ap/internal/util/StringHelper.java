@@ -102,4 +102,7 @@ public class StringHelper {
 				Character.isUpperCase( string.charAt( 1 ) );
 	}
 
+	public static String format(String format, Object... args) {
+		return String.format( Locale.ROOT, format, args );
+	}
 }

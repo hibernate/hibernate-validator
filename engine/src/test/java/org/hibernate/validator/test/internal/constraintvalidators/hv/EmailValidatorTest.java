@@ -25,6 +25,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.EmailDef;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
+import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
@@ -255,7 +256,7 @@ public class EmailValidatorTest {
 	}
 
 	private void isValidEmail(CharSequence email, String message) {
-		assertTrue( validator.isValid( email, null ), String.format( message, email ) );
+		assertTrue( validator.isValid( email, null ), StringHelper.format( message, email ) );
 	}
 
 	private void isValidEmail(CharSequence email) {
@@ -263,7 +264,7 @@ public class EmailValidatorTest {
 	}
 
 	private void isInvalidEmail(CharSequence email, String message) {
-		assertFalse( validator.isValid( email, null ), String.format( message, email ) );
+		assertFalse( validator.isValid( email, null ), StringHelper.format( message, email ) );
 	}
 
 	private void isInvalidEmail(CharSequence email) {

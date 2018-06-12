@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.ap.internal.util;
 
-import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.processing.Messager;
@@ -98,8 +97,7 @@ public class Configuration {
 			}
 			catch (IllegalArgumentException e) {
 				messager.printMessage(
-						Kind.WARNING, String.format(
-								Locale.ROOT,
+						Kind.WARNING, StringHelper.format(
 								"The given value %1$s is no valid diagnostic kind. %2$s will be used.",
 								diagnosticKindFromOptions,
 								DEFAULT_DIAGNOSTIC_KIND
@@ -120,8 +118,7 @@ public class Configuration {
 
 		if ( theValue ) {
 			messager.printMessage(
-					Kind.NOTE, String.format(
-							Locale.ROOT,
+					Kind.NOTE, StringHelper.format(
 							"Verbose reporting is activated. Some processing information will be displayed using diagnostic kind %1$s.",
 							Kind.NOTE
 					)
