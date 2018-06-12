@@ -43,23 +43,7 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 		this.type = ReflectionHelper.typeOf( executable );
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( type );
 		this.hasReturnValue = hasReturnValue;
-
-		if ( executable.getParameterCount() > 0 ) {
-			List<JavaBeanParameter> parameters = new ArrayList<>( executable.getParameterCount() );
-
-			Parameter[] parameterArray = executable.getParameters();
-			Class<?>[] parameterTypes = executable.getParameterTypes();
-			Type[] genericParameterTypes = executable.getGenericParameterTypes();
-
-			for ( int i = 0; i < parameterArray.length; i++ ) {
-				parameters.add( new JavaBeanParameter( i, parameterArray[i], parameterTypes[i],
-						getParameterGenericType( parameterTypes, genericParameterTypes, i ) ) );
-			}
-			this.parameters = CollectionHelper.toImmutableList( parameters );
-		}
-		else {
-			this.parameters = Collections.emptyList();
-		}
+		this.parameters = getParameters( executable );
 	}
 
 	public static JavaBeanExecutable<?> of(Executable executable) {
@@ -212,21 +196,52 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 		);
 	}
 
-	private static Type getParameterGenericType(Type[] parameterTypes, Type[] genericParameterTypes, int parameterIndex) {
-		// getGenericParameterTypes() doesn't return synthetic parameters; in this case fall back to getParameterTypes()
-		Type[] typesToConsider;
-		if ( parameterIndex >= genericParameterTypes.length ) {
-			typesToConsider = parameterTypes;
+	private static List<JavaBeanParameter> getParameters(Executable executable) {
+		if ( executable.getParameterCount() == 0 ) {
+			return Collections.emptyList();
+		}
+
+		List<JavaBeanParameter> parameters = new ArrayList<>( executable.getParameterCount() );
+
+		Parameter[] parameterArray = executable.getParameters();
+		Class<?>[] parameterTypes = executable.getParameterTypes();
+		// getGenericParameterTypes() does not include either the synthetic or the implicit parameters so we need to be
+		// extra careful
+		Type[] genericParameterTypes = executable.getGenericParameterTypes();
+
+		if ( parameterTypes.length == genericParameterTypes.length ) {
+			// this is the simple case where both arrays are consistent
+			// we could do without it but at some point, the behavior of getGenericParameterTypes() might be changed in
+			// Java and we'd better be ready.
+			for ( int i = 0; i < parameterArray.length; i++ ) {
+				parameters.add( new JavaBeanParameter( i, parameterArray[i], parameterTypes[i], getErasedTypeIfTypeVariable( genericParameterTypes[i] ) ) );
+			}
 		}
 		else {
-			typesToConsider = genericParameterTypes;
+			// in this case, we have synthetic or implicit parameters
+			int explicitlyDeclaredParameterIndex = 0;
+
+			for ( int i = 0; i < parameterArray.length; i++ ) {
+				if ( parameterArray[i].isSynthetic() || parameterArray[i].isImplicit() ) {
+					// in this case, the parameter is not present in genericParameterTypes
+					parameters.add( new JavaBeanParameter( i, parameterArray[i], parameterTypes[i], parameterTypes[i] ) );
+				}
+				else {
+					parameters.add( new JavaBeanParameter( i, parameterArray[i], parameterTypes[i],
+							getErasedTypeIfTypeVariable( genericParameterTypes[explicitlyDeclaredParameterIndex] ) ) );
+					explicitlyDeclaredParameterIndex++;
+				}
+			}
 		}
 
-		Type type = typesToConsider[parameterIndex];
+		return CollectionHelper.toImmutableList( parameters );
+	}
 
-		if ( type instanceof TypeVariable ) {
-			type = TypeHelper.getErasedType( type );
+	private static Type getErasedTypeIfTypeVariable(Type genericType) {
+		if ( genericType instanceof TypeVariable ) {
+			return TypeHelper.getErasedType( genericType );
 		}
-		return type;
+
+		return genericType;
 	}
 }
