@@ -259,6 +259,7 @@ public class ConstraintValidatorManager {
 		return determinedSuitableTypes;
 	}
 
+	@SuppressWarnings("unchecked")
 	private <A extends Annotation> void initializeValidator(
 			ConstraintDescriptor<A> descriptor,
 			ConstraintValidator<A, ?> constraintValidator,

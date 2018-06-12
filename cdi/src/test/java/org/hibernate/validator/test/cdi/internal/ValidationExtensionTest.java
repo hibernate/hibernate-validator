@@ -138,6 +138,7 @@ public class ValidationExtensionTest {
 
 					@Override
 					public Object answer() throws Throwable {
+						@SuppressWarnings("unchecked")
 						ProcessBean<?> event = getProcessBeanEvent( (Bean<ValidatorFactory>) EasyMock.getCurrentArguments()[0] );
 						extension.processBean( event );
 						return null;
@@ -151,6 +152,7 @@ public class ValidationExtensionTest {
 
 					@Override
 					public Object answer() throws Throwable {
+						@SuppressWarnings("unchecked")
 						ProcessBean<?> event = getProcessBeanEvent( (Bean<ValidatorBean>) EasyMock.getCurrentArguments()[0] );
 						extension.processBean( event );
 						return null;

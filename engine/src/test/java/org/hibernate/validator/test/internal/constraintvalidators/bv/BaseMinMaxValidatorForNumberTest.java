@@ -10,6 +10,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import javax.validation.ConstraintValidator;
@@ -19,7 +20,7 @@ import javax.validation.ConstraintValidator;
  */
 public class BaseMinMaxValidatorForNumberTest {
 
-	protected void testNumberValidator(ConstraintValidator<?, Number> constraint, boolean inclusive, boolean isMax) {
+	protected <A extends Annotation> void testNumberValidator(ConstraintValidator<A, Number> constraint, boolean inclusive, boolean isMax) {
 		byte b = 1;
 		Byte bWrapper = 127;
 		if ( inclusive ) {

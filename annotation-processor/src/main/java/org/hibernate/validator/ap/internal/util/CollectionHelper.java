@@ -40,13 +40,13 @@ public class CollectionHelper {
 		return new ArrayList<T>();
 	}
 
+	@SafeVarargs
 	public static <T> Set<T> asSet(T... ts) {
-
 		return new HashSet<T>( Arrays.asList( ts ) );
 	}
 
+	@SafeVarargs
 	public static <T> Set<T> asTreeSet(T... ts) {
-
 		return new TreeSet<T>( Arrays.asList( ts ) );
 	}
 

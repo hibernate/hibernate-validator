@@ -142,7 +142,7 @@ public class ConfigurationFilePropertiesTest {
 				boolean accessible = field.isAccessible();
 				try {
 					field.setAccessible( true );
-					return (T) field.get( subject );
+					return clazz.cast( field.get( subject ) );
 				}
 				catch (IllegalArgumentException e) {
 					e.printStackTrace();

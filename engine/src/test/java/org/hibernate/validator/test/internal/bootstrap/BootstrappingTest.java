@@ -82,7 +82,7 @@ public class BootstrappingTest {
 					@Override
 					public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
 						if ( key == NotNullValidator.class ) {
-							return (T) new BadlyBehavedNotNullConstraintValidator();
+							return key.cast( new BadlyBehavedNotNullConstraintValidator() );
 						}
 						return new ConstraintValidatorFactoryImpl().getInstance( key );
 					}

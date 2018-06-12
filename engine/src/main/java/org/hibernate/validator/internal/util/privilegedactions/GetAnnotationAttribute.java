@@ -38,6 +38,7 @@ public final class GetAnnotationAttribute<T> implements PrivilegedAction<T> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public T run() {
 		try {
 			Method m = annotation.getClass().getMethod( attributeName );
