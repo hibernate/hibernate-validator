@@ -91,6 +91,7 @@ class ConfiguredConstraint<A extends Annotation> {
 
 	public ConstraintAnnotationDescriptor<A> createAnnotationDescriptor() {
 		try {
+			@SuppressWarnings("unchecked")
 			AnnotationDescriptor<A> annotationDescriptor = (AnnotationDescriptor<A>) CREATE_ANNOTATION_DESCRIPTOR_METHOD_HANDLE.invoke( constraint );
 			return new ConstraintAnnotationDescriptor<>( annotationDescriptor );
 		}

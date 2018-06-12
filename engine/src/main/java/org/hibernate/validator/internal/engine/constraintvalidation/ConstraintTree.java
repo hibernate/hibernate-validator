@@ -69,7 +69,7 @@ public abstract class ConstraintTree<A extends Annotation> {
 	}
 
 	public final boolean validateConstraints(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext) {
-		List<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts = new ArrayList( 5 );
+		List<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts = new ArrayList<>( 5 );
 		validateConstraints( validationContext, valueContext, violatedConstraintValidatorContexts );
 		if ( !violatedConstraintValidatorContexts.isEmpty() ) {
 			for ( ConstraintValidatorContextImpl constraintValidatorContext : violatedConstraintValidatorContexts ) {
