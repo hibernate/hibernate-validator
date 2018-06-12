@@ -204,30 +204,6 @@ public final class ReflectionHelper {
 		return type;
 	}
 
-	/**
-	 * Returns the type of the parameter of the given method with the given parameter index.
-	 *
-	 * @param executable The executable of interest.
-	 * @param parameterIndex The index of the parameter for which the type should be returned.
-	 *
-	 * @return The erased type.
-	 */
-	public static Type typeOf(Executable executable, int parameterIndex) {
-		Type[] genericParameterTypes = executable.getGenericParameterTypes();
-
-		// getGenericParameterTypes() doesn't return synthetic parameters; in this case fall back to getParameterTypes()
-		if ( parameterIndex >= genericParameterTypes.length ) {
-			genericParameterTypes = executable.getParameterTypes();
-		}
-
-		Type type = genericParameterTypes[parameterIndex];
-
-		if ( type instanceof TypeVariable ) {
-			type = TypeHelper.getErasedType( type );
-		}
-		return type;
-	}
-
 	public static Object getValue(Field field, Object object) {
 		try {
 			return field.get( object );
