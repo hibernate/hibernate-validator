@@ -27,9 +27,9 @@ import org.testng.annotations.Test;
 public class JavaFXClassLoadingTest {
 
 	/**
-	 * This class will be present in the TCCL because is part of JDK 8
+	 * This class will be present in the TCCL because it is either part of the JDK (JDK 10-) or in the classpath (JDK 11+).
 	 */
-	private static final String JAVAFX_APPLICATION_CLASS = "javafx.application.Application";
+	private static final String JAVAFX_APPLICATION_CLASS = "javafx.beans.value.ObservableValue";
 
 	@Test
 	public void shouldBeAbleToFindTheClassInTCCL() throws Exception {
