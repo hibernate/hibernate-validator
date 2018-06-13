@@ -75,21 +75,6 @@ You will also need a JDK 8 and Maven 3 (>= 3.3.1). With these prerequisites in p
 
 There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://hibernate.org/validator/contribute/).
 
-### Build on JDK 9
-
-To build Hibernate Validator with JDK 9, export the following environment variable:
-
-    export MAVEN_OPTS="--add-opens=java.base/java.security=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED"
-
-Then the build can be started like this:
-
-    mvn -s settings-example.xml clean install
-
-Here are the reasons why we added the various build options:
-
- * add-opens java.security: required by wildfly-maven-plugin:execute-commands (for the WildFly integration tests and the TCK runner running in container mode)
- * add-opens java.lang: required by JRuby for Asciidoc processing
-
 ## Continuous Integration
 
 The official Continuous Integration service for the project is hosted on [ci.hibernate.org](http://ci.hibernate.org/view/Validator/).
