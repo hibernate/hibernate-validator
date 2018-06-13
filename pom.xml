@@ -90,7 +90,6 @@
         <module>modules</module>
         <module>tck-runner</module>
         <module>annotation-processor</module>
-        <module>integration</module>
         <module>performance</module>
     </modules>
 
@@ -1166,7 +1165,7 @@
         <profile>
             <id>jdk9-</id>
             <activation>
-                <jdk>(,9]</jdk>
+                <jdk>(,10)</jdk>
             </activation>
             <modules>
                 <module>osgi</module>
@@ -1222,6 +1221,15 @@
                     </plugins>
                 </pluginManagement>
             </build>
+        </profile>
+        <profile>
+            <id>jdk10-</id>
+            <activation>
+                <jdk>(,11)</jdk>
+            </activation>
+            <modules>
+                <module>integration</module>
+            </modules>
         </profile>
         <profile>
             <id>jdk11+</id>
