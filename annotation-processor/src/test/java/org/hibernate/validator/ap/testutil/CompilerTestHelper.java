@@ -33,6 +33,7 @@ import org.hibernate.validator.ap.internal.util.CollectionHelper;
 import org.hibernate.validator.ap.internal.util.Configuration;
 import org.hibernate.validator.ap.internal.util.StringHelper;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
+import org.hibernate.validator.internal.util.StringHelper;
 
 /**
  * Infrastructure for unit tests based on the Java Compiler API.
