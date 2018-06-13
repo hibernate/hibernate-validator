@@ -24,13 +24,13 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForCharSequence;
 import org.hibernate.validator.internal.engine.ConfigurationImpl;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
@@ -81,8 +81,8 @@ public class BootstrappingTest {
 				new ConstraintValidatorFactory() {
 					@Override
 					public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
-						if ( key == NotNullValidator.class ) {
-							return key.cast( new BadlyBehavedNotNullConstraintValidator() );
+						if ( key == NotEmptyValidatorForCharSequence.class ) {
+							return key.cast( new BadlyBehavedNotEmptyValidatorForCharSequence() );
 						}
 						return new ConstraintValidatorFactoryImpl().getInstance( key );
 					}
@@ -142,9 +142,9 @@ public class BootstrappingTest {
 		assertTrue( factory instanceof ValidatorFactoryImpl );
 	}
 
-	class BadlyBehavedNotNullConstraintValidator extends NotNullValidator {
+	class BadlyBehavedNotEmptyValidatorForCharSequence extends NotEmptyValidatorForCharSequence {
 		@Override
-		public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
+		public boolean isValid(CharSequence charSequence, ConstraintValidatorContext constraintValidatorContext) {
 			return true;
 		}
 	}

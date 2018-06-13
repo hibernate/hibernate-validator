@@ -68,6 +68,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void safeHtmlProgrammaticDefinition() {
 		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.BASIC ), "<td>1234qwertd>", 1 );
 		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE ), "test", 0 );

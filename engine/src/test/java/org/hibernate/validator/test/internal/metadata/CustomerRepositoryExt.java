@@ -12,6 +12,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.time.LocalDate;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -25,7 +26,6 @@ import javax.validation.groups.Default;
 
 import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;
 import org.hibernate.validator.test.internal.metadata.Customer.CustomerComplex;
-import org.joda.time.DateMidnight;
 
 /**
  * @author Gunnar Morling
@@ -57,7 +57,7 @@ public class CustomerRepositoryExt extends CustomerRepository {
 	}
 
 	@Valid
-	public CustomerRepositoryExt(DateMidnight start, DateMidnight end) {
+	public CustomerRepositoryExt(LocalDate start, LocalDate end) {
 	}
 
 	public CustomerRepositoryExt(long l) {
@@ -123,7 +123,7 @@ public class CustomerRepositoryExt extends CustomerRepository {
 	}
 
 	@Override
-	public void methodWithCrossParameterConstraint(DateMidnight start, DateMidnight end) {
+	public void methodWithCrossParameterConstraint(LocalDate start, LocalDate end) {
 	}
 
 	@Constraint(validatedBy = { ValidB2BRepositoryValidator.class })

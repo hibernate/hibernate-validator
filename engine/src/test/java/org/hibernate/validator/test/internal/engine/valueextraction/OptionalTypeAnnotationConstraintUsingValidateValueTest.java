@@ -28,11 +28,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.Validator;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

@@ -51,6 +51,7 @@ abstract class AbstractPropertyConstraintMappingContextImpl<T extends Property>
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public PropertyConstraintMappingContext ignoreAnnotations() {
 		return ignoreAnnotations( true );
 	}
@@ -62,6 +63,7 @@ abstract class AbstractPropertyConstraintMappingContextImpl<T extends Property>
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
 		return typeContext.property( property, elementType );
 	}

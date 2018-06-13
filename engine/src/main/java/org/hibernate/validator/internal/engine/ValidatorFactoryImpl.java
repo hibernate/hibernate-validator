@@ -404,6 +404,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 */
 	private static List<ConstraintMappingContributor> getPropertyConfiguredConstraintMappingContributors(
 			Map<String, String> properties, ClassLoader externalClassLoader) {
+		@SuppressWarnings("deprecation")
 		String deprecatedPropertyValue = properties.get( HibernateValidatorConfiguration.CONSTRAINT_MAPPING_CONTRIBUTOR );
 		String propertyValue = properties.get( HibernateValidatorConfiguration.CONSTRAINT_MAPPING_CONTRIBUTORS );
 

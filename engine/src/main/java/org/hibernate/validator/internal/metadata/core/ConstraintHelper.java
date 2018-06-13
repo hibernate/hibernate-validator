@@ -313,6 +313,7 @@ public class ConstraintHelper {
 
 	private final ValidatorDescriptorMap validatorDescriptors = new ValidatorDescriptorMap();
 
+	@SuppressWarnings("deprecation")
 	public ConstraintHelper() {
 		Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> tmpConstraints = new HashMap<>();
 

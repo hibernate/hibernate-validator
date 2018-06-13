@@ -21,6 +21,7 @@ import org.testng.annotations.Test;
  *
  * @author Hardy Ferentschik
  */
+@SuppressWarnings("deprecation")
 public class ModCheckValidatorTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)

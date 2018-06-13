@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.test.internal.metadata;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -15,7 +16,6 @@ import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.constraints.ScriptAssert;
-import org.joda.time.DateMidnight;
 
 /**
  * @author Gunnar Morling
@@ -31,7 +31,7 @@ public class CustomerRepository {
 	}
 
 	@ConsistentDateParameters
-	public CustomerRepository(DateMidnight start, DateMidnight end) {
+	public CustomerRepository(LocalDate start, LocalDate end) {
 	}
 
 	public Customer createCustomer(CharSequence firstName, @NotNull String lastName) {
@@ -69,7 +69,7 @@ public class CustomerRepository {
 	}
 
 	@ConsistentDateParameters(groups = ValidationGroup.class)
-	public void methodWithCrossParameterConstraint(DateMidnight start, DateMidnight end) {
+	public void methodWithCrossParameterConstraint(LocalDate start, LocalDate end) {
 	}
 
 	public void methodWithParameterGroupConversion(

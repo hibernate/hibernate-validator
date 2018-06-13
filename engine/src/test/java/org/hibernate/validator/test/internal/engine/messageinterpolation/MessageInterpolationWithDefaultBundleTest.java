@@ -17,8 +17,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Email;
 
-import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -58,7 +58,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 		user.setAge( 16 );
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
 		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( Email.class ).withMessage( "not a well-formed email address" ),
+				violationOf( Email.class ).withMessage( "must be a well-formed email address" ),
 				violationOf( Range.class ).withMessage( "must be between 18 and 21" )
 		);
 	}
@@ -90,7 +90,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 		user.setAge( 16 );
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
 		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( Email.class ).withMessage( "adresse email mal form\u00E9e" ),
+				violationOf( Email.class ).withMessage( "doit \u00EAtre une adresse email bien form\u00E9e" ),
 				violationOf( Range.class ).withMessage( "doit \u00EAtre entre 18 et 21" )
 		);
 	}
@@ -110,7 +110,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 		user.setAge( 16 );
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
 		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( Email.class ).withMessage( "not a well-formed email address" ),
+				violationOf( Email.class ).withMessage( "must be a well-formed email address" ),
 				violationOf( Range.class ).withMessage( "must be between 18 and 21" )
 		);
 	}

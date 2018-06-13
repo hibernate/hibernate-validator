@@ -6,16 +6,16 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
-import org.joda.time.DateMidnight;
 
 /**
  * @author Gunnar Morling
@@ -76,7 +76,7 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 	int getFoo(@NotEmpty String s);
 
 	@ConsistentDateParameters
-	void methodWithCrossParameterConstraint(@NotNull DateMidnight start, @NotNull DateMidnight end);
+	void methodWithCrossParameterConstraint(@NotNull LocalDate start, @NotNull LocalDate end);
 
 	public interface ValidationGroup {
 	}

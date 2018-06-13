@@ -119,6 +119,7 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 	}
 
 	@Override
+	@Deprecated
 	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
 		return typeContext.property( property, elementType );
 	}

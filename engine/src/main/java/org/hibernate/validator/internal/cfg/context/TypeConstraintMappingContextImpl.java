@@ -88,6 +88,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	}
 
 	@Override
+	@Deprecated
 	public TypeConstraintMappingContext<C> ignoreAnnotations() {
 		return ignoreAnnotations( true );
 	}
@@ -117,6 +118,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	}
 
 	@Override
+	@Deprecated
 	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
 		Contracts.assertNotNull( elementType, "The element type must not be null." );
 

@@ -25,8 +25,6 @@ import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
 
-import org.hibernate.validator.constraints.Email.List;
-
 /**
  * The string has to be a well-formed email address.
  *
@@ -39,7 +37,7 @@ import org.hibernate.validator.constraints.Email.List;
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
-@Repeatable(List.class)
+@Repeatable(Email.List.class)
 @ReportAsSingleViolation
 @Pattern(regexp = "")
 @Deprecated

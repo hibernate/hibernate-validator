@@ -26,6 +26,7 @@ import org.testng.annotations.Test;
 /**
  * @author Hardy Ferentschik
  */
+@SuppressWarnings("deprecation")
 public class BlankValidatorTest {
 	@Test
 	public void testConstraintValidator() {
