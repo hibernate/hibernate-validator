@@ -14,7 +14,6 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.fail;
 
-import java.lang.annotation.ElementType;
 import java.util.Set;
 
 import javax.validation.ConstraintDeclarationException;
@@ -94,7 +93,7 @@ public class MethodConstraintMappingTest {
 				.valid()
 				.convertGroup( Default.class ).to( TestGroup.class )
 				.type( Message.class )
-				.property( "message", ElementType.FIELD )
+				.field( "message" )
 				.constraint(
 						new NotNullDef()
 								.message( "message must not be null" )
@@ -607,7 +606,7 @@ public class MethodConstraintMappingTest {
 	public void constraintConfiguredOnPropertyIsEvaluatedByMethodValidation() {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
-				.property( "hello", ElementType.METHOD )
+				.getter( "hello" )
 				.constraint( new NotNullDef() );
 		config.addMapping( mapping );
 
@@ -636,7 +635,7 @@ public class MethodConstraintMappingTest {
 	public void cascadeConfiguredOnPropertyIsEvaluatedByMethodValidation() {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
-				.property( "user", ElementType.METHOD )
+				.getter( "user" )
 				.valid();
 		config.addMapping( mapping );
 
@@ -666,7 +665,7 @@ public class MethodConstraintMappingTest {
 	public void constraintConfiguredOnFieldIsNotEvaluatedByMethodValidation() {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingServiceImpl.class )
-				.property( "hello", ElementType.FIELD )
+				.field( "hello" )
 				.constraint( new NotNullDef() );
 		config.addMapping( mapping );
 
@@ -678,7 +677,7 @@ public class MethodConstraintMappingTest {
 	public void cascadeConfiguredOnFieldIsNotEvaluatedByMethodValidation() {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingServiceImpl.class )
-				.property( "user", ElementType.FIELD )
+				.field( "user" )
 				.valid();
 		config.addMapping( mapping );
 

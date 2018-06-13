@@ -9,7 +9,6 @@ package org.hibernate.validator.test.cfg;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
-import java.lang.annotation.ElementType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +37,7 @@ public class UniqueElementsDefTest {
 
 		final ConstraintMapping programmaticMapping = configuration.createConstraintMapping();
 		programmaticMapping.type( Library.class )
-				.property( "books", ElementType.FIELD ).constraint( new UniqueElementsDef() );
+				.field( "books" ).constraint( new UniqueElementsDef() );
 		configuration.addMapping( programmaticMapping );
 
 		Validator validator = configuration.buildValidatorFactory().getValidator();

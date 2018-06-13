@@ -7,7 +7,6 @@
 
 package org.hibernate.validator.test.cfg;
 
-import static java.lang.annotation.ElementType.FIELD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
@@ -154,7 +153,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 						.containerElementType()
 							.valid()
 			.type( Fish.class )
-				.property( "name", FIELD )
+				.field( "name" )
 					.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );

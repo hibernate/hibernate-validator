@@ -13,7 +13,6 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy
 import static org.testng.Assert.fail;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -225,7 +224,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Bar.class )
 				.ignoreAllAnnotations()
-				.property( "source", ElementType.FIELD )
+				.field( "source" )
 				.constraint( def );
 
 		Validator validator = config.addMapping( mapping )
@@ -248,7 +247,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( OtherPerson.class )
 				.ignoreAllAnnotations()
-				.property( "number", ElementType.FIELD )
+				.field( "number" )
 				.constraint( def );
 
 		Validator validator = config.addMapping( mapping )

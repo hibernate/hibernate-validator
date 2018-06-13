@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import static java.lang.annotation.ElementType.FIELD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertFalse;
@@ -186,7 +185,7 @@ public class Mod10CheckValidatorTest {
 		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class );
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Product.class )
-				.property( "productNumber", FIELD )
+				.field( "productNumber" )
 				.constraint(
 						new Mod10CheckDef()
 								.multiplier( 3 )

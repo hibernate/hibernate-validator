@@ -11,7 +11,6 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.lang.annotation.ElementType;
 import java.util.Set;
 
 import javax.money.MonetaryAmount;
@@ -75,7 +74,7 @@ public class CurrencyValidatorForMonetaryAmountTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Order.class )
 			.ignoreAllAnnotations()
-			.property( "amount", ElementType.FIELD )
+			.field( "amount" )
 				.constraint( new CurrencyDef().value( "EUR", "USD" ) );
 
 		Validator validator = config.addMapping( mapping )

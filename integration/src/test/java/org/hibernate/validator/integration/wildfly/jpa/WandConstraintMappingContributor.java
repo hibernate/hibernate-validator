@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.integration.wildfly.jpa;
 
-import java.lang.annotation.ElementType;
-
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 
@@ -20,7 +18,7 @@ public class WandConstraintMappingContributor implements ConstraintMappingContri
 	public void createConstraintMappings(ConstraintMappingBuilder builder) {
 		builder.addConstraintMapping()
 			.type( Wand.class )
-				.property( "brand", ElementType.FIELD )
+				.field( "brand" )
 					.constraint( new SizeDef().min( 5 ) );
 	}
 }

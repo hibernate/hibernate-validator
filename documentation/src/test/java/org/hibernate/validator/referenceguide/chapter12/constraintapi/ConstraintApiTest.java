@@ -1,8 +1,5 @@
 package org.hibernate.validator.referenceguide.chapter12.constraintapi;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-
 import java.util.List;
 
 import javax.validation.Validation;
@@ -33,14 +30,14 @@ public class ConstraintApiTest {
 
 		constraintMapping
 			.type( Car.class )
-				.property( "manufacturer", FIELD )
+				.field( "manufacturer" )
 					.constraint( new NotNullDef() )
-				.property( "licensePlate", FIELD )
+				.field( "licensePlate" )
 					.ignoreAnnotations( true )
 					.constraint( new NotNullDef() )
 					.constraint( new SizeDef().min( 2 ).max( 14 ) )
 			.type( RentalCar.class )
-				.property( "rentalStation", METHOD )
+				.getter( "rentalStation" )
 					.constraint( new NotNullDef() );
 
 		Validator validator = configuration.addMapping( constraintMapping )
@@ -60,7 +57,7 @@ public class ConstraintApiTest {
 
 		constraintMapping
 			.type( Car.class )
-				.property( "licensePlate", FIELD )
+				.field( "licensePlate" )
 					.constraint( new GenericConstraintDef<>( CheckCase.class )
 						.param( "value", CaseMode.UPPER )
 					);
@@ -78,19 +75,19 @@ public class ConstraintApiTest {
 
 		constraintMapping
 			.type( Car.class )
-				.property( "manufacturer", FIELD )
+				.field( "manufacturer" )
 					.constraint( new NotNullDef() )
-				.property( "licensePlate", FIELD )
+				.field( "licensePlate" )
 					.ignoreAnnotations( true )
 					.constraint( new NotNullDef() )
 					.constraint( new SizeDef().min( 2 ).max( 14 ) )
-				.property( "partManufacturers", FIELD )
+				.field( "partManufacturers" )
 					.containerElementType( 0 )
 						.constraint( new NotNullDef() )
 					.containerElementType( 1, 0 )
 						.constraint( new NotNullDef() )
 			.type( RentalCar.class )
-				.property( "rentalStation", METHOD )
+				.getter( "rentalStation" )
 					.constraint( new NotNullDef() );
 		//end::nestedContainerElementConstraint[]
 	}
@@ -107,17 +104,17 @@ public class ConstraintApiTest {
 
 		constraintMapping
 			.type( Car.class )
-				.property( "driver", FIELD )
+				.field( "driver" )
 					.constraint( new NotNullDef() )
 					.valid()
 					.convertGroup( Default.class ).to( PersonDefault.class )
-				.property( "partManufacturers", FIELD )
+				.field( "partManufacturers" )
 					.containerElementType( 0 )
 						.valid()
 					.containerElementType( 1, 0 )
 						.valid()
 			.type( Person.class )
-				.property( "name", FIELD )
+				.field( "name" )
 					.constraint( new NotNullDef().groups( PersonDefault.class ) );
 		//end::cascaded[]
 	}

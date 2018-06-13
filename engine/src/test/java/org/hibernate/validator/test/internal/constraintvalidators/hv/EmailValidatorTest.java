@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
@@ -158,7 +157,7 @@ public class EmailValidatorTest {
 		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class );
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( EmailContainer.class )
-				.property( "email", METHOD )
+				.getter( "email" )
 				.constraint(
 						new EmailDef().regexp( noOrgEmailAddressRegexp )
 								.message( "ORG addresses are not valid" )

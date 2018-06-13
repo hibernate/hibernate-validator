@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.integration.wildfly;
 
-import java.lang.annotation.ElementType;
-
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 
@@ -20,7 +18,7 @@ public class MyConstraintMappingContributor implements ConstraintMappingContribu
 	public void createConstraintMappings(ConstraintMappingBuilder builder) {
 		builder.addConstraintMapping()
 			.type( Broomstick.class )
-				.property( "brand", ElementType.FIELD )
+				.field( "brand" )
 					.constraint( new NotNullDef() );
 	}
 }
