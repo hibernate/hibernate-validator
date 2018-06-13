@@ -178,7 +178,7 @@ public class ValueExtractorManager {
 	}
 
 	private static boolean isJavaFxInClasspath() {
-		return isClassPresent( "javafx.application.Application", false );
+		return isClassPresent( "javafx.beans.value.ObservableValue", false );
 	}
 
 	private static boolean isClassPresent(String className, boolean fallbackOnTCCL) {
