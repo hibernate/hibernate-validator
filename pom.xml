@@ -372,7 +372,7 @@
             <dependency>
                 <groupId>javax.annotation</groupId>
                 <artifactId>javax.annotation-api</artifactId>
-                <version>1.2</version>
+                <version>${javax-annotation-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.spec.javax.interceptor</groupId>
