@@ -152,7 +152,7 @@
         <!-- JavaMoney dependencies -->
         <javax-money.version>1.0.1</javax-money.version>
         <moneta.version>1.1</moneta.version>
-        <!-- Used in the Karaf features file: it is a dependency of Moneta -->
+        <!-- Used in the Karaf features file: it is a dependency of Moneta, and for the documentation -->
         <javax-annotation-api.version>1.2</javax-annotation-api.version>
 
         <!-- WildFly patching infrastructure -->
@@ -932,6 +932,11 @@
                     <artifactId>sigtest-maven-plugin</artifactId>
                     <version>1.0</version>
                 </plugin>
+                <plugin>
+                    <groupId>com.googlecode.maven-download-plugin</groupId>
+                    <artifactId>download-maven-plugin</artifactId>
+                    <version>1.4.0</version>
+                </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
@@ -1198,6 +1203,35 @@
                         </plugin>
                     </plugins>
                 </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>jdk11+</id>
+            <activation>
+                <jdk>[11,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.googlecode.maven-download-plugin</groupId>
+                        <artifactId>download-maven-plugin</artifactId>
+                        <inherited>false</inherited>
+                        <executions>
+                            <execution>
+                                <id>install-javafx</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>wget</goal>
+                                </goals>
+                                <configuration>
+                                    <url>https://download.java.net/java/early_access/openjfx11/13/binaries/openjfx-11-ea+13_linux-x64_bin-sdk.zip</url>
+                                    <unpack>true</unpack>
+                                    <outputDirectory>${maven.multiModuleProjectDirectory}/target/javafx</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
         <profile>

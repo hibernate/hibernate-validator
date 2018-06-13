@@ -307,7 +307,7 @@
             </build>
         </profile>
         <profile>
-            <id>jdk9</id>
+            <id>jdk9+</id>
             <activation>
                 <jdk>[9,)</jdk>
             </activation>
@@ -384,6 +384,21 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>jdk11+</id>
+            <activation>
+                <jdk>[11,)</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>net.java</groupId>
+                    <artifactId>javafx-core</artifactId>
+                    <version>11-ea+13</version>
+                    <scope>system</scope>
+                    <systemPath>${maven.multiModuleProjectDirectory}/target/javafx/javafx-sdk-11/lib/javafx.base.jar</systemPath>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>sigtest</id>
