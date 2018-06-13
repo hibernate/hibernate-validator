@@ -189,7 +189,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/constraint
 ====
 
 Constraints can be configured on multiple classes and properties using method chaining. The
-constraint definition classes `NotNullDef` and SizeDef are helper classes which allow to configure
+constraint definition classes `NotNullDef` and `SizeDef` are helper classes which allow to configure
 constraint parameters in a type-safe fashion. Definition classes exist for all built-in constraints
 in the `org.hibernate.validator.cfg.defs` package. By calling `ignoreAnnotations()` any constraints
 configured via annotations or XML are ignored for the given element.

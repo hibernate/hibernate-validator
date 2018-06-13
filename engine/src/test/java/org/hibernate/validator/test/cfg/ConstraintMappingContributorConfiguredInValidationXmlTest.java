@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.test.cfg;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
@@ -24,9 +22,9 @@ import org.hibernate.validator.cfg.defs.MinDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.testng.annotations.Test;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
+import org.testng.annotations.Test;
 
 /**
  * Tests the contribution of constraint mappings via a contributor configured in {@code META-INF/validation.xml}.
@@ -92,9 +90,9 @@ public class ConstraintMappingContributorConfiguredInValidationXmlTest {
 		public void createConstraintMappings(ConstraintMappingBuilder builder) {
 			builder.addConstraintMapping()
 				.type( Marathon.class )
-					.property( "name", METHOD )
+					.getter( "name" )
 						.constraint( new NotNullDef() )
-					.property( "numberOfHelpers", FIELD )
+					.field( "numberOfHelpers" )
 						.constraint( new MinDef().value( 1 ) );
 		}
 	}
@@ -105,7 +103,7 @@ public class ConstraintMappingContributorConfiguredInValidationXmlTest {
 		public void createConstraintMappings(ConstraintMappingBuilder builder) {
 			builder.addConstraintMapping()
 				.type( Runner.class )
-					.property( "paidEntryFee", FIELD )
+					.field( "paidEntryFee" )
 						.constraint( new AssertTrueDef() );
 		}
 	}

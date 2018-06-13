@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
@@ -172,7 +171,7 @@ public class URLValidatorTest {
 		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( URLContainer.class )
-				.property( "url", METHOD )
+				.getter( "url" )
 				.constraint( new URLDef().regexp( "^http://\\S+[\\.htm|\\.html]{1}$" ) );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -195,7 +194,7 @@ public class URLValidatorTest {
 		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( URLContainer.class )
-				.property( "url", METHOD )
+				.getter( "url" )
 				.constraint(
 						new URLDef().regexp( "^http://\\S+[\\.htm|\\.html]{1}$" ).flags( Flag.CASE_INSENSITIVE )
 				);

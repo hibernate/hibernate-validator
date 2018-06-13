@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.test.cfg;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -93,10 +91,10 @@ public class ConstraintMappingTest {
 	@Test
 	public void testConstraintMappingWithConstraintDefs() {
 		mapping.type( Marathon.class )
-				.property( "name", METHOD )
-				.constraint( new NotNullDef() )
-				.property( "numberOfHelpers", FIELD )
-				.constraint( new MinDef().value( 1 ) );
+				.getter( "name" )
+					.constraint( new NotNullDef() )
+				.field( "numberOfHelpers" )
+					.constraint( new MinDef().value( 1 ) );
 
 		BeanConfiguration<Marathon> beanConfiguration = getBeanConfiguration( Marathon.class );
 		assertNotNull( beanConfiguration );
@@ -107,10 +105,10 @@ public class ConstraintMappingTest {
 	@Test
 	public void testConstraintMappingWithGenericConstraints() {
 		mapping.type( Marathon.class )
-				.property( "name", METHOD )
-				.constraint( new GenericConstraintDef<>( NotNull.class ) )
-				.property( "numberOfHelpers", FIELD )
-				.constraint( new GenericConstraintDef<>( Min.class ).param( "value", 1L ) );
+				.getter( "name" )
+					.constraint( new GenericConstraintDef<>( NotNull.class ) )
+				.field( "numberOfHelpers" )
+					.constraint( new GenericConstraintDef<>( Min.class ).param( "value", 1L ) );
 
 		BeanConfiguration<Marathon> beanConfiguration = getBeanConfiguration( Marathon.class );
 		assertNotNull( beanConfiguration );
@@ -121,9 +119,9 @@ public class ConstraintMappingTest {
 	@Test
 	public void testDefConstraintFollowedByGenericConstraint() {
 		mapping.type( Marathon.class )
-				.property( "numberOfHelpers", FIELD )
-				.constraint( new MinDef().value( 1 ) )
-				.constraint( new GenericConstraintDef<>( Min.class ).param( "value", 2L ) );
+				.field( "numberOfHelpers" )
+					.constraint( new MinDef().value( 1 ) )
+					.constraint( new GenericConstraintDef<>( Min.class ).param( "value", 2L ) );
 
 		BeanConfiguration<Marathon> beanConfiguration = getBeanConfiguration( Marathon.class );
 		assertNotNull( beanConfiguration );
@@ -143,8 +141,8 @@ public class ConstraintMappingTest {
 	@Test
 	public void testSingleConstraint() {
 		mapping.type( Marathon.class )
-				.property( "name", METHOD )
-				.constraint( new NotNullDef() );
+				.getter( "name" )
+					.constraint( new NotNullDef() );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -157,10 +155,8 @@ public class ConstraintMappingTest {
 	@Test
 	public void testThatSpecificParameterCanBeSetAfterInvokingMethodFromBaseType() {
 		mapping.type( Marathon.class )
-				.property( "name", METHOD )
-				.constraint(
-						new SizeDef().message( "too short" ).min( 3 )
-				);
+				.getter( "name" )
+					.constraint( new SizeDef().message( "too short" ).min( 3 ) );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -175,11 +171,9 @@ public class ConstraintMappingTest {
 	@Test(description = "HV-404: Introducing ConstraintsForType#genericConstraint(Class) allows to set specific parameters on following specific constraints.")
 	public void testThatSpecificParameterCanBeSetAfterAddingGenericConstraintDef() {
 		mapping.type( Marathon.class )
-				.constraint(
-						new GenericConstraintDef<>( MarathonConstraint.class ).param( "minRunner", 1 )
-				)
-				.property( "name", METHOD )
-				.constraint( new SizeDef().message( "name too short" ).min( 3 ) );
+					.constraint( new GenericConstraintDef<>( MarathonConstraint.class ).param( "minRunner", 1 ) )
+				.getter( "name" )
+					.constraint( new SizeDef().message( "name too short" ).min( 3 ) );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -195,11 +189,11 @@ public class ConstraintMappingTest {
 	@Test
 	public void testInheritedConstraint() {
 		mapping.type( Marathon.class )
-				.property( "name", METHOD )
-				.constraint( new NotNullDef() )
+				.getter( "name" )
+					.constraint( new NotNullDef() )
 				.type( Tournament.class )
-				.property( "tournamentDate", METHOD )
-				.constraint( new FutureDef() );
+					.getter( "tournamentDate" )
+						.constraint( new FutureDef() );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -218,11 +212,11 @@ public class ConstraintMappingTest {
 	@Test
 	public void testValid() {
 		mapping.type( Marathon.class )
-				.property( "runners", METHOD )
-				.valid()
+				.getter( "runners" )
+					.valid()
 				.type( Runner.class )
-				.property( "paidEntryFee", FIELD )
-				.constraint( new AssertTrueDef() );
+					.field( "paidEntryFee" )
+						.constraint( new AssertTrueDef() );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -242,12 +236,12 @@ public class ConstraintMappingTest {
 	@Test
 	public void testValidWithGroupConversion() {
 		mapping.type( Marathon.class )
-				.property( "runners", METHOD )
-				.valid()
-				.convertGroup( Default.class ).to( Foo.class )
+				.getter( "runners" )
+					.valid()
+					.convertGroup( Default.class ).to( Foo.class )
 				.type( Runner.class )
-				.property( "paidEntryFee", FIELD )
-				.constraint( new AssertTrueDef().groups( Foo.class ) );
+					.field( "paidEntryFee" )
+						.constraint( new AssertTrueDef().groups( Foo.class ) );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -264,14 +258,14 @@ public class ConstraintMappingTest {
 	@Test
 	public void testValidWithSeveralGroupConversions() {
 		mapping.type( Marathon.class )
-				.property( "runners", METHOD )
-				.valid()
-				.convertGroup( Default.class ).to( Foo.class )
-				.convertGroup( Bar.class ).to( Default.class )
+				.getter( "runners" )
+					.valid()
+					.convertGroup( Default.class ).to( Foo.class )
+					.convertGroup( Bar.class ).to( Default.class )
 				.type( Runner.class )
-				.property( "paidEntryFee", FIELD )
-				.constraint( new AssertTrueDef().groups( Foo.class ) )
-				.constraint( new AssertTrueDef().message( "really, it must be true" ) );
+					.field( "paidEntryFee" )
+						.constraint( new AssertTrueDef().groups( Foo.class ) )
+						.constraint( new AssertTrueDef().message( "really, it must be true" ) );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -292,18 +286,18 @@ public class ConstraintMappingTest {
 	)
 	public void testSingleConstraintWrongAccessType() throws Throwable {
 		mapping.type( Marathon.class )
-				.property( "numberOfHelpers", METHOD )
-				.constraint( new NotNullDef() );
+				.getter( "numberOfHelpers" )
+					.constraint( new NotNullDef() );
 	}
 
 	@Test
 	public void testDefaultGroupSequence() {
 		mapping.type( Marathon.class )
 				.defaultGroupSequence( Foo.class, Marathon.class )
-				.property( "name", METHOD )
-				.constraint( new NotNullDef().groups( Foo.class ) )
-				.property( "runners", METHOD )
-				.constraint( new NotEmptyDef() );
+				.getter( "name" )
+					.constraint( new NotNullDef().groups( Foo.class ) )
+				.getter( "runners" )
+					.constraint( new NotEmptyDef() );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -325,10 +319,10 @@ public class ConstraintMappingTest {
 	public void testDefaultGroupSequenceProvider() {
 		mapping.type( Marathon.class )
 				.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class )
-				.property( "name", METHOD )
-				.constraint( new NotNullDef().groups( Foo.class ) )
-				.property( "runners", METHOD )
-				.constraint( new NotEmptyDef() );
+				.getter( "name" )
+					.constraint( new NotNullDef().groups( Foo.class ) )
+				.getter( "runners" )
+					.constraint( new NotEmptyDef() );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -354,10 +348,10 @@ public class ConstraintMappingTest {
 		mapping.type( Marathon.class )
 				.defaultGroupSequence( Foo.class, Marathon.class )
 				.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class )
-				.property( "name", METHOD )
-				.constraint( new NotNullDef().groups( Foo.class ) )
-				.property( "runners", METHOD )
-				.constraint( new NotEmptyDef() );
+				.getter( "name" )
+					.constraint( new NotNullDef().groups( Foo.class ) )
+				.getter( "runners" )
+					.constraint( new NotEmptyDef() );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		validator.validate( new Marathon() );
@@ -370,8 +364,8 @@ public class ConstraintMappingTest {
 	public void testProgrammaticDefaultGroupSequenceDefinedOnClassWithGroupProviderAnnotation() {
 		mapping.type( B.class )
 				.defaultGroupSequence( Foo.class, B.class )
-				.property( "b", FIELD )
-				.constraint( new NotNullDef() );
+				.field( "b" )
+					.constraint( new NotNullDef() );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		validator.validate( new B() );
@@ -384,8 +378,8 @@ public class ConstraintMappingTest {
 	public void testProgrammaticDefaultGroupSequenceProviderDefinedOnClassWithGroupSequenceAnnotation() {
 		mapping.type( A.class )
 				.defaultGroupSequenceProviderClass( ADefaultGroupSequenceProvider.class )
-				.property( "a", FIELD )
-				.constraint( new NotNullDef() );
+				.field( "a" )
+					.constraint( new NotNullDef() );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		validator.validate( new A() );
@@ -394,9 +388,9 @@ public class ConstraintMappingTest {
 	@Test
 	public void testMultipleConstraintOfTheSameType() {
 		mapping.type( Marathon.class )
-				.property( "name", METHOD )
-				.constraint( new SizeDef().min( 5 ) )
-				.constraint( new SizeDef().min( 10 ) );
+				.getter( "name" )
+					.constraint( new SizeDef().min( 5 ) )
+					.constraint( new SizeDef().min( 10 ) );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -470,8 +464,8 @@ public class ConstraintMappingTest {
 	@Test(description = "HV-355 (parameter names of RangeDef wrong)")
 	public void testRangeDef() {
 		mapping.type( Runner.class )
-				.property( "age", METHOD )
-				.constraint( new RangeDef().min( 12 ).max( 99 ) );
+				.getter( "age" )
+					.constraint( new RangeDef().min( 12 ).max( 99 ) );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		Set<ConstraintViolation<Runner>> violations = validator.validate( new Runner() );
@@ -483,12 +477,12 @@ public class ConstraintMappingTest {
 	@Test(description = "HV-444")
 	public void testDefaultGroupSequenceDefinedOnClassWithNoConstraints() {
 		mapping.type( Marathon.class )
-				.property( "name", METHOD )
-				.constraint( new NotNullDef().groups( Foo.class ) )
-				.property( "runners", METHOD )
-				.constraint( new NotEmptyDef() )
+				.getter( "name" )
+					.constraint( new NotNullDef().groups( Foo.class ) )
+				.getter( "runners" )
+					.constraint( new NotEmptyDef() )
 				.type( ExtendedMarathon.class )
-				.defaultGroupSequence( Foo.class, ExtendedMarathon.class );
+					.defaultGroupSequence( Foo.class, ExtendedMarathon.class );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -509,8 +503,8 @@ public class ConstraintMappingTest {
 	@Test
 	public void testProgrammaticAndAnnotationFieldConstraintsAddUp() {
 		mapping.type( User.class )
-				.property( "firstName", ElementType.FIELD )
-				.constraint( new SizeDef().min( 2 ).max( 10 ) );
+				.field( "firstName" )
+					.constraint( new SizeDef().min( 2 ).max( 10 ) );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		Set<ConstraintViolation<User>> violations = validator.validateProperty( new User( "", "" ), "firstName" );
@@ -524,8 +518,8 @@ public class ConstraintMappingTest {
 	@Test
 	public void testProgrammaticAndAnnotationPropertyConstraintsAddUp() {
 		mapping.type( User.class )
-				.property( "lastName", ElementType.METHOD )
-				.constraint( new SizeDef().min( 4 ).max( 10 ) );
+				.getter( "lastName" )
+					.constraint( new SizeDef().min( 4 ).max( 10 ) );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		Set<ConstraintViolation<User>> violations = validator.validateProperty( new User( "", "" ), "lastName" );
@@ -537,12 +531,13 @@ public class ConstraintMappingTest {
 	}
 
 	@Test
-	public void testFieldAndGetterMethodsForProgrammaticConstraintDefinition() {
+	@SuppressWarnings("deprecation")
+	public void testDeprecatedPropertyMethodForFieldAndGetterProgrammaticConstraintDefinition() {
 		mapping.type( Marathon.class )
-				.getter( "name" )
+				.property( "name", ElementType.METHOD )
 					.constraint( new SizeDef().min( 5 ) )
 					.constraint( new SizeDef().min( 10 ) )
-				.field( "runners" )
+				.property( "runners", ElementType.FIELD )
 					.constraint( new SizeDef().max( 10 ).min( 1 ) );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();

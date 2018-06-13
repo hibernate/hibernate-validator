@@ -7,7 +7,6 @@
 
 package org.hibernate.validator.test.cfg;
 
-import static java.lang.annotation.ElementType.FIELD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
@@ -58,10 +57,10 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "model", FIELD )
+				.field( "model" )
 					.containerElementType()
 						.constraint( new SizeDef().max( 5 ) )
-				.property( "fishCountByType", FIELD )
+				.field( "fishCountByType" )
 					.containerElementType( 0 )
 						.constraint( new SizeDef().min( 3 ).max( 10 ) )
 					.containerElementType( 1 )
@@ -87,7 +86,7 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishOfTheMonth", FIELD )
+				.field( "fishOfTheMonth" )
 					.containerElementType( 1, 0 )
 						.constraint( new NotNullDef() );
 
@@ -107,7 +106,7 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "tagsOfFishOfTheMonth", FIELD )
+				.field( "tagsOfFishOfTheMonth" )
 					.containerElementType( 0, 1, 0 )
 						.constraint( new NotNullDef() );
 
@@ -127,11 +126,11 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "boss", FIELD )
+				.field( "boss" )
 					.containerElementType()
 						.valid()
 			.type( Fish.class )
-				.property( "name", FIELD )
+				.field( "name" )
 					.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
@@ -150,7 +149,7 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 				.type( FishTank.class )
-				.property( "tagsOfFishOfTheMonth", FIELD )
+				.field( "tagsOfFishOfTheMonth" )
 					.containerElementType( 0, 0 )
 						.constraint( new LengthDef().min( 10 ).max( 20 ) )
 					.containerElementType( 0, 1, 0 )
@@ -174,7 +173,7 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishNames", FIELD )
+				.field( "fishNames" )
 					.containerElementType()
 						.constraint( new SizeDef().max( 5 ) );
 
@@ -195,7 +194,7 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishNamesByMonth", FIELD )
+				.field( "fishNamesByMonth" )
 					.containerElementType( 0, 0 )
 						.constraint( new SizeDef().max( 5 ) );
 
@@ -216,7 +215,7 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishNamesByMonthAsArray", FIELD )
+				.field( "fishNamesByMonthAsArray" )
 					.containerElementType( 0, 0 )
 						.constraint( new SizeDef().max( 5 ) );
 
@@ -236,7 +235,7 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "size", FIELD )
+				.field( "size" )
 					.containerElementType( 1 );
 	}
 
@@ -246,7 +245,7 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "model", FIELD )
+				.field( "model" )
 					.containerElementType( 2 );
 	}
 
@@ -256,7 +255,7 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishOfTheMonth", FIELD )
+				.field( "fishOfTheMonth" )
 					.containerElementType( 1, 2 );
 	}
 
@@ -266,7 +265,7 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishCountByType", FIELD )
+				.field( "fishCountByType" )
 					.containerElementType();
 	}
 
@@ -276,7 +275,7 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "tagsOfFishOfTheMonth", FIELD )
+				.field( "tagsOfFishOfTheMonth" )
 					.containerElementType( 0, 1, 0 )
 						.constraint( new NotNullDef() )
 					.containerElementType( 0, 1, 0 );

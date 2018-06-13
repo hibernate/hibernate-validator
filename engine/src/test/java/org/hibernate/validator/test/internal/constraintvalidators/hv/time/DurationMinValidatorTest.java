@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv.time;
 
-import static java.lang.annotation.ElementType.FIELD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -76,7 +75,7 @@ public class DurationMinValidatorTest {
 		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class );
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( AnotherTask.class )
-				.property( "timeToComplete", FIELD )
+				.field( "timeToComplete" )
 				.constraint( new DurationMinDef()
 						.days( 1 ).hours( 1 )
 						.minutes( 1 ).seconds( 1 )
@@ -102,7 +101,7 @@ public class DurationMinValidatorTest {
 		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class, Locale.ENGLISH );
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( AnotherTask.class )
-				.property( "timeToComplete", FIELD )
+				.field( "timeToComplete" )
 				.constraint( new DurationMinDef()
 						.days( 30 )
 						.hours( 12 )

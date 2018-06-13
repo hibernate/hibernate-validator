@@ -7,7 +7,6 @@
 
 package org.hibernate.validator.test.cfg;
 
-import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
@@ -53,10 +52,10 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "model", METHOD )
+				.getter( "model" )
 					.containerElementType()
 						.constraint( new SizeDef().max( 5 ) )
-				.property( "fishCountByType", METHOD )
+				.getter( "fishCountByType" )
 					.containerElementType( 0 )
 						.constraint( new SizeDef().min( 3 ).max( 10 ) )
 					.containerElementType( 1 )
@@ -82,7 +81,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishOfTheMonth", METHOD )
+				.getter( "fishOfTheMonth" )
 					.containerElementType( 1, 0 )
 						.constraint( new NotNullDef() );
 
@@ -102,7 +101,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "tagsOfFishOfTheMonth", METHOD )
+				.getter( "tagsOfFishOfTheMonth" )
 					.containerElementType( 0, 1, 0 )
 						.constraint( new NotNullDef() );
 
@@ -122,11 +121,11 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "boss", METHOD )
+				.getter( "boss" )
 					.containerElementType()
 						.valid()
 			.type( Fish.class )
-				.property( "name", METHOD )
+				.getter( "name" )
 					.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
@@ -146,7 +145,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishNames", METHOD )
+				.getter( "fishNames" )
 					.containerElementType()
 						.constraint( new SizeDef().max( 5 ) );
 
@@ -167,7 +166,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishNamesByMonth", METHOD )
+				.getter( "fishNamesByMonth" )
 					.containerElementType( 0, 0 )
 						.constraint( new SizeDef().max( 5 ) );
 
@@ -188,7 +187,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishNamesByMonthAsArray", METHOD )
+				.getter( "fishNamesByMonthAsArray" )
 					.containerElementType( 0, 0 )
 						.constraint( new SizeDef().max( 5 ) );
 
@@ -208,7 +207,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "size", METHOD )
+				.getter( "size" )
 					.containerElementType( 1 );
 	}
 
@@ -218,7 +217,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "model", METHOD )
+				.getter( "model" )
 					.containerElementType( 2 );
 	}
 
@@ -228,7 +227,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishOfTheMonth", METHOD )
+				.getter( "fishOfTheMonth" )
 					.containerElementType( 1, 2 );
 	}
 
@@ -238,7 +237,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishCountByType", METHOD )
+				.getter( "fishCountByType" )
 					.containerElementType();
 	}
 
@@ -248,7 +247,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "tagsOfFishOfTheMonth", METHOD )
+				.getter( "tagsOfFishOfTheMonth" )
 					.containerElementType( 0, 1, 0 )
 						.constraint( new NotNullDef() )
 					.containerElementType( 0, 1, 0 );

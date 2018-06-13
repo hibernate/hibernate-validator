@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.test.cfg;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
@@ -93,7 +91,7 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 	public void testIgnoreAnnotationsOnProperty() {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Foo.class )
-				.property( "property", FIELD )
+				.field( "property" )
 				.ignoreAnnotations( true );
 		config.addMapping( mapping );
 
@@ -105,7 +103,7 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 	public void testIgnoreAnnotationsRespectsFieldVsGetterAccess() {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Foo.class )
-				.property( "property", METHOD )
+				.getter( "property" )
 				.ignoreAnnotations( true );
 		config.addMapping( mapping );
 
@@ -123,7 +121,7 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Bar.class )
-				.property( "property", FIELD )
+				.field( "property" )
 				.ignoreAnnotations( true )
 				.constraint( new NullDef() );
 		config.addMapping( mapping );

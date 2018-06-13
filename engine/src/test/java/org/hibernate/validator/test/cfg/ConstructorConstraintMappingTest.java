@@ -14,7 +14,6 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -124,7 +123,7 @@ public class ConstructorConstraintMappingTest {
 				.valid()
 				.convertGroup( Default.class ).to( TestGroup.class )
 				.type( User.class )
-				.property( "name", ElementType.FIELD )
+				.field( "name" )
 				.constraint( new NotNullDef().message( "name must not be null" ).groups( TestGroup.class ) );
 		config.addMapping( mapping );
 

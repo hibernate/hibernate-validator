@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import static java.lang.annotation.ElementType.FIELD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -122,7 +121,7 @@ public class ISBNValidatorTest {
 		HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class );
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Book.class )
-				.property( "isbn", FIELD )
+				.field( "isbn" )
 				.constraint( new ISBNDef().type( ISBN.Type.ISBN_13 ) );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();

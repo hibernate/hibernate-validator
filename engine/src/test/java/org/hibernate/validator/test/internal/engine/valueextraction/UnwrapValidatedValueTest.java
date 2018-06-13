@@ -9,7 +9,6 @@ package org.hibernate.validator.test.internal.engine.valueextraction;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
-import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
 import java.util.Set;
 
@@ -162,7 +161,7 @@ public class UnwrapValidatedValueTest {
 		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
 		ConstraintMapping mapping = configuration.createConstraintMapping();
 		mapping.type( OrderLine.class )
-				.property( "id", ElementType.FIELD )
+				.field( "id" )
 				.constraint( new MaxDef().value( 5 ) );
 
 		Validator validator = configuration.addMapping( mapping )
@@ -182,7 +181,7 @@ public class UnwrapValidatedValueTest {
 		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
 		ConstraintMapping mapping = configuration.createConstraintMapping();
 		mapping.type( OrderLine.class )
-				.property( "id", ElementType.FIELD )
+				.field( "id" )
 				.constraint( new MaxDef().value( 5 ).payload( Unwrapping.Skip.class ) );
 
 		Validator validator = configuration.addMapping( mapping )
@@ -199,7 +198,7 @@ public class UnwrapValidatedValueTest {
 		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
 		ConstraintMapping mapping = configuration.createConstraintMapping();
 		mapping.type( OrderLine.class )
-				.property( "id", ElementType.FIELD )
+				.field( "id" )
 				.constraint( new MaxDef().value( 5 ).payload( Unwrapping.Skip.class, Unwrapping.Unwrap.class ) );
 
 		validator = configuration.addMapping( mapping )

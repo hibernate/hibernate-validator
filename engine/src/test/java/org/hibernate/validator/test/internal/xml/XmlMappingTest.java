@@ -14,7 +14,6 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import static org.testng.Assert.assertEquals;
 
 import java.io.InputStream;
-import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -142,7 +141,7 @@ public class XmlMappingTest {
 		//given
 		final ConstraintMapping programmaticMapping = configuration.createConstraintMapping();
 		programmaticMapping.type( Customer.class )
-				.property( "firstName", ElementType.FIELD )
+				.field( "firstName" )
 				.constraint( new SizeDef().min( 2 ).max( 10 ) );
 
 		final InputStream xmlMapping = XmlMappingTest.class.getResourceAsStream( "hv-480-mapping.xml" );

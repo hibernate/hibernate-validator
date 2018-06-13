@@ -7,8 +7,6 @@
 
 package org.hibernate.validator.test.cfg;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -45,11 +43,11 @@ public class CascadingWithConstraintMappingTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 				.type( C.class )
-				.property( "string", FIELD )
-				.constraint( new NotNullDef() )
+					.field( "string" )
+						.constraint( new NotNullDef() )
 				.type( A.class )
-				.property( "c", FIELD )
-				.valid();
+					.field( "c" )
+						.valid();
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -69,11 +67,11 @@ public class CascadingWithConstraintMappingTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 				.type( C.class )
-				.property( "string", METHOD )
-				.constraint( new NotNullDef() )
+					.getter( "string" )
+						.constraint( new NotNullDef() )
 				.type( A.class )
-				.property( "c", METHOD )
-				.valid();
+					.getter( "c" )
+						.valid();
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -93,11 +91,11 @@ public class CascadingWithConstraintMappingTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 				.type( C.class )
-				.property( "string", METHOD )
-				.constraint( new NotNullDef() )
+					.getter( "string" )
+						.constraint( new NotNullDef() )
 				.type( A.class )
-				.property( "c", METHOD )
-				.valid();
+					.getter( "c" )
+						.valid();
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -120,11 +118,11 @@ public class CascadingWithConstraintMappingTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 				.type( Bean.class )
-				.property( "property", FIELD )
-				.constraint( new NotNullDef() )
+					.field( "property" )
+						.constraint( new NotNullDef() )
 				.type( ArrayHolder.class )
-				.property( "beans", FIELD )
-				.valid();
+					.field( "beans" )
+						.valid();
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
