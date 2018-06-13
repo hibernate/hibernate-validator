@@ -18,6 +18,7 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Gunnar Morling
  */
+@SuppressWarnings("deprecation")
 public interface TypeConstraintMappingContext<C> extends Constrainable<TypeConstraintMappingContext<C>>,
 		ConstraintMappingTarget,
 		PropertyTarget,

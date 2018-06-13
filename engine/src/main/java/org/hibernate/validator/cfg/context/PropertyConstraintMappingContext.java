@@ -14,6 +14,7 @@ package org.hibernate.validator.cfg.context;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
+@SuppressWarnings("deprecation")
 public interface PropertyConstraintMappingContext extends Constrainable<PropertyConstraintMappingContext>,
 		ConstraintMappingTarget,
 		PropertyTarget,

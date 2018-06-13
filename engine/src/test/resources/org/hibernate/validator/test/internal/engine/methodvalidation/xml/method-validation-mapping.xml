@@ -113,12 +113,12 @@
         </method>
 
         <method name="methodWithCrossParameterConstraint">
-            <parameter type="org.joda.time.DateMidnight">
+            <parameter type="java.time.LocalDate">
                 <constraint annotation="javax.validation.constraints.NotNull">
                     <message>[XML] - must not be null</message>
                 </constraint>
             </parameter>
-            <parameter type="org.joda.time.DateMidnight">
+            <parameter type="java.time.LocalDate">
                 <constraint annotation="javax.validation.constraints.NotNull">
                     <message>[XML] - must not be null</message>
                 </constraint>

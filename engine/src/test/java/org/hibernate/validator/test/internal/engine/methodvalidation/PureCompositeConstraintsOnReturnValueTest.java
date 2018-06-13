@@ -28,13 +28,13 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.Validator;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 
-import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
@@ -44,7 +44,6 @@ import org.testng.annotations.Test;
 /**
  * @author Marko Bekhta
  */
-@SuppressWarnings("deprecation")
 public class PureCompositeConstraintsOnReturnValueTest {
 	private Validator validator;
 	private Foo foo;

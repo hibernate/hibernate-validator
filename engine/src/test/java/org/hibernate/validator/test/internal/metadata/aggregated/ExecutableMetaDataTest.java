@@ -14,6 +14,7 @@ import static org.testng.Assert.assertTrue;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -39,7 +40,6 @@ import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.joda.time.DateMidnight;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -258,8 +258,8 @@ public class ExecutableMetaDataTest {
 	public void methodWithCrossParameterConstraint() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod(
 				"methodWithCrossParameterConstraint",
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		);
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 

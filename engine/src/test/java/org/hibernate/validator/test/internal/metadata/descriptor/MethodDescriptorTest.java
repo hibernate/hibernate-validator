@@ -13,8 +13,10 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.ConstraintDescriptor;
@@ -22,15 +24,13 @@ import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.Scope;
 
-import org.joda.time.DateMidnight;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerExtension;
 import org.hibernate.validator.test.internal.metadata.IllegalCustomerRepositoryExt;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
 
 /**
  * @author Gunnar Morling
@@ -75,8 +75,8 @@ public class MethodDescriptorTest {
 		descriptor = getMethodDescriptor(
 				CustomerRepository.class,
 				"methodWithCrossParameterConstraint",
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		);
 		assertFalse(
 				descriptor.hasConstraints(),
@@ -106,8 +106,8 @@ public class MethodDescriptorTest {
 		descriptor = getMethodDescriptor(
 				CustomerRepository.class,
 				"methodWithCrossParameterConstraint",
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		);
 		assertTrue( descriptor.getConstraintDescriptors().isEmpty() );
 	}
@@ -117,8 +117,8 @@ public class MethodDescriptorTest {
 		MethodDescriptor descriptor = getMethodDescriptor(
 				CustomerRepositoryExt.class,
 				"methodWithCrossParameterConstraint",
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		);
 
 		assertTrue(
@@ -264,7 +264,7 @@ public class MethodDescriptorTest {
 	public void testAreParametersConstrainedForCrossParameterConstrainedMethod() {
 		MethodDescriptor methodDescriptor = getMethodDescriptor(
 				CustomerRepositoryExt.class,
-				"methodWithCrossParameterConstraint", DateMidnight.class, DateMidnight.class
+				"methodWithCrossParameterConstraint", LocalDate.class, LocalDate.class
 		);
 		assertThat( methodDescriptor.hasConstrainedParameters() ).isTrue();
 	}

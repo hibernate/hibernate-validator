@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.metadata;
 
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * @author Hardy Ferentschik

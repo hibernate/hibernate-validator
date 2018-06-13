@@ -22,8 +22,6 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
-import org.hibernate.validator.constraints.ModCheck.List;
-
 /**
  * Modulo check constraint.
  * <p>
@@ -42,7 +40,7 @@ import org.hibernate.validator.constraints.ModCheck.List;
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
-@Repeatable(List.class)
+@Repeatable(ModCheck.List.class)
 public @interface ModCheck {
 	String message() default "{org.hibernate.validator.constraints.ModCheck.message}";
 

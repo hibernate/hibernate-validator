@@ -116,19 +116,19 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 39 ),
-				new DiagnosticExpectation( Kind.ERROR, 56 ),
-				new DiagnosticExpectation( Kind.ERROR, 71 ),
-				new DiagnosticExpectation( Kind.ERROR, 90 ),
-				new DiagnosticExpectation( Kind.ERROR, 144 ),
-				new DiagnosticExpectation( Kind.ERROR, 152 ),
-				new DiagnosticExpectation( Kind.ERROR, 169 ),
-				new DiagnosticExpectation( Kind.ERROR, 191 ),
-				new DiagnosticExpectation( Kind.ERROR, 219 ),
-				new DiagnosticExpectation( Kind.ERROR, 373 ),
-				new DiagnosticExpectation( Kind.ERROR, 387 ),
-				new DiagnosticExpectation( Kind.ERROR, 409 ),
-				new DiagnosticExpectation( Kind.ERROR, 434 )
+				new DiagnosticExpectation( Kind.ERROR, 38 ),
+				new DiagnosticExpectation( Kind.ERROR, 55 ),
+				new DiagnosticExpectation( Kind.ERROR, 70 ),
+				new DiagnosticExpectation( Kind.ERROR, 89 ),
+				new DiagnosticExpectation( Kind.ERROR, 143 ),
+				new DiagnosticExpectation( Kind.ERROR, 151 ),
+				new DiagnosticExpectation( Kind.ERROR, 168 ),
+				new DiagnosticExpectation( Kind.ERROR, 190 ),
+				new DiagnosticExpectation( Kind.ERROR, 218 ),
+				new DiagnosticExpectation( Kind.ERROR, 372 ),
+				new DiagnosticExpectation( Kind.ERROR, 386 ),
+				new DiagnosticExpectation( Kind.ERROR, 408 ),
+				new DiagnosticExpectation( Kind.ERROR, 433 )
 		);
 
 		assertEquals( diagnostics.getDiagnostics().get( 0 ).getMessage( Locale.getDefault() ),

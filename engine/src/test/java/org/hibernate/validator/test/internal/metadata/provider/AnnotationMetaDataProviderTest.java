@@ -15,6 +15,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Map;
 
@@ -44,7 +45,6 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.joda.time.DateMidnight;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -92,8 +92,8 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 				beanConfiguration,
 				Calendar.class,
 				"createEvent",
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		);
 
 		//then
@@ -107,8 +107,8 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 				JavaBeanExecutable.of(
 						Calendar.class.getMethod(
 								"createEvent",
-								DateMidnight.class,
-								DateMidnight.class
+								LocalDate.class,
+								LocalDate.class
 						)
 				)
 		);
@@ -319,7 +319,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 
 	private static class Calendar {
 		@ConsistentDateParameters
-		public void createEvent(DateMidnight start, DateMidnight end) {
+		public void createEvent(LocalDate start, LocalDate end) {
 		}
 	}
 

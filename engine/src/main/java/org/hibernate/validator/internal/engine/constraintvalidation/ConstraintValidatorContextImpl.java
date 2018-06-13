@@ -209,6 +209,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		}
 
 		@Override
+		@Deprecated
 		public NodeBuilderDefinedContext addNode(String name) {
 			dropLeafNodeIfRequired();
 			propertyPath.addPropertyNode( name );

@@ -8,15 +8,16 @@ package org.hibernate.validator.test.internal.engine.methodvalidation;
 
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
+import java.time.LocalDate;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.joda.time.DateMidnight;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
+
+import org.testng.annotations.Test;
 
 /**
  * Integration test for {@link org.hibernate.validator.internal.engine.ValidatorImpl} and
@@ -153,7 +154,7 @@ public class IllegalMethodParameterConstraintsTest {
 	}
 
 	private interface Zip {
-		void zip(DateMidnight start, DateMidnight end);
+		void zip(LocalDate start, LocalDate end);
 	}
 
 	private static class ZipImpl implements Zip {
@@ -162,7 +163,7 @@ public class IllegalMethodParameterConstraintsTest {
 		 */
 		@Override
 		@ConsistentDateParameters
-		public void zip(DateMidnight start, DateMidnight end) {
+		public void zip(LocalDate start, LocalDate end) {
 		}
 	}
 }

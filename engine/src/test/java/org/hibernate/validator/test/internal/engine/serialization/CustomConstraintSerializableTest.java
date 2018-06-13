@@ -77,6 +77,7 @@ public class CustomConstraintSerializableTest {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	static class HibernateEmail implements Serializable {
 		private static final long serialVersionUID = 7206154160792549270L;
 

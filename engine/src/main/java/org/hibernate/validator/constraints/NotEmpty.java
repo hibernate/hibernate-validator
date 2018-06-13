@@ -27,8 +27,6 @@ import javax.validation.constraints.Size;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 
-import org.hibernate.validator.constraints.NotEmpty.List;
-
 /**
  * Asserts that the annotated string, collection, map or array is not {@code null} or empty.
  *
@@ -42,7 +40,7 @@ import org.hibernate.validator.constraints.NotEmpty.List;
 @SupportedValidationTarget(ValidationTarget.ANNOTATED_ELEMENT)
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
-@Repeatable(List.class)
+@Repeatable(NotEmpty.List.class)
 @ReportAsSingleViolation
 @NotNull
 @Size(min = 1)

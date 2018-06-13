@@ -28,6 +28,7 @@ public class ReflectionParameterNameProviderTest {
 	private ParameterNameProvider parameterNameProvider;
 
 	@BeforeClass
+	@SuppressWarnings("deprecation")
 	public void setup() {
 		parameterNameProvider = new ReflectionParameterNameProvider();
 	}

@@ -16,10 +16,12 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -31,15 +33,13 @@ import javax.validation.metadata.MethodType;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
-import org.joda.time.DateMidnight;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.IllegalCustomerRepositoryExt;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
 
 /**
  * Unit test for {@link BeanDescriptor} and its creation.
@@ -313,7 +313,7 @@ public class BeanDescriptorTest {
 				Arrays.<Class<?>>asList( String.class ),
 				Arrays.<Class<?>>asList( String.class, Customer.class ),
 				Collections.<Class<?>>emptyList(),
-				Arrays.<Class<?>>asList( DateMidnight.class, DateMidnight.class )
+				Arrays.<Class<?>>asList( LocalDate.class, LocalDate.class )
 		);
 	}
 

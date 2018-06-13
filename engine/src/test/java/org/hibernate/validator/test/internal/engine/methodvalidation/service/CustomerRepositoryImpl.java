@@ -13,6 +13,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
-import org.joda.time.DateMidnight;
 
 /**
  * @author Gunnar Morling
@@ -148,7 +148,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	}
 
 	@Override
-	public void methodWithCrossParameterConstraint(DateMidnight start, DateMidnight end) {
+	public void methodWithCrossParameterConstraint(LocalDate start, LocalDate end) {
 	}
 
 	@Constraint(validatedBy = { ValidB2BRepositoryValidator.class })

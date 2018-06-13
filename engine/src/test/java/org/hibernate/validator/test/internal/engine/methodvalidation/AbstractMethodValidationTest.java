@@ -15,6 +15,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -41,7 +42,6 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.service.Cus
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.RepositoryBase;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.joda.time.DateMidnight;
 import org.testng.annotations.Test;
 
 /**
@@ -756,8 +756,8 @@ public abstract class AbstractMethodValidationTest {
 	@Test
 	public void validationOfCrossParameterConstraint() {
 		//given
-		DateMidnight startDate = new DateMidnight( 2012, 11, 5 );
-		DateMidnight endDate = new DateMidnight( 2012, 11, 4 );
+		LocalDate startDate = LocalDate.of( 2012, 11, 5 );
+		LocalDate endDate = LocalDate.of( 2012, 11, 4 );
 
 		try {
 			//when
@@ -787,8 +787,8 @@ public abstract class AbstractMethodValidationTest {
 			assertMethod(
 					constraintViolation,
 					"methodWithCrossParameterConstraint",
-					DateMidnight.class,
-					DateMidnight.class
+					LocalDate.class,
+					LocalDate.class
 			);
 		}
 	}

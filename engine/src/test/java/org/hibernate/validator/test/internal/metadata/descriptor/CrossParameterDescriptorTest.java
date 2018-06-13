@@ -14,13 +14,13 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.time.LocalDate;
 import java.util.Set;
 import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.CrossParameterDescriptor;
 import javax.validation.metadata.Scope;
 
-import org.joda.time.DateMidnight;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.internal.metadata.ConsistentDateParameters;
@@ -38,8 +38,8 @@ public class CrossParameterDescriptorTest {
 		CrossParameterDescriptor descriptor = getMethodDescriptor(
 				CustomerRepository.class,
 				"methodWithCrossParameterConstraint",
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		).getCrossParameterDescriptor();
 
 		assertEquals(
@@ -53,8 +53,8 @@ public class CrossParameterDescriptorTest {
 		CrossParameterDescriptor descriptor = getMethodDescriptor(
 				CustomerRepository.class,
 				"methodWithCrossParameterConstraint",
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		).getCrossParameterDescriptor();
 		assertConstraintTypes(
 				descriptor.getConstraintDescriptors(),
@@ -66,8 +66,8 @@ public class CrossParameterDescriptorTest {
 	public void testGetConstraintDescriptorsForConstructor() {
 		CrossParameterDescriptor descriptor = getConstructorDescriptor(
 				CustomerRepository.class,
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		).getCrossParameterDescriptor();
 		assertConstraintTypes(
 				descriptor.getConstraintDescriptors(),
@@ -80,8 +80,8 @@ public class CrossParameterDescriptorTest {
 		CrossParameterDescriptor descriptor = getMethodDescriptor(
 				CustomerRepositoryExt.class,
 				"methodWithCrossParameterConstraint",
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		).getCrossParameterDescriptor();
 		assertConstraintTypes(
 				descriptor.getConstraintDescriptors(),
@@ -93,8 +93,8 @@ public class CrossParameterDescriptorTest {
 	public void testGetConstraintDescriptorsForConstructorDoesNotConsiderConstraintsFromSuperType() {
 		CrossParameterDescriptor descriptor = getConstructorDescriptor(
 				CustomerRepositoryExt.class,
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		).getCrossParameterDescriptor();
 		assertTrue(
 				descriptor.getConstraintDescriptors().isEmpty()
@@ -115,8 +115,8 @@ public class CrossParameterDescriptorTest {
 		descriptor = getMethodDescriptor(
 				CustomerRepository.class,
 				"methodWithCrossParameterConstraint",
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		).getCrossParameterDescriptor();
 		assertTrue(
 				descriptor.hasConstraints(),
@@ -136,8 +136,8 @@ public class CrossParameterDescriptorTest {
 
 		descriptor = getConstructorDescriptor(
 				CustomerRepository.class,
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		).getCrossParameterDescriptor();
 		assertTrue(
 				descriptor.hasConstraints(),
@@ -150,8 +150,8 @@ public class CrossParameterDescriptorTest {
 		CrossParameterDescriptor descriptor = getMethodDescriptor(
 				CustomerRepositoryExt.class,
 				"methodWithCrossParameterConstraint",
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		).getCrossParameterDescriptor();
 		assertTrue(
 				descriptor.hasConstraints(),
@@ -163,8 +163,8 @@ public class CrossParameterDescriptorTest {
 	public void testHasConstraintsForConstructorDoesNotConsiderConstraintsFromSuperType() {
 		CrossParameterDescriptor descriptor = getConstructorDescriptor(
 				CustomerRepositoryExt.class,
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		).getCrossParameterDescriptor();
 		assertFalse(
 				descriptor.hasConstraints(),
@@ -177,8 +177,8 @@ public class CrossParameterDescriptorTest {
 		CrossParameterDescriptor descriptor = getMethodDescriptor(
 				CustomerRepositoryExt.class,
 				"methodWithCrossParameterConstraint",
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		).getCrossParameterDescriptor();
 
 		assertTrue(
@@ -199,8 +199,8 @@ public class CrossParameterDescriptorTest {
 		CrossParameterDescriptor descriptor = getMethodDescriptor(
 				CustomerRepositoryExt.class,
 				"methodWithCrossParameterConstraint",
-				DateMidnight.class,
-				DateMidnight.class
+				LocalDate.class,
+				LocalDate.class
 		).getCrossParameterDescriptor();
 
 		Set<ConstraintDescriptor<?>> constraintDescriptors = descriptor.findConstraints()

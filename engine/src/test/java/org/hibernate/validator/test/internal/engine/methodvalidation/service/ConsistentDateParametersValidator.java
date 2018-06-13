@@ -6,17 +6,17 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
+import java.time.LocalDate;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 
-import org.joda.time.DateMidnight;
-
 /**
  * @author Gunnar Morling
  */
-@SupportedValidationTarget( value = ValidationTarget.PARAMETERS)
+@SupportedValidationTarget(value = ValidationTarget.PARAMETERS)
 public class ConsistentDateParametersValidator implements ConstraintValidator<ConsistentDateParameters, Object[]> {
 
 	@Override
@@ -29,10 +29,10 @@ public class ConsistentDateParametersValidator implements ConstraintValidator<Co
 			return true;
 		}
 
-		if ( !( value[0] instanceof DateMidnight ) || !( value[1] instanceof DateMidnight ) ) {
+		if ( !( value[0] instanceof LocalDate ) || !( value[1] instanceof LocalDate ) ) {
 			throw new IllegalArgumentException( "Unexpected method signature" );
 		}
 
-		return ( (DateMidnight) value[0] ).isBefore( (DateMidnight) value[1] );
+		return ( (LocalDate) value[0] ).isBefore( (LocalDate) value[1] );
 	}
 }

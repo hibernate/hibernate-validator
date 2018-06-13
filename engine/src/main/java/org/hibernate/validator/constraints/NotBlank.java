@@ -24,8 +24,6 @@ import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotBlank.List;
-
 /**
  * Validate that the annotated string is not {@code null} or empty.
  * The difference to {@code NotEmpty} is that trailing whitespaces are getting ignored.
@@ -40,7 +38,7 @@ import org.hibernate.validator.constraints.NotBlank.List;
 @Retention(RUNTIME)
 @ReportAsSingleViolation
 @NotNull
-@Repeatable(List.class)
+@Repeatable(NotBlank.List.class)
 @Deprecated
 public @interface NotBlank {
 	String message() default "{org.hibernate.validator.constraints.NotBlank.message}";
