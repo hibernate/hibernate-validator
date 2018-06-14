@@ -6,16 +6,26 @@
  */
 package org.hibernate.validator.internal.properties.javabean;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
  * @author Guillaume Smet
  */
 public class JavaBeanParameter implements JavaBeanAnnotatedElement {
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+
+	private static final Annotation[] EMPTY_PARAMETER_ANNOTATIONS = new Annotation[0];
 
 	private final int index;
 
@@ -48,7 +58,14 @@ public class JavaBeanParameter implements JavaBeanAnnotatedElement {
 
 	@Override
 	public Annotation[] getDeclaredAnnotations() {
-		return parameter.getDeclaredAnnotations();
+		try {
+			return parameter.getDeclaredAnnotations();
+		}
+		catch (ArrayIndexOutOfBoundsException ex) {
+			// This looks like a JVM bug we are trying to work around, kept as is for now
+			LOG.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
+			return EMPTY_PARAMETER_ANNOTATIONS;
+		}
 	}
 
 	@Override
