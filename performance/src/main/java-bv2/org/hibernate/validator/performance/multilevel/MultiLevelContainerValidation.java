@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -189,7 +190,7 @@ public class MultiLevelContainerValidation {
 
 		public static EmailAddress generate() {
 			return new EmailAddress(
-					String.format( "%s@%s.com", RandomDataGenerator.randomString(), RandomDataGenerator.randomString() )
+					String.format( Locale.ROOT, "%s@%s.com", RandomDataGenerator.randomString(), RandomDataGenerator.randomString() )
 			);
 		}
 
