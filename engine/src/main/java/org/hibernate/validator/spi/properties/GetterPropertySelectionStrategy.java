@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.spi.properties;
 
+import java.util.Set;
+
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 
@@ -49,5 +51,15 @@ public interface GetterPropertySelectionStrategy {
 	 * @return a property name of a given executable
 	 */
 	String getPropertyName(ConstrainableExecutable method);
+
+	/**
+	 * Gives a set of possible method names from based on a getter property name. Usually it means
+	 * a property name prefixed with something like "get", "is", "has" etc.
+	 *
+	 * @param propertyName getter property name
+	 *
+	 * @return {@link Set} of possible method names
+	 */
+	Set<String> getGetterMethodNameCandidates(String propertyName);
 
 }

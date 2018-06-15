@@ -22,8 +22,7 @@ import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
+import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromPropertyNameCandidates;
 import org.hibernate.validator.spi.properties.ConstrainableExecutable;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 
@@ -55,32 +54,30 @@ public class JavaBeanHelper {
 	public Optional<JavaBeanGetter> findDeclaredGetter(Class<?> declaringClass, String property) {
 		Contracts.assertNotNull( declaringClass, MESSAGES.classCannotBeNull() );
 
-		return findGetter( declaringClass, run( GetDeclaredMethods.action( declaringClass ) ), property );
+		return findGetter( declaringClass, property, false );
 	}
-
-	private Optional<JavaBeanGetter> findGetter(Class<?> declaringClass, Method[] methods, String property) {
-		for ( Method method : methods ) {
-			JavaBeanConstrainableExecutable executable = new JavaBeanConstrainableExecutable( method );
-			if ( getterPropertySelectionStrategy.isGetter( executable )
-					&& property.equals( getterPropertySelectionStrategy.getPropertyName( executable ) ) ) {
-				return Optional.of( new JavaBeanGetter( declaringClass, method, getterPropertySelectionStrategy.getPropertyName( executable ) ) );
-			}
-		}
-		return Optional.empty();
-	}
-
 
 	public Optional<JavaBeanGetter> findGetter(Class<?> declaringClass, String property) {
 		Contracts.assertNotNull( declaringClass, MESSAGES.classCannotBeNull() );
 
-		Optional<JavaBeanGetter> declaredGetterProperty = findDeclaredGetter( declaringClass, property );
+		return findGetter( declaringClass, property, true );
+	}
 
-		if ( declaredGetterProperty.isPresent() ) {
-			return declaredGetterProperty;
+	private Optional<JavaBeanGetter> findGetter(Class<?> declaringClass, String property, boolean lookForMethodsOnSuperClass) {
+		Method getter = run(
+				GetMethodFromPropertyNameCandidates.action(
+						declaringClass,
+						getterPropertySelectionStrategy.getGetterMethodNameCandidates( property ),
+						lookForMethodsOnSuperClass
+				)
+		);
+		if ( getter == null ) {
+			return Optional.empty();
 		}
 		else {
-			// look for getters from the superclasses and interfaces
-			return findGetter( declaringClass, run( GetMethods.action( declaringClass ) ), property );
+			return Optional.of(
+					new JavaBeanGetter( declaringClass, getter, getterPropertySelectionStrategy.getPropertyName( new JavaBeanConstrainableExecutable( getter ) ) )
+			);
 		}
 	}
 
