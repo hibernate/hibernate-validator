@@ -49,6 +49,8 @@ public interface GetterPropertySelectionStrategy {
 	 * @param method the {@link ConstrainableExecutable} which methods name should be transformed
 	 *
 	 * @return a property name of a given executable
+	 *
+	 * @throws IllegalArgumentException If a propert name cannot be constructed
 	 */
 	String getPropertyName(ConstrainableExecutable method);
 

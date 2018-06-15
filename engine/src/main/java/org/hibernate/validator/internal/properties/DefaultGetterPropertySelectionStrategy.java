@@ -6,11 +6,14 @@
  */
 package org.hibernate.validator.internal.properties;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.StringHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.properties.ConstrainableExecutable;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 
@@ -18,6 +21,8 @@ import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
  * @author Marko Bekhta
  */
 public class DefaultGetterPropertySelectionStrategy implements GetterPropertySelectionStrategy {
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String GETTER_PREFIX_GET = "get";
 	private static final String GETTER_PREFIX_IS = "is";
@@ -70,13 +75,15 @@ public class DefaultGetterPropertySelectionStrategy implements GetterPropertySel
 
 	@Override
 	public String getPropertyName(ConstrainableExecutable executable) {
+		Contracts.assertNotNull( executable, "executable cannot be null" );
+
 		String methodName = executable.getName();
 		for ( String prefix : GETTER_PREFIXES ) {
 			if ( methodName.startsWith( prefix ) ) {
 				return StringHelper.decapitalize( methodName.substring( prefix.length() ) );
 			}
 		}
-		return null;
+		throw LOG.getIllegalArgumentException( "Property name cannot be constructed for a given method " + executable.getName() );
 	}
 
 	@Override
