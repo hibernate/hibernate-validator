@@ -12,6 +12,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -231,6 +232,11 @@ public class GetterPropertySelectionStrategyTest {
 		public String getPropertyName(ConstrainableExecutable method) {
 			return method.getName();
 		}
+
+		@Override
+		public Set<String> getGetterMethodNameCandidates(String propertyName) {
+			return Collections.singleton( propertyName );
+		}
 	}
 
 	public static class FooGetterPropertySelectionStrategy implements GetterPropertySelectionStrategy {
@@ -246,6 +252,11 @@ public class GetterPropertySelectionStrategyTest {
 			char[] chars = method.getName().substring( 3 ).toCharArray();
 			chars[0] = Character.toLowerCase( chars[0] );
 			return new String( chars );
+		}
+
+		@Override
+		public Set<String> getGetterMethodNameCandidates(String propertyName) {
+			return Collections.singleton( "foo" + Character.toUpperCase( propertyName.charAt( 0 ) ) + propertyName.substring( 1 ) );
 		}
 	}
 

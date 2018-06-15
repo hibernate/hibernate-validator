@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.internal.properties;
 
+import java.util.Set;
+
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.spi.properties.ConstrainableExecutable;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
@@ -73,5 +77,16 @@ public class DefaultGetterPropertySelectionStrategy implements GetterPropertySel
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public Set<String> getGetterMethodNameCandidates(String propertyName) {
+		Contracts.assertNotEmpty( propertyName, "Name of a property must not be empty" );
+
+		Set<String> nameCandidates = CollectionHelper.newHashSet( GETTER_PREFIXES.length );
+		for ( String prefix : GETTER_PREFIXES ) {
+			nameCandidates.add( prefix + Character.toUpperCase( propertyName.charAt( 0 ) ) + propertyName.substring( 1 ) );
+		}
+		return nameCandidates;
 	}
 }
