@@ -14,6 +14,7 @@ import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Getter;
 import org.hibernate.validator.internal.properties.PropertyAccessor;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
@@ -35,6 +36,8 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 
 	public JavaBeanGetter(Class<?> declaringClass, Method method, String propertyName) {
 		super( method );
+		Contracts.assertNotNull( propertyName, "Property name cannot be null." );
+
 		this.declaringClass = declaringClass;
 		this.propertyName = propertyName;
 	}
