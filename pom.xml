@@ -96,7 +96,7 @@
     <properties>
         <!-- Version to be used as baseline for API/SPI change reports -->
 
-        <previous.stable>6.0.9.Final</previous.stable>
+        <previous.stable>6.0.10.Final</previous.stable>
 
         <!-- URLs used in javadoc and documentation generation -->
 
