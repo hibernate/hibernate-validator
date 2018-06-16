@@ -675,3 +675,81 @@ Call `ValidatorFactory#close()` if a given validator factory instance is not nee
 Failure to do so may result in a class loader leak in cases where applications/bundles are re-deployed and a non-closed
 validator factory still is referenced by application code.
 ====
+
+[[section-getter-property-selection-strategy]]
+=== Getter property selection strategy configuration
+
+When a regular validation operation is performed on an object it's properties get validated. Per
+JavaBean specification, a property can either be a field or a getter. Hibernate Validator uses
+next set of rules to determine if a method is a getter or not:
+
+- a method name starts with `get`, it has a nonvoid return type and has no parameters
+- a method name starts with `is`, has a return type of `boolean` and has no parameters
+- a method name starts with `has`, has a return type of `boolean` and has no parameters (this
+is a Hibernate Validator specific rule and is not mandated by the JavaBeans specification)
+
+If any of the statements above are true - method is considered a getter.
+
+When working with objects that do not follow JavaBean specification rules on getters. These rules
+should either be redefined or extended, in order to be able to fully validate the object. An example
+of such objects can be the ones constructed from classes that follow fluent design pattern (i.e. <<example-using-fluent-api-pattern>> ).
+
+[[example-using-fluent-api-pattern]]
+.A data class that uses nonstandard getters
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/getterselectionstrategy/User.java[tags=include]
+----
+====
+
+If such object gets validated no validation will be performed on the methods:
+
+.Validating a class with nonstandard getters and default getter property selection strategy
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/getterselectionstrategy/GetterPropertySelectionStrategyTest.java[tags=no-strategy]
+----
+====
+
+To make Hibernate Validator treat such methods as getter properties a custom `GetterPropertySelectionStrategy`
+should be configured. In particular case the strategy can be implemeted like:
+
+.Custom GetterPropertySelectionStrategy implementation
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/getterselectionstrategy/NoPrefixGetterPropertySelectionStrategy.java[tags=include]
+----
+====
+
+There are multiple ways to configuring Hibernate Validator to use such strategy. It can either be done
+programmatically (<<custom-getter-strategy-programmatically>>) or via the
+`hibernate.validator.getter_property_selection_strategy` property using XML configuration (<<custom-getter-strategy-xml>>).
+
+[[custom-getter-strategy-programmatically]]
+.Configuring the custom `GetterPropertySelectionStrategy` programmatically
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/getterselectionstrategy/GetterPropertySelectionStrategyTest.java[tags=custom-strategy]
+----
+====
+
+[[custom-getter-strategy-xml]]
+.Configuring the custom `GetterPropertySelectionStrategy` using XML property
+====
+[source, XML, indent=0]
+----
+include::{resourcesdir}/org/hibernate/validator/referenceguide/chapter12/getter-property-selection-strategy-validation.xml[]
+----
+====
+
+[WARNING]
+====
+It is important to mention that in cases when any programmatic constraints are added using
+`HibernateValidatorConfiguration#addMapping(ConstraintMapping)` it should be done after the
+required getter property selection strategy is configured. Otherwise, the default one will be
+used.
+====
