@@ -1,0 +1,38 @@
+//tag::include[]
+package org.hibernate.validator.referenceguide.chapter12.getterselectionstrategy;
+
+//end::include[]
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+
+//tag::include[]
+public class User {
+
+	private final String firstName;
+	private final String lastName;
+	private final String email;
+
+	//end::include[]
+	public User(String firstName, String lastName, String email) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+	}
+
+	//tag::include[]
+	@NotEmpty
+	public String firstName() {
+		return firstName;
+	}
+
+	@NotEmpty
+	public String lastName() {
+		return lastName;
+	}
+
+	@Email
+	public String email() {
+		return email;
+	}
+}
+//end::include[]
