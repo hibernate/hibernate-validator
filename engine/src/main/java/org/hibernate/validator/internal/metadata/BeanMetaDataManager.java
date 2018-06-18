@@ -29,6 +29,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.properties.javabean.accessors.JavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.Contracts;
@@ -123,7 +124,8 @@ public class BeanMetaDataManager {
 			ValueExtractorManager valueExtractorManager,
 			ValidationOrderGenerator validationOrderGenerator,
 			List<MetaDataProvider> optionalMetaDataProviders,
-			MethodValidationConfiguration methodValidationConfiguration) {
+			MethodValidationConfiguration methodValidationConfiguration,
+			JavaBeanPropertyAccessorFactory propertyAccessorFactory) {
 		this.constraintHelper = constraintHelper;
 		this.executableHelper = executableHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
@@ -147,7 +149,8 @@ public class BeanMetaDataManager {
 				constraintHelper,
 				typeResolutionHelper,
 				valueExtractorManager,
-				annotationProcessingOptions
+				annotationProcessingOptions,
+				propertyAccessorFactory
 		);
 		List<MetaDataProvider> tmpMetaDataProviders = new ArrayList<>( optionalMetaDataProviders.size() + 1 );
 		// We add the annotation based metadata provider at the first position so that the entire metadata model is assembled

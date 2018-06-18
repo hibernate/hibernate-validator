@@ -42,6 +42,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
+import org.hibernate.validator.internal.properties.javabean.accessors.ReflectionJavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 
@@ -63,7 +64,8 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 				new ConstraintHelper(),
 				new TypeResolutionHelper(),
 				new ValueExtractorManager( Collections.emptySet() ),
-				new AnnotationProcessingOptionsImpl()
+				new AnnotationProcessingOptionsImpl(),
+				ReflectionJavaBeanPropertyAccessorFactory.INSTANCE
 		);
 	}
 
@@ -105,6 +107,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 
 		assertThat( createEvent.getCallable() ).isEqualTo(
 				JavaBeanExecutable.of(
+						ReflectionJavaBeanPropertyAccessorFactory.INSTANCE,
 						Calendar.class.getMethod(
 								"createEvent",
 								LocalDate.class,

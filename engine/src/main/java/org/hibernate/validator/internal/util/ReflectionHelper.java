@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.util;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -219,6 +220,15 @@ public final class ReflectionHelper {
 		}
 		catch (IllegalAccessException | InvocationTargetException e) {
 			throw LOG.getUnableToAccessMemberException( method.getName(), e );
+		}
+	}
+
+	public static Object getValue(MethodHandle methodHandle, Object object) {
+		try {
+			return methodHandle.invoke( object );
+		}
+		catch (Throwable e) {
+			throw LOG.getUnableToAccessPropertyException( e );
 		}
 	}
 

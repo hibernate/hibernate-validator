@@ -26,6 +26,7 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation.Con
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
+import org.hibernate.validator.internal.properties.javabean.accessors.JavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -63,7 +64,7 @@ class ConstrainedFieldStaxBuilder extends AbstractConstrainedElementStaxBuilder 
 		return FIELD_QNAME_LOCAL_PART;
 	}
 
-	ConstrainedField build(Class<?> beanClass, List<String> alreadyProcessedFieldNames) {
+	ConstrainedField build(JavaBeanPropertyAccessorFactory propertyAccessorFactory, Class<?> beanClass, List<String> alreadyProcessedFieldNames) {
 		if ( alreadyProcessedFieldNames.contains( mainAttributeValue ) ) {
 			throw LOG.getIsDefinedTwiceInMappingXmlForBeanException( mainAttributeValue, beanClass );
 		}
@@ -71,7 +72,7 @@ class ConstrainedFieldStaxBuilder extends AbstractConstrainedElementStaxBuilder 
 			alreadyProcessedFieldNames.add( mainAttributeValue );
 		}
 		Field field = findField( beanClass, mainAttributeValue );
-		JavaBeanField javaBeanField = new JavaBeanField( field );
+		JavaBeanField javaBeanField = new JavaBeanField( propertyAccessorFactory, field );
 		ConstraintLocation constraintLocation = ConstraintLocation.forField( javaBeanField );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()

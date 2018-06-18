@@ -24,6 +24,7 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.properties.javabean.accessors.JavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -45,13 +46,15 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 	private final Set<TypeConstraintMappingContextImpl<?>> typeContexts;
 	private final Set<Class<?>> definedConstraints;
 	private final Set<ConstraintDefinitionContextImpl<?>> constraintContexts;
+	private final JavaBeanPropertyAccessorFactory propertyAccessorFactory;
 
-	public DefaultConstraintMapping() {
+	public DefaultConstraintMapping(JavaBeanPropertyAccessorFactory propertyAccessorFactory) {
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 		this.configuredTypes = newHashSet();
 		this.typeContexts = newHashSet();
 		this.definedConstraints = newHashSet();
 		this.constraintContexts = newHashSet();
+		this.propertyAccessorFactory = propertyAccessorFactory;
 	}
 
 	@Override
@@ -123,5 +126,9 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 		}
 
 		return contributions;
+	}
+
+	JavaBeanPropertyAccessorFactory getPropertyAccessorFactory() {
+		return propertyAccessorFactory;
 	}
 }

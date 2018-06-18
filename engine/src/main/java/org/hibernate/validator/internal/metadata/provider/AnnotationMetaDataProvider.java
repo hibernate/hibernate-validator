@@ -66,6 +66,7 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanAnnotatedEle
 import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanParameter;
+import org.hibernate.validator.internal.properties.javabean.accessors.JavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -92,19 +93,22 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private final ConstraintHelper constraintHelper;
 	private final TypeResolutionHelper typeResolutionHelper;
-	private final AnnotationProcessingOptions annotationProcessingOptions;
 	private final ValueExtractorManager valueExtractorManager;
+	private final AnnotationProcessingOptions annotationProcessingOptions;
+	private final JavaBeanPropertyAccessorFactory propertyAccessorFactory;
 
 	private final BeanConfiguration<Object> objectBeanConfiguration;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager,
-			AnnotationProcessingOptions annotationProcessingOptions) {
+			AnnotationProcessingOptions annotationProcessingOptions,
+			JavaBeanPropertyAccessorFactory propertyAccessorFactory) {
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
 		this.annotationProcessingOptions = annotationProcessingOptions;
+		this.propertyAccessorFactory = propertyAccessorFactory;
 
 		this.objectBeanConfiguration = retrieveBeanConfiguration( Object.class );
 	}
@@ -220,7 +224,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				continue;
 			}
 
-			JavaBeanField javaBeanField = new JavaBeanField( field );
+			JavaBeanField javaBeanField = new JavaBeanField( propertyAccessorFactory, field );
 
 			if ( annotationProcessingOptions.areMemberConstraintsIgnoredFor( javaBeanField ) ) {
 				continue;
@@ -301,7 +305,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * given element.
 	 */
 	private ConstrainedExecutable findExecutableMetaData(Executable executable) {
-		JavaBeanExecutable<?> javaBeanExecutable = JavaBeanExecutable.of( executable );
+		JavaBeanExecutable<?> javaBeanExecutable = JavaBeanExecutable.of( propertyAccessorFactory, executable );
 		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( javaBeanExecutable );
 
 		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = findConstraints(

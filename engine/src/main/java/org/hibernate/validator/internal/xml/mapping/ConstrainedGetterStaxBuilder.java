@@ -28,6 +28,7 @@ import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
+import org.hibernate.validator.internal.properties.javabean.accessors.JavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -65,7 +66,7 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 		return GETTER_QNAME_LOCAL_PART;
 	}
 
-	ConstrainedExecutable build(Class<?> beanClass, List<String> alreadyProcessedGetterNames) {
+	ConstrainedExecutable build(JavaBeanPropertyAccessorFactory propertyAccessorFactory, Class<?> beanClass, List<String> alreadyProcessedGetterNames) {
 		if ( alreadyProcessedGetterNames.contains( mainAttributeValue ) ) {
 			throw LOG.getIsDefinedTwiceInMappingXmlForBeanException( mainAttributeValue, beanClass );
 		}
@@ -73,7 +74,7 @@ class ConstrainedGetterStaxBuilder extends AbstractConstrainedElementStaxBuilder
 			alreadyProcessedGetterNames.add( mainAttributeValue );
 		}
 		Method getter = findGetter( beanClass, mainAttributeValue );
-		JavaBeanGetter javaBeanGetter = new JavaBeanGetter( beanClass, getter );
+		JavaBeanGetter javaBeanGetter = new JavaBeanGetter( propertyAccessorFactory, beanClass, getter );
 		ConstraintLocation constraintLocation = ConstraintLocation.forGetter( javaBeanGetter );
 
 		Set<MetaConstraint<?>> metaConstraints = constraintTypeStaxBuilders.stream()

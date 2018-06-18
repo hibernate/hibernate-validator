@@ -19,6 +19,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
+import org.hibernate.validator.internal.properties.javabean.accessors.ReflectionJavaBeanPropertyAccessorFactory;
 
 /**
  * @author Gunnar Morling
@@ -64,10 +65,10 @@ public abstract class AnnotationMetaDataProviderTestBase {
 
 		Constrainable constrainable;
 		if ( member instanceof Field ) {
-			constrainable = new JavaBeanField( (Field) member );
+			constrainable = new JavaBeanField( ReflectionJavaBeanPropertyAccessorFactory.INSTANCE, (Field) member );
 		}
 		else {
-			constrainable = JavaBeanExecutable.of( (Executable) member );
+			constrainable = JavaBeanExecutable.of( ReflectionJavaBeanPropertyAccessorFactory.INSTANCE, (Executable) member );
 		}
 
 		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {

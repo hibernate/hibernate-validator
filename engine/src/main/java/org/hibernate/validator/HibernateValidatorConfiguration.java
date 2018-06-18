@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator;
 
+import java.lang.invoke.MethodHandles.Lookup;
 import java.time.Duration;
 import java.util.Set;
 
@@ -311,4 +312,37 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	@Incubating
 	HibernateValidatorConfiguration constraintValidatorPayload(Object constraintValidatorPayload);
+
+	/**
+	 * Allows to set the property access kind. Could be either {@link PropertyAccessKind#REFLECTION}, which is
+	 * a classic and default way to access properties, or it can also be {@link PropertyAccessKind#METHOD_HANDLES},
+	 * which is a new incubating way. Usage of method handle access should provide better performance but also requires
+	 * users to set {@link Lookup} through
+	 *
+	 * @param propertyAccessKind the desired property access kind
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.1.0
+	 */
+	@Incubating
+	HibernateValidatorConfiguration propertyAccessKind(PropertyAccessKind propertyAccessKind);
+
+	/**
+	 * Allows to set the {@link Lookup} object that will be used when accessing properies using {@link PropertyAccessKind#METHOD_HANDLES}.
+	 * if is not configured Hibernate Validator will internally call {@code MethodHandles.lookup()}.
+	 *
+	 * @param lookup the lookup object to use
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.1.0
+	 */
+	@Incubating
+	HibernateValidatorConfiguration externalLookup(Lookup lookup);
+
+	@Incubating
+	enum PropertyAccessKind {
+		REFLECTION, METHOD_HANDLES,
+	}
 }

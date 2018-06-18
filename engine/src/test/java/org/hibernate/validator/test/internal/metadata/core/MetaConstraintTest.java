@@ -21,6 +21,7 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
+import org.hibernate.validator.internal.properties.javabean.accessors.ReflectionJavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -51,14 +52,14 @@ public class MetaConstraintTest {
 	@TestForIssue(jiraKey = "HV-930")
 	public void two_meta_constraints_for_the_same_constraint_should_be_equal() throws Exception {
 		ConstraintDescriptorImpl<NotNull> constraintDescriptor1 = new ConstraintDescriptorImpl<>(
-				constraintHelper, JavaBeanExecutable.of( barMethod ), constraintAnnotationDescriptor, ConstraintLocationKind.METHOD
+				constraintHelper, JavaBeanExecutable.of( ReflectionJavaBeanPropertyAccessorFactory.INSTANCE, barMethod ), constraintAnnotationDescriptor, ConstraintLocationKind.METHOD
 		);
 		ConstraintLocation location1 = ConstraintLocation.forClass( Foo.class );
 		MetaConstraint<NotNull> metaConstraint1 = MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor1, location1 );
 
 
 		ConstraintDescriptorImpl<NotNull> constraintDescriptor2 = new ConstraintDescriptorImpl<>(
-				constraintHelper, JavaBeanExecutable.of( barMethod ), constraintAnnotationDescriptor, ConstraintLocationKind.METHOD
+				constraintHelper, JavaBeanExecutable.of( ReflectionJavaBeanPropertyAccessorFactory.INSTANCE, barMethod ), constraintAnnotationDescriptor, ConstraintLocationKind.METHOD
 		);
 		ConstraintLocation location2 = ConstraintLocation.forClass( Foo.class );
 		MetaConstraint<NotNull> metaConstraint2 = MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor2, location2 );

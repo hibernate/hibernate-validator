@@ -184,7 +184,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			throw LOG.getBeanDoesNotContainMethodException( beanClass, name, parameterTypes );
 		}
 
-		JavaBeanMethod javaBeanMethod = JavaBeanExecutable.of( method );
+		JavaBeanMethod javaBeanMethod = JavaBeanExecutable.of( mapping.getPropertyAccessorFactory(), method );
 
 		if ( configuredMembers.contains( javaBeanMethod ) ) {
 			throw LOG.getMethodHasAlreadyBeenConfiguredViaProgrammaticApiException(
@@ -289,7 +289,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		Contracts.assertNotNull( clazz, MESSAGES.classCannotBeNull() );
 
 		Field field = run( GetDeclaredField.action( clazz, property ) );
-		return field == null ? null : new JavaBeanField( field );
+		return field == null ? null : new JavaBeanField( mapping.getPropertyAccessorFactory(), field );
 	}
 
 	private JavaBeanGetter getGetterProperty(Class<?> clazz, String property) {
@@ -303,7 +303,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 				break;
 			}
 		}
-		return method == null ? null : new JavaBeanGetter( method );
+		return method == null ? null : new JavaBeanGetter( mapping.getPropertyAccessorFactory(), method );
 	}
 
 	/**
