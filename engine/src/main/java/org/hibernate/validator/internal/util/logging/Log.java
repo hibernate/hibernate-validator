@@ -872,7 +872,4 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 247, value = "Unable to instantiate getter property selection strategy class %s.")
 	ValidationException getUnableToInstantiateGetterPropertySelectionStrategyClassException(String getterPropertySelectionStrategyClassName, @Cause Exception e);
-
-	@Message(id = 248, value = "Unable to access field %3$s of class %2$s using lookup %1$s.")
-	ValidationException getUnableToAccessFieldException(Lookup lookup, @FormatWith(ClassObjectFormatter.class) Class<?> clazz, String property, @Cause Throwable e);
 }

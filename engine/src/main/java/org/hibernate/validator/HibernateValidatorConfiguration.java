@@ -323,7 +323,8 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	HibernateValidatorConfiguration constraintValidatorPayload(Object constraintValidatorPayload);
 
 	/**
-	 * Allows to set a getter property selection strategy defining if a given method is a getter or not.
+	 * Allows to set a getter property selection strategy defining the rules determining if a method is a getter
+	 * or not.
 	 *
 	 * @param getterPropertySelectionStrategy the {@link GetterPropertySelectionStrategy} to be used
 	 *

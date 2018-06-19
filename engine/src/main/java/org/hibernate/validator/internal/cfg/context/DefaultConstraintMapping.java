@@ -65,7 +65,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 			throw LOG.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( type );
 		}
 
-		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<>( this, type, javaBeanHelper );
+		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<>( javaBeanHelper, this, type );
 		typeContexts.add( typeContext );
 		configuredTypes.add( type );
 

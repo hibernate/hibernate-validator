@@ -70,7 +70,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	private List<Class<?>> defaultGroupSequence;
 	private Class<? extends DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass;
 
-	TypeConstraintMappingContextImpl(DefaultConstraintMapping mapping, Class<C> beanClass, JavaBeanHelper javaBeanHelper) {
+	TypeConstraintMappingContextImpl(JavaBeanHelper javaBeanHelper, DefaultConstraintMapping mapping, Class<C> beanClass) {
 		super( mapping );
 		this.javaBeanHelper = javaBeanHelper;
 		this.beanClass = beanClass;

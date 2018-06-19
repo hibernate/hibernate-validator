@@ -22,7 +22,7 @@ import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromPropertyNameCandidates;
+import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromGetterNameCandidates;
 import org.hibernate.validator.spi.properties.ConstrainableExecutable;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 
@@ -65,7 +65,7 @@ public class JavaBeanHelper {
 
 	private Optional<JavaBeanGetter> findGetter(Class<?> declaringClass, String property, boolean lookForMethodsOnSuperClass) {
 		Method getter = run(
-				GetMethodFromPropertyNameCandidates.action(
+				GetMethodFromGetterNameCandidates.action(
 						declaringClass,
 						getterPropertySelectionStrategy.getGetterMethodNameCandidates( property ),
 						lookForMethodsOnSuperClass

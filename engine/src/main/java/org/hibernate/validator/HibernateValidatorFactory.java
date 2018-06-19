@@ -49,7 +49,7 @@ public interface HibernateValidatorFactory extends ValidatorFactory {
 	Duration getTemporalValidationTolerance();
 
 	/**
-	 * Returns the getter property selection strategy defining if a given method is a getter or not.
+	 * Returns the getter property selection strategy defining the rules determining if a method is a getter or not.
 	 *
 	 * @return the getter property selection strategy of the current {@link ValidatorFactory}
 	 *

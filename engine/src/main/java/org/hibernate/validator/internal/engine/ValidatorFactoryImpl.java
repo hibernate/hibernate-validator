@@ -155,7 +155,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		Map<String, String> properties = configurationState.getProperties();
 
-		this.javaBeanHelper = new JavaBeanHelper( getterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ) );
+		this.javaBeanHelper = new JavaBeanHelper( getGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ) );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( configurationState.getMappingStreams().isEmpty() ) {
@@ -564,7 +564,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return null;
 	}
 
-	private static GetterPropertySelectionStrategy getterPropertySelectionStrategy(ConfigurationImpl hibernateSpecificConfig, Map<String, String> properties, ClassLoader externalClassLoader) {
+	private static GetterPropertySelectionStrategy getGetterPropertySelectionStrategy(ConfigurationImpl hibernateSpecificConfig, Map<String, String> properties,
+			ClassLoader externalClassLoader) {
 		if ( hibernateSpecificConfig.getGetterPropertySelectionStrategy() != null ) {
 			LOG.usingGetterPropertySelectionStrategy( hibernateSpecificConfig.getGetterPropertySelectionStrategy().getClass() );
 			return hibernateSpecificConfig.getGetterPropertySelectionStrategy();

@@ -223,7 +223,8 @@ public class GetterPropertySelectionStrategyTest {
 		@Override
 		public boolean isGetter(ConstrainableExecutable executable) {
 			String name = executable.getName();
-			return executable.getParameterTypes().length == 0
+			return executable.getReturnType() != void.class
+					&& executable.getParameterTypes().length == 0
 					&& !name.startsWith( "is" )
 					&& !name.startsWith( "get" );
 		}
