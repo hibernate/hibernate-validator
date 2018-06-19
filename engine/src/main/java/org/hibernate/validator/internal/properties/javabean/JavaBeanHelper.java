@@ -12,7 +12,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Optional;
@@ -76,7 +75,7 @@ public class JavaBeanHelper {
 		}
 		else {
 			return Optional.of(
-					new JavaBeanGetter( declaringClass, getter, getterPropertySelectionStrategy.getPropertyName( new JavaBeanConstrainableExecutable( getter ) ) )
+					new JavaBeanGetter( declaringClass, getter, property )
 			);
 		}
 	}
@@ -115,8 +114,10 @@ public class JavaBeanHelper {
 
 	public JavaBeanMethod executable(Class<?> declaringClass, Method method) {
 		JavaBeanConstrainableExecutable executable = new JavaBeanConstrainableExecutable( method );
-		if ( getterPropertySelectionStrategy.isGetter( executable ) ) {
-			return new JavaBeanGetter( declaringClass, method, getterPropertySelectionStrategy.getPropertyName( executable ) );
+
+		Optional<String> correspondingProperty = getterPropertySelectionStrategy.getProperty( executable );
+		if ( correspondingProperty.isPresent() ) {
+			return new JavaBeanGetter( declaringClass, method, correspondingProperty.get() );
 		}
 
 		return new JavaBeanMethod( method );
@@ -151,7 +152,7 @@ public class JavaBeanHelper {
 		}
 
 		@Override
-		public Type[] getParameterTypes() {
+		public Class<?>[] getParameterTypes() {
 			return method.getParameterTypes();
 		}
 	}

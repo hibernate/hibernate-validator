@@ -1,10 +1,11 @@
 //tag::include[]
 package org.hibernate.validator.referenceguide.chapter12.getterselectionstrategy;
 
+//end::include[]
 import java.lang.reflect.Method;
 import java.util.Arrays;
-//end::include[]
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,17 +25,14 @@ public class FluentGetterPropertySelectionStrategy implements GetterPropertySele
 	}
 
 	@Override
-	public boolean isGetter(ConstrainableExecutable executable) {
-		// We check that the method has a non-void return type and no parameters.
-		// And we do not care about the method name.
-		return !methodNamesToIgnore.contains( executable.getName() )
-				&& executable.getReturnType() != void.class
-				&& executable.getParameterTypes().length == 0;
-	}
+	public Optional<String> getProperty(ConstrainableExecutable executable) {
+		if ( methodNamesToIgnore.contains( executable.getName() )
+				|| executable.getReturnType() == void.class
+				|| executable.getParameterTypes().length > 0 ) {
+			return Optional.empty();
+		}
 
-	@Override
-	public String getPropertyName(ConstrainableExecutable method) {
-		return method.getName();
+		return Optional.of( executable.getName() );
 	}
 
 	@Override

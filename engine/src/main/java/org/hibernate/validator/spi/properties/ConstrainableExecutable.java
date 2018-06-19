@@ -6,15 +6,15 @@
  */
 package org.hibernate.validator.spi.properties;
 
-import java.lang.reflect.Type;
+import org.hibernate.validator.Incubating;
 
 /**
- * A class that describes JavaBeans method. Is used for determining if a given
- * JavaBeans method is a property or not.
+ * Descriptor for a method of a Java class.
  *
  * @author Marko Bekhta
  * @since 6.1.0
  */
+@Incubating
 public interface ConstrainableExecutable {
 
 	/**
@@ -30,5 +30,5 @@ public interface ConstrainableExecutable {
 	/**
 	 * @return the parameter types for the executable this object represents
 	 */
-	Type[] getParameterTypes();
+	Class<?>[] getParameterTypes();
 }

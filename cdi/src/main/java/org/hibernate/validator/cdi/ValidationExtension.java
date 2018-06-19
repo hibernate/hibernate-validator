@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -265,15 +266,16 @@ public class ValidationExtension implements Extension {
 		for ( AnnotatedMethod<? super T> annotatedMethod : type.getMethods() ) {
 			Method method = annotatedMethod.getJavaMember();
 
-			boolean isGetter = getterPropertySelectionStrategyHelper.isGetter( method );
+			Optional<String> correspondingProperty = getterPropertySelectionStrategyHelper.getProperty( method );
 
 			// obtain @ValidateOnExecution from the top-most method in the hierarchy
 			Method methodForExecutableTypeRetrieval = replaceWithOverriddenOrInterfaceMethod( method, overriddenAndImplementedMethods );
 
 			EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesDefinedOnType( methodForExecutableTypeRetrieval.getDeclaringClass() );
-			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesDefinedOnMethod( methodForExecutableTypeRetrieval, isGetter );
+			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesDefinedOnMethod( methodForExecutableTypeRetrieval,
+					correspondingProperty.isPresent() );
 
-			ExecutableType currentExecutableType = isGetter ? ExecutableType.GETTER_METHODS : ExecutableType.NON_GETTER_METHODS;
+			ExecutableType currentExecutableType = correspondingProperty.isPresent() ? ExecutableType.GETTER_METHODS : ExecutableType.NON_GETTER_METHODS;
 
 			// validation is enabled per default, so explicit configuration can just veto whether
 			// validation occurs
@@ -282,11 +284,11 @@ public class ValidationExtension implements Extension {
 			}
 
 			boolean needsValidation;
-			if ( isGetter ) {
-				needsValidation = isGetterConstrained( method, beanDescriptor );
+			if ( correspondingProperty.isPresent() ) {
+				needsValidation = isGetterConstrained( beanDescriptor, method, correspondingProperty.get() );
 			}
 			else {
-				needsValidation = isNonGetterConstrained( method, beanDescriptor );
+				needsValidation = isNonGetterConstrained( beanDescriptor, method );
 			}
 
 			if ( needsValidation ) {
@@ -313,13 +315,12 @@ public class ValidationExtension implements Extension {
 		}
 	}
 
-	private boolean isNonGetterConstrained(Method method, BeanDescriptor beanDescriptor) {
+	private boolean isNonGetterConstrained(BeanDescriptor beanDescriptor, Method method) {
 		return beanDescriptor.getConstraintsForMethod( method.getName(), method.getParameterTypes() ) != null;
 	}
 
-	private boolean isGetterConstrained(Method method, BeanDescriptor beanDescriptor) {
-		String propertyName = getterPropertySelectionStrategyHelper.getPropertyName( method );
-		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( propertyName );
+	private boolean isGetterConstrained(BeanDescriptor beanDescriptor, Method method, String property) {
+		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( property );
 		return propertyDescriptor != null && propertyDescriptor.findConstraints()
 				.declaredOn( ElementType.METHOD )
 				.hasConstraints();
