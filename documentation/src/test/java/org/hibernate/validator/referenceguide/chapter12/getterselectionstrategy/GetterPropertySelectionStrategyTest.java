@@ -37,7 +37,7 @@ public class GetterPropertySelectionStrategyTest {
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
 				// Setting a custom getter property selection strategy
-				.getterPropertySelectionStrategy( new NoPrefixGetterPropertySelectionStrategy() )
+				.getterPropertySelectionStrategy( new FluentGetterPropertySelectionStrategy() )
 				.buildValidatorFactory()
 				.getValidator();
 
