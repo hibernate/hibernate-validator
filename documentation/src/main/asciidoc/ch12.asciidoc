@@ -726,7 +726,7 @@ In this particular case, a possible implementation of the strategy would be:
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/getterselectionstrategy/NoPrefixGetterPropertySelectionStrategy.java[tags=include]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/getterselectionstrategy/FluentGetterPropertySelectionStrategy.java[tags=include]
 ----
 ====
 
