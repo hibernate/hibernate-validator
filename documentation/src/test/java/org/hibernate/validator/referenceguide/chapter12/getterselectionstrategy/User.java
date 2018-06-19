@@ -8,9 +8,11 @@ import javax.validation.constraints.NotEmpty;
 //tag::include[]
 public class User {
 
-	private final String firstName;
-	private final String lastName;
-	private final String email;
+	private String firstName;
+	private String lastName;
+	private String email;
+
+	// [...]
 
 	//end::include[]
 	public User(String firstName, String lastName, String email) {

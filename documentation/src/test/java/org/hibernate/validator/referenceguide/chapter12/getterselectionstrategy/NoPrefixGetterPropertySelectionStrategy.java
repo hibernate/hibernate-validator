@@ -13,8 +13,8 @@ public class NoPrefixGetterPropertySelectionStrategy implements GetterPropertySe
 
 	@Override
 	public boolean isGetter(ConstrainableExecutable executable) {
-		// We check that the method has non void return type and no parameters.
-		// And we do not care about method name at all.
+		// We check that the method has a non-void return type and no parameters.
+		// And we do not care about the method name.
 		return executable.getReturnType() != void.class
 				&& executable.getParameterTypes().length == 0;
 	}
@@ -26,7 +26,7 @@ public class NoPrefixGetterPropertySelectionStrategy implements GetterPropertySe
 
 	@Override
 	public Set<String> getGetterMethodNameCandidates(String propertyName) {
-		// As method name == property name there always is just one possible name for a method
+		// As method name == property name, there always is just one possible name for a method
 		return Collections.singleton( propertyName );
 	}
 }

@@ -26,7 +26,7 @@ public class GetterPropertySelectionStrategyTest {
 
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
 
-		// as User has nonstandard getters no violations are triggered
+		// as User has non-standard getters no violations are triggered
 		assertEquals( 0, constraintViolations.size() );
 		//end::no-strategy[]
 	}
@@ -41,11 +41,11 @@ public class GetterPropertySelectionStrategyTest {
 				.buildValidatorFactory()
 				.getValidator();
 
-		User user = new User( "first", "last", "not an email" );
+		User user = new User( "", "", "not an email" );
 
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
 
-		assertEquals( 1, constraintViolations.size() );
+		assertEquals( 3, constraintViolations.size() );
 		//end::custom-strategy[]
 	}
 }
