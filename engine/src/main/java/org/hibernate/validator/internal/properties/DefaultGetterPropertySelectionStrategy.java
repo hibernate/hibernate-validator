@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.properties;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -33,6 +34,36 @@ public class DefaultGetterPropertySelectionStrategy implements GetterPropertySel
 			GETTER_PREFIX_HAS
 	};
 
+	@Override
+	public Optional<String> getProperty(ConstrainableExecutable executable) {
+		Contracts.assertNotNull( executable, "executable cannot be null" );
+
+		if ( !isGetter( executable ) ) {
+			return Optional.empty();
+		}
+
+		String methodName = executable.getName();
+
+		for ( String prefix : GETTER_PREFIXES ) {
+			if ( methodName.startsWith( prefix ) ) {
+				return Optional.of( StringHelper.decapitalize( methodName.substring( prefix.length() ) ) );
+			}
+		}
+
+		throw new AssertionError( "Method " + executable.getName() + " was considered a getter but we couldn't extract a property name." );
+	}
+
+	@Override
+	public Set<String> getGetterMethodNameCandidates(String propertyName) {
+		Contracts.assertNotEmpty( propertyName, "Name of a property must not be empty" );
+
+		Set<String> nameCandidates = CollectionHelper.newHashSet( GETTER_PREFIXES.length );
+		for ( String prefix : GETTER_PREFIXES ) {
+			nameCandidates.add( prefix + Character.toUpperCase( propertyName.charAt( 0 ) ) + propertyName.substring( 1 ) );
+		}
+		return nameCandidates;
+	}
+
 	/**
 	 * Checks whether the given executable is a valid JavaBean getter method, which
 	 * is the case if
@@ -49,8 +80,7 @@ public class DefaultGetterPropertySelectionStrategy implements GetterPropertySel
 	 * @return {@code true}, if the given executable is a JavaBean getter method,
 	 * {@code false} otherwise.
 	 */
-	@Override
-	public boolean isGetter(ConstrainableExecutable executable) {
+	private static boolean isGetter(ConstrainableExecutable executable) {
 		if ( executable.getParameterTypes().length != 0 ) {
 			return false;
 		}
@@ -71,29 +101,5 @@ public class DefaultGetterPropertySelectionStrategy implements GetterPropertySel
 		}
 
 		return false;
-	}
-
-	@Override
-	public String getPropertyName(ConstrainableExecutable executable) {
-		Contracts.assertNotNull( executable, "executable cannot be null" );
-
-		String methodName = executable.getName();
-		for ( String prefix : GETTER_PREFIXES ) {
-			if ( methodName.startsWith( prefix ) ) {
-				return StringHelper.decapitalize( methodName.substring( prefix.length() ) );
-			}
-		}
-		throw LOG.getIllegalArgumentException( "Property name cannot be constructed for a given method " + executable.getName() );
-	}
-
-	@Override
-	public Set<String> getGetterMethodNameCandidates(String propertyName) {
-		Contracts.assertNotEmpty( propertyName, "Name of a property must not be empty" );
-
-		Set<String> nameCandidates = CollectionHelper.newHashSet( GETTER_PREFIXES.length );
-		for ( String prefix : GETTER_PREFIXES ) {
-			nameCandidates.add( prefix + Character.toUpperCase( propertyName.charAt( 0 ) ) + propertyName.substring( 1 ) );
-		}
-		return nameCandidates;
 	}
 }

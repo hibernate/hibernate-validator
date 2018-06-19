@@ -10,10 +10,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,7 +35,6 @@ import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
 import org.testng.annotations.Test;
 
 /**
@@ -45,15 +44,15 @@ public class GetterPropertySelectionStrategyTest {
 
 	@Test
 	public void testGetterPropertySelectionStrategy() throws Exception {
-		GetterPropertySelectionStrategy filter = new FooGetterPropertySelectionStrategy();
+		GetterPropertySelectionStrategy strategy = new FooGetterPropertySelectionStrategy();
 
 		ConstrainableExecutableImpl fooMethod = new ConstrainableExecutableImpl( Foo.class.getDeclaredMethod( "fooMethod" ) );
 		ConstrainableExecutableImpl getMethod = new ConstrainableExecutableImpl( Foo.class.getDeclaredMethod( "getMethod" ) );
 
-		assertThat( filter.isGetter( fooMethod ) ).isTrue();
-		assertThat( filter.isGetter( getMethod ) ).isFalse();
+		assertThat( strategy.getProperty( fooMethod ) ).isPresent();
+		assertThat( strategy.getProperty( getMethod ) ).isNotPresent();
 
-		assertThat( filter.getPropertyName( fooMethod ) ).isEqualTo( "method" );
+		assertThat( strategy.getProperty( fooMethod ).get() ).isEqualTo( "method" );
 	}
 
 	@Test
@@ -221,17 +220,15 @@ public class GetterPropertySelectionStrategyTest {
 	public static class NoPrefixGetterPropertySelectionStrategy implements GetterPropertySelectionStrategy {
 
 		@Override
-		public boolean isGetter(ConstrainableExecutable executable) {
-			String name = executable.getName();
-			return executable.getReturnType() != void.class
-					&& executable.getParameterTypes().length == 0
-					&& !name.startsWith( "is" )
-					&& !name.startsWith( "get" );
-		}
+		public Optional<String> getProperty(ConstrainableExecutable executable) {
+			if ( executable.getReturnType() == void.class
+					|| executable.getParameterTypes().length > 0
+					|| executable.getName().startsWith( "is" )
+					|| executable.getName().startsWith( "get" ) ) {
+				return Optional.empty();
+			}
 
-		@Override
-		public String getPropertyName(ConstrainableExecutable method) {
-			return method.getName();
+			return Optional.of( executable.getName() );
 		}
 
 		@Override
@@ -243,16 +240,15 @@ public class GetterPropertySelectionStrategyTest {
 	public static class FooGetterPropertySelectionStrategy implements GetterPropertySelectionStrategy {
 
 		@Override
-		public boolean isGetter(ConstrainableExecutable executable) {
-			return executable.getParameterTypes().length == 0
-					&& executable.getName().startsWith( "foo" );
-		}
+		public Optional<String> getProperty(ConstrainableExecutable executable) {
+			if ( executable.getParameterTypes().length > 0
+					|| !executable.getName().startsWith( "foo" ) ) {
+				return Optional.empty();
+			}
 
-		@Override
-		public String getPropertyName(ConstrainableExecutable method) {
-			char[] chars = method.getName().substring( 3 ).toCharArray();
+			char[] chars = executable.getName().substring( 3 ).toCharArray();
 			chars[0] = Character.toLowerCase( chars[0] );
-			return new String( chars );
+			return Optional.of( new String( chars ) );
 		}
 
 		@Override
@@ -280,7 +276,7 @@ public class GetterPropertySelectionStrategyTest {
 		}
 
 		@Override
-		public Type[] getParameterTypes() {
+		public Class<?>[] getParameterTypes() {
 			return method.getParameterTypes();
 		}
 	}

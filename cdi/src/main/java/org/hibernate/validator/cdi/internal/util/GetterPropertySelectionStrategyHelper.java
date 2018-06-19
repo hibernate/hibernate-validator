@@ -7,7 +7,7 @@
 package org.hibernate.validator.cdi.internal.util;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import java.util.Optional;
 
 import javax.validation.ValidatorFactory;
 
@@ -29,12 +29,8 @@ public class GetterPropertySelectionStrategyHelper {
 		this.getterPropertySelectionStrategy = getterPropertySelectionStrategy;
 	}
 
-	public boolean isGetter(Method method) {
-		return getterPropertySelectionStrategy.isGetter( new ConstrainableMethod( method ) );
-	}
-
-	public String getPropertyName(Method method) {
-		return getterPropertySelectionStrategy.getPropertyName( new ConstrainableMethod( method ) );
+	public Optional<String> getProperty(Method method) {
+		return getterPropertySelectionStrategy.getProperty( new ConstrainableMethod( method ) );
 	}
 
 	public static GetterPropertySelectionStrategyHelper forValidationFactory(ValidatorFactory factory) {
@@ -67,7 +63,7 @@ public class GetterPropertySelectionStrategyHelper {
 		}
 
 		@Override
-		public Type[] getParameterTypes() {
+		public Class<?>[] getParameterTypes() {
 			return method.getParameterTypes();
 		}
 	}

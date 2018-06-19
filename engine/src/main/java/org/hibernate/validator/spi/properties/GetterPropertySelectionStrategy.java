@@ -6,26 +6,15 @@
  */
 package org.hibernate.validator.spi.properties;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.validator.Incubating;
-import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 
 /**
- * Used to define the strategy to detect the getter of a bean. The default
- * implementation ({@link DefaultGetterPropertySelectionStrategy}) uses the JavaBeans
- * naming convention:
+ * Used to define the strategy to detect the getters of a bean.
  * <p>
- * A JavaBean's method is considered to be a valid getter method (property), if
- * one of the next rules can be applied to it:
- * </p>
- * <ul>
- * <li>its name starts with "get" and it has a return type but no parameters</li>
- * <li>its name starts with "is", it has no parameters and is returning {@code boolean}</li>
- * <li>its name starts with "has", it has no parameters and is returning {@code boolean}.</li>
- * </ul>
- * <p>
- * The last rule is specific to Hibernate Validator and is not mandated by the JavaBeans specification.
+ * A getter is considered as being a property of the bean and thus validated when validating the bean.
  *
  * @author Marko Bekhta
  * @since 6.1.0
@@ -34,25 +23,16 @@ import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectio
 public interface GetterPropertySelectionStrategy {
 
 	/**
-	 * Determines if a given {@link ConstrainableExecutable} is a getter method (property).
+	 * Returns the property corresponding to the getter if the method is considered a getter.
 	 *
 	 * @param executable a {@link ConstrainableExecutable}
 	 *
-	 * @return {@code true} if the given executable should be considered a getter, {@code false} otherwise
-	 */
-	boolean isGetter(ConstrainableExecutable executable);
-
-	/**
-	 * Performs a transformation of a getter method name to its corresponding property name.
-	 * For example by removing the prefixes like {@code get}/{@code is} etc.
-	 *
-	 * @param executable a {@link ConstrainableExecutable}
-	 *
-	 * @return the property name corresponding to the given executable
+	 * @return an optional containing the property corresponding to the given executable if it is considered a getter,
+	 * or an empty optional otherwise
 	 *
 	 * @throws IllegalArgumentException if a property name cannot be constructed
 	 */
-	String getPropertyName(ConstrainableExecutable executable);
+	Optional<String> getProperty(ConstrainableExecutable executable);
 
 	/**
 	 * Gives a set of possible method names based on a property name. Usually, it means
