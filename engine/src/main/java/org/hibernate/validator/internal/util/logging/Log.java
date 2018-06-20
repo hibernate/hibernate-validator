@@ -864,4 +864,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 245, value = "Allowed constraint element types are FIELD and GETTER, but instead received %1$s.")
 	AssertionError getUnsupportedConstraintElementType(ConstrainedElement.ConstrainedElementKind kind);
+
+	@Message(id = 246, value = "Cannot construct a method handle for %1$s while creating property accessor.")
+	IllegalStateException getCannotCustructMethodHandleForMember(Member member);
+
+	@Message(id = 247, value = "Unable to access property.")
+	ValidationException getUnableToAccessPropertyException(@Cause Throwable e);
 }

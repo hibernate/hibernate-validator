@@ -33,6 +33,7 @@ import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.properties.javabean.accessors.ReflectionJavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -63,7 +64,8 @@ public class ParameterMetaDataTest {
 				new ValueExtractorManager( Collections.emptySet() ),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build()
+				new MethodValidationConfiguration.Builder().build(),
+				ReflectionJavaBeanPropertyAccessorFactory.INSTANCE
 		);
 
 		beanMetaData = beanMetaDataManager.getBeanMetaData( CustomerRepository.class );
@@ -133,7 +135,8 @@ public class ParameterMetaDataTest {
 				new ValueExtractorManager( Collections.emptySet() ),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build()
+				new MethodValidationConfiguration.Builder().build(),
+				ReflectionJavaBeanPropertyAccessorFactory.INSTANCE
 		);
 		BeanMetaData<ServiceImpl> localBeanMetaData = beanMetaDataManager.getBeanMetaData( ServiceImpl.class );
 

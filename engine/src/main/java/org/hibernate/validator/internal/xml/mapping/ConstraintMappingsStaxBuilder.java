@@ -19,6 +19,7 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.properties.javabean.accessors.JavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.AbstractStaxBuilder;
 
@@ -89,8 +90,8 @@ class ConstraintMappingsStaxBuilder extends AbstractStaxBuilder {
 		return new ConstraintDefinitionStaxBuilder( classLoadingHelper, constraintHelper, defaultPackageStaxBuilder );
 	}
 
-	public void build(Set<Class<?>> processedClasses, Map<Class<?>, Set<ConstrainedElement>> constrainedElementsByType, Set<String> alreadyProcessedConstraintDefinitions) {
+	public void build(JavaBeanPropertyAccessorFactory propertyAccessorFactory, Set<Class<?>> processedClasses, Map<Class<?>, Set<ConstrainedElement>> constrainedElementsByType, Set<String> alreadyProcessedConstraintDefinitions) {
 		constraintDefinitionStaxBuilders.forEach( builder -> builder.build( alreadyProcessedConstraintDefinitions ) );
-		beanStaxBuilders.forEach( builder -> builder.build( processedClasses, constrainedElementsByType ) );
+		beanStaxBuilders.forEach( builder -> builder.build( propertyAccessorFactory, processedClasses, constrainedElementsByType ) );
 	}
 }

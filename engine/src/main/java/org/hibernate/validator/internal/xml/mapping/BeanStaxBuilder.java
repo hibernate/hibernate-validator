@@ -29,6 +29,7 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.properties.javabean.accessors.JavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -140,7 +141,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 		return new ConstrainedConstructorStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder, annotationProcessingOptions );
 	}
 
-	void build(Set<Class<?>> processedClasses, Map<Class<?>, Set<ConstrainedElement>> constrainedElementsByType) {
+	void build(JavaBeanPropertyAccessorFactory propertyAccessorFactory, Set<Class<?>> processedClasses, Map<Class<?>, Set<ConstrainedElement>> constrainedElementsByType) {
 		Class<?> beanClass = classLoadingHelper.loadClass( className, defaultPackageStaxBuilder.build().orElse( "" ) );
 
 		checkClassHasNotBeenProcessed( processedClasses, beanClass );
@@ -165,7 +166,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 		addConstrainedElements(
 				constrainedElementsByType,
 				beanClass, constrainedFieldStaxBuilders.stream()
-						.map( builder -> builder.build( beanClass, alreadyProcessedFieldNames ) )
+						.map( builder -> builder.build( propertyAccessorFactory, beanClass, alreadyProcessedFieldNames ) )
 						.collect( Collectors.toList() )
 		);
 
@@ -174,7 +175,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 				constrainedElementsByType,
 				beanClass,
 				constrainedGetterStaxBuilders.stream()
-						.map( builder -> builder.build( beanClass, alreadyProcessedGetterNames ) )
+						.map( builder -> builder.build( propertyAccessorFactory, beanClass, alreadyProcessedGetterNames ) )
 						.collect( Collectors.toList() )
 		);
 
@@ -183,7 +184,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 				constrainedElementsByType,
 				beanClass,
 				constrainedMethodStaxBuilders.stream()
-						.map( builder -> builder.build( beanClass, alreadyProcessedMethods ) )
+						.map( builder -> builder.build( propertyAccessorFactory, beanClass, alreadyProcessedMethods ) )
 						.collect( Collectors.toList() )
 		);
 

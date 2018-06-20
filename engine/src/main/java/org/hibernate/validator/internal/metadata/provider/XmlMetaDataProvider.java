@@ -17,6 +17,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.properties.javabean.accessors.JavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
@@ -40,11 +41,12 @@ public class XmlMetaDataProvider implements MetaDataProvider {
 	public XmlMetaDataProvider(ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager,
+			JavaBeanPropertyAccessorFactory propertyAccessorFactory,
 			Set<InputStream> mappingStreams,
 			ClassLoader externalClassLoader) {
 
 		MappingXmlParser mappingParser = new MappingXmlParser( constraintHelper, typeResolutionHelper, valueExtractorManager,
-				externalClassLoader );
+				propertyAccessorFactory, externalClassLoader );
 		mappingParser.parse( mappingStreams );
 
 		configuredBeans = CollectionHelper.toImmutableMap( createBeanConfigurations( mappingParser ) );

@@ -42,6 +42,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.properties.javabean.accessors.JavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -103,6 +104,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private ScriptEvaluatorFactory scriptEvaluatorFactory;
 	private Duration temporalValidationTolerance;
 	private Object constraintValidatorPayload;
+	private PropertyAccessKind propertyAccessKind;
+	private MethodHandles.Lookup lookup;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -133,6 +136,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
+		// we default to classical reflection access
+		this.propertyAccessKind = PropertyAccessKind.REFLECTION;
+		// set default lookup value to be used unless it will be redefined by users.
+		this.lookup = MethodHandles.lookup();
 	}
 
 	@Override
@@ -294,6 +301,22 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
+	@Override
+	public HibernateValidatorConfiguration propertyAccessKind(PropertyAccessKind propertyAccessKind) {
+		Contracts.assertNotNull( propertyAccessKind, MESSAGES.parameterMustNotBeNull( "propertyAccessKind" ) );
+
+		this.propertyAccessKind = propertyAccessKind;
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorConfiguration externalLookup(MethodHandles.Lookup lookup) {
+		Contracts.assertNotNull( lookup, MESSAGES.parameterMustNotBeNull( "lookup" ) );
+
+		this.lookup = lookup;
+		return this;
+	}
+
 	public boolean isAllowParallelMethodsDefineParameterConstraints() {
 		return this.methodValidationConfigurationBuilder.isAllowParallelMethodsDefineParameterConstraints();
 	}
@@ -304,7 +327,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final DefaultConstraintMapping createConstraintMapping() {
-		return new DefaultConstraintMapping();
+		return new DefaultConstraintMapping( JavaBeanPropertyAccessorFactory.of( this ) );
 	}
 
 	@Override
@@ -448,6 +471,14 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public Object getConstraintValidatorPayload() {
 		return constraintValidatorPayload;
+	}
+
+	public PropertyAccessKind getPropertyAccessKind() {
+		return propertyAccessKind;
+	}
+
+	public MethodHandles.Lookup getLookup() {
+		return lookup;
 	}
 
 	@Override

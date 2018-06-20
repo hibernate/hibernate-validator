@@ -36,6 +36,7 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.properties.javabean.accessors.ReflectionJavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -199,7 +200,8 @@ public class PathImplTest {
 				new ValueExtractorManager( Collections.emptySet() ),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build()
+				new MethodValidationConfiguration.Builder().build(),
+				ReflectionJavaBeanPropertyAccessorFactory.INSTANCE
 		);
 
 		ExecutableMetaData executableMetaData = beanMetaDataManager.getBeanMetaData( Container.class )

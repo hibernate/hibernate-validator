@@ -31,6 +31,7 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.properties.javabean.accessors.JavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -54,6 +55,7 @@ public class MappingXmlParser {
 	private final ConstraintHelper constraintHelper;
 	private final TypeResolutionHelper typeResolutionHelper;
 	private final ValueExtractorManager valueExtractorManager;
+	private final JavaBeanPropertyAccessorFactory propertyAccessorFactory;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 	private final Map<Class<?>, Set<ConstrainedElement>> constrainedElements;
@@ -75,10 +77,11 @@ public class MappingXmlParser {
 	}
 
 	public MappingXmlParser(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
-			ClassLoader externalClassLoader) {
+			JavaBeanPropertyAccessorFactory propertyAccessorFactory, ClassLoader externalClassLoader) {
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
+		this.propertyAccessorFactory = propertyAccessorFactory;
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 		this.defaultSequences = newHashMap();
 		this.constrainedElements = newHashMap();
@@ -128,7 +131,7 @@ public class MappingXmlParser {
 				while ( xmlEventReader.hasNext() ) {
 					constraintMappingsStaxBuilder.process( xmlEventReader, xmlEventReader.nextEvent() );
 				}
-				constraintMappingsStaxBuilder.build( processedClasses, constrainedElements, alreadyProcessedConstraintDefinitions );
+				constraintMappingsStaxBuilder.build( propertyAccessorFactory, processedClasses, constrainedElements, alreadyProcessedConstraintDefinitions );
 				xmlEventReader.close();
 				in.reset();
 			}

@@ -47,6 +47,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
+import org.hibernate.validator.internal.properties.javabean.accessors.JavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -134,6 +135,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private final ValidationOrderGenerator validationOrderGenerator;
 
+	private final JavaBeanPropertyAccessorFactory propertyAccessorFactory;
+
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		ClassLoader externalClassLoader = getExternalClassLoader( configurationState );
 
@@ -147,6 +150,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if ( configurationState instanceof ConfigurationImpl ) {
 			hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 		}
+		this.propertyAccessorFactory = JavaBeanPropertyAccessorFactory.of( hibernateSpecificConfig );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( configurationState.getMappingStreams().isEmpty() ) {
@@ -154,12 +158,13 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 		else {
 			this.xmlMetaDataProvider = new XmlMetaDataProvider(
-					constraintHelper, typeResolutionHelper, valueExtractorManager, configurationState.getMappingStreams(), externalClassLoader
+					constraintHelper, typeResolutionHelper, valueExtractorManager, propertyAccessorFactory, configurationState.getMappingStreams(), externalClassLoader
 			);
 		}
 
 		this.constraintMappings = Collections.unmodifiableSet(
 				getConstraintMappings(
+						propertyAccessorFactory,
 						typeResolutionHelper,
 						configurationState,
 						externalClassLoader
@@ -207,7 +212,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return ( configurationState instanceof ConfigurationImpl ) ? ( (ConfigurationImpl) configurationState ).getExternalClassLoader() : null;
 	}
 
-	private static Set<DefaultConstraintMapping> getConstraintMappings(TypeResolutionHelper typeResolutionHelper,
+	private static Set<DefaultConstraintMapping> getConstraintMappings(JavaBeanPropertyAccessorFactory propertyAccessorFactory, TypeResolutionHelper typeResolutionHelper,
 			ConfigurationState configurationState, ClassLoader externalClassLoader) {
 		Set<DefaultConstraintMapping> constraintMappings = newHashSet();
 
@@ -224,7 +229,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ConstraintMappingContributor serviceLoaderBasedContributor = new ServiceLoaderBasedConstraintMappingContributor(
 					typeResolutionHelper,
 					externalClassLoader != null ? externalClassLoader : run( GetClassLoader.fromContext() ) );
-			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
+			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( propertyAccessorFactory, constraintMappings );
 			serviceLoaderBasedContributor.createConstraintMappings( builder );
 		}
 
@@ -233,7 +238,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				externalClassLoader );
 
 		for ( ConstraintMappingContributor contributor : contributors ) {
-			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
+			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( propertyAccessorFactory, constraintMappings );
 			contributor.createConstraintMappings( builder );
 		}
 
@@ -349,7 +354,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						valueExtractorManager,
 						validationOrderGenerator,
 						buildDataProviders(),
-						methodValidationConfiguration
+						methodValidationConfiguration,
+						propertyAccessorFactory
 				)
 		 );
 
@@ -598,16 +604,18 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 */
 	private static class DefaultConstraintMappingBuilder
 			implements ConstraintMappingContributor.ConstraintMappingBuilder {
+		private final JavaBeanPropertyAccessorFactory propertyAccessorFactory;
 		private final Set<DefaultConstraintMapping> mappings;
 
-		public DefaultConstraintMappingBuilder(Set<DefaultConstraintMapping> mappings) {
+		public DefaultConstraintMappingBuilder(JavaBeanPropertyAccessorFactory propertyAccessorFactory, Set<DefaultConstraintMapping> mappings) {
 			super();
+			this.propertyAccessorFactory = propertyAccessorFactory;
 			this.mappings = mappings;
 		}
 
 		@Override
 		public ConstraintMapping addConstraintMapping() {
-			DefaultConstraintMapping mapping = new DefaultConstraintMapping();
+			DefaultConstraintMapping mapping = new DefaultConstraintMapping( propertyAccessorFactory );
 			mappings.add( mapping );
 			return mapping;
 		}

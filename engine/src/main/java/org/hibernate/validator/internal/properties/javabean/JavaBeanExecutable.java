@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.javabean.accessors.JavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -46,17 +47,17 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 		this.parameters = getParameters( executable );
 	}
 
-	public static JavaBeanExecutable<?> of(Executable executable) {
+	public static JavaBeanExecutable<?> of(JavaBeanPropertyAccessorFactory propertyAccessorFactory, Executable executable) {
 		if ( executable instanceof Constructor ) {
 			return new JavaBeanConstructor( (Constructor<?>) executable );
 		}
 
-		return of( ( (Method) executable ) );
+		return of( propertyAccessorFactory, ( (Method) executable ) );
 	}
 
-	public static JavaBeanMethod of(Method method) {
+	public static JavaBeanMethod of(JavaBeanPropertyAccessorFactory propertyAccessorFactory, Method method) {
 		if ( ReflectionHelper.isGetterMethod( method ) ) {
-			return new JavaBeanGetter( method );
+			return new JavaBeanGetter( propertyAccessorFactory, method );
 		}
 
 		return new JavaBeanMethod( method );

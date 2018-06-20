@@ -7,21 +7,20 @@
 package org.hibernate.validator.internal.properties.javabean;
 
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
-import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Getter;
 import org.hibernate.validator.internal.properties.PropertyAccessor;
+import org.hibernate.validator.internal.properties.javabean.accessors.JavaBeanPropertyAccessorFactory;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
 
 /**
  * @author Marko Bekhta
  */
 public class JavaBeanGetter extends JavaBeanMethod implements Getter {
+
+	private final JavaBeanPropertyAccessorFactory propertyAccessorFactory;
 
 	private final String name;
 
@@ -33,14 +32,15 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 	 */
 	private final Class<?> declaringClass;
 
-	public JavaBeanGetter(Method method) {
-		super( method );
-		this.name = ReflectionHelper.getPropertyName( method );
-		this.declaringClass = method.getDeclaringClass();
+	public JavaBeanGetter(JavaBeanPropertyAccessorFactory propertyAccessorFactory, Method method) {
+		this( propertyAccessorFactory, method.getDeclaringClass(), method );
 	}
 
-	public JavaBeanGetter(Class<?> declaringClass, Method method) {
+	public JavaBeanGetter(JavaBeanPropertyAccessorFactory propertyAccessorFactory, Class<?> declaringClass, Method method) {
 		super( method );
+
+		this.propertyAccessorFactory = propertyAccessorFactory;
+
 		this.name = ReflectionHelper.getPropertyName( method );
 		this.declaringClass = declaringClass;
 	}
@@ -79,7 +79,7 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 
 	@Override
 	public PropertyAccessor createAccessor() {
-		return new GetterAccessor( executable );
+		return propertyAccessorFactory.forGetter( executable );
 	}
 
 	@Override
@@ -104,44 +104,5 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 		int result = super.hashCode();
 		result = 31 * result + this.name.hashCode();
 		return result;
-	}
-
-	private static class GetterAccessor implements PropertyAccessor {
-
-		private Method accessibleGetter;
-
-		private GetterAccessor(Method getter) {
-			this.accessibleGetter = getAccessible( getter );
-		}
-
-		@Override
-		public Object getValueFrom(Object bean) {
-			return ReflectionHelper.getValue( accessibleGetter, bean );
-		}
-	}
-
-	/**
-	 * Returns an accessible copy of the given method.
-	 */
-	private static Method getAccessible(Method original) {
-		SecurityManager sm = System.getSecurityManager();
-		if ( sm != null ) {
-			sm.checkPermission( HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS );
-		}
-
-		Class<?> clazz = original.getDeclaringClass();
-		Method accessibleMethod = run( GetDeclaredMethod.andMakeAccessible( clazz, original.getName() ) );
-
-		return accessibleMethod;
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }
