@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.osgi.integrationtest;
 
+import static org.hibernate.validator.osgi.integrationtest.PaxExamOptions.JAVA_9;
 import static org.junit.Assert.assertEquals;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.options;
@@ -91,6 +92,7 @@ public class OsgiIntegrationTest {
 
 		return options(
 				when( DEBUG ).useOptions( debugConfiguration( "5005", true ) ),
+				when( JavaVersionUtil.getMajorVersion() >= 9 ).useOptions( JAVA_9.option() ),
 				karafDistributionConfiguration()
 						.frameworkUrl(
 								maven()

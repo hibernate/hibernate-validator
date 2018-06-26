@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.osgi.integrationtest;
 
+import static org.hibernate.validator.osgi.integrationtest.PaxExamOptions.JAVA_9;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.ops4j.pax.exam.CoreOptions.maven;
@@ -68,6 +69,7 @@ public class KarafFeaturesAreInstallableTest {
 
 		return options(
 				when( DEBUG ).useOptions( debugConfiguration( "5005", true ) ),
+				when( JavaVersionUtil.getMajorVersion() >= 9 ).useOptions( JAVA_9.option() ),
 				karafDistributionConfiguration()
 						.frameworkUrl(
 								maven()
