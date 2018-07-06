@@ -69,7 +69,7 @@ public class KarafFeaturesAreInstallableTest {
 
 		return options(
 				when( DEBUG ).useOptions( debugConfiguration( "5005", true ) ),
-				when( JavaVersionUtil.getMajorVersion() >= 9 ).useOptions( JAVA_9.option() ),
+				when( JavaVersionUtil.getMajorVersion() >= 9 ).useOptions( JAVA_9.options() ),
 				karafDistributionConfiguration()
 						.frameworkUrl(
 								maven()

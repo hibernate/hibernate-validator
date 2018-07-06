@@ -31,13 +31,13 @@ public enum PaxExamOptions {
 			"java.xml.ws.annotation,java.corba,java.transaction,java.xml.bind,java.xml.ws,jdk.xml.bind" )
 	);
 
-	private final Option[] options;
+	private final Option options;
 
 	PaxExamOptions(Option... options) {
-		this.options = options;
+		this.options = new DefaultCompositeOption( options );
 	}
 
-	public Option option() {
-		return new DefaultCompositeOption( options );
+	public Option options() {
+		return options;
 	}
 }
