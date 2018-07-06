@@ -24,11 +24,7 @@ final class JavaVersionUtil {
 			}
 		}
 		catch (NumberFormatException e) {
-			throw getUnableToParseVersionException( javaSpecVersion );
+			throw new IllegalArgumentException( String.format( Locale.ROOT, "We are unable to parse Java version '%1$s'.", javaSpecVersion ) );
 		}
-	}
-
-	private static IllegalArgumentException getUnableToParseVersionException(String version) {
-		return new IllegalArgumentException( String.format( Locale.ROOT, "We are unable to parse Java version '%1$s'.", version ) );
 	}
 }
