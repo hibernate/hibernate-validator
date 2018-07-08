@@ -875,4 +875,16 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 248, value = "Unable to get an XML schema named %s.")
 	ValidationException unableToGetXmlSchema(String schemaResourceName);
+
+	@Message(id = 249, value = "Unable to find property creator for property holder of %1$s type.")
+	ValidationException getUnableToFindPropertyCreatorException(@FormatWith(ClassObjectFormatter.class) Class<?> clazz);
+
+	@Message(id = 250, value = "Unable to find single unique property creator for property holder of %1$s type.")
+	ValidationException getUnableToFinUniquedPropertyCreatorException(@FormatWith(ClassObjectFormatter.class) Class<?> clazz);
+
+	@Message(id = 251, value = "Unexpected property holder type received. Expected %1$s type, but instead got %2$s.")
+	ValidationException getUnexpextedPropertyHolderTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> expecetedHolderType, @FormatWith(ClassObjectFormatter.class) Class<?> realHolderType);
+
+	@Message(id = 252, value = "Unexpected property type in a given property holder. Expected that '%3$s' will be of %1$s type, but instead it is %2$s.")
+	ValidationException getUnexpextedPropertyTypeInPropertyHolderException(Type expecetedType, @FormatWith(ClassObjectFormatter.class) Class<?> realType, String propertyName);
 }
