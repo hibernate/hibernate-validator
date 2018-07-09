@@ -571,6 +571,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				+ ", defaultGroupSequence=" + getDefaultGroupSequence( null ) + '}';
 	}
 
+	public static class PropertyHolderBeanMetaDataBuilder<T> {
+
+	}
+
 	public static class BeanMetaDataBuilder<T> {
 
 		private final ConstraintHelper constraintHelper;
