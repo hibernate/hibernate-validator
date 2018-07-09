@@ -42,7 +42,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.HibernateCon
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
@@ -131,7 +131,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * provider. See also HV-659.
 	 */
 	@ThreadSafe
-	private final ConcurrentMap<BeanMetaDataManagerKey, BeanMetaDataManager> beanMetaDataManagers;
+	private final ConcurrentMap<BeanMetaDataManagerKey, ConstraintMetaDataManager> beanMetaDataManagers;
 
 	private final ValueExtractorManager valueExtractorManager;
 
@@ -336,8 +336,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	public void close() {
 		constraintValidatorManager.clear();
 		constraintHelper.clear();
-		for ( BeanMetaDataManager beanMetaDataManager : beanMetaDataManagers.values() ) {
-			beanMetaDataManager.clear();
+		for ( ConstraintMetaDataManager constraintMetaDataManager : beanMetaDataManagers.values() ) {
+			constraintMetaDataManager.clear();
 		}
 		validatorFactoryScopedContext.getScriptEvaluatorFactory().clear();
 		valueExtractorManager.clear();
@@ -352,9 +352,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ValidatorFactoryScopedContext validatorFactoryScopedContext,
 			MethodValidationConfiguration methodValidationConfiguration) {
 
-		BeanMetaDataManager beanMetaDataManager = beanMetaDataManagers.computeIfAbsent(
+		ConstraintMetaDataManager constraintMetaDataManager = beanMetaDataManagers.computeIfAbsent(
 				new BeanMetaDataManagerKey( validatorFactoryScopedContext.getParameterNameProvider(), valueExtractorManager, methodValidationConfiguration ),
-				key -> new BeanMetaDataManager(
+				key -> new ConstraintMetaDataManager(
 						constraintHelper,
 						executableHelper,
 						typeResolutionHelper,
@@ -369,7 +369,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		return new ValidatorImpl(
 				constraintValidatorFactory,
-				beanMetaDataManager,
+				constraintMetaDataManager,
 				valueExtractorManager,
 				constraintValidatorManager,
 				validationOrderGenerator,

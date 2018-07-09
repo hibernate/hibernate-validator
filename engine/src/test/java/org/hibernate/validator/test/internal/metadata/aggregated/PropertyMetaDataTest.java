@@ -20,7 +20,7 @@ import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
@@ -37,11 +37,11 @@ import org.testng.annotations.Test;
  */
 public class PropertyMetaDataTest {
 
-	private BeanMetaDataManager beanMetaDataManager;
+	private ConstraintMetaDataManager constraintMetaDataManager;
 
 	@BeforeMethod
 	public void setupBeanMetaDataManager() {
-		beanMetaDataManager = new BeanMetaDataManager(
+		constraintMetaDataManager = new ConstraintMetaDataManager(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new TypeResolutionHelper(),
@@ -56,21 +56,21 @@ public class PropertyMetaDataTest {
 
 	@Test
 	public void locallyDefinedGroupConversion() {
-		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( User1.class ).getMetaDataFor( "addresses" );
+		PropertyMetaData property = constraintMetaDataManager.getBeanMetaData( User1.class ).getMetaDataFor( "addresses" );
 
 		assertThat( property.getCascadables().iterator().next().getCascadingMetaData().convertGroup( Default.class ) ).isEqualTo( BasicPostal.class );
 	}
 
 	@Test
 	public void groupConversionDefinedInHierarchy() {
-		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( User2.class ).getMetaDataFor( "addresses" );
+		PropertyMetaData property = constraintMetaDataManager.getBeanMetaData( User2.class ).getMetaDataFor( "addresses" );
 
 		assertThat( property.getCascadables().iterator().next().getCascadingMetaData().convertGroup( Default.class ) ).isEqualTo( BasicPostal.class );
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
 	public void groupConversionInHierarchyWithSameFrom() {
-		beanMetaDataManager.getBeanMetaData( User3.class ).getMetaDataFor( "addresses" );
+		constraintMetaDataManager.getBeanMetaData( User3.class ).getMetaDataFor( "addresses" );
 	}
 
 	public interface Complete extends Default {

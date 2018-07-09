@@ -32,7 +32,7 @@ import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
@@ -193,7 +193,7 @@ public class PathImplTest {
 	public void testCreationOfExecutablePath() throws Exception {
 		Method executable = Container.class.getMethod( "addItem", Key.class, Item.class );
 
-		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
+		ConstraintMetaDataManager constraintMetaDataManager = new ConstraintMetaDataManager(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new TypeResolutionHelper(),
@@ -205,7 +205,7 @@ public class PathImplTest {
 				new MethodValidationConfiguration.Builder().build()
 		);
 
-		ExecutableMetaData executableMetaData = beanMetaDataManager.getBeanMetaData( Container.class )
+		ExecutableMetaData executableMetaData = constraintMetaDataManager.getBeanMetaData( Container.class )
 				.getMetaDataFor( executable ).get();
 
 		PathImpl methodParameterPath = PathImpl.createPathForExecutable( executableMetaData );

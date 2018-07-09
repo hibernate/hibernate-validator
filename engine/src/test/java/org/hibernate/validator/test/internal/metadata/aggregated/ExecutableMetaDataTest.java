@@ -26,7 +26,7 @@ import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -52,12 +52,12 @@ import org.testng.annotations.Test;
  */
 public class ExecutableMetaDataTest {
 
-	private BeanMetaDataManager beanMetaDataManager;
+	private ConstraintMetaDataManager constraintMetaDataManager;
 	private BeanMetaData<CustomerRepositoryExt> beanMetaData;
 
 	@BeforeMethod
 	public void setupBeanMetaData() {
-		beanMetaDataManager = new BeanMetaDataManager(
+		constraintMetaDataManager = new ConstraintMetaDataManager(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new TypeResolutionHelper(),
@@ -69,7 +69,7 @@ public class ExecutableMetaDataTest {
 				new MethodValidationConfiguration.Builder().build()
 		);
 
-		beanMetaData = beanMetaDataManager.getBeanMetaData( CustomerRepositoryExt.class );
+		beanMetaData = constraintMetaDataManager.getBeanMetaData( CustomerRepositoryExt.class );
 	}
 
 	@Test
@@ -175,7 +175,7 @@ public class ExecutableMetaDataTest {
 	@TestForIssue(jiraKey = "HV-1011")
 	public void getIdentifierForOverridingGenericMethod() throws Exception {
 		Method method = JobRepositoryImpl.class.getMethod( "createJob", UUID.class );
-		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( JobRepositoryImpl.class );
+		BeanMetaData<?> beanMetaData = constraintMetaDataManager.getBeanMetaData( JobRepositoryImpl.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getSignatures() )
@@ -183,7 +183,7 @@ public class ExecutableMetaDataTest {
 			.containsOnly( "createJob(java.lang.Object)", "createJob(java.util.UUID)" );
 
 		method = JobRepository.class.getMethod( "createJob", Object.class );
-		beanMetaData = beanMetaDataManager.getBeanMetaData( JobRepository.class );
+		beanMetaData = constraintMetaDataManager.getBeanMetaData( JobRepository.class );
 		methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getSignatures() )
@@ -191,7 +191,7 @@ public class ExecutableMetaDataTest {
 			.containsOnly( "createJob(java.lang.Object)" );
 
 		method = SpecialJobRepositoryImpl.class.getMethod( "createJob", Object.class );
-		beanMetaData = beanMetaDataManager.getBeanMetaData( SpecialJobRepositoryImpl.class );
+		beanMetaData = constraintMetaDataManager.getBeanMetaData( SpecialJobRepositoryImpl.class );
 		methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getSignatures() )
@@ -203,7 +203,7 @@ public class ExecutableMetaDataTest {
 	@TestForIssue(jiraKey = "HV-1011")
 	public void getIdentifierForOverloadedMethod() throws Exception {
 		Method method = SpecialJobRepositoryImpl.class.getMethod( "createJob", String.class );
-		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( SpecialJobRepositoryImpl.class );
+		BeanMetaData<?> beanMetaData = constraintMetaDataManager.getBeanMetaData( SpecialJobRepositoryImpl.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getSignatures() )

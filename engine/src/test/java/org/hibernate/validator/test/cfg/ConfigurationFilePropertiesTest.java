@@ -18,7 +18,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -60,7 +60,7 @@ public class ConfigurationFilePropertiesTest {
 				Validator validator = factory.getValidator();
 
 				ValidatorImpl hibernateValidatorImpl = (ValidatorImpl) validator;
-				BeanMetaDataManager bmdm = findPropertyOfType( hibernateValidatorImpl, BeanMetaDataManager.class );
+				ConstraintMetaDataManager bmdm = findPropertyOfType( hibernateValidatorImpl, ConstraintMetaDataManager.class );
 				MethodValidationConfiguration methodConfig = findPropertyOfType( bmdm, MethodValidationConfiguration.class );
 
 				Assert.assertTrue( methodConfig.isAllowMultipleCascadedValidationOnReturnValues() );
@@ -89,7 +89,7 @@ public class ConfigurationFilePropertiesTest {
 				Validator validator = factory.getValidator();
 
 				ValidatorImpl hibernateValidatorImpl = (ValidatorImpl) validator;
-				BeanMetaDataManager bmdm = findPropertyOfType( hibernateValidatorImpl, BeanMetaDataManager.class );
+				ConstraintMetaDataManager bmdm = findPropertyOfType( hibernateValidatorImpl, ConstraintMetaDataManager.class );
 				MethodValidationConfiguration methodConfig = findPropertyOfType( bmdm, MethodValidationConfiguration.class );
 
 				Assert.assertTrue( methodConfig.isAllowOverridingMethodAlterParameterConstraint() );
@@ -118,7 +118,7 @@ public class ConfigurationFilePropertiesTest {
 				Validator validator = factory.getValidator();
 
 				ValidatorImpl hibernateValidatorImpl = (ValidatorImpl) validator;
-				BeanMetaDataManager bmdm = findPropertyOfType( hibernateValidatorImpl, BeanMetaDataManager.class );
+				ConstraintMetaDataManager bmdm = findPropertyOfType( hibernateValidatorImpl, ConstraintMetaDataManager.class );
 				MethodValidationConfiguration methodConfig = findPropertyOfType( bmdm, MethodValidationConfiguration.class );
 
 				Assert.assertTrue( methodConfig.isAllowParallelMethodsDefineParameterConstraints() );
