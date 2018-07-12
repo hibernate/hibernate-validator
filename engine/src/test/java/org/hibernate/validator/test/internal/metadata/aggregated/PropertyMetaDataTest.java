@@ -20,15 +20,15 @@ import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -49,8 +49,9 @@ public class PropertyMetaDataTest {
 				new ValueExtractorManager( Collections.emptySet() ),
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
 				new ValidationOrderGenerator(),
-				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build()
+				new MethodValidationConfiguration.Builder().build(),
+				Collections.emptyList(),
+				Collections.emptyList()
 		);
 	}
 

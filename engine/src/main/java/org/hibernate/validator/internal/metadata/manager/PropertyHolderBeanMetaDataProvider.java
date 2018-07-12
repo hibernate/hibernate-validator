@@ -81,6 +81,14 @@ public class PropertyHolderBeanMetaDataProvider {
 		return builder.build();
 	}
 
+	public void clear() {
+		metaDataCache.clear();
+	}
+
+	public int numberOfCachedBeanMetaDataInstances() {
+		return metaDataCache.size();
+	}
+
 	private static class PropertyHolderMetadataKey {
 		private String mapping;
 		private Class<?> propertyHolderClass;

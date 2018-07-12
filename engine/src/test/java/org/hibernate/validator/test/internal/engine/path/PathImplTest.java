@@ -32,10 +32,9 @@ import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
@@ -201,8 +200,9 @@ public class PathImplTest {
 				new ValueExtractorManager( Collections.emptySet() ),
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
 				new ValidationOrderGenerator(),
-				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build()
+				new MethodValidationConfiguration.Builder().build(),
+				Collections.emptyList(),
+				Collections.emptyList()
 		);
 
 		ExecutableMetaData executableMetaData = constraintMetaDataManager.getBeanMetaData( Container.class )

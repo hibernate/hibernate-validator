@@ -14,6 +14,7 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.PropertyHolderMetaDataProvider;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -43,6 +44,8 @@ public class ConstraintMetaDataManager {
 
 	private final BeanMetaDataProvider beanMetaDataProvider;
 
+	private final PropertyHolderBeanMetaDataProvider propertyHolderBeanMetaDataProvider;
+
 	public ConstraintMetaDataManager(ConstraintHelper constraintHelper,
 			ExecutableHelper executableHelper,
 			TypeResolutionHelper typeResolutionHelper,
@@ -50,8 +53,9 @@ public class ConstraintMetaDataManager {
 			ValueExtractorManager valueExtractorManager,
 			JavaBeanHelper javaBeanHelper,
 			ValidationOrderGenerator validationOrderGenerator,
+			MethodValidationConfiguration methodValidationConfiguration,
 			List<MetaDataProvider> optionalMetaDataProviders,
-			MethodValidationConfiguration methodValidationConfiguration) {
+			List<PropertyHolderMetaDataProvider> propertyHolderMetaDataProviders) {
 		this.beanMetaDataProvider = new BeanMetaDataProvider(
 				constraintHelper,
 				executableHelper,
@@ -63,17 +67,29 @@ public class ConstraintMetaDataManager {
 				optionalMetaDataProviders,
 				methodValidationConfiguration
 		);
+		this.propertyHolderBeanMetaDataProvider = new PropertyHolderBeanMetaDataProvider(
+				propertyHolderMetaDataProviders,
+				constraintHelper,
+				typeResolutionHelper,
+				valueExtractorManager,
+				validationOrderGenerator
+		);
 	}
 
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
 		return beanMetaDataProvider.getBeanMetaData( beanClass );
 	}
 
+	public <T> BeanMetaData<T> getPropertyHolderBeanMetaData(Class<T> propertyHolderClass, String mapping) {
+		return propertyHolderBeanMetaDataProvider.getBeanMetaData( propertyHolderClass, mapping );
+	}
+
 	public void clear() {
 		beanMetaDataProvider.clear();
+		propertyHolderBeanMetaDataProvider.clear();
 	}
 
 	public int numberOfCachedBeanMetaDataInstances() {
-		return beanMetaDataProvider.numberOfCachedBeanMetaDataInstances();
+		return beanMetaDataProvider.numberOfCachedBeanMetaDataInstances() + propertyHolderBeanMetaDataProvider.numberOfCachedBeanMetaDataInstances();
 	}
 }

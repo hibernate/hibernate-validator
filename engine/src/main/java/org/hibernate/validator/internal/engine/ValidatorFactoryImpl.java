@@ -42,10 +42,11 @@ import org.hibernate.validator.internal.engine.constraintvalidation.HibernateCon
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.PropertyHolderMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
@@ -362,8 +363,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						valueExtractorManager,
 						javaBeanHelper,
 						validationOrderGenerator,
-						buildDataProviders(),
-						methodValidationConfiguration
+						methodValidationConfiguration,
+						buildMetaDataProviders(),
+						buildPropertyHolderMetaDataProvider()
+
 				)
 		);
 
@@ -377,7 +380,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		);
 	}
 
-	private List<MetaDataProvider> buildDataProviders() {
+	private List<MetaDataProvider> buildMetaDataProviders() {
 		List<MetaDataProvider> metaDataProviders = newArrayList();
 		if ( xmlMetaDataProvider != null ) {
 			metaDataProviders.add( xmlMetaDataProvider );
@@ -394,6 +397,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			);
 		}
 		return metaDataProviders;
+	}
+
+	private List<PropertyHolderMetaDataProvider> buildPropertyHolderMetaDataProvider() {
+		return Collections.emptyList();
 	}
 
 	private static boolean checkPropertiesForBoolean(Map<String, String> properties, String propertyKey, boolean programmaticValue) {
