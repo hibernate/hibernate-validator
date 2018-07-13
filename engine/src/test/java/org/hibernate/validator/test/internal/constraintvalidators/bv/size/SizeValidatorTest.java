@@ -177,7 +177,7 @@ public class SizeValidatorTest {
 		descriptorBuilder.setMessage( "{validator.max}" );
 		Size m = descriptorBuilder.build().getAnnotation();
 		@SuppressWarnings("unchecked")
-		ConstraintValidator<Size, T> validator = (ConstraintValidator<Size, T>) validatorClass.newInstance();
+		ConstraintValidator<Size, T> validator = (ConstraintValidator<Size, T>) validatorClass.getConstructor().newInstance();
 		validator.initialize( m );
 		return validator;
 	}

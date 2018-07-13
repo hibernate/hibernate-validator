@@ -65,7 +65,7 @@ public class PathImplTest {
 		elem = propIter.next();
 		assertEquals( elem.getName(), "deliveryAddress" );
 		assertTrue( elem.isInIterable() );
-		assertEquals( elem.getIndex(), new Integer( 3 ) );
+		assertEquals( elem.getIndex(), Integer.valueOf( 3 ) );
 
 		assertTrue( propIter.hasNext() );
 		elem = propIter.next();
@@ -76,7 +76,7 @@ public class PathImplTest {
 		elem = propIter.next();
 		assertEquals( elem.getName(), null );
 		assertTrue( elem.isInIterable() );
-		assertEquals( elem.getIndex(), new Integer( 1 ) );
+		assertEquals( elem.getIndex(), Integer.valueOf( 1 ) );
 
 		assertFalse( propIter.hasNext() );
 

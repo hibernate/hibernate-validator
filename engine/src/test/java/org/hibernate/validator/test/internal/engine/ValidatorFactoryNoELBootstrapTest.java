@@ -27,6 +27,7 @@ import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.constraints.Min;
 
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
@@ -143,6 +144,7 @@ public class ValidatorFactoryNoELBootstrapTest {
 		}
 
 		@Override
+		@IgnoreForbiddenApisErrors(reason = "getPackage() is deprecated but getDefinedPackage() is only available from JDK 9.")
 		public Class<?> loadClass(String className) throws ClassNotFoundException {
 			// This is what we in the end want to achieve. Throw ClassNotFoundException for javax.el classes
 			if ( className.startsWith( packageMissing ) ) {
@@ -230,7 +232,7 @@ public class ValidatorFactoryNoELBootstrapTest {
 				ClassLoader classLoader = new ELIgnoringClassLoader( packageMissing );
 				run( SetContextClassLoader.action( classLoader ) );
 
-				Object test = classLoader.loadClass( delegateType.getName() ).newInstance();
+				Object test = classLoader.loadClass( delegateType.getName() ).getConstructor().newInstance();
 				test.getClass().getMethod( "run" ).invoke( test );
 			}
 			finally {
