@@ -6,6 +6,7 @@
  */
 package com.example;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
@@ -22,9 +23,10 @@ public class ExampleConstraintValidatorFactory implements ConstraintValidatorFac
 	@Override
 	public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
 		try {
-			return key.newInstance();
+			return key.getConstructor().newInstance();
 		}
-		catch (InstantiationException | IllegalAccessException e) {
+		catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+				| SecurityException e) {
 			throw new RuntimeException( e );
 		}
 		finally {
