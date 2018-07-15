@@ -25,6 +25,9 @@ import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorHelper;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.ContainerCascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.NonContainerCascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.PotentiallyContainerCascadingMetaData;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
@@ -46,6 +49,8 @@ public class CascadingMetaDataBuilder {
 
 	private static final CascadingMetaDataBuilder NON_CASCADING =
 			new CascadingMetaDataBuilder( null, null, null, null, false, Collections.emptyMap(), Collections.emptyMap() );
+
+	private final String mapping;
 
 	/**
 	 * The enclosing type that defines this type parameter.
@@ -122,6 +127,8 @@ public class CascadingMetaDataBuilder {
 		}
 		hasContainerElementsMarkedForCascading = tmpHasContainerElementsMarkedForCascading;
 		hasGroupConversionsOnAnnotatedObjectOrContainerElements = tmpHasGroupConversionsOnAnnotatedObjectOrContainerElements;
+
+		mapping = null;
 	}
 
 	public static CascadingMetaDataBuilder nonCascading() {
@@ -138,6 +145,10 @@ public class CascadingMetaDataBuilder {
 
 	public Type getEnclosingType() {
 		return enclosingType;
+	}
+
+	public String getMappingName() {
+		return mapping;
 	}
 
 	public Class<?> getDeclaredContainerClass() {

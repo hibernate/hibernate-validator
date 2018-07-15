@@ -23,8 +23,8 @@ import javax.validation.ConstraintDeclarationException;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
-import org.hibernate.validator.internal.metadata.aggregated.ContainerCascadingMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.PotentiallyContainerCascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.ContainerCascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.PotentiallyContainerCascadingMetaData;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;

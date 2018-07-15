@@ -15,6 +15,8 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.ContainerCascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.NonContainerCascadingMetaData;
 import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 
 /**

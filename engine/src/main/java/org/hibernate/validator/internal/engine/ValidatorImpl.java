@@ -54,7 +54,7 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorMan
 import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.ContainerCascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.ContainerCascadingMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
@@ -603,7 +603,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private void validateCascadedContainerElementsForCurrentGroup(Object value, BaseBeanValidationContext<?> validationContext, ValueContext<?, ?> valueContext,
-			List<ContainerCascadingMetaData> containerElementTypesCascadingMetaData) {
+			List<? extends ContainerCascadingMetaData> containerElementTypesCascadingMetaData) {
 		for ( ContainerCascadingMetaData cascadingMetaData : containerElementTypesCascadingMetaData ) {
 			if ( !cascadingMetaData.isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ) {
 				continue;

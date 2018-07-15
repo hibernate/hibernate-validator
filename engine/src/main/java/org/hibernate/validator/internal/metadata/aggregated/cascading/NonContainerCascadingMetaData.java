@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.metadata.aggregated;
+package org.hibernate.validator.internal.metadata.aggregated.cascading;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.TypeVariable;
@@ -14,6 +14,8 @@ import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -47,7 +49,10 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 	private GroupConversionHelper groupConversionHelper;
 
 	public static NonContainerCascadingMetaData of(CascadingMetaDataBuilder cascadingMetaDataBuilder, Object context) {
-		if ( !cascadingMetaDataBuilder.isCascading() ) {
+		if ( cascadingMetaDataBuilder.getMappingName() != null ) {
+			return NonContainerPropertyHolderCascadingMetaData.of( cascadingMetaDataBuilder, context );
+		}
+		else if ( !cascadingMetaDataBuilder.isCascading() ) {
 			return NON_CASCADING;
 		}
 		else if ( cascadingMetaDataBuilder.getGroupConversions().isEmpty() ) {
@@ -58,14 +63,14 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 		}
 	}
 
-	private NonContainerCascadingMetaData(CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+	protected NonContainerCascadingMetaData(CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 		this(
 				cascadingMetaDataBuilder.isCascading(),
 				GroupConversionHelper.of( cascadingMetaDataBuilder.getGroupConversions() )
 		);
 	}
 
-	private NonContainerCascadingMetaData(boolean cascading, GroupConversionHelper groupConversionHelper) {
+	protected NonContainerCascadingMetaData(boolean cascading, GroupConversionHelper groupConversionHelper) {
 		this.cascading = cascading;
 		this.groupConversionHelper = groupConversionHelper;
 	}
