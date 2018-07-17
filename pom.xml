@@ -208,7 +208,9 @@
         <maven-surefire-plugin.argLine.add-opens></maven-surefire-plugin.argLine.add-opens>
 
         <!-- add-opens options required for Arquillian and WildFly -->
-        <arquillian.javaVmArguments.add-opens></arquillian.javaVmArguments.add-opens>
+        <arquillian.wildfly.jvm.args.add-opens></arquillian.wildfly.jvm.args.add-opens>
+        <arquillian.wildfly.jvm.args.add-modules></arquillian.wildfly.jvm.args.add-modules>
+        <arquillian.wildfly.jvm.args>${arquillian.wildfly.jvm.args.add-opens} ${arquillian.wildfly.jvm.args.add-modules}</arquillian.wildfly.jvm.args>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
@@ -1130,7 +1132,7 @@
                 All these add-opens are probably not necessary for our WildFly usage but add the ones defined in
                 https://github.com/ctomc/wildfly/commit/d8c4f55a1f900d931c224049c8a118ba4a5bcb45 to be on the safe side.
                 -->
-                <arquillian.javaVmArguments.add-opens>
+                <arquillian.wildfly.jvm.args.add-opens>
                     --add-opens=java.base/java.lang=ALL-UNNAMED
                     --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
                     --add-opens=java.base/java.security=ALL-UNNAMED
@@ -1145,7 +1147,7 @@
                     --add-opens=java.management/javax.management=ALL-UNNAMED
                     --add-opens=java.management/javax.management.openmbean=ALL-UNNAMED
                     --add-opens=java.naming/javax.naming=ALL-UNNAMED
-                </arquillian.javaVmArguments.add-opens>
+                </arquillian.wildfly.jvm.args.add-opens>
             </properties>
             <build>
                 <pluginManagement>
@@ -1193,6 +1195,11 @@
             <activation>
                 <jdk>[11,)</jdk>
             </activation>
+            <properties>
+                <arquillian.wildfly.jvm.args.add-modules>
+                    --add-modules=java.se
+                </arquillian.wildfly.jvm.args.add-modules>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -1215,6 +1222,31 @@
                         </executions>
                     </plugin>
                 </plugins>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.wildfly.plugins</groupId>
+                            <artifactId>wildfly-maven-plugin</artifactId>
+                            <configuration>
+                                <javaOpts>
+                                    --add-opens=java.base/java.lang=ALL-UNNAMED
+                                    --add-opens=java.base/java.security=ALL-UNNAMED
+                                    --add-opens=java.base/java.io=ALL-UNNAMED
+                                    --add-modules=java.se
+                                </javaOpts>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.jboss.as</groupId>
+                            <artifactId>patch-gen-maven-plugin</artifactId>
+                            <configuration>
+                                <argLine>
+                                    --add-modules=java.se
+                                </argLine>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
         <profile>
