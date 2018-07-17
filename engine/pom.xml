@@ -289,11 +289,9 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>net.java</groupId>
-                    <artifactId>javafx-core</artifactId>
-                    <version>11-ea+13</version>
-                    <scope>system</scope>
-                    <systemPath>${maven.multiModuleProjectDirectory}/target/javafx/javafx-sdk-11/lib/javafx.base.jar</systemPath>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx.base</artifactId>
+                    <version>11.0.0-SNAPSHOT</version>
                 </dependency>
             </dependencies>
         </profile>
