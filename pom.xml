@@ -272,7 +272,8 @@
         <failsafe.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access}</failsafe.jvm.args>
 
         <arquillian.wildfly.jvm.args.add-opens></arquillian.wildfly.jvm.args.add-opens>
-        <arquillian.wildfly.jvm.args>${arquillian.wildfly.jvm.args.add-opens}</arquillian.wildfly.jvm.args>
+        <arquillian.wildfly.jvm.args.add-modules></arquillian.wildfly.jvm.args.add-modules>
+        <arquillian.wildfly.jvm.args>${arquillian.wildfly.jvm.args.add-opens} ${arquillian.wildfly.jvm.args.add-modules}</arquillian.wildfly.jvm.args>
 
         <!-- JDK version required for the build -->
         <jdk.min.version>${maven.compiler.argument.source}</jdk.min.version>
@@ -1228,6 +1229,11 @@
             <activation>
                 <jdk>[11,)</jdk>
             </activation>
+            <properties>
+                <arquillian.wildfly.jvm.args.add-modules>
+                    --add-modules=java.se
+                </arquillian.wildfly.jvm.args.add-modules>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -1250,6 +1256,31 @@
                         </executions>
                     </plugin>
                 </plugins>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.wildfly.plugins</groupId>
+                            <artifactId>wildfly-maven-plugin</artifactId>
+                            <configuration>
+                                <javaOpts>
+                                    --add-opens=java.base/java.lang=ALL-UNNAMED
+                                    --add-opens=java.base/java.security=ALL-UNNAMED
+                                    --add-opens=java.base/java.io=ALL-UNNAMED
+                                    --add-modules=java.se
+                                </javaOpts>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.jboss.as</groupId>
+                            <artifactId>patch-gen-maven-plugin</artifactId>
+                            <configuration>
+                                <argLine>
+                                    --add-modules=java.se
+                                </argLine>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
         <profile>
