@@ -207,7 +207,6 @@
         <version.dependency.plugin>3.0.2</version.dependency.plugin>
         <version.depends.plugin>1.4.0</version.depends.plugin>
         <version.deploy.plugin>2.8.2</version.deploy.plugin>
-        <version.download.plugin>1.4.0</version.download.plugin>
         <version.enforcer.plugin>3.0.0-M1</version.enforcer.plugin>
         <version.forbiddenapis.plugin>2.5</version.forbiddenapis.plugin>
         <version.gmavenplus.plugin>1.6</version.gmavenplus.plugin>
@@ -961,11 +960,6 @@
                     <artifactId>sigtest-maven-plugin</artifactId>
                     <version>${version.sigtest.plugin}</version>
                 </plugin>
-                <plugin>
-                    <groupId>com.googlecode.maven-download-plugin</groupId>
-                    <artifactId>download-maven-plugin</artifactId>
-                    <version>${version.download.plugin}</version>
-                </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
@@ -1235,27 +1229,6 @@
                 </arquillian.wildfly.jvm.args.add-modules>
             </properties>
             <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.googlecode.maven-download-plugin</groupId>
-                        <artifactId>download-maven-plugin</artifactId>
-                        <inherited>false</inherited>
-                        <executions>
-                            <execution>
-                                <id>install-javafx</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>wget</goal>
-                                </goals>
-                                <configuration>
-                                    <url>https://download.java.net/java/early_access/openjfx11/13/binaries/openjfx-11-ea+13_linux-x64_bin-sdk.zip</url>
-                                    <unpack>true</unpack>
-                                    <outputDirectory>${maven.multiModuleProjectDirectory}/target/javafx</outputDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
                 <pluginManagement>
                     <plugins>
                         <plugin>
@@ -1282,6 +1255,13 @@
                     </plugins>
                 </pluginManagement>
             </build>
+            <repositories>
+                <repository>
+                    <id>sonatype-oss-snapshots</id>
+                    <name>Sonatype OSS Snapshots</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </repository>
+            </repositories>
         </profile>
         <profile>
             <id>jqassistant</id>
