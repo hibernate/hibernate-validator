@@ -104,6 +104,14 @@ public interface ConstraintLocation {
 	 */
 	ConstraintLocationKind getKind();
 
+	interface Builder {
+		ConstraintLocation build(Constrainable constrainable);
+
+		static Builder forPropertyHolderProperty() {
+			return new PropertyHolderPropertyConstraintLocationBuilder();
+		}
+	}
+
 	enum ConstraintLocationKind {
 		TYPE( ElementType.TYPE ),
 		CONSTRUCTOR( ElementType.CONSTRUCTOR ),

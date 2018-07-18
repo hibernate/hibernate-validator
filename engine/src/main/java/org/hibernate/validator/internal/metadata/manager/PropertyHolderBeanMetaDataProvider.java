@@ -19,6 +19,7 @@ import org.hibernate.validator.internal.metadata.aggregated.PropertyHolderBeanMe
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.PropertyHolderMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.propertyholder.PropertyHolderConfiguration;
+import org.hibernate.validator.internal.properties.propertyholder.PropertyAccessorCreatorProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
@@ -45,15 +46,18 @@ public class PropertyHolderBeanMetaDataProvider {
 	 */
 	private final ValueExtractorManager valueExtractorManager;
 
+	private final PropertyAccessorCreatorProvider propertyAccessorCreatorProvider;
+
 	private final ValidationOrderGenerator validationOrderGenerator;
 
 	private final MetaDataCache<PropertyHolderMetadataKey> metaDataCache;
 
-	public PropertyHolderBeanMetaDataProvider(List<PropertyHolderMetaDataProvider> propertyHolderMetaDataProviderList, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager, ValidationOrderGenerator validationOrderGenerator) {
+	public PropertyHolderBeanMetaDataProvider(List<PropertyHolderMetaDataProvider> propertyHolderMetaDataProviderList, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager, PropertyAccessorCreatorProvider propertyAccessorCreatorProvider, ValidationOrderGenerator validationOrderGenerator) {
 		this.propertyHolderMetaDataProviderList = propertyHolderMetaDataProviderList;
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
+		this.propertyAccessorCreatorProvider = propertyAccessorCreatorProvider;
 		this.validationOrderGenerator = validationOrderGenerator;
 
 		this.metaDataCache = new MetaDataCache<>();
@@ -69,7 +73,7 @@ public class PropertyHolderBeanMetaDataProvider {
 
 	private <T> BeanMetaDataImpl<T> createBeanMetaData(PropertyHolderMetadataKey metadataKey) {
 		PropertyHolderBeanMetaDataBuilder builder = PropertyHolderBeanMetaDataBuilder.getInstance(
-				constraintHelper, typeResolutionHelper, valueExtractorManager, validationOrderGenerator, metadataKey.propertyHolderClass
+				constraintHelper, typeResolutionHelper, valueExtractorManager, propertyAccessorCreatorProvider, validationOrderGenerator, metadataKey.propertyHolderClass
 		);
 
 		for ( PropertyHolderMetaDataProvider metaDataProvider : propertyHolderMetaDataProviderList ) {

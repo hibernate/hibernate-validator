@@ -8,14 +8,14 @@ package org.hibernate.validator.internal.properties.propertyholder;
 
 import java.lang.reflect.Type;
 
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.internal.properties.Field;
 import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.properties.PropertyAccessor;
 
 /**
  * @author Marko Bekhta
  */
-public class PropertyHolderProperty implements Property {
+public class PropertyHolderProperty implements Property, Field {
 
 	private final Class<?> propertyHolderType;
 	private final PropertyAccessor propertyAccessor;
@@ -58,11 +58,6 @@ public class PropertyHolderProperty implements Property {
 	@Override
 	public Type getType() {
 		return type;
-	}
-
-	@Override
-	public ConstrainedElementKind getConstrainedElementKind() {
-		return ConstrainedElementKind.FIELD;
 	}
 
 	@Override

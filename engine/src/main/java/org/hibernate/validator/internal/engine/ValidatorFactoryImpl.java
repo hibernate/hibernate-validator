@@ -50,6 +50,7 @@ import org.hibernate.validator.internal.metadata.provider.PropertyHolderMetaData
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
+import org.hibernate.validator.internal.properties.propertyholder.PropertyAccessorCreatorProvider;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -136,6 +137,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private final ValueExtractorManager valueExtractorManager;
 
+	private final PropertyAccessorCreatorProvider propertyAccessorCreatorProvider;
+
 	private final JavaBeanHelper javaBeanHelper;
 
 	private final ValidationOrderGenerator validationOrderGenerator;
@@ -144,6 +147,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		ClassLoader externalClassLoader = getExternalClassLoader( configurationState );
 
 		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
+		this.propertyAccessorCreatorProvider = new PropertyAccessorCreatorProvider();
 		this.beanMetaDataManagers = new ConcurrentHashMap<>();
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
@@ -361,6 +365,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						typeResolutionHelper,
 						validatorFactoryScopedContext.getParameterNameProvider(),
 						valueExtractorManager,
+						propertyAccessorCreatorProvider,
 						javaBeanHelper,
 						validationOrderGenerator,
 						methodValidationConfiguration,

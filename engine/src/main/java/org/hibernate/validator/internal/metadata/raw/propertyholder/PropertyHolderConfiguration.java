@@ -9,35 +9,34 @@ package org.hibernate.validator.internal.metadata.raw.propertyholder;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 
 /**
  * @author Marko Bekhta
  */
 public class PropertyHolderConfiguration {
 
-	private final PropertyHolderConfigurationSource source;
+	private final ConfigurationSource source;
 
 	private final String mappingName;
 
-	private final Set<ConstrainedElement> constrainedElements;
+	private final Set<ConstrainedPropertyHolderElementBuilder> constrainedElements;
 
 	private final List<Class<?>> defaultGroupSequence;
 
 	public PropertyHolderConfiguration(
-			PropertyHolderConfigurationSource source,
+			ConfigurationSource source,
 			String mappingName,
-			Set<? extends ConstrainedElement> constrainedElements,
+			Set<ConstrainedPropertyHolderElementBuilder> constrainedElements,
 			List<Class<?>> defaultGroupSequence) {
 
 		this.source = source;
 		this.mappingName = mappingName;
-		this.constrainedElements = CollectionHelper.<ConstrainedElement>newHashSet( constrainedElements );
+		this.constrainedElements = constrainedElements;
 		this.defaultGroupSequence = defaultGroupSequence;
 	}
 
-	public PropertyHolderConfigurationSource getSource() {
+	public ConfigurationSource getSource() {
 		return source;
 	}
 
@@ -45,7 +44,7 @@ public class PropertyHolderConfiguration {
 		return mappingName;
 	}
 
-	public Set<ConstrainedElement> getConstrainedElements() {
+	public Set<ConstrainedPropertyHolderElementBuilder> getConstrainedElements() {
 		return constrainedElements;
 	}
 

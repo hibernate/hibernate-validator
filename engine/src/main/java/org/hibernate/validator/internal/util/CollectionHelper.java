@@ -126,6 +126,15 @@ public final class CollectionHelper {
 		}
 	}
 
+	public static <T> Set<T> toImmutableSetOfNullable(Set<? extends T> set) {
+		if ( set == null ) {
+			return Collections.emptySet();
+		}
+		else {
+			return toImmutableSet( set );
+		}
+	}
+
 	/**
 	 * As the default loadFactor is of 0.75, we need to calculate the initial capacity from the expected size to avoid
 	 * resizing the collection when we populate the collection with all the initial elements. We use a calculation

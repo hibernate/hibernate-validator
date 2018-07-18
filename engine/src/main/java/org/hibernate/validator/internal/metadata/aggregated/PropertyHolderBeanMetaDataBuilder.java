@@ -14,10 +14,12 @@ import java.util.Set;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.metadata.raw.propertyholder.ConstrainedPropertyHolderElementBuilder;
 import org.hibernate.validator.internal.metadata.raw.propertyholder.PropertyHolderConfiguration;
-import org.hibernate.validator.internal.metadata.raw.propertyholder.PropertyHolderConfigurationSource;
+import org.hibernate.validator.internal.properties.propertyholder.PropertyAccessorCreatorProvider;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
@@ -37,9 +39,10 @@ public class PropertyHolderBeanMetaDataBuilder<T> {
 	private final Set<BuilderDelegate> builders = newHashSet();
 	private final TypeResolutionHelper typeResolutionHelper;
 	private final ValueExtractorManager valueExtractorManager;
+	private final PropertyAccessorCreatorProvider propertyAccessorCreatorProvider;
 
-	private PropertyHolderConfigurationSource sequenceSource;
-	private PropertyHolderConfigurationSource providerSource;
+	private ConfigurationSource sequenceSource;
+	private ConfigurationSource providerSource;
 	private List<Class<?>> defaultGroupSequence;
 
 
@@ -47,6 +50,7 @@ public class PropertyHolderBeanMetaDataBuilder<T> {
 			ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager,
+			PropertyAccessorCreatorProvider propertyAccessorCreatorProvider,
 			ValidationOrderGenerator validationOrderGenerator,
 			Class<T> propertyHolderClass) {
 		this.propertyHolderClass = propertyHolderClass;
@@ -54,18 +58,21 @@ public class PropertyHolderBeanMetaDataBuilder<T> {
 		this.validationOrderGenerator = validationOrderGenerator;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
+		this.propertyAccessorCreatorProvider = propertyAccessorCreatorProvider;
 	}
 
 	public static <T> PropertyHolderBeanMetaDataBuilder<T> getInstance(
 			ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager,
+			PropertyAccessorCreatorProvider propertyAccessorCreatorProvider,
 			ValidationOrderGenerator validationOrderGenerator,
 			Class<T> propertyHolderClass) {
 		return new PropertyHolderBeanMetaDataBuilder<>(
 				constraintHelper,
 				typeResolutionHelper,
 				valueExtractorManager,
+				propertyAccessorCreatorProvider,
 				validationOrderGenerator,
 				propertyHolderClass );
 	}
@@ -79,8 +86,18 @@ public class PropertyHolderBeanMetaDataBuilder<T> {
 			defaultGroupSequence = configuration.getDefaultGroupSequence();
 		}
 
-		for ( ConstrainedElement constrainedElement : configuration.getConstrainedElements() ) {
-			addMetaDataToBuilder( constrainedElement, builders );
+		for ( ConstrainedPropertyHolderElementBuilder constrainedElement : configuration.getConstrainedElements() ) {
+			if ( constrainedElement.isConstrained() ) {
+				addMetaDataToBuilder(
+						constrainedElement.build(
+								typeResolutionHelper,
+								valueExtractorManager,
+								propertyAccessorCreatorProvider,
+								propertyHolderClass
+						),
+						builders
+				);
+			}
 		}
 	}
 

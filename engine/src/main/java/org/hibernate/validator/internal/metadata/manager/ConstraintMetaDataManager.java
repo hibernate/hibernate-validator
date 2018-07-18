@@ -16,6 +16,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.PropertyHolderMetaDataProvider;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
+import org.hibernate.validator.internal.properties.propertyholder.PropertyAccessorCreatorProvider;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -51,6 +52,7 @@ public class ConstraintMetaDataManager {
 			TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ValueExtractorManager valueExtractorManager,
+			PropertyAccessorCreatorProvider propertyAccessorCreatorProvider,
 			JavaBeanHelper javaBeanHelper,
 			ValidationOrderGenerator validationOrderGenerator,
 			MethodValidationConfiguration methodValidationConfiguration,
@@ -72,6 +74,7 @@ public class ConstraintMetaDataManager {
 				constraintHelper,
 				typeResolutionHelper,
 				valueExtractorManager,
+				propertyAccessorCreatorProvider,
 				validationOrderGenerator
 		);
 	}
