@@ -246,6 +246,27 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return validateReturnValue( object, (Executable) method, returnValue, groups );
 	}
 
+	public <T> Set<ConstraintViolation<T>> validatePropertyHolder(T object, String mapping, Class<?>... groups) {
+		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
+		sanityCheckGroups( groups );
+
+		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forPropertyHolder( object, mapping );
+
+		if ( !validationContext.getRootBeanMetaData().hasConstraints() ) {
+			return Collections.emptySet();
+		}
+
+		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
+		ValueContext<?, Object> valueContext = ValueContext.getLocalExecutionContext(
+				validatorScopedContext.getParameterNameProvider(),
+				object,
+				validationContext.getRootBeanMetaData(),
+				PathImpl.createRootPath()
+		);
+
+		return validateInContext( validationContext, valueContext, validationOrder );
+	}
+
 	private <T> Set<ConstraintViolation<T>> validateParameters(T object, Executable executable, Object[] parameterValues, Class<?>... groups) {
 		sanityCheckGroups( groups );
 

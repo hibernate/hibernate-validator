@@ -136,4 +136,19 @@ public class ValidationContextBuilder {
 				executableReturnValue
 		);
 	}
+
+	public <T> BaseBeanValidationContext<T> forPropertyHolder(T propertyHolder, String mapping) {
+		@SuppressWarnings("unchecked")
+		Class<T> propertyHolderClass = (Class<T>) propertyHolder.getClass();
+		return new BeanValidationContext<>(
+				constraintValidatorManager,
+				constraintValidatorFactory,
+				validatorScopedContext,
+				traversableResolver,
+				constraintValidatorInitializationContext,
+				propertyHolder,
+				propertyHolderClass,
+				constraintMetaDataManager.getPropertyHolderBeanMetaData( propertyHolderClass, mapping )
+		);
+	}
 }
