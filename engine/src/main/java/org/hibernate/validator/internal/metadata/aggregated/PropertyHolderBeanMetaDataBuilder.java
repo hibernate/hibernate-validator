@@ -91,6 +91,7 @@ public class PropertyHolderBeanMetaDataBuilder<T> {
 				addMetaDataToBuilder(
 						constrainedElement.build(
 								typeResolutionHelper,
+								constraintHelper,
 								valueExtractorManager,
 								propertyAccessorCreatorProvider,
 								propertyHolderClass

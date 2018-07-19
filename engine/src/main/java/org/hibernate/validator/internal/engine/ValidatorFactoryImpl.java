@@ -48,6 +48,7 @@ import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.PropertyHolderMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.proeprtyholder.DummyPropertyHolderMetaDataProvider;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.properties.propertyholder.PropertyAccessorCreatorProvider;
@@ -405,7 +406,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	private List<PropertyHolderMetaDataProvider> buildPropertyHolderMetaDataProvider() {
-		return Collections.emptyList();
+		return Collections.singletonList( new DummyPropertyHolderMetaDataProvider() );
 	}
 
 	private static boolean checkPropertiesForBoolean(Map<String, String> properties, String propertyKey, boolean programmaticValue) {

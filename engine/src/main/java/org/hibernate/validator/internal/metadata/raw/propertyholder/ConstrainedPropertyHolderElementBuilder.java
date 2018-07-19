@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraintBuilder;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -28,7 +29,7 @@ import org.hibernate.validator.spi.propertyholder.PropertyAccessorCreator;
 /**
  * @author Marko Bekhta
  */
-public abstract class ConstrainedPropertyHolderElementBuilder {
+public class ConstrainedPropertyHolderElementBuilder {
 
 	private final ConfigurationSource source;
 
@@ -60,7 +61,7 @@ public abstract class ConstrainedPropertyHolderElementBuilder {
 				|| !typeArgumentConstraints.isEmpty();
 	}
 
-	public ConstrainedElement build(TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager, PropertyAccessorCreatorProvider propertyAccessorCreatorProvider, Class<?> propertyHolderType) {
+	public ConstrainedElement build(TypeResolutionHelper typeResolutionHelper, ConstraintHelper constraintHelper, ValueExtractorManager valueExtractorManager, PropertyAccessorCreatorProvider propertyAccessorCreatorProvider, Class<?> propertyHolderType) {
 		PropertyAccessorCreator<?> propertyAccessorCreator = propertyAccessorCreatorProvider.getPropertyAccessorCreatorFor( propertyHolderType );
 		PropertyAccessor propertyAccessor = propertyAccessorCreator.create( name, type );
 
@@ -69,16 +70,16 @@ public abstract class ConstrainedPropertyHolderElementBuilder {
 		return new ConstrainedField(
 				source,
 				property,
-				toMetaConstraints( typeResolutionHelper, valueExtractorManager, property, constraints ),
-				toMetaConstraints( typeResolutionHelper, valueExtractorManager, property, typeArgumentConstraints ),
+				toMetaConstraints( typeResolutionHelper, constraintHelper, valueExtractorManager, property, constraints ),
+				toMetaConstraints( typeResolutionHelper, constraintHelper, valueExtractorManager, property, typeArgumentConstraints ),
 				cascadingMetaDataBuilder
 		);
 	}
 
-	private Set<MetaConstraint<?>> toMetaConstraints(TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager, PropertyHolderProperty property, Collection<MetaConstraintBuilder<?>> collection) {
+	private Set<MetaConstraint<?>> toMetaConstraints(TypeResolutionHelper typeResolutionHelper, ConstraintHelper constraintHelper, ValueExtractorManager valueExtractorManager, PropertyHolderProperty property, Collection<MetaConstraintBuilder<?>> collection) {
 		Set<MetaConstraint<?>> builtConstraints = new HashSet<>( constraints.size() );
 		for ( MetaConstraintBuilder<?> builder : constraints ) {
-			builtConstraints.add( builder.build( typeResolutionHelper, valueExtractorManager, property ) );
+			builtConstraints.add( builder.build( typeResolutionHelper, constraintHelper, valueExtractorManager, property ) );
 		}
 		return builtConstraints;
 	}

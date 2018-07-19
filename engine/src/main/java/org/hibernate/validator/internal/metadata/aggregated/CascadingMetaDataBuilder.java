@@ -48,7 +48,7 @@ public class CascadingMetaDataBuilder {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final CascadingMetaDataBuilder NON_CASCADING =
-			new CascadingMetaDataBuilder( null, null, null, null, false, Collections.emptyMap(), Collections.emptyMap() );
+			new CascadingMetaDataBuilder( null, null, null, null, null, false, Collections.emptyMap(), Collections.emptyMap() );
 
 	private final String mapping;
 
@@ -101,15 +101,23 @@ public class CascadingMetaDataBuilder {
 
 	public CascadingMetaDataBuilder(Type enclosingType, TypeVariable<?> typeParameter, boolean cascading,
 			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
-		this( enclosingType, typeParameter,
+		this( enclosingType, null, typeParameter,
 				TypeVariables.getContainerClass( typeParameter ), TypeVariables.getActualTypeParameter( typeParameter ),
 				cascading, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
-	private CascadingMetaDataBuilder(Type enclosingType, TypeVariable<?> typeParameter, Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter,
+	private CascadingMetaDataBuilder(String mapping, TypeVariable<?> typeParameter, boolean cascading,
+			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
+		this( null, mapping, typeParameter,
+				TypeVariables.getContainerClass( typeParameter ), TypeVariables.getActualTypeParameter( typeParameter ),
+				cascading, containerElementTypesCascadingMetaData, groupConversions );
+	}
+
+	private CascadingMetaDataBuilder(Type enclosingType, String mapping, TypeVariable<?> typeParameter, Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter,
 			boolean cascading, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData,
 			Map<Class<?>, Class<?>> groupConversions) {
 		this.enclosingType = enclosingType;
+		this.mapping = mapping;
 		this.typeParameter = typeParameter;
 		this.declaredContainerClass = declaredContainerClass;
 		this.declaredTypeParameter = declaredTypeParameter;
@@ -127,8 +135,6 @@ public class CascadingMetaDataBuilder {
 		}
 		hasContainerElementsMarkedForCascading = tmpHasContainerElementsMarkedForCascading;
 		hasGroupConversionsOnAnnotatedObjectOrContainerElements = tmpHasGroupConversionsOnAnnotatedObjectOrContainerElements;
-
-		mapping = null;
 	}
 
 	public static CascadingMetaDataBuilder nonCascading() {
@@ -137,6 +143,10 @@ public class CascadingMetaDataBuilder {
 
 	public static CascadingMetaDataBuilder annotatedObject(Type cascadableType, boolean cascading, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
 		return new CascadingMetaDataBuilder( cascadableType, AnnotatedObject.INSTANCE, cascading, containerElementTypesCascadingMetaData, groupConversions );
+	}
+
+	public static CascadingMetaDataBuilder propertyHolder(String mappingName, boolean cascading, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
+		return new CascadingMetaDataBuilder( mappingName, AnnotatedObject.INSTANCE, cascading, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
 	public TypeVariable<?> getTypeParameter() {
@@ -429,7 +439,7 @@ public class CascadingMetaDataBuilder {
 		}
 		else {
 			amendedCascadingMetadata.put( cascadableTypeParameter,
-					new CascadingMetaDataBuilder( cascadableClass, cascadableTypeParameter, enclosingType, correspondingTypeParameter, true,
+					new CascadingMetaDataBuilder( cascadableClass, null, cascadableTypeParameter, enclosingType, correspondingTypeParameter, true,
 							Collections.emptyMap(), groupConversions ) );
 		}
 

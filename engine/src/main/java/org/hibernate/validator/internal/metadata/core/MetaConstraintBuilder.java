@@ -13,21 +13,32 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
 /**
  * @author Marko Bekhta
  */
 public class MetaConstraintBuilder<A extends Annotation> {
 
-	private final ConstraintDescriptorImpl<A> constraintDescriptor;
+	private final ConstraintAnnotationDescriptor<A> annotationDescriptor;
 	private final ConstraintLocation.Builder locationBuilder;
 
-	public MetaConstraintBuilder(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation.Builder locationBuilder) {
-		this.constraintDescriptor = constraintDescriptor;
+	public MetaConstraintBuilder(ConstraintAnnotationDescriptor<A> annotationDescriptor, ConstraintLocation.Builder locationBuilder) {
+		this.annotationDescriptor = annotationDescriptor;
 		this.locationBuilder = locationBuilder;
 	}
 
-	public MetaConstraint<A> build(TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager, Constrainable constrainable) {
-		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor, locationBuilder.build( constrainable ) );
+	public MetaConstraint<A> build(TypeResolutionHelper typeResolutionHelper, ConstraintHelper constraintHelper, ValueExtractorManager valueExtractorManager, Constrainable constrainable) {
+		ConstraintLocation constraintLocation = locationBuilder.build( constrainable );
+		return MetaConstraints.create(
+				typeResolutionHelper,
+				valueExtractorManager,
+				new ConstraintDescriptorImpl<>(
+						constraintHelper,
+						constrainable,
+						annotationDescriptor,
+						constraintLocation.getKind()
+				),
+				constraintLocation );
 	}
 }
