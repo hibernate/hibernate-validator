@@ -453,42 +453,60 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		final BeanMetaData<U> beanMetaData = valueContext.getCurrentBeanMetaData();
 		final Map<Class<?>, Class<?>> validatedInterfaces = new HashMap<>();
 
-		// evaluating the constraints of a bean per class in hierarchy, this is necessary to detect potential default group re-definitions
-		for ( Class<? super U> clazz : beanMetaData.getClassHierarchy() ) {
-			BeanMetaData<? super U> hostingBeanMetaData = constraintMetaDataManager.getBeanMetaData( clazz );
-			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.isDefaultGroupSequenceRedefined();
-
-			// if the current class redefined the default group sequence, this sequence has to be applied to all the class hierarchy.
-			if ( defaultGroupSequenceIsRedefined ) {
-				Iterator<Sequence> defaultGroupSequence = hostingBeanMetaData.getDefaultValidationSequence( valueContext.getCurrentBean() );
-				Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getMetaConstraints();
-
-				while ( defaultGroupSequence.hasNext() ) {
-					for ( GroupWithInheritance groupOfGroups : defaultGroupSequence.next() ) {
-						boolean validationSuccessful = true;
-
-						for ( Group defaultSequenceMember : groupOfGroups ) {
-							validationSuccessful = validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz,
-									metaConstraints, defaultSequenceMember );
-						}
-						if ( !validationSuccessful ) {
-							break;
-						}
-					}
-				}
-			}
-			// fast path in case the default group sequence hasn't been redefined
-			else {
-				Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
-				validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, metaConstraints,
-						Group.DEFAULT_GROUP );
-			}
+		boolean defaultGroupSequenceIsRedefined = beanMetaData.isDefaultGroupSequenceRedefined();
+		if ( defaultGroupSequenceIsRedefined ) {
+			validateConstraintsForRedefinedGroupSequence( validationContext, valueContext, validatedInterfaces, beanMetaData.getBeanClass(), beanMetaData );
+			validationContext.markCurrentBeanAsProcessed( valueContext );
+		}
+		else {
+			validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, beanMetaData.getBeanClass(), beanMetaData.getDirectMetaConstraints(), Group.DEFAULT_GROUP );
+			List<Class<? super U>> classHierarchy = beanMetaData.getClassHierarchy();
 
 			validationContext.markCurrentBeanAsProcessed( valueContext );
+			// we start from the second element as first one (the most specific class) was already validated ^
 
-			// all constraints in the hierarchy has been validated, stop validation.
-			if ( defaultGroupSequenceIsRedefined ) {
-				break;
+			// evaluating the constraints of a bean per class in hierarchy, this is necessary to detect potential default group re-definitions
+			for ( int i = 1; i < classHierarchy.size(); i++ ) {
+				Class<? super U> clazz = classHierarchy.get( i );
+
+				BeanMetaData<? super U> hostingBeanMetaData = constraintMetaDataManager.getBeanMetaData( clazz );
+				defaultGroupSequenceIsRedefined = hostingBeanMetaData.isDefaultGroupSequenceRedefined();
+
+				// if the current class redefined the default group sequence, this sequence has to be applied to all the class hierarchy.
+				if ( defaultGroupSequenceIsRedefined ) {
+					validateConstraintsForRedefinedGroupSequence( validationContext, valueContext, validatedInterfaces, clazz, hostingBeanMetaData );
+				}
+				// fast path in case the default group sequence hasn't been redefined
+				else {
+					Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
+					validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, metaConstraints, Group.DEFAULT_GROUP );
+				}
+
+				validationContext.markCurrentBeanAsProcessed( valueContext );
+
+				// all constraints in the hierarchy has been validated, stop validation.
+				if ( defaultGroupSequenceIsRedefined ) {
+					break;
+				}
+			}
+		}
+	}
+
+	private <U> void validateConstraintsForRedefinedGroupSequence(BaseBeanValidationContext<?> validationContext, ValueContext<U, Object> valueContext, Map<Class<?>, Class<?>> validatedInterfaces, Class<? super U> clazz, BeanMetaData<? super U> hostingBeanMetaData) {
+		Iterator<Sequence> defaultGroupSequence = hostingBeanMetaData.getDefaultValidationSequence( valueContext.getCurrentBean() );
+		Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getMetaConstraints();
+
+		while ( defaultGroupSequence.hasNext() ) {
+			for ( GroupWithInheritance groupOfGroups : defaultGroupSequence.next() ) {
+				boolean validationSuccessful = true;
+
+				for ( Group defaultSequenceMember : groupOfGroups ) {
+					validationSuccessful = validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz,
+							metaConstraints, defaultSequenceMember );
+				}
+				if ( !validationSuccessful ) {
+					break;
+				}
 			}
 		}
 	}
