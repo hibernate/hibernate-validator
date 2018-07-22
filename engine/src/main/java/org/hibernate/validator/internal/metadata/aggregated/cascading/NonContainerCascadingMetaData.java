@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.metadata.aggregated.cascading;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.TypeVariable;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.metadata.GroupConversionDescriptor;
@@ -15,7 +16,6 @@ import javax.validation.metadata.GroupConversionDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -28,14 +28,16 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public class NonContainerCascadingMetaData implements CascadingMetaData {
+class NonContainerCascadingMetaData implements CascadingMetaData {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
-	private static final NonContainerCascadingMetaData NON_CASCADING = new NonContainerCascadingMetaData( false,
+	private static final NonContainerCascadingMetaData NON_CASCADING = new NonContainerCascadingMetaData(
+			false,
 			GroupConversionHelper.EMPTY );
 
-	private static final NonContainerCascadingMetaData CASCADING_WITHOUT_GROUP_CONVERSIONS = new NonContainerCascadingMetaData( true,
+	private static final NonContainerCascadingMetaData CASCADING_WITHOUT_GROUP_CONVERSIONS = new NonContainerCascadingMetaData(
+			true,
 			GroupConversionHelper.EMPTY );
 
 	/**
@@ -48,26 +50,18 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 	 */
 	private GroupConversionHelper groupConversionHelper;
 
-	public static NonContainerCascadingMetaData of(CascadingMetaDataBuilder cascadingMetaDataBuilder, Object context) {
-		if ( cascadingMetaDataBuilder.getMappingName() != null ) {
-			return NonContainerPropertyHolderCascadingMetaData.of( cascadingMetaDataBuilder, context );
-		}
-		else if ( !cascadingMetaDataBuilder.isCascading() ) {
+	public static NonContainerCascadingMetaData of(boolean cascading, Map<Class<?>, Class<?>> groupConversions) {
+		if ( !cascading ) {
 			return NON_CASCADING;
 		}
-		else if ( cascadingMetaDataBuilder.getGroupConversions().isEmpty() ) {
+		else if ( groupConversions.isEmpty() ) {
 			return CASCADING_WITHOUT_GROUP_CONVERSIONS;
 		}
 		else {
-			return new NonContainerCascadingMetaData( cascadingMetaDataBuilder );
+			return new NonContainerCascadingMetaData(
+					cascading,
+					GroupConversionHelper.of( groupConversions ) );
 		}
-	}
-
-	protected NonContainerCascadingMetaData(CascadingMetaDataBuilder cascadingMetaDataBuilder) {
-		this(
-				cascadingMetaDataBuilder.isCascading(),
-				GroupConversionHelper.of( cascadingMetaDataBuilder.getGroupConversions() )
-		);
 	}
 
 	protected NonContainerCascadingMetaData(boolean cascading, GroupConversionHelper groupConversionHelper) {

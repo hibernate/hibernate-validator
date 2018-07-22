@@ -4,13 +4,14 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.metadata.aggregated;
+package org.hibernate.validator.internal.metadata.aggregated.cascading;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -20,15 +21,14 @@ import java.util.stream.Stream;
 
 import javax.validation.GroupSequence;
 
-import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorHelper;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.aggregated.cascading.ContainerCascadingMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.cascading.NonContainerCascadingMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.cascading.PotentiallyContainerCascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
+import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
@@ -42,52 +42,48 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * gets.
  *
  * @author Guillaume Smet
+ * @author Marko Bekhta
  */
-public class CascadingMetaDataBuilder {
+public class SimpleBeanCascadingMetaDataBuilder implements CascadingMetaDataBuilder {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
-
-	private static final CascadingMetaDataBuilder NON_CASCADING =
-			new CascadingMetaDataBuilder( null, null, null, null, null, false, Collections.emptyMap(), Collections.emptyMap() );
-
-	private final String mapping;
 
 	/**
 	 * The enclosing type that defines this type parameter.
 	 */
-	private final Type enclosingType;
+	protected final Type enclosingType;
 
 	/**
 	 * The type parameter.
 	 */
-	private final TypeVariable<?> typeParameter;
+	protected final TypeVariable<?> typeParameter;
 
 	/**
 	 * The declared container class: it is the one used in the node of the property path.
 	 */
-	private final Class<?> declaredContainerClass;
+	protected final Class<?> declaredContainerClass;
 
 	/**
 	 * The declared type parameter: it is the one used in the node of the property path.
 	 */
-	private final TypeVariable<?> declaredTypeParameter;
+	protected final TypeVariable<?> declaredTypeParameter;
 
 	/**
 	 * Possibly the cascading type parameters corresponding to this type parameter if it is a parameterized type.
 	 */
 	@Immutable
-	private final Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData;
+	protected final Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData;
 
 	/**
 	 * If this type parameter is marked for cascading.
 	 */
-	private final boolean cascading;
+	protected final boolean cascading;
 
 	/**
 	 * Group conversions defined for this type parameter.
 	 */
 	@Immutable
-	private final Map<Class<?>, Class<?>> groupConversions;
+	protected final Map<Class<?>, Class<?>> groupConversions;
 
 	/**
 	 * Whether any container element (it can be nested) is marked for cascaded validation.
@@ -99,25 +95,30 @@ public class CascadingMetaDataBuilder {
 	 */
 	private final boolean hasGroupConversionsOnAnnotatedObjectOrContainerElements;
 
-	public CascadingMetaDataBuilder(Type enclosingType, TypeVariable<?> typeParameter, boolean cascading,
+	public SimpleBeanCascadingMetaDataBuilder(Type enclosingType, TypeVariable<?> typeParameter, boolean cascading,
+			List<CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
+		this(
+				enclosingType,
+				typeParameter,
+				TypeVariables.getContainerClass( typeParameter ),
+				TypeVariables.getActualTypeParameter( typeParameter ),
+				cascading,
+				convertContainerElementTypesCascadingMetaData( containerElementTypesCascadingMetaData ),
+				groupConversions
+		);
+	}
+
+	public SimpleBeanCascadingMetaDataBuilder(Type enclosingType, TypeVariable<?> typeParameter, boolean cascading,
 			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
-		this( enclosingType, null, typeParameter,
+		this( enclosingType, typeParameter,
 				TypeVariables.getContainerClass( typeParameter ), TypeVariables.getActualTypeParameter( typeParameter ),
 				cascading, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
-	private CascadingMetaDataBuilder(String mapping, TypeVariable<?> typeParameter, boolean cascading,
-			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
-		this( null, mapping, typeParameter,
-				TypeVariables.getContainerClass( typeParameter ), TypeVariables.getActualTypeParameter( typeParameter ),
-				cascading, containerElementTypesCascadingMetaData, groupConversions );
-	}
-
-	private CascadingMetaDataBuilder(Type enclosingType, String mapping, TypeVariable<?> typeParameter, Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter,
+	private SimpleBeanCascadingMetaDataBuilder(Type enclosingType, TypeVariable<?> typeParameter, Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter,
 			boolean cascading, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData,
 			Map<Class<?>, Class<?>> groupConversions) {
 		this.enclosingType = enclosingType;
-		this.mapping = mapping;
 		this.typeParameter = typeParameter;
 		this.declaredContainerClass = declaredContainerClass;
 		this.declaredTypeParameter = declaredTypeParameter;
@@ -125,96 +126,68 @@ public class CascadingMetaDataBuilder {
 		this.groupConversions = CollectionHelper.toImmutableMap( groupConversions );
 		this.containerElementTypesCascadingMetaData = CollectionHelper.toImmutableMap( containerElementTypesCascadingMetaData );
 
-		boolean tmpHasContainerElementsMarkedForCascading = false;
+
 		boolean tmpHasGroupConversionsOnAnnotatedObjectOrContainerElements = !groupConversions.isEmpty();
 		for ( CascadingMetaDataBuilder nestedCascadingTypeParameter : containerElementTypesCascadingMetaData.values() ) {
-			tmpHasContainerElementsMarkedForCascading = tmpHasContainerElementsMarkedForCascading
-					|| nestedCascadingTypeParameter.cascading || nestedCascadingTypeParameter.hasContainerElementsMarkedForCascading;
 			tmpHasGroupConversionsOnAnnotatedObjectOrContainerElements = tmpHasGroupConversionsOnAnnotatedObjectOrContainerElements
-					|| nestedCascadingTypeParameter.hasGroupConversionsOnAnnotatedObjectOrContainerElements;
+					|| nestedCascadingTypeParameter.hasGroupConversionsOnAnnotatedObjectOrContainerElements();
 		}
-		hasContainerElementsMarkedForCascading = tmpHasContainerElementsMarkedForCascading;
 		hasGroupConversionsOnAnnotatedObjectOrContainerElements = tmpHasGroupConversionsOnAnnotatedObjectOrContainerElements;
+		hasContainerElementsMarkedForCascading = hasContainerElementsMarkedForCascading( containerElementTypesCascadingMetaData );
 	}
 
-	public static CascadingMetaDataBuilder nonCascading() {
-		return NON_CASCADING;
-	}
-
-	public static CascadingMetaDataBuilder annotatedObject(Type cascadableType, boolean cascading, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
-		return new CascadingMetaDataBuilder( cascadableType, AnnotatedObject.INSTANCE, cascading, containerElementTypesCascadingMetaData, groupConversions );
-	}
-
-	public static CascadingMetaDataBuilder propertyHolder(String mappingName, boolean cascading, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
-		return new CascadingMetaDataBuilder( mappingName, AnnotatedObject.INSTANCE, cascading, containerElementTypesCascadingMetaData, groupConversions );
-	}
-
-	public TypeVariable<?> getTypeParameter() {
-		return typeParameter;
-	}
-
-	public Type getEnclosingType() {
-		return enclosingType;
-	}
-
-	public String getMappingName() {
-		return mapping;
-	}
-
-	public Class<?> getDeclaredContainerClass() {
-		return declaredContainerClass;
-	}
-
-	public TypeVariable<?> getDeclaredTypeParameter() {
-		return declaredTypeParameter;
-	}
-
+	@Override
 	public boolean isCascading() {
 		return cascading;
 	}
 
+	@Override
 	public Map<Class<?>, Class<?>> getGroupConversions() {
 		return groupConversions;
 	}
 
+	@Override
 	public boolean hasContainerElementsMarkedForCascading() {
 		return hasContainerElementsMarkedForCascading;
 	}
 
+	@Override
 	public boolean isMarkedForCascadingOnAnnotatedObjectOrContainerElements() {
 		return cascading || hasContainerElementsMarkedForCascading;
 	}
 
+	@Override
 	public boolean hasGroupConversionsOnAnnotatedObjectOrContainerElements() {
 		return hasGroupConversionsOnAnnotatedObjectOrContainerElements;
 	}
 
+	@Override
 	public Map<TypeVariable<?>, CascadingMetaDataBuilder> getContainerElementTypesCascadingMetaData() {
 		return containerElementTypesCascadingMetaData;
 	}
 
+	@Override
 	public CascadingMetaDataBuilder merge(CascadingMetaDataBuilder otherCascadingTypeParameter) {
-		if ( this == NON_CASCADING ) {
-			return otherCascadingTypeParameter;
-		}
-		if ( otherCascadingTypeParameter == NON_CASCADING ) {
+		if ( otherCascadingTypeParameter == NonCascadingMetaDataBuilder.INSTANCE ) {
 			return this;
 		}
 
-		boolean cascading = this.cascading || otherCascadingTypeParameter.cascading;
+		boolean cascading = this.cascading || otherCascadingTypeParameter.isCascading();
 
-		Map<Class<?>, Class<?>> groupConversions = mergeGroupConversion( this.groupConversions, otherCascadingTypeParameter.groupConversions );
+		Map<Class<?>, Class<?>> groupConversions = mergeGroupConversion( this.groupConversions, otherCascadingTypeParameter.getGroupConversions() );
 
 		Map<TypeVariable<?>, CascadingMetaDataBuilder> nestedCascadingTypeParameterMap = Stream
-				.concat( this.containerElementTypesCascadingMetaData.entrySet().stream(),
-						otherCascadingTypeParameter.containerElementTypesCascadingMetaData.entrySet().stream() )
+				.concat(
+						this.containerElementTypesCascadingMetaData.entrySet().stream(),
+						otherCascadingTypeParameter.getContainerElementTypesCascadingMetaData().entrySet().stream() )
 				.collect(
-						Collectors.toMap( entry -> entry.getKey(), entry -> entry.getValue(), ( value1, value2 ) -> value1.merge( value2 ) ) );
+						Collectors.toMap( entry -> entry.getKey(), entry -> entry.getValue(), (value1, value2) -> value1.merge( value2 ) ) );
 
-		return new CascadingMetaDataBuilder( this.enclosingType, this.typeParameter, cascading, nestedCascadingTypeParameterMap, groupConversions );
+		return new SimpleBeanCascadingMetaDataBuilder( this.enclosingType, this.typeParameter, cascading, nestedCascadingTypeParameterMap, groupConversions );
 	}
 
-	public CascadingMetaData build(ValueExtractorManager valueExtractorManager, Object context) {
+	@Override
+	public CascadingMetaData build(ValueExtractorManager valueExtractorManager, Constrainable context) {
 		validateGroupConversions( context );
 
 		// In the case the whole object is not annotated as cascading, we don't need to enable
@@ -222,11 +195,11 @@ public class CascadingMetaDataBuilder {
 		if ( !cascading ) {
 			// We have cascading enabled for at least one of the container elements
 			if ( !containerElementTypesCascadingMetaData.isEmpty() && hasContainerElementsMarkedForCascading ) {
-				return ContainerCascadingMetaData.of( valueExtractorManager, this, context );
+				return toContainerCascadingMetaData( valueExtractorManager );
 			}
 			// It is not a container or it doesn't have cascading enabled on any container element
 			else {
-				return NonContainerCascadingMetaData.of( this, context );
+				return nonContainerCascadingMetaData();
 			}
 		}
 
@@ -244,8 +217,7 @@ public class CascadingMetaDataBuilder {
 		//
 		// The value extractor returned here is just used to add the proper cascading metadata to the type
 		// argument of the container. Proper value extractor resolution is executed at runtime.
-		Set<ValueExtractorDescriptor> containerDetectionValueExtractorCandidates = valueExtractorManager.getResolver()
-				.getValueExtractorCandidatesForContainerDetectionOfGlobalCascadedValidation( enclosingType );
+		Set<ValueExtractorDescriptor> containerDetectionValueExtractorCandidates = findContainerDetectionValueExtractorCandidates( valueExtractorManager );
 		if ( !containerDetectionValueExtractorCandidates.isEmpty() ) {
 			if ( containerDetectionValueExtractorCandidates.size() > 1 ) {
 				throw LOG.getUnableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclaredException(
@@ -254,17 +226,20 @@ public class CascadingMetaDataBuilder {
 				);
 			}
 
-			return ContainerCascadingMetaData.of(
-					valueExtractorManager,
-					new CascadingMetaDataBuilder(
+			return toContainerCascadingMetaData(
+					new SimpleBeanCascadingMetaDataBuilder(
 							enclosingType,
 							typeParameter,
 							cascading,
-							addCascadingMetaDataBasedOnContainerDetection( enclosingType, containerElementTypesCascadingMetaData, groupConversions,
-									containerDetectionValueExtractorCandidates.iterator().next() ),
+							addCascadingMetaDataBasedOnContainerDetection(
+									enclosingType,
+									containerElementTypesCascadingMetaData,
+									groupConversions,
+									containerDetectionValueExtractorCandidates.iterator().next()
+							),
 							groupConversions
 					),
-					context
+					valueExtractorManager
 			);
 		}
 
@@ -275,18 +250,31 @@ public class CascadingMetaDataBuilder {
 		// extends ContainerWithoutRegisteredVE)
 		// so we are looking for VEs such that ValueExtractorDescriptor#getContainerType() is assignable to the declared
 		// type under inspection.
-		Set<ValueExtractorDescriptor> potentialValueExtractorCandidates = valueExtractorManager.getResolver()
-				.getPotentialValueExtractorCandidatesForCascadedValidation( enclosingType );
+		Set<ValueExtractorDescriptor> potentialValueExtractorCandidates = findPotentialValueExtractorCandidates( valueExtractorManager );
 
 		// if such VEs were found we return an instance of PotentiallyContainerCascadingMetaData that will store those potential VEs
 		// and they will be used at runtime to check if any of those could be applied to a runtime type and if PotentiallyContainerCascadingMetaData
 		// should be promoted to ContainerCascadingMetaData or not.
 		if ( !potentialValueExtractorCandidates.isEmpty() ) {
-			return PotentiallyContainerCascadingMetaData.of( this, potentialValueExtractorCandidates, context );
+			return PotentiallyContainerCascadingMetaData.of( groupConversions, potentialValueExtractorCandidates );
 		}
 
 		// if cascading == false, or none of the above cases matched we just return a non container metadata
-		return NonContainerCascadingMetaData.of( this, context );
+		return nonContainerCascadingMetaData();
+	}
+
+	protected NonContainerCascadingMetaData nonContainerCascadingMetaData() {
+		return NonContainerCascadingMetaData.of( cascading, groupConversions );
+	}
+
+	protected Set<ValueExtractorDescriptor> findContainerDetectionValueExtractorCandidates(ValueExtractorManager valueExtractorManager) {
+		return valueExtractorManager.getResolver()
+				.getValueExtractorCandidatesForContainerDetectionOfGlobalCascadedValidation( enclosingType );
+	}
+
+	protected Set<ValueExtractorDescriptor> findPotentialValueExtractorCandidates(ValueExtractorManager valueExtractorManager) {
+		return valueExtractorManager.getResolver()
+				.getPotentialValueExtractorCandidatesForCascadedValidation( enclosingType );
 	}
 
 	private void validateGroupConversions(Object context) {
@@ -303,7 +291,9 @@ public class CascadingMetaDataBuilder {
 		}
 
 		for ( CascadingMetaDataBuilder containerElementCascadingTypeParameter : containerElementTypesCascadingMetaData.values() ) {
-			containerElementCascadingTypeParameter.validateGroupConversions( context );
+			if ( containerElementCascadingTypeParameter instanceof SimpleBeanCascadingMetaDataBuilder ) {
+				( (SimpleBeanCascadingMetaDataBuilder) containerElementCascadingTypeParameter ).validateGroupConversions( context );
+			}
 		}
 	}
 
@@ -347,7 +337,7 @@ public class CascadingMetaDataBuilder {
 		if ( getClass() != obj.getClass() ) {
 			return false;
 		}
-		CascadingMetaDataBuilder other = (CascadingMetaDataBuilder) obj;
+		SimpleBeanCascadingMetaDataBuilder other = (SimpleBeanCascadingMetaDataBuilder) obj;
 		if ( !typeParameter.equals( other.typeParameter ) ) {
 			return false;
 		}
@@ -363,7 +353,26 @@ public class CascadingMetaDataBuilder {
 		return true;
 	}
 
-	private static Map<Class<?>, Class<?>> mergeGroupConversion(Map<Class<?>, Class<?>> groupConversions, Map<Class<?>, Class<?>> otherGroupConversions) {
+	private static Map<TypeVariable<?>, CascadingMetaDataBuilder> convertContainerElementTypesCascadingMetaData(List<CascadingMetaDataBuilder> containerElementTypesCascadingMetaData) {
+		Map<TypeVariable<?>, CascadingMetaDataBuilder> converted = CollectionHelper.newHashMap( containerElementTypesCascadingMetaData.size() );
+		for ( CascadingMetaDataBuilder containerElement : containerElementTypesCascadingMetaData ) {
+			Contracts.assertTrue( containerElement instanceof SimpleBeanCascadingMetaDataBuilder, "Supports only SimpleBeanCascadingMetaDataBuilder." );
+
+			converted.put( ( (SimpleBeanCascadingMetaDataBuilder) containerElement ).typeParameter, containerElement );
+		}
+		return converted;
+	}
+
+	private boolean hasContainerElementsMarkedForCascading(Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData) {
+		boolean tmpHasContainerElementsMarkedForCascading = false;
+		for ( CascadingMetaDataBuilder nestedCascadingTypeParameter : containerElementTypesCascadingMetaData.values() ) {
+			tmpHasContainerElementsMarkedForCascading = tmpHasContainerElementsMarkedForCascading
+					|| nestedCascadingTypeParameter.isCascading() || nestedCascadingTypeParameter.hasContainerElementsMarkedForCascading();
+		}
+		return tmpHasContainerElementsMarkedForCascading;
+	}
+
+	protected static Map<Class<?>, Class<?>> mergeGroupConversion(Map<Class<?>, Class<?>> groupConversions, Map<Class<?>, Class<?>> otherGroupConversions) {
 		if ( groupConversions.isEmpty() && otherGroupConversions.isEmpty() ) {
 			// this is a rather common case so let's optimize it
 			return Collections.emptyMap();
@@ -389,7 +398,7 @@ public class CascadingMetaDataBuilder {
 
 	private static Map<TypeVariable<?>, CascadingMetaDataBuilder> addCascadingMetaDataBasedOnContainerDetection(Type cascadableType, Map<TypeVariable<?>,
 			CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions,
-			 ValueExtractorDescriptor possibleValueExtractor) {
+			ValueExtractorDescriptor possibleValueExtractor) {
 		Class<?> cascadableClass = ReflectionHelper.getClassFromType( cascadableType );
 		if ( cascadableClass.isArray() ) {
 			// for arrays, we need to add an ArrayElement cascading metadata: it's the only way arrays support cascading at the moment.
@@ -397,13 +406,13 @@ public class CascadingMetaDataBuilder {
 		}
 		else {
 			Map<TypeVariable<?>, CascadingMetaDataBuilder> cascadingMetaData = containerElementTypesCascadingMetaData;
-				cascadingMetaData = addCascadingMetaData(
-						cascadableClass,
-						possibleValueExtractor.getContainerType(),
-						possibleValueExtractor.getExtractedTypeParameter(),
-						cascadingMetaData,
-						groupConversions
-				);
+			cascadingMetaData = addCascadingMetaData(
+					cascadableClass,
+					possibleValueExtractor.getContainerType(),
+					possibleValueExtractor.getExtractedTypeParameter(),
+					cascadingMetaData,
+					groupConversions
+			);
 			return cascadingMetaData;
 		}
 	}
@@ -434,12 +443,14 @@ public class CascadingMetaDataBuilder {
 		amendedCascadingMetadata.putAll( containerElementTypesCascadingMetaData );
 
 		if ( containerElementTypesCascadingMetaData.containsKey( cascadableTypeParameter ) ) {
-			amendedCascadingMetadata.put( cascadableTypeParameter,
-					makeCascading( containerElementTypesCascadingMetaData.get( cascadableTypeParameter ), groupConversions ) );
+			amendedCascadingMetadata.put(
+					cascadableTypeParameter,
+					makeCascading( (SimpleBeanCascadingMetaDataBuilder) containerElementTypesCascadingMetaData.get( cascadableTypeParameter ), groupConversions ) );
 		}
 		else {
-			amendedCascadingMetadata.put( cascadableTypeParameter,
-					new CascadingMetaDataBuilder( cascadableClass, null, cascadableTypeParameter, enclosingType, correspondingTypeParameter, true,
+			amendedCascadingMetadata.put(
+					cascadableTypeParameter,
+					new SimpleBeanCascadingMetaDataBuilder( cascadableClass, cascadableTypeParameter, enclosingType, correspondingTypeParameter, true,
 							Collections.emptyMap(), groupConversions ) );
 		}
 
@@ -454,15 +465,37 @@ public class CascadingMetaDataBuilder {
 
 		TypeVariable<?> cascadableTypeParameter = new ArrayElement( enclosingType );
 
-		amendedCascadingMetadata.put( cascadableTypeParameter,
-				new CascadingMetaDataBuilder( enclosingType, cascadableTypeParameter, true, Collections.emptyMap(), groupConversions ) );
+		amendedCascadingMetadata.put(
+				cascadableTypeParameter,
+				new SimpleBeanCascadingMetaDataBuilder( enclosingType, cascadableTypeParameter, true, Collections.emptyMap(), groupConversions ) );
 
 		return amendedCascadingMetadata;
 	}
 
-	private static CascadingMetaDataBuilder makeCascading(CascadingMetaDataBuilder cascadingTypeParameter, Map<Class<?>, Class<?>> groupConversions) {
-		return new CascadingMetaDataBuilder( cascadingTypeParameter.enclosingType, cascadingTypeParameter.typeParameter, true,
+	private static SimpleBeanCascadingMetaDataBuilder makeCascading(SimpleBeanCascadingMetaDataBuilder cascadingTypeParameter, Map<Class<?>, Class<?>> groupConversions) {
+		return new SimpleBeanCascadingMetaDataBuilder( cascadingTypeParameter.enclosingType, cascadingTypeParameter.typeParameter, true,
 				cascadingTypeParameter.containerElementTypesCascadingMetaData,
 				cascadingTypeParameter.groupConversions.isEmpty() ? groupConversions : cascadingTypeParameter.groupConversions );
+	}
+
+	protected ContainerCascadingMetaData toContainerCascadingMetaData(ValueExtractorManager valueExtractorManager) {
+		return new ContainerCascadingMetaData(
+				valueExtractorManager,
+				enclosingType,
+				typeParameter,
+				declaredContainerClass,
+				declaredTypeParameter,
+				containerElementTypesCascadingMetaData.entrySet().stream()
+						.map( entry -> toContainerCascadingMetaData( entry.getValue(), valueExtractorManager ) )
+						.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) ),
+				cascading,
+				GroupConversionHelper.of( groupConversions ),
+				isMarkedForCascadingOnAnnotatedObjectOrContainerElements()
+		);
+	}
+
+	protected static ContainerCascadingMetaData toContainerCascadingMetaData(CascadingMetaDataBuilder builder, ValueExtractorManager valueExtractorManager) {
+		Contracts.assertTrue( builder instanceof SimpleBeanCascadingMetaDataBuilder, "Only instances of SimpleBeanCascadingMetaDataBuilder type are supported here." );
+		return ( (SimpleBeanCascadingMetaDataBuilder) builder ).toContainerCascadingMetaData( valueExtractorManager );
 	}
 }

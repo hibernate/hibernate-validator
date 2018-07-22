@@ -12,7 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.ValidationException;
@@ -23,13 +23,14 @@ import org.hibernate.validator.cfg.defs.EmailDef;
 import org.hibernate.validator.cfg.defs.MinDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.PropertyHolderCascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraintBuilder;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.provider.PropertyHolderMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
-import org.hibernate.validator.internal.metadata.raw.propertyholder.ConstrainedPropertyHolderElementBuilder;
+import org.hibernate.validator.internal.metadata.raw.propertyholder.CascadingConstrainedPropertyHolderElementBuilder;
 import org.hibernate.validator.internal.metadata.raw.propertyholder.PropertyHolderConfiguration;
+import org.hibernate.validator.internal.metadata.raw.propertyholder.SimpleConstrainedPropertyHolderElementBuilder;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
@@ -69,7 +70,7 @@ public class DummyPropertyHolderMetaDataProvider implements PropertyHolderMetaDa
 				ConfigurationSource.API,
 				USER_MAPPING_NAME,
 				CollectionHelper.asSet(
-						new ConstrainedPropertyHolderElementBuilder(
+						new SimpleConstrainedPropertyHolderElementBuilder(
 								ConfigurationSource.API,
 								"name",
 								String.class,
@@ -83,10 +84,9 @@ public class DummyPropertyHolderMetaDataProvider implements PropertyHolderMetaDa
 												ConstraintLocation.Builder.forPropertyHolderProperty()
 										)
 								),
-								Collections.emptySet(),
-								CascadingMetaDataBuilder.nonCascading()
+								Collections.emptySet()
 						),
-						new ConstrainedPropertyHolderElementBuilder(
+						new SimpleConstrainedPropertyHolderElementBuilder(
 								ConfigurationSource.API,
 								"email",
 								String.class,
@@ -100,21 +100,48 @@ public class DummyPropertyHolderMetaDataProvider implements PropertyHolderMetaDa
 												ConstraintLocation.Builder.forPropertyHolderProperty()
 										)
 								),
-								Collections.emptySet(),
-								CascadingMetaDataBuilder.nonCascading()
+								Collections.emptySet()
 						),
-						new ConstrainedPropertyHolderElementBuilder(
+						new CascadingConstrainedPropertyHolderElementBuilder(
 								ConfigurationSource.API,
 								"address",
-								Map.class, // TODO: note this won't work need to handle cascading differently
 								Collections.emptySet(),
 								Collections.emptySet(),
-								// TODO: might require a builder over it to collect info and then when we know the property hodler class we
-								// could build the CascadingMetaDataBuilder from it.
-								CascadingMetaDataBuilder.propertyHolder(
-										USER_MAPPING_NAME,
+								PropertyHolderCascadingMetaDataBuilder.simplePropertyHolder(
+										ADDRESS_MAPPING_NAME,
 										true,
-										Collections.emptyMap(),
+										Collections.emptyMap()
+								)
+						),
+						new SimpleConstrainedPropertyHolderElementBuilder(
+								ConfigurationSource.API,
+								"secondaryAddresses",
+								List.class,
+								CollectionHelper.asSet(
+										new MetaConstraintBuilder(
+												createAnnotationDescriptor( new NotNullDef() ),
+												ConstraintLocation.Builder.forPropertyHolderProperty()
+										),
+										new MetaConstraintBuilder(
+												createAnnotationDescriptor( new SizeDef().max( 2 ) ),
+												ConstraintLocation.Builder.forPropertyHolderProperty()
+										)
+								),
+								Collections.emptySet(),
+								PropertyHolderCascadingMetaDataBuilder.propertyHolderContainer(
+										false, //TODO: need to throw exception if cascading is true here or completely remove the ability to set it.
+										List.class,
+										Collections.singletonMap(
+												List.class.getTypeParameters()[0],
+												PropertyHolderCascadingMetaDataBuilder.propertyHolderContainer(
+														ADDRESS_MAPPING_NAME,
+														true,
+														List.class,
+														List.class.getTypeParameters()[0],
+														Collections.emptyMap(),
+														Collections.emptyMap()
+												)
+										),
 										Collections.emptyMap()
 								)
 						)
@@ -128,7 +155,7 @@ public class DummyPropertyHolderMetaDataProvider implements PropertyHolderMetaDa
 				ConfigurationSource.API,
 				USER_MAPPING_NAME,
 				CollectionHelper.asSet(
-						new ConstrainedPropertyHolderElementBuilder(
+						new SimpleConstrainedPropertyHolderElementBuilder(
 								ConfigurationSource.API,
 								"street",
 								String.class,
@@ -142,10 +169,9 @@ public class DummyPropertyHolderMetaDataProvider implements PropertyHolderMetaDa
 												ConstraintLocation.Builder.forPropertyHolderProperty()
 										)
 								),
-								Collections.emptySet(),
-								CascadingMetaDataBuilder.nonCascading()
+								Collections.emptySet()
 						),
-						new ConstrainedPropertyHolderElementBuilder(
+						new SimpleConstrainedPropertyHolderElementBuilder(
 								ConfigurationSource.API,
 								"buildingNumber",
 								Long.class,
@@ -159,8 +185,7 @@ public class DummyPropertyHolderMetaDataProvider implements PropertyHolderMetaDa
 												ConstraintLocation.Builder.forPropertyHolderProperty()
 										)
 								),
-								Collections.emptySet(),
-								CascadingMetaDataBuilder.nonCascading()
+								Collections.emptySet()
 						)
 				),
 				Collections.emptyList()

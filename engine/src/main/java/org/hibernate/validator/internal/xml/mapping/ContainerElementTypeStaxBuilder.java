@@ -25,7 +25,8 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.CascadingMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.SimpleBeanCascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -151,7 +152,7 @@ class ContainerElementTypeStaxBuilder extends AbstractStaxBuilder {
 
 		boolean isCascaded = validStaxBuilder.build();
 
-		containerElementTypesCascadingMetaDataBuilder.put( typeParameter, new CascadingMetaDataBuilder( enclosingType, typeParameter, isCascaded,
+		containerElementTypesCascadingMetaDataBuilder.put( typeParameter, new SimpleBeanCascadingMetaDataBuilder( enclosingType, typeParameter, isCascaded,
 						nestedContainerElementTypeConfiguration.getTypeParametersCascadingMetaData(),
 						groupConversionBuilder.build()
 				)

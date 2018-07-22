@@ -11,7 +11,7 @@ import java.util.Set;
 import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
 
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
 /**

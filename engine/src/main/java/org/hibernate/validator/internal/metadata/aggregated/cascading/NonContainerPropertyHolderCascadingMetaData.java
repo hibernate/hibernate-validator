@@ -6,8 +6,9 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated.cascading;
 
+import java.util.Map;
+
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.util.Contracts;
 
@@ -23,16 +24,15 @@ public class NonContainerPropertyHolderCascadingMetaData extends NonContainerCas
 	 */
 	private final String mapping;
 
-	public static NonContainerPropertyHolderCascadingMetaData of(CascadingMetaDataBuilder cascadingMetaDataBuilder, Object context) {
-		Contracts.assertTrue( cascadingMetaDataBuilder.isCascading(), "Property holder cascading metadata should always be cascading." );
-		Contracts.assertNotEmpty( cascadingMetaDataBuilder.getMappingName(), "Property holder mapping cannot be an empty string." );
+	public static NonContainerPropertyHolderCascadingMetaData of(String mapping, Map<Class<?>, Class<?>> groupConversions) {
+		Contracts.assertNotEmpty( mapping, "Property holder mapping cannot be an empty string." );
 
-		return new NonContainerPropertyHolderCascadingMetaData( cascadingMetaDataBuilder );
+		return new NonContainerPropertyHolderCascadingMetaData( mapping, groupConversions );
 	}
 
-	private NonContainerPropertyHolderCascadingMetaData(CascadingMetaDataBuilder cascadingMetaDataBuilder) {
-		super( cascadingMetaDataBuilder );
-		this.mapping = cascadingMetaDataBuilder.getMappingName();
+	private NonContainerPropertyHolderCascadingMetaData(String mapping, Map<Class<?>, Class<?>> groupConversions) {
+		super( true, GroupConversionHelper.of( groupConversions ) );
+		this.mapping = mapping;
 	}
 
 	@Override

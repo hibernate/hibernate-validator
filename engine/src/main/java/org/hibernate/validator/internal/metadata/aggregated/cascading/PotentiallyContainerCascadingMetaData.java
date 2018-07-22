@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.aggregated.cascading;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.TypeVariable;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.metadata.GroupConversionDescriptor;
@@ -17,7 +18,6 @@ import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -39,15 +39,12 @@ public class PotentiallyContainerCascadingMetaData implements CascadingMetaData 
 
 	private final Set<ValueExtractorDescriptor> potentialValueExtractorDescriptors;
 
-	public static PotentiallyContainerCascadingMetaData of(CascadingMetaDataBuilder cascadingMetaDataBuilder, Set<ValueExtractorDescriptor> potentialValueExtractorDescriptors, Object context) {
-		if ( cascadingMetaDataBuilder.getMappingName() != null ) {
-			return PotentiallyContainerPropertyHolderCascadingMetaData.of( cascadingMetaDataBuilder, potentialValueExtractorDescriptors, context );
-		}
-		return new PotentiallyContainerCascadingMetaData( cascadingMetaDataBuilder, potentialValueExtractorDescriptors );
+	public static PotentiallyContainerCascadingMetaData of(Map<Class<?>, Class<?>> groupConversions, Set<ValueExtractorDescriptor> potentialValueExtractorDescriptors) {
+		return new PotentiallyContainerCascadingMetaData( groupConversions, potentialValueExtractorDescriptors );
 	}
 
-	protected PotentiallyContainerCascadingMetaData(CascadingMetaDataBuilder cascadingMetaDataBuilder, Set<ValueExtractorDescriptor> potentialValueExtractorDescriptors) {
-		this( potentialValueExtractorDescriptors, GroupConversionHelper.of( cascadingMetaDataBuilder.getGroupConversions() ) );
+	protected PotentiallyContainerCascadingMetaData(Map<Class<?>, Class<?>> groupConversions, Set<ValueExtractorDescriptor> potentialValueExtractorDescriptors) {
+		this( potentialValueExtractorDescriptors, GroupConversionHelper.of( groupConversions ) );
 	}
 
 	private PotentiallyContainerCascadingMetaData(Set<ValueExtractorDescriptor> potentialValueExtractorDescriptors, GroupConversionHelper groupConversionHelper) {

@@ -9,7 +9,7 @@ package org.hibernate.validator.internal.metadata.raw;
 import java.util.Collections;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
 /**

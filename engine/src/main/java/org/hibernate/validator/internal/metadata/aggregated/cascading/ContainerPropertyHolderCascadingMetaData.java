@@ -9,14 +9,10 @@ package org.hibernate.validator.internal.metadata.aggregated.cascading;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.List;
-import java.util.Set;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
-import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.StringHelper;
 
 /**
@@ -31,27 +27,16 @@ public class ContainerPropertyHolderCascadingMetaData extends ContainerCascading
 	 */
 	private final String mapping;
 
-	public static ContainerPropertyHolderCascadingMetaData of(ValueExtractorManager valueExtractorManager, CascadingMetaDataBuilder cascadingMetaDataBuilder,
-			Object context) {
-		Contracts.assertNotEmpty( cascadingMetaDataBuilder.getMappingName(), "Property holder mapping cannot be an empty string." );
-
-		return new ContainerPropertyHolderCascadingMetaData( valueExtractorManager, cascadingMetaDataBuilder );
-	}
-
-	private ContainerPropertyHolderCascadingMetaData(ValueExtractorManager valueExtractorManager, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
-		super( valueExtractorManager, cascadingMetaDataBuilder );
-		this.mapping = cascadingMetaDataBuilder.getMappingName();
-	}
-
-	ContainerPropertyHolderCascadingMetaData(String mapping, Type enclosingType, List<ContainerPropertyHolderCascadingMetaData> containerElementTypesCascadingMetaData,
-			GroupConversionHelper groupConversionHelper, Set<ValueExtractorDescriptor> valueExtractorCandidates) {
-		super( enclosingType, containerElementTypesCascadingMetaData, groupConversionHelper, valueExtractorCandidates );
-		this.mapping = mapping;
-	}
-
-	ContainerPropertyHolderCascadingMetaData(String mapping, Type enclosingType, TypeVariable<?> typeParameter, Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter,
-			GroupConversionHelper groupConversionHelper) {
-		super( enclosingType, typeParameter, declaredContainerClass, declaredTypeParameter, groupConversionHelper );
+	protected ContainerPropertyHolderCascadingMetaData(ValueExtractorManager valueExtractorManager, String mapping, Type enclosingType, TypeVariable<?> typeParameter,
+			Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter, List<ContainerCascadingMetaData> containerElementTypesCascadingMetaData,
+			boolean cascading, GroupConversionHelper groupConversionHelper, boolean markedForCascadingOnContainerElements) {
+		super( valueExtractorManager,
+				enclosingType,
+				typeParameter,
+				declaredContainerClass,
+				declaredTypeParameter,
+				containerElementTypesCascadingMetaData,
+				cascading, groupConversionHelper, markedForCascadingOnContainerElements );
 		this.mapping = mapping;
 	}
 

@@ -41,7 +41,8 @@ import javax.validation.groups.ConvertGroup;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.CascadingMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.SimpleBeanCascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -666,7 +667,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			Map<TypeVariable<?>, CascadingMetaDataBuilder> nestedTypeParametersCascadingMetadata = getTypeParametersCascadingMetaDataForAnnotatedType(
 					annotatedTypeArgument );
 
-			typeParametersCascadingMetadata.put( typeParameters[i], new CascadingMetaDataBuilder( annotatedParameterizedType.getType(), typeParameters[i],
+			typeParametersCascadingMetadata.put( typeParameters[i], new SimpleBeanCascadingMetaDataBuilder( annotatedParameterizedType.getType(), typeParameters[i],
 					annotatedTypeArgument.isAnnotationPresent( Valid.class ), nestedTypeParametersCascadingMetadata,
 					getGroupConversions( annotatedTypeArgument ) ) );
 			i++;

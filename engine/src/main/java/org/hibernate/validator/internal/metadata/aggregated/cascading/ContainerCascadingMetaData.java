@@ -12,7 +12,6 @@ import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.validation.metadata.GroupConversionDescriptor;
 
@@ -20,7 +19,6 @@ import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeVariables;
@@ -92,31 +90,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	 */
 	private final Set<ValueExtractorDescriptor> valueExtractorCandidates;
 
-	public static ContainerCascadingMetaData of(ValueExtractorManager valueExtractorManager, CascadingMetaDataBuilder cascadingMetaDataBuilder,
-			Object context) {
-		if ( cascadingMetaDataBuilder.getMappingName() != null ) {
-			return ContainerPropertyHolderCascadingMetaData.of( valueExtractorManager, cascadingMetaDataBuilder, context );
-		}
-		return new ContainerCascadingMetaData( valueExtractorManager, cascadingMetaDataBuilder );
-	}
-
-	protected ContainerCascadingMetaData(ValueExtractorManager valueExtractorManager, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
-		this(
-				valueExtractorManager,
-				cascadingMetaDataBuilder.getEnclosingType(),
-				cascadingMetaDataBuilder.getTypeParameter(),
-				cascadingMetaDataBuilder.getDeclaredContainerClass(),
-				cascadingMetaDataBuilder.getDeclaredTypeParameter(),
-				cascadingMetaDataBuilder.getContainerElementTypesCascadingMetaData().entrySet().stream()
-						.map( entry -> new ContainerCascadingMetaData( valueExtractorManager, entry.getValue() ) )
-						.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) ),
-				cascadingMetaDataBuilder.isCascading(),
-				GroupConversionHelper.of( cascadingMetaDataBuilder.getGroupConversions() ),
-				cascadingMetaDataBuilder.isMarkedForCascadingOnAnnotatedObjectOrContainerElements()
-		);
-	}
-
-	private ContainerCascadingMetaData(ValueExtractorManager valueExtractorManager, Type enclosingType, TypeVariable<?> typeParameter,
+	ContainerCascadingMetaData(ValueExtractorManager valueExtractorManager, Type enclosingType, TypeVariable<?> typeParameter,
 			Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter, List<ContainerCascadingMetaData> containerElementTypesCascadingMetaData,
 			boolean cascading, GroupConversionHelper groupConversionHelper, boolean markedForCascadingOnContainerElements) {
 		this.enclosingType = enclosingType;

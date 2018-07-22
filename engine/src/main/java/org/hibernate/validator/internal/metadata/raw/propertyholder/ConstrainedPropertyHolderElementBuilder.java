@@ -11,44 +11,40 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraintBuilder;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.properties.PropertyAccessor;
 import org.hibernate.validator.internal.properties.propertyholder.PropertyAccessorCreatorProvider;
 import org.hibernate.validator.internal.properties.propertyholder.PropertyHolderProperty;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
-import org.hibernate.validator.spi.propertyholder.PropertyAccessorCreator;
 
 /**
  * @author Marko Bekhta
  */
-public class ConstrainedPropertyHolderElementBuilder {
+public abstract class ConstrainedPropertyHolderElementBuilder {
 
-	private final ConfigurationSource source;
+	protected final ConfigurationSource source;
 
-	private final String name;
-	private final Class<?> type;
+	protected final String name;
 
 	@Immutable
-	private final Set<MetaConstraintBuilder<?>> constraints;
-	private final CascadingMetaDataBuilder cascadingMetaDataBuilder;
+	protected final Set<MetaConstraintBuilder<?>> constraints;
+	protected final CascadingMetaDataBuilder cascadingMetaDataBuilder;
 	@Immutable
-	private final Set<MetaConstraintBuilder<?>> typeArgumentConstraints;
+	protected final Set<MetaConstraintBuilder<?>> typeArgumentConstraints;
 
 	public ConstrainedPropertyHolderElementBuilder(ConfigurationSource source,
-			String name, Class<?> type, Set<MetaConstraintBuilder<?>> constraints,
+			String name, Set<MetaConstraintBuilder<?>> constraints,
 			Set<MetaConstraintBuilder<?>> typeArgumentConstraints,
 			CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 		this.source = source;
 		this.name = name;
-		this.type = type;
 		this.constraints = CollectionHelper.toImmutableSetOfNullable( constraints );
 		this.typeArgumentConstraints = CollectionHelper.toImmutableSetOfNullable( typeArgumentConstraints );
 		this.cascadingMetaDataBuilder = cascadingMetaDataBuilder;
@@ -62,10 +58,7 @@ public class ConstrainedPropertyHolderElementBuilder {
 	}
 
 	public ConstrainedElement build(TypeResolutionHelper typeResolutionHelper, ConstraintHelper constraintHelper, ValueExtractorManager valueExtractorManager, PropertyAccessorCreatorProvider propertyAccessorCreatorProvider, Class<?> propertyHolderType) {
-		PropertyAccessorCreator<?> propertyAccessorCreator = propertyAccessorCreatorProvider.getPropertyAccessorCreatorFor( propertyHolderType );
-		PropertyAccessor propertyAccessor = propertyAccessorCreator.create( name, type );
-
-		PropertyHolderProperty property = new PropertyHolderProperty( propertyHolderType, propertyAccessor, name, type );
+		PropertyHolderProperty property = createPropertyHolderProperty( propertyAccessorCreatorProvider, propertyHolderType );
 
 		return new ConstrainedField(
 				source,
@@ -76,7 +69,9 @@ public class ConstrainedPropertyHolderElementBuilder {
 		);
 	}
 
-	private Set<MetaConstraint<?>> toMetaConstraints(TypeResolutionHelper typeResolutionHelper, ConstraintHelper constraintHelper, ValueExtractorManager valueExtractorManager, PropertyHolderProperty property, Collection<MetaConstraintBuilder<?>> collection) {
+	protected abstract PropertyHolderProperty createPropertyHolderProperty(PropertyAccessorCreatorProvider propertyAccessorCreatorProvider, Class<?> propertyHolderType);
+
+	protected Set<MetaConstraint<?>> toMetaConstraints(TypeResolutionHelper typeResolutionHelper, ConstraintHelper constraintHelper, ValueExtractorManager valueExtractorManager, PropertyHolderProperty property, Collection<MetaConstraintBuilder<?>> collection) {
 		Set<MetaConstraint<?>> builtConstraints = new HashSet<>( constraints.size() );
 		for ( MetaConstraintBuilder<?> builder : constraints ) {
 			builtConstraints.add( builder.build( typeResolutionHelper, constraintHelper, valueExtractorManager, property ) );
@@ -90,7 +85,6 @@ public class ConstrainedPropertyHolderElementBuilder {
 		sb.append( "{" );
 		sb.append( "source=" ).append( source );
 		sb.append( ", name='" ).append( name ).append( '\'' );
-		sb.append( ", type=" ).append( type );
 		sb.append( ", constraints=" ).append( constraints );
 		sb.append( ", cascadingMetaDataBuilder=" ).append( cascadingMetaDataBuilder );
 		sb.append( ", typeArgumentConstraints=" ).append( typeArgumentConstraints );
@@ -116,9 +110,6 @@ public class ConstrainedPropertyHolderElementBuilder {
 		if ( !name.equals( that.name ) ) {
 			return false;
 		}
-		if ( !type.equals( that.type ) ) {
-			return false;
-		}
 
 		return true;
 	}
@@ -127,7 +118,6 @@ public class ConstrainedPropertyHolderElementBuilder {
 	public int hashCode() {
 		int result = source.hashCode();
 		result = 31 * result + name.hashCode();
-		result = 31 * result + type.hashCode();
 		return result;
 	}
 }
