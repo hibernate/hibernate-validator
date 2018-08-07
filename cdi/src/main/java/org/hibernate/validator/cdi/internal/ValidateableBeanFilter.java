@@ -21,9 +21,56 @@ import java.util.function.Predicate;
 import javax.enterprise.inject.spi.WithAnnotations;
 import javax.validation.Constraint;
 import javax.validation.Valid;
+import javax.validation.constraints.AssertFalse;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Negative;
+import javax.validation.constraints.NegativeOrZero;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import javax.validation.executable.ValidateOnExecution;
 
+import org.hibernate.validator.constraints.CodePointLength;
+import org.hibernate.validator.constraints.CreditCardNumber;
+import org.hibernate.validator.constraints.Currency;
+import org.hibernate.validator.constraints.EAN;
+import org.hibernate.validator.constraints.ISBN;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.LuhnCheck;
+import org.hibernate.validator.constraints.Mod10Check;
+import org.hibernate.validator.constraints.Mod11Check;
+import org.hibernate.validator.constraints.ModCheck;
+import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.Range;
+import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraints.URL;
+import org.hibernate.validator.constraints.UniqueElements;
+import org.hibernate.validator.constraints.br.CNPJ;
+import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.constraints.br.TituloEleitoral;
+import org.hibernate.validator.constraints.pl.NIP;
+import org.hibernate.validator.constraints.pl.PESEL;
+import org.hibernate.validator.constraints.pl.REGON;
+import org.hibernate.validator.constraints.time.DurationMax;
+import org.hibernate.validator.constraints.time.DurationMin;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 
 /**
@@ -42,6 +89,7 @@ import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper
  * This filter is required as {@link WithAnnotations} does not look for annotations into the class hierarchy.
  *
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
 public class ValidateableBeanFilter implements Predicate<Class<?>> {
 
@@ -49,9 +97,33 @@ public class ValidateableBeanFilter implements Predicate<Class<?>> {
 			CollectionHelper.asSet( Valid.class, Constraint.class, ValidateOnExecution.class )
 	);
 
+	// We don't need to be exhaustive here as we will look for @Constraint annotations in the annotations of an
+	// annotation. It is just an optimization.
+	private static final Set<Class<? extends Annotation>> BEAN_VALIDATION_CONSTRAINTS = Collections.unmodifiableSet(
+			CollectionHelper.asSet( AssertFalse.class, AssertTrue.class, DecimalMax.class, DecimalMin.class,
+					Digits.class, Email.class, Future.class, FutureOrPresent.class, Max.class, Min.class,
+					Negative.class, NegativeOrZero.class, NotBlank.class, NotEmpty.class, NotNull.class, Null.class,
+					Past.class, PastOrPresent.class, Pattern.class, Positive.class, PositiveOrZero.class, Size.class )
+	);
+
+	// We don't need to be exhaustive here as we will look for @Constraint annotations in the annotations of an
+	// annotation. It is just an optimization.
+	@SuppressWarnings("deprecation")
+	private static final Set<Class<? extends Annotation>> HIBERNATE_VALIDATOR_CONSTRAINTS = Collections.unmodifiableSet(
+			CollectionHelper.asSet( CodePointLength.class, CreditCardNumber.class, Currency.class, EAN.class,
+					Email.class, ISBN.class, Length.class, LuhnCheck.class, Mod10Check.class, Mod11Check.class,
+					ModCheck.class, NotBlank.class, NotEmpty.class, ParameterScriptAssert.class, Range.class,
+					SafeHtml.class, ScriptAssert.class, UniqueElements.class, URL.class, DurationMax.class,
+					DurationMin.class, CNPJ.class, CPF.class, TituloEleitoral.class, NIP.class, PESEL.class,
+					REGON.class ) );
+
 	@Override
 	public boolean test(Class<?> type) {
 		for ( Class<?> clazz : ClassHierarchyHelper.getHierarchy( type ) ) {
+			if ( isJdkClass( clazz ) ) {
+				continue;
+			}
+
 			if ( hasMatchingAnnotation( clazz ) ) {
 				return true;
 			}
@@ -76,6 +148,7 @@ public class ValidateableBeanFilter implements Predicate<Class<?>> {
 				return true;
 			}
 		}
+
 		// 3. Or on any executable
 		// 3.1 Constructors
 		for ( Constructor<?> constructor : clazz.getDeclaredConstructors() ) {
@@ -90,15 +163,7 @@ public class ValidateableBeanFilter implements Predicate<Class<?>> {
 				return true;
 			}
 		}
-		return false;
-	}
 
-	private boolean containsMatchingAnnotation(Annotation[] annotations, Set<Annotation> processedAnnotations) {
-		for ( Annotation annotation : annotations ) {
-			if ( isMatchingAnnotation( annotation, processedAnnotations ) ) {
-				return true;
-			}
-		}
 		return false;
 	}
 
@@ -121,12 +186,15 @@ public class ValidateableBeanFilter implements Predicate<Class<?>> {
 		if ( containsMatchingAnnotation( executable.getDeclaredAnnotations(), processedAnnotations ) ) {
 			return true;
 		}
+
 		// Check its return value
 		if ( hasMatchingAnnotation( executable.getAnnotatedReturnType(), processedAnnotations ) ) {
 			return true;
 		}
+
 		// Then check its parameters
-		for ( AnnotatedType annotatedParameterType : executable.getAnnotatedParameterTypes() ) {
+		AnnotatedType[] annotatedParameterTypes = executable.getAnnotatedParameterTypes();
+		for ( AnnotatedType annotatedParameterType : annotatedParameterTypes ) {
 			if ( hasMatchingAnnotation( annotatedParameterType, processedAnnotations ) ) {
 				return true;
 			}
@@ -134,28 +202,63 @@ public class ValidateableBeanFilter implements Predicate<Class<?>> {
 		// NOTE: this check looks to be redundant BUT without it, test on BeanWithCustomConstraintOnParameter
 		// will fail as executable.getAnnotatedParameterTypes() on BeanWithCustomConstraintOnParameter#doDefault()
 		// will not contain matching annotations
-		for ( Annotation[] annotations : executable.getParameterAnnotations() ) {
-			if ( containsMatchingAnnotation( annotations, processedAnnotations ) ) {
-				return true;
+		if ( annotatedParameterTypes.length > 0 ) {
+			for ( Annotation[] annotations : executable.getParameterAnnotations() ) {
+				if ( containsMatchingAnnotation( annotations, processedAnnotations ) ) {
+					return true;
+				}
 			}
 		}
+
 		return false;
 	}
 
-	private boolean isMatchingAnnotation(Annotation annotationToCheck, Set<Annotation> processedAnnotations) {
-		// Need to have this to prevent infinite loops, for example on annotations like @Target
-		if ( !processedAnnotations.add( annotationToCheck ) ) {
-			return false;
-		}
-		Class<? extends Annotation> annotationType = annotationToCheck.annotationType();
-		if ( MATCHING_ANNOTATIONS.contains( annotationType ) ) {
-			return true;
-		}
-		for ( Annotation annotation : annotationType.getDeclaredAnnotations() ) {
-			if ( isMatchingAnnotation( annotation, processedAnnotations ) ) {
+	private boolean containsMatchingAnnotation(Annotation[] annotations, Set<Annotation> processedAnnotations) {
+		// we do a full pass on the current annotations
+		for ( Annotation annotation : annotations ) {
+			Class<? extends Annotation> annotationType = annotation.annotationType();
+
+			if ( isJdkClass( annotationType ) ) {
+				continue;
+			}
+
+			if ( MATCHING_ANNOTATIONS.contains( annotationType ) ||
+					BEAN_VALIDATION_CONSTRAINTS.contains( annotationType ) ||
+					HIBERNATE_VALIDATOR_CONSTRAINTS.contains( annotationType ) ) {
 				return true;
 			}
 		}
+
+		// and only after that we check the parent annotations
+		for ( Annotation annotation : annotations ) {
+			Class<? extends Annotation> annotationType = annotation.annotationType();
+
+			if ( isJdkClass( annotationType ) ) {
+				continue;
+			}
+
+			// Need to have this to prevent infinite loops, for example on annotations like @Target
+			if ( !processedAnnotations.add( annotation ) ) {
+				continue;
+			}
+
+			boolean containsMatchingAnnotation = containsMatchingAnnotation( annotationType.getDeclaredAnnotations(),
+					processedAnnotations );
+			if ( containsMatchingAnnotation ) {
+				return true;
+			}
+		}
+
 		return false;
+	}
+
+	private boolean isJdkClass(Class<?> clazz) {
+		Package pakkage = clazz.getPackage();
+
+		if ( pakkage == null || StringHelper.isNullOrEmptyString( pakkage.getName() ) ) {
+			return false;
+		}
+
+		return ( pakkage.getName().startsWith( "java." ) || pakkage.getName().startsWith( "jdk.internal" ) );
 	}
 }
