@@ -158,6 +158,9 @@
         <!-- Used in the Karaf features file: it is a dependency of Moneta, and for the documentation -->
         <version.javax.annotation>1.2</version.javax.annotation>
 
+        <!-- JavaFX dependencies (from JDK 11) -->
+        <version.org.openjfx>11-ea+19</version.org.openjfx>
+
         <!-- Test dependencies -->
         <version.org.jboss.arquillian>1.1.11.Final</version.org.jboss.arquillian>
         <version.org.testng>6.8</version.org.testng>
@@ -1255,13 +1258,6 @@
                     </plugins>
                 </pluginManagement>
             </build>
-            <repositories>
-                <repository>
-                    <id>sonatype-oss-snapshots</id>
-                    <name>Sonatype OSS Snapshots</name>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-                </repository>
-            </repositories>
         </profile>
         <profile>
             <id>jqassistant</id>
