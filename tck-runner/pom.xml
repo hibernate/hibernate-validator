@@ -305,28 +305,9 @@
                             <jbossHome>${wildfly.target-dir}</jbossHome>
                         </configuration>
                     </plugin>
-                    <!-- Copy additional modules -->
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-resources</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${wildfly.target-dir}/modules/system/layers/base/</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>src/test/modules</directory>
-                                            <filtering>true</filtering>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
+
+                    <!-- Additional resources are copied in the profiles below -->
+
                     <!-- Update standalone.xml -->
                     <plugin>
                         <groupId>org.codehaus.gmavenplus</groupId>
@@ -360,13 +341,45 @@
             </build>
         </profile>
         <profile>
-            <id>jdk9</id>
+            <id>jdk9+</id>
             <activation>
                 <jdk>[9,)</jdk>
             </activation>
             <properties>
                 <maven-surefire-plugin.argLine.add-opens>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED</maven-surefire-plugin.argLine.add-opens>
             </properties>
+        </profile>
+        <profile>
+            <id>jdk10-</id>
+            <activation>
+                <jdk>(,11)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Copy additional modules -->
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-resources</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${wildfly.target-dir}/modules/system/layers/base/</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/test/modules/jdk8</directory>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>jdk11+</id>
@@ -381,6 +394,97 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
+            <build>
+                <plugins>
+                    <!-- Copy additional modules -->
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-resources</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${wildfly.target-dir}/modules/system/layers/base/</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/test/modules/jdk11</directory>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.openjfx</groupId>
+                                            <artifactId>javafx-base</artifactId>
+                                            <version>${version.org.openjfx}</version>
+                                            <type>jar</type>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.openjfx</groupId>
+                                            <artifactId>javafx-base</artifactId>
+                                            <version>${version.org.openjfx}</version>
+                                            <classifier>${javafx.platform}</classifier>
+                                            <type>jar</type>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <outputDirectory>${wildfly.target-dir}/modules/system/layers/base/javafx/api/main/</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- Resolution of the JavaFX platform -->
+        <profile>
+            <id>linux</id>
+            <activation>
+                <os>
+                    <name>linux</name>
+                </os>
+            </activation>
+            <properties>
+                <javafx.platform>linux</javafx.platform>
+            </properties>
+        </profile>
+        <profile>
+            <id>macosx</id>
+            <activation>
+                <os>
+                    <name>mac os x</name>
+                </os>
+            </activation>
+            <properties>
+                <javafx.platform>mac</javafx.platform>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <javafx.platform>win</javafx.platform>
+            </properties>
         </profile>
     </profiles>
 </project>
