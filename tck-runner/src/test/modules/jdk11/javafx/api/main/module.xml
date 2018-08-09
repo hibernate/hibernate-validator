@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<module xmlns="urn:jboss:module:1.3" name="javafx.api">
+    <resources>
+        <!-- we only include base as that's what we need -->
+        <resource-root path="javafx-base-${version.org.openjfx}.jar" />
+        <resource-root path="javafx-base-${version.org.openjfx}-${javafx.platform}.jar" />
+    </resources>
+</module>
