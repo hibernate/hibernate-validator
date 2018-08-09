@@ -160,6 +160,9 @@
         <wildfly-maven-plugin.version>1.2.1.Final</wildfly-maven-plugin.version>
         <wildfly-core.version>4.0.0.Final</wildfly-core.version>
 
+        <!-- JavaFX dependencies (from JDK 11) -->
+        <version.org.openjfx>11-ea+19</version.org.openjfx>
+
         <!-- Test dependencies -->
         <arquillian.version>1.1.11.Final</arquillian.version>
         <testng.version>6.8</testng.version>
@@ -1221,13 +1224,6 @@
                     </plugins>
                 </pluginManagement>
             </build>
-            <repositories>
-                <repository>
-                    <id>sonatype-oss-snapshots</id>
-                    <name>Sonatype OSS Snapshots</name>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-                </repository>
-            </repositories>
         </profile>
         <profile>
             <id>jqassistant</id>
