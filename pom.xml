@@ -117,7 +117,7 @@
         <!-- Dependencies versions -->
 
         <version.javax.validation>2.0.1.Final</version.javax.validation>
-        <version.org.hibernate.beanvalidation.tck>2.0.3.Final</version.org.hibernate.beanvalidation.tck>
+        <version.org.hibernate.beanvalidation.tck>2.0.4.Final</version.org.hibernate.beanvalidation.tck>
 
         <version.com.thoughtworks.paranamer>2.8</version.com.thoughtworks.paranamer>
         <version.org.glassfish.javax.el>3.0.1-b09</version.org.glassfish.javax.el>
