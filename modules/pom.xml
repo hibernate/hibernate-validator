@@ -37,8 +37,6 @@
         <wildfly-secondary.patched.target-dir>${project.build.directory}/wildfly-patched/wildfly-${wildfly-secondary.version}</wildfly-secondary.patched.target-dir>
         <wildfly-secondary.patch-file>${project.build.directory}/wildfly-secondary-hv-patch.zip</wildfly-secondary.patch-file>
 
-        <patch-gen-maven-plugin.argLine.add-opens></patch-gen-maven-plugin.argLine.add-opens>
-
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
 
@@ -284,7 +282,6 @@
                             <goal>generate-patch</goal>
                         </goals>
                         <configuration>
-                            <argLine>${patch-gen-maven-plugin.argLine.add-opens}</argLine>
                             <appliesToDist>${wildfly-main.original.target-dir}</appliesToDist>
                             <patchConfig>${module.xml.targetdir}/wildfly-current-patch.xml</patchConfig>
                             <updatedDist>${wildfly-main.patched.target-dir}</updatedDist>
@@ -298,7 +295,6 @@
                             <goal>generate-patch</goal>
                         </goals>
                         <configuration>
-                            <argLine>${patch-gen-maven-plugin.argLine.add-opens}</argLine>
                             <appliesToDist>${wildfly-secondary.original.target-dir}</appliesToDist>
                             <patchConfig>${module.xml.targetdir}/wildfly-secondary-patch.xml</patchConfig>
                             <updatedDist>${wildfly-secondary.patched.target-dir}</updatedDist>
@@ -309,16 +305,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>jdk9</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <properties>
-                <patch-gen-maven-plugin.argLine.add-opens>--add-opens=java.base/java.lang=ALL-UNNAMED</patch-gen-maven-plugin.argLine.add-opens>
-            </properties>
-        </profile>
-    </profiles>
 </project>

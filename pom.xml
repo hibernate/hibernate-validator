@@ -91,6 +91,7 @@
         <module>tck-runner</module>
         <module>annotation-processor</module>
         <module>performance</module>
+        <module>integration</module>
     </modules>
 
     <properties>
@@ -122,9 +123,9 @@
         <jboss.logging.processor.version>2.1.0.Final</jboss.logging.processor.version>
 
         <!-- Currently supported version of WildFly -->
-        <wildfly.version>12.0.0.Final</wildfly.version>
+        <wildfly.version>14.0.0.Beta1</wildfly.version>
         <!-- Used to create a patch file for the second version of WildFly we support -->
-        <wildfly-secondary.version>11.0.0.Final</wildfly-secondary.version>
+        <wildfly-secondary.version>13.0.0.Final</wildfly-secondary.version>
         <!-- Version used to run the TCK in incontainer mode -->
         <wildfly-tck.version>${wildfly.version}</wildfly-tck.version>
 
@@ -144,8 +145,8 @@
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
         <cdi-api.version>2.0</cdi-api.version>
-        <weld.version>3.0.3.Final</weld.version>
-        <wildfly-arquillian.version>2.1.0.Final</wildfly-arquillian.version>
+        <weld.version>3.0.4.Final</weld.version>
+        <wildfly-arquillian.version>2.1.1.Final</wildfly-arquillian.version>
         <jboss-ejb-api_3.2_spec.version>1.0.1.Final</jboss-ejb-api_3.2_spec.version>
 
         <!-- JavaMoney dependencies -->
@@ -155,7 +156,7 @@
         <javax-annotation-api.version>1.2</javax-annotation-api.version>
 
         <!-- WildFly patching infrastructure -->
-        <wildfly-patch-gen-maven-plugin.version>2.0.1.Alpha5</wildfly-patch-gen-maven-plugin.version>
+        <wildfly-patch-gen-maven-plugin.version>2.0.1.Final</wildfly-patch-gen-maven-plugin.version>
         <wildfly-patch-gen-maven-plugin.woodstox.version>5.0.3</wildfly-patch-gen-maven-plugin.woodstox.version>
         <wildfly-maven-plugin.version>1.2.1.Final</wildfly-maven-plugin.version>
         <wildfly-core.version>4.0.0.Final</wildfly-core.version>
@@ -1183,7 +1184,6 @@
                 <jdk>(,11)</jdk>
             </activation>
             <modules>
-                <module>integration</module>
                 <module>osgi</module>
             </modules>
         </profile>

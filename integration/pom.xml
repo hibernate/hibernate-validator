@@ -165,19 +165,6 @@
                             <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-current.xml</summaryFile>
                         </configuration>
                     </execution>
-                    <!-- WildFly secondary version -->
-                    <execution>
-                        <id>wildfly-secondary-integration-test</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                        </goals>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <arquillian.launch>wildfly-secondary</arquillian.launch>
-                            </systemPropertyVariables>
-                            <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-secondary.xml</summaryFile>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>verify</id>
                         <goals>
@@ -186,7 +173,6 @@
                         <configuration>
                             <summaryFiles>
                                 <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-current.xml</summaryFile>
-                                <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-secondary.xml</summaryFile>
                             </summaryFiles>
                         </configuration>
                     </execution>
@@ -196,7 +182,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack-wildfly</id>
+                        <id>unpack-wildfly-current</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>unpack</goal>
@@ -212,20 +198,11 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
-                                <!-- WildFly secondary version -->
-                                <artifactItem>
-                                    <groupId>org.wildfly</groupId>
-                                    <artifactId>wildfly-dist</artifactId>
-                                    <version>${wildfly-secondary.version}</version>
-                                    <type>tar.gz</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-patch</id>
+                        <id>copy-patch-current</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>copy</goal>
@@ -241,20 +218,11 @@
                                     <type>zip</type>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
-                                <!-- WildFly secondary version -->
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>hibernate-validator-modules</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>wildfly-${wildfly-secondary.version}-patch</classifier>
-                                    <type>zip</type>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-javamoney</id>
+                        <id>copy-javamoney-current</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>copy</goal>
@@ -274,19 +242,6 @@
                                     <version>${moneta.version}</version>
                                     <outputDirectory>${wildfly.modules-dir}/org/javamoney/moneta/main/</outputDirectory>
                                 </artifactItem>
-                                <!-- WildFly secondary version -->
-                                <artifactItem>
-                                    <groupId>javax.money</groupId>
-                                    <artifactId>money-api</artifactId>
-                                    <version>${javax-money.version}</version>
-                                    <outputDirectory>${wildfly-secondary.modules-dir}/javax/money/api/main/</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.javamoney</groupId>
-                                    <artifactId>moneta</artifactId>
-                                    <version>${moneta.version}</version>
-                                    <outputDirectory>${wildfly-secondary.modules-dir}/org/javamoney/moneta/main/</outputDirectory>
-                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -304,23 +259,6 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${wildfly.modules-dir}</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/test/modules</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <!-- WildFly secondary version -->
-                    <execution>
-                        <id>copy-wildfly-secondary-resources</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${wildfly-secondary.modules-dir}</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/test/modules</directory>
@@ -351,22 +289,6 @@
                             </commands>
                         </configuration>
                     </execution>
-                    <!-- WildFly secondary version -->
-                    <execution>
-                        <id>apply-wildfly-secondary-patch-file</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>execute-commands</goal>
-                        </goals>
-                        <configuration>
-                            <offline>true</offline>
-                            <jbossHome>${project.build.directory}/wildfly-${wildfly-secondary.version}/</jbossHome>
-                            <fail-on-error>false</fail-on-error>
-                            <commands>
-                                <command>patch apply ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly-secondary.version}-patch.zip</command>
-                            </commands>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
         </plugins>
@@ -381,6 +303,161 @@
                 <!-- required by Arquillian to connect to the JMX interface of WildFly -->
                 <maven-surefire-plugin.argLine.add-opens>--add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED</maven-surefire-plugin.argLine.add-opens>
             </properties>
+        </profile>
+        <!-- WildFly 13 does not support JDK 11 so running the tests with WildFly 13 for JDK 10 - -->
+        <profile>
+            <id>jdk10-</id>
+            <activation>
+                <jdk>(,11)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <!-- WildFly secondary version -->
+                            <execution>
+                                <id>wildfly-secondary-integration-test</id>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
+                                <configuration>
+                                    <systemPropertyVariables>
+                                        <arquillian.launch>wildfly-secondary</arquillian.launch>
+                                    </systemPropertyVariables>
+                                    <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-secondary.xml</summaryFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>verify</id>
+                                <goals>
+                                    <goal>verify</goal>
+                                </goals>
+                                <configuration>
+                                    <summaryFiles>
+                                        <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-current.xml</summaryFile>
+                                        <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-secondary.xml</summaryFile>
+                                    </summaryFiles>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-wildfly-secondary</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <!-- WildFly secondary version -->
+                                        <artifactItem>
+                                            <groupId>org.wildfly</groupId>
+                                            <artifactId>wildfly-dist</artifactId>
+                                            <version>${wildfly-secondary.version}</version>
+                                            <type>tar.gz</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-patch-secondary</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <!-- WildFly secondary version -->
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>hibernate-validator-modules</artifactId>
+                                            <version>${project.version}</version>
+                                            <classifier>wildfly-${wildfly-secondary.version}-patch</classifier>
+                                            <type>zip</type>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-javamoney-secondary</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <!-- WildFly secondary version -->
+                                        <artifactItem>
+                                            <groupId>javax.money</groupId>
+                                            <artifactId>money-api</artifactId>
+                                            <version>${version.javax.money}</version>
+                                            <outputDirectory>${wildfly-secondary.modules-dir}/javax/money/api/main/</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.javamoney</groupId>
+                                            <artifactId>moneta</artifactId>
+                                            <version>${version.org.javamoney.moneta}</version>
+                                            <outputDirectory>${wildfly-secondary.modules-dir}/org/javamoney/moneta/main/</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <!-- WildFly secondary version -->
+                            <execution>
+                                <id>copy-wildfly-secondary-resources</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${wildfly-secondary.modules-dir}</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/test/modules</directory>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.wildfly.plugins</groupId>
+                        <artifactId>wildfly-maven-plugin</artifactId>
+                        <executions>
+                            <!-- WildFly secondary version -->
+                            <execution>
+                                <id>apply-wildfly-secondary-patch-file</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>execute-commands</goal>
+                                </goals>
+                                <configuration>
+                                    <offline>true</offline>
+                                    <jbossHome>${project.build.directory}/wildfly-${wildfly-secondary.version}/</jbossHome>
+                                    <fail-on-error>false</fail-on-error>
+                                    <commands>
+                                        <command>patch apply ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly-secondary.version}-patch.zip</command>
+                                    </commands>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>
