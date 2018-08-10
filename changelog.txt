@@ -1,6 +1,23 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.12.Final (10-08-2018)
+-------------------------
+
+** Bug
+    * HV-1645 - extensions                     - Revert HV-1609 due to increased CDI startup caused by ValidateableBeanFilter
+    * HV-1644 - build                          - Using Hibernate Validator with Java 11 brings JavaFX on the classpath
+
+** Improvement
+    * HV-1643 - translations                   - Fix Russian translation for @Null constraint
+
+** Task
+    * HV-1649 - tck-runner                     - Upgrade to Bean Validation TCK 2.0.4.Final
+    * HV-1648 - build, integration             - Reenable WildFly integration tests for JDK 11
+    * HV-1647 - tck-runner                     - Allow running TCK tests in container mode with JDK 11
+    * HV-1646 - build, integration, tck-runner - Upgrade WildFly to 14.0.0.Beta1
+    * HV-1627 - build                          - Upgrade our JPA test dependency to 2.2
+
 6.0.11.Final (18-07-2018)
 -------------------------
 
