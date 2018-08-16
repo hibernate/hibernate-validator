@@ -15,6 +15,7 @@ import org.hibernate.validator.internal.metadata.aggregated.cascading.CascadingM
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraintBuilder;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
@@ -73,8 +74,9 @@ public abstract class ConstrainedPropertyHolderElementBuilder {
 
 	protected Set<MetaConstraint<?>> toMetaConstraints(TypeResolutionHelper typeResolutionHelper, ConstraintHelper constraintHelper, ValueExtractorManager valueExtractorManager, PropertyHolderProperty property, Collection<MetaConstraintBuilder<?>> collection) {
 		Set<MetaConstraint<?>> builtConstraints = new HashSet<>( constraints.size() );
+		ConstraintLocation constraintLocation = ConstraintLocation.forField( property );
 		for ( MetaConstraintBuilder<?> builder : constraints ) {
-			builtConstraints.add( builder.build( typeResolutionHelper, constraintHelper, valueExtractorManager, property ) );
+			builtConstraints.add( builder.build( typeResolutionHelper, constraintHelper, valueExtractorManager, constraintLocation ) );
 		}
 		return builtConstraints;
 	}

@@ -17,7 +17,7 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyHolderBeanMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.provider.PropertyHolderMetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.proeprtyholder.PropertyHolderMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.propertyholder.PropertyHolderConfiguration;
 import org.hibernate.validator.internal.properties.propertyholder.PropertyAccessorCreatorProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;

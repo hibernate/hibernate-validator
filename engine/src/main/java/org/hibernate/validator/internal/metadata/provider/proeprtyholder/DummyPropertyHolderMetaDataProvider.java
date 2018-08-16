@@ -25,8 +25,6 @@ import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.internal.metadata.aggregated.cascading.PropertyHolderCascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraintBuilder;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.provider.PropertyHolderMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.propertyholder.CascadingConstrainedPropertyHolderElementBuilder;
 import org.hibernate.validator.internal.metadata.raw.propertyholder.PropertyHolderConfiguration;
@@ -76,12 +74,10 @@ public class DummyPropertyHolderMetaDataProvider implements PropertyHolderMetaDa
 								String.class,
 								CollectionHelper.asSet(
 										new MetaConstraintBuilder(
-												createAnnotationDescriptor( new NotNullDef() ),
-												ConstraintLocation.Builder.forPropertyHolderProperty()
+												createAnnotationDescriptor( new NotNullDef() )
 										),
 										new MetaConstraintBuilder(
-												createAnnotationDescriptor( new SizeDef().min( 5 ).max( 10 ) ),
-												ConstraintLocation.Builder.forPropertyHolderProperty()
+												createAnnotationDescriptor( new SizeDef().min( 5 ).max( 10 ) )
 										)
 								),
 								Collections.emptySet()
@@ -92,12 +88,10 @@ public class DummyPropertyHolderMetaDataProvider implements PropertyHolderMetaDa
 								String.class,
 								CollectionHelper.asSet(
 										new MetaConstraintBuilder(
-												createAnnotationDescriptor( new NotNullDef() ),
-												ConstraintLocation.Builder.forPropertyHolderProperty()
+												createAnnotationDescriptor( new NotNullDef() )
 										),
 										new MetaConstraintBuilder(
-												createAnnotationDescriptor( new EmailDef() ),
-												ConstraintLocation.Builder.forPropertyHolderProperty()
+												createAnnotationDescriptor( new EmailDef() )
 										)
 								),
 								Collections.emptySet()
@@ -119,17 +113,15 @@ public class DummyPropertyHolderMetaDataProvider implements PropertyHolderMetaDa
 								List.class,
 								CollectionHelper.asSet(
 										new MetaConstraintBuilder(
-												createAnnotationDescriptor( new NotNullDef() ),
-												ConstraintLocation.Builder.forPropertyHolderProperty()
+												createAnnotationDescriptor( new NotNullDef() )
 										),
 										new MetaConstraintBuilder(
-												createAnnotationDescriptor( new SizeDef().max( 2 ) ),
-												ConstraintLocation.Builder.forPropertyHolderProperty()
+												createAnnotationDescriptor( new SizeDef().max( 2 ) )
 										)
 								),
 								Collections.emptySet(),
 								PropertyHolderCascadingMetaDataBuilder.propertyHolderContainer(
-										false, //TODO: need to throw exception if cascading is true here or completely remove the ability to set it.
+										false, //TODO: need to throw exception if cascading is true here or maybe completely remove the ability to set it ?
 										List.class,
 										Collections.singletonMap(
 												List.class.getTypeParameters()[0],
@@ -161,12 +153,10 @@ public class DummyPropertyHolderMetaDataProvider implements PropertyHolderMetaDa
 								String.class,
 								CollectionHelper.asSet(
 										new MetaConstraintBuilder(
-												createAnnotationDescriptor( new NotNullDef() ),
-												ConstraintLocation.Builder.forPropertyHolderProperty()
+												createAnnotationDescriptor( new NotNullDef() )
 										),
 										new MetaConstraintBuilder(
-												createAnnotationDescriptor( new SizeDef().min( 5 ).max( 10 ) ),
-												ConstraintLocation.Builder.forPropertyHolderProperty()
+												createAnnotationDescriptor( new SizeDef().min( 5 ).max( 10 ) )
 										)
 								),
 								Collections.emptySet()
@@ -177,12 +167,10 @@ public class DummyPropertyHolderMetaDataProvider implements PropertyHolderMetaDa
 								Long.class,
 								CollectionHelper.asSet(
 										new MetaConstraintBuilder(
-												createAnnotationDescriptor( new NotNullDef() ),
-												ConstraintLocation.Builder.forPropertyHolderProperty()
+												createAnnotationDescriptor( new NotNullDef() )
 										),
 										new MetaConstraintBuilder(
-												createAnnotationDescriptor( new MinDef().value( 0 ) ),
-												ConstraintLocation.Builder.forPropertyHolderProperty()
+												createAnnotationDescriptor( new MinDef().value( 0 ) )
 										)
 								),
 								Collections.emptySet()

@@ -36,6 +36,7 @@ import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.cfg.propertyholder.PropertyHolderConstraintMappingImpl;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
@@ -46,9 +47,9 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
-import org.hibernate.validator.internal.metadata.provider.PropertyHolderMetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.proeprtyholder.ProgrammaticPropertyHolderMetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.proeprtyholder.PropertyHolderMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
-import org.hibernate.validator.internal.metadata.provider.proeprtyholder.DummyPropertyHolderMetaDataProvider;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.properties.propertyholder.PropertyAccessorCreatorProvider;
@@ -100,6 +101,13 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 */
 	@Immutable
 	private final Set<DefaultConstraintMapping> constraintMappings;
+
+	/**
+	 * Programmatic constraints for property holders passed via the Hibernate Validator specific API.
+	 * Empty if there are no programmatic constraints.
+	 */
+	@Immutable
+	private final Set<PropertyHolderConstraintMappingImpl> propertyHolderConstraintMappings;
 
 	/**
 	 * Helper for dealing with built-in validators and determining custom constraint annotations.
@@ -182,6 +190,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				)
 		);
 
+		this.propertyHolderConstraintMappings = Collections.unmodifiableSet(
+				getPropertyHolderConstraintMappings( configurationState )
+		);
+
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
 
 		this.methodValidationConfiguration = new MethodValidationConfiguration.Builder()
@@ -249,6 +261,17 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		for ( ConstraintMappingContributor contributor : contributors ) {
 			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( javaBeanHelper, constraintMappings );
 			contributor.createConstraintMappings( builder );
+		}
+
+		return constraintMappings;
+	}
+
+	private static Set<PropertyHolderConstraintMappingImpl> getPropertyHolderConstraintMappings(ConfigurationState configurationState) {
+		Set<PropertyHolderConstraintMappingImpl> constraintMappings = newHashSet();
+
+		if ( configurationState instanceof ConfigurationImpl ) {
+			ConfigurationImpl hibernateConfiguration = (ConfigurationImpl) configurationState;
+			constraintMappings.addAll( hibernateConfiguration.getPropertyHolderConstraintMappings() );
 		}
 
 		return constraintMappings;
@@ -406,7 +429,14 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	private List<PropertyHolderMetaDataProvider> buildPropertyHolderMetaDataProvider() {
-		return Collections.singletonList( new DummyPropertyHolderMetaDataProvider() );
+		if ( !propertyHolderConstraintMappings.isEmpty() ) {
+			return Collections.singletonList( new ProgrammaticPropertyHolderMetaDataProvider(
+					constraintHelper, typeResolutionHelper, valueExtractorManager, propertyHolderConstraintMappings
+			) );
+		}
+		else {
+			return Collections.emptyList();
+		}
 	}
 
 	private static boolean checkPropertiesForBoolean(Map<String, String> properties, String propertyKey, boolean programmaticValue) {

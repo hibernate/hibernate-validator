@@ -37,7 +37,9 @@ import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.propertyholder.PropertyHolderConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.cfg.propertyholder.PropertyHolderConstraintMappingImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
@@ -99,6 +101,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	// HV-specific options
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
+	private final Set<PropertyHolderConstraintMappingImpl> propertyHolderConstraintMappings = newHashSet();
 	private boolean failFast;
 	private ClassLoader externalClassLoader;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
@@ -328,10 +331,23 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
+	public PropertyHolderConstraintMapping createPropertyHolderConstraintMapping() {
+		return new PropertyHolderConstraintMappingImpl();
+	}
+
+	@Override
 	public final HibernateValidatorConfiguration addMapping(ConstraintMapping mapping) {
 		Contracts.assertNotNull( mapping, MESSAGES.parameterMustNotBeNull( "mapping" ) );
 
 		this.programmaticMappings.add( (DefaultConstraintMapping) mapping );
+		return this;
+	}
+
+	@Override
+	public final HibernateValidatorConfiguration addPropertyHolderMapping(PropertyHolderConstraintMapping mapping) {
+		Contracts.assertNotNull( mapping, MESSAGES.parameterMustNotBeNull( "mapping" ) );
+
+		this.propertyHolderConstraintMappings.add( (PropertyHolderConstraintMappingImpl) mapping );
 		return this;
 	}
 
@@ -533,6 +549,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {
 		return programmaticMappings;
+	}
+
+	public final Set<PropertyHolderConstraintMappingImpl> getPropertyHolderConstraintMappings() {
+		return propertyHolderConstraintMappings;
 	}
 
 	private boolean isSpecificProvider() {

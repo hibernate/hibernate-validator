@@ -337,7 +337,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				validatorScopedContext,
 				TraversableResolvers.wrapWithCachingForSingleValidation( traversableResolver, validatorScopedContext.isTraversableResolverResultCacheEnabled() ),
 				constraintValidatorInitializationContext
-
 		);
 	}
 

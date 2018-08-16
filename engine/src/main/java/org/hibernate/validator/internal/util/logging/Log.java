@@ -887,4 +887,13 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 252, value = "Unexpected property type in a given property holder. Expected that '%3$s' will be of %1$s type, but instead it is %2$s.")
 	ValidationException getUnexpextedPropertyTypeInPropertyHolderException(Type expecetedType, @FormatWith(ClassObjectFormatter.class) Class<?> realType, String propertyName);
+
+	@Message(id = 253, value = "%s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getPropertyHolderMappingHasAlreadyBeenConfiguredViaProgrammaticApiException(String mappingName);
+
+	@Message(id = 254, value = "Property \"%2$s\" in mapping %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getPropertyHolderMappingPropertyHasAlreadyBeenConfiguredViaProgrammaticApiException(String mappingName, String propertyName);
+
+	@Message(id = 255, value = "Object of type \"%1$s\" is not a property holder, and cannot be validated as one.")
+	ValidationException getCannotConvertToPropertyHolderException(@FormatWith(ClassObjectFormatter.class) Class<?> clazz);
 }
