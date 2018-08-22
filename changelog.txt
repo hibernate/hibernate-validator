@@ -1,6 +1,13 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.13.Final (22-08-2018)
+-------------------------
+
+** Bug
+    * HV-1652 - engine     - Fix a few theoretical null pointer dereference issues
+    * HV-1650 - validators - French translations are badly encoded
+
 6.0.12.Final (10-08-2018)
 -------------------------
 
