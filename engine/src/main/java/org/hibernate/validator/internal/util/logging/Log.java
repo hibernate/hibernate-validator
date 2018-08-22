@@ -872,4 +872,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 247, value = "Unable to instantiate getter property selection strategy class %s.")
 	ValidationException getUnableToInstantiateGetterPropertySelectionStrategyClassException(String getterPropertySelectionStrategyClassName, @Cause Exception e);
+
+	@Message(id = 248, value = "Unable to get an XML schema named %s.")
+	ValidationException unableToGetXmlSchema(String schemaResourceName);
 }

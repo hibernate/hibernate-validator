@@ -117,6 +117,10 @@ public class MappingXmlParser {
 				// do any validation of the input.
 				String schemaResourceName = getSchemaResourceName( schemaVersion );
 				Schema schema = xmlParserHelper.getSchema( schemaResourceName );
+				if ( schema == null ) {
+					throw LOG.unableToGetXmlSchema( schemaResourceName );
+				}
+
 				Validator validator = schema.newValidator();
 				validator.validate( new StreamSource( new CloseIgnoringInputStream( in ) ) );
 

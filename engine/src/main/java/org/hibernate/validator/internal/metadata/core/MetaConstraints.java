@@ -159,14 +159,14 @@ public class MetaConstraints {
 	 */
 	private static Class<?> getWrappedValueType(TypeResolutionHelper typeResolutionHelper, Type declaredType, ValueExtractorDescriptor valueExtractorDescriptor) {
 		ResolvedType resolvedType = typeResolutionHelper.getTypeResolver().resolve( declaredType );
+
 		List<ResolvedType> resolvedTypeParameters = resolvedType.typeParametersFor( valueExtractorDescriptor.getContainerType() );
 
-		if ( resolvedTypeParameters.isEmpty() ) {
+		if ( resolvedTypeParameters == null || resolvedTypeParameters.isEmpty() ) {
 			throw LOG.getNoValueExtractorFoundForUnwrapException( declaredType );
 		}
-		else {
-			return resolvedTypeParameters.get( TypeVariables.getTypeParameterIndex( valueExtractorDescriptor.getExtractedTypeParameter() ) ).getErasedType();
-		}
+
+		return resolvedTypeParameters.get( TypeVariables.getTypeParameterIndex( valueExtractorDescriptor.getExtractedTypeParameter() ) ).getErasedType();
 	}
 
 	private static TypeVariable<?> getContainerClassTypeParameter(Class<?> declaredType, ValueExtractorDescriptor selectedValueExtractorDescriptor) {

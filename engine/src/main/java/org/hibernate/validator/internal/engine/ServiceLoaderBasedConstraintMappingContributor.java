@@ -60,7 +60,7 @@ public class ServiceLoaderBasedConstraintMappingContributor implements Constrain
 				ConstraintValidator.class ) );
 
 		for ( ConstraintValidator constraintValidator : discoveredConstraintValidators ) {
-			Class<?> constraintValidatorClass = constraintValidator.getClass();
+			Class<? extends ConstraintValidator> constraintValidatorClass = constraintValidator.getClass();
 			Class<?> annotationType = determineAnnotationType( constraintValidatorClass );
 
 			List<Class<?>> validators = customValidators.get( annotationType );
@@ -90,7 +90,8 @@ public class ServiceLoaderBasedConstraintMappingContributor implements Constrain
 		}
 	}
 
-	private Class<?> determineAnnotationType(Class<?> constraintValidatorClass) {
+	@SuppressWarnings("rawtypes")
+	private Class<?> determineAnnotationType(Class<? extends ConstraintValidator> constraintValidatorClass) {
 		ResolvedType resolvedType = typeResolutionHelper.getTypeResolver()
 				.resolve( constraintValidatorClass );
 
