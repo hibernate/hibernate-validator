@@ -136,7 +136,13 @@ public class ValidationXmlParser {
 			throw LOG.getUnsupportedSchemaVersionException( VALIDATION_XML_FILE, schemaVersion );
 		}
 
-		return xmlParserHelper.getSchema( schemaResource );
+		Schema schema = xmlParserHelper.getSchema( schemaResource );
+
+		if ( schema == null ) {
+			throw LOG.unableToGetXmlSchema( schemaResource );
+		}
+
+		return schema;
 	}
 
 	private void closeStream(InputStream inputStream) {

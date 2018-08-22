@@ -884,7 +884,7 @@ public class ConstraintHelper {
 				throw LOG.getConstraintWithoutMandatoryParameterException( PAYLOAD, annotationType.getName() );
 			}
 			Class<?>[] defaultPayload = (Class<?>[]) method.getDefaultValue();
-			if ( defaultPayload.length != 0 ) {
+			if ( defaultPayload == null || defaultPayload.length != 0 ) {
 				throw LOG.getWrongDefaultValueForPayloadParameterException( annotationType.getName() );
 			}
 		}
@@ -900,7 +900,7 @@ public class ConstraintHelper {
 				throw LOG.getConstraintWithoutMandatoryParameterException( GROUPS, annotationType.getName() );
 			}
 			Class<?>[] defaultGroups = (Class<?>[]) method.getDefaultValue();
-			if ( defaultGroups.length != 0 ) {
+			if ( defaultGroups == null || defaultGroups.length != 0 ) {
 				throw LOG.getWrongDefaultValueForGroupsParameterException( annotationType.getName() );
 			}
 		}

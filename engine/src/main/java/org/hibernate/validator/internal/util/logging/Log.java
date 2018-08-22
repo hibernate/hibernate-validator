@@ -855,4 +855,7 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidator<?, ?>> constraintValidatorImplementationType,
 			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> registeredConstraintAnnotationType,
 			@FormatWith(TypeFormatter.class) Type declaredConstraintAnnotationType);
+
+	@Message(id = 248, value = "Unable to get an XML schema named %s.")
+	ValidationException unableToGetXmlSchema(String schemaResourceName);
 }
