@@ -33,7 +33,10 @@ import org.hibernate.validator.constraints.ParameterScriptAssert.List;
  * ("Scripting for the Java<sup>TM</sup> Platform") compatible engine can be
  * found on the classpath. To refer to a parameter within the scripting
  * expression, use its name as obtained by the active
- * {@link javax.validation.ParameterNameProvider}. 
+ * {@link javax.validation.ParameterNameProvider}. The default provider will
+ * return the actual parameter names, if the -parameters compiler option
+ * has been enabled, and {@code arg0}, {@code arg1} etc. otherwise
+ * will be used as parameter names.
  * </p>
  * <p>
  * The following listing shows an example using the JavaScript engine which
