@@ -687,18 +687,21 @@ public class ConstraintHelper {
 
 	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
 			Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType1, Class<? extends ConstraintValidator<A, ?>> validatorType2) {
-		List<ConstraintValidatorDescriptor<?>> descriptors = Stream.of( validatorType1, validatorType2 )
-				.map( vt -> ConstraintValidatorDescriptor.forClass( vt, constraintType ) )
-				.collect( Collectors.toList() );
+		List<ConstraintValidatorDescriptor<?>> descriptors = new ArrayList<>( 2 );
+
+		descriptors.add( ConstraintValidatorDescriptor.forClass( validatorType1, constraintType ) );
+		descriptors.add( ConstraintValidatorDescriptor.forClass( validatorType2, constraintType ) );
 
 		validators.put( constraintType, CollectionHelper.toImmutableList( descriptors ) );
 	}
 
 	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
-			Class<A> constraintType, List<Class<? extends ConstraintValidator<A, ?>>> validatorDescriptors) {
-		List<ConstraintValidatorDescriptor<?>> descriptors = validatorDescriptors.stream()
-				.map( vt -> ConstraintValidatorDescriptor.forClass( vt, constraintType ) )
-				.collect( Collectors.toList() );
+			Class<A> constraintType, List<Class<? extends ConstraintValidator<A, ?>>> validatorTypes) {
+		List<ConstraintValidatorDescriptor<?>> descriptors = new ArrayList<>( validatorTypes.size() );
+
+		for ( Class<? extends ConstraintValidator<A, ?>> validatorType : validatorTypes ) {
+			descriptors.add( ConstraintValidatorDescriptor.forClass( validatorType, constraintType ) );
+		}
 
 		validators.put( constraintType, CollectionHelper.toImmutableList( descriptors ) );
 	}
