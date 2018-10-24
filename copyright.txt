@@ -60,6 +60,7 @@ Shelly McGowan
 Steve Ebersole
 Strong Liu
 Tadhg Pearson
+Takashi Aoe
 Tomaz Cerar
 Tommy Johansen
 Victor Rezende dos Santos
