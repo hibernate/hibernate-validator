@@ -18,6 +18,7 @@ import javax.validation.constraints.PastOrPresent;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.propertyholder.PropertyHolderConstraintMapping;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
@@ -64,8 +65,8 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	String ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS = "hibernate.validator.allow_parallel_method_parameter_constraint";
 
 	/**
-	 * @deprecated planned for removal. Use hibernate.validator.constraint_mapping_contributors instead.
 	 * @since 5.2
+	 * @deprecated planned for removal. Use hibernate.validator.constraint_mapping_contributors instead.
 	 */
 	@Deprecated
 	String CONSTRAINT_MAPPING_CONTRIBUTOR = "hibernate.validator.constraint_mapping_contributor";
@@ -334,4 +335,10 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	@Incubating
 	HibernateValidatorConfiguration getterPropertySelectionStrategy(GetterPropertySelectionStrategy getterPropertySelectionStrategy);
+
+	@Incubating
+	HibernateValidatorConfiguration addPropertyHolderMapping(PropertyHolderConstraintMapping mapping);
+
+	@Incubating
+	PropertyHolderConstraintMapping createPropertyHolderConstraintMapping();
 }

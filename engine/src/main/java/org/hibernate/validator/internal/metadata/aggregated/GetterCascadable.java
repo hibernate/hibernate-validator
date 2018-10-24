@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.metadata.aggregated;
 
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.properties.Getter;

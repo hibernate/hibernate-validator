@@ -18,7 +18,8 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.manager.BeanMetaDataProvider;
+import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -59,9 +60,7 @@ public class ConfigurationFilePropertiesTest {
 				ValidatorFactory factory = hibernateConfig.buildValidatorFactory();
 				Validator validator = factory.getValidator();
 
-				ValidatorImpl hibernateValidatorImpl = (ValidatorImpl) validator;
-				BeanMetaDataManager bmdm = findPropertyOfType( hibernateValidatorImpl, BeanMetaDataManager.class );
-				MethodValidationConfiguration methodConfig = findPropertyOfType( bmdm, MethodValidationConfiguration.class );
+				MethodValidationConfiguration methodConfig = getMethodValidationConfiguration( (ValidatorImpl) validator );
 
 				Assert.assertTrue( methodConfig.isAllowMultipleCascadedValidationOnReturnValues() );
 			}
@@ -88,9 +87,7 @@ public class ConfigurationFilePropertiesTest {
 				ValidatorFactory factory = hibernateConfig.buildValidatorFactory();
 				Validator validator = factory.getValidator();
 
-				ValidatorImpl hibernateValidatorImpl = (ValidatorImpl) validator;
-				BeanMetaDataManager bmdm = findPropertyOfType( hibernateValidatorImpl, BeanMetaDataManager.class );
-				MethodValidationConfiguration methodConfig = findPropertyOfType( bmdm, MethodValidationConfiguration.class );
+				MethodValidationConfiguration methodConfig = getMethodValidationConfiguration( (ValidatorImpl) validator );
 
 				Assert.assertTrue( methodConfig.isAllowOverridingMethodAlterParameterConstraint() );
 			}
@@ -117,9 +114,7 @@ public class ConfigurationFilePropertiesTest {
 				ValidatorFactory factory = hibernateConfig.buildValidatorFactory();
 				Validator validator = factory.getValidator();
 
-				ValidatorImpl hibernateValidatorImpl = (ValidatorImpl) validator;
-				BeanMetaDataManager bmdm = findPropertyOfType( hibernateValidatorImpl, BeanMetaDataManager.class );
-				MethodValidationConfiguration methodConfig = findPropertyOfType( bmdm, MethodValidationConfiguration.class );
+				MethodValidationConfiguration methodConfig = getMethodValidationConfiguration( (ValidatorImpl) validator );
 
 				Assert.assertTrue( methodConfig.isAllowParallelMethodsDefineParameterConstraints() );
 			}
@@ -156,6 +151,12 @@ public class ConfigurationFilePropertiesTest {
 			}
 		}
 		return null;
+	}
+
+	private MethodValidationConfiguration getMethodValidationConfiguration(ValidatorImpl hibernateValidatorImpl) {
+		ConstraintMetaDataManager cmdm = findPropertyOfType( hibernateValidatorImpl, ConstraintMetaDataManager.class );
+		BeanMetaDataProvider bmdp = findPropertyOfType( cmdm, BeanMetaDataProvider.class );
+		return findPropertyOfType( bmdp, MethodValidationConfiguration.class );
 	}
 
 	private void runWithCustomValidationXml(String validationXmlName, Runnable runnable) {

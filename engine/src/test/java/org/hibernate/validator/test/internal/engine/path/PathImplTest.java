@@ -32,12 +32,12 @@ import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
+import org.hibernate.validator.internal.properties.propertyholder.PropertyAccessorCreatorProvider;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -193,19 +193,21 @@ public class PathImplTest {
 	public void testCreationOfExecutablePath() throws Exception {
 		Method executable = Container.class.getMethod( "addItem", Key.class, Item.class );
 
-		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
+		ConstraintMetaDataManager constraintMetaDataManager = new ConstraintMetaDataManager(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptySet() ),
+				new PropertyAccessorCreatorProvider(),
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
 				new ValidationOrderGenerator(),
-				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build()
+				new MethodValidationConfiguration.Builder().build(),
+				Collections.emptyList(),
+				Collections.emptyList()
 		);
 
-		ExecutableMetaData executableMetaData = beanMetaDataManager.getBeanMetaData( Container.class )
+		ExecutableMetaData executableMetaData = constraintMetaDataManager.getBeanMetaData( Container.class )
 				.getMetaDataFor( executable ).get();
 
 		PathImpl methodParameterPath = PathImpl.createPathForExecutable( executableMetaData );

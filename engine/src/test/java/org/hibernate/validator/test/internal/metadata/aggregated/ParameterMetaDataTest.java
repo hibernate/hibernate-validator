@@ -27,14 +27,14 @@ import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
+import org.hibernate.validator.internal.properties.propertyholder.PropertyAccessorCreatorProvider;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -42,6 +42,7 @@ import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -57,19 +58,21 @@ public class ParameterMetaDataTest {
 
 	@BeforeMethod
 	public void setupBeanMetaData() {
-		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
+		ConstraintMetaDataManager constraintMetaDataManager = new ConstraintMetaDataManager(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptySet() ),
+				new PropertyAccessorCreatorProvider(),
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
 				new ValidationOrderGenerator(),
-				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build()
+				new MethodValidationConfiguration.Builder().build(),
+				Collections.emptyList(),
+				Collections.emptyList()
 		);
 
-		beanMetaData = beanMetaDataManager.getBeanMetaData( CustomerRepository.class );
+		beanMetaData = constraintMetaDataManager.getBeanMetaData( CustomerRepository.class );
 	}
 
 	@Test
@@ -128,18 +131,20 @@ public class ParameterMetaDataTest {
 		//
 		// The failure rate on my current VM before fixing the bug is 50%.
 		// Running it in a loop does not improve the odds of failure: all tests will pass or fail for all loop run.
-		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
+		ConstraintMetaDataManager constraintMetaDataManager = new ConstraintMetaDataManager(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new SkewedParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptySet() ),
+				new PropertyAccessorCreatorProvider(),
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
 				new ValidationOrderGenerator(),
-				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build()
+				new MethodValidationConfiguration.Builder().build(),
+				Collections.emptyList(),
+				Collections.emptyList()
 		);
-		BeanMetaData<ServiceImpl> localBeanMetaData = beanMetaDataManager.getBeanMetaData( ServiceImpl.class );
+		BeanMetaData<ServiceImpl> localBeanMetaData = constraintMetaDataManager.getBeanMetaData( ServiceImpl.class );
 
 		Method method = Service.class.getMethod( "sayHello", String.class );
 		ExecutableMetaData methodMetaData = localBeanMetaData.getMetaDataFor( method ).get();

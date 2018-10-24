@@ -4,15 +4,12 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.metadata;
+package org.hibernate.validator.internal.metadata.manager;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.Option.IDENTITY_COMPARISONS;
-import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 import javax.validation.valueextraction.ValueExtractor;
@@ -22,7 +19,7 @@ import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
-import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -31,7 +28,6 @@ import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -57,23 +53,9 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Gunnar Morling
  * @author Chris Beckey &lt;cbeckey@paypal.com&gt;
  * @author Guillaume Smet
-*/
-public class BeanMetaDataManager {
-	/**
-	 * The default initial capacity for this cache.
-	 */
-	private static final int DEFAULT_INITIAL_CAPACITY = 16;
-
-	/**
-	 * The default load factor for this cache.
-	 */
-	private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-
-	/**
-	 * The default concurrency level for this cache.
-	 */
-	private static final int DEFAULT_CONCURRENCY_LEVEL = 16;
-
+ * @author Marko Bekhta
+ */
+public class BeanMetaDataProvider {
 	/**
 	 * Additional metadata providers used for meta data retrieval if
 	 * the XML and/or programmatic configuration is used.
@@ -99,11 +81,6 @@ public class BeanMetaDataManager {
 	private final ExecutableParameterNameProvider parameterNameProvider;
 
 	/**
-	 * Used to cache the constraint meta data for validated entities
-	 */
-	private final ConcurrentReferenceHashMap<Class<?>, BeanMetaData<?>> beanMetaDataCache;
-
-	/**
 	 * Used for resolving type parameters. Thread-safe.
 	 */
 	private final ExecutableHelper executableHelper;
@@ -117,7 +94,9 @@ public class BeanMetaDataManager {
 	 */
 	private final MethodValidationConfiguration methodValidationConfiguration;
 
-	public BeanMetaDataManager(ConstraintHelper constraintHelper,
+	private final MetaDataCache<Class<?>> beanMetaDataCache;
+
+	public BeanMetaDataProvider(ConstraintHelper constraintHelper,
 			ExecutableHelper executableHelper,
 			TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
@@ -135,14 +114,8 @@ public class BeanMetaDataManager {
 
 		this.methodValidationConfiguration = methodValidationConfiguration;
 
-		this.beanMetaDataCache = new ConcurrentReferenceHashMap<>(
-				DEFAULT_INITIAL_CAPACITY,
-				DEFAULT_LOAD_FACTOR,
-				DEFAULT_CONCURRENCY_LEVEL,
-				SOFT,
-				SOFT,
-				EnumSet.of( IDENTITY_COMPARISONS )
-		);
+		this.beanMetaDataCache = new MetaDataCache<>();
+
 
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders( optionalMetaDataProviders );
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
@@ -167,7 +140,8 @@ public class BeanMetaDataManager {
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
 		Contracts.assertNotNull( beanClass, MESSAGES.beanTypeCannotBeNull() );
 
-		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataCache.computeIfAbsent( beanClass,
+		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataCache.computeIfAbsent(
+				beanClass,
 				bc -> createBeanMetaData( bc ) );
 
 		return beanMetaData;
@@ -221,6 +195,7 @@ public class BeanMetaDataManager {
 	 *
 	 * @param beanClass The type of interest.
 	 * @param <T> The type of the class to get the configurations for.
+	 *
 	 * @return A set with the configurations for the complete hierarchy of the given type. May be empty, but never
 	 * {@code null}.
 	 */

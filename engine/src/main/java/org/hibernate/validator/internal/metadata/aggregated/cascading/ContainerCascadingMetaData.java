@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.metadata.aggregated;
+package org.hibernate.validator.internal.metadata.aggregated.cascading;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
@@ -12,13 +12,13 @@ import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeVariables;
@@ -66,7 +66,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	 * Possibly the cascading type parameters corresponding to this type parameter if it is a parameterized type.
 	 */
 	@Immutable
-	private final List<ContainerCascadingMetaData> containerElementTypesCascadingMetaData;
+	private final List<? extends ContainerCascadingMetaData> containerElementTypesCascadingMetaData;
 
 	/**
 	 * If this type parameter is marked for cascading.
@@ -90,28 +90,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 	 */
 	private final Set<ValueExtractorDescriptor> valueExtractorCandidates;
 
-	public static ContainerCascadingMetaData of(ValueExtractorManager valueExtractorManager, CascadingMetaDataBuilder cascadingMetaDataBuilder,
-			Object context) {
-		return new ContainerCascadingMetaData( valueExtractorManager, cascadingMetaDataBuilder );
-	}
-
-	private ContainerCascadingMetaData(ValueExtractorManager valueExtractorManager, CascadingMetaDataBuilder cascadingMetaDataBuilder) {
-		this(
-				valueExtractorManager,
-				cascadingMetaDataBuilder.getEnclosingType(),
-				cascadingMetaDataBuilder.getTypeParameter(),
-				cascadingMetaDataBuilder.getDeclaredContainerClass(),
-				cascadingMetaDataBuilder.getDeclaredTypeParameter(),
-				cascadingMetaDataBuilder.getContainerElementTypesCascadingMetaData().entrySet().stream()
-						.map( entry -> new ContainerCascadingMetaData( valueExtractorManager, entry.getValue() ) )
-						.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) ),
-				cascadingMetaDataBuilder.isCascading(),
-				GroupConversionHelper.of( cascadingMetaDataBuilder.getGroupConversions() ),
-				cascadingMetaDataBuilder.isMarkedForCascadingOnAnnotatedObjectOrContainerElements()
-		);
-	}
-
-	private ContainerCascadingMetaData(ValueExtractorManager valueExtractorManager, Type enclosingType, TypeVariable<?> typeParameter,
+	ContainerCascadingMetaData(ValueExtractorManager valueExtractorManager, Type enclosingType, TypeVariable<?> typeParameter,
 			Class<?> declaredContainerClass, TypeVariable<?> declaredTypeParameter, List<ContainerCascadingMetaData> containerElementTypesCascadingMetaData,
 			boolean cascading, GroupConversionHelper groupConversionHelper, boolean markedForCascadingOnContainerElements) {
 		this.enclosingType = enclosingType;
@@ -138,7 +117,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		}
 	}
 
-	ContainerCascadingMetaData(Type enclosingType, List<ContainerCascadingMetaData> containerElementTypesCascadingMetaData,
+	ContainerCascadingMetaData(Type enclosingType, List<? extends ContainerCascadingMetaData> containerElementTypesCascadingMetaData,
 			GroupConversionHelper groupConversionHelper, Set<ValueExtractorDescriptor> valueExtractorCandidates) {
 		this.enclosingType = enclosingType;
 		this.typeParameter = AnnotatedObject.INSTANCE;
@@ -206,7 +185,7 @@ public class ContainerCascadingMetaData implements CascadingMetaData {
 		return cascading || hasContainerElementsMarkedForCascading;
 	}
 
-	public List<ContainerCascadingMetaData> getContainerElementTypesCascadingMetaData() {
+	public List<? extends ContainerCascadingMetaData> getContainerElementTypesCascadingMetaData() {
 		return containerElementTypesCascadingMetaData;
 	}
 

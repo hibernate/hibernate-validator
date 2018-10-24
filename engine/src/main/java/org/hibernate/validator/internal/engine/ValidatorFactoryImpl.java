@@ -36,19 +36,23 @@ import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.cfg.propertyholder.PropertyHolderConstraintMappingImpl;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.proeprtyholder.ProgrammaticPropertyHolderMetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.proeprtyholder.PropertyHolderMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
+import org.hibernate.validator.internal.properties.propertyholder.PropertyAccessorCreatorProvider;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -99,6 +103,13 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final Set<DefaultConstraintMapping> constraintMappings;
 
 	/**
+	 * Programmatic constraints for property holders passed via the Hibernate Validator specific API.
+	 * Empty if there are no programmatic constraints.
+	 */
+	@Immutable
+	private final Set<PropertyHolderConstraintMappingImpl> propertyHolderConstraintMappings;
+
+	/**
 	 * Helper for dealing with built-in validators and determining custom constraint annotations.
 	 */
 	private final ConstraintHelper constraintHelper;
@@ -131,9 +142,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * provider. See also HV-659.
 	 */
 	@ThreadSafe
-	private final ConcurrentMap<BeanMetaDataManagerKey, BeanMetaDataManager> beanMetaDataManagers;
+	private final ConcurrentMap<BeanMetaDataManagerKey, ConstraintMetaDataManager> beanMetaDataManagers;
 
 	private final ValueExtractorManager valueExtractorManager;
+
+	private final PropertyAccessorCreatorProvider propertyAccessorCreatorProvider;
 
 	private final JavaBeanHelper javaBeanHelper;
 
@@ -143,6 +156,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		ClassLoader externalClassLoader = getExternalClassLoader( configurationState );
 
 		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
+		this.propertyAccessorCreatorProvider = new PropertyAccessorCreatorProvider();
 		this.beanMetaDataManagers = new ConcurrentHashMap<>();
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
@@ -174,6 +188,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						javaBeanHelper,
 						externalClassLoader
 				)
+		);
+
+		this.propertyHolderConstraintMappings = Collections.unmodifiableSet(
+				getPropertyHolderConstraintMappings( configurationState )
 		);
 
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
@@ -243,6 +261,17 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		for ( ConstraintMappingContributor contributor : contributors ) {
 			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( javaBeanHelper, constraintMappings );
 			contributor.createConstraintMappings( builder );
+		}
+
+		return constraintMappings;
+	}
+
+	private static Set<PropertyHolderConstraintMappingImpl> getPropertyHolderConstraintMappings(ConfigurationState configurationState) {
+		Set<PropertyHolderConstraintMappingImpl> constraintMappings = newHashSet();
+
+		if ( configurationState instanceof ConfigurationImpl ) {
+			ConfigurationImpl hibernateConfiguration = (ConfigurationImpl) configurationState;
+			constraintMappings.addAll( hibernateConfiguration.getPropertyHolderConstraintMappings() );
 		}
 
 		return constraintMappings;
@@ -336,8 +365,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	public void close() {
 		constraintValidatorManager.clear();
 		constraintHelper.clear();
-		for ( BeanMetaDataManager beanMetaDataManager : beanMetaDataManagers.values() ) {
-			beanMetaDataManager.clear();
+		for ( ConstraintMetaDataManager constraintMetaDataManager : beanMetaDataManagers.values() ) {
+			constraintMetaDataManager.clear();
 		}
 		validatorFactoryScopedContext.getScriptEvaluatorFactory().clear();
 		valueExtractorManager.clear();
@@ -352,24 +381,27 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ValidatorFactoryScopedContext validatorFactoryScopedContext,
 			MethodValidationConfiguration methodValidationConfiguration) {
 
-		BeanMetaDataManager beanMetaDataManager = beanMetaDataManagers.computeIfAbsent(
+		ConstraintMetaDataManager constraintMetaDataManager = beanMetaDataManagers.computeIfAbsent(
 				new BeanMetaDataManagerKey( validatorFactoryScopedContext.getParameterNameProvider(), valueExtractorManager, methodValidationConfiguration ),
-				key -> new BeanMetaDataManager(
+				key -> new ConstraintMetaDataManager(
 						constraintHelper,
 						executableHelper,
 						typeResolutionHelper,
 						validatorFactoryScopedContext.getParameterNameProvider(),
 						valueExtractorManager,
+						propertyAccessorCreatorProvider,
 						javaBeanHelper,
 						validationOrderGenerator,
-						buildDataProviders(),
-						methodValidationConfiguration
+						methodValidationConfiguration,
+						buildMetaDataProviders(),
+						buildPropertyHolderMetaDataProvider()
+
 				)
 		);
 
 		return new ValidatorImpl(
 				constraintValidatorFactory,
-				beanMetaDataManager,
+				constraintMetaDataManager,
 				valueExtractorManager,
 				constraintValidatorManager,
 				validationOrderGenerator,
@@ -377,7 +409,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		);
 	}
 
-	private List<MetaDataProvider> buildDataProviders() {
+	private List<MetaDataProvider> buildMetaDataProviders() {
 		List<MetaDataProvider> metaDataProviders = newArrayList();
 		if ( xmlMetaDataProvider != null ) {
 			metaDataProviders.add( xmlMetaDataProvider );
@@ -394,6 +426,17 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			);
 		}
 		return metaDataProviders;
+	}
+
+	private List<PropertyHolderMetaDataProvider> buildPropertyHolderMetaDataProvider() {
+		if ( !propertyHolderConstraintMappings.isEmpty() ) {
+			return Collections.singletonList( new ProgrammaticPropertyHolderMetaDataProvider(
+					constraintHelper, typeResolutionHelper, valueExtractorManager, propertyHolderConstraintMappings
+			) );
+		}
+		else {
+			return Collections.emptyList();
+		}
 	}
 
 	private static boolean checkPropertiesForBoolean(Map<String, String> properties, String propertyKey, boolean programmaticValue) {

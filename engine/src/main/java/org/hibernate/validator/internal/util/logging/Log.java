@@ -875,4 +875,25 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 248, value = "Unable to get an XML schema named %s.")
 	ValidationException unableToGetXmlSchema(String schemaResourceName);
+
+	@Message(id = 249, value = "Unable to find property creator for property holder of %1$s type.")
+	ValidationException getUnableToFindPropertyCreatorException(@FormatWith(ClassObjectFormatter.class) Class<?> clazz);
+
+	@Message(id = 250, value = "Unable to find single unique property creator for property holder of %1$s type.")
+	ValidationException getUnableToFinUniquedPropertyCreatorException(@FormatWith(ClassObjectFormatter.class) Class<?> clazz);
+
+	@Message(id = 251, value = "Unexpected property holder type received. Expected %1$s type, but instead got %2$s.")
+	ValidationException getUnexpextedPropertyHolderTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> expecetedHolderType, @FormatWith(ClassObjectFormatter.class) Class<?> realHolderType);
+
+	@Message(id = 252, value = "Unexpected property type in a given property holder. Expected that '%3$s' will be of %1$s type, but instead it is %2$s.")
+	ValidationException getUnexpextedPropertyTypeInPropertyHolderException(Type expecetedType, @FormatWith(ClassObjectFormatter.class) Class<?> realType, String propertyName);
+
+	@Message(id = 253, value = "%s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getPropertyHolderMappingHasAlreadyBeenConfiguredViaProgrammaticApiException(String mappingName);
+
+	@Message(id = 254, value = "Property \"%2$s\" in mapping %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getPropertyHolderMappingPropertyHasAlreadyBeenConfiguredViaProgrammaticApiException(String mappingName, String propertyName);
+
+	@Message(id = 255, value = "Object of type \"%1$s\" is not a property holder, and cannot be validated as one.")
+	ValidationException getCannotConvertToPropertyHolderException(@FormatWith(ClassObjectFormatter.class) Class<?> clazz);
 }

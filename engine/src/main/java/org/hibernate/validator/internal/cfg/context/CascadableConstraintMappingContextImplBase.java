@@ -11,11 +11,11 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,7 +24,7 @@ import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingCont
 import org.hibernate.validator.cfg.context.ContainerElementTarget;
 import org.hibernate.validator.cfg.context.GroupConversionTargetContext;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -160,19 +160,15 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 	}
 
 	protected CascadingMetaDataBuilder getCascadingMetaDataBuilder() {
-		Map<TypeVariable<?>, CascadingMetaDataBuilder> typeParametersCascadingMetaData = containerElementContexts.values().stream()
-				.filter( c -> c.getContainerElementCascadingMetaDataBuilder() != null )
-				.collect( Collectors.toMap( c -> c.getContainerElementCascadingMetaDataBuilder().getTypeParameter(),
-						c -> c.getContainerElementCascadingMetaDataBuilder() ) );
-
-		for ( ContainerElementConstraintMappingContextImpl typeArgumentContext : containerElementContexts.values() ) {
-			CascadingMetaDataBuilder cascadingMetaDataBuilder = typeArgumentContext.getContainerElementCascadingMetaDataBuilder();
-			if ( cascadingMetaDataBuilder != null ) {
-				typeParametersCascadingMetaData.put( cascadingMetaDataBuilder.getTypeParameter(), cascadingMetaDataBuilder );
-			}
-		}
-
-		return CascadingMetaDataBuilder.annotatedObject( configuredType, isCascading, typeParametersCascadingMetaData, groupConversions );
+		return CascadingMetaDataBuilder.annotatedObject(
+				configuredType,
+				isCascading,
+				containerElementContexts.values().stream()
+						.map( ContainerElementConstraintMappingContextImpl::getContainerElementCascadingMetaDataBuilder )
+						.filter( Objects::nonNull )
+						.collect( Collectors.toList() ),
+				groupConversions
+		);
 	}
 
 	private static class ContainerElementPathKey {

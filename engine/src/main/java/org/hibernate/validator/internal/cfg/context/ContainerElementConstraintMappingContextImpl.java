@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,7 +32,7 @@ import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueTarget;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.cascading.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
@@ -219,15 +218,15 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 	}
 
 	CascadingMetaDataBuilder getContainerElementCascadingMetaDataBuilder() {
-		return new CascadingMetaDataBuilder(
-			parentLocation.getTypeForValidatorResolution(),
-			typeParameter,
-			isCascading,
-			nestedContainerElementContexts.values()
-					.stream()
-					.map( ContainerElementConstraintMappingContextImpl::getContainerElementCascadingMetaDataBuilder )
-					.collect( Collectors.toMap( CascadingMetaDataBuilder::getTypeParameter, Function.identity() ) ),
-			groupConversions
+		return CascadingMetaDataBuilder.typeArgument(
+				parentLocation.getTypeForValidatorResolution(),
+				typeParameter,
+				isCascading,
+				nestedContainerElementContexts.values()
+						.stream()
+						.map( ContainerElementConstraintMappingContextImpl::getContainerElementCascadingMetaDataBuilder )
+						.collect( Collectors.toList() ),
+				groupConversions
 		);
 	}
 

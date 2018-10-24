@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 import javax.validation.metadata.ContainerElementTypeDescriptor;
 import javax.validation.metadata.GroupConversionDescriptor;
 
+import org.hibernate.validator.internal.metadata.aggregated.cascading.ContainerCascadingMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ContainerElementTypeDescriptorImpl;

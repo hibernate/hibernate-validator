@@ -13,7 +13,7 @@ import javax.validation.groups.Default;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.manager.ConstraintMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
@@ -71,11 +71,11 @@ public class ValueContext<T, V> {
 	 */
 	private ConstraintLocationKind constraintLocationKind;
 
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(BeanMetaDataManager beanMetaDataManager,
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ConstraintMetaDataManager constraintMetaDataManager,
 			ExecutableParameterNameProvider parameterNameProvider, T value, Validatable validatable, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanType = (Class<T>) value.getClass();
-		return new ValueContext<>( parameterNameProvider, value, rootBeanType, beanMetaDataManager.getBeanMetaData( rootBeanType ), validatable, propertyPath );
+		return new ValueContext<>( parameterNameProvider, value, rootBeanType, constraintMetaDataManager.getBeanMetaData( rootBeanType ), validatable, propertyPath );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -85,9 +85,9 @@ public class ValueContext<T, V> {
 		return new ValueContext<>( parameterNameProvider, value, rootBeanType, (BeanMetaData<T>) currentBeanMetaData, currentBeanMetaData, propertyPath );
 	}
 
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(BeanMetaDataManager beanMetaDataManager,
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ConstraintMetaDataManager constraintMetaDataManager,
 			ExecutableParameterNameProvider parameterNameProvider, Class<T> rootBeanType, Validatable validatable, PathImpl propertyPath) {
-		BeanMetaData<T> rootBeanMetaData = rootBeanType != null ? beanMetaDataManager.getBeanMetaData( rootBeanType ) : null;
+		BeanMetaData<T> rootBeanMetaData = rootBeanType != null ? constraintMetaDataManager.getBeanMetaData( rootBeanType ) : null;
 		return new ValueContext<>( parameterNameProvider, null, rootBeanType, rootBeanMetaData, validatable, propertyPath );
 	}
 
