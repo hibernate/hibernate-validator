@@ -8,7 +8,7 @@
 This is the reference implementation of [JSR-380 - Bean Validation 2.0](http://beanvalidation.org/).
 Bean Validation defines a metadata model and API for JavaBean as well as method validation.
 The default metadata source are annotations, with the ability to override and extend
-the meta-data through the use of XML validation descriptors.
+the metadata through the use of XML validation descriptors.
 
 ## Documentation
 
@@ -20,7 +20,7 @@ The full list of changes for this release can be found in changelog.txt.
 
 ## System Requirements
 
-JDK 1.8 or above.
+JDK 8 or above.
 
 ## Using Hibernate Validator
 
@@ -30,7 +30,7 @@ the JBoss Logging API, an abstraction layer which supports several logging solut
 provided by the JDK) as implementation. Just add a supported logging library to the classpath (e.g. _log4j-&lt;version&gt;.jar_) and JBoss
 Logging will delegate any log requests to that provider.
 
-* Add the following to your Maven or Ivy dependency list
+* Add the following artifact to your Maven/Ivy/Gradle dependency list:
 
         <dependency>
             <groupId>org.hibernate.validator</groupId>
@@ -68,10 +68,10 @@ the Apache Software License 2.0. Refer to license.txt for more information.
 
 ## Build from Source
 
-You can build Hibernate Validator from source by cloning the git repository git://github.com/hibernate/hibernate-validator.git.
-You will also need a JDK 8 and Maven 3 (>= 3.3.1). With these prerequisites in place you can compile the source via:
+You can build Hibernate Validator from source by cloning the git repository `git://github.com/hibernate/hibernate-validator.git`.
+You will also need a JDK 8+ and Maven 3 (>= 3.3.1). With these prerequisites in place you can compile the source via:
 
-    mvn -s settings-example.xml clean install
+    mvn clean install
 
 There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://hibernate.org/validator/contribute/).
 
