@@ -1246,7 +1246,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		propertyPath.removeLeafNode();
 
-		return ValueContext.getLocalExecutionContext( validatorScopedContext.getParameterNameProvider(), clazz, beanMetaData, propertyPath );
+		return ValueContext.getLocalExecutionContext( validatorScopedContext.getParameterNameProvider(), beanMetaData, propertyPath );
 	}
 
 	private boolean isValidationRequired(BaseBeanValidationContext<?> validationContext,

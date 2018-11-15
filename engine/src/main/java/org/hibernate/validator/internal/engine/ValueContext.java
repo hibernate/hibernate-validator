@@ -40,11 +40,6 @@ public class ValueContext<T, V> {
 	private final T currentBean;
 
 	/**
-	 * The class of the current bean.
-	 */
-	private final Class<T> currentBeanType;
-
-	/**
 	 * The metadata of the current bean.
 	 */
 	private final BeanMetaData<T> currentBeanMetaData;
@@ -75,32 +70,31 @@ public class ValueContext<T, V> {
 			ExecutableParameterNameProvider parameterNameProvider, T value, Validatable validatable, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanType = (Class<T>) value.getClass();
-		return new ValueContext<>( parameterNameProvider, value, rootBeanType, beanMetaDataManager.getBeanMetaData( rootBeanType ), validatable, propertyPath );
+		return new ValueContext<>( parameterNameProvider, value, beanMetaDataManager.getBeanMetaData( rootBeanType ), validatable, propertyPath );
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider, T value,
 			BeanMetaData<?> currentBeanMetaData, PathImpl propertyPath) {
 		Class<T> rootBeanType = (Class<T>) value.getClass();
-		return new ValueContext<>( parameterNameProvider, value, rootBeanType, (BeanMetaData<T>) currentBeanMetaData, currentBeanMetaData, propertyPath );
+		return new ValueContext<>( parameterNameProvider, value, (BeanMetaData<T>) currentBeanMetaData, currentBeanMetaData, propertyPath );
 	}
 
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(BeanMetaDataManager beanMetaDataManager,
 			ExecutableParameterNameProvider parameterNameProvider, Class<T> rootBeanType, Validatable validatable, PathImpl propertyPath) {
 		BeanMetaData<T> rootBeanMetaData = rootBeanType != null ? beanMetaDataManager.getBeanMetaData( rootBeanType ) : null;
-		return new ValueContext<>( parameterNameProvider, null, rootBeanType, rootBeanMetaData, validatable, propertyPath );
+		return new ValueContext<>( parameterNameProvider, null, rootBeanMetaData, validatable, propertyPath );
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider, Class<T> currentBeanType,
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider,
 			BeanMetaData<?> currentBeanMetaData, PathImpl propertyPath) {
-		return new ValueContext<>( parameterNameProvider, null, currentBeanType, (BeanMetaData<T>) currentBeanMetaData, currentBeanMetaData, propertyPath );
+		return new ValueContext<>( parameterNameProvider, null, (BeanMetaData<T>) currentBeanMetaData, currentBeanMetaData, propertyPath );
 	}
 
-	private ValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, Class<T> currentBeanType, BeanMetaData<T> currentBeanMetaData, Validatable validatable, PathImpl propertyPath) {
+	private ValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, BeanMetaData<T> currentBeanMetaData, Validatable validatable, PathImpl propertyPath) {
 		this.parameterNameProvider = parameterNameProvider;
 		this.currentBean = currentBean;
-		this.currentBeanType = currentBeanType;
 		this.currentBeanMetaData = currentBeanMetaData;
 		this.currentValidatable = validatable;
 		this.propertyPath = propertyPath;
@@ -116,10 +110,6 @@ public class ValueContext<T, V> {
 
 	public final T getCurrentBean() {
 		return currentBean;
-	}
-
-	public final Class<T> getCurrentBeanType() {
-		return currentBeanType;
 	}
 
 	public final BeanMetaData<T> getCurrentBeanMetaData() {
@@ -221,7 +211,6 @@ public class ValueContext<T, V> {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "ValueContext" );
 		sb.append( "{currentBean=" ).append( currentBean );
-		sb.append( ", currentBeanType=" ).append( currentBeanType );
 		sb.append( ", propertyPath=" ).append( propertyPath );
 		sb.append( ", currentGroup=" ).append( currentGroup );
 		sb.append( ", currentValue=" ).append( currentValue );
