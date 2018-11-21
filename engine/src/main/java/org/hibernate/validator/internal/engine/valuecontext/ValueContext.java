@@ -4,17 +4,16 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.engine;
+package org.hibernate.validator.internal.engine.valuecontext;
 
 import java.lang.reflect.TypeVariable;
 
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.valuecontext.BeanValueContext.ValueState;
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
-import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -40,11 +39,6 @@ public class ValueContext<T, V> {
 	private final T currentBean;
 
 	/**
-	 * The metadata of the current bean.
-	 */
-	private final BeanMetaData<T> currentBeanMetaData;
-
-	/**
 	 * The current property path we are validating.
 	 */
 	private PathImpl propertyPath;
@@ -66,36 +60,9 @@ public class ValueContext<T, V> {
 	 */
 	private ConstraintLocationKind constraintLocationKind;
 
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(BeanMetaDataManager beanMetaDataManager,
-			ExecutableParameterNameProvider parameterNameProvider, T value, Validatable validatable, PathImpl propertyPath) {
-		@SuppressWarnings("unchecked")
-		Class<T> rootBeanType = (Class<T>) value.getClass();
-		return new ValueContext<>( parameterNameProvider, value, beanMetaDataManager.getBeanMetaData( rootBeanType ), validatable, propertyPath );
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider, T value,
-			BeanMetaData<?> currentBeanMetaData, PathImpl propertyPath) {
-		Class<T> rootBeanType = (Class<T>) value.getClass();
-		return new ValueContext<>( parameterNameProvider, value, (BeanMetaData<T>) currentBeanMetaData, currentBeanMetaData, propertyPath );
-	}
-
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(BeanMetaDataManager beanMetaDataManager,
-			ExecutableParameterNameProvider parameterNameProvider, Class<T> rootBeanType, Validatable validatable, PathImpl propertyPath) {
-		BeanMetaData<T> rootBeanMetaData = rootBeanType != null ? beanMetaDataManager.getBeanMetaData( rootBeanType ) : null;
-		return new ValueContext<>( parameterNameProvider, null, rootBeanMetaData, validatable, propertyPath );
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider,
-			BeanMetaData<?> currentBeanMetaData, PathImpl propertyPath) {
-		return new ValueContext<>( parameterNameProvider, null, (BeanMetaData<T>) currentBeanMetaData, currentBeanMetaData, propertyPath );
-	}
-
-	private ValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, BeanMetaData<T> currentBeanMetaData, Validatable validatable, PathImpl propertyPath) {
+	ValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, Validatable validatable, PathImpl propertyPath) {
 		this.parameterNameProvider = parameterNameProvider;
 		this.currentBean = currentBean;
-		this.currentBeanMetaData = currentBeanMetaData;
 		this.currentValidatable = validatable;
 		this.propertyPath = propertyPath;
 	}
@@ -110,10 +77,6 @@ public class ValueContext<T, V> {
 
 	public final T getCurrentBean() {
 		return currentBean;
-	}
-
-	public final BeanMetaData<T> getCurrentBeanMetaData() {
-		return currentBeanMetaData;
 	}
 
 	public Validatable getCurrentValidatable() {
@@ -202,8 +165,8 @@ public class ValueContext<T, V> {
 	}
 
 	public final void resetValueState(ValueState<V> valueState) {
-		this.propertyPath = valueState.propertyPath;
-		this.currentValue = valueState.currentValue;
+		this.propertyPath = valueState.getPropertyPath();
+		this.currentValue = valueState.getCurrentValue();
 	}
 
 	@Override
@@ -222,17 +185,5 @@ public class ValueContext<T, V> {
 	public Object getValue(Object parent, ConstraintLocation location) {
 		// TODO: For BVAL-214 we'd get the value from a map or another alternative structure instead
 		return location.getValue( parent );
-	}
-
-	public static class ValueState<V> {
-
-		private final PathImpl propertyPath;
-
-		private final V currentValue;
-
-		private ValueState(PathImpl propertyPath, V currentValue) {
-			this.propertyPath = propertyPath;
-			this.currentValue = currentValue;
-		}
 	}
 }

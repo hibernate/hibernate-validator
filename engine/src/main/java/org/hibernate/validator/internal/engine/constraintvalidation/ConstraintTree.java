@@ -18,7 +18,7 @@ import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.internal.engine.ValueContext;
+import org.hibernate.validator.internal.engine.valuecontext.ValueContext;
 import org.hibernate.validator.internal.engine.validationcontext.ValidationContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.logging.Log;
