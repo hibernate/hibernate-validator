@@ -15,7 +15,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
-import org.hibernate.validator.internal.engine.ValueContext;
+import org.hibernate.validator.internal.engine.valuecontext.ValueContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
