@@ -12,7 +12,7 @@ import javax.validation.ClockProvider;
 import javax.validation.MessageInterpolator;
 import javax.validation.Validator;
 
-import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
+import org.hibernate.validator.internal.engine.ValidatorFactoryScopedContext;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -65,7 +65,7 @@ public class ValidatorScopedContext {
 	 */
 	private final Object constraintValidatorPayload;
 
-	public ValidatorScopedContext(ValidatorFactoryImpl.ValidatorFactoryScopedContext validatorFactoryScopedContext) {
+	public ValidatorScopedContext(ValidatorFactoryScopedContext validatorFactoryScopedContext) {
 		this.messageInterpolator = validatorFactoryScopedContext.getMessageInterpolator();
 		this.parameterNameProvider = validatorFactoryScopedContext.getParameterNameProvider();
 		this.clockProvider = validatorFactoryScopedContext.getClockProvider();
