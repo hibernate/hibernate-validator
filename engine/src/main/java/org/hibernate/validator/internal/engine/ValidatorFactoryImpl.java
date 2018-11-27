@@ -40,6 +40,7 @@ import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -192,7 +193,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				getConstraintValidatorPayload( hibernateSpecificConfig )
 		);
 
-		this.constraintValidatorManager = new ConstraintValidatorManager(
+		this.constraintValidatorManager = new ConstraintValidatorManagerImpl(
 				configurationState.getConstraintValidatorFactory(),
 				this.validatorFactoryScopedContext.getConstraintValidatorInitializationContext()
 		);
