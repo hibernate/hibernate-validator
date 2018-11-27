@@ -36,7 +36,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
 import org.hibernate.validator.internal.engine.DefaultClockProvider;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -49,14 +49,14 @@ import org.testng.annotations.Test;
  * @author Gunnar Morling
  */
 public class ConstraintValidatorManagerTest {
-	private ConstraintValidatorManager constraintValidatorManager;
+	private ConstraintValidatorManagerImpl constraintValidatorManager;
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private Validator validator;
 
 	@BeforeMethod
 	public void setUp() {
 		constraintValidatorFactory = new ConstraintValidatorFactoryImpl();
-		constraintValidatorManager = new ConstraintValidatorManager( constraintValidatorFactory, getDummyConstraintValidatorInitializationContext() );
+		constraintValidatorManager = new ConstraintValidatorManagerImpl( constraintValidatorFactory, getDummyConstraintValidatorInitializationContext() );
 		validator = getValidator();
 	}
 
