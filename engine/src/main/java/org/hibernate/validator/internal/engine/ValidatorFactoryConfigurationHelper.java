@@ -138,7 +138,7 @@ final class ValidatorFactoryConfigurationHelper {
 		return contributors;
 	}
 
-	static boolean getAllowParallelMethodsDefineParameterConstraints(ConfigurationImpl hibernateSpecificConfig, Map<String, String> properties) {
+	static boolean getAllowParallelMethodsDefineParameterConstraints(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties) {
 		return checkPropertiesForBoolean(
 				properties,
 				HibernateValidatorConfiguration.ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS,
@@ -146,7 +146,7 @@ final class ValidatorFactoryConfigurationHelper {
 		);
 	}
 
-	static boolean getAllowMultipleCascadedValidationOnReturnValues(ConfigurationImpl hibernateSpecificConfig, Map<String, String> properties) {
+	static boolean getAllowMultipleCascadedValidationOnReturnValues(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties) {
 		return checkPropertiesForBoolean(
 				properties,
 				HibernateValidatorConfiguration.ALLOW_MULTIPLE_CASCADED_VALIDATION_ON_RESULT,
@@ -154,7 +154,7 @@ final class ValidatorFactoryConfigurationHelper {
 		);
 	}
 
-	static boolean getAllowOverridingMethodAlterParameterConstraint(ConfigurationImpl hibernateSpecificConfig, Map<String, String> properties) {
+	static boolean getAllowOverridingMethodAlterParameterConstraint(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties) {
 		return checkPropertiesForBoolean(
 				properties,
 				HibernateValidatorConfiguration.ALLOW_PARAMETER_CONSTRAINT_OVERRIDE,
@@ -162,7 +162,7 @@ final class ValidatorFactoryConfigurationHelper {
 		);
 	}
 
-	static boolean getTraversableResolverResultCacheEnabled(ConfigurationImpl configuration, Map<String, String> properties) {
+	static boolean getTraversableResolverResultCacheEnabled(AbstractConfigurationImpl<?> configuration, Map<String, String> properties) {
 		return checkPropertiesForBoolean(
 				properties,
 				HibernateValidatorConfiguration.ENABLE_TRAVERSABLE_RESOLVER_RESULT_CACHE,
@@ -170,7 +170,7 @@ final class ValidatorFactoryConfigurationHelper {
 		);
 	}
 
-	static boolean getFailFast(ConfigurationImpl configuration, Map<String, String> properties) {
+	static boolean getFailFast(AbstractConfigurationImpl<?> configuration, Map<String, String> properties) {
 		// check whether fail fast is programmatically enabled
 		boolean tmpFailFast = configuration != null ? configuration.getFailFast() : false;
 
@@ -252,7 +252,7 @@ final class ValidatorFactoryConfigurationHelper {
 		return null;
 	}
 
-	static GetterPropertySelectionStrategy getGetterPropertySelectionStrategy(ConfigurationImpl hibernateSpecificConfig, Map<String, String> properties,
+	static GetterPropertySelectionStrategy getGetterPropertySelectionStrategy(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
 			ClassLoader externalClassLoader) {
 		if ( hibernateSpecificConfig.getGetterPropertySelectionStrategy() != null ) {
 			LOG.usingGetterPropertySelectionStrategy( hibernateSpecificConfig.getGetterPropertySelectionStrategy().getClass() );
