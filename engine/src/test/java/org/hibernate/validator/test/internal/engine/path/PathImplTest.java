@@ -33,6 +33,7 @@ import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.BeanMetaDataManagerImpl;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
@@ -42,7 +43,6 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
 import org.testng.annotations.Test;
 
 /**
@@ -193,7 +193,7 @@ public class PathImplTest {
 	public void testCreationOfExecutablePath() throws Exception {
 		Method executable = Container.class.getMethod( "addItem", Key.class, Item.class );
 
-		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
+		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManagerImpl(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new TypeResolutionHelper(),

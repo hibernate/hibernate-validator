@@ -44,6 +44,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.BeanMetaDataManagerImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
@@ -311,7 +312,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		BeanMetaDataManager beanMetaDataManager = beanMetaDataManagers.computeIfAbsent(
 				new BeanMetaDataManagerKey( validatorFactoryScopedContext.getParameterNameProvider(), valueExtractorManager, methodValidationConfiguration ),
-				key -> new BeanMetaDataManager(
+				key -> new BeanMetaDataManagerImpl(
 						constraintHelper,
 						executableHelper,
 						typeResolutionHelper,

@@ -24,7 +24,7 @@ import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.BeanMetaDataManagerImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -48,11 +48,11 @@ public class BeanMetaDataManagerTest {
 	private static final int LOOP_COUNT = 100000;
 	private static final int ARRAY_ALLOCATION_SIZE = 100000;
 
-	private BeanMetaDataManager metaDataManager;
+	private BeanMetaDataManagerImpl metaDataManager;
 
 	@BeforeMethod
 	public void setUpBeanMetaDataManager() {
-		metaDataManager = new BeanMetaDataManager(
+		metaDataManager = new BeanMetaDataManagerImpl(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new TypeResolutionHelper(),

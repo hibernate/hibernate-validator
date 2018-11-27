@@ -28,6 +28,7 @@ import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.BeanMetaDataManagerImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
@@ -57,7 +58,7 @@ public class ParameterMetaDataTest {
 
 	@BeforeMethod
 	public void setupBeanMetaData() {
-		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
+		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManagerImpl(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new TypeResolutionHelper(),
@@ -128,7 +129,7 @@ public class ParameterMetaDataTest {
 		//
 		// The failure rate on my current VM before fixing the bug is 50%.
 		// Running it in a loop does not improve the odds of failure: all tests will pass or fail for all loop run.
-		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
+		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManagerImpl(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new TypeResolutionHelper(),
