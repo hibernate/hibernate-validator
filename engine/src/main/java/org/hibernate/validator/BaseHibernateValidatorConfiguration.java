@@ -28,7 +28,8 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 /**
  * Base interface for Hibernate Validator specific configurations.
  * <p>
- * Should not be used directly, prefer {@link HibernateValidatorConfiguration}.
+ * Should not be used directly, prefer {@link HibernateValidatorConfiguration} or
+ * {@link PredefinedScopeHibernateValidatorConfiguration}.
  *
  * @author Emmanuel Bernard
  * @author Gunnar Morling
