@@ -39,7 +39,7 @@ import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.PredefinedScopeHibernateValidatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
+import org.hibernate.validator.internal.engine.constraintvalidation.PredefinedScopeConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.PredefinedScopeBeanMetaDataManager;
@@ -116,7 +116,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				getConstraintValidatorPayload( hibernateSpecificConfig )
 		);
 
-		this.constraintValidatorManager = new ConstraintValidatorManagerImpl(
+		this.constraintValidatorManager = new PredefinedScopeConstraintValidatorManagerImpl(
 				configurationState.getConstraintValidatorFactory(),
 				this.validatorFactoryScopedContext.getConstraintValidatorInitializationContext()
 		);
