@@ -621,7 +621,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		// already and need only to pass the current element
 		ValidationOrder validationOrder = validationOrderGenerator.getValidationOrder( currentGroup, currentGroup != originalGroup );
 
-		BeanValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
+		BeanValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( cascadingMetaData, valueContext, value );
 
 		validateInContext( validationContext, cascadedValueContext, validationOrder );
 	}
@@ -699,7 +699,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			// already and need only to pass the current element
 			ValidationOrder validationOrder = validationOrderGenerator.getValidationOrder( currentGroup, currentGroup != originalGroup );
 
-			BeanValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
+			BeanValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( cascadingMetaData, valueContext, value );
 
 			if ( cascadingMetaData.getDeclaredContainerClass() != null ) {
 				cascadedValueContext.setTypeParameter( cascadingMetaData.getDeclaredContainerClass(), cascadingMetaData.getDeclaredTypeParameterIndex() );
@@ -712,7 +712,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			// Cascade validation to container elements if we are dealing with a container element
 			if ( cascadingMetaData.hasContainerElementsMarkedForCascading() ) {
-				ValueContext<?, Object> cascadedTypeArgumentValueContext = buildNewLocalExecutionContext( valueContext, value );
+				ValueContext<?, Object> cascadedTypeArgumentValueContext = buildNewLocalExecutionContext( cascadingMetaData, valueContext, value );
 				if ( cascadingMetaData.getTypeParameter() != null ) {
 					cascadedValueContext.setTypeParameter( cascadingMetaData.getDeclaredContainerClass(), cascadingMetaData.getDeclaredTypeParameterIndex() );
 				}
@@ -761,14 +761,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private BeanValueContext<?, Object> buildNewLocalExecutionContext(ValueContext<?, ?> valueContext, Object value) {
+	private BeanValueContext<?, Object> buildNewLocalExecutionContext(CascadingMetaData cascadingMetaData, ValueContext<?, ?> valueContext, Object value) {
 		BeanValueContext<?, Object> newValueContext;
 		Contracts.assertNotNull( value, "value cannot be null" );
-		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( value.getClass() );
 		newValueContext = ValueContexts.getLocalExecutionContextForBean(
 				validatorScopedContext.getParameterNameProvider(),
 				value,
-				beanMetaData,
+				cascadingMetaData.getBeanMetaDataForCascadable( beanMetaDataManager, value ),
 				valueContext.getPropertyPath()
 		);
 		newValueContext.setCurrentValidatedValue( value );
