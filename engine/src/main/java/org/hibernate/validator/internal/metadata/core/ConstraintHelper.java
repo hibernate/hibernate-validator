@@ -55,6 +55,7 @@ import javax.validation.constraintvalidation.ValidationTarget;
 
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.ConstraintComposition;
+import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.ISBN;
@@ -64,12 +65,14 @@ import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
@@ -418,8 +421,6 @@ public class ConstraintHelper {
 
 		putConstraints( tmpConstraints, FutureOrPresent.class, futureOrPresentValidators );
 
-		putConstraint( tmpConstraints, ISBN.class, ISBNValidator.class );
-
 		if ( isJavaMoneyInClasspath() ) {
 			putConstraints( tmpConstraints, Max.class, Arrays.asList(
 					MaxValidatorForBigDecimal.class,
@@ -657,27 +658,37 @@ public class ConstraintHelper {
 		if ( isJavaMoneyInClasspath() ) {
 			putConstraint( tmpConstraints, Currency.class, CurrencyValidatorForMonetaryAmount.class );
 		}
+		putConstraint( tmpConstraints, CreditCardNumber.class );
 		putConstraint( tmpConstraints, DurationMax.class, DurationMaxValidator.class );
 		putConstraint( tmpConstraints, DurationMin.class, DurationMinValidator.class );
 		putConstraint( tmpConstraints, EAN.class, EANValidator.class );
 		putConstraint( tmpConstraints, org.hibernate.validator.constraints.Email.class, org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator.class );
+		putConstraint( tmpConstraints, ISBN.class, ISBNValidator.class );
 		putConstraint( tmpConstraints, Length.class, LengthValidator.class );
 		putConstraint( tmpConstraints, CodePointLength.class, CodePointLengthValidator.class );
-		putConstraint( tmpConstraints, ModCheck.class, ModCheckValidator.class );
 		putConstraint( tmpConstraints, LuhnCheck.class, LuhnCheckValidator.class );
+		putConstraint( tmpConstraints, ModCheck.class, ModCheckValidator.class );
 		putConstraint( tmpConstraints, Mod10Check.class, Mod10CheckValidator.class );
 		putConstraint( tmpConstraints, Mod11Check.class, Mod11CheckValidator.class );
-		putConstraint( tmpConstraints, REGON.class, REGONValidator.class );
 		putConstraint( tmpConstraints, NIP.class, NIPValidator.class );
-		putConstraint( tmpConstraints, PESEL.class, PESELValidator.class );
 		putConstraint( tmpConstraints, org.hibernate.validator.constraints.NotBlank.class, org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator.class );
+		putConstraint( tmpConstraints, org.hibernate.validator.constraints.NotEmpty.class );
 		putConstraint( tmpConstraints, ParameterScriptAssert.class, ParameterScriptAssertValidator.class );
+		putConstraint( tmpConstraints, PESEL.class, PESELValidator.class );
+		putConstraint( tmpConstraints, Range.class );
+		putConstraint( tmpConstraints, REGON.class, REGONValidator.class );
 		putConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
 		putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
+		putConstraint( tmpConstraints, TituloEleitoral.class );
 		putConstraint( tmpConstraints, UniqueElements.class, UniqueElementsValidator.class );
 		putConstraint( tmpConstraints, URL.class, URLValidator.class );
 
 		this.builtinConstraints = Collections.unmodifiableMap( tmpConstraints );
+	}
+
+	private static <A extends Annotation> void putConstraint(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
+			Class<A> constraintType) {
+		validators.put( constraintType, Collections.emptyList() );
 	}
 
 	private static <A extends Annotation> void putConstraint(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
