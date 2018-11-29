@@ -74,15 +74,13 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 		Map<Class<?>, BeanMetaData<?>> tmpBeanMetadataMap = new HashMap<>();
 
 		for ( Class<?> validatedClass : beanClassesToInitialize ) {
-			@SuppressWarnings("unchecked")
-			List<Class<?>> classHierarchy = (List<Class<?>>) (Object) ClassHierarchyHelper.getHierarchy( validatedClass, Filters.excludeInterfaces() );
+			BeanMetaData<?> beanMetaData = createBeanMetaData( this, constraintCreationContext, executableHelper, parameterNameProvider,
+					javaBeanHelper, validationOrderGenerator, optionalMetaDataProviders, methodValidationConfiguration,
+					metaDataProviders, validatedClass );
 
-			// note that the hierarchy also contains the initial class
-			for ( Class<?> hierarchyElement : classHierarchy ) {
-				tmpBeanMetadataMap.put( beanMetaDataClassNormalizer.normalize( hierarchyElement ),
-						createBeanMetaData( constraintCreationContext, executableHelper, parameterNameProvider,
-								javaBeanHelper, validationOrderGenerator, optionalMetaDataProviders, methodValidationConfiguration,
-								metaDataProviders, hierarchyElement ) );
+			tmpBeanMetadataMap.put( validatedClass, beanMetaData );
+			for ( BeanMetaData<?> metaData : beanMetaData.getBeanMetadataHierarchy() ) {
+				tmpBeanMetadataMap.put( metaData.getBeanClass(), metaData );
 			}
 		}
 
@@ -115,7 +113,8 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 	 *
 	 * @return A bean meta data object for the given type.
 	 */
-	private static <T> BeanMetaDataImpl<T> createBeanMetaData(ConstraintCreationContext constraintCreationContext,
+	private static <T> BeanMetaDataImpl<T> createBeanMetaData(BeanMetaDataManager beanMetaDataManager,
+			ConstraintCreationContext constraintCreationContext,
 			ExecutableHelper executableHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
 			JavaBeanHelper javaBeanHelper,
@@ -134,7 +133,7 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 			}
 		}
 
-		return builder.build();
+		return builder.build( beanMetaDataManager );
 	}
 
 	/**
