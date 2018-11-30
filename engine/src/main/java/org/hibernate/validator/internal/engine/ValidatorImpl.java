@@ -34,6 +34,8 @@ import javax.validation.metadata.BeanDescriptor;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
+import org.hibernate.validator.engine.HibernateConstrainedType;
+import org.hibernate.validator.internal.engine.constrainedtype.JavaBeanConstrainedType;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.GroupWithInheritance;
@@ -148,18 +150,57 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	@Override
 	public final <T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups) {
+		HibernateConstrainedType<T> constrainedType = object == null ? null : new JavaBeanConstrainedType<>( (Class<T>) object.getClass() );
+		return validate( object, constrainedType, groups );
+	}
+
+	@Override
+	public final <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
+		HibernateConstrainedType<T> constrainedType = object == null ? null : new JavaBeanConstrainedType<>( (Class<T>) object.getClass() );
+		return validateProperty( object, propertyName, constrainedType, groups );
+	}
+
+	@Override
+	public final <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
+		HibernateConstrainedType<T> constrainedType = beanType == null ? null : new JavaBeanConstrainedType<>( beanType );
+		return validateValue( beanType, propertyName, value, constrainedType, groups );
+	}
+
+	@Override
+	public <T> Set<ConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
+		HibernateConstrainedType<T> constrainedType = object == null ? null : new JavaBeanConstrainedType<>( ( (Class<T>) object.getClass() ) );
+		return validateParameters( object, method, parameterValues, constrainedType, groups );
+	}
+
+	@Override
+	public <T> Set<ConstraintViolation<T>> validateConstructorParameters(Constructor<? extends T> constructor, Object[] parameterValues, Class<?>... groups) {
+		HibernateConstrainedType<T> constrainedType = constructor == null ? null : new JavaBeanConstrainedType<>( ( (Class<T>) constructor.getDeclaringClass() ) );
+		return validateConstructorParameters( constructor, parameterValues, constrainedType, groups );
+	}
+
+	@Override
+	public <T> Set<ConstraintViolation<T>> validateConstructorReturnValue(Constructor<? extends T> constructor, T createdObject, Class<?>... groups) {
+		HibernateConstrainedType<T> constrainedType = constructor == null ? null : new JavaBeanConstrainedType<>( ( (Class<T>) constructor.getDeclaringClass() ) );
+		return validateConstructorReturnValue( constructor, createdObject, constrainedType, groups );
+	}
+
+	@Override
+	public <T> Set<ConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
+		HibernateConstrainedType<T> constrainedType = object == null ? null : new JavaBeanConstrainedType<>( ( (Class<T>) object.getClass() ) );
+		return validateReturnValue( object, method, returnValue, constrainedType, groups );
+	}
+
+	private <T> Set<ConstraintViolation<T>> validate(T object, HibernateConstrainedType<T> constrainedType, Class<?>... groups) {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 		sanityCheckGroups( groups );
 
-		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = (Class<T>) object.getClass();
-		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
+		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( constrainedType );
 
 		if ( !rootBeanMetaData.hasConstraints() ) {
 			return Collections.emptySet();
 		}
 
-		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidate( rootBeanClass, rootBeanMetaData, object );
+		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidate( constrainedType, rootBeanMetaData, object );
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 		BeanValueContext<?, Object> valueContext = ValueContexts.getLocalExecutionContextForBean(
@@ -172,22 +213,19 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return validateInContext( validationContext, valueContext, validationOrder );
 	}
 
-	@Override
-	public final <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
+	private <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, HibernateConstrainedType<T> constrainedType, Class<?>... groups) {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 		sanityCheckPropertyPath( propertyName );
 		sanityCheckGroups( groups );
 
-		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = (Class<T>) object.getClass();
-		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
+		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( constrainedType );
 
 		if ( !rootBeanMetaData.hasConstraints() ) {
 			return Collections.emptySet();
 		}
 
 		PathImpl propertyPath = PathImpl.createPathFromString( propertyName );
-		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidateProperty( rootBeanClass, rootBeanMetaData, object,
+		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidateProperty( constrainedType, rootBeanMetaData, object,
 				propertyPath );
 
 		BeanValueContext<?, Object> valueContext = getValueContextForPropertyValidation( validationContext, propertyPath );
@@ -201,77 +239,71 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return validateInContext( validationContext, valueContext, validationOrder );
 	}
 
-	@Override
-	public final <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
+	private <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, HibernateConstrainedType<T> constrainedType, Class<?>... groups) {
 		Contracts.assertNotNull( beanType, MESSAGES.beanTypeCannotBeNull() );
 		sanityCheckPropertyPath( propertyName );
 		sanityCheckGroups( groups );
 
-		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( beanType );
+		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( constrainedType );
 
 		if ( !rootBeanMetaData.hasConstraints() ) {
 			return Collections.emptySet();
 		}
 
 		PathImpl propertyPath = PathImpl.createPathFromString( propertyName );
-		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidateValue( beanType, rootBeanMetaData, propertyPath );
+		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidateValue( constrainedType, rootBeanMetaData, propertyPath );
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
 		return validateValueInContext(
 				validationContext,
 				value,
+				constrainedType,
 				propertyPath,
 				validationOrder
 		);
 	}
 
-	@Override
-	public <T> Set<ConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
+	private <T> Set<ConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, HibernateConstrainedType<T> constrainedType, Class<?>... groups) {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
 		Contracts.assertNotNull( parameterValues, MESSAGES.validatedParameterArrayMustNotBeNull() );
 
-		return validateParameters( object, (Executable) method, parameterValues, groups );
+		return validateParameters( object, (Executable) method, parameterValues, constrainedType, groups );
 	}
 
-	@Override
-	public <T> Set<ConstraintViolation<T>> validateConstructorParameters(Constructor<? extends T> constructor, Object[] parameterValues, Class<?>... groups) {
+	private <T> Set<ConstraintViolation<T>> validateConstructorParameters(Constructor<? extends T> constructor, Object[] parameterValues, HibernateConstrainedType<T> constrainedType, Class<?>... groups) {
 		Contracts.assertNotNull( constructor, MESSAGES.validatedConstructorMustNotBeNull() );
 		Contracts.assertNotNull( parameterValues, MESSAGES.validatedParameterArrayMustNotBeNull() );
 
-		return validateParameters( null, constructor, parameterValues, groups );
+		return validateParameters( null, constructor, parameterValues, constrainedType, groups );
 	}
 
-	@Override
-	public <T> Set<ConstraintViolation<T>> validateConstructorReturnValue(Constructor<? extends T> constructor, T createdObject, Class<?>... groups) {
+	private <T> Set<ConstraintViolation<T>> validateConstructorReturnValue(Constructor<? extends T> constructor, T createdObject, HibernateConstrainedType<T> constrainedType, Class<?>... groups) {
 		Contracts.assertNotNull( constructor, MESSAGES.validatedConstructorMustNotBeNull() );
 		Contracts.assertNotNull( createdObject, MESSAGES.validatedConstructorCreatedInstanceMustNotBeNull() );
 
-		return validateReturnValue( null, constructor, createdObject, groups );
+		return validateReturnValue( null, constructor, createdObject, constrainedType, groups );
 	}
 
-	@Override
-	public <T> Set<ConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
+	private <T> Set<ConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, HibernateConstrainedType<T> constrainedType, Class<?>... groups) {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
 
-		return validateReturnValue( object, (Executable) method, returnValue, groups );
+		return validateReturnValue( object, (Executable) method, returnValue, constrainedType, groups );
 	}
 
-	private <T> Set<ConstraintViolation<T>> validateParameters(T object, Executable executable, Object[] parameterValues, Class<?>... groups) {
+	private <T> Set<ConstraintViolation<T>> validateParameters(T object, Executable executable, Object[] parameterValues, HibernateConstrainedType<T> constrainedType, Class<?>... groups) {
 		sanityCheckGroups( groups );
 
-		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = object != null ? (Class<T>) object.getClass() : (Class<T>) executable.getDeclaringClass();
-		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
+		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( constrainedType );
 
 		if ( !rootBeanMetaData.hasConstraints() ) {
 			return Collections.emptySet();
 		}
 
 		ExecutableValidationContext<T> validationContext = getValidationContextBuilder().forValidateParameters(
-				rootBeanClass,
+				constrainedType,
 				rootBeanMetaData,
 				object,
 				executable,
@@ -285,19 +317,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return validationContext.getFailingConstraints();
 	}
 
-	private <T> Set<ConstraintViolation<T>> validateReturnValue(T object, Executable executable, Object returnValue, Class<?>... groups) {
+	private <T> Set<ConstraintViolation<T>> validateReturnValue(T object, Executable executable, Object returnValue, HibernateConstrainedType<T> constrainedType, Class<?>... groups) {
 		sanityCheckGroups( groups );
 
-		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = object != null ? (Class<T>) object.getClass() : (Class<T>) executable.getDeclaringClass();
-		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
+		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( constrainedType );
 
 		if ( !rootBeanMetaData.hasConstraints() ) {
 			return Collections.emptySet();
 		}
 
 		ExecutableValidationContext<T> validationContext = getValidationContextBuilder().forValidateReturnValue(
-				rootBeanClass,
+				constrainedType,
 				rootBeanMetaData,
 				object,
 				executable,
@@ -313,7 +343,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	@Override
 	public final BeanDescriptor getConstraintsForClass(Class<?> clazz) {
-		return beanMetaDataManager.getBeanMetaData( clazz ).getBeanDescriptor();
+		return beanMetaDataManager.getBeanMetaData( new JavaBeanConstrainedType<>( clazz ) ).getBeanDescriptor();
 	}
 
 	@Override
@@ -453,7 +483,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private <U> void validateConstraintsForDefaultGroup(BaseBeanValidationContext<?> validationContext, BeanValueContext<U, Object> valueContext) {
 		final BeanMetaData<U> beanMetaData = valueContext.getCurrentBeanMetaData();
-		final Map<Class<?>, Class<?>> validatedInterfaces = new HashMap<>();
+		final Map<HibernateConstrainedType<?>, HibernateConstrainedType<?>> validatedInterfaces = new HashMap<>();
 
 		// evaluating the constraints of a bean per class in hierarchy, this is necessary to detect potential default group re-definitions
 		for ( BeanMetaData<? super U> hostingBeanMetaData : beanMetaData.getBeanMetadataHierarchy() ) {
@@ -469,7 +499,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						boolean validationSuccessful = true;
 
 						for ( Group defaultSequenceMember : groupOfGroups ) {
-							validationSuccessful = validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, hostingBeanMetaData.getBeanClass(),
+							validationSuccessful = validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, hostingBeanMetaData.getConstrainedType(),
 									metaConstraints, defaultSequenceMember );
 						}
 
@@ -484,7 +514,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			// fast path in case the default group sequence hasn't been redefined
 			else {
 				Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
-				validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, hostingBeanMetaData.getBeanClass(), metaConstraints,
+				validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, hostingBeanMetaData.getConstrainedType(), metaConstraints,
 						Group.DEFAULT_GROUP );
 				validationContext.markCurrentBeanAsProcessed( valueContext );
 			}
@@ -496,8 +526,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private <U> boolean validateConstraintsForSingleDefaultGroupElement(BaseBeanValidationContext<?> validationContext, ValueContext<U, Object> valueContext, final Map<Class<?>, Class<?>> validatedInterfaces,
-			Class<? super U> clazz, Set<MetaConstraint<?>> metaConstraints, Group defaultSequenceMember) {
+	private <U> boolean validateConstraintsForSingleDefaultGroupElement(BaseBeanValidationContext<?> validationContext, ValueContext<U, Object> valueContext, final Map<HibernateConstrainedType<?>, HibernateConstrainedType<?>> validatedInterfaces,
+			HibernateConstrainedType<? super U> constrainedType, Set<MetaConstraint<?>> metaConstraints, Group defaultSequenceMember) {
 		boolean validationSuccessful = true;
 
 		valueContext.setCurrentGroup( defaultSequenceMember.getDefiningClass() );
@@ -505,13 +535,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
 			// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
 			// time. An interface can define more than one constraint, we have to check the class we are validating.
-			final Class<?> declaringClass = metaConstraint.getLocation().getDeclaringClass();
+			final HibernateConstrainedType<?> declaringClass = metaConstraint.getLocation().getDeclaringConstrainedType();
 			if ( declaringClass.isInterface() ) {
-				Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
-				if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
+				HibernateConstrainedType<?> validatedForClass = validatedInterfaces.get( declaringClass );
+				if ( validatedForClass != null && !validatedForClass.equals( constrainedType ) ) {
 					continue;
 				}
-				validatedInterfaces.put( declaringClass, clazz );
+				validatedInterfaces.put( declaringClass, constrainedType );
 			}
 
 			boolean tmp = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), metaConstraint );
@@ -775,9 +805,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return newValueContext;
 	}
 
-	private <T> Set<ConstraintViolation<T>> validateValueInContext(BaseBeanValidationContext<T> validationContext, Object value, PathImpl propertyPath,
-			ValidationOrder validationOrder) {
-		BeanValueContext<?, Object> valueContext = getValueContextForValueValidation( validationContext.getRootBeanClass(), propertyPath );
+	private <T> Set<ConstraintViolation<T>> validateValueInContext(BaseBeanValidationContext<T> validationContext, Object value, HibernateConstrainedType<T> constrainedType,
+			PathImpl propertyPath, ValidationOrder validationOrder) {
+		BeanValueContext<?, Object> valueContext = getValueContextForValueValidation( constrainedType, propertyPath );
 		valueContext.setCurrentValidatedValue( value );
 
 		BeanMetaData<?> beanMetaData = valueContext.getCurrentBeanMetaData();
@@ -1146,13 +1176,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * 		the given property path.
 	 */
 	private <V> BeanValueContext<?, V> getValueContextForPropertyValidation(BaseBeanValidationContext<?> validationContext, PathImpl propertyPath) {
-		Class<?> clazz = validationContext.getRootBeanClass();
 		BeanMetaData<?> beanMetaData = validationContext.getRootBeanMetaData();
 		Object value = validationContext.getRootBean();
 		PropertyMetaData propertyMetaData = null;
 
 		Iterator<Path.Node> propertyPathIter = propertyPath.iterator();
 
+		HibernateConstrainedType<?> constrainedType = null;
 		while ( propertyPathIter.hasNext() ) {
 			// cast is ok, since we are dealing with engine internal classes
 			NodeImpl propertyPathNode = (NodeImpl) propertyPathIter.next();
@@ -1169,7 +1199,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				if ( value == null ) {
 					throw LOG.getUnableToReachPropertyToValidateException( validationContext.getRootBean(), propertyPath );
 				}
-				clazz = value.getClass();
 
 				// if we are in the case of an iterable and we want to validate an element of this iterable, we have to get the
 				// element value
@@ -1190,19 +1219,22 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						throw LOG.getUnableToReachPropertyToValidateException( validationContext.getRootBean(), propertyPath );
 					}
 
-					clazz = value.getClass();
-					beanMetaData = beanMetaDataManager.getBeanMetaData( clazz );
+					// TODO: is there a better way of doing this?
+					constrainedType = propertyMetaData.getConstrainedTypeForPropertyPathAndValue( propertyPathNode, value );
+
+					beanMetaData = beanMetaDataManager.getBeanMetaData( constrainedType );
 					propertyMetaData = getBeanPropertyMetaData( beanMetaData, propertyPathNode );
 				}
 				else {
-					beanMetaData = beanMetaDataManager.getBeanMetaData( clazz );
+					constrainedType = propertyMetaData.getConstrainedTypeForPropertyPathAndValue( propertyPathNode, value );
+					beanMetaData = beanMetaDataManager.getBeanMetaData( constrainedType );
 				}
 			}
 		}
 
 		if ( propertyMetaData == null ) {
 			// should only happen if the property path is empty, which should never happen
-			throw LOG.getInvalidPropertyPathException( clazz, propertyPath.asString() );
+			throw LOG.getInvalidPropertyPathException( constrainedType.getActuallClass() , propertyPath.asString() );
 		}
 
 		propertyPath.removeLeafNode();
@@ -1216,14 +1248,14 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * We are only able to use the static types as we don't have the value.
 	 * </p>
 	 *
-	 * @param rootBeanClass The class of the root bean.
+	 * @param hibernateConstrainedType The class of the root bean.
 	 * @param propertyPath The property path for which constraints have to be collected.
 	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to
 	 * the given property path.
 	 */
-	private <V> BeanValueContext<?, V> getValueContextForValueValidation(Class<?> rootBeanClass,
+	private <V> BeanValueContext<?, V> getValueContextForValueValidation(HibernateConstrainedType<?> hibernateConstrainedType,
 			PathImpl propertyPath) {
-		Class<?> clazz = rootBeanClass;
+		HibernateConstrainedType<?> constrainedType = hibernateConstrainedType;
 		BeanMetaData<?> beanMetaData = null;
 		PropertyMetaData propertyMetaData = null;
 
@@ -1232,7 +1264,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		while ( propertyPathIter.hasNext() ) {
 			// cast is ok, since we are dealing with engine internal classes
 			NodeImpl propertyPathNode = (NodeImpl) propertyPathIter.next();
-			beanMetaData = beanMetaDataManager.getBeanMetaData( clazz );
+			beanMetaData = beanMetaDataManager.getBeanMetaData( constrainedType );
 			propertyMetaData = getBeanPropertyMetaData( beanMetaData, propertyPathNode );
 
 			// if the property is not the leaf property, we set up the context for the next iteration
@@ -1242,19 +1274,19 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				if ( propertyPathNode.isIterable() ) {
 					propertyPathNode = (NodeImpl) propertyPathIter.next();
 
-					clazz = ReflectionHelper.getClassFromType( ReflectionHelper.getCollectionElementType( propertyMetaData.getType() ) );
-					beanMetaData = beanMetaDataManager.getBeanMetaData( clazz );
+					constrainedType = propertyMetaData.getConstrainedTypeForPropertyPath( propertyPathNode );
+					beanMetaData = beanMetaDataManager.getBeanMetaData( constrainedType );
 					propertyMetaData = getBeanPropertyMetaData( beanMetaData, propertyPathNode );
 				}
 				else {
-					clazz = ReflectionHelper.getClassFromType( propertyMetaData.getType() );
+					constrainedType = propertyMetaData.getConstrainedTypeForPropertyPath( propertyPathNode );
 				}
 			}
 		}
 
 		if ( propertyMetaData == null ) {
 			// should only happen if the property path is empty, which should never happen
-			throw LOG.getInvalidPropertyPathException( clazz, propertyPath.asString() );
+			throw LOG.getInvalidPropertyPathException( constrainedType.getActuallClass(), propertyPath.asString() );
 		}
 
 		propertyPath.removeLeafNode();
@@ -1370,7 +1402,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private PropertyMetaData getBeanPropertyMetaData(BeanMetaData<?> beanMetaData, Path.Node propertyNode) {
 		if ( !ElementKind.PROPERTY.equals( propertyNode.getKind() ) ) {
-			throw LOG.getInvalidPropertyPathException( beanMetaData.getBeanClass(), propertyNode.getName() );
+			throw LOG.getInvalidPropertyPathException( beanMetaData.getConstrainedType().getActuallClass(), propertyNode.getName() );
 		}
 
 		return beanMetaData.getMetaDataFor( propertyNode.getName() );

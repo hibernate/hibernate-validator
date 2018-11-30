@@ -8,6 +8,8 @@ package org.hibernate.validator.internal.metadata.location;
 
 import java.lang.reflect.Type;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
+import org.hibernate.validator.internal.engine.constrainedtype.JavaBeanConstrainedType;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
@@ -26,15 +28,17 @@ class ReturnValueConstraintLocation implements ConstraintLocation {
 	private final Callable callable;
 
 	private final ConstraintLocationKind kind;
+	private final HibernateConstrainedType<?> constrainedType;
 
 	ReturnValueConstraintLocation(Callable callable) {
 		this.callable = callable;
 		this.kind = ConstraintLocationKind.of( callable.getConstrainedElementKind() );
+		this.constrainedType = new JavaBeanConstrainedType<>( callable.getDeclaringClass() );
 	}
 
 	@Override
-	public Class<?> getDeclaringClass() {
-		return callable.getDeclaringClass();
+	public HibernateConstrainedType<?> getDeclaringConstrainedType() {
+		return constrainedType;
 	}
 
 	@Override

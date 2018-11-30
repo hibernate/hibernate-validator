@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.location;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -47,8 +48,8 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
-	public Class<?> getDeclaringClass() {
-		return delegate.getDeclaringClass();
+	public HibernateConstrainedType<?> getDeclaringConstrainedType() {
+		return delegate.getDeclaringConstrainedType();
 	}
 
 	@Override

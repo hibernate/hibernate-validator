@@ -11,6 +11,7 @@ import java.util.Set;
 
 import javax.validation.ElementKind;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ClassDescriptorImpl;
@@ -27,12 +28,12 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
  */
 public class ClassMetaData extends AbstractConstraintMetaData {
 
-	private ClassMetaData(Class<?> beanClass,
+	private ClassMetaData(HibernateConstrainedType<?> constrainedType,
 			Set<MetaConstraint<?>> constraints,
 			Set<MetaConstraint<?>> containerElementsConstraints) {
 		super(
-				beanClass.getSimpleName(),
-				beanClass,
+				constrainedType.getActuallClass().getSimpleName(),
+				constrainedType.getActuallClass(),
 				constraints,
 				containerElementsConstraints,
 				false,
@@ -84,8 +85,8 @@ public class ClassMetaData extends AbstractConstraintMetaData {
 	}
 
 	public static class Builder extends MetaDataBuilder {
-		public Builder(Class<?> beanClass, ConstrainedType constrainedType, ConstraintCreationContext constraintCreationContext) {
-			super( beanClass, constraintCreationContext );
+		public Builder(HibernateConstrainedType<?> hibernateConstrainedType, ConstrainedType constrainedType, ConstraintCreationContext constraintCreationContext) {
+			super( hibernateConstrainedType, constraintCreationContext );
 
 			add( constrainedType );
 		}
@@ -103,7 +104,7 @@ public class ClassMetaData extends AbstractConstraintMetaData {
 		@Override
 		public ClassMetaData build() {
 			return new ClassMetaData(
-					getBeanClass(),
+					getConstrainedType(),
 					adaptOriginsAndImplicitGroups( getDirectConstraints() ),
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() )
 			);

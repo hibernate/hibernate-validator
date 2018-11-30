@@ -12,15 +12,16 @@ import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.R
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataBuilder;
-import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
@@ -32,7 +33,6 @@ import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -51,7 +51,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Gunnar Morling
  * @author Chris Beckey &lt;cbeckey@paypal.com&gt;
  * @author Guillaume Smet
-*/
+ */
 public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 	/**
 	 * The default initial capacity for this cache.
@@ -85,7 +85,7 @@ public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 	/**
 	 * Used to cache the constraint meta data for validated entities
 	 */
-	private final ConcurrentReferenceHashMap<Class<?>, BeanMetaData<?>> beanMetaDataCache;
+	private final ConcurrentReferenceHashMap<HibernateConstrainedType<?>, BeanMetaData<?>> beanMetaDataCache;
 
 	/**
 	 * Used for resolving type parameters. Thread-safe.
@@ -141,20 +141,19 @@ public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 		this.metaDataProviders = CollectionHelper.toImmutableList( tmpMetaDataProviders );
 	}
 
-	@Override
 	@SuppressWarnings("unchecked")
-	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
-		Contracts.assertNotNull( beanClass, MESSAGES.beanTypeCannotBeNull() );
+	public <T> BeanMetaData<T> getBeanMetaData(HibernateConstrainedType<T> constrainedType) {
+		Contracts.assertNotNull( constrainedType, MESSAGES.beanTypeCannotBeNull() );
 
 		// First, let's do a simple lookup as it's the default case
-		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataCache.get( beanClass );
+		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataCache.get( constrainedType );
 
 		if ( beanMetaData != null ) {
 			return beanMetaData;
 		}
 
-		beanMetaData = createBeanMetaData( beanClass );
-		BeanMetaData<T> previousBeanMetaData = (BeanMetaData<T>) beanMetaDataCache.putIfAbsent( beanClass, beanMetaData );
+		beanMetaData = createBeanMetaData( constrainedType );
+		BeanMetaData<T> previousBeanMetaData = (BeanMetaData<T>) beanMetaDataCache.putIfAbsent( constrainedType, beanMetaData );
 
 		// we return the previous value if not null
 		if ( previousBeanMetaData != null ) {
@@ -178,22 +177,44 @@ public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 	 * data providers for the given type and its hierarchy.
 	 *
 	 * @param <T> The type of interest.
-	 * @param clazz The type's class.
+	 * @param constrainedType The type's class.
 	 *
 	 * @return A bean meta data object for the given type.
 	 */
-	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
+	private <T> BeanMetaData<T> createBeanMetaData(HibernateConstrainedType<T> constrainedType) {
+		List<HibernateConstrainedType<? super T>> hierarchy = constrainedType.getHierarchy();
+
+		if ( hierarchy.isEmpty() ) {
+			// it means that our `constrained type is an interface and we don't care about super-type bean metadata.
+			// can happen if not a real class is passed for validation but for example a Validator#getConstraintsForClass(Class<?>)
+			// is called
+			hierarchy = Collections.singletonList( constrainedType );
+		}
+
+		List<BeanMetaData<?>> list = new ArrayList<>( hierarchy.size() );
+		for ( int index = hierarchy.size() - 1; index > -1; index-- ) {
+			HibernateConstrainedType<? super T> type = hierarchy.get( index );
+			// we skip interfaces if any occur, unless constrained type is an interface itself...
+			if ( !constrainedType.equals( type ) && type.isInterface() ) {
+				continue;
+			}
+			list.add( 0, beanMetaDataCache.computeIfAbsent( type, cType -> findSingleBeanMetaData( cType, list ) ) );
+		}
+
+		return (BeanMetaData<T>) list.get( 0 );
+	}
+
+	private <T> BeanMetaData<T> findSingleBeanMetaData(HibernateConstrainedType<T> constrainedType, List<BeanMetaData<?>> hierarchy) {
 		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance(
 				constraintCreationContext, executableHelper, parameterNameProvider,
-				validationOrderGenerator, clazz, methodValidationConfiguration );
+				validationOrderGenerator, constrainedType, methodValidationConfiguration );
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
-			for ( BeanConfiguration<? super T> beanConfiguration : getBeanConfigurationForHierarchy( provider, clazz ) ) {
+			for ( BeanConfiguration<? super T> beanConfiguration : getBeanConfigurationForHierarchy( provider, constrainedType ) ) {
 				builder.add( beanConfiguration );
 			}
 		}
-
-		return builder.build( this );
+		return builder.build( hierarchy );
 	}
 
 	/**
@@ -212,16 +233,17 @@ public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 	 * Returns a list with the configurations for all types contained in the given type's hierarchy (including
 	 * implemented interfaces) starting at the specified type.
 	 *
-	 * @param beanClass The type of interest.
+	 * @param constrainedType The type of interest.
 	 * @param <T> The type of the class to get the configurations for.
+	 *
 	 * @return A set with the configurations for the complete hierarchy of the given type. May be empty, but never
 	 * {@code null}.
 	 */
-	private <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(MetaDataProvider provider, Class<T> beanClass) {
+	private <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(MetaDataProvider provider, HibernateConstrainedType<T> constrainedType) {
 		List<BeanConfiguration<? super T>> configurations = newArrayList();
 
-		for ( Class<? super T> clazz : ClassHierarchyHelper.getHierarchy( beanClass ) ) {
-			BeanConfiguration<? super T> configuration = provider.getBeanConfiguration( clazz );
+		for ( HibernateConstrainedType<? super T> type : constrainedType.getHierarchy() ) {
+			BeanConfiguration<? super T> configuration = provider.getBeanConfiguration( type );
 			if ( configuration != null ) {
 				configurations.add( configuration );
 			}

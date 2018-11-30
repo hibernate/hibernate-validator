@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.ElementKind;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
@@ -155,16 +156,16 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		private final Map<Property, Cascadable.Builder> cascadableBuilders = new HashMap<>();
 		private final Type propertyType;
 
-		public Builder(Class<?> beanClass, ConstrainedField constrainedProperty, ConstraintCreationContext constraintCreationContext) {
-			super( beanClass, constraintCreationContext );
+		public Builder(HibernateConstrainedType<?> constrainedType, ConstrainedField constrainedProperty, ConstraintCreationContext constraintCreationContext) {
+			super( constrainedType, constraintCreationContext );
 
 			this.propertyName = constrainedProperty.getField().getName();
 			this.propertyType = constrainedProperty.getField().getType();
 			add( constrainedProperty );
 		}
 
-		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedMethod, ConstraintCreationContext constraintCreationContext) {
-			super( beanClass, constraintCreationContext );
+		public Builder(HibernateConstrainedType<?> constrainedType, ConstrainedExecutable constrainedMethod, ConstraintCreationContext constraintCreationContext) {
+			super( constrainedType, constraintCreationContext );
 
 			this.propertyName = constrainedMethod.getCallable().as( Property.class ).getPropertyName();
 			this.propertyType = constrainedMethod.getCallable().getType();

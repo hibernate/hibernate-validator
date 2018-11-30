@@ -19,6 +19,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.internal.engine.constrainedtype.JavaBeanConstrainedType;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
@@ -51,7 +52,7 @@ public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProvi
 
 	@Test
 	public void testFieldTypeArgument() throws Exception {
-		BeanConfiguration<A> beanConfiguration = provider.getBeanConfiguration( A.class );
+		BeanConfiguration<A> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( A.class ) );
 
 		ConstrainedField field = findConstrainedField( beanConfiguration, A.class, "names" );
 		assertThat( field.getTypeArgumentConstraints().size() ).isEqualTo( 2 );
@@ -62,7 +63,7 @@ public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProvi
 
 	@Test
 	public void testGetterTypeArgument() throws Exception {
-		BeanConfiguration<B> beanConfiguration = provider.getBeanConfiguration( B.class );
+		BeanConfiguration<B> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( B.class ) );
 
 		ConstrainedExecutable executable = findConstrainedMethod( beanConfiguration, B.class, "getNames" );
 		assertThat( executable.getTypeArgumentConstraints().size() ).isEqualTo( 2 );
@@ -73,7 +74,7 @@ public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProvi
 
 	@Test
 	public void testReturnValueTypeArgument() throws Exception {
-		BeanConfiguration<C> beanConfiguration = provider.getBeanConfiguration( C.class );
+		BeanConfiguration<C> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( C.class ) );
 
 		ConstrainedExecutable executable = findConstrainedMethod( beanConfiguration, C.class, "returnNames" );
 		assertThat( executable.getTypeArgumentConstraints().size() ).isEqualTo( 2 );
@@ -84,7 +85,7 @@ public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProvi
 
 	@Test
 	public void testExecutableParameterTypeArgument() throws Exception {
-		BeanConfiguration<D> beanConfiguration = provider.getBeanConfiguration( D.class );
+		BeanConfiguration<D> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( D.class ) );
 
 		ConstrainedExecutable executable = findConstrainedMethod(
 				beanConfiguration,
@@ -103,7 +104,7 @@ public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProvi
 
 	@Test
 	public void testConstructorParameterTypeArgument() throws Exception {
-		BeanConfiguration<E> beanConfiguration = provider.getBeanConfiguration( E.class );
+		BeanConfiguration<E> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( E.class ) );
 
 		ConstrainedExecutable executable = findConstrainedConstructor(
 				beanConfiguration,
@@ -122,8 +123,8 @@ public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProvi
 
 	private List<Class<? extends Annotation>> getAnnotationsTypes(Collection<MetaConstraint<?>> metaConstraints) {
 		return metaConstraints.stream()
-			.map( m -> m.getDescriptor().getAnnotationType() )
-			.collect( Collectors.toList() );
+				.map( m -> m.getDescriptor().getAnnotationType() )
+				.collect( Collectors.toList() );
 	}
 
 	static class A {

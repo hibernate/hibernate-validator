@@ -27,10 +27,11 @@ import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
+import org.hibernate.validator.internal.engine.constrainedtype.JavaBeanConstrainedType;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -40,7 +41,6 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation.Con
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
-import org.hibernate.validator.internal.util.classhierarchy.Filters;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
@@ -76,7 +76,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * The root bean class for this meta data.
 	 */
-	private final Class<T> beanClass;
+	private final HibernateConstrainedType<T> constrainedType;
 
 	/**
 	 * Set of all constraints for this bean type (defined on any implemented interfaces or super types)
@@ -164,18 +164,19 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * Creates a new {@link BeanMetaDataImpl}
 	 *
-	 * @param beanClass The Java type represented by this meta data object.
+	 * @param constrainedType The Java type represented by this meta data object.
 	 * @param defaultGroupSequence The default group sequence.
 	 * @param defaultGroupSequenceProvider The default group sequence provider if set.
 	 * @param constraintMetaDataSet All constraint meta data relating to the represented type.
 	 */
-	public BeanMetaDataImpl(BeanMetaDataManager beanMetaDataManager, Class<T> beanClass,
-							List<Class<?>> defaultGroupSequence,
-							DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider,
-							Set<ConstraintMetaData> constraintMetaDataSet,
-							ValidationOrderGenerator validationOrderGenerator) {
+	public BeanMetaDataImpl(HibernateConstrainedType<T> constrainedType,
+			List<Class<?>> defaultGroupSequence,
+			DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider,
+			Set<ConstraintMetaData> constraintMetaDataSet,
+			ValidationOrderGenerator validationOrderGenerator,
+			List<BeanMetaData<?>> beanMetadataHierarchy) {
 		this.validationOrderGenerator = validationOrderGenerator;
-		this.beanClass = beanClass;
+		this.constrainedType = constrainedType;
 		this.propertyMetaDataMap = newHashMap();
 
 		Set<PropertyMetaData> propertyMetaDataSet = newHashSet();
@@ -219,22 +220,16 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.cascadedProperties = CollectionHelper.toImmutableSet( cascadedProperties );
 		this.allMetaConstraints = CollectionHelper.toImmutableSet( allMetaConstraints );
 
-		// get the metadata for all other classes in hierarchy:
-		List<Class<? super T>> hierarchy = ClassHierarchyHelper.getHierarchy(
-				beanClass,
-				Filters.excludeInterfaces()
-		);
-		List<BeanMetaData<? super T>> beanMetadataHierarchy = new ArrayList<>( hierarchy.size() );
+		List<BeanMetaData<? super T>> beanMetadataHierarchyTmp = new ArrayList<>( beanMetadataHierarchy.size() + 1 );
 		// metadata for a class `beanClass` should go as a first element in the list
-		beanMetadataHierarchy.add( this );
-		for ( int index = 1; index < hierarchy.size(); index++ ) {
-			beanMetadataHierarchy.add( beanMetaDataManager.getBeanMetaData( hierarchy.get( index ) ) );
+		beanMetadataHierarchyTmp.add( this );
+		for ( BeanMetaData<?> beanMetaData : beanMetadataHierarchy ) {
+			beanMetadataHierarchyTmp.add( (BeanMetaData<? super T>) beanMetaData );
 		}
 
-		this.beanMetadataHierarchyWithoutInterfaces = CollectionHelper.toImmutableList( beanMetadataHierarchy );
+		this.beanMetadataHierarchyWithoutInterfaces = CollectionHelper.toImmutableList( beanMetadataHierarchyTmp );
 
-
-		DefaultGroupSequenceContext<? super T> defaultGroupContext = getDefaultGroupSequenceData( beanClass, defaultGroupSequence, defaultGroupSequenceProvider, validationOrderGenerator );
+		DefaultGroupSequenceContext<? super T> defaultGroupContext = getDefaultGroupSequenceData( constrainedType.getActuallClass(), defaultGroupSequence, defaultGroupSequenceProvider, validationOrderGenerator );
 		this.defaultGroupSequenceProvider = defaultGroupContext.defaultGroupSequenceProvider;
 		this.defaultGroupSequence = CollectionHelper.toImmutableList( defaultGroupContext.defaultGroupSequence );
 		this.validationOrder = defaultGroupContext.validationOrder;
@@ -250,8 +245,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	@Override
-	public Class<T> getBeanClass() {
-		return beanClass;
+	public HibernateConstrainedType<T> getConstrainedType() {
+		return constrainedType;
 	}
 
 	@Override
@@ -268,7 +263,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				beanDescriptor = this.beanDescriptor;
 
 				if ( beanDescriptor == null ) {
-					beanDescriptor = createBeanDescriptor( beanClass, allMetaConstraints, propertyMetaDataMap, executableMetaDataMap,
+					beanDescriptor = createBeanDescriptor( constrainedType.getActuallClass(), allMetaConstraints, propertyMetaDataMap, executableMetaDataMap,
 							defaultGroupSequenceRedefined, resolvedDefaultGroupSequence );
 
 					this.beanDescriptor = beanDescriptor;
@@ -294,7 +289,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		PropertyMetaData propertyMetaData = propertyMetaDataMap.get( propertyName );
 
 		if ( propertyMetaData == null ) {
-			throw LOG.getPropertyNotDefinedByValidatedTypeException( beanClass, propertyName );
+			throw LOG.getPropertyNotDefinedByValidatedTypeException( constrainedType.getActuallClass(), propertyName );
 		}
 
 		return propertyMetaData;
@@ -323,7 +318,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		if ( executableMetaData == null ) {
 			// there is no executable metadata - specified object and method do not match
 			throw LOG.getMethodOrConstructorNotDefinedByValidatedTypeException(
-					beanClass,
+					constrainedType.getActuallClass(),
 					executable
 			);
 		}
@@ -335,7 +330,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	public List<Class<?>> getDefaultGroupSequence(T beanState) {
 		if ( hasDefaultGroupSequenceProvider() ) {
 			List<Class<?>> providerDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( beanState );
-			return getValidDefaultGroupSequence( beanClass, providerDefaultGroupSequence );
+			return getValidDefaultGroupSequence( constrainedType.getActuallClass(), providerDefaultGroupSequence );
 		}
 
 		return defaultGroupSequence;
@@ -346,8 +341,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		if ( hasDefaultGroupSequenceProvider() ) {
 			List<Class<?>> providerDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( beanState );
 			return validationOrderGenerator.getDefaultValidationOrder(
-					beanClass,
-					getValidDefaultGroupSequence( beanClass, providerDefaultGroupSequence )
+					constrainedType.getActuallClass(),
+					getValidDefaultGroupSequence( constrainedType.getActuallClass(), providerDefaultGroupSequence )
 			)
 					.getSequenceIterator();
 		}
@@ -492,13 +487,16 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private Set<MetaConstraint<?>> getDirectConstraints() {
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
-		Set<Class<?>> classAndInterfaces = newHashSet();
-		classAndInterfaces.add( beanClass );
-		classAndInterfaces.addAll( ClassHierarchyHelper.getDirectlyImplementedInterfaces( beanClass ) );
+		Set<HibernateConstrainedType<?>> classAndInterfaces = newHashSet();
+		classAndInterfaces.add( constrainedType );
+		for ( Class<? super T> directlyImplementedInterface : ClassHierarchyHelper.getDirectlyImplementedInterfaces( constrainedType.getActuallClass() ) ) {
+			classAndInterfaces.add( new JavaBeanConstrainedType<>( directlyImplementedInterface ) );
+		}
 
-		for ( Class<?> clazz : classAndInterfaces ) {
+
+		for ( HibernateConstrainedType<?> type : classAndInterfaces ) {
 			for ( MetaConstraint<?> metaConstraint : allMetaConstraints ) {
-				if ( metaConstraint.getLocation().getDeclaringClass().equals( clazz ) ) {
+				if ( metaConstraint.getLocation().getDeclaringConstrainedType().equals( type ) ) {
 					constraints.add( metaConstraint );
 				}
 			}
@@ -562,7 +560,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@Override
 	public String toString() {
 		return "BeanMetaDataImpl"
-				+ "{beanClass=" + beanClass.getSimpleName()
+				+ "{beanClass=" + constrainedType.getActuallClass().getSimpleName()
 				+ ", constraintCount=" + getMetaConstraints().size()
 				+ ", cascadedPropertiesCount=" + cascadedProperties.size()
 				+ ", defaultGroupSequence=" + getDefaultGroupSequence( null ) + '}';

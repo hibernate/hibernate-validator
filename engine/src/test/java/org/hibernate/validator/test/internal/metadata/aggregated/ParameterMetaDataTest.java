@@ -7,6 +7,7 @@
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.testutils.BeanMetadataManagerUtil.getBeanMetadata;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -67,7 +68,7 @@ public class ParameterMetaDataTest {
 				new MethodValidationConfiguration.Builder().build()
 		);
 
-		beanMetaData = beanMetaDataManager.getBeanMetaData( CustomerRepository.class );
+		beanMetaData = getBeanMetadata( beanMetaDataManager, CustomerRepository.class );
 	}
 
 	@Test
@@ -135,7 +136,7 @@ public class ParameterMetaDataTest {
 				Collections.<MetaDataProvider>emptyList(),
 				new MethodValidationConfiguration.Builder().build()
 		);
-		BeanMetaData<ServiceImpl> localBeanMetaData = beanMetaDataManager.getBeanMetaData( ServiceImpl.class );
+		BeanMetaData<ServiceImpl> localBeanMetaData = getBeanMetadata( beanMetaDataManager, ServiceImpl.class );
 
 		Method method = Service.class.getMethod( "sayHello", String.class );
 		ExecutableMetaData methodMetaData = localBeanMetaData.getMetaDataFor( method ).get();

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
@@ -35,7 +36,7 @@ public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 
 	// cached against the fqcn of a class. not a class instance itself (HV-479)
 	@Immutable
-	private final Map<String, BeanConfiguration<?>> configuredBeans;
+	private final Map<HibernateConstrainedType<?>, BeanConfiguration<?>> configuredBeans;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
 	public ProgrammaticMetaDataProvider(ConstraintCreationContext constraintCreationContext,
@@ -64,14 +65,14 @@ public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 		}
 	}
 
-	private static Map<String, BeanConfiguration<?>> createBeanConfigurations(Set<DefaultConstraintMapping> mappings,
+	private static Map<HibernateConstrainedType<?>, BeanConfiguration<?>> createBeanConfigurations(Set<DefaultConstraintMapping> mappings,
 			ConstraintCreationContext constraintCreationContext) {
-		final Map<String, BeanConfiguration<?>> configuredBeans = new HashMap<>();
+		final Map<HibernateConstrainedType<?>, BeanConfiguration<?>> configuredBeans = new HashMap<>();
 		for ( DefaultConstraintMapping mapping : mappings ) {
 			Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations( constraintCreationContext );
 
 			for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {
-				configuredBeans.put( beanConfiguration.getBeanClass().getName(), beanConfiguration );
+				configuredBeans.put( beanConfiguration.getConstrainedType(), beanConfiguration );
 			}
 		}
 		return configuredBeans;
@@ -105,8 +106,8 @@ public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass) {
-		return (BeanConfiguration<T>) configuredBeans.get( beanClass.getName() );
+	public <T> BeanConfiguration<T> getBeanConfiguration(HibernateConstrainedType<T> constrainedType) {
+		return (BeanConfiguration<T>) configuredBeans.get( constrainedType );
 	}
 
 	@Override

@@ -25,12 +25,16 @@ import java.util.stream.Stream;
 import javax.validation.metadata.ContainerElementTypeDescriptor;
 import javax.validation.metadata.GroupConversionDescriptor;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
+import org.hibernate.validator.internal.engine.constrainedtype.JavaBeanConstrainedType;
+import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ContainerElementTypeDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
@@ -68,6 +72,20 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 				.collect( Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) );
 		this.isCascading = isCascading;
 		this.isConstrained = isConstrained;
+	}
+
+	public HibernateConstrainedType<?> getConstrainedTypeForPropertyPath(NodeImpl node) {
+		if ( node.getIndex() == null ) {
+			return new JavaBeanConstrainedType<>( ReflectionHelper.getClassFromType( getType() ) );
+		}
+		else {
+			// TODO: Do we need to make sure that actual index from the node is used and not the 'predefined' one from the helper logic?
+			return new JavaBeanConstrainedType<>( ReflectionHelper.getClassFromType( ReflectionHelper.getCollectionElementType( getType() ) ) );
+		}
+	}
+
+	public HibernateConstrainedType<?> getConstrainedTypeForPropertyPathAndValue(NodeImpl node, Object value) {
+		return new JavaBeanConstrainedType<>( value.getClass() );
 	}
 
 	@Override

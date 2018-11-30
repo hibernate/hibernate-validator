@@ -8,6 +8,8 @@ package org.hibernate.validator.internal.metadata.location;
 
 import java.lang.reflect.Type;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
+import org.hibernate.validator.internal.engine.constrainedtype.JavaBeanConstrainedType;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -25,7 +27,7 @@ class BeanConstraintLocation implements ConstraintLocation {
 	/**
 	 * The type hosting this location.
 	 */
-	private final Class<?> declaringClass;
+	private final HibernateConstrainedType<?> declaringConstrainedType;
 
 	/**
 	 * The type to be used for validator resolution for constraints at this location.
@@ -33,7 +35,7 @@ class BeanConstraintLocation implements ConstraintLocation {
 	private final Type typeForValidatorResolution;
 
 	BeanConstraintLocation(Class<?> declaringClass) {
-		this.declaringClass = declaringClass;
+		this.declaringConstrainedType = new JavaBeanConstrainedType<>( declaringClass );
 
 		// HV-623 - create a ParameterizedType in case the class has type parameters. Needed for constraint validator
 		// resolution (HF)
@@ -43,8 +45,8 @@ class BeanConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
-	public Class<?> getDeclaringClass() {
-		return declaringClass;
+	public HibernateConstrainedType<?> getDeclaringConstrainedType() {
+		return declaringConstrainedType;
 	}
 
 	@Override
@@ -74,14 +76,14 @@ class BeanConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public String toString() {
-		return "BeanConstraintLocation [declaringClass=" + declaringClass + ", typeForValidatorResolution=" + typeForValidatorResolution + "]";
+		return "BeanConstraintLocation [declaringClass=" + declaringConstrainedType + ", typeForValidatorResolution=" + typeForValidatorResolution + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ( ( declaringClass == null ) ? 0 : declaringClass.hashCode() );
+		result = prime * result + ( ( declaringConstrainedType == null ) ? 0 : declaringConstrainedType.hashCode() );
 		result = prime * result + ( ( typeForValidatorResolution == null ) ? 0 : typeForValidatorResolution.hashCode() );
 		return result;
 	}
@@ -98,12 +100,12 @@ class BeanConstraintLocation implements ConstraintLocation {
 			return false;
 		}
 		BeanConstraintLocation other = (BeanConstraintLocation) obj;
-		if ( declaringClass == null ) {
-			if ( other.declaringClass != null ) {
+		if ( declaringConstrainedType == null ) {
+			if ( other.declaringConstrainedType != null ) {
 				return false;
 			}
 		}
-		else if ( !declaringClass.equals( other.declaringClass ) ) {
+		else if ( !declaringConstrainedType.equals( other.declaringConstrainedType ) ) {
 			return false;
 		}
 		if ( typeForValidatorResolution == null ) {

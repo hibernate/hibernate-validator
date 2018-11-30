@@ -21,6 +21,7 @@ import java.util.Set;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
@@ -275,13 +276,13 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private final ExecutableParameterNameProvider parameterNameProvider;
 
 		public Builder(
-				Class<?> beanClass,
+				HibernateConstrainedType<?> constrainedType,
 				ConstrainedExecutable constrainedExecutable,
 				ConstraintCreationContext constraintCreationContext,
 				ExecutableHelper executableHelper,
 				ExecutableParameterNameProvider parameterNameProvider,
 				MethodValidationConfiguration methodValidationConfiguration) {
-			super( beanClass, constraintCreationContext );
+			super( constrainedType, constraintCreationContext );
 
 			this.executableHelper = executableHelper;
 			this.parameterNameProvider = parameterNameProvider;
@@ -310,7 +311,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				return first.equals( other );
 			}
 
-			return first.isResolvedToSameMethodInHierarchy( executableHelper, getBeanClass(), other );
+			return first.isResolvedToSameMethodInHierarchy( executableHelper, getConstrainedType().getActuallClass(), other );
 		}
 
 		private boolean overrides(Callable first, Callable other) {
@@ -412,7 +413,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					for ( ConstrainedParameter oneParameter : oneExecutable.getAllParameterMetaData() ) {
 						parameterBuilders.add(
 								new ParameterMetaData.Builder(
-										callable.getDeclaringClass(),
+										// TODO: is ot OK to use this constrained type instead of calling the `callable.getDeclaringConstrainedType()` ?
+										getConstrainedType(),
 										oneParameter,
 										constraintCreationContext,
 										parameterNameProvider

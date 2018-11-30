@@ -38,7 +38,9 @@ import javax.validation.GroupSequence;
 import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.group.GroupSequenceProvider;
+import org.hibernate.validator.internal.engine.constrainedtype.JavaBeanConstrainedType;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
@@ -102,7 +104,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		this.javaBeanHelper = javaBeanHelper;
 		this.annotationProcessingOptions = annotationProcessingOptions;
 
-		this.objectBeanConfiguration = retrieveBeanConfiguration( Object.class );
+		this.objectBeanConfiguration = retrieveBeanConfiguration( new JavaBeanConstrainedType<>( Object.class ) );
 	}
 
 	@Override
@@ -112,12 +114,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass) {
-		if ( Object.class.equals( beanClass ) ) {
+	public <T> BeanConfiguration<T> getBeanConfiguration(HibernateConstrainedType<T> constrainedType) {
+		if ( Object.class.equals( constrainedType.getActuallClass() ) ) {
 			return (BeanConfiguration<T>) objectBeanConfiguration;
 		}
 
-		return retrieveBeanConfiguration( beanClass );
+		return retrieveBeanConfiguration( constrainedType );
 	}
 
 	/**
@@ -125,7 +127,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @return Retrieves constraint related meta data from the annotations of the given type.
 	 */
-	private <T> BeanConfiguration<T> retrieveBeanConfiguration(Class<T> beanClass) {
+	private <T> BeanConfiguration<T> retrieveBeanConfiguration(HibernateConstrainedType<T> constrainedType) {
+		Class<T> beanClass = constrainedType.getActuallClass();
 		Set<ConstrainedElement> constrainedElements = getFieldMetaData( beanClass );
 		constrainedElements.addAll( getMethodMetaData( beanClass ) );
 		constrainedElements.addAll( getConstructorMetaData( beanClass ) );
@@ -143,7 +146,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		return new BeanConfiguration<>(
 				ConfigurationSource.ANNOTATION,
-				beanClass,
+				constrainedType,
 				constrainedElements,
 				getDefaultGroupSequence( beanClass ),
 				getDefaultGroupSequenceProvider( beanClass )
