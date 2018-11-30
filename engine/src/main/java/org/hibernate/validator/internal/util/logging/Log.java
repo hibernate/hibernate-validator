@@ -20,6 +20,7 @@ import java.lang.reflect.TypeVariable;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
@@ -64,7 +65,6 @@ import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
-
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
@@ -878,4 +878,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 249, value = "Uninitialized bean metadata for class: %s. Please register your bean class as a class to initialize when initializing your ValidatorFactory.")
 	ValidationException uninitializedBeanMetaData(@FormatWith(ClassObjectFormatter.class) Class<?> clazz);
+
+	@Message(id = 250, value = "Uninitialized locale: %s. Please register your locale as a locale to initialize when initializing your ValidatorFactory.")
+	ValidationException uninitializedLocale(Locale locale);
 }

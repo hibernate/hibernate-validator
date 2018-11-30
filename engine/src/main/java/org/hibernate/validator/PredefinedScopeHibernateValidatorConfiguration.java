@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator;
 
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -21,4 +22,7 @@ public interface PredefinedScopeHibernateValidatorConfiguration extends BaseHibe
 
 	@Incubating
 	PredefinedScopeHibernateValidatorConfiguration initializeBeanMetaData(Set<Class<?>> beanClassesToInitialize);
+
+	@Incubating
+	PredefinedScopeHibernateValidatorConfiguration initializeLocales(Set<Locale> locales);
 }

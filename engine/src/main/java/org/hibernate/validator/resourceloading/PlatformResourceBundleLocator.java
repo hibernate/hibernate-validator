@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.AccessController;
@@ -17,17 +18,21 @@ import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.privilegedactions.GetResources;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
-import org.jboss.logging.Logger;
 
 /**
  * A resource bundle locator, that loads resource bundles by invoking {@code ResourceBundle.loadBundle(String, Local, ClassLoader)}.
@@ -40,15 +45,23 @@ import org.jboss.logging.Logger;
  */
 public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 
-	private static final Logger log = Logger.getLogger( PlatformResourceBundleLocator.class.getName() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 	private static final boolean RESOURCE_BUNDLE_CONTROL_INSTANTIABLE = determineAvailabilityOfResourceBundleControl();
 
 	private final String bundleName;
 	private final ClassLoader classLoader;
 	private final boolean aggregate;
 
+	@Immutable
+	private final Map<Locale, ResourceBundle> preloadedResourceBundles;
+
+	/**
+	 * Creates a new {@link PlatformResourceBundleLocator}.
+	 *
+	 * @param bundleName the name of the bundle to load
+	 */
 	public PlatformResourceBundleLocator(String bundleName) {
-		this( bundleName, null );
+		this( bundleName, Collections.emptySet() );
 	}
 
 	/**
@@ -62,7 +75,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 * @since 5.2
 	 */
 	public PlatformResourceBundleLocator(String bundleName, ClassLoader classLoader) {
-		this( bundleName, classLoader, false );
+		this( bundleName, Collections.emptySet(), classLoader );
 	}
 
 	/**
@@ -77,12 +90,66 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 * @since 5.2
 	 */
 	public PlatformResourceBundleLocator(String bundleName, ClassLoader classLoader, boolean aggregate) {
+		this( bundleName, Collections.emptySet(), classLoader, aggregate );
+	}
+
+	/**
+	 * Creates a new {@link PlatformResourceBundleLocator}.
+	 *
+	 * @param bundleName the name of the bundle to load
+	 * @param localesToInitialize the set of locales to initialize at bootstrap.
+	 *
+	 * @since 6.1
+	 */
+	public PlatformResourceBundleLocator(String bundleName, Set<Locale> localesToInitialize) {
+		this( bundleName, localesToInitialize, null );
+	}
+
+	/**
+	 * Creates a new {@link PlatformResourceBundleLocator}.
+	 *
+	 * @param bundleName the name of the bundle to load
+	 * @param localesToInitialize the set of locales to initialize at bootstrap.
+	 * @param classLoader the classloader to be used for loading the bundle. If {@code null}, the current thread context
+	 * classloader and finally Hibernate Validator's own classloader will be used for loading the specified
+	 * bundle.
+	 *
+	 * @since 6.1
+	 */
+	public PlatformResourceBundleLocator(String bundleName, Set<Locale> localesToInitialize, ClassLoader classLoader) {
+		this( bundleName, localesToInitialize, classLoader, false );
+	}
+
+	/**
+	 * Creates a new {@link PlatformResourceBundleLocator}.
+	 *
+	 * @param bundleName the name of the bundle to load
+	 * @param localesToInitialize the set of locales to initialize at bootstrap.
+	 * @param classLoader the classloader to be used for loading the bundle. If {@code null}, the current thread context
+	 * classloader and finally Hibernate Validator's own classloader will be used for loading the specified
+	 * bundle.
+	 * @param aggregate Whether or not all resource bundles of a given name should be loaded and potentially merged.
+	 *
+	 * @since 6.1
+	 */
+	public PlatformResourceBundleLocator(String bundleName, Set<Locale> localesToInitialize, ClassLoader classLoader, boolean aggregate) {
 		Contracts.assertNotNull( bundleName, "bundleName" );
 
 		this.bundleName = bundleName;
 		this.classLoader = classLoader;
 
 		this.aggregate = aggregate && RESOURCE_BUNDLE_CONTROL_INSTANTIABLE;
+
+		if ( !localesToInitialize.isEmpty() ) {
+			Map<Locale, ResourceBundle> tmpPreloadedResourceBundles = CollectionHelper.newHashMap( localesToInitialize.size() );
+			for ( Locale localeToPreload : localesToInitialize ) {
+				tmpPreloadedResourceBundles.put( localeToPreload, doGetResourceBundle( localeToPreload ) );
+			}
+			this.preloadedResourceBundles = CollectionHelper.toImmutableMap( tmpPreloadedResourceBundles );
+		}
+		else {
+			this.preloadedResourceBundles = Collections.emptyMap();
+		}
 	}
 
 	/**
@@ -95,6 +162,21 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 */
 	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
+		// we are in the preloading case
+		if ( !preloadedResourceBundles.isEmpty() ) {
+			// we need to use containsKey() as the cached resource bundle can be null
+			if ( preloadedResourceBundles.containsKey( locale ) ) {
+				return preloadedResourceBundles.get( locale );
+			}
+			else {
+				throw LOG.uninitializedLocale( locale );
+			}
+		}
+
+		return doGetResourceBundle( locale );
+	}
+
+	private ResourceBundle doGetResourceBundle(Locale locale) {
 		ResourceBundle rb = null;
 
 		if ( classLoader != null ) {
@@ -122,10 +204,10 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 			);
 		}
 		if ( rb != null ) {
-			log.debugf( "%s found.", bundleName );
+			LOG.debugf( "%s found.", bundleName );
 		}
 		else {
-			log.debugf( "%s not found.", bundleName );
+			LOG.debugf( "%s not found.", bundleName );
 		}
 		return rb;
 	}
@@ -150,7 +232,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 			}
 		}
 		catch (MissingResourceException e) {
-			log.trace( message );
+			LOG.trace( message );
 		}
 		return rb;
 	}
@@ -202,7 +284,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 			return !isNamed;
 		}
 		catch (Throwable e) {
-			log.info( MESSAGES.unableToUseResourceBundleAggregation() );
+			LOG.info( MESSAGES.unableToUseResourceBundleAggregation() );
 			return false;
 		}
 	}

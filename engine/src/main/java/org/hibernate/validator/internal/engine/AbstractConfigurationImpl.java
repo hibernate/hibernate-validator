@@ -16,8 +16,10 @@ import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -77,11 +79,11 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
-	private final ResourceBundleLocator defaultResourceBundleLocator;
 
 	/**
 	 * Built lazily so RBMI and its dependency on EL is only initialized if actually needed
 	 */
+	private ResourceBundleLocator defaultResourceBundleLocator;
 	private MessageInterpolator defaultMessageInterpolator;
 	private MessageInterpolator messageInterpolator;
 
@@ -109,6 +111,9 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private Object constraintValidatorPayload;
 	private GetterPropertySelectionStrategy getterPropertySelectionStrategy;
 
+	// locales to initialize eagerly
+	private Set<Locale> localesToInitialize = Collections.emptySet();
+
 	protected AbstractConfigurationImpl(BootstrapState state) {
 		this();
 		if ( state.getValidationProviderResolver() == null ) {
@@ -131,9 +136,6 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private AbstractConfigurationImpl() {
 		this.validationBootstrapParameters = new ValidationBootstrapParameters();
 
-		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator(
-				ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES
-		);
 		this.defaultTraversableResolver = TraversableResolvers.getDefault();
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
@@ -496,7 +498,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	@Override
 	public final MessageInterpolator getDefaultMessageInterpolator() {
 		if ( defaultMessageInterpolator == null ) {
-			defaultMessageInterpolator = new ResourceBundleMessageInterpolator( defaultResourceBundleLocator );
+			defaultMessageInterpolator = new ResourceBundleMessageInterpolator( getDefaultResourceBundleLocator(), localesToInitialize );
 		}
 
 		return defaultMessageInterpolator;
@@ -514,6 +516,11 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	@Override
 	public final ResourceBundleLocator getDefaultResourceBundleLocator() {
+		if ( defaultResourceBundleLocator == null ) {
+			defaultResourceBundleLocator = new PlatformResourceBundleLocator(
+					ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES, localesToInitialize );
+		}
+
 		return defaultResourceBundleLocator;
 	}
 
@@ -648,10 +655,12 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		if ( externalClassLoader != null ) {
 			PlatformResourceBundleLocator userResourceBundleLocator = new PlatformResourceBundleLocator(
 					ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES,
+					localesToInitialize,
 					externalClassLoader
 			);
 			PlatformResourceBundleLocator contributorResourceBundleLocator = new PlatformResourceBundleLocator(
 					ResourceBundleMessageInterpolator.CONTRIBUTOR_VALIDATION_MESSAGES,
+					localesToInitialize,
 					externalClassLoader,
 					true
 			);
@@ -664,7 +673,8 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 				run( SetContextClassLoader.action( externalClassLoader ) );
 				return new ResourceBundleMessageInterpolator(
 						userResourceBundleLocator,
-						contributorResourceBundleLocator
+						contributorResourceBundleLocator,
+						localesToInitialize
 				);
 			}
 			finally {
@@ -674,6 +684,10 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		else {
 			return getDefaultMessageInterpolator();
 		}
+	}
+
+	protected void setLocalesToInitialize(Set<Locale> localesToInitialize) {
+		this.localesToInitialize = localesToInitialize;
 	}
 
 	@SuppressWarnings("unchecked")

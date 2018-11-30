@@ -9,7 +9,9 @@ package org.hibernate.validator.messageinterpolation;
 import java.lang.invoke.MethodHandles;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.el.ELManager;
 import javax.el.ExpressionFactory;
@@ -38,35 +40,69 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	private final ExpressionFactory expressionFactory;
 
 	public ResourceBundleMessageInterpolator() {
-		super();
-		this.expressionFactory = buildExpressionFactory();
+		this( Collections.emptySet() );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
-		super( userResourceBundleLocator );
-		this.expressionFactory = buildExpressionFactory();
+		this( userResourceBundleLocator, Collections.emptySet() );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator) {
-		super( userResourceBundleLocator, contributorResourceBundleLocator );
-		this.expressionFactory = buildExpressionFactory();
+		this( userResourceBundleLocator, contributorResourceBundleLocator, Collections.emptySet() );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator,
 			boolean cachingEnabled) {
-		super( userResourceBundleLocator, contributorResourceBundleLocator, cachingEnabled );
-		this.expressionFactory = buildExpressionFactory();
+		this( userResourceBundleLocator, contributorResourceBundleLocator, Collections.emptySet(), cachingEnabled );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cachingEnabled) {
-		super( userResourceBundleLocator, null, cachingEnabled );
+		this( userResourceBundleLocator, null, Collections.emptySet(), cachingEnabled );
+	}
+
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			boolean cachingEnabled,
+			ExpressionFactory expressionFactory) {
+		this( userResourceBundleLocator, null, Collections.emptySet(), cachingEnabled );
+	}
+
+	public ResourceBundleMessageInterpolator(Set<Locale> localesToInitialize) {
+		super( localesToInitialize );
 		this.expressionFactory = buildExpressionFactory();
 	}
 
-	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cachingEnabled, ExpressionFactory expressionFactory) {
-		super( userResourceBundleLocator, null, cachingEnabled );
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, Set<Locale> localesToInitialize) {
+		super( userResourceBundleLocator, localesToInitialize );
+		this.expressionFactory = buildExpressionFactory();
+	}
+
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			ResourceBundleLocator contributorResourceBundleLocator,
+			Set<Locale> localesToInitialize) {
+		super( userResourceBundleLocator, contributorResourceBundleLocator, localesToInitialize );
+		this.expressionFactory = buildExpressionFactory();
+	}
+
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			ResourceBundleLocator contributorResourceBundleLocator,
+			Set<Locale> localesToInitialize,
+			boolean cachingEnabled) {
+		super( userResourceBundleLocator, contributorResourceBundleLocator, localesToInitialize, cachingEnabled );
+		this.expressionFactory = buildExpressionFactory();
+	}
+
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, Set<Locale> localesToInitialize, boolean cachingEnabled) {
+		super( userResourceBundleLocator, null, localesToInitialize, cachingEnabled );
+		this.expressionFactory = buildExpressionFactory();
+	}
+
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			Set<Locale> localesToInitialize,
+			boolean cachingEnabled,
+			ExpressionFactory expressionFactory) {
+		super( userResourceBundleLocator, null, localesToInitialize, cachingEnabled );
 		this.expressionFactory = expressionFactory;
 	}
 

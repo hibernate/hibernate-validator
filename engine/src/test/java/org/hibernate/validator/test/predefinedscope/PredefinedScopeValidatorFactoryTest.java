@@ -11,7 +11,9 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -125,6 +127,62 @@ public class PredefinedScopeValidatorFactoryTest {
 		assertNoViolations( violations );
 	}
 
+	@Test
+	public void testExistingInitializedLocale() {
+		Locale defaultLocale = Locale.getDefault();
+
+		try {
+			Locale.setDefault( Locale.FRANCE );
+
+			Validator validator = getValidatorWithInitializedLocale( Locale.FRANCE );
+
+			Set<ConstraintViolation<Bean>> violations = validator.validate( new Bean( "", "invalid" ) );
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( Email.class ).withProperty( "email" ).withMessage( "doit être une adresse email bien formée" ) );
+		}
+		finally {
+			Locale.setDefault( defaultLocale );
+		}
+	}
+
+	@Test
+	public void testUnavailableInitializedLocale() {
+		Locale defaultLocale = Locale.getDefault();
+
+		try {
+			Locale georgianLocale = new Locale( "ka", "GE" );
+
+			Locale.setDefault( georgianLocale );
+
+			Validator validator = getValidatorWithInitializedLocale( georgianLocale );
+
+			Set<ConstraintViolation<Bean>> violations = validator.validate( new Bean( "", "invalid" ) );
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( Email.class ).withProperty( "email" ).withMessage( "must be a well-formed email address" ) );
+		}
+		finally {
+			Locale.setDefault( defaultLocale );
+		}
+	}
+
+	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000250:.*")
+	public void testUninitializedLocale() {
+		Locale defaultLocale = Locale.getDefault();
+
+		try {
+			Locale.setDefault( Locale.FRANCE );
+
+			Validator validator = getValidatorWithInitializedLocale( Locale.ENGLISH );
+
+			Set<ConstraintViolation<Bean>> violations = validator.validate( new Bean( "", "invalid" ) );
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( Email.class ).withProperty( "email" ).withMessage( "doit être une adresse email bien formée" ) );
+		}
+		finally {
+			Locale.setDefault( defaultLocale );
+		}
+	}
+
 	private static Validator getValidator() {
 		Set<Class<?>> beanMetaDataToInitialize = new HashSet<>();
 		beanMetaDataToInitialize.add( Bean.class );
@@ -132,6 +190,19 @@ public class PredefinedScopeValidatorFactoryTest {
 		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
 				.initializeBeanMetaData( beanMetaDataToInitialize )
+				.buildValidatorFactory();
+
+		return validatorFactory.getValidator();
+	}
+
+	private static Validator getValidatorWithInitializedLocale(Locale locale) {
+		Set<Class<?>> beanMetaDataToInitialize = new HashSet<>();
+		beanMetaDataToInitialize.add( Bean.class );
+
+		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
+				.configure()
+				.initializeBeanMetaData( beanMetaDataToInitialize )
+				.initializeLocales( Collections.singleton( locale ) )
 				.buildValidatorFactory();
 
 		return validatorFactory.getValidator();
