@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
@@ -719,6 +720,10 @@ public class ConstraintHelper {
 
 	private boolean isBuiltinConstraint(Class<? extends Annotation> annotationType) {
 		return builtinConstraints.containsKey( annotationType );
+	}
+
+	public Set<Class<? extends Annotation>> getBuiltinConstraints() {
+		return CollectionHelper.toImmutableSet( builtinConstraints.keySet() );
 	}
 
 	/**
