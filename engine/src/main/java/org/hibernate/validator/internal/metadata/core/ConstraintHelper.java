@@ -307,6 +307,7 @@ public class ConstraintHelper {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
 	private static final String JAVA_MONEY_CLASS_NAME = "javax.money.MonetaryAmount";
+	private static final String JSOUP_CLASS_NAME = "org.jsoup.Jsoup";
 
 	@Immutable
 	private final Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> builtinConstraints;
@@ -678,7 +679,9 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, PESEL.class, PESELValidator.class );
 		putConstraint( tmpConstraints, Range.class );
 		putConstraint( tmpConstraints, REGON.class, REGONValidator.class );
-		putConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
+		if ( isJsoupInClasspath() ) {
+			putConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
+		}
 		putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
 		putConstraint( tmpConstraints, TituloEleitoral.class );
 		putConstraint( tmpConstraints, UniqueElements.class, UniqueElementsValidator.class );
@@ -992,6 +995,10 @@ public class ConstraintHelper {
 
 	private static boolean isJavaMoneyInClasspath() {
 		return isClassPresent( JAVA_MONEY_CLASS_NAME );
+	}
+
+	private static boolean isJsoupInClasspath() {
+		return isClassPresent( JSOUP_CLASS_NAME );
 	}
 
 	/**
