@@ -7,6 +7,7 @@
 package org.hibernate.validator.resourceloading;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
@@ -27,8 +29,8 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  * @author Gunnar Morling
  */
 public class AggregateResourceBundleLocator extends DelegatingResourceBundleLocator {
-	private final List<String> bundleNames;
-	private final ClassLoader classLoader;
+
+	private final List<PlatformResourceBundleLocator> resourceBundleLocators;
 
 	/**
 	 * Creates a locator that delivers a resource bundle merged from the given
@@ -40,7 +42,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 * first bundle containing the key.
 	 */
 	public AggregateResourceBundleLocator(List<String> bundleNames) {
-		this( bundleNames, null );
+		this( bundleNames, Collections.emptySet(), null );
 	}
 
 	/**
@@ -56,7 +58,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 * source bundles.
 	 */
 	public AggregateResourceBundleLocator(List<String> bundleNames, ResourceBundleLocator delegate) {
-		this( bundleNames, delegate, null );
+		this( bundleNames, Collections.emptySet(), delegate, null );
 	}
 
 	/**
@@ -75,21 +77,77 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 */
 	public AggregateResourceBundleLocator(List<String> bundleNames, ResourceBundleLocator delegate,
 			ClassLoader classLoader) {
+		this( bundleNames, Collections.emptySet(), delegate, classLoader );
+	}
+
+	/**
+	 * Creates a locator that delivers a resource bundle merged from the given
+	 * list of source bundles.
+	 *
+	 * @param bundleNames A list with source bundle names. The returned bundle will
+	 * contain all entries from all source bundles. In case a key occurs
+	 * in multiple source bundles, the value will be taken from the
+	 * first bundle containing the key.
+	 * @param localesToInitialize The set of locales to initialize at bootstrap.
+	 *
+	 * @since 6.1
+	 */
+	public AggregateResourceBundleLocator(List<String> bundleNames, Set<Locale> localesToInitialize) {
+		this( bundleNames, localesToInitialize, null );
+	}
+
+	/**
+	 * Creates a locator that delivers a resource bundle merged from the given
+	 * list of source bundles.
+	 *
+	 * @param bundleNames A list with source bundle names. The returned bundle will
+	 * contain all keys from all source bundles. In case a key occurs
+	 * in multiple source bundles, the value will be taken from the
+	 * first bundle containing the key.
+	 * @param localesToInitialize The set of locales to initialize at bootstrap.
+	 * @param delegate A delegate resource bundle locator. The bundle returned by
+	 * this locator will be added to the aggregate bundle after all
+	 * source bundles.
+	 *
+	 * @since 6.1
+	 */
+	public AggregateResourceBundleLocator(List<String> bundleNames, Set<Locale> localesToInitialize, ResourceBundleLocator delegate) {
+		this( bundleNames, localesToInitialize, delegate, null );
+	}
+
+	/**
+	 * Creates a locator that delivers a resource bundle merged from the given
+	 * list of source bundles.
+	 *
+	 * @param bundleNames A list with source bundle names. The returned bundle will
+	 * contain all keys from all source bundles. In case a key occurs
+	 * in multiple source bundles, the value will be taken from the
+	 * first bundle containing the key.
+	 * @param localesToInitialize The set of locales to initialize at bootstrap.
+	 * @param delegate A delegate resource bundle locator. The bundle returned by
+	 * this locator will be added to the aggregate bundle after all
+	 * source bundles.
+	 * @param classLoader The classloader to use for loading the bundle.
+	 *
+	 * @since 6.1
+	 */
+	public AggregateResourceBundleLocator(List<String> bundleNames, Set<Locale> localesToInitialize, ResourceBundleLocator delegate,
+			ClassLoader classLoader) {
 		super( delegate );
 		Contracts.assertValueNotNull( bundleNames, "bundleNames" );
 
-		this.bundleNames = CollectionHelper.toImmutableList( bundleNames );
-		this.classLoader = classLoader;
+		List<PlatformResourceBundleLocator> tmpBundleLocators = new ArrayList<>( bundleNames.size() );
+		for ( String bundleName : bundleNames ) {
+			tmpBundleLocators.add( new PlatformResourceBundleLocator( bundleName, localesToInitialize, classLoader ) );
+		}
+		this.resourceBundleLocators = CollectionHelper.toImmutableList( tmpBundleLocators );
 	}
 
 	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
 		List<ResourceBundle> sourceBundles = new ArrayList<ResourceBundle>();
 
-		for ( String bundleName : bundleNames ) {
-			ResourceBundleLocator resourceBundleLocator =
-					new PlatformResourceBundleLocator( bundleName, classLoader );
-
+		for ( PlatformResourceBundleLocator resourceBundleLocator : resourceBundleLocators ) {
 			ResourceBundle resourceBundle = resourceBundleLocator.getResourceBundle( locale );
 
 			if ( resourceBundle != null ) {

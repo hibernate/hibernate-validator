@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import java.util.Locale;
 import java.util.Set;
 
 import javax.validation.spi.BootstrapState;
@@ -39,5 +40,11 @@ public class PredefinedScopeConfigurationImpl extends AbstractConfigurationImpl<
 
 	public Set<Class<?>> getBeanClassesToInitialize() {
 		return beanClassesToInitialize;
+	}
+
+	@Override
+	public PredefinedScopeHibernateValidatorConfiguration initializeLocales(Set<Locale> locales) {
+		setLocalesToInitialize( CollectionHelper.toImmutableSet( locales ) );
+		return thisAsT();
 	}
 }

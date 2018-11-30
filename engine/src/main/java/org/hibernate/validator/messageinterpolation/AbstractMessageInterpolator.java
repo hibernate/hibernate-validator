@@ -9,11 +9,13 @@ package org.hibernate.validator.messageinterpolation;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +42,7 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  * @author Gunnar Morling
  * @author Adam Stawicki
  * @author Marko Bekhta
+ * @author Guillaume Smet
  *
  * @since 5.2
  */
@@ -124,12 +127,20 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	private static final Pattern SLASH = Pattern.compile( "\\\\", Pattern.LITERAL );
 	private static final Pattern DOLLAR = Pattern.compile( "\\$", Pattern.LITERAL );
 
+	/**
+	 * {@code MessageInterpolator} using the default resource bundle locators.
+	 */
 	public AbstractMessageInterpolator() {
-		this( null );
+		this( Collections.emptySet() );
 	}
 
+	/**
+	 * {@code MessageInterpolator} taking a resource bundle locator.
+	 *
+	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
+	 */
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
-		this( userResourceBundleLocator, null );
+		this( userResourceBundleLocator, Collections.emptySet() );
 	}
 
 	/**
@@ -141,7 +152,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 */
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator) {
-		this( userResourceBundleLocator, contributorResourceBundleLocator, true );
+		this( userResourceBundleLocator, contributorResourceBundleLocator, Collections.emptySet() );
 	}
 
 	/**
@@ -155,10 +166,64 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator,
 			boolean cacheMessages) {
+		this( userResourceBundleLocator, contributorResourceBundleLocator, Collections.emptySet(), cacheMessages );
+	}
+
+	/**
+	 * {@code MessageInterpolator} using the default resource bundle locators.
+	 *
+	 * @param localesToInitialize The set of locales to initialize at bootstrap.
+	 *
+	 * @since 6.1
+	 */
+	public AbstractMessageInterpolator(Set<Locale> localesToInitialize) {
+		this( null, localesToInitialize );
+	}
+
+	/**
+	 * {@code MessageInterpolator} taking a resource bundle locator.
+	 *
+	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
+	 * @param localesToInitialize The set of locales to initialize at bootstrap.
+	 *
+	 * @since 6.1
+	 */
+	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, Set<Locale> localesToInitialize) {
+		this( userResourceBundleLocator, null, localesToInitialize );
+	}
+
+	/**
+	 * {@code MessageInterpolator} taking two resource bundle locators.
+	 *
+	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
+	 * @param contributorResourceBundleLocator {@code ResourceBundleLocator} used to load resource bundle of constraint contributor
+	 * @param localesToInitialize The set of locales to initialize at bootstrap.
+	 *
+	 * @since 6.1
+	 */
+	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			ResourceBundleLocator contributorResourceBundleLocator, Set<Locale> localesToInitialize) {
+		this( userResourceBundleLocator, contributorResourceBundleLocator, localesToInitialize, true );
+	}
+
+	/**
+	 * {@code MessageInterpolator} taking two resource bundle locators.
+	 *
+	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
+	 * @param contributorResourceBundleLocator {@code ResourceBundleLocator} used to load resource bundle of constraint contributor
+	 * @param localesToInitialize The set of locales to initialize at bootstrap.
+	 * @param cacheMessages Whether resolved messages should be cached or not.
+	 *
+	 * @since 6.1
+	 */
+	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			ResourceBundleLocator contributorResourceBundleLocator,
+			Set<Locale> localesToInitialize,
+			boolean cacheMessages) {
 		defaultLocale = Locale.getDefault();
 
 		if ( userResourceBundleLocator == null ) {
-			this.userResourceBundleLocator = new PlatformResourceBundleLocator( USER_VALIDATION_MESSAGES );
+			this.userResourceBundleLocator = new PlatformResourceBundleLocator( USER_VALIDATION_MESSAGES, localesToInitialize );
 		}
 		else {
 			this.userResourceBundleLocator = userResourceBundleLocator;
@@ -167,6 +232,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		if ( contributorResourceBundleLocator == null ) {
 			this.contributorResourceBundleLocator = new PlatformResourceBundleLocator(
 					CONTRIBUTOR_VALIDATION_MESSAGES,
+					localesToInitialize,
 					null,
 					true
 			);
@@ -175,7 +241,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			this.contributorResourceBundleLocator = contributorResourceBundleLocator;
 		}
 
-		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator( DEFAULT_VALIDATION_MESSAGES );
+		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator( DEFAULT_VALIDATION_MESSAGES, localesToInitialize );
 
 		this.cachingEnabled = cacheMessages;
 		if ( cachingEnabled ) {

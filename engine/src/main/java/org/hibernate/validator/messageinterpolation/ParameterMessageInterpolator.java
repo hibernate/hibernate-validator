@@ -7,7 +7,9 @@
 package org.hibernate.validator.messageinterpolation;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Set;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.internal.engine.messageinterpolation.ParameterTermResolver;
@@ -24,6 +26,14 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class ParameterMessageInterpolator extends AbstractMessageInterpolator {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+
+	public ParameterMessageInterpolator() {
+		this( Collections.emptySet() );
+	}
+
+	public ParameterMessageInterpolator(Set<Locale> localesToInitialize) {
+		super( localesToInitialize );
+	}
 
 	@Override
 	public String interpolate(Context context, Locale locale, String term) {
