@@ -116,6 +116,24 @@ For using the Hibernate Validator annotation processor with Maven, set it up via
 ----
 ====
 
+[[validator-annotationprocessor-gradle]]
+===== Gradle
+
+When using https://gradle.org[Gradle] it is enough to reference the annotation processor as an `annotationProcessor` dependency.
+
+.Using the annotation processor with Gradle
+====
+[source, groovy]
+[subs="verbatim,attributes"]
+----
+dependencies {
+	annotationProcessor group: 'org.hibernate.validator', name: 'hibernate-validator-annotation-processor', version: '{hvVersion}'
+
+	// any other dependencies ...
+}
+----
+====
+
 [[validator-annotationprocessor-ant]]
 ===== Apache Ant
 
