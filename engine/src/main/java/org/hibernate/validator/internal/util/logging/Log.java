@@ -875,4 +875,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 248, value = "Unable to get an XML schema named %s.")
 	ValidationException unableToGetXmlSchema(String schemaResourceName);
+
+	@Message(id = 249, value = "Uninitialized bean metadata for class: %s. Please register your bean class as a class to initialize when initializing your ValidatorFactory.")
+	ValidationException uninitializedBeanMetaData(@FormatWith(ClassObjectFormatter.class) Class<?> clazz);
 }
