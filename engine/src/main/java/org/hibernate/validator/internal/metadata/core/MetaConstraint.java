@@ -71,7 +71,7 @@ public class MetaConstraint<A extends Annotation> {
 	MetaConstraint(ConstraintValidatorManager constraintValidatorManager, ConstraintDescriptorImpl<A> constraintDescriptor,
 			ConstraintLocation location, List<ContainerClassTypeParameterAndExtractor> valueExtractionPath,
 			Type validatedValueType) {
-		this.constraintTree = ConstraintTree.of( constraintDescriptor, validatedValueType );
+		this.constraintTree = ConstraintTree.of( constraintValidatorManager, constraintDescriptor, validatedValueType );
 		this.location = location;
 		this.valueExtractionPath = getValueExtractionPath( valueExtractionPath );
 		this.hashCode = buildHashCode( constraintDescriptor, location );

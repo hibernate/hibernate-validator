@@ -47,19 +47,19 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 	@Immutable
 	private final List<ConstraintTree<?>> children;
 
-	public ComposingConstraintTree(ConstraintDescriptorImpl<B> descriptor, Type validatedValueType) {
-		super( descriptor, validatedValueType );
+	public ComposingConstraintTree(ConstraintValidatorManager constraintValidatorManager, ConstraintDescriptorImpl<B> descriptor, Type validatedValueType) {
+		super( constraintValidatorManager, descriptor, validatedValueType );
 		this.children = descriptor.getComposingConstraintImpls().stream()
-				.map( desc -> createConstraintTree( desc ) )
+				.map( desc -> createConstraintTree( constraintValidatorManager, desc ) )
 				.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) );
 	}
 
-	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintDescriptorImpl<U> composingDescriptor) {
+	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintValidatorManager constraintValidatorManager, ConstraintDescriptorImpl<U> composingDescriptor) {
 		if ( composingDescriptor.getComposingConstraintImpls().isEmpty() ) {
-			return new SimpleConstraintTree<>( composingDescriptor, getValidatedValueType() );
+			return new SimpleConstraintTree<>( constraintValidatorManager, composingDescriptor, getValidatedValueType() );
 		}
 		else {
-			return new ComposingConstraintTree<>( composingDescriptor, getValidatedValueType() );
+			return new ComposingConstraintTree<>( constraintValidatorManager, composingDescriptor, getValidatedValueType() );
 		}
 	}
 
