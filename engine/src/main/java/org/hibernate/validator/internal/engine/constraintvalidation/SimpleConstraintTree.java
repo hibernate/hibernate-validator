@@ -33,8 +33,8 @@ class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
-	public SimpleConstraintTree(ConstraintDescriptorImpl<B> descriptor, Type validatedValueType) {
-		super( descriptor, validatedValueType );
+	public SimpleConstraintTree(ConstraintValidatorManager constraintValidatorManager, ConstraintDescriptorImpl<B> descriptor, Type validatedValueType) {
+		super( constraintValidatorManager, descriptor, validatedValueType );
 	}
 
 	@Override
