@@ -12,13 +12,11 @@ import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Set;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
  * Base class for implementations of constraint mapping creational context types.
@@ -54,8 +52,7 @@ abstract class ConstraintMappingContextImplBase extends ConstraintContextImplBas
 		constraints.add( constraint );
 	}
 
-	protected Set<MetaConstraint<?>> getConstraints(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-			ValueExtractorManager valueExtractorManager) {
+	protected Set<MetaConstraint<?>> getConstraints(ConstraintCreationContext constraintCreationContext) {
 		if ( constraints == null ) {
 			return Collections.emptySet();
 		}
@@ -63,22 +60,23 @@ abstract class ConstraintMappingContextImplBase extends ConstraintContextImplBas
 		Set<MetaConstraint<?>> metaConstraints = newHashSet();
 
 		for ( ConfiguredConstraint<?> configuredConstraint : constraints ) {
-			metaConstraints.add( asMetaConstraint( configuredConstraint, constraintHelper, typeResolutionHelper, valueExtractorManager ) );
+			metaConstraints.add( asMetaConstraint( configuredConstraint, constraintCreationContext ) );
 		}
 
 		return metaConstraints;
 	}
 
-	private <A extends Annotation> MetaConstraint<A> asMetaConstraint(ConfiguredConstraint<A> config, ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
+	private <A extends Annotation> MetaConstraint<A> asMetaConstraint(ConfiguredConstraint<A> config, ConstraintCreationContext constraintCreationContext ) {
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				constraintHelper,
+				constraintCreationContext.getConstraintHelper(),
 				config.getLocation().getConstrainable(),
 				config.createAnnotationDescriptor(),
 				config.getLocation().getKind(),
 				getConstraintType()
 		);
 
-		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor, config.getLocation() );
+		return MetaConstraints.create( constraintCreationContext.getTypeResolutionHelper(),
+				constraintCreationContext.getValueExtractorManager(),
+				constraintCreationContext.getConstraintValidatorManager(), constraintDescriptor, config.getLocation() );
 	}
 }

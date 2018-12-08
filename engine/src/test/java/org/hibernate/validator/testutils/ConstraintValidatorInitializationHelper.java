@@ -8,17 +8,23 @@ package org.hibernate.validator.testutils;
 
 import java.lang.annotation.Annotation;
 import java.time.Duration;
+import java.util.Collections;
 
 import javax.validation.ClockProvider;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.DefaultClockProvider;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -64,6 +70,13 @@ public class ConstraintValidatorInitializationHelper {
 
 	public static HibernateConstraintValidatorInitializationContext getDummyConstraintValidatorInitializationContext() {
 		return DUMMY_CONSTRAINT_VALIDATOR_INITIALIZATION_CONTEXT;
+	}
+
+	public static ConstraintCreationContext getDummyConstraintCreationContext() {
+		return new ConstraintCreationContext( new ConstraintHelper(),
+				new ConstraintValidatorManagerImpl( new ConstraintValidatorFactoryImpl(), getDummyConstraintValidatorInitializationContext() ),
+				new TypeResolutionHelper(),
+				new ValueExtractorManager( Collections.emptySet() ) );
 	}
 
 	public static HibernateConstraintValidatorInitializationContext getConstraintValidatorInitializationContext(

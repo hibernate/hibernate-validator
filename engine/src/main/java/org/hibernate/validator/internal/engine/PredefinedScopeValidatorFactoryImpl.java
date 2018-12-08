@@ -91,8 +91,6 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 	public PredefinedScopeValidatorFactoryImpl(ConfigurationState configurationState) {
 		ClassLoader externalClassLoader = getExternalClassLoader( configurationState );
 
-		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
-
 		PredefinedScopeConfigurationImpl hibernateSpecificConfig = (PredefinedScopeConfigurationImpl) configurationState;
 
 		Map<String, String> properties = configurationState.getProperties();
@@ -127,8 +125,13 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 
 		this.getterPropertySelectionStrategy = ValidatorFactoryConfigurationHelper.getGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader );
 
+		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
 		ConstraintHelper constraintHelper = new ConstraintHelper();
 		TypeResolutionHelper typeResolutionHelper = new TypeResolutionHelper();
+
+		ConstraintCreationContext constraintCreationContext = new ConstraintCreationContext( constraintHelper,
+				constraintValidatorManager, typeResolutionHelper, valueExtractorManager );
+
 		ExecutableHelper executableHelper = new ExecutableHelper( typeResolutionHelper );
 		JavaBeanHelper javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.getGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ) );
 
@@ -139,7 +142,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		}
 		else {
 			xmlMetaDataProvider = new XmlMetaDataProvider(
-					constraintHelper, typeResolutionHelper, valueExtractorManager, javaBeanHelper, configurationState.getMappingStreams(), externalClassLoader
+					constraintCreationContext, javaBeanHelper, configurationState.getMappingStreams(), externalClassLoader
 			);
 		}
 
@@ -155,14 +158,12 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
 
 		this.beanMetaDataManager = new PredefinedScopeBeanMetaDataManager(
-				constraintHelper,
+				constraintCreationContext,
 				executableHelper,
-				typeResolutionHelper,
 				validatorFactoryScopedContext.getParameterNameProvider(),
-				valueExtractorManager,
 				javaBeanHelper,
 				validationOrderGenerator,
-				buildDataProviders( constraintHelper, typeResolutionHelper, valueExtractorManager, constraintValidatorManager, xmlMetaDataProvider, constraintMappings ),
+				buildMetaDataProviders( constraintCreationContext, xmlMetaDataProvider, constraintMappings ),
 				methodValidationConfiguration,
 				hibernateSpecificConfig.getBeanClassesToInitialize()
 		);
@@ -266,11 +267,8 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		);
 	}
 
-	private static List<MetaDataProvider> buildDataProviders(
-			ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper,
-			ValueExtractorManager valueExtractorManager,
-			ConstraintValidatorManager constraintValidatorManager,
+	private static List<MetaDataProvider> buildMetaDataProviders(
+			ConstraintCreationContext constraintCreationContext,
 			XmlMetaDataProvider xmlMetaDataProvider,
 			Set<DefaultConstraintMapping> constraintMappings) {
 		List<MetaDataProvider> metaDataProviders = newArrayList();
@@ -279,14 +277,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		}
 
 		if ( !constraintMappings.isEmpty() ) {
-			metaDataProviders.add(
-					new ProgrammaticMetaDataProvider(
-							constraintHelper,
-							typeResolutionHelper,
-							valueExtractorManager,
-							constraintMappings
-					)
-			);
+			metaDataProviders.add( new ProgrammaticMetaDataProvider( constraintCreationContext, constraintMappings ) );
 		}
 		return metaDataProviders;
 	}

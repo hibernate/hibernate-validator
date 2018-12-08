@@ -7,6 +7,7 @@
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -26,13 +27,11 @@ import javax.validation.groups.Default;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManagerImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
@@ -59,11 +58,9 @@ public class ParameterMetaDataTest {
 	@BeforeMethod
 	public void setupBeanMetaData() {
 		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManagerImpl(
-				new ConstraintHelper(),
+				getDummyConstraintCreationContext(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
-				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new ValueExtractorManager( Collections.emptySet() ),
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
@@ -130,11 +127,9 @@ public class ParameterMetaDataTest {
 		// The failure rate on my current VM before fixing the bug is 50%.
 		// Running it in a loop does not improve the odds of failure: all tests will pass or fail for all loop run.
 		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManagerImpl(
-				new ConstraintHelper(),
+				getDummyConstraintCreationContext(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
-				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new SkewedParameterNameProvider() ),
-				new ValueExtractorManager( Collections.emptySet() ),
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),

@@ -21,10 +21,9 @@ import java.util.Set;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -35,7 +34,6 @@ import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -279,13 +277,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		public Builder(
 				Class<?> beanClass,
 				ConstrainedExecutable constrainedExecutable,
-				ConstraintHelper constraintHelper,
+				ConstraintCreationContext constraintCreationContext,
 				ExecutableHelper executableHelper,
-				TypeResolutionHelper typeResolutionHelper,
-				ValueExtractorManager valueExtractorManager,
 				ExecutableParameterNameProvider parameterNameProvider,
 				MethodValidationConfiguration methodValidationConfiguration) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
+			super( beanClass, constraintCreationContext );
 
 			this.executableHelper = executableHelper;
 			this.parameterNameProvider = parameterNameProvider;
@@ -393,7 +389,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
-					cascadingMetaDataBuilder.build( valueExtractorManager, callable ),
+					cascadingMetaDataBuilder.build( constraintCreationContext.getValueExtractorManager(), callable ),
 					isConstrained,
 					kind == ConstrainedElementKind.GETTER
 			);
@@ -418,9 +414,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 								new ParameterMetaData.Builder(
 										callable.getDeclaringClass(),
 										oneParameter,
-										constraintHelper,
-										typeResolutionHelper,
-										valueExtractorManager,
+										constraintCreationContext,
 										parameterNameProvider
 								)
 						);

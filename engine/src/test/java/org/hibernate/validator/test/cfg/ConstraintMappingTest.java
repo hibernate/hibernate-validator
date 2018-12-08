@@ -9,13 +9,13 @@ package org.hibernate.validator.test.cfg;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 import java.lang.annotation.ElementType;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
@@ -48,17 +48,13 @@ import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -555,9 +551,7 @@ public class ConstraintMappingTest {
 
 	private <T> BeanConfiguration<T> getBeanConfiguration(Class<T> type) {
 		Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations(
-				new ConstraintHelper(),
-				new TypeResolutionHelper(),
-				new ValueExtractorManager( Collections.emptySet() )
+				getDummyConstraintCreationContext()
 		);
 
 		for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {

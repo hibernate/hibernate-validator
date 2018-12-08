@@ -8,14 +8,12 @@ package org.hibernate.validator.internal.cfg.context;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
  * An implementation of {@link AbstractPropertyConstraintMappingContextImpl} for a getter property.
@@ -40,12 +38,13 @@ final class GetterConstraintMappingContextImpl extends AbstractPropertyConstrain
 		return this;
 	}
 
-	ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
+	@Override
+	ConstrainedElement build(ConstraintCreationContext constraintCreationContext) {
 		return new ConstrainedExecutable(
 				ConfigurationSource.API,
 				getProperty(),
-				getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-				getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
+				getConstraints( constraintCreationContext ),
+				getTypeArgumentConstraints( constraintCreationContext ),
 				getCascadingMetaDataBuilder()
 		);
 	}

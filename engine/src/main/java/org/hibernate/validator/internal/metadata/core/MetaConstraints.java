@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.metadata.ValidateUnwrappedValue;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorHelper;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
@@ -49,6 +50,7 @@ public class MetaConstraints {
 	}
 
 	public static <A extends Annotation> MetaConstraint<A> create(TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
+			ConstraintValidatorManager constraintValidatorManager,
 			ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location) {
 		List<ContainerClassTypeParameterAndExtractor> valueExtractionPath = new ArrayList<>();
 
@@ -69,7 +71,7 @@ public class MetaConstraints {
 
 		Collections.reverse( valueExtractionPath );
 
-		return new MetaConstraint<>( constraintDescriptor, location, valueExtractionPath, typeOfValidatedElement );
+		return new MetaConstraint<>( constraintValidatorManager, constraintDescriptor, location, valueExtractionPath, typeOfValidatedElement );
 	}
 
 	private static <A extends Annotation> Type addValueExtractorDescriptorForWrappedValue(TypeResolutionHelper typeResolutionHelper,

@@ -15,10 +15,9 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
@@ -26,7 +25,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanConstructor;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -44,10 +42,9 @@ class ConstrainedConstructorStaxBuilder extends AbstractConstrainedExecutableEle
 	private static final String METHOD_QNAME_LOCAL_PART = "constructor";
 
 	ConstrainedConstructorStaxBuilder(
-			ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-			ValueExtractorManager valueExtractorManager, DefaultPackageStaxBuilder defaultPackageStaxBuilder,
-			AnnotationProcessingOptionsImpl annotationProcessingOptions) {
-		super( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder, annotationProcessingOptions );
+			ClassLoadingHelper classLoadingHelper, ConstraintCreationContext constraintCreationContext,
+			DefaultPackageStaxBuilder defaultPackageStaxBuilder, AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+		super( classLoadingHelper, constraintCreationContext, defaultPackageStaxBuilder, annotationProcessingOptions );
 	}
 
 	@Override

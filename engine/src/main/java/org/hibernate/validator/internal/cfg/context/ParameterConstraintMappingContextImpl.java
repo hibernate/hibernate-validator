@@ -15,13 +15,11 @@ import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContex
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method parameter.
@@ -119,8 +117,7 @@ final class ParameterConstraintMappingContextImpl
 		);
 	}
 
-	public ConstrainedParameter build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-			ValueExtractorManager valueExtractorManager) {
+	public ConstrainedParameter build(ConstraintCreationContext constraintCreationContext) {
 		Type parameterType = executableContext.getCallable().getParameterGenericType( parameterIndex );
 
 		return new ConstrainedParameter(
@@ -128,8 +125,8 @@ final class ParameterConstraintMappingContextImpl
 				executableContext.getCallable(),
 				parameterType,
 				parameterIndex,
-				getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-				getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
+				getConstraints( constraintCreationContext ),
+				getTypeArgumentConstraints( constraintCreationContext ),
 				getCascadingMetaDataBuilder()
 		);
 	}

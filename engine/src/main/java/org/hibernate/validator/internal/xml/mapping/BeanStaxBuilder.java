@@ -23,14 +23,12 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanConstructor;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanMethod;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.xml.AbstractStaxBuilder;
@@ -49,9 +47,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 	private static final String BEAN_QNAME_LOCAL_PART = "bean";
 
 	private final ClassLoadingHelper classLoadingHelper;
-	private final ConstraintHelper constraintHelper;
-	private final TypeResolutionHelper typeResolutionHelper;
-	private final ValueExtractorManager valueExtractorManager;
+	private final ConstraintCreationContext constraintCreationContext;
 	private final DefaultPackageStaxBuilder defaultPackageStaxBuilder;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
@@ -64,15 +60,12 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 	private final List<ConstrainedMethodStaxBuilder> constrainedMethodStaxBuilders;
 	private final List<ConstrainedConstructorStaxBuilder> constrainedConstructorStaxBuilders;
 
-	BeanStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
+	BeanStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintCreationContext constraintCreationContext,
 			DefaultPackageStaxBuilder defaultPackageStaxBuilder, AnnotationProcessingOptionsImpl annotationProcessingOptions,
 			Map<Class<?>, List<Class<?>>> defaultSequences) {
 		this.classLoadingHelper = classLoadingHelper;
 		this.defaultPackageStaxBuilder = defaultPackageStaxBuilder;
-		this.constraintHelper = constraintHelper;
-		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractorManager = valueExtractorManager;
+		this.constraintCreationContext = constraintCreationContext;
 
 		this.annotationProcessingOptions = annotationProcessingOptions;
 		this.defaultSequences = defaultSequences;
@@ -98,7 +91,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 		ConstrainedConstructorStaxBuilder constructorStaxBuilder = getNewConstrainedConstructorStaxBuilder();
 
 		ClassConstraintTypeStaxBuilder localClassConstraintTypeStaxBuilder = new ClassConstraintTypeStaxBuilder(
-				classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager,
+				classLoadingHelper, constraintCreationContext,
 				defaultPackageStaxBuilder, annotationProcessingOptions, defaultSequences
 		);
 		while ( !( xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().getLocalPart().equals( getAcceptableQName() ) ) ) {
@@ -126,19 +119,23 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 	}
 
 	private ConstrainedFieldStaxBuilder getNewConstrainedFieldStaxBuilder() {
-		return new ConstrainedFieldStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder, annotationProcessingOptions );
+		return new ConstrainedFieldStaxBuilder( classLoadingHelper, constraintCreationContext,
+				defaultPackageStaxBuilder, annotationProcessingOptions );
 	}
 
 	private ConstrainedGetterStaxBuilder getNewConstrainedGetterStaxBuilder() {
-		return new ConstrainedGetterStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder, annotationProcessingOptions );
+		return new ConstrainedGetterStaxBuilder( classLoadingHelper, constraintCreationContext,
+				defaultPackageStaxBuilder, annotationProcessingOptions );
 	}
 
 	private ConstrainedMethodStaxBuilder getNewConstrainedMethodStaxBuilder() {
-		return new ConstrainedMethodStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder, annotationProcessingOptions );
+		return new ConstrainedMethodStaxBuilder( classLoadingHelper, constraintCreationContext,
+				defaultPackageStaxBuilder, annotationProcessingOptions );
 	}
 
 	private ConstrainedConstructorStaxBuilder getNewConstrainedConstructorStaxBuilder() {
-		return new ConstrainedConstructorStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder, annotationProcessingOptions );
+		return new ConstrainedConstructorStaxBuilder( classLoadingHelper, constraintCreationContext,
+				defaultPackageStaxBuilder, annotationProcessingOptions );
 	}
 
 	void build(JavaBeanHelper javaBeanHelper, Set<Class<?>> processedClasses, Map<Class<?>, Set<ConstrainedElement>> constrainedElementsByType) {

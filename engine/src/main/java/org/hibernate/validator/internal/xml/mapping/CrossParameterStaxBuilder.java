@@ -17,15 +17,13 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.properties.Callable;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.AbstractStaxBuilder;
 
 /**
@@ -39,23 +37,18 @@ class CrossParameterStaxBuilder extends AbstractStaxBuilder {
 	private static final QName IGNORE_ANNOTATIONS_QNAME = new QName( "ignore-annotations" );
 
 	protected final ClassLoadingHelper classLoadingHelper;
-	protected final ConstraintHelper constraintHelper;
-	protected final TypeResolutionHelper typeResolutionHelper;
-	protected final ValueExtractorManager valueExtractorManager;
+	protected final ConstraintCreationContext constraintCreationContext;
 	protected final DefaultPackageStaxBuilder defaultPackageStaxBuilder;
 	protected final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 
 	protected Optional<Boolean> ignoreAnnotations;
 	protected final List<ConstraintTypeStaxBuilder> constraintTypeStaxBuilders;
 
-	CrossParameterStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
+	CrossParameterStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintCreationContext constraintCreationContext,
 			DefaultPackageStaxBuilder defaultPackageStaxBuilder, AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		this.classLoadingHelper = classLoadingHelper;
 		this.defaultPackageStaxBuilder = defaultPackageStaxBuilder;
-		this.constraintHelper = constraintHelper;
-		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractorManager = valueExtractorManager;
+		this.constraintCreationContext = constraintCreationContext;
 
 		this.annotationProcessingOptions = annotationProcessingOptions;
 
@@ -81,7 +74,7 @@ class CrossParameterStaxBuilder extends AbstractStaxBuilder {
 	}
 
 	private ConstraintTypeStaxBuilder getNewConstraintTypeStaxBuilder() {
-		return new ConstraintTypeStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder );
+		return new ConstraintTypeStaxBuilder( classLoadingHelper, constraintCreationContext, defaultPackageStaxBuilder );
 	}
 
 	Set<MetaConstraint<?>> build(Callable callable) {

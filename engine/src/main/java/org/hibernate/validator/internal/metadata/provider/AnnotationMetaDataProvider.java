@@ -39,12 +39,11 @@ import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
 
 import org.hibernate.validator.group.GroupSequenceProvider;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -69,7 +68,6 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanParameter;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -91,22 +89,16 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
-	private final ConstraintHelper constraintHelper;
-	private final TypeResolutionHelper typeResolutionHelper;
+	private final ConstraintCreationContext constraintCreationContext;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
-	private final ValueExtractorManager valueExtractorManager;
 	private final JavaBeanHelper javaBeanHelper;
 
 	private final BeanConfiguration<Object> objectBeanConfiguration;
 
-	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper,
-			ValueExtractorManager valueExtractorManager,
+	public AnnotationMetaDataProvider(ConstraintCreationContext constraintCreationContext,
 			JavaBeanHelper javaBeanHelper,
 			AnnotationProcessingOptions annotationProcessingOptions) {
-		this.constraintHelper = constraintHelper;
-		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractorManager = valueExtractorManager;
+		this.constraintCreationContext = constraintCreationContext;
 		this.javaBeanHelper = javaBeanHelper;
 		this.annotationProcessingOptions = annotationProcessingOptions;
 
@@ -209,7 +201,11 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		ConstraintLocation location = ConstraintLocation.forClass( clazz );
 
 		for ( ConstraintDescriptorImpl<?> constraintDescriptor : classLevelConstraintDescriptors ) {
-			classLevelConstraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor, location ) );
+			classLevelConstraints.add( MetaConstraints.create( constraintCreationContext.getTypeResolutionHelper(),
+					constraintCreationContext.getValueExtractorManager(),
+					constraintCreationContext.getConstraintValidatorManager(),
+					constraintDescriptor,
+					location ) );
 		}
 
 		return classLevelConstraints;
@@ -263,7 +259,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		ConstraintLocation location = ConstraintLocation.forField( javaBeanField );
 
 		for ( ConstraintDescriptorImpl<?> constraintDescription : constraintDescriptors ) {
-			constraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescription, location ) );
+			constraints.add( MetaConstraints.create( constraintCreationContext.getTypeResolutionHelper(),
+					constraintCreationContext.getValueExtractorManager(),
+					constraintCreationContext.getConstraintValidatorManager(),
+					constraintDescription, location ) );
 		}
 		return constraints;
 	}
@@ -364,8 +363,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		ConstraintLocation crossParameterLocation = ConstraintLocation.forCrossParameter( callable );
 
 		for ( ConstraintDescriptorImpl<?> constraintDescriptor : constraintDescriptors ) {
-			ConstraintLocation location = constraintDescriptor.getConstraintType() == ConstraintType.GENERIC ? returnValueLocation : crossParameterLocation;
-			constraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor, location ) );
+			ConstraintLocation location = constraintDescriptor.getConstraintType() == ConstraintType.GENERIC
+					? returnValueLocation
+					: crossParameterLocation;
+			constraints.add( MetaConstraints.create( constraintCreationContext.getTypeResolutionHelper(),
+					constraintCreationContext.getValueExtractorManager(),
+					constraintCreationContext.getConstraintValidatorManager(), constraintDescriptor, location ) );
 		}
 
 		return constraints;
@@ -415,8 +418,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraintDescriptors ) {
 					parameterConstraints.add(
-							MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptorImpl, location )
-					);
+							MetaConstraints.create( constraintCreationContext.getTypeResolutionHelper(),
+									constraintCreationContext.getValueExtractorManager(),
+									constraintCreationContext.getConstraintValidatorManager(), constraintDescriptorImpl,
+									location ) );
 				}
 			}
 			else {
@@ -520,17 +525,17 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		// HV-1049 and HV-1311 - Ignore annotations from the JDK (jdk.internal.* and java.*); They cannot be constraint
 		// annotations so skip them right here, as for the proper check we'd need package access permission for
 		// "jdk.internal" and "java".
-		if ( constraintHelper.isJdkAnnotation( annotation.annotationType() ) ) {
+		if ( constraintCreationContext.getConstraintHelper().isJdkAnnotation( annotation.annotationType() ) ) {
 			return Collections.emptyList();
 		}
 
 		List<Annotation> constraints = newArrayList();
 		Class<? extends Annotation> annotationType = annotation.annotationType();
-		if ( constraintHelper.isConstraintAnnotation( annotationType ) ) {
+		if ( constraintCreationContext.getConstraintHelper().isConstraintAnnotation( annotationType ) ) {
 			constraints.add( annotation );
 		}
-		else if ( constraintHelper.isMultiValueConstraint( annotationType ) ) {
-			constraints.addAll( constraintHelper.getConstraintsFromMultiValueConstraint( annotation ) );
+		else if ( constraintCreationContext.getConstraintHelper().isMultiValueConstraint( annotationType ) ) {
+			constraints.addAll( constraintCreationContext.getConstraintHelper().getConstraintsFromMultiValueConstraint( annotation ) );
 		}
 
 		return constraints.stream()
@@ -575,7 +580,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			A annotation,
 			ConstraintLocationKind type) {
 		return new ConstraintDescriptorImpl<>(
-				constraintHelper,
+				constraintCreationContext.getConstraintHelper(),
 				constrainable,
 				new ConstraintAnnotationDescriptor<>( annotation ),
 				type
@@ -793,7 +798,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		ConstraintLocation constraintLocation = ConstraintLocation.forTypeArgument( location.toConstraintLocation(), typeVariable, type );
 
 		for ( ConstraintDescriptorImpl<?> constraintDescriptor : constraintDescriptors ) {
-			constraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor, constraintLocation ) );
+			constraints.add( MetaConstraints.create( constraintCreationContext.getTypeResolutionHelper(),
+					constraintCreationContext.getValueExtractorManager(),
+					constraintCreationContext.getConstraintValidatorManager(), constraintDescriptor,
+					constraintLocation ) );
 		}
 
 		return constraints;

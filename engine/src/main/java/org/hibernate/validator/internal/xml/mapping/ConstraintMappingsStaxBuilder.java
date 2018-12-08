@@ -15,12 +15,10 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.AbstractStaxBuilder;
 
 /**
@@ -34,9 +32,7 @@ class ConstraintMappingsStaxBuilder extends AbstractStaxBuilder {
 	private static final String CONSTRAINT_MAPPINGS_QNAME = "constraint-mappings";
 
 	private final ClassLoadingHelper classLoadingHelper;
-	private final ConstraintHelper constraintHelper;
-	private final TypeResolutionHelper typeResolutionHelper;
-	private final ValueExtractorManager valueExtractorManager;
+	private final ConstraintCreationContext constraintCreationContext;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 	private final JavaBeanHelper javaBeanHelper;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
@@ -45,12 +41,10 @@ class ConstraintMappingsStaxBuilder extends AbstractStaxBuilder {
 	private final List<BeanStaxBuilder> beanStaxBuilders;
 	private final List<ConstraintDefinitionStaxBuilder> constraintDefinitionStaxBuilders;
 
-	public ConstraintMappingsStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
+	public ConstraintMappingsStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintCreationContext constraintCreationContext,
 			AnnotationProcessingOptionsImpl annotationProcessingOptions, JavaBeanHelper javaBeanHelper, Map<Class<?>, List<Class<?>>> defaultSequences) {
 		this.classLoadingHelper = classLoadingHelper;
-		this.constraintHelper = constraintHelper;
-		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractorManager = valueExtractorManager;
+		this.constraintCreationContext = constraintCreationContext;
 		this.annotationProcessingOptions = annotationProcessingOptions;
 		this.javaBeanHelper = javaBeanHelper;
 		this.defaultSequences = defaultSequences;
@@ -85,11 +79,12 @@ class ConstraintMappingsStaxBuilder extends AbstractStaxBuilder {
 	}
 
 	private BeanStaxBuilder getNewBeanStaxBuilder() {
-		return new BeanStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder, annotationProcessingOptions, defaultSequences );
+		return new BeanStaxBuilder( classLoadingHelper, constraintCreationContext,
+				defaultPackageStaxBuilder, annotationProcessingOptions, defaultSequences );
 	}
 
 	private ConstraintDefinitionStaxBuilder getNewConstraintDefinitionStaxBuilder() {
-		return new ConstraintDefinitionStaxBuilder( classLoadingHelper, constraintHelper, defaultPackageStaxBuilder );
+		return new ConstraintDefinitionStaxBuilder( classLoadingHelper, constraintCreationContext.getConstraintHelper(), defaultPackageStaxBuilder );
 	}
 
 	public void build(Set<Class<?>> processedClasses, Map<Class<?>, Set<ConstrainedElement>> constrainedElementsByType, Set<String> alreadyProcessedConstraintDefinitions) {

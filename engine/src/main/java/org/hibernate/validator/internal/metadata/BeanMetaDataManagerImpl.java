@@ -15,17 +15,14 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-import javax.validation.valueextraction.ValueExtractor;
-
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
@@ -35,7 +32,6 @@ import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
@@ -80,19 +76,9 @@ public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 	private final List<MetaDataProvider> metaDataProviders;
 
 	/**
-	 * Helper for builtin constraints and their validator implementations
+	 * The constraint creation context containing all the helpers necessary to the constraint creation.
 	 */
-	private final ConstraintHelper constraintHelper;
-
-	/**
-	 * Used for resolving generic type information.
-	 */
-	private final TypeResolutionHelper typeResolutionHelper;
-
-	/**
-	 * The {@link ValueExtractor} manager.
-	 */
-	private final ValueExtractorManager valueExtractorManager;
+	private final ConstraintCreationContext constraintCreationContext;
 
 	private final ExecutableParameterNameProvider parameterNameProvider;
 
@@ -115,19 +101,15 @@ public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 	 */
 	private final MethodValidationConfiguration methodValidationConfiguration;
 
-	public BeanMetaDataManagerImpl(ConstraintHelper constraintHelper,
+	public BeanMetaDataManagerImpl(ConstraintCreationContext constraintCreationContext,
 			ExecutableHelper executableHelper,
-			TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
-			ValueExtractorManager valueExtractorManager,
 			JavaBeanHelper javaBeanHelper,
 			ValidationOrderGenerator validationOrderGenerator,
 			List<MetaDataProvider> optionalMetaDataProviders,
 			MethodValidationConfiguration methodValidationConfiguration) {
-		this.constraintHelper = constraintHelper;
+		this.constraintCreationContext = constraintCreationContext;
 		this.executableHelper = executableHelper;
-		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractorManager = valueExtractorManager;
 		this.parameterNameProvider = parameterNameProvider;
 		this.validationOrderGenerator = validationOrderGenerator;
 
@@ -144,9 +126,7 @@ public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders( optionalMetaDataProviders );
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
-				constraintHelper,
-				typeResolutionHelper,
-				valueExtractorManager,
+				constraintCreationContext,
 				javaBeanHelper,
 				annotationProcessingOptions
 		);
@@ -192,7 +172,8 @@ public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 	 */
 	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
 		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance(
-				constraintHelper, executableHelper, typeResolutionHelper, valueExtractorManager, parameterNameProvider, validationOrderGenerator, clazz, methodValidationConfiguration );
+				constraintCreationContext, executableHelper, parameterNameProvider,
+				validationOrderGenerator, clazz, methodValidationConfiguration );
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
 			for ( BeanConfiguration<? super T> beanConfiguration : getBeanConfigurationForHierarchy( provider, clazz ) ) {

@@ -17,6 +17,7 @@ import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.validationcontext.ValidationContext;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorHelper;
@@ -67,7 +68,8 @@ public class MetaConstraint<A extends Annotation> {
 	 * @param valueExtractorDescriptors the potential {@link ValueExtractor}s used to extract the value to validate
 	 * @param validatedValueType the type of the validated element
 	 */
-	MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location, List<ContainerClassTypeParameterAndExtractor> valueExtractionPath,
+	MetaConstraint(ConstraintValidatorManager constraintValidatorManager, ConstraintDescriptorImpl<A> constraintDescriptor,
+			ConstraintLocation location, List<ContainerClassTypeParameterAndExtractor> valueExtractionPath,
 			Type validatedValueType) {
 		this.constraintTree = ConstraintTree.of( constraintDescriptor, validatedValueType );
 		this.location = location;

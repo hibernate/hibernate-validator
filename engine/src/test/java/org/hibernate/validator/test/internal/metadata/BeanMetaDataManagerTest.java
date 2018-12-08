@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.test.internal.metadata;
 
+import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotSame;
 import static org.testng.Assert.assertTrue;
@@ -23,11 +24,9 @@ import java.util.List;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManagerImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
@@ -53,11 +52,9 @@ public class BeanMetaDataManagerTest {
 	@BeforeMethod
 	public void setUpBeanMetaDataManager() {
 		metaDataManager = new BeanMetaDataManagerImpl(
-				new ConstraintHelper(),
+				getDummyConstraintCreationContext(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
-				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new ValueExtractorManager( Collections.emptySet() ),
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),

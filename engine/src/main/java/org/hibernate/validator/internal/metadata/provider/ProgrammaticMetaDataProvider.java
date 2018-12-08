@@ -14,14 +14,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
@@ -40,14 +38,12 @@ public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 	private final Map<String, BeanConfiguration<?>> configuredBeans;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
-	public ProgrammaticMetaDataProvider(ConstraintHelper constraintHelper,
-										TypeResolutionHelper typeResolutionHelper,
-										ValueExtractorManager valueExtractorManager,
+	public ProgrammaticMetaDataProvider(ConstraintCreationContext constraintCreationContext,
 										Set<DefaultConstraintMapping> constraintMappings) {
 		Contracts.assertNotNull( constraintMappings );
 
 		configuredBeans = CollectionHelper.toImmutableMap(
-				createBeanConfigurations( constraintMappings, constraintHelper, typeResolutionHelper, valueExtractorManager )
+				createBeanConfigurations( constraintMappings, constraintCreationContext )
 		);
 
 		assertUniquenessOfConfiguredTypes( constraintMappings );
@@ -68,12 +64,11 @@ public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 		}
 	}
 
-	private static Map<String, BeanConfiguration<?>> createBeanConfigurations(Set<DefaultConstraintMapping> mappings, ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
+	private static Map<String, BeanConfiguration<?>> createBeanConfigurations(Set<DefaultConstraintMapping> mappings,
+			ConstraintCreationContext constraintCreationContext) {
 		final Map<String, BeanConfiguration<?>> configuredBeans = new HashMap<>();
 		for ( DefaultConstraintMapping mapping : mappings ) {
-			Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations( constraintHelper, typeResolutionHelper,
-					valueExtractorManager );
+			Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations( constraintCreationContext );
 
 			for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {
 				configuredBeans.put( beanConfiguration.getBeanClass().getName(), beanConfiguration );

@@ -11,15 +11,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.xml.mapping.MappingXmlParser;
 
@@ -38,14 +36,12 @@ public class XmlMetaDataProvider implements MetaDataProvider {
 
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
-	public XmlMetaDataProvider(ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper,
-			ValueExtractorManager valueExtractorManager,
+	public XmlMetaDataProvider(ConstraintCreationContext constraintCreationContext,
 			JavaBeanHelper javaBeanHelper,
 			Set<InputStream> mappingStreams,
 			ClassLoader externalClassLoader) {
 
-		MappingXmlParser mappingParser = new MappingXmlParser( constraintHelper, typeResolutionHelper, valueExtractorManager,
+		MappingXmlParser mappingParser = new MappingXmlParser( constraintCreationContext,
 				javaBeanHelper, externalClassLoader );
 		mappingParser.parse( mappingStreams );
 

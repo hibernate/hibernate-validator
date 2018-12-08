@@ -23,15 +23,13 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.xml.AbstractStaxBuilder;
@@ -51,9 +49,7 @@ class ContainerElementTypeStaxBuilder extends AbstractStaxBuilder {
 	private static final QName TYPE_ARGUMENT_INDEX_QNAME = new QName( "type-argument-index" );
 
 	private final ClassLoadingHelper classLoadingHelper;
-	private final ConstraintHelper constraintHelper;
-	private final TypeResolutionHelper typeResolutionHelper;
-	private final ValueExtractorManager valueExtractorManager;
+	private final ConstraintCreationContext constraintCreationContext;
 	private final DefaultPackageStaxBuilder defaultPackageStaxBuilder;
 
 	private Integer typeArgumentIndex;
@@ -62,13 +58,11 @@ class ContainerElementTypeStaxBuilder extends AbstractStaxBuilder {
 	private final GroupConversionStaxBuilder groupConversionBuilder;
 	private final List<ContainerElementTypeStaxBuilder> containerElementTypeConfigurationStaxBuilders;
 
-	ContainerElementTypeStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager, DefaultPackageStaxBuilder defaultPackageStaxBuilder) {
+	ContainerElementTypeStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintCreationContext constraintCreationContext,
+			DefaultPackageStaxBuilder defaultPackageStaxBuilder) {
 		this.classLoadingHelper = classLoadingHelper;
 		this.defaultPackageStaxBuilder = defaultPackageStaxBuilder;
-		this.constraintHelper = constraintHelper;
-		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractorManager = valueExtractorManager;
+		this.constraintCreationContext = constraintCreationContext;
 
 		this.groupConversionBuilder = new GroupConversionStaxBuilder( classLoadingHelper, defaultPackageStaxBuilder );
 		this.validStaxBuilder = new ValidStaxBuilder();
@@ -106,11 +100,13 @@ class ContainerElementTypeStaxBuilder extends AbstractStaxBuilder {
 	}
 
 	private ConstraintTypeStaxBuilder getNewConstraintTypeStaxBuilder() {
-		return new ConstraintTypeStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder );
+		return new ConstraintTypeStaxBuilder( classLoadingHelper, constraintCreationContext,
+				defaultPackageStaxBuilder );
 	}
 
 	private ContainerElementTypeStaxBuilder getNewContainerElementTypeConfigurationStaxBuilder() {
-		return new ContainerElementTypeStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder );
+		return new ContainerElementTypeStaxBuilder( classLoadingHelper, constraintCreationContext,
+				defaultPackageStaxBuilder );
 	}
 
 	public ContainerElementTypeConfiguration build(Set<ContainerElementTypePath> configuredPaths,

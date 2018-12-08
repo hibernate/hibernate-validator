@@ -12,13 +12,11 @@ import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.properties.Property;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one bean property.
@@ -98,7 +96,7 @@ abstract class AbstractPropertyConstraintMappingContextImpl<T extends Property>
 		return super.containerElement( this, typeContext, location, index, nestedIndexes );
 	}
 
-	abstract ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager);
+	abstract ConstrainedElement build(ConstraintCreationContext constraintCreationContext);
 
 	@Override
 	protected ConstraintType getConstraintType() {

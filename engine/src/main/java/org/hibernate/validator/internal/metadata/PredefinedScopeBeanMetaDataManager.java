@@ -14,15 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
@@ -30,7 +29,6 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 
 public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
@@ -40,11 +38,9 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 	 */
 	private final Map<String, BeanMetaData<?>> beanMetaDataMap;
 
-	public PredefinedScopeBeanMetaDataManager(ConstraintHelper constraintHelper,
+	public PredefinedScopeBeanMetaDataManager(ConstraintCreationContext constraintCreationContext,
 			ExecutableHelper executableHelper,
-			TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
-			ValueExtractorManager valueExtractorManager,
 			JavaBeanHelper javaBeanHelper,
 			ValidationOrderGenerator validationOrderGenerator,
 			List<MetaDataProvider> optionalMetaDataProviders,
@@ -52,9 +48,7 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 			Set<Class<?>> beanClassesToInitialize) {
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders( optionalMetaDataProviders );
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
-				constraintHelper,
-				typeResolutionHelper,
-				valueExtractorManager,
+				constraintCreationContext,
 				javaBeanHelper,
 				annotationProcessingOptions
 		);
@@ -70,7 +64,7 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 		Map<String, BeanMetaData<?>> tmpBeanMetadataMap = new HashMap<>();
 
 		for ( Class<?> validatedClass : beanClassesToInitialize ) {
-			BeanMetaData<?> beanMetaData = createBeanMetaData( constraintHelper, executableHelper, typeResolutionHelper, parameterNameProvider, valueExtractorManager,
+			BeanMetaData<?> beanMetaData = createBeanMetaData( constraintCreationContext, executableHelper, parameterNameProvider,
 					javaBeanHelper, validationOrderGenerator, optionalMetaDataProviders, methodValidationConfiguration,
 					metaDataProviders, validatedClass );
 
@@ -78,7 +72,7 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 
 			for ( Class<?> parentClass : beanMetaData.getClassHierarchy() ) {
 				tmpBeanMetadataMap.put( parentClass.getName(),
-						createBeanMetaData( constraintHelper, executableHelper, typeResolutionHelper, parameterNameProvider, valueExtractorManager,
+						createBeanMetaData( constraintCreationContext, executableHelper, parameterNameProvider,
 								javaBeanHelper, validationOrderGenerator, optionalMetaDataProviders, methodValidationConfiguration,
 								metaDataProviders, parentClass ) );
 			}
@@ -107,11 +101,9 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 	 *
 	 * @return A bean meta data object for the given type.
 	 */
-	private static <T> BeanMetaDataImpl<T> createBeanMetaData(ConstraintHelper constraintHelper,
+	private static <T> BeanMetaDataImpl<T> createBeanMetaData(ConstraintCreationContext constraintCreationContext,
 			ExecutableHelper executableHelper,
-			TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
-			ValueExtractorManager valueExtractorManager,
 			JavaBeanHelper javaBeanHelper,
 			ValidationOrderGenerator validationOrderGenerator,
 			List<MetaDataProvider> optionalMetaDataProviders,
@@ -119,7 +111,8 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 			List<MetaDataProvider> metaDataProviders,
 			Class<T> clazz) {
 		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance(
-				constraintHelper, executableHelper, typeResolutionHelper, valueExtractorManager, parameterNameProvider, validationOrderGenerator, clazz, methodValidationConfiguration );
+				constraintCreationContext, executableHelper, parameterNameProvider,
+				validationOrderGenerator, clazz, methodValidationConfiguration );
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
 			for ( BeanConfiguration<? super T> beanConfiguration : getBeanConfigurationForHierarchy( provider, clazz ) ) {

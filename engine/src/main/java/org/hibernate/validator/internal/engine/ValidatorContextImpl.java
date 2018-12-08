@@ -40,7 +40,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private final ValidatorFactoryScopedContext.Builder validatorFactoryScopedContextBuilder;
-	private final ValueExtractorManager valueExtractorManager;
+	private final ConstraintCreationContext constraintCreationContext;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder;
 	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors;
 
@@ -48,8 +48,8 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.validatorFactoryScopedContextBuilder = new ValidatorFactoryScopedContext.Builder( validatorFactory.getValidatorFactoryScopedContext() );
 		this.validatorFactory = validatorFactory;
 		this.constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
+		this.constraintCreationContext = validatorFactory.getConstraintCreationContext();
 		this.methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder( validatorFactory.getMethodValidationConfiguration() );
-		this.valueExtractorManager = validatorFactory.getValueExtractorManager();
 		this.valueExtractorDescriptors = new HashMap<>();
 	}
 
@@ -146,9 +146,12 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	public Validator getValidator() {
 		return validatorFactory.createValidator(
 				constraintValidatorFactory,
-				valueExtractorDescriptors.isEmpty() ? valueExtractorManager : new ValueExtractorManager( valueExtractorManager, valueExtractorDescriptors ),
+				valueExtractorDescriptors.isEmpty()
+						? constraintCreationContext
+						: new ConstraintCreationContext( constraintCreationContext.getConstraintHelper(),
+								constraintCreationContext.getConstraintValidatorManager(), constraintCreationContext.getTypeResolutionHelper(),
+								new ValueExtractorManager( constraintCreationContext.getValueExtractorManager(), valueExtractorDescriptors ) ),
 				validatorFactoryScopedContextBuilder.build(),
-				methodValidationConfigurationBuilder.build()
-		);
+				methodValidationConfigurationBuilder.build() );
 	}
 }

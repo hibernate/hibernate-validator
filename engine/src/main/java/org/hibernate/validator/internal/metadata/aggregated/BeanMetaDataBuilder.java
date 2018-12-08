@@ -11,10 +11,9 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -25,7 +24,6 @@ import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.StringHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 /**
@@ -38,13 +36,11 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  */
 public class BeanMetaDataBuilder<T> {
 
-	private final ConstraintHelper constraintHelper;
+	private final ConstraintCreationContext constraintCreationContext;
 	private final ValidationOrderGenerator validationOrderGenerator;
 	private final Class<T> beanClass;
 	private final Set<BuilderDelegate> builders = newHashSet();
 	private final ExecutableHelper executableHelper;
-	private final TypeResolutionHelper typeResolutionHelper;
-	private final ValueExtractorManager valueExtractorManager;
 	private final ExecutableParameterNameProvider parameterNameProvider;
 	private final MethodValidationConfiguration methodValidationConfiguration;
 
@@ -55,38 +51,30 @@ public class BeanMetaDataBuilder<T> {
 
 
 	private BeanMetaDataBuilder(
-			ConstraintHelper constraintHelper,
+			ConstraintCreationContext constraintCreationContext,
 			ExecutableHelper executableHelper,
-			TypeResolutionHelper typeResolutionHelper,
-			ValueExtractorManager valueExtractorManager,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ValidationOrderGenerator validationOrderGenerator,
 			Class<T> beanClass,
 			MethodValidationConfiguration methodValidationConfiguration) {
 		this.beanClass = beanClass;
-		this.constraintHelper = constraintHelper;
+		this.constraintCreationContext = constraintCreationContext;
 		this.validationOrderGenerator = validationOrderGenerator;
 		this.executableHelper = executableHelper;
-		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractorManager = valueExtractorManager;
 		this.parameterNameProvider = parameterNameProvider;
 		this.methodValidationConfiguration = methodValidationConfiguration;
 	}
 
 	public static <T> BeanMetaDataBuilder<T> getInstance(
-			ConstraintHelper constraintHelper,
+			ConstraintCreationContext constraintCreationContext,
 			ExecutableHelper executableHelper,
-			TypeResolutionHelper typeResolutionHelper,
-			ValueExtractorManager valueExtractorManager,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ValidationOrderGenerator validationOrderGenerator,
 			Class<T> beanClass,
 			MethodValidationConfiguration methodValidationConfiguration) {
 		return new BeanMetaDataBuilder<>(
-				constraintHelper,
+				constraintCreationContext,
 				executableHelper,
-				typeResolutionHelper,
-				valueExtractorManager,
 				parameterNameProvider,
 				validationOrderGenerator,
 				beanClass,
@@ -130,10 +118,8 @@ public class BeanMetaDataBuilder<T> {
 				new BuilderDelegate(
 						beanClass,
 						constrainableElement,
-						constraintHelper,
+						constraintCreationContext,
 						executableHelper,
-						typeResolutionHelper,
-						valueExtractorManager,
 						parameterNameProvider,
 						methodValidationConfiguration
 				)
@@ -159,10 +145,8 @@ public class BeanMetaDataBuilder<T> {
 	private static class BuilderDelegate {
 		private final Class<?> beanClass;
 		private final ConstrainedElement constrainedElement;
-		private final ConstraintHelper constraintHelper;
+		private final ConstraintCreationContext constraintCreationContext;
 		private final ExecutableHelper executableHelper;
-		private final TypeResolutionHelper typeResolutionHelper;
-		private final ValueExtractorManager valueExtractorManager;
 		private final ExecutableParameterNameProvider parameterNameProvider;
 		private MetaDataBuilder metaDataBuilder;
 		private ExecutableMetaData.Builder methodBuilder;
@@ -172,19 +156,15 @@ public class BeanMetaDataBuilder<T> {
 		public BuilderDelegate(
 				Class<?> beanClass,
 				ConstrainedElement constrainedElement,
-				ConstraintHelper constraintHelper,
+				ConstraintCreationContext constraintCreationContext,
 				ExecutableHelper executableHelper,
-				TypeResolutionHelper typeResolutionHelper,
-				ValueExtractorManager valueExtractorManager,
 				ExecutableParameterNameProvider parameterNameProvider,
 				MethodValidationConfiguration methodValidationConfiguration
 		) {
 			this.beanClass = beanClass;
 			this.constrainedElement = constrainedElement;
-			this.constraintHelper = constraintHelper;
+			this.constraintCreationContext = constraintCreationContext;
 			this.executableHelper = executableHelper;
-			this.typeResolutionHelper = typeResolutionHelper;
-			this.valueExtractorManager = valueExtractorManager;
 			this.parameterNameProvider = parameterNameProvider;
 			this.methodValidationConfiguration = methodValidationConfiguration;
 
@@ -194,9 +174,7 @@ public class BeanMetaDataBuilder<T> {
 					metaDataBuilder = new PropertyMetaData.Builder(
 							beanClass,
 							constrainedField,
-							constraintHelper,
-							typeResolutionHelper,
-							valueExtractorManager
+							constraintCreationContext
 					);
 					break;
 				case CONSTRUCTOR:
@@ -211,10 +189,8 @@ public class BeanMetaDataBuilder<T> {
 						methodBuilder = new ExecutableMetaData.Builder(
 								beanClass,
 								constrainedExecutable,
-								constraintHelper,
+								constraintCreationContext,
 								executableHelper,
-								typeResolutionHelper,
-								valueExtractorManager,
 								parameterNameProvider,
 								methodValidationConfiguration
 						);
@@ -224,9 +200,7 @@ public class BeanMetaDataBuilder<T> {
 						metaDataBuilder = new PropertyMetaData.Builder(
 								beanClass,
 								constrainedExecutable,
-								constraintHelper,
-								typeResolutionHelper,
-								valueExtractorManager
+								constraintCreationContext
 						);
 					}
 					break;
@@ -235,9 +209,7 @@ public class BeanMetaDataBuilder<T> {
 					metaDataBuilder = new ClassMetaData.Builder(
 							beanClass,
 							constrainedType,
-							constraintHelper,
-							typeResolutionHelper,
-							valueExtractorManager
+							constraintCreationContext
 					);
 					break;
 				default:
@@ -264,10 +236,8 @@ public class BeanMetaDataBuilder<T> {
 					methodBuilder = new ExecutableMetaData.Builder(
 							beanClass,
 							constrainedMethod,
-							constraintHelper,
+							constraintCreationContext,
 							executableHelper,
-							typeResolutionHelper,
-							valueExtractorManager,
 							parameterNameProvider,
 							methodValidationConfiguration
 					);

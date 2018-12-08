@@ -7,6 +7,7 @@
 package org.hibernate.validator.test.internal.metadata.provider;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -18,9 +19,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
@@ -29,7 +28,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -45,9 +43,7 @@ public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProvi
 	@BeforeClass
 	public void setup() {
 		provider = new AnnotationMetaDataProvider(
-				new ConstraintHelper(),
-				new TypeResolutionHelper(),
-				new ValueExtractorManager( Collections.emptySet() ),
+				getDummyConstraintCreationContext(),
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
 				new AnnotationProcessingOptionsImpl()
 		);

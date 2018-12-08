@@ -29,14 +29,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -61,9 +60,7 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 	private static final QName CONSTRAINT_ANNOTATION_QNAME = new QName( "annotation" );
 
 	private final ClassLoadingHelper classLoadingHelper;
-	private final ConstraintHelper constraintHelper;
-	private final TypeResolutionHelper typeResolutionHelper;
-	private final ValueExtractorManager valueExtractorManager;
+	private final ConstraintCreationContext constraintCreationContext;
 	private final DefaultPackageStaxBuilder defaultPackageStaxBuilder;
 
 	// Builders:
@@ -77,14 +74,11 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 	private String constraintAnnotation;
 
 	ConstraintTypeStaxBuilder(
-			ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
+			ClassLoadingHelper classLoadingHelper, ConstraintCreationContext constraintCreationContext,
 			DefaultPackageStaxBuilder defaultPackageStaxBuilder) {
 		this.classLoadingHelper = classLoadingHelper;
 		this.defaultPackageStaxBuilder = defaultPackageStaxBuilder;
-		this.constraintHelper = constraintHelper;
-		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractorManager = valueExtractorManager;
+		this.constraintCreationContext = constraintCreationContext;
 
 		this.groupsStaxBuilder = new GroupsStaxBuilder( classLoadingHelper, defaultPackageStaxBuilder );
 		this.payloadStaxBuilder = new PayloadStaxBuilder( classLoadingHelper, defaultPackageStaxBuilder );
@@ -150,10 +144,12 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 		// we set initially ConstraintOrigin.DEFINED_LOCALLY for all xml configured constraints
 		// later we will make copies of this constraint descriptor when needed and adjust the ConstraintOrigin
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<>(
-				constraintHelper, constraintLocation.getConstrainable(), annotationDescriptor, kind, constraintType
+				constraintCreationContext.getConstraintHelper(), constraintLocation.getConstrainable(), annotationDescriptor, kind, constraintType
 		);
 
-		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor, constraintLocation );
+		return MetaConstraints.create( constraintCreationContext.getTypeResolutionHelper(),
+				constraintCreationContext.getValueExtractorManager(),
+				constraintCreationContext.getConstraintValidatorManager(), constraintDescriptor, constraintLocation );
 	}
 
 	private static class MessageStaxBuilder extends AbstractOneLineStringStaxBuilder {
