@@ -7,13 +7,13 @@
 package org.hibernate.validator.test.internal.xml;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -22,12 +22,10 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.ValidationException;
 import javax.validation.constraints.DecimalMin;
 
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.mapping.MappingXmlParser;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeMethod;
@@ -39,20 +37,21 @@ import org.testng.annotations.Test;
 public class MappingXmlParserTest {
 
 	private MappingXmlParser xmlMappingParser;
-	private ConstraintHelper constraintHelper;
+	private ConstraintCreationContext constraintCreationContext;
 
 	@BeforeMethod
 	public void setupParserHelper() {
-		constraintHelper = new ConstraintHelper();
+		constraintCreationContext = getDummyConstraintCreationContext();
 		xmlMappingParser = new MappingXmlParser(
-				constraintHelper, new TypeResolutionHelper(), new ValueExtractorManager( Collections.emptySet() ), new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ), null
+				constraintCreationContext,
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ), null
 		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-782")
 	public void testAdditionalConstraintValidatorsGetAddedAndAreLastInList() {
-		List<ConstraintValidatorDescriptor<DecimalMin>> validatorDescriptors = constraintHelper.getAllValidatorDescriptors(
+		List<ConstraintValidatorDescriptor<DecimalMin>> validatorDescriptors = constraintCreationContext.getConstraintHelper().getAllValidatorDescriptors(
 				DecimalMin.class
 		);
 
@@ -64,7 +63,7 @@ public class MappingXmlParserTest {
 
 		xmlMappingParser.parse( mappingStreams );
 
-		validatorDescriptors = constraintHelper.getAllValidatorDescriptors( DecimalMin.class );
+		validatorDescriptors = constraintCreationContext.getConstraintHelper().getAllValidatorDescriptors( DecimalMin.class );
 		assertFalse( validatorDescriptors.isEmpty(), "Wrong number of default validators" );
 		assertEquals( getIndex( validatorDescriptors, DecimalMinValidatorForFoo.class ), validatorDescriptors.size() - 1,
 				"The custom validator must be last" );

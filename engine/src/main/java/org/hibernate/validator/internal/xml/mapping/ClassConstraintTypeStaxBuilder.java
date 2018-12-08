@@ -19,15 +19,13 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.AbstractStaxBuilder;
 
 /**
@@ -41,9 +39,7 @@ class ClassConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 	private static final QName IGNORE_ANNOTATIONS_QNAME = new QName( "ignore-annotations" );
 
 	private final ClassLoadingHelper classLoadingHelper;
-	private final ConstraintHelper constraintHelper;
-	private final TypeResolutionHelper typeResolutionHelper;
-	private final ValueExtractorManager valueExtractorManager;
+	private final ConstraintCreationContext constraintCreationContext;
 	private final DefaultPackageStaxBuilder defaultPackageStaxBuilder;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
@@ -52,15 +48,12 @@ class ClassConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 	private final List<ConstraintTypeStaxBuilder> constraintTypeStaxBuilders;
 	private final GroupSequenceStaxBuilder groupSequenceStaxBuilder;
 
-	ClassConstraintTypeStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
+	ClassConstraintTypeStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintCreationContext constraintCreationContext,
 			DefaultPackageStaxBuilder defaultPackageStaxBuilder, AnnotationProcessingOptionsImpl annotationProcessingOptions,
 			Map<Class<?>, List<Class<?>>> defaultSequences) {
 		this.classLoadingHelper = classLoadingHelper;
 		this.defaultPackageStaxBuilder = defaultPackageStaxBuilder;
-		this.constraintHelper = constraintHelper;
-		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractorManager = valueExtractorManager;
+		this.constraintCreationContext = constraintCreationContext;
 
 		this.annotationProcessingOptions = annotationProcessingOptions;
 		this.defaultSequences = defaultSequences;
@@ -90,7 +83,8 @@ class ClassConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 	}
 
 	private ConstraintTypeStaxBuilder getNewConstraintTypeStaxBuilder() {
-		return new ConstraintTypeStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder );
+		return new ConstraintTypeStaxBuilder( classLoadingHelper, constraintCreationContext,
+				defaultPackageStaxBuilder );
 	}
 
 	ConstrainedType build(Class<?> beanClass) {

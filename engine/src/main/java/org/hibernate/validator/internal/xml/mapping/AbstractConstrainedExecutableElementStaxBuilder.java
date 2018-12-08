@@ -15,10 +15,8 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.AbstractStaxBuilder;
 
 /**
@@ -31,9 +29,7 @@ abstract class AbstractConstrainedExecutableElementStaxBuilder extends AbstractS
 	private static final QName IGNORE_ANNOTATIONS_QNAME = new QName( "ignore-annotations" );
 
 	protected final ClassLoadingHelper classLoadingHelper;
-	protected final ConstraintHelper constraintHelper;
-	protected final TypeResolutionHelper typeResolutionHelper;
-	protected final ValueExtractorManager valueExtractorManager;
+	protected final ConstraintCreationContext constraintCreationContext;
 	protected final DefaultPackageStaxBuilder defaultPackageStaxBuilder;
 	protected final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 
@@ -44,14 +40,11 @@ abstract class AbstractConstrainedExecutableElementStaxBuilder extends AbstractS
 	private ReturnValueStaxBuilder returnValueStaxBuilder;
 
 	AbstractConstrainedExecutableElementStaxBuilder(
-			ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
+			ClassLoadingHelper classLoadingHelper, ConstraintCreationContext constraintCreationContext,
 			DefaultPackageStaxBuilder defaultPackageStaxBuilder, AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		this.classLoadingHelper = classLoadingHelper;
 		this.defaultPackageStaxBuilder = defaultPackageStaxBuilder;
-		this.constraintHelper = constraintHelper;
-		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractorManager = valueExtractorManager;
+		this.constraintCreationContext = constraintCreationContext;
 
 		this.annotationProcessingOptions = annotationProcessingOptions;
 
@@ -86,15 +79,18 @@ abstract class AbstractConstrainedExecutableElementStaxBuilder extends AbstractS
 	}
 
 	private ConstrainedParameterStaxBuilder getNewConstrainedParameterStaxBuilder() {
-		return new ConstrainedParameterStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder, annotationProcessingOptions );
+		return new ConstrainedParameterStaxBuilder( classLoadingHelper, constraintCreationContext,
+				defaultPackageStaxBuilder, annotationProcessingOptions );
 	}
 
 	private CrossParameterStaxBuilder getNewCrossParameterStaxBuilder() {
-		return new CrossParameterStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder, annotationProcessingOptions );
+		return new CrossParameterStaxBuilder( classLoadingHelper, constraintCreationContext,
+				defaultPackageStaxBuilder, annotationProcessingOptions );
 	}
 
 	private ReturnValueStaxBuilder getNewReturnValueStaxBuilder() {
-		return new ReturnValueStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder, annotationProcessingOptions );
+		return new ReturnValueStaxBuilder( classLoadingHelper, constraintCreationContext,
+				defaultPackageStaxBuilder, annotationProcessingOptions );
 	}
 
 	public Optional<ReturnValueStaxBuilder> getReturnValueStaxBuilder() {

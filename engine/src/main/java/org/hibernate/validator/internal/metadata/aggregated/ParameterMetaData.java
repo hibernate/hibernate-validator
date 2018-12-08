@@ -13,9 +13,8 @@ import java.util.Set;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ParameterDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
@@ -25,7 +24,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
  * An aggregated view of the constraint related meta data for a single method
@@ -117,11 +115,9 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 
 		public Builder(Class<?> beanClass,
 				ConstrainedParameter constrainedParameter,
-				ConstraintHelper constraintHelper,
-				TypeResolutionHelper typeResolutionHelper,
-				ValueExtractorManager valueExtractorManager,
+				ConstraintCreationContext constraintCreationContext,
 				ExecutableParameterNameProvider parameterNameProvider) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
+			super( beanClass, constraintCreationContext );
 
 			this.parameterNameProvider = parameterNameProvider;
 			this.parameterType = constrainedParameter.getType();
@@ -170,7 +166,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 					parameterType,
 					adaptOriginsAndImplicitGroups( getDirectConstraints() ),
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
-					cascadingMetaDataBuilder.build( valueExtractorManager, callableForNameRetrieval )
+					cascadingMetaDataBuilder.build( constraintCreationContext.getValueExtractorManager(), callableForNameRetrieval )
 			);
 		}
 	}

@@ -31,10 +31,9 @@ import org.hibernate.validator.cfg.context.ParameterTarget;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueTarget;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -43,7 +42,6 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -231,30 +229,29 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 		);
 	}
 
-	Set<MetaConstraint<?>> build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-			ValueExtractorManager valueExtractorManager) {
+	Set<MetaConstraint<?>> build(ConstraintCreationContext constraintCreationContext) {
 		return Stream.concat(
 			constraints.stream()
-				.map( c -> asMetaConstraint( c, constraintHelper, typeResolutionHelper, valueExtractorManager ) ),
+				.map( c -> asMetaConstraint( c, constraintCreationContext ) ),
 			nestedContainerElementContexts.values()
 				.stream()
-				.map( c -> c.build( constraintHelper, typeResolutionHelper, valueExtractorManager ) )
+				.map( c -> c.build( constraintCreationContext ) )
 				.flatMap( Set::stream )
 			)
 			.collect( Collectors.toSet() );
 	}
 
-	private <A extends Annotation> MetaConstraint<A> asMetaConstraint(ConfiguredConstraint<A> config, ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
+	private <A extends Annotation> MetaConstraint<A> asMetaConstraint(ConfiguredConstraint<A> config, ConstraintCreationContext constraintCreationContext) {
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<>(
-				constraintHelper,
+				constraintCreationContext.getConstraintHelper(),
 				config.getLocation().getConstrainable(),
 				config.createAnnotationDescriptor(),
 				config.getLocation().getKind(),
 				getConstraintType()
 		);
 
-		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor, config.getLocation() );
+		return MetaConstraints.create( constraintCreationContext.getTypeResolutionHelper(), constraintCreationContext.getValueExtractorManager(),
+				constraintCreationContext.getConstraintValidatorManager(), constraintDescriptor, config.getLocation() );
 	}
 
 	@Override

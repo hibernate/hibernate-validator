@@ -11,14 +11,12 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.lang.annotation.Annotation;
 import java.util.Set;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
  * Builds {@link ConstraintMetaData} instances for the
@@ -29,20 +27,16 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
  */
 public abstract class MetaDataBuilder {
 
-	protected final ConstraintHelper constraintHelper;
-	protected final TypeResolutionHelper typeResolutionHelper;
-	protected final ValueExtractorManager valueExtractorManager;
+	protected final ConstraintCreationContext constraintCreationContext;
 
 	private final Class<?> beanClass;
 	private final Set<MetaConstraint<?>> directConstraints = newHashSet();
 	private final Set<MetaConstraint<?>> containerElementsConstraints = newHashSet();
 	private boolean isCascading = false;
 
-	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
+	protected MetaDataBuilder(Class<?> beanClass, ConstraintCreationContext constraintCreationContext) {
 		this.beanClass = beanClass;
-		this.constraintHelper = constraintHelper;
-		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractorManager = valueExtractorManager;
+		this.constraintCreationContext = constraintCreationContext;
 	}
 
 	/**
@@ -128,7 +122,7 @@ public abstract class MetaDataBuilder {
 		Class<?> constraintClass = constraint.getLocation().getDeclaringClass();
 
 		ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<>(
-				constraintHelper,
+				constraintCreationContext.getConstraintHelper(),
 				constraint.getLocation().getConstrainable(),
 				constraint.getDescriptor().getAnnotationDescriptor(),
 				constraint.getConstraintLocationKind(),
@@ -137,7 +131,9 @@ public abstract class MetaDataBuilder {
 				constraint.getDescriptor().getConstraintType()
 		);
 
-		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, descriptor, constraint.getLocation() );
+		return MetaConstraints.create( constraintCreationContext.getTypeResolutionHelper(),
+				constraintCreationContext.getValueExtractorManager(),
+				constraintCreationContext.getConstraintValidatorManager(), descriptor, constraint.getLocation() );
 	}
 
 	/**

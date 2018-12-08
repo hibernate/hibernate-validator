@@ -82,11 +82,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final ValidatorFactoryScopedContext validatorFactoryScopedContext;
 
 	/**
-	 * The constraint validator manager for this factory.
-	 */
-	private final ConstraintValidatorManager constraintValidatorManager;
-
-	/**
 	 * Programmatic constraints passed via the Hibernate Validator specific API. Empty if there are
 	 * no programmatic constraints
 	 */
@@ -94,14 +89,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final Set<DefaultConstraintMapping> constraintMappings;
 
 	/**
-	 * Helper for dealing with built-in validators and determining custom constraint annotations.
+	 * The constraint creation context containing all the helpers necessary to the constraint creation.
 	 */
-	private final ConstraintHelper constraintHelper;
-
-	/**
-	 * Used for resolving type parameters. Thread-safe.
-	 */
-	private final TypeResolutionHelper typeResolutionHelper;
+	private final ConstraintCreationContext constraintCreationContext;
 
 	/**
 	 * Used for discovering overridden methods. Thread-safe.
@@ -126,9 +116,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * provider. See also HV-659.
 	 */
 	@ThreadSafe
-	private final ConcurrentMap<BeanMetaDataManagerKey, BeanMetaDataManager> beanMetaDataManagers;
-
-	private final ValueExtractorManager valueExtractorManager;
+	private final ConcurrentMap<BeanMetaDataManagerKey, BeanMetaDataManager> beanMetaDataManagers = new ConcurrentHashMap<>();
 
 	private final JavaBeanHelper javaBeanHelper;
 
@@ -137,41 +125,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		ClassLoader externalClassLoader = getExternalClassLoader( configurationState );
 
-		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
-		this.beanMetaDataManagers = new ConcurrentHashMap<>();
-		this.constraintHelper = new ConstraintHelper();
-		this.typeResolutionHelper = new TypeResolutionHelper();
-		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
-
 		ConfigurationImpl hibernateSpecificConfig = null;
 		if ( configurationState instanceof ConfigurationImpl ) {
 			hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 		}
 
 		Map<String, String> properties = configurationState.getProperties();
-
-		this.javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.getGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ) );
-
-		// HV-302; don't load XmlMappingParser if not necessary
-		if ( configurationState.getMappingStreams().isEmpty() ) {
-			this.xmlMetaDataProvider = null;
-		}
-		else {
-			this.xmlMetaDataProvider = new XmlMetaDataProvider(
-					constraintHelper, typeResolutionHelper, valueExtractorManager, javaBeanHelper, configurationState.getMappingStreams(), externalClassLoader
-			);
-		}
-
-		this.constraintMappings = Collections.unmodifiableSet(
-				getConstraintMappings(
-						typeResolutionHelper,
-						configurationState,
-						javaBeanHelper,
-						externalClassLoader
-				)
-		);
-
-		registerCustomConstraintValidators( constraintMappings, constraintHelper );
 
 		this.methodValidationConfiguration = new MethodValidationConfiguration.Builder()
 				.allowOverridingMethodAlterParameterConstraint(
@@ -194,12 +153,41 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				getConstraintValidatorPayload( hibernateSpecificConfig )
 		);
 
-		this.constraintValidatorManager = new ConstraintValidatorManagerImpl(
+		ConstraintValidatorManager constraintValidatorManager = new ConstraintValidatorManagerImpl(
 				configurationState.getConstraintValidatorFactory(),
 				this.validatorFactoryScopedContext.getConstraintValidatorInitializationContext()
 		);
 
 		this.validationOrderGenerator = new ValidationOrderGenerator();
+
+		ValueExtractorManager valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
+		ConstraintHelper constraintHelper = new ConstraintHelper();
+		TypeResolutionHelper typeResolutionHelper = new TypeResolutionHelper();
+		JavaBeanHelper javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.getGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ) );
+
+		this.constraintCreationContext = new ConstraintCreationContext( constraintHelper, constraintValidatorManager, typeResolutionHelper, valueExtractorManager );
+
+		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
+		this.javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.getGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ) );
+
+		// HV-302; don't load XmlMappingParser if not necessary
+		if ( configurationState.getMappingStreams().isEmpty() ) {
+			this.xmlMetaDataProvider = null;
+		}
+		else {
+			this.xmlMetaDataProvider = new XmlMetaDataProvider( constraintCreationContext, javaBeanHelper, configurationState.getMappingStreams(), externalClassLoader );
+		}
+
+		this.constraintMappings = Collections.unmodifiableSet(
+				getConstraintMappings(
+						typeResolutionHelper,
+						configurationState,
+						javaBeanHelper,
+						externalClassLoader
+				)
+		);
+
+		registerCustomConstraintValidators( constraintMappings, constraintHelper );
 
 		if ( LOG.isDebugEnabled() ) {
 			logValidatorFactoryScopedConfiguration( validatorFactoryScopedContext );
@@ -209,8 +197,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	@Override
 	public Validator getValidator() {
 		return createValidator(
-				constraintValidatorManager.getDefaultConstraintValidatorFactory(),
-				valueExtractorManager,
+				constraintCreationContext.getConstraintValidatorManager().getDefaultConstraintValidatorFactory(),
+				constraintCreationContext,
 				validatorFactoryScopedContext,
 				methodValidationConfiguration
 		);
@@ -228,7 +216,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	@Override
 	public ConstraintValidatorFactory getConstraintValidatorFactory() {
-		return constraintValidatorManager.getDefaultConstraintValidatorFactory();
+		return constraintCreationContext.getConstraintValidatorManager().getDefaultConstraintValidatorFactory();
 	}
 
 	@Override
@@ -272,8 +260,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return validatorFactoryScopedContext.isTraversableResolverResultCacheEnabled();
 	}
 
-	ValueExtractorManager getValueExtractorManager() {
-		return valueExtractorManager;
+	ConstraintCreationContext getConstraintCreationContext() {
+		return constraintCreationContext;
 	}
 
 	@Override
@@ -292,13 +280,13 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	@Override
 	public void close() {
-		constraintValidatorManager.clear();
-		constraintHelper.clear();
+		constraintCreationContext.getConstraintValidatorManager().clear();
+		constraintCreationContext.getConstraintHelper().clear();
 		for ( BeanMetaDataManager beanMetaDataManager : beanMetaDataManagers.values() ) {
 			beanMetaDataManager.clear();
 		}
 		validatorFactoryScopedContext.getScriptEvaluatorFactory().clear();
-		valueExtractorManager.clear();
+		constraintCreationContext.getValueExtractorManager().clear();
 	}
 
 	public ValidatorFactoryScopedContext getValidatorFactoryScopedContext() {
@@ -306,21 +294,18 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	Validator createValidator(ConstraintValidatorFactory constraintValidatorFactory,
-			ValueExtractorManager valueExtractorManager,
+			ConstraintCreationContext constraintCreationContext,
 			ValidatorFactoryScopedContext validatorFactoryScopedContext,
 			MethodValidationConfiguration methodValidationConfiguration) {
-
 		BeanMetaDataManager beanMetaDataManager = beanMetaDataManagers.computeIfAbsent(
-				new BeanMetaDataManagerKey( validatorFactoryScopedContext.getParameterNameProvider(), valueExtractorManager, methodValidationConfiguration ),
+				new BeanMetaDataManagerKey( validatorFactoryScopedContext.getParameterNameProvider(), constraintCreationContext.getValueExtractorManager(), methodValidationConfiguration ),
 				key -> new BeanMetaDataManagerImpl(
-						constraintHelper,
+						constraintCreationContext,
 						executableHelper,
-						typeResolutionHelper,
 						validatorFactoryScopedContext.getParameterNameProvider(),
-						valueExtractorManager,
 						javaBeanHelper,
 						validationOrderGenerator,
-						buildDataProviders(),
+						buildMetaDataProviders(),
 						methodValidationConfiguration
 				)
 		);
@@ -328,14 +313,14 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return new ValidatorImpl(
 				constraintValidatorFactory,
 				beanMetaDataManager,
-				valueExtractorManager,
-				constraintValidatorManager,
+				constraintCreationContext.getValueExtractorManager(),
+				constraintCreationContext.getConstraintValidatorManager(),
 				validationOrderGenerator,
 				validatorFactoryScopedContext
 		);
 	}
 
-	private List<MetaDataProvider> buildDataProviders() {
+	private List<MetaDataProvider> buildMetaDataProviders() {
 		List<MetaDataProvider> metaDataProviders = newArrayList();
 		if ( xmlMetaDataProvider != null ) {
 			metaDataProviders.add( xmlMetaDataProvider );
@@ -344,9 +329,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if ( !constraintMappings.isEmpty() ) {
 			metaDataProviders.add(
 					new ProgrammaticMetaDataProvider(
-							constraintHelper,
-							typeResolutionHelper,
-							valueExtractorManager,
+							constraintCreationContext,
 							constraintMappings
 					)
 			);

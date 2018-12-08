@@ -11,13 +11,11 @@ import java.util.Set;
 
 import javax.validation.ElementKind;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ClassDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
  * Represents the constraint related meta data for a type i.e. class-level
@@ -86,9 +84,8 @@ public class ClassMetaData extends AbstractConstraintMetaData {
 	}
 
 	public static class Builder extends MetaDataBuilder {
-		public Builder(Class<?> beanClass, ConstrainedType constrainedType, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-				ValueExtractorManager valueExtractorManager) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
+		public Builder(Class<?> beanClass, ConstrainedType constrainedType, ConstraintCreationContext constraintCreationContext) {
+			super( beanClass, constraintCreationContext );
 
 			add( constrainedType );
 		}

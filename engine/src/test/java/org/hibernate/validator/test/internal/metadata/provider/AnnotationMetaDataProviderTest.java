@@ -10,13 +10,13 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Map;
 
 import javax.validation.Constraint;
@@ -29,9 +29,7 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.ScriptAssert;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
@@ -43,9 +41,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
-
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -61,9 +57,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	@BeforeMethod
 	public void setUpProvider() {
 		provider = new AnnotationMetaDataProvider(
-				new ConstraintHelper(),
-				new TypeResolutionHelper(),
-				new ValueExtractorManager( Collections.emptySet() ),
+				getDummyConstraintCreationContext(),
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
 				new AnnotationProcessingOptionsImpl()
 		);

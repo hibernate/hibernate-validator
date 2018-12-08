@@ -18,12 +18,10 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.AbstractStaxBuilder;
 import org.hibernate.validator.internal.xml.mapping.ContainerElementTypeConfigurationBuilder.ContainerElementTypeConfiguration;
 
@@ -37,9 +35,7 @@ abstract class AbstractConstrainedElementStaxBuilder extends AbstractStaxBuilder
 	private static final QName IGNORE_ANNOTATIONS_QNAME = new QName( "ignore-annotations" );
 
 	protected final ClassLoadingHelper classLoadingHelper;
-	protected final ConstraintHelper constraintHelper;
-	protected final TypeResolutionHelper typeResolutionHelper;
-	protected final ValueExtractorManager valueExtractorManager;
+	protected final ConstraintCreationContext constraintCreationContext;
 	protected final DefaultPackageStaxBuilder defaultPackageStaxBuilder;
 	protected final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 
@@ -50,14 +46,11 @@ abstract class AbstractConstrainedElementStaxBuilder extends AbstractStaxBuilder
 	protected final List<ConstraintTypeStaxBuilder> constraintTypeStaxBuilders;
 	protected final ContainerElementTypeConfigurationBuilder containerElementTypeConfigurationBuilder;
 
-	AbstractConstrainedElementStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
+	AbstractConstrainedElementStaxBuilder(ClassLoadingHelper classLoadingHelper, ConstraintCreationContext constraintCreationContext,
 			DefaultPackageStaxBuilder defaultPackageStaxBuilder, AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		this.classLoadingHelper = classLoadingHelper;
 		this.defaultPackageStaxBuilder = defaultPackageStaxBuilder;
-		this.constraintHelper = constraintHelper;
-		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractorManager = valueExtractorManager;
+		this.constraintCreationContext = constraintCreationContext;
 
 		this.groupConversionBuilder = new GroupConversionStaxBuilder( classLoadingHelper, defaultPackageStaxBuilder );
 		this.validStaxBuilder = new ValidStaxBuilder();
@@ -94,11 +87,13 @@ abstract class AbstractConstrainedElementStaxBuilder extends AbstractStaxBuilder
 	}
 
 	private ConstraintTypeStaxBuilder getNewConstraintTypeStaxBuilder() {
-		return new ConstraintTypeStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder );
+		return new ConstraintTypeStaxBuilder( classLoadingHelper, constraintCreationContext,
+				defaultPackageStaxBuilder );
 	}
 
 	private ContainerElementTypeStaxBuilder getNewContainerElementTypeStaxBuilder() {
-		return new ContainerElementTypeStaxBuilder( classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager, defaultPackageStaxBuilder );
+		return new ContainerElementTypeStaxBuilder( classLoadingHelper, constraintCreationContext,
+				defaultPackageStaxBuilder );
 	}
 
 	protected ContainerElementTypeConfiguration getContainerElementTypeConfiguration(Type type, ConstraintLocation constraintLocation) {

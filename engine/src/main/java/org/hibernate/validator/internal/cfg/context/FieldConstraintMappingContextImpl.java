@@ -8,15 +8,13 @@ package org.hibernate.validator.internal.cfg.context;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
  * An implementation of {@link AbstractPropertyConstraintMappingContextImpl} for a field property.
@@ -41,12 +39,13 @@ final class FieldConstraintMappingContextImpl extends AbstractPropertyConstraint
 		return this;
 	}
 
-	ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
+	@Override
+	ConstrainedElement build(ConstraintCreationContext constraintCreationContext) {
 		return new ConstrainedField(
 				ConfigurationSource.API,
 				getProperty(),
-				getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-				getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
+				getConstraints( constraintCreationContext ),
+				getTypeArgumentConstraints( constraintCreationContext ),
 				getCascadingMetaDataBuilder()
 		);
 	}

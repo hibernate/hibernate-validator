@@ -26,20 +26,17 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 
-import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.internal.xml.CloseIgnoringInputStream;
 import org.hibernate.validator.internal.xml.XmlParserHelper;
-
 import org.xml.sax.SAXException;
 
 /**
@@ -53,9 +50,7 @@ public class MappingXmlParser {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Set<Class<?>> processedClasses = newHashSet();
-	private final ConstraintHelper constraintHelper;
-	private final TypeResolutionHelper typeResolutionHelper;
-	private final ValueExtractorManager valueExtractorManager;
+	private final ConstraintCreationContext constraintCreationContext;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 	private final JavaBeanHelper javaBeanHelper;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
@@ -77,11 +72,8 @@ public class MappingXmlParser {
 		return schemasByVersion;
 	}
 
-	public MappingXmlParser(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
-			JavaBeanHelper javaBeanHelper, ClassLoader externalClassLoader) {
-		this.constraintHelper = constraintHelper;
-		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractorManager = valueExtractorManager;
+	public MappingXmlParser(ConstraintCreationContext constraintCreationContext, JavaBeanHelper javaBeanHelper, ClassLoader externalClassLoader) {
+		this.constraintCreationContext = constraintCreationContext;
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 		this.javaBeanHelper = javaBeanHelper;
 		this.defaultSequences = newHashMap();
@@ -127,7 +119,7 @@ public class MappingXmlParser {
 				in.reset();
 
 				ConstraintMappingsStaxBuilder constraintMappingsStaxBuilder = new ConstraintMappingsStaxBuilder(
-						classLoadingHelper, constraintHelper, typeResolutionHelper, valueExtractorManager,
+						classLoadingHelper, constraintCreationContext,
 						annotationProcessingOptions, javaBeanHelper, defaultSequences
 				);
 
