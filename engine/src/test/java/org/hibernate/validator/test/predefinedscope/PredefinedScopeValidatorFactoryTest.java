@@ -138,7 +138,7 @@ public class PredefinedScopeValidatorFactoryTest {
 
 			Set<ConstraintViolation<Bean>> violations = validator.validate( new Bean( "", "invalid" ) );
 			assertThat( violations ).containsOnlyViolations(
-					violationOf( Email.class ).withProperty( "email" ).withMessage( "doit être une adresse email bien formée" ) );
+					violationOf( Email.class ).withProperty( "email" ).withMessage( "doit être une adresse électronique syntaxiquement correcte" ) );
 		}
 		finally {
 			Locale.setDefault( defaultLocale );
@@ -176,7 +176,7 @@ public class PredefinedScopeValidatorFactoryTest {
 
 			Set<ConstraintViolation<Bean>> violations = validator.validate( new Bean( "", "invalid" ) );
 			assertThat( violations ).containsOnlyViolations(
-					violationOf( Email.class ).withProperty( "email" ).withMessage( "doit être une adresse email bien formée" ) );
+					violationOf( Email.class ).withProperty( "email" ).withMessage( "doit être une adresse électronique syntaxiquement correcte" ) );
 		}
 		finally {
 			Locale.setDefault( defaultLocale );

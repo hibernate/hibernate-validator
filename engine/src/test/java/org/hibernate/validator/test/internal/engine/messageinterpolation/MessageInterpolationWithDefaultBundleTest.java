@@ -74,8 +74,8 @@ public class MessageInterpolationWithDefaultBundleTest {
 		user.setAge( 16 );
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
 		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( Email.class ).withMessage( "keine g\u00FCltige E-Mail-Adresse" ),
-				violationOf( Range.class ).withMessage( "muss zwischen 18 und 21 liegen" )
+				violationOf( Email.class ).withMessage( "muss eine korrekt formatierte E-Mail-Adresse sein" ),
+				violationOf( Range.class ).withMessage( "muss zwischen 18 und 21 sein" )
 		);
 	}
 
@@ -90,8 +90,8 @@ public class MessageInterpolationWithDefaultBundleTest {
 		user.setAge( 16 );
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
 		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( Email.class ).withMessage( "doit \u00EAtre une adresse email bien form\u00E9e" ),
-				violationOf( Range.class ).withMessage( "doit \u00EAtre entre 18 et 21" )
+				violationOf( Email.class ).withMessage( "doit être une adresse électronique syntaxiquement correcte" ),
+				violationOf( Range.class ).withMessage( "doit être compris entre 18 et 21" )
 		);
 	}
 
