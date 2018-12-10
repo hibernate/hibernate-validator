@@ -61,6 +61,11 @@ public class PredefinedScopeConstraintValidatorManagerImpl extends AbstractConst
 	}
 
 	@Override
+	public boolean isPredefinedScope() {
+		return true;
+	}
+
+	@Override
 	public void clear() {
 	}
 }

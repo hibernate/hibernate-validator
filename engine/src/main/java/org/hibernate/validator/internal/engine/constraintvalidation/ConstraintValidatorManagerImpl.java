@@ -82,6 +82,11 @@ public class ConstraintValidatorManagerImpl extends AbstractConstraintValidatorM
 		this.constraintValidatorCache = new ConcurrentHashMap<>();
 	}
 
+	@Override
+	public boolean isPredefinedScope() {
+		return false;
+	}
+
 	/**
 	 * @param validatedValueType the type of the value to be validated. Cannot be {@code null}.
 	 * @param descriptor the constraint descriptor for which to get an initialized constraint validator. Cannot be {@code null}

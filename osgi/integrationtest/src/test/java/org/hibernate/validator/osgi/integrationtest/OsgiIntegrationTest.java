@@ -195,7 +195,7 @@ public class OsgiIntegrationTest {
 				.getValidator()
 				.validate( new Customer() );
 
-		assertEquals( 2, ExampleConstraintValidatorFactory.invocationCounter.get() );
+		assertEquals( 1, ExampleConstraintValidatorFactory.invocationCounter.get() );
 	}
 
 	@Test

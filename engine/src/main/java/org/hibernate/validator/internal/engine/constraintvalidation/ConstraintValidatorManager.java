@@ -43,4 +43,6 @@ public interface ConstraintValidatorManager {
 	ConstraintValidatorFactory getDefaultConstraintValidatorFactory();
 
 	HibernateConstraintValidatorInitializationContext getDefaultConstraintValidatorInitializationContext();
+
+	boolean isPredefinedScope();
 }

@@ -46,16 +46,18 @@ public abstract class ConstraintTree<A extends Annotation> {
 
 	private final Type validatedValueType;
 
-	private final ConstraintValidator<A, ?> defaultInitializedConstraintValidator;
+	private volatile ConstraintValidator<A, ?> defaultInitializedConstraintValidator;
 
 	protected ConstraintTree(ConstraintValidatorManager constraintValidatorManager, ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
 		this.descriptor = descriptor;
 		this.validatedValueType = validatedValueType;
 
-		this.defaultInitializedConstraintValidator = constraintValidatorManager.getInitializedValidator( validatedValueType,
-				descriptor,
-				constraintValidatorManager.getDefaultConstraintValidatorFactory(),
-				constraintValidatorManager.getDefaultConstraintValidatorInitializationContext() );
+		if ( constraintValidatorManager.isPredefinedScope() ) {
+			this.defaultInitializedConstraintValidator = constraintValidatorManager.getInitializedValidator( validatedValueType,
+					descriptor,
+					constraintValidatorManager.getDefaultConstraintValidatorFactory(),
+					constraintValidatorManager.getDefaultConstraintValidatorInitializationContext() );
+		}
 	}
 
 	public static <U extends Annotation> ConstraintTree<U> of(ConstraintValidatorManager constraintValidatorManager,
@@ -118,22 +120,42 @@ public abstract class ConstraintTree<A extends Annotation> {
 	protected final ConstraintValidator<A, ?> getInitializedConstraintValidator(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext) {
 		ConstraintValidator<A, ?> validator;
 
-		if ( validationContext.getConstraintValidatorFactory() == validationContext.getConstraintValidatorManager().getDefaultConstraintValidatorFactory()
-				&& validationContext.getConstraintValidatorInitializationContext() == validationContext.getConstraintValidatorManager()
-						.getDefaultConstraintValidatorInitializationContext() ) {
+		if ( validationContext.getConstraintValidatorManager().isPredefinedScope() ) {
 			validator = defaultInitializedConstraintValidator;
 		}
 		else {
-			// For now, we don't cache the result in the ConstraintTree if we don't use the default constraint validator
-			// factory. Creating a lot of CHM for that cache might not be a good idea and we prefer being conservative
-			// for now. Note that we have the ConstraintValidatorManager cache that mitigates the situation.
-			// If you come up with a use case where it makes sense, please reach out to us.
-			validator = validationContext.getConstraintValidatorManager().getInitializedValidator(
-					validatedValueType,
-					descriptor,
-					validationContext.getConstraintValidatorFactory(),
-					validationContext.getConstraintValidatorInitializationContext()
-			);
+			if ( validationContext.getConstraintValidatorFactory() == validationContext.getConstraintValidatorManager().getDefaultConstraintValidatorFactory()
+					&& validationContext.getConstraintValidatorInitializationContext() == validationContext.getConstraintValidatorManager()
+							.getDefaultConstraintValidatorInitializationContext() ) {
+				validator = defaultInitializedConstraintValidator;
+
+				if ( validator == null ) {
+					synchronized ( this ) {
+						validator = defaultInitializedConstraintValidator;
+						if ( validator == null ) {
+							validator = validationContext.getConstraintValidatorManager().getInitializedValidator(
+									validatedValueType,
+									descriptor,
+									validationContext.getConstraintValidatorManager().getDefaultConstraintValidatorFactory(),
+									validationContext.getConstraintValidatorManager().getDefaultConstraintValidatorInitializationContext() );
+
+							defaultInitializedConstraintValidator = validator;
+						}
+					}
+				}
+			}
+			else {
+				// For now, we don't cache the result in the ConstraintTree if we don't use the default constraint validator
+				// factory. Creating a lot of CHM for that cache might not be a good idea and we prefer being conservative
+				// for now. Note that we have the ConstraintValidatorManager cache that mitigates the situation.
+				// If you come up with a use case where it makes sense, please reach out to us.
+				validator = validationContext.getConstraintValidatorManager().getInitializedValidator(
+						validatedValueType,
+						descriptor,
+						validationContext.getConstraintValidatorFactory(),
+						validationContext.getConstraintValidatorInitializationContext()
+				);
+			}
 		}
 
 		if ( validator == null ) {
