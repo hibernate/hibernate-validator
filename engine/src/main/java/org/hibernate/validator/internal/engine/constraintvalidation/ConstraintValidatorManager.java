@@ -10,9 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorFactory;
-import javax.validation.constraints.Null;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -23,18 +21,6 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
  * @author Hardy Ferentschik
  */
 public interface ConstraintValidatorManager {
-
-	/**
-	 * Dummy {@code ConstraintValidator} used as placeholder for the case that for a given context there exists
-	 * no matching constraint validator instance
-	 */
-	ConstraintValidator<?, ?> DUMMY_CONSTRAINT_VALIDATOR = new ConstraintValidator<Null, Object>() {
-
-		@Override
-		public boolean isValid(Object value, ConstraintValidatorContext context) {
-			return false;
-		}
-	};
 
 	/**
 	 * @param validatedValueType the type of the value to be validated. Cannot be {@code null}.

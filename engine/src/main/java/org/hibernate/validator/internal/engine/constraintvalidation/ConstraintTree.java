@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
-import static org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager.DUMMY_CONSTRAINT_VALIDATOR;
-
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
@@ -18,10 +16,8 @@ import java.util.Optional;
 
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.engine.validationcontext.ValidationContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -56,7 +52,8 @@ public abstract class ConstraintTree<A extends Annotation> {
 		this.descriptor = descriptor;
 		this.validatedValueType = validatedValueType;
 
-		this.defaultInitializedConstraintValidator = getInitializedConstraintValidator( constraintValidatorManager,
+		this.defaultInitializedConstraintValidator = constraintValidatorManager.getInitializedValidator( validatedValueType,
+				descriptor,
 				constraintValidatorManager.getDefaultConstraintValidatorFactory(),
 				constraintValidatorManager.getDefaultConstraintValidatorInitializationContext() );
 	}
@@ -131,34 +128,19 @@ public abstract class ConstraintTree<A extends Annotation> {
 			// factory. Creating a lot of CHM for that cache might not be a good idea and we prefer being conservative
 			// for now. Note that we have the ConstraintValidatorManager cache that mitigates the situation.
 			// If you come up with a use case where it makes sense, please reach out to us.
-			validator = getInitializedConstraintValidator( validationContext.getConstraintValidatorManager(), validationContext.getConstraintValidatorFactory(),
-					validationContext.getConstraintValidatorInitializationContext() );
+			validator = validationContext.getConstraintValidatorManager().getInitializedValidator(
+					validatedValueType,
+					descriptor,
+					validationContext.getConstraintValidatorFactory(),
+					validationContext.getConstraintValidatorInitializationContext()
+			);
 		}
 
-		if ( validator == DUMMY_CONSTRAINT_VALIDATOR ) {
+		if ( validator == null ) {
 			throw getExceptionForNullValidator( validatedValueType, valueContext.getPropertyPath().asString() );
 		}
 
 		return validator;
-	}
-
-	@SuppressWarnings("unchecked")
-	private ConstraintValidator<A, ?> getInitializedConstraintValidator(ConstraintValidatorManager constraintValidatorManager,
-			ConstraintValidatorFactory constraintValidatorFactory,
-			HibernateConstraintValidatorInitializationContext constraintValidatorInitializationContext) {
-		ConstraintValidator<A, ?> validator = constraintValidatorManager.getInitializedValidator(
-				validatedValueType,
-				descriptor,
-				constraintValidatorFactory,
-				constraintValidatorInitializationContext
-		);
-
-		if ( validator != null ) {
-			return validator;
-		}
-		else {
-			return (ConstraintValidator<A, ?>) DUMMY_CONSTRAINT_VALIDATOR;
-		}
 	}
 
 	/**

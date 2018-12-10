@@ -15,7 +15,9 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorFactory;
+import javax.validation.constraints.Null;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -33,6 +35,18 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class ConstraintValidatorManagerImpl extends AbstractConstraintValidatorManagerImpl {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+
+	/**
+	 * Dummy {@code ConstraintValidator} used as placeholder for the case that for a given context there exists
+	 * no matching constraint validator instance
+	 */
+	private static final ConstraintValidator<?, ?> DUMMY_CONSTRAINT_VALIDATOR = new ConstraintValidator<Null, Object>() {
+
+		@Override
+		public boolean isValid(Object value, ConstraintValidatorContext context) {
+			return false;
+		}
+	};
 
 	/**
 	 * The most recently used non default constraint validator factory.
