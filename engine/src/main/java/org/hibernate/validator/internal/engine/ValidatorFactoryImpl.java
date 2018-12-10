@@ -6,14 +6,16 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.getAllowMultipleCascadedValidationOnReturnValues;
-import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.getAllowOverridingMethodAlterParameterConstraint;
-import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.getAllowParallelMethodsDefineParameterConstraints;
-import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.getConstraintMappings;
-import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.getConstraintValidatorPayload;
-import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.getExternalClassLoader;
-import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.getFailFast;
-import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.getTraversableResolverResultCacheEnabled;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowMultipleCascadedValidationOnReturnValues;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowOverridingMethodAlterParameterConstraint;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowParallelMethodsDefineParameterConstraints;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintMappings;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintValidatorPayload;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineExternalClassLoader;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFast;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineScriptEvaluatorFactory;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTemporalValidationTolerance;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTraversableResolverResultCacheEnabled;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.logValidatorFactoryScopedConfiguration;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.registerCustomConstraintValidators;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -123,7 +125,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final ValidationOrderGenerator validationOrderGenerator;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
-		ClassLoader externalClassLoader = getExternalClassLoader( configurationState );
+		ClassLoader externalClassLoader = determineExternalClassLoader( configurationState );
 
 		ConfigurationImpl hibernateSpecificConfig = null;
 		if ( configurationState instanceof ConfigurationImpl ) {
@@ -134,11 +136,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		this.methodValidationConfiguration = new MethodValidationConfiguration.Builder()
 				.allowOverridingMethodAlterParameterConstraint(
-						getAllowOverridingMethodAlterParameterConstraint( hibernateSpecificConfig, properties )
+						determineAllowOverridingMethodAlterParameterConstraint( hibernateSpecificConfig, properties )
 				).allowMultipleCascadedValidationOnReturnValues(
-						getAllowMultipleCascadedValidationOnReturnValues( hibernateSpecificConfig, properties )
+						determineAllowMultipleCascadedValidationOnReturnValues( hibernateSpecificConfig, properties )
 				).allowParallelMethodsDefineParameterConstraints(
-						getAllowParallelMethodsDefineParameterConstraints( hibernateSpecificConfig, properties )
+						determineAllowParallelMethodsDefineParameterConstraints( hibernateSpecificConfig, properties )
 				).build();
 
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
@@ -146,11 +148,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				configurationState.getTraversableResolver(),
 				new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() ),
 				configurationState.getClockProvider(),
-				ValidatorFactoryConfigurationHelper.getTemporalValidationTolerance( configurationState, properties ),
-				ValidatorFactoryConfigurationHelper.getScriptEvaluatorFactory( configurationState, properties, externalClassLoader ),
-				getFailFast( hibernateSpecificConfig, properties ),
-				getTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
-				getConstraintValidatorPayload( hibernateSpecificConfig )
+				determineTemporalValidationTolerance( configurationState, properties ),
+				determineScriptEvaluatorFactory( configurationState, properties, externalClassLoader ),
+				determineFailFast( hibernateSpecificConfig, properties ),
+				determineTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
+				determineConstraintValidatorPayload( hibernateSpecificConfig )
 		);
 
 		ConstraintValidatorManager constraintValidatorManager = new ConstraintValidatorManagerImpl(
@@ -167,7 +169,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.constraintCreationContext = new ConstraintCreationContext( constraintHelper, constraintValidatorManager, typeResolutionHelper, valueExtractorManager );
 
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
-		this.javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.getGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ) );
+		this.javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ) );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( configurationState.getMappingStreams().isEmpty() ) {
@@ -178,7 +180,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 
 		this.constraintMappings = Collections.unmodifiableSet(
-				getConstraintMappings(
+				determineConstraintMappings(
 						typeResolutionHelper,
 						configurationState,
 						javaBeanHelper,

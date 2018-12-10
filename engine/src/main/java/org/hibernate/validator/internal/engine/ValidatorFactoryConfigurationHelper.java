@@ -47,11 +47,11 @@ final class ValidatorFactoryConfigurationHelper {
 	private ValidatorFactoryConfigurationHelper() {
 	}
 
-	static ClassLoader getExternalClassLoader(ConfigurationState configurationState) {
+	static ClassLoader determineExternalClassLoader(ConfigurationState configurationState) {
 		return ( configurationState instanceof ConfigurationImpl ) ? ( (ConfigurationImpl) configurationState ).getExternalClassLoader() : null;
 	}
 
-	static Set<DefaultConstraintMapping> getConstraintMappings(TypeResolutionHelper typeResolutionHelper,
+	static Set<DefaultConstraintMapping> determineConstraintMappings(TypeResolutionHelper typeResolutionHelper,
 			ConfigurationState configurationState, JavaBeanHelper javaBeanHelper, ClassLoader externalClassLoader) {
 		Set<DefaultConstraintMapping> constraintMappings = newHashSet();
 
@@ -73,7 +73,7 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 
 		// XML-defined constraint mapping contributors
-		List<ConstraintMappingContributor> contributors = getPropertyConfiguredConstraintMappingContributors( configurationState.getProperties(),
+		List<ConstraintMappingContributor> contributors = determinePropertyConfiguredConstraintMappingContributors( configurationState.getProperties(),
 				externalClassLoader );
 
 		for ( ConstraintMappingContributor contributor : contributors ) {
@@ -104,7 +104,7 @@ final class ValidatorFactoryConfigurationHelper {
 	 *
 	 * @return a list with property-configured {@link ConstraintMappingContributor}s; May be empty but never {@code null}
 	 */
-	static List<ConstraintMappingContributor> getPropertyConfiguredConstraintMappingContributors(
+	static List<ConstraintMappingContributor> determinePropertyConfiguredConstraintMappingContributors(
 			Map<String, String> properties, ClassLoader externalClassLoader) {
 		@SuppressWarnings("deprecation")
 		String deprecatedPropertyValue = properties.get( HibernateValidatorConfiguration.CONSTRAINT_MAPPING_CONTRIBUTOR );
@@ -138,7 +138,7 @@ final class ValidatorFactoryConfigurationHelper {
 		return contributors;
 	}
 
-	static boolean getAllowParallelMethodsDefineParameterConstraints(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties) {
+	static boolean determineAllowParallelMethodsDefineParameterConstraints(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties) {
 		return checkPropertiesForBoolean(
 				properties,
 				HibernateValidatorConfiguration.ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS,
@@ -146,7 +146,7 @@ final class ValidatorFactoryConfigurationHelper {
 		);
 	}
 
-	static boolean getAllowMultipleCascadedValidationOnReturnValues(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties) {
+	static boolean determineAllowMultipleCascadedValidationOnReturnValues(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties) {
 		return checkPropertiesForBoolean(
 				properties,
 				HibernateValidatorConfiguration.ALLOW_MULTIPLE_CASCADED_VALIDATION_ON_RESULT,
@@ -154,7 +154,7 @@ final class ValidatorFactoryConfigurationHelper {
 		);
 	}
 
-	static boolean getAllowOverridingMethodAlterParameterConstraint(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties) {
+	static boolean determineAllowOverridingMethodAlterParameterConstraint(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties) {
 		return checkPropertiesForBoolean(
 				properties,
 				HibernateValidatorConfiguration.ALLOW_PARAMETER_CONSTRAINT_OVERRIDE,
@@ -162,7 +162,7 @@ final class ValidatorFactoryConfigurationHelper {
 		);
 	}
 
-	static boolean getTraversableResolverResultCacheEnabled(AbstractConfigurationImpl<?> configuration, Map<String, String> properties) {
+	static boolean determineTraversableResolverResultCacheEnabled(AbstractConfigurationImpl<?> configuration, Map<String, String> properties) {
 		return checkPropertiesForBoolean(
 				properties,
 				HibernateValidatorConfiguration.ENABLE_TRAVERSABLE_RESOLVER_RESULT_CACHE,
@@ -170,7 +170,7 @@ final class ValidatorFactoryConfigurationHelper {
 		);
 	}
 
-	static boolean getFailFast(AbstractConfigurationImpl<?> configuration, Map<String, String> properties) {
+	static boolean determineFailFast(AbstractConfigurationImpl<?> configuration, Map<String, String> properties) {
 		// check whether fail fast is programmatically enabled
 		boolean tmpFailFast = configuration != null ? configuration.getFailFast() : false;
 
@@ -187,7 +187,7 @@ final class ValidatorFactoryConfigurationHelper {
 		return tmpFailFast;
 	}
 
-	static ScriptEvaluatorFactory getScriptEvaluatorFactory(ConfigurationState configurationState, Map<String, String> properties,
+	static ScriptEvaluatorFactory determineScriptEvaluatorFactory(ConfigurationState configurationState, Map<String, String> properties,
 			ClassLoader externalClassLoader) {
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
@@ -217,7 +217,7 @@ final class ValidatorFactoryConfigurationHelper {
 		return new DefaultScriptEvaluatorFactory( externalClassLoader );
 	}
 
-	static Duration getTemporalValidationTolerance(ConfigurationState configurationState, Map<String, String> properties) {
+	static Duration determineTemporalValidationTolerance(ConfigurationState configurationState, Map<String, String> properties) {
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 			if ( hibernateSpecificConfig.getTemporalValidationTolerance() != null ) {
@@ -240,7 +240,7 @@ final class ValidatorFactoryConfigurationHelper {
 		return Duration.ZERO;
 	}
 
-	static Object getConstraintValidatorPayload(ConfigurationState configurationState) {
+	static Object determineConstraintValidatorPayload(ConfigurationState configurationState) {
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 			if ( hibernateSpecificConfig.getConstraintValidatorPayload() != null ) {
@@ -252,7 +252,7 @@ final class ValidatorFactoryConfigurationHelper {
 		return null;
 	}
 
-	static GetterPropertySelectionStrategy getGetterPropertySelectionStrategy(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
+	static GetterPropertySelectionStrategy determineGetterPropertySelectionStrategy(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
 			ClassLoader externalClassLoader) {
 		if ( hibernateSpecificConfig.getGetterPropertySelectionStrategy() != null ) {
 			LOG.usingGetterPropertySelectionStrategy( hibernateSpecificConfig.getGetterPropertySelectionStrategy().getClass() );
@@ -343,6 +343,4 @@ final class ValidatorFactoryConfigurationHelper {
 			return mapping;
 		}
 	}
-
-
 }
