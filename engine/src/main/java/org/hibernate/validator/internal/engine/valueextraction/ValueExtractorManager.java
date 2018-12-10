@@ -36,10 +36,16 @@ public class ValueExtractorManager {
 	@Immutable
 	public static final Set<ValueExtractorDescriptor> SPEC_DEFINED_EXTRACTORS;
 
+	/**
+	 * Set this environment variable to true to ensure the JavaFX integrations are disabled.
+	 * Normally the JavaFX extensions are enabled if and only if JavaFX is found on classpath.
+	 */
+	private static final String HIBERNATE_VALIDATOR_FORCE_DISABLE_JAVA_FX = "org.hibernate.validator.force-disable-JavaFX-integration";
+
 	static {
 		LinkedHashSet<ValueExtractorDescriptor> specDefinedExtractors = new LinkedHashSet<>();
 
-		if ( isJavaFxInClasspath() ) {
+		if ( isJavaFxExtensionsEnabled() ) {
 			specDefinedExtractors.add( ObservableValueValueExtractor.DESCRIPTOR );
 			specDefinedExtractors.add( ListPropertyValueExtractor.DESCRIPTOR );
 			specDefinedExtractors.add( ReadOnlyListPropertyValueExtractor.DESCRIPTOR );
@@ -74,6 +80,24 @@ public class ValueExtractorManager {
 		specDefinedExtractors.add( OptionalLongValueExtractor.DESCRIPTOR );
 
 		SPEC_DEFINED_EXTRACTORS = Collections.unmodifiableSet( specDefinedExtractors );
+	}
+
+	private static boolean isJavaFxExtensionsEnabled() {
+		if ( isJavaFXForcefullyDisabled() ) {
+			return false;
+		}
+		else {
+			return isJavaFxInClasspath();
+		}
+	}
+
+	private static boolean isJavaFXForcefullyDisabled() {
+		return run( new PrivilegedAction<Boolean>() {
+			@Override
+			public Boolean run() {
+				 return Boolean.valueOf( Boolean.getBoolean( HIBERNATE_VALIDATOR_FORCE_DISABLE_JAVA_FX ) );
+			}
+		} );
 	}
 
 	@Immutable

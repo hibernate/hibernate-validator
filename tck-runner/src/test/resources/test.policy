@@ -27,6 +27,7 @@ grant codeBase "file:${localRepository}/org/hibernate/validator/hibernate-valida
     permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     permission java.lang.RuntimePermission "accessDeclaredMembers";
     permission java.lang.RuntimePermission "setContextClassLoader";
+    permission java.util.PropertyPermission "org.hibernate.validator.force-disable-JavaFX-integration", "read";
 
     permission org.hibernate.validator.HibernateValidatorPermission "accessPrivateMembers";
 
@@ -38,6 +39,7 @@ grant codeBase "file:${basedir}/../engine/target/hibernate-validator-${project.v
     permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     permission java.lang.RuntimePermission "accessDeclaredMembers";
     permission java.lang.RuntimePermission "setContextClassLoader";
+    permission java.util.PropertyPermission "org.hibernate.validator.force-disable-JavaFX-integration", "read";
 
     permission org.hibernate.validator.HibernateValidatorPermission "accessPrivateMembers";
 
