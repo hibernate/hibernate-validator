@@ -50,6 +50,7 @@ import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -91,6 +92,8 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 	private final ValidationOrderGenerator validationOrderGenerator;
 
 	public PredefinedScopeValidatorFactoryImpl(ConfigurationState configurationState) {
+		Contracts.assertTrue( configurationState instanceof PredefinedScopeConfigurationImpl, "Only PredefinedScopeConfigurationImpl is supported." );
+
 		ClassLoader externalClassLoader = determineExternalClassLoader( configurationState );
 
 		PredefinedScopeConfigurationImpl hibernateSpecificConfig = (PredefinedScopeConfigurationImpl) configurationState;
