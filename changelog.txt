@@ -1,6 +1,67 @@
 Hibernate Validator Changelog
 =============================
 
+6.1.0.Alpha1 (11-12-2018)
+-------------------------
+
+** Bug
+    * HV-1650 - validators                          - French translations are badly encoded
+    * HV-1645 - extensions                          - Revert HV-1609 due to increased CDI startup caused by ValidateableBeanFilter
+    * HV-1644 - build                               - Using Hibernate Validator with Java 11 brings JavaFX on the classpath
+    * HV-1637 - translations                        - PropertyNotFoundException for @DecimalMax when using the German translation
+    * HV-1634 - engine                              - Deal with synthetic and implicit parameters properly when getting the generic type of a parameter
+    * HV-1510 - validators                          - @NotNull doesn't work in 50% when annotated method is extended from multiple classes
+    * HV-1450 - engine                              - BeanMetaDataImpl.BeanMetaDataBuilder#build() can choose ConstraintMetaData w/o constraints
+
+** Improvement
+    * HV-1662 - engine                              - Extract BeanMetaDataBuilder to its own class file
+    * HV-1661 - engine                              - Remove impossible case from ValidatorImpl#buildNewLocalExecutionContext()
+    * HV-1656 - translations                        - Add translation of Validation Messages for Japanese language
+    * HV-1653 - engine                              - Improve the javadoc of ParameterScriptAssert
+    * HV-1643 - translations                        - Fix Russian translation for @Null constraint
+    * HV-1636 - engine                              - Avoid instantiating unnecessary objects during constraint metadata creation
+    * HV-1631 - engine                              - Avoid doing two lookups in the read methods of AnnotationProcessingOptionsImpl
+    * HV-1630 - engine                              - Introduce StringHelper.format()
+    * HV-1629 - engine                              - Fix compiler warnings
+    * HV-1628 - annotation-processor, engine, tests - Configure a stricter forbidden-apis policy and remove calls deprecated in Java 10
+    * HV-1626 - build                               - Remove useless Maven plugins and extensions
+    * HV-1623 - engine                              - Build an abstraction over reflection in engine
+    * HV-1622 - integration                         - Update the WildFly integration tests to use WildFly 13
+    * HV-1617 - build                               - Make our pom files more consistent with WildFly and JBoss parent pom files
+    * HV-1599 - engine                              - Avoid creating later discarded violations when reportAsSingleViolation is true
+    * HV-1526 - engine                              - Create separate validation context for different validation kinds
+    * HV-1484 - build                               - Unify JPMS module names and OSGi bundle names
+    * HV-667 - engine                              - Consider to create descriptor model lazily
+
+** New Feature
+    * HV-1671 - engine                              - Allow to retrieve all the built-in constraint annotations from ConstraintHelper
+    * HV-1670 - engine                              - Add the ability to preload a set of locales
+    * HV-1667 - engine                              - Create a predefined scope ValidatorFactory which initializes things eagerly
+    * HV-1363 - engine                              - Support for non-standard Java beans
+
+** Remove Feature
+    * HV-1624 - engine                              - Remove the StaticFieldELResolver
+
+** Task
+    * HV-1677 - engine                              - Allow for an explicit environment variable to disable the JavaFX extensions
+    * HV-1674 - engine                              - Make the name of the default bundle public in AbstractMessageInterpolator
+    * HV-1673 - engine                              - Audit new privileged calls in the reflection abstraction
+    * HV-1669 - engine                              - Only enable the SafeHtml constraint if jsoup in in the classpath
+    * HV-1668 - engine                              - Properly register all built-in constraints
+    * HV-1659 - integration                         - Upgrade WildFly to 14.0.1
+    * HV-1658 - engine                              - Remove a couple of stream usages in ConstraintHelper that cause a problem for another project
+    * HV-1649 - tck-runner                          - Upgrade to Bean Validation TCK 2.0.4.Final
+    * HV-1648 - build, integration                  - Reenable WildFly integration tests for JDK 11
+    * HV-1647 - tck-runner                          - Allow running TCK tests in container mode with JDK 11
+    * HV-1646 - build, integration, tck-runner      - Upgrade WildFly to 14.0.0.Beta1
+    * HV-1641 - build                               - Use the OSS snapshot repository to download the JavaFX dependencies when building with JDK 11
+    * HV-1640 - build                               - Add compatibility with the latest JDK 11 build 22
+    * HV-1635 - documentation                       - Remove specific instructions for building with JDK 9 from the README
+    * HV-1627 - build                               - Upgrade our JPA test dependency to 2.2
+    * HV-1610 - integration                         - Reenable OSGi tests for JDK 10
+    * HV-1608 - build                               - Have the build work with JDK 11
+    * HV-1577 - engine                              - Use Stax instead of JAXB to parse the XML descriptors
+
 6.0.13.Final (22-08-2018)
 -------------------------
 
