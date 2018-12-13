@@ -260,7 +260,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 *
 	 * @see <a href="http://code.google.com/appengine/docs/java/jrewhitelist.html">GAE JRE whitelist</a>
 	 * @see <a href="https://hibernate.atlassian.net/browse/HV-1023">HV-1023</a>
-	 * @see <a href="http://download.java.net/java/jdk9/docs/api/java/util/ResourceBundle.Control.html>ResourceBundle.Control</a>
+	 * @see <a href="http://download.java.net/java/jdk9/docs/api/java/util/ResourceBundle.Control.html">ResourceBundle.Control</a>
 	 */
 	private static boolean determineAvailabilityOfResourceBundleControl() {
 		try {
