@@ -40,6 +40,7 @@ import java.util.Set;
 
 import javax.validation.ConstraintValidator;
 
+import org.hibernate.validator.engine.HibernateValidatorEnhancedBean;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -75,6 +76,10 @@ public final class TypeHelper {
 
 	private TypeHelper() {
 		throw new AssertionError();
+	}
+
+	public static boolean isHibernateValidatorEnhancedBean(Class<?> clazz) {
+		return HibernateValidatorEnhancedBean.class.isAssignableFrom( clazz );
 	}
 
 	public static boolean isAssignable(Type supertype, Type type) {

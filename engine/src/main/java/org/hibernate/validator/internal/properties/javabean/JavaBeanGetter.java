@@ -6,11 +6,14 @@
  */
 package org.hibernate.validator.internal.properties.javabean;
 
+import static org.hibernate.validator.internal.util.TypeHelper.isHibernateValidatorEnhancedBean;
+
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.hibernate.validator.HibernateValidatorPermission;
+import org.hibernate.validator.engine.HibernateValidatorEnhancedBean;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Getter;
 import org.hibernate.validator.internal.properties.PropertyAccessor;
@@ -83,7 +86,13 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 
 	@Override
 	public PropertyAccessor createAccessor() {
-		return new GetterAccessor( executable );
+		if ( isHibernateValidatorEnhancedBean( executable.getDeclaringClass() ) ) {
+			return new EnhancedBeanGetterAccessor( executable.getName() );
+		}
+		else {
+			return new GetterAccessor( executable );
+		}
+
 	}
 
 	@Override
@@ -110,6 +119,19 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 		return result;
 	}
 
+	private static class EnhancedBeanGetterAccessor implements PropertyAccessor {
+		private final String getterFullName;
+
+		private EnhancedBeanGetterAccessor(final String getterFullName) {
+			this.getterFullName = getterFullName;
+		}
+
+		@Override
+		public Object getValueFrom(Object bean) {
+			// we don't do an instanceof check here as it should already be applied when the accessor was created.
+			return ( (HibernateValidatorEnhancedBean) bean ).getGetterValue( getterFullName );
+		}
+	}
 	private static class GetterAccessor implements PropertyAccessor {
 
 		private Method accessibleGetter;
