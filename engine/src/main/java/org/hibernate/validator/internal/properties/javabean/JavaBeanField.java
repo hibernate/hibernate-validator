@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.properties.javabean;
 
+import static org.hibernate.validator.internal.util.TypeHelper.isHibernateValidatorEnhancedBean;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Field;
@@ -15,6 +17,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.hibernate.validator.HibernateValidatorPermission;
+import org.hibernate.validator.engine.HibernateValidatorEnhancedBean;
 import org.hibernate.validator.internal.properties.PropertyAccessor;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
@@ -93,7 +96,12 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 
 	@Override
 	public PropertyAccessor createAccessor() {
-		return new FieldAccessor( field );
+		if ( isHibernateValidatorEnhancedBean( field.getDeclaringClass() ) ) {
+			return new EnhancedBeanFieldAccessor( field.getName() );
+		}
+		else {
+			return new FieldAccessor( field );
+		}
 	}
 
 	@Override
@@ -127,6 +135,21 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 	@Override
 	public String toString() {
 		return getName();
+	}
+
+	private static class EnhancedBeanFieldAccessor implements PropertyAccessor {
+
+		private final String name;
+
+		private EnhancedBeanFieldAccessor(final String name) {
+			this.name = name;
+		}
+
+		@Override
+		public Object getValueFrom(Object bean) {
+			// we don't do an instanceof check here as it should already be applied when the accessor was created.
+			return ( (HibernateValidatorEnhancedBean) bean ).getFieldValue( name );
+		}
 	}
 
 	private static class FieldAccessor implements PropertyAccessor {
