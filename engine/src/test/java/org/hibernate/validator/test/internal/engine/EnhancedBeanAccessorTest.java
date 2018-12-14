@@ -10,12 +10,15 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
@@ -33,7 +36,7 @@ public class EnhancedBeanAccessorTest {
 	@Test
 	public void testValidatePropertyWithRedefinedDefaultGroupOnMainEntity() {
 		Validator validator = getValidator();
-		Foo foo = new Foo();
+		Foo foo = new Bar();
 
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( foo );
 
@@ -42,8 +45,26 @@ public class EnhancedBeanAccessorTest {
 				violationOf( Positive.class ).withProperty( "num" ),
 				violationOf( Min.class ).withProperty( "looooong" ),
 				violationOf( Length.class ).withProperty( "message" ),
-				violationOf( AssertTrue.class ).withProperty( "key" )
+				violationOf( AssertTrue.class ).withProperty( "key" ),
+				violationOf( NotEmpty.class ).withProperty( "strings" )
 		);
+	}
+
+	private static class Bar extends Foo implements HibernateValidatorEnhancedBean {
+		@NotEmpty
+		private final List<String> strings;
+
+		private Bar() {
+			this.strings = Collections.emptyList();
+		}
+
+		@Override
+		public Object getFieldValue(String name) {
+			if ( "strings".equals( name ) ) {
+				return strings;
+			}
+			return super.getFieldValue( name );
+		}
 	}
 
 	private static class Foo implements HibernateValidatorEnhancedBean {

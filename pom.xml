@@ -153,6 +153,7 @@
         <!-- JavaMoney dependencies -->
         <version.javax.money>1.0.1</version.javax.money>
         <version.org.javamoney.moneta>1.1</version.org.javamoney.moneta>
+
         <!-- Used in the Karaf features file: it is a dependency of Moneta, and for the documentation -->
         <version.javax.annotation>1.2</version.javax.annotation>
 
@@ -172,6 +173,7 @@
         <version.org.jboss.arquillian.container.arquillian-weld-se-embedded-1.1>1.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-se-embedded-1.1>
         <version.com.fasterxml.jackson.core.jackson-databind>2.9.9.2</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.9.9</version.com.fasterxml.jackson.core.jackson-annotations>
+        <version.net.bytebuddy.byte-buddy>1.10.1</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
         <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
@@ -362,6 +364,11 @@
                 <groupId>org.javamoney</groupId>
                 <artifactId>moneta</artifactId>
                 <version>${version.org.javamoney.moneta}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${version.net.bytebuddy.byte-buddy}</version>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
