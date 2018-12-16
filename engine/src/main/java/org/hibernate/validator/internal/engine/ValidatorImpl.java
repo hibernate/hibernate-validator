@@ -1011,7 +1011,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		ValueContext<V, Object> cascadingValueContext = null;
 
-		if ( value != null ) {
+		boolean isCascadingRequired = value != null && executableMetaData.isCascading();
+
+		if ( isCascadingRequired ) {
 			cascadingValueContext = ValueContexts.getLocalExecutionContextForExecutable(
 					validatorScopedContext.getParameterNameProvider(),
 					value,
@@ -1042,7 +1044,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						return;
 					}
 
-					if ( value != null ) {
+					if ( isCascadingRequired ) {
 						cascadingValueContext.setCurrentGroup( group.getDefiningClass() );
 						validateCascadedConstraints( validationContext, cascadingValueContext );
 
