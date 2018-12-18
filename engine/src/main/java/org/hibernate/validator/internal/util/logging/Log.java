@@ -61,6 +61,7 @@ import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatt
 import org.hibernate.validator.internal.util.logging.formatter.ObjectArrayFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
 import org.hibernate.validator.internal.xml.mapping.ContainerElementTypePath;
+import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -881,4 +882,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 250, value = "Uninitialized locale: %s. Please register your locale as a locale to initialize when initializing your ValidatorFactory.")
 	ValidationException uninitializedLocale(Locale locale);
+
+	@LogMessage(level = INFO)
+	@Message(id = 251, value = "Using %s as bean metadata class normalizer.")
+	void usingBeanMetaDataClassNormalizer(@FormatWith(ClassObjectFormatter.class) Class<? extends BeanMetaDataClassNormalizer> beanMetaDataClassNormalizerClass);
 }

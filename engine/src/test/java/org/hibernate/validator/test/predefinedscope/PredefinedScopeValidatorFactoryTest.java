@@ -26,6 +26,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
+import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
 
@@ -189,6 +190,32 @@ public class PredefinedScopeValidatorFactoryTest {
 		}
 	}
 
+	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000249:.*")
+	public void testBeanMetaDataClassNormalizerNoNormalizer() {
+		Validator validator = getValidator();
+
+		validator.validate( new BeanProxy() );
+	}
+
+	@Test
+	public void testBeanMetaDataClassNormalizer() {
+		Set<Class<?>> beanMetaDataToInitialize = new HashSet<>();
+		beanMetaDataToInitialize.add( Bean.class );
+
+		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
+				.configure()
+				.initializeBeanMetaData( beanMetaDataToInitialize )
+				.initializeLocales( Collections.singleton( Locale.ENGLISH ) )
+				.beanMetaDataClassNormalizer( new MyProxyInterfaceBeanMetaDataClassNormalizer() )
+				.buildValidatorFactory();
+
+		Validator validator = validatorFactory.getValidator();
+
+		Set<ConstraintViolation<Bean>> violations = validator.validate( new BeanProxy() );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "property" ) );
+	}
+
 	private static Validator getValidator() {
 		Set<Class<?>> beanMetaDataToInitialize = new HashSet<>();
 		beanMetaDataToInitialize.add( Bean.class );
@@ -275,5 +302,23 @@ public class PredefinedScopeValidatorFactoryTest {
 		@SuppressWarnings("unused")
 		public void setMethod(String parameter) {
 		}
+	}
+
+	private interface MyProxyInterface {
+	}
+
+	private static class MyProxyInterfaceBeanMetaDataClassNormalizer implements BeanMetaDataClassNormalizer {
+
+		@Override
+		public Class<?> normalize(Class<?> beanClass) {
+			if ( MyProxyInterface.class.isAssignableFrom( beanClass ) ) {
+				return beanClass.getSuperclass();
+			}
+
+			return beanClass;
+		}
+	}
+
+	private static class BeanProxy extends Bean implements MyProxyInterface {
 	}
 }

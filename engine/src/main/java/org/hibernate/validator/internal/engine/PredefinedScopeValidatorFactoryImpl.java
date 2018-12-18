@@ -18,6 +18,7 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTraversableResolverResultCacheEnabled;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.logValidatorFactoryScopedConfiguration;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.registerCustomConstraintValidators;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineBeanMetaDataClassNormalizer;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 import java.lang.invoke.MethodHandles;
@@ -170,6 +171,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				validationOrderGenerator,
 				buildMetaDataProviders( constraintCreationContext, xmlMetaDataProvider, constraintMappings ),
 				methodValidationConfiguration,
+				determineBeanMetaDataClassNormalizer( hibernateSpecificConfig ),
 				hibernateSpecificConfig.getBeanClassesToInitialize()
 		);
 
