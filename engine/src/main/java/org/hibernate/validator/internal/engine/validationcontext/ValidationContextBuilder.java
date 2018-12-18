@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.engine.validationcontext;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Executable;
 
 import javax.validation.ConstraintValidatorFactory;
@@ -17,8 +16,6 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Builder for creating {@link AbstractValidationContext}s suited for the different kinds of validation.
@@ -27,8 +24,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Marko Bekhta
  */
 public class ValidationContextBuilder {
-
-	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final BeanMetaDataManager beanMetaDataManager;
 	private final ConstraintValidatorManager constraintValidatorManager;
@@ -57,8 +52,6 @@ public class ValidationContextBuilder {
 		Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
 
-		checkRootBeanMetaData( rootBeanClass, rootBeanMetaData );
-
 		return new BeanValidationContext<>(
 				constraintValidatorManager,
 				constraintValidatorFactory,
@@ -76,8 +69,6 @@ public class ValidationContextBuilder {
 		Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
 
-		checkRootBeanMetaData( rootBeanClass, rootBeanMetaData );
-
 		return new PropertyValidationContext<>(
 				constraintValidatorManager,
 				constraintValidatorFactory,
@@ -93,8 +84,6 @@ public class ValidationContextBuilder {
 
 	public <T> BaseBeanValidationContext<T> forValidateValue(Class<T> rootBeanClass, PathImpl propertyPath) {
 		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
-
-		checkRootBeanMetaData( rootBeanClass, rootBeanMetaData );
 
 		return new PropertyValidationContext<>(
 				constraintValidatorManager,
@@ -116,8 +105,6 @@ public class ValidationContextBuilder {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = rootBean != null ? (Class<T>) rootBean.getClass() : (Class<T>) executable.getDeclaringClass();
 		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
-
-		checkRootBeanMetaData( rootBeanClass, rootBeanMetaData );
 
 		return new ParameterExecutableValidationContext<>(
 				constraintValidatorManager,
@@ -142,8 +129,6 @@ public class ValidationContextBuilder {
 		Class<T> rootBeanClass = rootBean != null ? (Class<T>) rootBean.getClass() : (Class<T>) executable.getDeclaringClass();
 		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
 
-		checkRootBeanMetaData( rootBeanClass, rootBeanMetaData );
-
 		return new ReturnValueExecutableValidationContext<>(
 				constraintValidatorManager,
 				constraintValidatorFactory,
@@ -157,11 +142,5 @@ public class ValidationContextBuilder {
 				rootBeanMetaData.getMetaDataFor( executable ),
 				executableReturnValue
 		);
-	}
-
-	private <T> void checkRootBeanMetaData(Class<T> rootBeanClass, BeanMetaData<T> rootBeanMetaData) {
-		if ( rootBeanMetaData == null ) {
-			throw LOG.uninitializedBeanMetaData( rootBeanClass );
-		}
 	}
 }

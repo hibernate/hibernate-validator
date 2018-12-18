@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.metadata;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +31,12 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * Used to cache the constraint meta data for validated entities
@@ -84,7 +89,11 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
-		return (BeanMetaData<T>) beanMetaDataMap.get( beanClass.getName() );
+		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataMap.get( beanClass.getName() );
+		if ( beanMetaData == null ) {
+			throw LOG.uninitializedBeanMetaData( beanClass );
+		}
+		return beanMetaData;
 	}
 
 	@Override
