@@ -165,6 +165,12 @@ public class PredefinedScopeValidatorFactoryTest {
 		}
 	}
 
+	@TestForIssue(jiraKey = "HV-1681")
+	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000249:.*")
+	public void testValidOnUnknownBean() {
+		getValidator().validate( new AnotherBean() );
+	}
+
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000250:.*")
 	public void testUninitializedLocale() {
 		Locale defaultLocale = Locale.getDefault();
@@ -186,6 +192,7 @@ public class PredefinedScopeValidatorFactoryTest {
 	private static Validator getValidator() {
 		Set<Class<?>> beanMetaDataToInitialize = new HashSet<>();
 		beanMetaDataToInitialize.add( Bean.class );
+		beanMetaDataToInitialize.add( AnotherBean.class );
 
 		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
@@ -237,6 +244,17 @@ public class PredefinedScopeValidatorFactoryTest {
 		@SuppressWarnings("unused")
 		public void setEmail(@Email String email) {
 			this.email = email;
+		}
+	}
+
+	private static class AnotherBean {
+
+		@Valid
+		private final UnknownBean bean;
+
+
+		private AnotherBean() {
+			bean = new UnknownBean();
 		}
 	}
 
