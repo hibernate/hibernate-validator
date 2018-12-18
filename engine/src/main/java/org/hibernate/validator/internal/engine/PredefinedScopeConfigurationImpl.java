@@ -15,6 +15,7 @@ import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.PredefinedScopeHibernateValidatorConfiguration;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 
 /**
  * @author Guillaume Smet
@@ -23,6 +24,8 @@ public class PredefinedScopeConfigurationImpl extends AbstractConfigurationImpl<
 		implements PredefinedScopeHibernateValidatorConfiguration, ConfigurationState {
 
 	private Set<Class<?>> beanClassesToInitialize;
+
+	private BeanMetaDataClassNormalizer beanMetaDataClassNormalizer;
 
 	public PredefinedScopeConfigurationImpl(BootstrapState state) {
 		super( state );
@@ -46,5 +49,15 @@ public class PredefinedScopeConfigurationImpl extends AbstractConfigurationImpl<
 	public PredefinedScopeHibernateValidatorConfiguration initializeLocales(Set<Locale> locales) {
 		setLocalesToInitialize( CollectionHelper.toImmutableSet( locales ) );
 		return thisAsT();
+	}
+
+	@Override
+	public PredefinedScopeHibernateValidatorConfiguration beanMetaDataClassNormalizer(BeanMetaDataClassNormalizer beanMetaDataClassNormalizer) {
+		this.beanMetaDataClassNormalizer = beanMetaDataClassNormalizer;
+		return thisAsT();
+	}
+
+	public BeanMetaDataClassNormalizer getBeanMetaDataClassNormalizer() {
+		return beanMetaDataClassNormalizer;
 	}
 }

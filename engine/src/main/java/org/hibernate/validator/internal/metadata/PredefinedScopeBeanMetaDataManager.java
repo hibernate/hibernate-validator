@@ -31,17 +31,21 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
+import org.hibernate.validator.internal.util.classhierarchy.Filters;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 
 public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
+	private final BeanMetaDataClassNormalizer beanMetaDataClassNormalizer;
+
 	/**
 	 * Used to cache the constraint meta data for validated entities
 	 */
-	private final Map<String, BeanMetaData<?>> beanMetaDataMap;
+	private final Map<Class<?>, BeanMetaData<?>> beanMetaDataMap;
 
 	public PredefinedScopeBeanMetaDataManager(ConstraintCreationContext constraintCreationContext,
 			ExecutableHelper executableHelper,
@@ -50,6 +54,7 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 			ValidationOrderGenerator validationOrderGenerator,
 			List<MetaDataProvider> optionalMetaDataProviders,
 			MethodValidationConfiguration methodValidationConfiguration,
+			BeanMetaDataClassNormalizer beanMetaDataClassNormalizer,
 			Set<Class<?>> beanClassesToInitialize) {
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders( optionalMetaDataProviders );
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
@@ -66,30 +71,30 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 		metaDataProviders.add( defaultProvider );
 		metaDataProviders.addAll( optionalMetaDataProviders );
 
-		Map<String, BeanMetaData<?>> tmpBeanMetadataMap = new HashMap<>();
+		Map<Class<?>, BeanMetaData<?>> tmpBeanMetadataMap = new HashMap<>();
 
 		for ( Class<?> validatedClass : beanClassesToInitialize ) {
-			BeanMetaData<?> beanMetaData = createBeanMetaData( constraintCreationContext, executableHelper, parameterNameProvider,
-					javaBeanHelper, validationOrderGenerator, optionalMetaDataProviders, methodValidationConfiguration,
-					metaDataProviders, validatedClass );
+			@SuppressWarnings("unchecked")
+			List<Class<?>> classHierarchy = (List<Class<?>>) (Object) ClassHierarchyHelper.getHierarchy( validatedClass, Filters.excludeInterfaces() );
 
-			tmpBeanMetadataMap.put( validatedClass.getName(), beanMetaData );
-
-			for ( Class<?> parentClass : beanMetaData.getClassHierarchy() ) {
-				tmpBeanMetadataMap.put( parentClass.getName(),
+			// note that the hierarchy also contains the initial class
+			for ( Class<?> hierarchyElement : classHierarchy ) {
+				tmpBeanMetadataMap.put( beanMetaDataClassNormalizer.normalize( hierarchyElement ),
 						createBeanMetaData( constraintCreationContext, executableHelper, parameterNameProvider,
 								javaBeanHelper, validationOrderGenerator, optionalMetaDataProviders, methodValidationConfiguration,
-								metaDataProviders, parentClass ) );
+								metaDataProviders, hierarchyElement ) );
 			}
 		}
 
 		this.beanMetaDataMap = CollectionHelper.toImmutableMap( tmpBeanMetadataMap );
+
+		this.beanMetaDataClassNormalizer = beanMetaDataClassNormalizer;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
-		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataMap.get( beanClass.getName() );
+		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataMap.get( beanMetaDataClassNormalizer.normalize( beanClass ) );
 		if ( beanMetaData == null ) {
 			throw LOG.uninitializedBeanMetaData( beanClass );
 		}

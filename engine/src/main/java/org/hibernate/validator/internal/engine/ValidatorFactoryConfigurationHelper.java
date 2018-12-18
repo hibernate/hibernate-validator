@@ -26,6 +26,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
+import org.hibernate.validator.internal.metadata.DefaultBeanMetaDataClassNormalizer;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
@@ -36,6 +37,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -277,6 +279,14 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 
 		return new DefaultGetterPropertySelectionStrategy();
+	}
+
+	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(PredefinedScopeConfigurationImpl hibernateSpecificConfig) {
+		if ( hibernateSpecificConfig.getBeanMetaDataClassNormalizer() != null ) {
+			return hibernateSpecificConfig.getBeanMetaDataClassNormalizer();
+		}
+
+		return new DefaultBeanMetaDataClassNormalizer();
 	}
 
 	static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,

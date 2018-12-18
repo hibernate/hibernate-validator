@@ -9,6 +9,8 @@ package org.hibernate.validator;
 import java.util.Locale;
 import java.util.Set;
 
+import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
+
 /**
  * Extension of {@link HibernateValidatorConfiguration} with additional methods dedicated to defining the predefined
  * scope of bean validation e.g. validated classes, constraint validators...
@@ -25,4 +27,7 @@ public interface PredefinedScopeHibernateValidatorConfiguration extends BaseHibe
 
 	@Incubating
 	PredefinedScopeHibernateValidatorConfiguration initializeLocales(Set<Locale> locales);
+
+	@Incubating
+	PredefinedScopeHibernateValidatorConfiguration beanMetaDataClassNormalizer(BeanMetaDataClassNormalizer beanMetaDataClassNormalizer);
 }
