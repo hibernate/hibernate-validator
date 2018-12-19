@@ -1,6 +1,18 @@
 Hibernate Validator Changelog
 =============================
 
+6.1.0.Alpha2 (19-12-2018)
+-------------------------
+
+** Bug
+    * HV-1681 - engine       - PredefinedScopeValidatorFactory and @Valid on unregistered bean throws a NPE
+
+** Improvement
+    * HV-1651 - translations - Contribute additional language translations from OpenLiberty
+
+** New Feature
+    * HV-1682 - engine       - Provide a way to normalize the class before getting the bean metadata
+
 6.1.0.Alpha1 (11-12-2018)
 -------------------------
 
