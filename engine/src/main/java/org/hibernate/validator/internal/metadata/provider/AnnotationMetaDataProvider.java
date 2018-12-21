@@ -59,7 +59,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
-import org.hibernate.validator.internal.properties.Property;
+import org.hibernate.validator.internal.properties.Getter;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanAnnotatedConstrainable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanAnnotatedElement;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanExecutable;
@@ -817,7 +817,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * The location of a type argument before it is really considered a constraint location.
 	 * <p>
 	 * It avoids initializing a constraint location if we did not find any constraints. This is especially useful in
-	 * a Java 9 environment as {@link ConstraintLocation#forProperty(Property)} tries to make the {@code Member} accessible
+	 * a Java 9 environment as {@link ConstraintLocation#forField(org.hibernate.validator.internal.properties.Field)}
+	 * or {@link ConstraintLocation#forGetter(Getter)} tries to make the {@code Member} accessible
 	 * which might not be possible (for instance for {@code java.util} classes).
 	 */
 	private interface TypeArgumentLocation {

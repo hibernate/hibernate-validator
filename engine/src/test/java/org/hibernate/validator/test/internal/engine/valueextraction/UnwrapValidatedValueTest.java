@@ -39,7 +39,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
- * Test for unwrapping validated values via {@link org.hibernate.validator.valuehandling.UnwrapValidatedValue}.
+ * Test for unwrapping validated values via {@link Unwrapping.Unwrap}.
  *
  * @author Gunnar Morling
  */

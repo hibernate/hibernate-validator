@@ -84,7 +84,7 @@ public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 	 * all the given contexts. So the "merge" pulls together the information for all configured elements, but it will never
 	 * merge several configurations for one given element.
 	 *
-	 * @param contexts set of mapping contexts providing annotation processing options to be merged
+	 * @param mappings set of mapping contexts providing annotation processing options to be merged
 	 *
 	 * @return a single annotation processing options object
 	 */

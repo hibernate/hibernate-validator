@@ -182,7 +182,7 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 	 *
 	 * @param typeMirror The {@code TypeMirror} instance.
 	 *
-	 * @return The generic type or {@code null} if the given type doesn't implement the {@link org.hibernate.validator.group.DefaultGroupSequenceProvider} interface.
+	 * @return The generic type or {@code null} if the given type doesn't implement the {@link org.hibernate.validator.spi.group.DefaultGroupSequenceProvider} interface.
 	 */
 	private TypeMirror retrieveGenericProviderType(TypeMirror typeMirror) {
 		return typeMirror.accept(

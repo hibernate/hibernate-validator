@@ -21,7 +21,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttr
 import org.testng.annotations.Test;
 
 /**
- * Unit test for {@link GetAnnotationsParameter}.
+ * Unit test for {@link GetAnnotationAttribute}.
  *
  * @author Gunnar Morling
  *

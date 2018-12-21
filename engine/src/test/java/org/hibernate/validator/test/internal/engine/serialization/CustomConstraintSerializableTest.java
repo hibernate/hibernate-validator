@@ -22,10 +22,9 @@ import org.testng.annotations.Test;
  * simple custom Email validation constraint taken from <a href="http://blog.jteam.nl/2009/08/04/bean-validation-integrating-jsr-303-with-spring/"
  * >this blog</a> gives a validation result that is not Serializable with
  * Hibernate Validator 4.0.2.GA with underlying cause that
- * <p/>
+ * <p>
  * {@code org.hibernate.validator.internal.util.annotationfactory.AnnotationProxy}
- * <p/>
- * <p/>
+ * <p>
  * Note that Hibernate Validator does not guarantee at all that a
  * {@link ConstraintViolation} is Serializable because an entity need not be
  * Serializable, but otherwise there should not be much of a problem (right?).

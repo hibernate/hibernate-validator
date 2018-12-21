@@ -102,7 +102,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	/**
 	 * {@link TraversableResolver} as passed to the constructor of this instance.
-	 * Never use it directly, always use {@link #getCachingTraversableResolver()} to retrieved the single threaded caching wrapper.
+	 * Never use it directly, always use {@link TraversableResolvers#wrapWithCachingForSingleValidation(TraversableResolver, boolean)} to retrieved the single threaded caching wrapper.
 	 */
 	private final TraversableResolver traversableResolver;
 

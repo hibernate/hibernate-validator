@@ -31,10 +31,12 @@ public class ConfigurationFilePropertiesTest {
 	/**
 	 * The following test assumes that the file META-INF/validation.xml is present and
 	 * contains:
+	 * <pre>{@code
 	 * <property name="hibernate.validator.allow_parameter_constraint_override">true</property>
 	 * <property name="hibernate.validator.allow_multiple_cascaded_validation_on_return_values">true</property>
 	 * <property name="hibernate.validator.allow_parallel_method_parameter_constraint">true</property>
 	 * <property name="hibernate.validator.fail_fast">true</property>
+	 * }</pre>
 	 *
 	 * The Maven build runs this test in a separate execution of surefire, which adds the
 	 * path to the required file onto its classpath.

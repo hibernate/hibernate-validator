@@ -41,7 +41,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Test combination of {@link Optional} and {@link UnwrapValidatedValue} on fields using validate property.
+ * Test combination of {@link Optional} and {@link Unwrapping.Unwrap} on fields using validate property.
  *
  * @author Davide D'Alto
  */

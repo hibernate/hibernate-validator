@@ -66,7 +66,7 @@ public class MetaConstraint<A extends Annotation> {
 	/**
 	 * @param constraintDescriptor The constraint descriptor for this constraint
 	 * @param location meta data about constraint placement
-	 * @param valueExtractorDescriptors the potential {@link ValueExtractor}s used to extract the value to validate
+	 * @param valueExtractionPath the potential {@link ValueExtractor}s used to extract the value to validate
 	 * @param validatedValueType the type of the validated element
 	 */
 	MetaConstraint(ConstraintValidatorManager constraintValidatorManager, ConstraintDescriptorImpl<A> constraintDescriptor,
