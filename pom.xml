@@ -218,7 +218,7 @@
         <version.japicmp.plugin>0.11.0</version.japicmp.plugin>
         <version.jar.plugin>3.0.2</version.jar.plugin>
         <version.jqassistant.plugin>1.3.0</version.jqassistant.plugin>
-        <version.javadoc.plugin>3.0.0</version.javadoc.plugin>
+        <version.javadoc.plugin>3.0.1</version.javadoc.plugin>
         <version.license.plugin>3.0</version.license.plugin>
         <version.release.plugin>2.5.3</version.release.plugin>
         <version.resources.plugin>3.0.2</version.resources.plugin>
