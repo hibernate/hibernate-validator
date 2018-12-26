@@ -17,6 +17,7 @@ import javax.validation.Validator;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.spi.damir.PropertyPathNodeNameProvider;
 
 /**
  * @author Guillaume Smet
@@ -50,6 +51,11 @@ public class PredefinedScopeValidatorContextImpl implements HibernateValidatorCo
 	@Override
 	public HibernateValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider) {
 		throw new IllegalStateException( "Defining a Validator-specific parameter name provider is not supported by the predefined scope ValidatorFactory." );
+	}
+
+	@Override
+	public HibernateValidatorContext propertyPathNodeNameProvider(PropertyPathNodeNameProvider propertyPathNodeNameProvider) {
+		throw new IllegalStateException( "Defining a Validator-specific property path name provider is not supported by the predefined scope ValidatorFactory." );
 	}
 
 	@Override

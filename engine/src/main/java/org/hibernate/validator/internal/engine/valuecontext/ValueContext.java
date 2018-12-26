@@ -18,6 +18,7 @@ import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.PropertyPathNodeNameProviderWrapper;
 import org.hibernate.validator.internal.util.TypeVariables;
 
 /**
@@ -31,6 +32,8 @@ import org.hibernate.validator.internal.util.TypeVariables;
 public class ValueContext<T, V> {
 
 	private final ExecutableParameterNameProvider parameterNameProvider;
+
+	private final PropertyPathNodeNameProviderWrapper propertyPathNodeNameProvider;
 
 	/**
 	 * The current bean which gets validated. This is the bean hosting the constraints which get validated.
@@ -59,8 +62,14 @@ public class ValueContext<T, V> {
 	 */
 	private ConstraintLocationKind constraintLocationKind;
 
-	ValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, Validatable validatable, PathImpl propertyPath) {
+	ValueContext(
+			ExecutableParameterNameProvider parameterNameProvider,
+			PropertyPathNodeNameProviderWrapper propertyPathNodeNameProvider,
+			T currentBean,
+			Validatable validatable,
+			PathImpl propertyPath) {
 		this.parameterNameProvider = parameterNameProvider;
+		this.propertyPathNodeNameProvider = propertyPathNodeNameProvider;
 		this.currentBean = currentBean;
 		this.currentValidatable = validatable;
 		this.propertyPath = propertyPath;

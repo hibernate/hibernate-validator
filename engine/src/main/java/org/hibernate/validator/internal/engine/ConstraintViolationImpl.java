@@ -245,6 +245,11 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		}
 	}
 
+	@Override
+	public Path getResolvedPropertyPath() {
+		return null;
+	}
+
 	/**
 	 * IMPORTANT - some behaviour of Validator depends on the correct implementation of this equals method! (HF)
 	 * <p>

@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -39,8 +38,10 @@ import javax.validation.ConstraintViolation;
 import javax.validation.GroupSequence;
 import javax.validation.Payload;
 import javax.validation.Valid;
+import javax.validation.Validation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -48,8 +49,11 @@ import javax.validation.constraints.Pattern;
 import javax.validation.executable.ExecutableValidator;
 import javax.validation.metadata.BeanDescriptor;
 
+import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.internal.JsonPropertyPathNodeNameProvider;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
+import org.hibernate.validator.spi.damir.PropertyPathNodeNameProvider;
 import org.hibernate.validator.testutil.CountValidationCalls;
 import org.hibernate.validator.testutil.CountValidationCallsValidator;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -62,6 +66,27 @@ import org.testng.annotations.Test;
  * @author Guillaume Smet
  */
 public class ValidatorTest {
+	@Test
+	public void damirTest() {
+		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.propertyPathNodeNameProvider( new JsonPropertyPathNodeNameProvider() )
+				.buildValidatorFactory();
+		Validator validator = validatorFactory.getValidator();
+
+		A testInstance = new A();
+		testInstance.c = new C( "aaa" );
+
+		Set<ConstraintViolation<A>> constraintViolations = validator.validateProperty( testInstance, "c.id" );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Pattern.class )
+						.withPropertyPath( pathWith()
+								.property( "c" )
+								.property( "id" )
+						)
+		);
+	}
+
 	@Test
 	@TestForIssue(jiraKey = "HV-429")
 	public void testValidatePropertyWithRedefinedDefaultGroupOnMainEntity() {
@@ -171,6 +196,8 @@ public class ValidatorTest {
 	public void testValidateInterfaceConstraintsAreValidatedOneTime() {
 		CountValidationCallsValidator.init();
 		Set<ConstraintViolation<H>> constraintViolations = getValidator().validate( new H() );
+
+		// constraintViolations.iterator().next().getPropertyPath().toString() ->foo.bar.dfg
 
 		assertNoViolations( constraintViolations );
 		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 2 );
@@ -357,6 +384,7 @@ public class ValidatorTest {
 		@NotNull
 		String b;
 
+		// @JsonProperty("i_am_c")
 		@Valid
 		C c;
 

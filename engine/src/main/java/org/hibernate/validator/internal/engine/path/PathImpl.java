@@ -22,6 +22,7 @@ import javax.validation.Path;
 
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.PropertyPathNodeNameProviderWrapper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -57,6 +58,7 @@ public final class PathImpl implements Path, Serializable {
 	private boolean nodeListRequiresCopy;
 	private NodeImpl currentLeafNode;
 	private int hashCode;
+	private final PropertyPathNodeNameProviderWrapper provider;
 
 	/**
 	 * Returns a {@code Path} instance representing the path described by the
@@ -70,20 +72,20 @@ public final class PathImpl implements Path, Serializable {
 	 * @throws IllegalArgumentException in case {@code property == null} or
 	 * {@code property} cannot be parsed.
 	 */
-	public static PathImpl createPathFromString(String propertyPath) {
+	public static PathImpl createPathFromString(String propertyPath, PropertyPathNodeNameProviderWrapper provider) {
 		Contracts.assertNotNull( propertyPath, MESSAGES.propertyPathCannotBeNull() );
 
 		if ( propertyPath.length() == 0 ) {
-			return createRootPath();
+			return createRootPath(provider);
 		}
 
-		return parseProperty( propertyPath );
+		return parseProperty( propertyPath, provider );
 	}
 
-	public static PathImpl createPathForExecutable(ExecutableMetaData executable) {
+	public static PathImpl createPathForExecutable(ExecutableMetaData executable, PropertyPathNodeNameProviderWrapper provider) {
 		Contracts.assertNotNull( executable, "A method is required to create a method return value path." );
 
-		PathImpl path = createRootPath();
+		PathImpl path = createRootPath(provider);
 
 		if ( executable.getKind() == ElementKind.CONSTRUCTOR ) {
 			path.addConstructorNode( executable.getName(), executable.getParameterTypes() );
@@ -95,8 +97,8 @@ public final class PathImpl implements Path, Serializable {
 		return path;
 	}
 
-	public static PathImpl createRootPath() {
-		PathImpl path = new PathImpl();
+	public static PathImpl createRootPath(PropertyPathNodeNameProviderWrapper provider) {
+		PathImpl path = new PathImpl( provider );
 		path.addBeanNode();
 		return path;
 	}
@@ -110,14 +112,16 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public PathImpl getPathWithoutLeafNode() {
-		return new PathImpl( nodeList.subList( 0, nodeList.size() - 1 ) );
+		return new PathImpl( nodeList.subList( 0, nodeList.size() - 1 ), provider );
 	}
 
 	public NodeImpl addPropertyNode(String nodeName) {
 		requiresWriteableNodeList();
 
+		String resolvedNodeName = provider.getName( nodeName, currentLeafNode.getValue() );
+
 		NodeImpl parent = currentLeafNode;
-		currentLeafNode = NodeImpl.createPropertyNode( nodeName, parent );
+		currentLeafNode = NodeImpl.createPropertyNode( resolvedNodeName, parent );
 		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
@@ -361,18 +365,21 @@ public final class PathImpl implements Path, Serializable {
 		nodeList = path.nodeList;
 		currentLeafNode = path.currentLeafNode;
 		hashCode = path.hashCode;
+		provider = path.provider;
 		nodeListRequiresCopy = true;
 	}
 
-	private PathImpl() {
+	private PathImpl(PropertyPathNodeNameProviderWrapper provider) {
+		this.provider = provider;
 		nodeList = new ArrayList<>( 1 );
 		hashCode = -1;
 		nodeListRequiresCopy = false;
 	}
 
-	private PathImpl(List<Node> nodeList) {
+	private PathImpl(List<Node> nodeList, PropertyPathNodeNameProviderWrapper provider) {
 		this.nodeList = nodeList;
 		currentLeafNode = (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		this.provider = provider;
 		hashCode = -1;
 		nodeListRequiresCopy = true;
 	}
@@ -381,8 +388,8 @@ public final class PathImpl implements Path, Serializable {
 		hashCode = -1;
 	}
 
-	private static PathImpl parseProperty(String propertyName) {
-		PathImpl path = createRootPath();
+	private static PathImpl parseProperty(String propertyName, PropertyPathNodeNameProviderWrapper provider) {
+		PathImpl path = createRootPath(provider);
 		String tmp = propertyName;
 		do {
 			Matcher matcher = PATH_PATTERN.matcher( tmp );

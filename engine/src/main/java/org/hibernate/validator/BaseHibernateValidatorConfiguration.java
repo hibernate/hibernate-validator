@@ -8,7 +8,6 @@ package org.hibernate.validator;
 
 import java.time.Duration;
 import java.util.Set;
-
 import javax.validation.Configuration;
 import javax.validation.TraversableResolver;
 import javax.validation.constraints.Future;
@@ -20,6 +19,7 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.spi.damir.PropertyPathNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
@@ -149,6 +149,12 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * @return The default {@link ResourceBundleLocator}. Never null.
 	 */
 	ResourceBundleLocator getDefaultResourceBundleLocator();
+
+	S propertyPathNodeNameProvider(PropertyPathNodeNameProvider propertyPathNodeNameProvider);
+
+	PropertyPathNodeNameProvider getDefaultPropertyPathNodeNameProvider();
+
+	PropertyPathNodeNameProvider getPropertyPathNodeNameProvider();
 
 	/**
 	 * Creates a new constraint mapping which can be used to programmatically configure the constraints for given types. After

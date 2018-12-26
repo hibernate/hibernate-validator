@@ -54,6 +54,7 @@ import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.PropertyPathNodeNameProviderWrapper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -147,6 +148,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				configurationState.getMessageInterpolator(),
 				configurationState.getTraversableResolver(),
 				new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() ),
+				new PropertyPathNodeNameProviderWrapper(  hibernateSpecificConfig.getPropertyPathNodeNameProvider() ),
 				configurationState.getClockProvider(),
 				determineTemporalValidationTolerance( configurationState, properties ),
 				determineScriptEvaluatorFactory( configurationState, properties, externalClassLoader ),

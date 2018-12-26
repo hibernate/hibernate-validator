@@ -14,6 +14,7 @@ import javax.validation.Validator;
 
 import org.hibernate.validator.internal.engine.ValidatorFactoryScopedContext;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.PropertyPathNodeNameProviderWrapper;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
@@ -32,6 +33,8 @@ public class ValidatorScopedContext {
 	 * The parameter name provider.
 	 */
 	private final ExecutableParameterNameProvider parameterNameProvider;
+
+	private final PropertyPathNodeNameProviderWrapper propertyPathNodeNameProvider;
 
 	/**
 	 * Provider for the current time when validating {@code @Future} or {@code @Past}
@@ -74,6 +77,7 @@ public class ValidatorScopedContext {
 		this.failFast = validatorFactoryScopedContext.isFailFast();
 		this.traversableResolverResultCacheEnabled = validatorFactoryScopedContext.isTraversableResolverResultCacheEnabled();
 		this.constraintValidatorPayload = validatorFactoryScopedContext.getConstraintValidatorPayload();
+		this.propertyPathNodeNameProvider = validatorFactoryScopedContext.getPropertyPathNodeNameProvider();
 	}
 
 	public MessageInterpolator getMessageInterpolator() {
@@ -82,6 +86,10 @@ public class ValidatorScopedContext {
 
 	public ExecutableParameterNameProvider getParameterNameProvider() {
 		return this.parameterNameProvider;
+	}
+
+	public PropertyPathNodeNameProviderWrapper getPropertyPathNodeNameProvider() {
+		return propertyPathNodeNameProvider;
 	}
 
 	public ClockProvider getClockProvider() {

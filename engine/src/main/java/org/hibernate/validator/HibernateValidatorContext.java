@@ -17,6 +17,8 @@ import javax.validation.TraversableResolver;
 import javax.validation.ValidatorContext;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.spi.damir.PropertyPathNodeNameProvider;
+
 /**
  * Represents a Hibernate Validator specific context that is used to create
  * {@link javax.validation.Validator} instances. Adds additional configuration options to those
@@ -43,6 +45,8 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 */
 	@Override
 	HibernateValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider);
+
+	HibernateValidatorContext propertyPathNodeNameProvider(PropertyPathNodeNameProvider propertyPathNodeNameProvider);
 
 	/**
 	 * @since 6.0

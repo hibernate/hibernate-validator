@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.engine.valuecontext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.PropertyPathNodeNameProviderWrapper;
 
 /**
  * @author Marko Bekhta
@@ -20,8 +21,8 @@ public class BeanValueContext<T, V> extends ValueContext<T, V> {
 	 */
 	private final BeanMetaData<T> currentBeanMetaData;
 
-	BeanValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, BeanMetaData<T> currentBeanMetaData, PathImpl propertyPath) {
-		super( parameterNameProvider, currentBean, currentBeanMetaData, propertyPath );
+	BeanValueContext(ExecutableParameterNameProvider parameterNameProvider, PropertyPathNodeNameProviderWrapper propertyPathNodeNameProvider, T currentBean, BeanMetaData<T> currentBeanMetaData, PathImpl propertyPath) {
+		super( parameterNameProvider, propertyPathNodeNameProvider, currentBean, currentBeanMetaData, propertyPath );
 		this.currentBeanMetaData = currentBeanMetaData;
 	}
 
