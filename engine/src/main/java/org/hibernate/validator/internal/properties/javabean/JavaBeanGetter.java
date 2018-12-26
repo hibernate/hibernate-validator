@@ -25,6 +25,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
 public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 
 	private final String propertyName;
+	private final String resolvedPropertyName;
 
 	/**
 	 * The class of the method for which the constraint was defined.
@@ -34,17 +35,23 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 	 */
 	private final Class<?> declaringClass;
 
-	public JavaBeanGetter(Class<?> declaringClass, Method method, String propertyName) {
+	public JavaBeanGetter(Class<?> declaringClass, Method method, String propertyName, String resolvedPropertyName) {
 		super( method );
 		Contracts.assertNotNull( propertyName, "Property name cannot be null." );
 
 		this.declaringClass = declaringClass;
 		this.propertyName = propertyName;
+		this.resolvedPropertyName = resolvedPropertyName;
 	}
 
 	@Override
 	public String getPropertyName() {
 		return propertyName;
+	}
+
+	@Override
+	public String getResolvedPropertyName() {
+		return resolvedPropertyName;
 	}
 
 	@Override

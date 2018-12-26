@@ -48,7 +48,7 @@ public abstract class AbstractPropertyCascadable<T extends Property> implements 
 
 	@Override
 	public void appendTo(PathImpl path) {
-		path.addPropertyNode( property.getPropertyName() );
+		path.addPropertyNode( property.getResolvedPropertyName() );
 	}
 
 	@Override

@@ -63,6 +63,7 @@ import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatt
 import org.hibernate.validator.internal.util.logging.formatter.ObjectArrayFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
 import org.hibernate.validator.internal.xml.mapping.ContainerElementTypePath;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -887,4 +888,11 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = ERROR)
 	@Message(id = 251, value = "An error occurred while loading an instance of service %s.")
 	void unableToLoadInstanceOfService(String serviceName, @Cause ServiceConfigurationError e);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = 252, value = "Using %s as property node name provider.")
+	void usingPropertyNodeNameProvider(@FormatWith(ClassObjectFormatter.class) Class<? extends PropertyNodeNameProvider> propertyNodeNameProviderClass);
+
+	@Message(id = 253, value = "Unable to instantiate property node name provider class %s.")
+	ValidationException getUnableToInstantiatePropertyNodeNameProviderClassException(String propertyNodeNameProviderClassName, @Cause Exception e);
 }

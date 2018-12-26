@@ -57,6 +57,7 @@ import org.hibernate.validator.internal.xml.config.ValidationBootstrapParameters
 import org.hibernate.validator.internal.xml.config.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -91,6 +92,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
 	private final ParameterNameProvider defaultParameterNameProvider;
 	private final ClockProvider defaultClockProvider;
+	private final PropertyNodeNameProvider defaultPropertyNodeNameProvider;
 
 	private ValidationProviderResolver providerResolver;
 	private final ValidationBootstrapParameters validationBootstrapParameters;
@@ -140,6 +142,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
+		this.defaultPropertyNodeNameProvider = new DefaultPropertyNodeNameProvider();
 	}
 
 	@Override
@@ -216,6 +219,19 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 			}
 		}
 		this.validationBootstrapParameters.setClockProvider( clockProvider );
+		return thisAsT();
+	}
+
+	@Override
+	public T propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider) {
+		if ( LOG.isDebugEnabled() ) {
+			if ( propertyNodeNameProvider != null ) {
+				LOG.debug( "Setting custom PropertyNodeNameProvider of type " + propertyNodeNameProvider.getClass()
+						.getName() );
+			}
+		}
+		this.validationBootstrapParameters.setPropertyNodeNameProvider( propertyNodeNameProvider );
+
 		return thisAsT();
 	}
 
@@ -327,7 +343,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 			getterPropertySelectionStrategyToUse = getterPropertySelectionStrategy;
 		}
 
-		return new DefaultConstraintMapping( new JavaBeanHelper( getterPropertySelectionStrategyToUse ) );
+		return new DefaultConstraintMapping( new JavaBeanHelper( getterPropertySelectionStrategyToUse, defaultPropertyNodeNameProvider ) );
 	}
 
 	@Override
@@ -461,6 +477,10 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		return validationBootstrapParameters.getClockProvider();
 	}
 
+	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
+		return validationBootstrapParameters.getPropertyNodeNameProvider();
+	}
+
 	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
 		return scriptEvaluatorFactory;
 	}
@@ -566,6 +586,9 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 			if ( validationBootstrapParameters.getClockProvider() == null ) {
 				validationBootstrapParameters.setClockProvider( defaultClockProvider );
 			}
+			if ( validationBootstrapParameters.getPropertyNodeNameProvider() == null ) {
+				validationBootstrapParameters.setPropertyNodeNameProvider( defaultPropertyNodeNameProvider );
+			}
 		}
 		else {
 			ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters(
@@ -631,6 +654,16 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 			}
 			else {
 				validationBootstrapParameters.setClockProvider( defaultClockProvider );
+			}
+		}
+
+		if ( validationBootstrapParameters.getPropertyNodeNameProvider() == null ) {
+			if ( xmlParameters.getPropertyNodeNameProvider() != null ) {
+				validationBootstrapParameters.setPropertyNodeNameProvider(
+						xmlParameters.getPropertyNodeNameProvider() );
+			}
+			else {
+				validationBootstrapParameters.setPropertyNodeNameProvider( defaultPropertyNodeNameProvider );
 			}
 		}
 

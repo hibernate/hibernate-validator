@@ -220,7 +220,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				continue;
 			}
 
-			JavaBeanField javaBeanField = new JavaBeanField( field );
+			JavaBeanField javaBeanField = javaBeanHelper.field( field );
 
 			if ( annotationProcessingOptions.areMemberConstraintsIgnoredFor( javaBeanField ) ) {
 				continue;
