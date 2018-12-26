@@ -32,6 +32,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 /**
  * @author Hardy Ferentschik
@@ -50,6 +51,7 @@ public class ValidationBootstrapParameters {
 	private final Map<String, String> configProperties = new HashMap<>();
 	private final Set<InputStream> mappings = new HashSet<>();
 	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = new HashMap<>();
+	private PropertyNodeNameProvider propertyNodeNameProvider;
 
 	public ValidationBootstrapParameters() {
 	}
@@ -148,6 +150,14 @@ public class ValidationBootstrapParameters {
 
 	public void addValueExtractorDescriptor(ValueExtractorDescriptor descriptor) {
 		valueExtractorDescriptors.put( descriptor.getKey(), descriptor );
+	}
+
+	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
+		return propertyNodeNameProvider;
+	}
+
+	public void setPropertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider) {
+		this.propertyNodeNameProvider = propertyNodeNameProvider;
 	}
 
 	@SuppressWarnings("unchecked")

@@ -11,6 +11,7 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 
+import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
@@ -61,7 +62,7 @@ public abstract class AnnotationMetaDataProviderTestBase {
 	}
 
 	protected ConstrainedElement findConstrainedElement(BeanConfiguration<?> beanConfiguration, Member member) {
-		JavaBeanHelper javaBeanHelper = new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() );
+		JavaBeanHelper javaBeanHelper = new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider() );
 		Constrainable constrainable;
 		if ( member instanceof Field ) {
 			constrainable = javaBeanHelper.findDeclaredField( member.getDeclaringClass(), member.getName() ).get();

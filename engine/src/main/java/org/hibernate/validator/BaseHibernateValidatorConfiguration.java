@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.util.Set;
 
 import javax.validation.Configuration;
+import javax.validation.ConstraintViolation;
 import javax.validation.TraversableResolver;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;
@@ -20,6 +21,7 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
@@ -118,6 +120,15 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	String GETTER_PROPERTY_SELECTION_STRATEGY_CLASSNAME = "hibernate.validator.getter_property_selection_strategy";
+
+	/**
+	 * Property for configuring the property node name provider, allowing to select an implementation of {@link PropertyNodeNameProvider}
+	 * which will be used for property name resolution when creating a property path.
+	 *
+	 * @since 6.1.0
+	 */
+	@Incubating
+	String PROPERTY_NODE_NAME_PROVIDER_CLASSNAME = "hibernate.validator.property_node_name_provider";
 
 	/**
 	 * <p>
@@ -336,4 +347,17 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	S getterPropertySelectionStrategy(GetterPropertySelectionStrategy getterPropertySelectionStrategy);
+
+	/**
+	 * Allows to set a property node name provider, defining how the name of a property node will be resolved
+	 * when constructing a property path as the one returned by {@link ConstraintViolation#getPropertyPath()}.
+	 *
+	 * @param propertyNodeNameProvider the {@link PropertyNodeNameProvider} to be used
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.1.0
+	 */
+	@Incubating
+	S propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider);
 }

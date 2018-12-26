@@ -22,6 +22,8 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstr
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromGetterNameCandidates;
+import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.ConstrainableExecutable;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 
@@ -34,9 +36,11 @@ import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 public class JavaBeanHelper {
 
 	private final GetterPropertySelectionStrategy getterPropertySelectionStrategy;
+	private final PropertyNodeNameProvider propertyNodeNameProvider;
 
-	public JavaBeanHelper(GetterPropertySelectionStrategy getterPropertySelectionStrategy) {
+	public JavaBeanHelper(GetterPropertySelectionStrategy getterPropertySelectionStrategy, PropertyNodeNameProvider propertyNodeNameProvider) {
 		this.getterPropertySelectionStrategy = getterPropertySelectionStrategy;
+		this.propertyNodeNameProvider = propertyNodeNameProvider;
 	}
 
 	public GetterPropertySelectionStrategy getGetterPropertySelectionStrategy() {
@@ -47,7 +51,8 @@ public class JavaBeanHelper {
 		Contracts.assertNotNull( declaringClass, MESSAGES.classCannotBeNull() );
 
 		Field field = run( GetDeclaredField.action( declaringClass, property ) );
-		return Optional.ofNullable( field ).map( JavaBeanField::new );
+
+		return Optional.ofNullable( field ).map( this::field );
 	}
 
 	public Optional<JavaBeanGetter> findDeclaredGetter(Class<?> declaringClass, String property) {
@@ -74,9 +79,8 @@ public class JavaBeanHelper {
 			return Optional.empty();
 		}
 		else {
-			return Optional.of(
-					new JavaBeanGetter( declaringClass, getter, property )
-			);
+			return Optional.of( new JavaBeanGetter( declaringClass, getter, property, propertyNodeNameProvider.getName(
+					new JavaBeanPropertyImpl( declaringClass, property ) ) ) );
 		}
 	}
 
@@ -117,10 +121,15 @@ public class JavaBeanHelper {
 
 		Optional<String> correspondingProperty = getterPropertySelectionStrategy.getProperty( executable );
 		if ( correspondingProperty.isPresent() ) {
-			return new JavaBeanGetter( declaringClass, method, correspondingProperty.get() );
+			return new JavaBeanGetter( declaringClass, method, correspondingProperty.get(), propertyNodeNameProvider.getName(
+					new JavaBeanPropertyImpl( declaringClass, correspondingProperty.get() ) ) );
 		}
 
 		return new JavaBeanMethod( method );
+	}
+
+	public JavaBeanField field(Field field) {
+		return new JavaBeanField( field, propertyNodeNameProvider.getName( new JavaBeanPropertyImpl( field.getDeclaringClass(), field.getName() ) ) );
 	}
 
 	/**
@@ -154,6 +163,26 @@ public class JavaBeanHelper {
 		@Override
 		public Class<?>[] getParameterTypes() {
 			return method.getParameterTypes();
+		}
+	}
+
+	private static class JavaBeanPropertyImpl implements JavaBeanProperty {
+		private final Class<?> declaringClass;
+		private final String name;
+
+		private JavaBeanPropertyImpl(Class<?> declaringClass, String name) {
+			this.declaringClass = declaringClass;
+			this.name = name;
+		}
+
+		@Override
+		public Class<?> getDeclaringClass() {
+			return declaringClass;
+		}
+
+		@Override
+		public String getName() {
+			return name;
 		}
 	}
 }

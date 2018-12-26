@@ -39,6 +39,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -287,6 +288,32 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 
 		return new DefaultBeanMetaDataClassNormalizer();
+	}
+
+	static PropertyNodeNameProvider determinePropertyNodeNameProvider(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
+			ClassLoader externalClassLoader) {
+		if ( hibernateSpecificConfig.getPropertyNodeNameProvider() != null ) {
+			LOG.usingPropertyNodeNameProvider( hibernateSpecificConfig.getPropertyNodeNameProvider().getClass() );
+
+			return hibernateSpecificConfig.getPropertyNodeNameProvider();
+		}
+
+		String propertyNodeNameProviderFqcn = properties.get( HibernateValidatorConfiguration.PROPERTY_NODE_NAME_PROVIDER_CLASSNAME );
+		if ( propertyNodeNameProviderFqcn != null ) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<? extends PropertyNodeNameProvider> clazz = (Class<? extends PropertyNodeNameProvider>) run( LoadClass.action( propertyNodeNameProviderFqcn, externalClassLoader ) );
+				PropertyNodeNameProvider propertyNodeNameProvider = run( NewInstance.action( clazz, "property node name provider class" ) );
+				LOG.usingPropertyNodeNameProvider( clazz );
+
+				return propertyNodeNameProvider;
+			}
+			catch (Exception e) {
+				throw LOG.getUnableToInstantiatePropertyNodeNameProviderClassException( propertyNodeNameProviderFqcn, e );
+			}
+		}
+
+		return new DefaultPropertyNodeNameProvider();
 	}
 
 	static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,
