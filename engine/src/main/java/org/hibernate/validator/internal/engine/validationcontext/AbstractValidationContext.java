@@ -12,6 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -234,11 +235,13 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		// at this point we make a copy of the path to avoid side effects
 		Path path = PathImpl.createCopy( constraintViolationCreationContext.getPath() );
 
+		List<String> resolvedPropertyNames = valueContext.getResolvedPropertyNames();
 		this.failingConstraintViolations.add(
 				createConstraintViolation(
 						messageTemplate,
 						interpolatedMessage,
 						path,
+						resolvedPropertyNames,
 						descriptor,
 						valueContext,
 						constraintViolationCreationContext
@@ -250,6 +253,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			String messageTemplate,
 			String interpolatedMessage,
 			Path propertyPath,
+			List<String> resolvedPropertyNames,
 			ConstraintDescriptor<?> constraintDescriptor,
 			ValueContext<?, ?> valueContext,
 			ConstraintViolationCreationContext constraintViolationCreationContext);

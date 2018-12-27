@@ -58,7 +58,6 @@ public final class PathImpl implements Path, Serializable {
 	private boolean nodeListRequiresCopy;
 	private NodeImpl currentLeafNode;
 	private int hashCode;
-	private final PropertyPathNodeNameProviderWrapper provider;
 
 	/**
 	 * Returns a {@code Path} instance representing the path described by the
@@ -72,20 +71,20 @@ public final class PathImpl implements Path, Serializable {
 	 * @throws IllegalArgumentException in case {@code property == null} or
 	 * {@code property} cannot be parsed.
 	 */
-	public static PathImpl createPathFromString(String propertyPath, PropertyPathNodeNameProviderWrapper provider) {
+	public static PathImpl createPathFromString(String propertyPath) {
 		Contracts.assertNotNull( propertyPath, MESSAGES.propertyPathCannotBeNull() );
 
 		if ( propertyPath.length() == 0 ) {
-			return createRootPath(provider);
+			return createRootPath();
 		}
 
-		return parseProperty( propertyPath, provider );
+		return parseProperty( propertyPath );
 	}
 
-	public static PathImpl createPathForExecutable(ExecutableMetaData executable, PropertyPathNodeNameProviderWrapper provider) {
+	public static PathImpl createPathForExecutable(ExecutableMetaData executable ) {
 		Contracts.assertNotNull( executable, "A method is required to create a method return value path." );
 
-		PathImpl path = createRootPath(provider);
+		PathImpl path = createRootPath();
 
 		if ( executable.getKind() == ElementKind.CONSTRUCTOR ) {
 			path.addConstructorNode( executable.getName(), executable.getParameterTypes() );
@@ -97,8 +96,8 @@ public final class PathImpl implements Path, Serializable {
 		return path;
 	}
 
-	public static PathImpl createRootPath(PropertyPathNodeNameProviderWrapper provider) {
-		PathImpl path = new PathImpl( provider );
+	public static PathImpl createRootPath() {
+		PathImpl path = new PathImpl( );
 		path.addBeanNode();
 		return path;
 	}
@@ -112,16 +111,14 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public PathImpl getPathWithoutLeafNode() {
-		return new PathImpl( nodeList.subList( 0, nodeList.size() - 1 ), provider );
+		return new PathImpl( nodeList.subList( 0, nodeList.size() - 1 ) );
 	}
 
 	public NodeImpl addPropertyNode(String nodeName) {
 		requiresWriteableNodeList();
 
-		String resolvedNodeName = provider.getName( nodeName, currentLeafNode.getValue() );
-
 		NodeImpl parent = currentLeafNode;
-		currentLeafNode = NodeImpl.createPropertyNode( resolvedNodeName, parent );
+		currentLeafNode = NodeImpl.createPropertyNode( nodeName, parent );
 		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
@@ -365,21 +362,18 @@ public final class PathImpl implements Path, Serializable {
 		nodeList = path.nodeList;
 		currentLeafNode = path.currentLeafNode;
 		hashCode = path.hashCode;
-		provider = path.provider;
 		nodeListRequiresCopy = true;
 	}
 
-	private PathImpl(PropertyPathNodeNameProviderWrapper provider) {
-		this.provider = provider;
+	private PathImpl() {
 		nodeList = new ArrayList<>( 1 );
 		hashCode = -1;
 		nodeListRequiresCopy = false;
 	}
 
-	private PathImpl(List<Node> nodeList, PropertyPathNodeNameProviderWrapper provider) {
+	private PathImpl(List<Node> nodeList) {
 		this.nodeList = nodeList;
 		currentLeafNode = (NodeImpl) nodeList.get( nodeList.size() - 1 );
-		this.provider = provider;
 		hashCode = -1;
 		nodeListRequiresCopy = true;
 	}
@@ -388,8 +382,8 @@ public final class PathImpl implements Path, Serializable {
 		hashCode = -1;
 	}
 
-	private static PathImpl parseProperty(String propertyName, PropertyPathNodeNameProviderWrapper provider) {
-		PathImpl path = createRootPath(provider);
+	private static PathImpl parseProperty(String propertyName) {
+		PathImpl path = createRootPath();
 		String tmp = propertyName;
 		do {
 			Matcher matcher = PATH_PATTERN.matcher( tmp );

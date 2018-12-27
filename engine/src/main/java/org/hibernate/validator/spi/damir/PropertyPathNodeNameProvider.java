@@ -7,6 +7,5 @@
 package org.hibernate.validator.spi.damir;
 
 public interface PropertyPathNodeNameProvider {
-	// TODO make applicable to (fields, getters)
 	String getName(String propertyName, Object object);
 }

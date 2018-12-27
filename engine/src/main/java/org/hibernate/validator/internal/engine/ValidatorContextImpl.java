@@ -84,12 +84,6 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
-	public HibernateValidatorContext propertyPathNodeNameProvider(PropertyPathNodeNameProvider propertyPathNodeNameProvider) {
-		validatorFactoryScopedContextBuilder.setPropertyPathNodeNameProvider( propertyPathNodeNameProvider );
-		return this;
-	}
-
-	@Override
 	public HibernateValidatorContext clockProvider(ClockProvider clockProvider) {
 		validatorFactoryScopedContextBuilder.setClockProvider( clockProvider );
 		return this;

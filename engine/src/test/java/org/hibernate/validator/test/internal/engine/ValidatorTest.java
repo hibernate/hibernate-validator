@@ -67,27 +67,6 @@ import org.testng.annotations.Test;
  */
 public class ValidatorTest {
 	@Test
-	public void damirTest() {
-		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.propertyPathNodeNameProvider( new JsonPropertyPathNodeNameProvider() )
-				.buildValidatorFactory();
-		Validator validator = validatorFactory.getValidator();
-
-		A testInstance = new A();
-		testInstance.c = new C( "aaa" );
-
-		Set<ConstraintViolation<A>> constraintViolations = validator.validateProperty( testInstance, "c.id" );
-		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( Pattern.class )
-						.withPropertyPath( pathWith()
-								.property( "c" )
-								.property( "id" )
-						)
-		);
-	}
-
-	@Test
 	@TestForIssue(jiraKey = "HV-429")
 	public void testValidatePropertyWithRedefinedDefaultGroupOnMainEntity() {
 		Validator validator = getValidator();
@@ -196,8 +175,6 @@ public class ValidatorTest {
 	public void testValidateInterfaceConstraintsAreValidatedOneTime() {
 		CountValidationCallsValidator.init();
 		Set<ConstraintViolation<H>> constraintViolations = getValidator().validate( new H() );
-
-		// constraintViolations.iterator().next().getPropertyPath().toString() ->foo.bar.dfg
 
 		assertNoViolations( constraintViolations );
 		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 2 );
@@ -384,7 +361,6 @@ public class ValidatorTest {
 		@NotNull
 		String b;
 
-		// @JsonProperty("i_am_c")
 		@Valid
 		C c;
 

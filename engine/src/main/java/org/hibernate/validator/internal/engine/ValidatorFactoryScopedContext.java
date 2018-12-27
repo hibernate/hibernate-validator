@@ -129,7 +129,7 @@ public class ValidatorFactoryScopedContext {
 	}
 
 	public PropertyPathNodeNameProviderWrapper getPropertyPathNodeNameProvider() {
-		return this.propertyPathNodeNameProvider;
+		return propertyPathNodeNameProvider;
 	}
 
 	public ClockProvider getClockProvider() {
@@ -219,16 +219,6 @@ public class ValidatorFactoryScopedContext {
 			}
 			else {
 				this.parameterNameProvider = new ExecutableParameterNameProvider( parameterNameProvider );
-			}
-			return this;
-		}
-
-		public ValidatorFactoryScopedContext.Builder setPropertyPathNodeNameProvider(PropertyPathNodeNameProvider propertyPathNodeNameProvider) {
-			if ( parameterNameProvider == null ) {
-				this.parameterNameProvider = defaultContext.parameterNameProvider;
-			}
-			else {
-				this.propertyPathNodeNameProvider = new PropertyPathNodeNameProviderWrapper( propertyPathNodeNameProvider );
 			}
 			return this;
 		}

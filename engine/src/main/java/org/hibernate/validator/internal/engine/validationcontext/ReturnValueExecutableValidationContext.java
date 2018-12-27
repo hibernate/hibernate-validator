@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.engine.validationcontext;
 
 import java.lang.reflect.Executable;
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.ConstraintValidatorFactory;
@@ -88,7 +89,7 @@ public class ReturnValueExecutableValidationContext<T> extends AbstractValidatio
 	}
 
 	@Override
-	protected ConstraintViolation<T> createConstraintViolation(String messageTemplate, String interpolatedMessage, Path propertyPath, ConstraintDescriptor<?> constraintDescriptor, ValueContext<?, ?> valueContext,
+	protected ConstraintViolation<T> createConstraintViolation(String messageTemplate, String interpolatedMessage, Path propertyPath, List<String> abc, ConstraintDescriptor<?> constraintDescriptor, ValueContext<?, ?> valueContext,
 			ConstraintViolationCreationContext constraintViolationCreationContext) {
 		return ConstraintViolationImpl.forReturnValueValidation(
 				messageTemplate,

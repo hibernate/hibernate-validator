@@ -53,12 +53,10 @@ import org.testng.annotations.Test;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public class PathImplTest {
-	private final PropertyPathNodeNameProviderWrapper provider = new PropertyPathNodeNameProviderWrapper( new DefaultPropertyPathNodeNameProvider());
-
 	@Test
 	public void testParsing() {
 		String property = "orders[3].deliveryAddress.addressline[1]";
-		Path path = PathImpl.createPathFromString( property, provider);
+		Path path = PathImpl.createPathFromString( property);
 		Iterator<Path.Node> propIter = path.iterator();
 
 		assertTrue( propIter.hasNext() );
@@ -90,7 +88,7 @@ public class PathImplTest {
 
 	@Test
 	public void testParsingPropertyWithCurrencySymbol() {
-		PathImpl path = PathImpl.createPathFromString( "€Amount", provider );
+		PathImpl path = PathImpl.createPathFromString( "€Amount" );
 		Iterator<Path.Node> it = path.iterator();
 
 		assertEquals( it.next().getName(), "€Amount" );
@@ -98,7 +96,7 @@ public class PathImplTest {
 
 	@Test
 	public void testParsingPropertyWithGermanCharacter() {
-		PathImpl path = PathImpl.createPathFromString( "höchstBetrag", provider );
+		PathImpl path = PathImpl.createPathFromString( "höchstBetrag" );
 		Iterator<Path.Node> it = path.iterator();
 
 		assertEquals( it.next().getName(), "höchstBetrag" );
@@ -106,7 +104,7 @@ public class PathImplTest {
 
 	@Test
 	public void testParsingPropertyWithUnicodeCharacter() {
-		PathImpl path = PathImpl.createPathFromString( "höchst\u00f6Betrag", provider );
+		PathImpl path = PathImpl.createPathFromString( "höchst\u00f6Betrag" );
 		Iterator<Path.Node> it = path.iterator();
 
 		assertEquals( it.next().getName(), "höchst\u00f6Betrag" );
@@ -114,13 +112,13 @@ public class PathImplTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testParsingInvalidJavaProperty() {
-		PathImpl.createPathFromString( "1invalid", provider );
+		PathImpl.createPathFromString( "1invalid" );
 	}
 
 	@Test
 	public void testParseMapBasedProperty() {
 		String property = "order[foo].deliveryAddress";
-		Path path = PathImpl.createPathFromString( property, provider );
+		Path path = PathImpl.createPathFromString( property );
 		Iterator<Path.Node> propIter = path.iterator();
 
 		assertTrue( propIter.hasNext() );
@@ -139,32 +137,32 @@ public class PathImplTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNull() {
-		PathImpl.createPathFromString( null, provider );
+		PathImpl.createPathFromString( null );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testUnbalancedBraces() {
-		PathImpl.createPathFromString( "foo[.bar",provider );
+		PathImpl.createPathFromString( "foo[.bar" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testIndexInMiddleOfProperty() {
-		PathImpl.createPathFromString( "f[1]oo.bar",provider );
+		PathImpl.createPathFromString( "f[1]oo.bar" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testTrailingPathSeparator() {
-		PathImpl.createPathFromString( "foo.bar.",provider );
+		PathImpl.createPathFromString( "foo.bar." );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testLeadingPathSeparator() {
-		PathImpl.createPathFromString( ".foo.bar",provider );
+		PathImpl.createPathFromString( ".foo.bar" );
 	}
 
 	@Test
 	public void testEmptyString() {
-		Path path = PathImpl.createPathFromString( "",provider );
+		Path path = PathImpl.createPathFromString( "" );
 		assertTrue( path.iterator().hasNext() );
 	}
 
@@ -209,14 +207,14 @@ public class PathImplTest {
 		ExecutableMetaData executableMetaData = beanMetaDataManager.getBeanMetaData( Container.class )
 				.getMetaDataFor( executable ).get();
 
-		PathImpl methodParameterPath = PathImpl.createPathForExecutable( executableMetaData,provider );
+		PathImpl methodParameterPath = PathImpl.createPathForExecutable( executableMetaData );
 
 		assertEquals( methodParameterPath.toString(), "addItem" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testCreationOfExecutablePathFailsDueToMissingExecutable() throws Exception {
-		PathImpl.createPathForExecutable( null,provider );
+		PathImpl.createPathForExecutable( null );
 	}
 
 	class Container {

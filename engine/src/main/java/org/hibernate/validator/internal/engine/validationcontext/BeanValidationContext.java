@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.validationcontext;
 
+import java.util.List;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
@@ -47,7 +48,7 @@ class BeanValidationContext<T> extends AbstractValidationContext<T> {
 
 	@Override
 	protected ConstraintViolation<T> createConstraintViolation(
-			String messageTemplate, String interpolatedMessage, Path propertyPath,
+			String messageTemplate, String interpolatedMessage, Path propertyPath, List<String> abc,
 			ConstraintDescriptor<?> constraintDescriptor, ValueContext<?, ?> localContext,
 			ConstraintViolationCreationContext constraintViolationCreationContext) {
 		return ConstraintViolationImpl.forBeanValidation(
@@ -60,6 +61,7 @@ class BeanValidationContext<T> extends AbstractValidationContext<T> {
 				localContext.getCurrentBean(),
 				localContext.getCurrentValidatedValue(),
 				propertyPath,
+				List.of(),
 				constraintDescriptor,
 				constraintViolationCreationContext.getDynamicPayload()
 		);

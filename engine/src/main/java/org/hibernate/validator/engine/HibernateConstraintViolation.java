@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.engine;
 
+import java.util.List;
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 
@@ -29,5 +30,5 @@ public interface HibernateConstraintViolation<T> extends ConstraintViolation<T> 
 	/**
 	 * @return the property path to the value from {@code rootBean}
 	 */
-	Path getResolvedPropertyPath();
+	List<String> getResolvedPropertyPath();
 }

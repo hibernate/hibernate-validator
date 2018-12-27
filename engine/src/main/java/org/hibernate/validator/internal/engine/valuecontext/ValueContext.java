@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.engine.valuecontext;
 
 import java.lang.reflect.TypeVariable;
+import java.util.List;
 
 import javax.validation.groups.Default;
 
@@ -33,7 +34,7 @@ public class ValueContext<T, V> {
 
 	private final ExecutableParameterNameProvider parameterNameProvider;
 
-	private final PropertyPathNodeNameProviderWrapper propertyPathNodeNameProvider;
+	private final List<String> resolvedPropertyNames;
 
 	/**
 	 * The current bean which gets validated. This is the bean hosting the constraints which get validated.
@@ -64,12 +65,12 @@ public class ValueContext<T, V> {
 
 	ValueContext(
 			ExecutableParameterNameProvider parameterNameProvider,
-			PropertyPathNodeNameProviderWrapper propertyPathNodeNameProvider,
+			List<String> resolvedPropertyNames,
 			T currentBean,
 			Validatable validatable,
 			PathImpl propertyPath) {
 		this.parameterNameProvider = parameterNameProvider;
-		this.propertyPathNodeNameProvider = propertyPathNodeNameProvider;
+		this.resolvedPropertyNames = resolvedPropertyNames;
 		this.currentBean = currentBean;
 		this.currentValidatable = validatable;
 		this.propertyPath = propertyPath;
@@ -81,6 +82,10 @@ public class ValueContext<T, V> {
 
 	public final Class<?> getCurrentGroup() {
 		return currentGroup;
+	}
+
+	public List<String> getResolvedPropertyNames() {
+		return resolvedPropertyNames;
 	}
 
 	public final T getCurrentBean() {

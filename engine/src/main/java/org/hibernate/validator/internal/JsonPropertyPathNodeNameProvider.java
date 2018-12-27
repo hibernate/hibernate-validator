@@ -16,10 +16,6 @@ import org.hibernate.validator.spi.damir.PropertyPathNodeNameProvider;
 public class JsonPropertyPathNodeNameProvider implements PropertyPathNodeNameProvider, Serializable {
 	@Override
 	public String getName(String propertyName, Object object) {
-		if ( Objects.isNull(object)) {
-			return propertyName;
-		}
-
 		for ( Field field : object.getClass().getDeclaredFields() ) {
 			Class type = field.getType();
 			String name = field.getName();

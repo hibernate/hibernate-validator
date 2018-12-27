@@ -162,10 +162,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 		BeanValueContext<?, Object> valueContext = ValueContexts.getLocalExecutionContextForBean(
 				validatorScopedContext.getParameterNameProvider(),
-				validatorScopedContext.getPropertyPathNodeNameProvider(),
+				List.of(),
 				object,
 				validationContext.getRootBeanMetaData(),
-				PathImpl.createRootPath(validatorScopedContext.getPropertyPathNodeNameProvider())
+				PathImpl.createRootPath()
 		);
 
 		return validateInContext( validationContext, valueContext, validationOrder );
@@ -177,7 +177,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		sanityCheckPropertyPath( propertyName );
 		sanityCheckGroups( groups );
 
-		PathImpl propertyPath = PathImpl.createPathFromString( propertyName, validatorScopedContext.getPropertyPathNodeNameProvider() );
+		PathImpl propertyPath = PathImpl.createPathFromString( propertyName );
 		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidateProperty( object, propertyPath );
 
 		if ( !validationContext.getRootBeanMetaData().hasConstraints() ) {
@@ -201,7 +201,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		sanityCheckPropertyPath( propertyName );
 		sanityCheckGroups( groups );
 
-		PathImpl propertyPath = PathImpl.createPathFromString( propertyName, validatorScopedContext.getPropertyPathNodeNameProvider() );
+		PathImpl propertyPath = PathImpl.createPathFromString( propertyName );
 		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidateValue( beanType, propertyPath );
 
 		if ( !validationContext.getRootBeanMetaData().hasConstraints() ) {
@@ -748,7 +748,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( value.getClass() );
 		newValueContext = ValueContexts.getLocalExecutionContextForBean(
 				validatorScopedContext.getParameterNameProvider(),
-				validatorScopedContext.getPropertyPathNodeNameProvider(),
+				List.of(),
 				value,
 				beanMetaData,
 				valueContext.getPropertyPath()
@@ -845,10 +845,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		ValueContext<Object[], Object> cascadingValueContext = ValueContexts.getLocalExecutionContextForExecutable(
 				validatorScopedContext.getParameterNameProvider(),
-				validatorScopedContext.getPropertyPathNodeNameProvider(),
+				List.of(),
 				parameterValues,
 				executableMetaData.getValidatableParametersMetaData(),
-				PathImpl.createPathForExecutable( executableMetaData, validatorScopedContext.getPropertyPathNodeNameProvider() )
+				PathImpl.createPathForExecutable( executableMetaData )
 		);
 
 		groupIterator = validationOrder.getGroupIterator();
@@ -978,10 +978,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		valueContext = ValueContexts.getLocalExecutionContextForExecutable(
 				validatorScopedContext.getParameterNameProvider(),
-				validatorScopedContext.getPropertyPathNodeNameProvider(),
+				List.of(),
 				object,
 				validatable,
-				PathImpl.createPathForExecutable( executableMetaData, validatorScopedContext.getPropertyPathNodeNameProvider() )
+				PathImpl.createPathForExecutable( executableMetaData )
 		);
 
 		valueContext.setCurrentGroup( group );
@@ -1022,10 +1022,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		if ( isCascadingRequired ) {
 			cascadingValueContext = ValueContexts.getLocalExecutionContextForExecutable(
 					validatorScopedContext.getParameterNameProvider(),
-					validatorScopedContext.getPropertyPathNodeNameProvider(),
+					List.of(),
 					value,
 					executableMetaData.getReturnValueMetaData(),
-					PathImpl.createPathForExecutable( executableMetaData, validatorScopedContext.getPropertyPathNodeNameProvider() )
+					PathImpl.createPathForExecutable( executableMetaData )
 			);
 
 			groupIterator = validationOrder.getGroupIterator();
@@ -1200,8 +1200,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		propertyPath.removeLeafNode();
-
-		return ValueContexts.getLocalExecutionContextForBean( validatorScopedContext.getParameterNameProvider(), validatorScopedContext.getPropertyPathNodeNameProvider(), value, beanMetaData, propertyPath );
+		return ValueContexts.getLocalExecutionContextForBean( validatorScopedContext.getParameterNameProvider(), resolvedPropertyNames, value, beanMetaData, propertyPath );
 	}
 
 	/**
@@ -1253,7 +1252,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		propertyPath.removeLeafNode();
 
-		return ValueContexts.getLocalExecutionContextForValueValidation( validatorScopedContext.getParameterNameProvider(), validatorScopedContext.getPropertyPathNodeNameProvider(), beanMetaData, propertyPath );
+		return ValueContexts.getLocalExecutionContextForValueValidation( validatorScopedContext.getParameterNameProvider(), List.of(), beanMetaData, propertyPath );
 	}
 
 	private boolean isValidationRequired(BaseBeanValidationContext<?> validationContext,

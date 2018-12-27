@@ -215,7 +215,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		if ( LOG.isDebugEnabled() ) {
 			if ( propertyPathNodeNameProvider != null ) {
 				LOG.debug(
-						"Setting custom ParameterNameProvider of type " + propertyPathNodeNameProvider.getClass()
+						"Setting custom PropertyPathNodeNameProvider of type " + propertyPathNodeNameProvider.getClass()
 								.getName()
 				);
 			}
