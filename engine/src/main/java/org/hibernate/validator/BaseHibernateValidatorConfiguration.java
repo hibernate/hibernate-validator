@@ -8,6 +8,7 @@ package org.hibernate.validator;
 
 import java.time.Duration;
 import java.util.Set;
+
 import javax.validation.Configuration;
 import javax.validation.TraversableResolver;
 import javax.validation.constraints.Future;

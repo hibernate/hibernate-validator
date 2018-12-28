@@ -24,7 +24,6 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDes
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.spi.damir.PropertyPathNodeNameProvider;
 
 /**
  * @author Emmanuel Bernard

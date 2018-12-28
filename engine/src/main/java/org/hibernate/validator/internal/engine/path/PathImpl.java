@@ -81,7 +81,7 @@ public final class PathImpl implements Path, Serializable {
 		return parseProperty( propertyPath );
 	}
 
-	public static PathImpl createPathForExecutable(ExecutableMetaData executable ) {
+	public static PathImpl createPathForExecutable(ExecutableMetaData executable) {
 		Contracts.assertNotNull( executable, "A method is required to create a method return value path." );
 
 		PathImpl path = createRootPath();
@@ -97,7 +97,7 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public static PathImpl createRootPath() {
-		PathImpl path = new PathImpl( );
+		PathImpl path = new PathImpl();
 		path.addBeanNode();
 		return path;
 	}

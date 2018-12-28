@@ -29,7 +29,6 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
-import org.hibernate.validator.internal.engine.DefaultPropertyPathNodeNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.path.PathImpl;
@@ -41,9 +40,7 @@ import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectio
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.PropertyPathNodeNameProviderWrapper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.spi.damir.PropertyPathNodeNameProvider;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
 
@@ -56,7 +53,7 @@ public class PathImplTest {
 	@Test
 	public void testParsing() {
 		String property = "orders[3].deliveryAddress.addressline[1]";
-		Path path = PathImpl.createPathFromString( property);
+		Path path = PathImpl.createPathFromString( property );
 		Iterator<Path.Node> propIter = path.iterator();
 
 		assertTrue( propIter.hasNext() );

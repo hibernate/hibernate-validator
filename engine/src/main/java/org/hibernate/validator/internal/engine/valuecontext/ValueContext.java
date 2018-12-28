@@ -63,12 +63,8 @@ public class ValueContext<T, V> {
 	 */
 	private ConstraintLocationKind constraintLocationKind;
 
-	ValueContext(
-			ExecutableParameterNameProvider parameterNameProvider,
-			List<String> resolvedPropertyNames,
-			T currentBean,
-			Validatable validatable,
-			PathImpl propertyPath) {
+	ValueContext(ExecutableParameterNameProvider parameterNameProvider, List<String> resolvedPropertyNames,
+			T currentBean, Validatable validatable, PathImpl propertyPath) {
 		this.parameterNameProvider = parameterNameProvider;
 		this.resolvedPropertyNames = resolvedPropertyNames;
 		this.currentBean = currentBean;

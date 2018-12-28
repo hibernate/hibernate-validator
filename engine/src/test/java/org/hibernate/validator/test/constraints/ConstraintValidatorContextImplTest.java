@@ -18,11 +18,9 @@ import java.util.Map;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.internal.engine.DefaultPropertyPathNodeNameProvider;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.util.PropertyPathNodeNameProviderWrapper;
 import org.hibernate.validator.testutil.ConstraintViolationAssert.PathExpectation;
 import org.testng.annotations.Test;
 
@@ -225,7 +223,7 @@ public class ConstraintValidatorContextImplTest {
 	}
 
 	private ConstraintValidatorContextImpl createEmptyConstraintValidatorContextImpl() {
-		PathImpl path = PathImpl.createRootPath( );
+		PathImpl path = PathImpl.createRootPath();
 		path.addBeanNode();
 
 		ConstraintValidatorContextImpl context = new ConstraintValidatorContextImpl( null, path, null, null );
