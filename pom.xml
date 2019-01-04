@@ -123,9 +123,9 @@
         <jboss.logging.processor.version>2.1.0.Final</jboss.logging.processor.version>
 
         <!-- Currently supported version of WildFly -->
-        <wildfly.version>14.0.1.Final</wildfly.version>
+        <wildfly.version>15.0.0.Final</wildfly.version>
         <!-- Used to create a patch file for the second version of WildFly we support -->
-        <wildfly-secondary.version>13.0.0.Final</wildfly-secondary.version>
+        <wildfly-secondary.version>14.0.1.Final</wildfly-secondary.version>
         <!-- Version used to run the TCK in incontainer mode -->
         <wildfly-tck.version>${wildfly.version}</wildfly-tck.version>
 
