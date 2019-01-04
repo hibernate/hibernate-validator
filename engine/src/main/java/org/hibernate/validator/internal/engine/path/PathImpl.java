@@ -22,7 +22,6 @@ import javax.validation.Path;
 
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.PropertyPathNodeNameProviderWrapper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 

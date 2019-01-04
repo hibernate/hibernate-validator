@@ -11,7 +11,6 @@ import java.util.List;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.PropertyPathNodeNameProviderWrapper;
 
 /**
  * @author Marko Bekhta

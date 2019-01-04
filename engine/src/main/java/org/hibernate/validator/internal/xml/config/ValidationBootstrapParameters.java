@@ -32,7 +32,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
-import org.hibernate.validator.spi.damir.PropertyPathNodeNameProvider;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 /**
  * @author Hardy Ferentschik
@@ -45,7 +45,7 @@ public class ValidationBootstrapParameters {
 	private MessageInterpolator messageInterpolator;
 	private TraversableResolver traversableResolver;
 	private ParameterNameProvider parameterNameProvider;
-	private PropertyPathNodeNameProvider propertyPathNodeNameProvider;
+	private PropertyNodeNameProvider propertyNodeNameProvider;
 	private ClockProvider clockProvider;
 	private ValidationProvider<?> provider;
 	private Class<? extends ValidationProvider<?>> providerClass = null;
@@ -136,12 +136,12 @@ public class ValidationBootstrapParameters {
 		this.parameterNameProvider = parameterNameProvider;
 	}
 
-	public PropertyPathNodeNameProvider getPropertyPathNodeNameProvider() {
-		return propertyPathNodeNameProvider;
+	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
+		return propertyNodeNameProvider;
 	}
 
-	public void setPropertyPathNodeNameProvider(PropertyPathNodeNameProvider propertyPathNodeNameProvider) {
-		this.propertyPathNodeNameProvider = propertyPathNodeNameProvider;
+	public void setPropertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider) {
+		this.propertyNodeNameProvider = propertyNodeNameProvider;
 	}
 
 	public ClockProvider getClockProvider() {

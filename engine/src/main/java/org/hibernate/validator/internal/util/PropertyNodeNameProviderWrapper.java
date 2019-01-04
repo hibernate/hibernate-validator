@@ -8,12 +8,12 @@ package org.hibernate.validator.internal.util;
 
 import java.io.Serializable;
 
-import org.hibernate.validator.spi.damir.PropertyPathNodeNameProvider;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
-public class PropertyPathNodeNameProviderWrapper implements Serializable {
-	private final PropertyPathNodeNameProvider delegate;
+public class PropertyNodeNameProviderWrapper implements Serializable {
+	private final PropertyNodeNameProvider delegate;
 
-	public PropertyPathNodeNameProviderWrapper(PropertyPathNodeNameProvider delegate) {
+	public PropertyNodeNameProviderWrapper(PropertyNodeNameProvider delegate) {
 		this.delegate = delegate;
 	}
 

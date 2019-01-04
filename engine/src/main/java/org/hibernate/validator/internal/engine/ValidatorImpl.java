@@ -69,6 +69,7 @@ import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.PropertyNodeNameProviderWrapper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -1136,19 +1137,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		BeanMetaData<?> beanMetaData = validationContext.getRootBeanMetaData();
 		Object value = validationContext.getRootBean();
 		PropertyMetaData propertyMetaData = null;
+		PropertyNodeNameProviderWrapper nameProvider = validatorScopedContext.getPropertyNodeNameProvider();
+		List<String> resolvedPropertyNames = new ArrayList<>();
 
 		Iterator<Path.Node> propertyPathIter = propertyPath.iterator();
 
 		Type parent = clazz;
-		List<String> resolvedPropertyNames = new ArrayList<>();
-
 		while ( propertyPathIter.hasNext() ) {
 			// cast is ok, since we are dealing with engine internal classes
 			NodeImpl propertyPathNode = (NodeImpl) propertyPathIter.next();
 			propertyMetaData = getBeanPropertyMetaData( beanMetaData, propertyPathNode );
-
-			String resolvedPropertyName = validatorScopedContext.getPropertyPathNodeNameProvider().getName(propertyMetaData.getName(), parent);
-			resolvedPropertyNames.add(resolvedPropertyName);
+			resolvedPropertyNames.add(nameProvider.getName( propertyMetaData.getName(), parent ));
 
 			parent = propertyMetaData.getType();
 
@@ -1200,6 +1199,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		propertyPath.removeLeafNode();
+
 		return ValueContexts.getLocalExecutionContextForBean( validatorScopedContext.getParameterNameProvider(), resolvedPropertyNames, value, beanMetaData, propertyPath );
 	}
 

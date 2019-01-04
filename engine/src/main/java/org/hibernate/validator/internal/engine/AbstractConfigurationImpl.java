@@ -57,7 +57,7 @@ import org.hibernate.validator.internal.xml.config.ValidationBootstrapParameters
 import org.hibernate.validator.internal.xml.config.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
-import org.hibernate.validator.spi.damir.PropertyPathNodeNameProvider;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -91,7 +91,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private final TraversableResolver defaultTraversableResolver;
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
 	private final ParameterNameProvider defaultParameterNameProvider;
-	private final PropertyPathNodeNameProvider defaultPropertyPathNodeNameProvider;
+	private final PropertyNodeNameProvider defaultPropertyNodeNameProvider;
 	private final ClockProvider defaultClockProvider;
 
 	private ValidationProviderResolver providerResolver;
@@ -141,7 +141,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		this.defaultTraversableResolver = TraversableResolvers.getDefault();
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
-		this.defaultPropertyPathNodeNameProvider = new DefaultPropertyPathNodeNameProvider();
+		this.defaultPropertyNodeNameProvider = new DefaultPropertyNodeNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
 	}
 
@@ -212,16 +212,16 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	}
 
 	@Override
-	public T propertyPathNodeNameProvider(PropertyPathNodeNameProvider propertyPathNodeNameProvider) {
+	public T propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider) {
 		if ( LOG.isDebugEnabled() ) {
-			if ( propertyPathNodeNameProvider != null ) {
+			if ( propertyNodeNameProvider != null ) {
 				LOG.debug(
-						"Setting custom PropertyPathNodeNameProvider of type " + propertyPathNodeNameProvider.getClass()
+						"Setting custom PropertyNodeNameProvider of type " + propertyNodeNameProvider.getClass()
 								.getName()
 				);
 			}
 		}
-		this.validationBootstrapParameters.setPropertyPathNodeNameProvider( propertyPathNodeNameProvider );
+		this.validationBootstrapParameters.setPropertyNodeNameProvider( propertyNodeNameProvider );
 		return thisAsT();
 	}
 
@@ -474,8 +474,8 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	}
 
 	@Override
-	public PropertyPathNodeNameProvider getPropertyPathNodeNameProvider() {
-		return validationBootstrapParameters.getPropertyPathNodeNameProvider();
+	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
+		return validationBootstrapParameters.getPropertyNodeNameProvider();
 	}
 
 	@Override
@@ -552,8 +552,8 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	}
 
 	@Override
-	public PropertyPathNodeNameProvider getDefaultPropertyPathNodeNameProvider() {
-		return defaultPropertyPathNodeNameProvider;
+	public PropertyNodeNameProvider getDefaultPropertyNodeNameProvider() {
+		return defaultPropertyNodeNameProvider;
 	}
 
 	@Override
@@ -590,8 +590,8 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 			if ( validationBootstrapParameters.getParameterNameProvider() == null ) {
 				validationBootstrapParameters.setParameterNameProvider( defaultParameterNameProvider );
 			}
-			if ( validationBootstrapParameters.getPropertyPathNodeNameProvider() == null ) {
-				validationBootstrapParameters.setPropertyPathNodeNameProvider( defaultPropertyPathNodeNameProvider );
+			if ( validationBootstrapParameters.getPropertyNodeNameProvider() == null ) {
+				validationBootstrapParameters.setPropertyNodeNameProvider( defaultPropertyNodeNameProvider );
 			}
 			if ( validationBootstrapParameters.getClockProvider() == null ) {
 				validationBootstrapParameters.setClockProvider( defaultClockProvider );
@@ -655,13 +655,13 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 			}
 		}
 
-		if ( validationBootstrapParameters.getPropertyPathNodeNameProvider() == null ) {
-			if ( xmlParameters.getPropertyPathNodeNameProvider() != null ) {
-				validationBootstrapParameters.setPropertyPathNodeNameProvider(
-						xmlParameters.getPropertyPathNodeNameProvider() );
+		if ( validationBootstrapParameters.getPropertyNodeNameProvider() == null ) {
+			if ( xmlParameters.getPropertyNodeNameProvider() != null ) {
+				validationBootstrapParameters.setPropertyNodeNameProvider(
+						xmlParameters.getPropertyNodeNameProvider() );
 			}
 			else {
-				validationBootstrapParameters.setPropertyPathNodeNameProvider( defaultPropertyPathNodeNameProvider );
+				validationBootstrapParameters.setPropertyNodeNameProvider( defaultPropertyNodeNameProvider );
 			}
 		}
 

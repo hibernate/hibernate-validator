@@ -4,8 +4,8 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.spi.damir;
+package org.hibernate.validator.spi.nodenameprovider;
 
-public interface PropertyPathNodeNameProvider {
+public interface PropertyNodeNameProvider {
 	String getName(String propertyName, Object object);
 }

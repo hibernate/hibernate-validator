@@ -24,6 +24,7 @@ import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDes
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 /**
  * @author Emmanuel Bernard
@@ -79,6 +80,12 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	@Override
 	public HibernateValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider) {
 		validatorFactoryScopedContextBuilder.setParameterNameProvider( parameterNameProvider );
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorContext propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider) {
+		validatorFactoryScopedContextBuilder.setPropertyNodeNameProvider( propertyNodeNameProvider );
 		return this;
 	}
 

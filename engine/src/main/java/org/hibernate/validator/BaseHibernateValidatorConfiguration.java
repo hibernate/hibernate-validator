@@ -20,7 +20,7 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
-import org.hibernate.validator.spi.damir.PropertyPathNodeNameProvider;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
@@ -151,11 +151,11 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	ResourceBundleLocator getDefaultResourceBundleLocator();
 
-	S propertyPathNodeNameProvider(PropertyPathNodeNameProvider propertyPathNodeNameProvider);
+	S propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider);
 
-	PropertyPathNodeNameProvider getDefaultPropertyPathNodeNameProvider();
+	PropertyNodeNameProvider getDefaultPropertyNodeNameProvider();
 
-	PropertyPathNodeNameProvider getPropertyPathNodeNameProvider();
+	PropertyNodeNameProvider getPropertyNodeNameProvider();
 
 	/**
 	 * Creates a new constraint mapping which can be used to programmatically configure the constraints for given types. After

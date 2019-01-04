@@ -19,7 +19,6 @@ import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.PropertyPathNodeNameProviderWrapper;
 import org.hibernate.validator.internal.util.TypeVariables;
 
 /**

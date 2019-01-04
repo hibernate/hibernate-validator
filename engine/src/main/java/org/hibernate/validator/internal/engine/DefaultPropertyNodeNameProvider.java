@@ -8,9 +8,9 @@ package org.hibernate.validator.internal.engine;
 
 import java.io.Serializable;
 
-import org.hibernate.validator.spi.damir.PropertyPathNodeNameProvider;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
-public class DefaultPropertyPathNodeNameProvider implements PropertyPathNodeNameProvider, Serializable {
+public class DefaultPropertyNodeNameProvider implements PropertyNodeNameProvider, Serializable {
 	@Override
 	public String getName(String propertyName, Object object) {
 		return propertyName;
