@@ -303,26 +303,27 @@ public class ValueExtractorResolver {
 		}
 
 		Set<ValueExtractorDescriptor> valueExtractorDescriptors = possibleValueExtractorsByRuntimeType.get( runtimeType );
-		if ( valueExtractorDescriptors == null ) {
-			//otherwise we just look for maximally specific extractors for the runtime type
-			Set<ValueExtractorDescriptor> possibleValueExtractors = potentialValueExtractorDescriptors
-					.stream()
-					.filter( e -> TypeHelper.isAssignable( e.getContainerType(), runtimeType ) )
-					.collect( Collectors.toSet() );
 
-			valueExtractorDescriptors = getMaximallySpecificValueExtractors( possibleValueExtractors );
+		if ( valueExtractorDescriptors != null ) {
+			return valueExtractorDescriptors;
 		}
+
+		Set<ValueExtractorDescriptor> possibleValueExtractors = potentialValueExtractorDescriptors
+				.stream()
+				.filter( e -> TypeHelper.isAssignable( e.getContainerType(), runtimeType ) )
+				.collect( Collectors.toSet() );
+
+		valueExtractorDescriptors = getMaximallySpecificValueExtractors( possibleValueExtractors );
 
 		if ( valueExtractorDescriptors.isEmpty() ) {
 			nonContainerTypes.put( runtimeType, NON_CONTAINER_VALUE );
-		}
-		else {
-			Set<ValueExtractorDescriptor> extractorDescriptorsToCache = CollectionHelper.toImmutableSet( valueExtractorDescriptors );
-			possibleValueExtractorsByRuntimeType.put( runtimeType, extractorDescriptorsToCache );
-			return extractorDescriptorsToCache;
+			return Collections.emptySet();
 		}
 
-		return valueExtractorDescriptors;
+		Set<ValueExtractorDescriptor> valueExtractorDescriptorsToCache = CollectionHelper.toImmutableSet( valueExtractorDescriptors );
+		Set<ValueExtractorDescriptor> cachedValueExtractorDescriptors = possibleValueExtractorsByRuntimeType.putIfAbsent( runtimeType,
+				valueExtractorDescriptorsToCache );
+		return cachedValueExtractorDescriptors != null ? cachedValueExtractorDescriptors : valueExtractorDescriptorsToCache;
 	}
 
 	private Set<ValueExtractorDescriptor> getRuntimeAndContainerElementCompliantValueExtractorsFromPossibleCandidates(Type declaredType,
@@ -334,32 +335,34 @@ public class ValueExtractorResolver {
 		ValueExtractorCacheKey cacheKey = new ValueExtractorCacheKey( runtimeType, typeParameter );
 
 		Set<ValueExtractorDescriptor> valueExtractorDescriptors = possibleValueExtractorsByRuntimeTypeAndTypeParameter.get( cacheKey );
-		if ( valueExtractorDescriptors == null ) {
-			boolean isInternal = TypeVariables.isInternal( typeParameter );
-			Class<?> erasedDeclaredType = TypeHelper.getErasedReferenceType( declaredType );
 
-			Set<ValueExtractorDescriptor> possibleValueExtractors = valueExtractorCandidates
-					.stream()
-					.filter( e -> TypeHelper.isAssignable( e.getContainerType(), runtimeType ) )
-					.filter( extractorDescriptor ->
-							checkValueExtractorTypeCompatibility(
-									typeParameter, isInternal, erasedDeclaredType, extractorDescriptor
-							)
-					).collect( Collectors.toSet() );
-
-			valueExtractorDescriptors = getMaximallySpecificValueExtractors( possibleValueExtractors );
-
-			if ( valueExtractorDescriptors.isEmpty() ) {
-				nonContainerTypes.put( runtimeType, NON_CONTAINER_VALUE );
-			}
-			else {
-				Set<ValueExtractorDescriptor> extractorDescriptorsToCache = CollectionHelper.toImmutableSet( valueExtractorDescriptors );
-				possibleValueExtractorsByRuntimeTypeAndTypeParameter.put( cacheKey, extractorDescriptorsToCache );
-				return extractorDescriptorsToCache;
-			}
+		if ( valueExtractorDescriptors != null ) {
+			return valueExtractorDescriptors;
 		}
 
-		return valueExtractorDescriptors;
+		boolean isInternal = TypeVariables.isInternal( typeParameter );
+		Class<?> erasedDeclaredType = TypeHelper.getErasedReferenceType( declaredType );
+
+		Set<ValueExtractorDescriptor> possibleValueExtractors = valueExtractorCandidates
+				.stream()
+				.filter( e -> TypeHelper.isAssignable( e.getContainerType(), runtimeType ) )
+				.filter( extractorDescriptor ->
+						checkValueExtractorTypeCompatibility(
+								typeParameter, isInternal, erasedDeclaredType, extractorDescriptor
+						)
+				).collect( Collectors.toSet() );
+
+		valueExtractorDescriptors = getMaximallySpecificValueExtractors( possibleValueExtractors );
+
+		if ( valueExtractorDescriptors.isEmpty() ) {
+			nonContainerTypes.put( runtimeType, NON_CONTAINER_VALUE );
+			return Collections.emptySet();
+		}
+
+		Set<ValueExtractorDescriptor> valueExtractorDescriptorsToCache = CollectionHelper.toImmutableSet( valueExtractorDescriptors );
+		Set<ValueExtractorDescriptor> cachedValueExtractorDescriptors = possibleValueExtractorsByRuntimeTypeAndTypeParameter.putIfAbsent( cacheKey,
+				valueExtractorDescriptorsToCache );
+		return cachedValueExtractorDescriptors != null ? cachedValueExtractorDescriptors : valueExtractorDescriptorsToCache;
 	}
 
 	private boolean checkValueExtractorTypeCompatibility(TypeVariable<?> typeParameter, boolean isInternal, Class<?> erasedDeclaredType,
