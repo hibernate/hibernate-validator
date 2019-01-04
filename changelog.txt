@@ -1,6 +1,19 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.14.Final (04-01-2019)
+-------------------------
+
+** Bug
+    * HV-1684 - validators   - StackOverflowError with Hibernate Validator 6.0.13.Final
+
+** Improvement
+    * HV-1686 - translations - Fix a few typos in the Dutch translation
+
+** Task
+    * HV-1685 - integration  - Upgrade the WildFly versions we generate patches for to 14.0.1.Final and 15.0.0.Final
+    * HV-1659 - integration  - Upgrade WildFly to 14.0.1
+
 6.0.13.Final (22-08-2018)
 -------------------------
 
