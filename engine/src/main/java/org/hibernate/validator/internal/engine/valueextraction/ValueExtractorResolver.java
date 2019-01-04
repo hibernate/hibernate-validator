@@ -47,8 +47,6 @@ public class ValueExtractorResolver {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
-	private static final Object NON_CONTAINER_VALUE = new Object();
-
 	@Immutable
 	private final Set<ValueExtractorDescriptor> registeredValueExtractors;
 
@@ -56,7 +54,7 @@ public class ValueExtractorResolver {
 
 	private final ConcurrentHashMap<Class<?>, Set<ValueExtractorDescriptor>> possibleValueExtractorsByRuntimeType = new ConcurrentHashMap<>();
 
-	private final ConcurrentHashMap<Class<?>, Object> nonContainerTypes = new ConcurrentHashMap<>();
+	private final Set<Class<?>> nonContainerTypes = Collections.newSetFromMap( new ConcurrentHashMap<>() );
 
 	ValueExtractorResolver(Set<ValueExtractorDescriptor> valueExtractors) {
 		this.registeredValueExtractors = CollectionHelper.toImmutableSet( valueExtractors );
@@ -316,7 +314,7 @@ public class ValueExtractorResolver {
 		valueExtractorDescriptors = getMaximallySpecificValueExtractors( possibleValueExtractors );
 
 		if ( valueExtractorDescriptors.isEmpty() ) {
-			nonContainerTypes.put( runtimeType, NON_CONTAINER_VALUE );
+			nonContainerTypes.add( runtimeType );
 			return Collections.emptySet();
 		}
 
@@ -355,7 +353,7 @@ public class ValueExtractorResolver {
 		valueExtractorDescriptors = getMaximallySpecificValueExtractors( possibleValueExtractors );
 
 		if ( valueExtractorDescriptors.isEmpty() ) {
-			nonContainerTypes.put( runtimeType, NON_CONTAINER_VALUE );
+			nonContainerTypes.add( runtimeType );
 			return Collections.emptySet();
 		}
 
