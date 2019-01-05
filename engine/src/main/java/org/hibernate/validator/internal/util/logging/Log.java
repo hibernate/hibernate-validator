@@ -91,27 +91,27 @@ public interface Log extends BasicLogger {
 	@Message(id = 1, value = "Hibernate Validator %s")
 	void version(String version);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 2, value = "Ignoring XML configuration.")
 	void ignoringXmlConfiguration();
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 3, value = "Using %s as constraint validator factory.")
 	void usingConstraintValidatorFactory(@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidatorFactory> constraintValidatorFactoryClass);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 4, value = "Using %s as message interpolator.")
 	void usingMessageInterpolator(@FormatWith(ClassObjectFormatter.class) Class<? extends MessageInterpolator> messageInterpolatorClass);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 5, value = "Using %s as traversable resolver.")
 	void usingTraversableResolver(@FormatWith(ClassObjectFormatter.class) Class<? extends TraversableResolver> traversableResolverClass);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 6, value = "Using %s as validation provider.")
 	void usingValidationProvider(@FormatWith(ClassObjectFormatter.class) Class<? extends ValidationProvider<?>> validationProviderClass);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 7, value = "%s found. Parsing XML based configuration.")
 	void parsingXMLFile(String fileName);
 
@@ -434,7 +434,7 @@ public interface Log extends BasicLogger {
 	ClassCastException getUnableToNarrowNodeTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> actualDescriptorType, ElementKind kind,
 			@FormatWith(ClassObjectFormatter.class) Class<?> expectedDescriptorType);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 119, value = "Using %s as parameter name provider.")
 	void usingParameterNameProvider(@FormatWith(ClassObjectFormatter.class) Class<? extends ParameterNameProvider> parameterNameProviderClass);
 
@@ -703,7 +703,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 198, value = "No suitable value extractor found for type %1$s.")
 	ConstraintDeclarationException getNoValueExtractorFoundForUnwrapException(Type type);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 200, value = "Using %s as clock provider.")
 	void usingClockProvider(@FormatWith(ClassObjectFormatter.class) Class<? extends ClockProvider> clockProviderClass);
 
@@ -725,7 +725,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 206, value = "Unable to instantiate value extractor class %s.")
 	ValidationException getUnableToInstantiateValueExtractorClassException(String valueExtractorClassName, @Cause ValidationException e);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 207, value = "Adding value extractor %s.")
 	void addingValueExtractor(@FormatWith(ClassObjectFormatter.class) Class<? extends ValueExtractor<?>> valueExtractorClass);
 
@@ -811,7 +811,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 229, value = "Unable to cast %1$s to %2$s.")
 	ClassCastException getUnableToCastException(Object object, @FormatWith(ClassObjectFormatter.class) Class<?> clazz);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 230, value = "Using %s as script evaluator factory.")
 	void usingScriptEvaluatorFactory(@FormatWith(ClassObjectFormatter.class) Class<? extends ScriptEvaluatorFactory> scriptEvaluatorFactoryClass);
 
@@ -838,7 +838,7 @@ public interface Log extends BasicLogger {
 	ValidationException getUnableToAccessMethodException(Lookup lookup, @FormatWith(ClassObjectFormatter.class) Class<?> clazz, String methodName,
 			@FormatWith(ObjectArrayFormatter.class) Object[] parameterTypes, @Cause Throwable e);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 238, value = "Temporal validation tolerance set to %1$s.")
 	void logTemporalValidationTolerance(@FormatWith(DurationFormatter.class) Duration tolerance);
 
@@ -868,7 +868,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 245, value = "Allowed constraint element types are FIELD and GETTER, but instead received %1$s.")
 	AssertionError getUnsupportedConstraintElementType(ConstrainedElement.ConstrainedElementKind kind);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 246, value = "Using %s as getter property selection strategy.")
 	void usingGetterPropertySelectionStrategy(@FormatWith(ClassObjectFormatter.class) Class<? extends GetterPropertySelectionStrategy> getterPropertySelectionStrategyClass);
 
