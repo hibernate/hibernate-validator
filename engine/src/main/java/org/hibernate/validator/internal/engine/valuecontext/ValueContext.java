@@ -96,13 +96,13 @@ public class ValueContext<T, V> {
 
 	public final void appendNode(Cascadable node) {
 		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		node.appendTo(propertyNodeNameProvider.create(currentBean), newPath );
+		node.appendTo(new InternalExecutablePropertyNodeNameProvider(propertyNodeNameProvider, currentBean), newPath );
 		propertyPath = newPath;
 	}
 
 	public final void appendNode(ConstraintLocation location) {
 		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		location.appendTo( parameterNameProvider, propertyNodeNameProvider.create(currentBean), newPath );
+		location.appendTo( parameterNameProvider, new InternalExecutablePropertyNodeNameProvider(propertyNodeNameProvider, currentBean), newPath );
 		propertyPath = newPath;
 	}
 
@@ -208,6 +208,21 @@ public class ValueContext<T, V> {
 
 		public V getCurrentValue() {
 			return currentValue;
+		}
+	}
+
+	private static class InternalExecutablePropertyNodeNameProvider extends ExecutablePropertyNodeNameProvider {
+		private final Object currentBean;
+
+		private InternalExecutablePropertyNodeNameProvider(ExecutablePropertyNodeNameProvider provider, Object currentBean) {
+			super(provider.getDelegate());
+
+			this.currentBean = currentBean;
+		}
+
+		@Override
+		public String getName(String propertyName, Object object) {
+			return super.getName(propertyName, this.currentBean);
 		}
 	}
 }
