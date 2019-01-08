@@ -36,7 +36,7 @@ public class AnnotationPropertyNodeNameProvider implements PropertyNodeNameProvi
 
 		Field field = getField( propertyName, object );
 
-		if ( field.isAnnotationPresent( annotationType ) ) {
+		if ( field != null && field.isAnnotationPresent( annotationType ) ) {
 			Annotation a = field.getAnnotation( annotationType );
 
 			try {

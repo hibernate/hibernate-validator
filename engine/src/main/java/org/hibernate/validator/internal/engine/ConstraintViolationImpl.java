@@ -8,10 +8,14 @@ package org.hibernate.validator.internal.engine;
 
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
 
@@ -19,6 +23,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.engine.HibernateConstraintViolation;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.path.PropertyNode;
 
 /**
  * @author Emmanuel Bernard
@@ -33,7 +38,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	private final T rootBean;
 	private final Object value;
 	private final Path propertyPath;
-	private final List<String> resolvedPropertyNames;
 	private final Object leafBeanInstance;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private final String messageTemplate;
@@ -54,7 +58,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 			Object leafBeanInstance,
 			Object value,
 			Path propertyPath,
-			List<String> resolvedPropertyNames,
 			ConstraintDescriptor<?> constraintDescriptor,
 			Object dynamicPayload) {
 		return new ConstraintViolationImpl<>(
@@ -67,7 +70,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 				leafBeanInstance,
 				value,
 				propertyPath,
-				resolvedPropertyNames,
 				constraintDescriptor,
 				null,
 				null,
@@ -97,7 +99,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 				leafBeanInstance,
 				value,
 				propertyPath,
-				List.of(),
 				constraintDescriptor,
 				executableParameters,
 				null,
@@ -127,7 +128,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 				leafBeanInstance,
 				value,
 				propertyPath,
-				List.of(),
 				constraintDescriptor,
 				null,
 				executableReturnValue,
@@ -144,7 +144,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 			Object leafBeanInstance,
 			Object value,
 			Path propertyPath,
-			List<String> resolvedPropertyNames,
 			ConstraintDescriptor<?> constraintDescriptor,
 			Object[] executableParameters,
 			Object executableReturnValue,
@@ -156,7 +155,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		this.rootBean = rootBean;
 		this.value = value;
 		this.propertyPath = propertyPath;
-		this.resolvedPropertyNames = resolvedPropertyNames;
 		this.leafBeanInstance = leafBeanInstance;
 		this.constraintDescriptor = constraintDescriptor;
 		this.rootBeanClass = rootBeanClass;
@@ -254,8 +252,14 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	}
 
 	@Override
-	public List<String> getResolvedPropertyPath() {
-		return resolvedPropertyNames;
+	public String getResolvedPropertyPath() {
+		return StreamSupport.stream(this.propertyPath.spliterator(), false)
+			.map(path -> {
+				if (path.getKind() == ElementKind.PROPERTY) {
+					return path.as(PropertyNode.class).getResolvedName();
+				}
+				return path.getName();
+			}).collect(Collectors.joining("."));
 	}
 
 	/**

@@ -8,10 +8,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.engine.HibernateConstraintViolation;
@@ -28,14 +30,39 @@ public class AnnotationPropertyNodeNameProviderTest {
 				.buildValidatorFactory();
 		Validator validator = validatorFactory.getValidator();
 
-		Car testInstance = new Car( "BMW" );
+		Car testInstance = new Car( "BMW",100 );
 
-		Set<ConstraintViolation<Car>> violations = validator.validateProperty( testInstance, "model" );
+		Set<ConstraintViolation<Car>> violations = validator.validateProperty( testInstance, "model.name" );
 		ConstraintViolation<Car> violation = violations.iterator().next();
 		HibernateConstraintViolation<Car> hibernateViolation = violation.unwrap( HibernateConstraintViolation.class );
 
-		assertEquals( 1, hibernateViolation.getResolvedPropertyPath().size() );
-		assertEquals( "car_model_field", hibernateViolation.getResolvedPropertyPath().get( 0 ) );
+		assertEquals(hibernateViolation.getResolvedPropertyPath(), "null.car_model_field");
+
+
+
+//		assertEquals( 2, hibernateViolation.getResolvedPropertyPath().size() );
+//
+//		assertEquals( "model", hibernateViolation.getResolvedPropertyPath().get( 0 ) );
+//		assertEquals( "car_model_field", hibernateViolation.getResolvedPropertyPath().get( 1 ) );
+	}
+
+
+	@Test
+	public void validate() {
+		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+			.configure()
+			.propertyNodeNameProvider( new AnnotationPropertyNodeNameProvider( AlternativePropertyName.class ) )
+			.buildValidatorFactory();
+		Validator validator = validatorFactory.getValidator();
+
+		Car testInstance = new Car( "BMW", 100 );
+
+		Set<ConstraintViolation<Car>> violations = validator.validate( testInstance );
+		ConstraintViolation<Car> violation = violations.iterator().next();
+		HibernateConstraintViolation<Car> hibernateViolation = violation.unwrap( HibernateConstraintViolation.class );
+
+		assertEquals(hibernateViolation.getResolvedPropertyPath(), "model.car_model_field");
+
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -45,12 +72,43 @@ public class AnnotationPropertyNodeNameProviderTest {
 	}
 
 	private static class Car {
+		@Valid
+		public Model model;
+
+		@Valid
+		public Engine engine;
+
+		Car(String model, int horsePower) {
+			this.model = new Model(model);
+			this.engine = new Engine(horsePower);
+		}
+	}
+
+	private static class Model {
 		@Max(2)
 		@AlternativePropertyName(value = "car_model_field")
-		public String model;
+		public String name;
 
-		Car(String model) {
-			this.model = model;
+		public Model(String model) {
+			this.name = model;
+		}
+	}
+
+	private static class Engine {
+		@Valid
+		private HorsePower horsePower;
+
+		public Engine(int horsePower) {
+			this.horsePower = new HorsePower(horsePower);
+		}
+	}
+
+	private static class HorsePower {
+		@Max(500)
+		private int power;
+
+		public HorsePower(int power) {
+			this.power = power;
 		}
 	}
 }

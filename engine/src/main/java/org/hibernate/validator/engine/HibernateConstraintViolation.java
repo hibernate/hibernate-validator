@@ -30,5 +30,5 @@ public interface HibernateConstraintViolation<T> extends ConstraintViolation<T> 
 	/**
 	 * @return the property path to the value from {@code rootBean}
 	 */
-	List<String> getResolvedPropertyPath();
+	String getResolvedPropertyPath();
 }

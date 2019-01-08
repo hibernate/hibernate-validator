@@ -17,6 +17,7 @@ import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.properties.Field;
 import org.hibernate.validator.internal.properties.Getter;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.StringHelper;
 
 /**
@@ -90,7 +91,7 @@ public interface ConstraintLocation {
 	/**
 	 * Appends a node representing this location to the given property path.
 	 */
-	void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path);
+	void appendTo(ExecutableParameterNameProvider parameterNameProvider, ExecutablePropertyNodeNameProvider propertyNodeNameProvider, PathImpl path);
 
 	/**
 	 * Obtains the value of this location from the parent. The type of the passed parent depends on the location type,

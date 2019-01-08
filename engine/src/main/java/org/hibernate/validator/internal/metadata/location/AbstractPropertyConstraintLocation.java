@@ -12,6 +12,8 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.properties.PropertyAccessor;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 /**
  * An abstract property constraint location.
@@ -53,8 +55,9 @@ public abstract class AbstractPropertyConstraintLocation<T extends Property> imp
 	}
 
 	@Override
-	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path) {
-		path.addPropertyNode( property.getPropertyName() );
+	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, ExecutablePropertyNodeNameProvider propertyNodeNameProvider, PathImpl path) {
+		final String resolvedName = propertyNodeNameProvider.getName(property.getPropertyName(), property.getType());
+		path.addPropertyNode( property.getPropertyName(), resolvedName );
 	}
 
 	@Override

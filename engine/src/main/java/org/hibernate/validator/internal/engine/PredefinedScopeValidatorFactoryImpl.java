@@ -54,7 +54,7 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.PropertyNodeNameProviderWrapper;
+import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -115,7 +115,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				configurationState.getMessageInterpolator(),
 				configurationState.getTraversableResolver(),
 				new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() ),
-				new PropertyNodeNameProviderWrapper( hibernateSpecificConfig.getDefaultPropertyNodeNameProvider() ),
+				new ExecutablePropertyNodeNameProvider( hibernateSpecificConfig.getDefaultPropertyNodeNameProvider() ),
 				configurationState.getClockProvider(),
 				determineTemporalValidationTolerance( configurationState, properties ),
 				determineScriptEvaluatorFactory( configurationState, properties, externalClassLoader ),

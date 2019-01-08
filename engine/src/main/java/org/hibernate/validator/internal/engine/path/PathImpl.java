@@ -113,11 +113,11 @@ public final class PathImpl implements Path, Serializable {
 		return new PathImpl( nodeList.subList( 0, nodeList.size() - 1 ) );
 	}
 
-	public NodeImpl addPropertyNode(String nodeName) {
+	public NodeImpl addPropertyNode(String nodeName, String resolvedNodeName) {
 		requiresWriteableNodeList();
 
 		NodeImpl parent = currentLeafNode;
-		currentLeafNode = NodeImpl.createPropertyNode( nodeName, parent );
+		currentLeafNode = NodeImpl.createPropertyNode( nodeName, resolvedNodeName, parent );
 		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
@@ -394,7 +394,7 @@ public final class PathImpl implements Path, Serializable {
 				}
 
 				// create the node
-				path.addPropertyNode( value );
+				path.addPropertyNode( value, null );
 
 				// is the node indexable
 				if ( matcher.group( INDEXED_GROUP ) != null ) {

@@ -12,9 +12,11 @@ import java.lang.reflect.TypeVariable;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 /**
  * Type argument constraint location.
@@ -70,8 +72,8 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
-	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path) {
-		delegate.appendTo( parameterNameProvider, path );
+	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, ExecutablePropertyNodeNameProvider propertyNodeNameProvider, PathImpl path) {
+		delegate.appendTo( parameterNameProvider, propertyNodeNameProvider, path );
 	}
 
 	@Override

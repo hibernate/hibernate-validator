@@ -12,6 +12,7 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
+import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 
 /**
  * Provides a unified view on cascadable elements of all kinds, be it properties
@@ -46,7 +47,7 @@ public interface Cascadable {
 	/**
 	 * Appends this cascadable element to the given path.
 	 */
-	void appendTo(PathImpl path);
+	void appendTo(ExecutablePropertyNodeNameProvider provider, PathImpl path);
 
 	/**
 	 * Returns cascading metadata of this cascadable element. Also contains the cascading metadata of the potential

@@ -6,12 +6,11 @@
  */
 package org.hibernate.validator.internal.engine.valuecontext;
 
-import java.util.List;
-
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 
 /**
  * @author Marko Bekhta
@@ -27,29 +26,29 @@ public final class ValueContexts {
 	 */
 	public static <T, V> ValueContext<T, V> getLocalExecutionContextForExecutable(
 			ExecutableParameterNameProvider parameterNameProvider,
-			List<String> resolvedPropertyNames,
+			ExecutablePropertyNodeNameProvider propertyNodeNameProvider,
 			T value,
 			Validatable validatable,
 			PathImpl propertyPath) {
-		return new ValueContext<>( parameterNameProvider, resolvedPropertyNames, value, validatable, propertyPath );
+		return new ValueContext<>( parameterNameProvider, propertyNodeNameProvider, value, validatable, propertyPath );
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T, V> BeanValueContext<T, V> getLocalExecutionContextForBean(
 			ExecutableParameterNameProvider parameterNameProvider,
-			List<String> resolvedPropertyNames,
+			ExecutablePropertyNodeNameProvider propertyNodeNameProvider,
 			T value,
 			BeanMetaData<?> currentBeanMetaData,
 			PathImpl propertyPath) {
-		return new BeanValueContext<>( parameterNameProvider, resolvedPropertyNames, value, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
+		return new BeanValueContext<>( parameterNameProvider, propertyNodeNameProvider, value, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T, V> BeanValueContext<T, V> getLocalExecutionContextForValueValidation(
 			ExecutableParameterNameProvider parameterNameProvider,
-			List<String> resolvedPropertyNames,
+			ExecutablePropertyNodeNameProvider propertyNodeNameProvider,
 			BeanMetaData<?> currentBeanMetaData,
 			PathImpl propertyPath) {
-		return new BeanValueContext<>( parameterNameProvider, resolvedPropertyNames, null, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
+		return new BeanValueContext<>( parameterNameProvider, propertyNodeNameProvider, null, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
 	}
 }

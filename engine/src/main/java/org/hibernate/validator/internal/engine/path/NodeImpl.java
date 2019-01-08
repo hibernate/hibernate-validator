@@ -56,6 +56,7 @@ public class NodeImpl
 	public static final String MAP_VALUE_NODE_NAME = "<map value>";
 
 	private final String name;
+	private final String resolvedName;
 	private final NodeImpl parent;
 	private final boolean isIterable;
 	private final Integer index;
@@ -72,7 +73,7 @@ public class NodeImpl
 	private int hashCode = -1;
 	private String asString;
 
-	private NodeImpl(String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
+	private NodeImpl(String name, String resolvedName, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
 			Integer parameterIndex, Object value, Class<?> containerClass, Integer typeArgumentIndex) {
 		this.name = name;
 		this.parent = parent;
@@ -85,12 +86,14 @@ public class NodeImpl
 		this.parameterIndex = parameterIndex;
 		this.containerClass = containerClass;
 		this.typeArgumentIndex = typeArgumentIndex;
+		this.resolvedName = resolvedName;
 	}
 
 	//TODO It would be nicer if we could return PropertyNode
-	public static NodeImpl createPropertyNode(String name, NodeImpl parent) {
+	public static NodeImpl createPropertyNode(String name, String resolvedName, NodeImpl parent) {
 		return new NodeImpl(
 				name,
+				resolvedName,
 				parent,
 				false,
 				null,
@@ -107,6 +110,7 @@ public class NodeImpl
 	public static NodeImpl createContainerElementNode(String name, NodeImpl parent) {
 		return new NodeImpl(
 				name,
+				null,
 				parent,
 				false,
 				null,
@@ -123,6 +127,7 @@ public class NodeImpl
 	public static NodeImpl createParameterNode(String name, NodeImpl parent, int parameterIndex) {
 		return new NodeImpl(
 				name,
+				null,
 				parent,
 				false,
 				null,
@@ -139,6 +144,7 @@ public class NodeImpl
 	public static NodeImpl createCrossParameterNode(NodeImpl parent) {
 		return new NodeImpl(
 				CROSS_PARAMETER_NODE_NAME,
+				null,
 				parent,
 				false,
 				null,
@@ -153,15 +159,16 @@ public class NodeImpl
 	}
 
 	public static NodeImpl createMethodNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null, null, null );
+		return new NodeImpl( name, null, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null, null, null );
 	}
 
 	public static NodeImpl createConstructorNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null, null, null );
+		return new NodeImpl( name, null, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null, null, null );
 	}
 
 	public static NodeImpl createBeanNode(NodeImpl parent) {
 		return new NodeImpl(
+				null,
 				null,
 				parent,
 				false,
@@ -179,6 +186,7 @@ public class NodeImpl
 	public static NodeImpl createReturnValue(NodeImpl parent) {
 		return new NodeImpl(
 				RETURN_VALUE_NODE_NAME,
+				null,
 				parent,
 				false,
 				null,
@@ -195,6 +203,7 @@ public class NodeImpl
 	public static NodeImpl makeIterable(NodeImpl node) {
 		return new NodeImpl(
 				node.name,
+				node.resolvedName,
 				node.parent,
 				true,
 				null,
@@ -211,6 +220,7 @@ public class NodeImpl
 	public static NodeImpl makeIterableAndSetIndex(NodeImpl node, Integer index) {
 		return new NodeImpl(
 				node.name,
+				node.resolvedName,
 				node.parent,
 				true,
 				index,
@@ -227,6 +237,7 @@ public class NodeImpl
 	public static NodeImpl makeIterableAndSetMapKey(NodeImpl node, Object key) {
 		return new NodeImpl(
 				node.name,
+				node.resolvedName,
 				node.parent,
 				true,
 				null,
@@ -243,6 +254,7 @@ public class NodeImpl
 	public static NodeImpl setPropertyValue(NodeImpl node, Object value) {
 		return new NodeImpl(
 				node.name,
+				node.resolvedName,
 				node.parent,
 				node.isIterable,
 				node.index,
@@ -259,6 +271,7 @@ public class NodeImpl
 	public static NodeImpl setTypeParameter(NodeImpl node, Class<?> containerClass, Integer typeArgumentIndex) {
 		return new NodeImpl(
 				node.name,
+				node.resolvedName,
 				node.parent,
 				node.isIterable,
 				node.index,
@@ -373,6 +386,11 @@ public class NodeImpl
 	@Override
 	public Object getValue() {
 		return value;
+	}
+
+	@Override
+	public String getResolvedName() {
+		return this.resolvedName;
 	}
 
 	@Override

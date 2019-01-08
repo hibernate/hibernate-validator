@@ -17,4 +17,6 @@ public interface PropertyNode extends javax.validation.Path.PropertyNode {
 	 * @return Returns the value of the bean property represented by this node.
 	 */
 	Object getValue();
+
+	String getResolvedName();
 }

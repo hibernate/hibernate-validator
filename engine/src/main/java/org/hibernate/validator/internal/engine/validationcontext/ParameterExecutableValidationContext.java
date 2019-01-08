@@ -116,7 +116,7 @@ public class ParameterExecutableValidationContext<T> extends AbstractValidationC
 
 	@Override
 	protected ConstraintViolation<T> createConstraintViolation(
-			String messageTemplate, String interpolatedMessage, Path propertyPath, List<String> abc, ConstraintDescriptor<?> constraintDescriptor, ValueContext<?, ?> valueContext,
+			String messageTemplate, String interpolatedMessage, Path propertyPath, ConstraintDescriptor<?> constraintDescriptor, ValueContext<?, ?> valueContext,
 			ConstraintViolationCreationContext constraintViolationCreationContext) {
 		return ConstraintViolationImpl.forParameterValidation(
 				messageTemplate,

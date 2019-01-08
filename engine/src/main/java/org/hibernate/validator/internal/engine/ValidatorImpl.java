@@ -69,7 +69,7 @@ import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.PropertyNodeNameProviderWrapper;
+import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -163,7 +163,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 		BeanValueContext<?, Object> valueContext = ValueContexts.getLocalExecutionContextForBean(
 				validatorScopedContext.getParameterNameProvider(),
-				List.of(),
+				validatorScopedContext.getPropertyNodeNameProvider(),
 				object,
 				validationContext.getRootBeanMetaData(),
 				PathImpl.createRootPath()
@@ -749,7 +749,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( value.getClass() );
 		newValueContext = ValueContexts.getLocalExecutionContextForBean(
 				validatorScopedContext.getParameterNameProvider(),
-				List.of(),
+				validatorScopedContext.getPropertyNodeNameProvider(),
 				value,
 				beanMetaData,
 				valueContext.getPropertyPath()
@@ -846,7 +846,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		ValueContext<Object[], Object> cascadingValueContext = ValueContexts.getLocalExecutionContextForExecutable(
 				validatorScopedContext.getParameterNameProvider(),
-				List.of(),
+				validatorScopedContext.getPropertyNodeNameProvider(),
 				parameterValues,
 				executableMetaData.getValidatableParametersMetaData(),
 				PathImpl.createPathForExecutable( executableMetaData )
@@ -979,7 +979,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		valueContext = ValueContexts.getLocalExecutionContextForExecutable(
 				validatorScopedContext.getParameterNameProvider(),
-				List.of(),
+				validatorScopedContext.getPropertyNodeNameProvider(),
 				object,
 				validatable,
 				PathImpl.createPathForExecutable( executableMetaData )
@@ -1023,7 +1023,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		if ( isCascadingRequired ) {
 			cascadingValueContext = ValueContexts.getLocalExecutionContextForExecutable(
 					validatorScopedContext.getParameterNameProvider(),
-					List.of(),
+					validatorScopedContext.getPropertyNodeNameProvider(),
 					value,
 					executableMetaData.getReturnValueMetaData(),
 					PathImpl.createPathForExecutable( executableMetaData )
@@ -1137,19 +1137,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		BeanMetaData<?> beanMetaData = validationContext.getRootBeanMetaData();
 		Object value = validationContext.getRootBean();
 		PropertyMetaData propertyMetaData = null;
-		PropertyNodeNameProviderWrapper nameProvider = validatorScopedContext.getPropertyNodeNameProvider();
-		List<String> resolvedPropertyNames = new ArrayList<>();
 
 		Iterator<Path.Node> propertyPathIter = propertyPath.iterator();
 
-		Type parent = clazz;
 		while ( propertyPathIter.hasNext() ) {
 			// cast is ok, since we are dealing with engine internal classes
 			NodeImpl propertyPathNode = (NodeImpl) propertyPathIter.next();
 			propertyMetaData = getBeanPropertyMetaData( beanMetaData, propertyPathNode );
-			resolvedPropertyNames.add(nameProvider.getName( propertyMetaData.getName(), parent ));
-
-			parent = propertyMetaData.getType();
 
 			// if the property is not the leaf property, we set up the context for the next iteration
 			if ( propertyPathIter.hasNext() ) {
@@ -1200,7 +1194,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		propertyPath.removeLeafNode();
 
-		return ValueContexts.getLocalExecutionContextForBean( validatorScopedContext.getParameterNameProvider(), resolvedPropertyNames, value, beanMetaData, propertyPath );
+		return ValueContexts.getLocalExecutionContextForBean( validatorScopedContext.getParameterNameProvider(), validatorScopedContext.getPropertyNodeNameProvider(), value, beanMetaData, propertyPath );
 	}
 
 	/**
@@ -1252,7 +1246,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		propertyPath.removeLeafNode();
 
-		return ValueContexts.getLocalExecutionContextForValueValidation( validatorScopedContext.getParameterNameProvider(), List.of(), beanMetaData, propertyPath );
+		return ValueContexts.getLocalExecutionContextForValueValidation( validatorScopedContext.getParameterNameProvider(), validatorScopedContext.getPropertyNodeNameProvider(), beanMetaData, propertyPath );
 	}
 
 	private boolean isValidationRequired(BaseBeanValidationContext<?> validationContext,

@@ -20,6 +20,7 @@ import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescripto
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
+import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -95,7 +96,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	}
 
 	@Override
-	public void appendTo(PathImpl path) {
+	public void appendTo(ExecutablePropertyNodeNameProvider provider, PathImpl path) {
 		path.addReturnValueNode();
 	}
 

@@ -6,11 +6,6 @@
  */
 package org.hibernate.validator.internal.engine.valuecontext;
 
-import java.lang.reflect.TypeVariable;
-import java.util.List;
-
-import javax.validation.groups.Default;
-
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
@@ -19,7 +14,11 @@ import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.TypeVariables;
+
+import javax.validation.groups.Default;
+import java.lang.reflect.TypeVariable;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
@@ -33,7 +32,7 @@ public class ValueContext<T, V> {
 
 	private final ExecutableParameterNameProvider parameterNameProvider;
 
-	private final List<String> resolvedPropertyNames;
+	private final ExecutablePropertyNodeNameProvider propertyNodeNameProvider;
 
 	/**
 	 * The current bean which gets validated. This is the bean hosting the constraints which get validated.
@@ -62,10 +61,11 @@ public class ValueContext<T, V> {
 	 */
 	private ConstraintLocationKind constraintLocationKind;
 
-	ValueContext(ExecutableParameterNameProvider parameterNameProvider, List<String> resolvedPropertyNames,
-			T currentBean, Validatable validatable, PathImpl propertyPath) {
+
+	ValueContext(ExecutableParameterNameProvider parameterNameProvider, ExecutablePropertyNodeNameProvider propertyNodeNameProvider,
+				 T currentBean, Validatable validatable, PathImpl propertyPath) {
 		this.parameterNameProvider = parameterNameProvider;
-		this.resolvedPropertyNames = resolvedPropertyNames;
+		this.propertyNodeNameProvider = propertyNodeNameProvider;
 		this.currentBean = currentBean;
 		this.currentValidatable = validatable;
 		this.propertyPath = propertyPath;
@@ -77,10 +77,6 @@ public class ValueContext<T, V> {
 
 	public final Class<?> getCurrentGroup() {
 		return currentGroup;
-	}
-
-	public List<String> getResolvedPropertyNames() {
-		return resolvedPropertyNames;
 	}
 
 	public final T getCurrentBean() {
@@ -100,13 +96,13 @@ public class ValueContext<T, V> {
 
 	public final void appendNode(Cascadable node) {
 		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		node.appendTo( newPath );
+		node.appendTo(propertyNodeNameProvider.create(currentBean), newPath );
 		propertyPath = newPath;
 	}
 
 	public final void appendNode(ConstraintLocation location) {
 		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		location.appendTo( parameterNameProvider, newPath );
+		location.appendTo( parameterNameProvider, propertyNodeNameProvider.create(currentBean), newPath );
 		propertyPath = newPath;
 	}
 
