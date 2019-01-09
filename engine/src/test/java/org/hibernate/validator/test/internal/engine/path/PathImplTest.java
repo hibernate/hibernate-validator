@@ -50,6 +50,7 @@ import org.testng.annotations.Test;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public class PathImplTest {
+	
 	@Test
 	public void testParsing() {
 		String property = "orders[3].deliveryAddress.addressline[1]";
