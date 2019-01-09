@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal;
+package org.hibernate.validator.test.spi.nodenameprovider;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -13,20 +13,21 @@ import java.util.Objects;
 
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
-public class AnnotationPropertyNodeNameProvider implements PropertyNodeNameProvider, Serializable {
+class AnnotationPropertyNodeNameProvider implements PropertyNodeNameProvider, Serializable {
 	private static final String VALUE = "value";
 
 	private final Class<? extends Annotation> annotationType;
 	private final String annotationMemberName;
 
-	public AnnotationPropertyNodeNameProvider(Class<? extends Annotation> annotationType, String annotationMemberName) {
+	private AnnotationPropertyNodeNameProvider(Class<? extends Annotation> annotationType,
+			String annotationMemberName) {
 		Objects.requireNonNull( annotationType );
 
 		this.annotationType = annotationType;
 		this.annotationMemberName = annotationMemberName;
 	}
 
-	public AnnotationPropertyNodeNameProvider(Class<? extends Annotation> annotationType) {
+	AnnotationPropertyNodeNameProvider(Class<? extends Annotation> annotationType) {
 		this( annotationType, VALUE );
 	}
 
