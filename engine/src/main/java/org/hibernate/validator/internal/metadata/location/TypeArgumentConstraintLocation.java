@@ -16,7 +16,6 @@ import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
-import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 /**
  * Type argument constraint location.

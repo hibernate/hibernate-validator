@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.engine.validationcontext;
 
 import java.lang.reflect.Executable;
-import java.util.List;
 import java.util.Optional;
 
 import javax.validation.ConstraintValidatorFactory;

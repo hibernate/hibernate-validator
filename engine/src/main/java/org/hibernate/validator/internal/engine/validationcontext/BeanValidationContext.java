@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.internal.engine.validationcontext;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;

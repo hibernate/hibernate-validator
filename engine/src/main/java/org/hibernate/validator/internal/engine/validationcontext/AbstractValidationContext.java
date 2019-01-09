@@ -12,7 +12,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 

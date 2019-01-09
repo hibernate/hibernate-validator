@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.internal.engine.valuecontext;
 
+import java.lang.reflect.TypeVariable;
+
+import javax.validation.groups.Default;
+
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
@@ -17,9 +21,6 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
-
-import javax.validation.groups.Default;
-import java.lang.reflect.TypeVariable;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
