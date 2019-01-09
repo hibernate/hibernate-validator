@@ -13,7 +13,6 @@ import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.TypeHelper;
-import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 /**
  * Bean constraint location (i.e. for a class-level constraint).

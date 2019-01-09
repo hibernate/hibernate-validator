@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.engine.valuecontext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 /**

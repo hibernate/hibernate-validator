@@ -98,13 +98,13 @@ public class ValueContext<T, V> {
 
 	public final void appendNode(Cascadable node) {
 		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		node.appendTo(new ExecutablePropertyNodeNameProvider(propertyNodeNameProvider, currentBean), newPath );
+		node.appendTo( new ExecutablePropertyNodeNameProvider( propertyNodeNameProvider, currentBean ), newPath );
 		propertyPath = newPath;
 	}
 
 	public final void appendNode(ConstraintLocation location) {
 		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		location.appendTo( parameterNameProvider, new ExecutablePropertyNodeNameProvider(propertyNodeNameProvider, currentBean), newPath );
+		location.appendTo( parameterNameProvider, new ExecutablePropertyNodeNameProvider( propertyNodeNameProvider, currentBean ), newPath );
 		propertyPath = newPath;
 	}
 

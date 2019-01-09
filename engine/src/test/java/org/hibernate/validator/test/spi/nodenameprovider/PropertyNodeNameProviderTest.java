@@ -1,6 +1,12 @@
+/*
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.test.spi.nodenameprovider;
 
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -17,7 +23,7 @@ import javax.validation.constraints.Max;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.engine.HibernateConstraintViolation;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 public class PropertyNodeNameProviderTest {
 	@Test
