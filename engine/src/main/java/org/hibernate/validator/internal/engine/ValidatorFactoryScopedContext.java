@@ -40,7 +40,7 @@ public class ValidatorFactoryScopedContext {
 	/**
 	 *  Docs
 	 */
-	private final ExecutablePropertyNodeNameProvider propertyNodeNameProvider;
+	private final PropertyNodeNameProvider propertyNodeNameProvider;
 
 	/**
 	 * Provider for the current time when validating {@code @Future} or {@code @Past}
@@ -82,7 +82,7 @@ public class ValidatorFactoryScopedContext {
 	ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
-			ExecutablePropertyNodeNameProvider propertyNodeNameProvider,
+			PropertyNodeNameProvider propertyNodeNameProvider,
 			ClockProvider clockProvider,
 			Duration temporalValidationTolerance,
 			ScriptEvaluatorFactory scriptEvaluatorFactory,
@@ -98,7 +98,7 @@ public class ValidatorFactoryScopedContext {
 	private ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
-			ExecutablePropertyNodeNameProvider propertyNodeNameProvider,
+			PropertyNodeNameProvider propertyNodeNameProvider,
 			ClockProvider clockProvider,
 			Duration temporalValidationTolerance,
 			ScriptEvaluatorFactory scriptEvaluatorFactory,
@@ -131,7 +131,7 @@ public class ValidatorFactoryScopedContext {
 		return this.parameterNameProvider;
 	}
 
-	public ExecutablePropertyNodeNameProvider getPropertyNodeNameProvider() {
+	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
 		return this.propertyNodeNameProvider;
 	}
 
@@ -169,7 +169,7 @@ public class ValidatorFactoryScopedContext {
 		private MessageInterpolator messageInterpolator;
 		private TraversableResolver traversableResolver;
 		private ExecutableParameterNameProvider parameterNameProvider;
-		private ExecutablePropertyNodeNameProvider propertyNodeNameProvider;
+		private PropertyNodeNameProvider propertyNodeNameProvider;
 		private ClockProvider clockProvider;
 		private ScriptEvaluatorFactory scriptEvaluatorFactory;
 		private Duration temporalValidationTolerance;
@@ -231,7 +231,7 @@ public class ValidatorFactoryScopedContext {
 				this.propertyNodeNameProvider = defaultContext.propertyNodeNameProvider;
 			}
 			else {
-				this.propertyNodeNameProvider = new ExecutablePropertyNodeNameProvider( propertyNodeNameProvider );
+				this.propertyNodeNameProvider = propertyNodeNameProvider;
 			}
 			return this;
 		}

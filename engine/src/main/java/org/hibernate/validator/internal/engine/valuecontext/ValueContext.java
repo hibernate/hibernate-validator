@@ -16,6 +16,7 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation.Con
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.TypeVariables;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 import javax.validation.groups.Default;
 import java.lang.reflect.TypeVariable;
@@ -32,7 +33,7 @@ public class ValueContext<T, V> {
 
 	private final ExecutableParameterNameProvider parameterNameProvider;
 
-	private final ExecutablePropertyNodeNameProvider propertyNodeNameProvider;
+	private final PropertyNodeNameProvider propertyNodeNameProvider;
 
 	/**
 	 * The current bean which gets validated. This is the bean hosting the constraints which get validated.
@@ -62,7 +63,7 @@ public class ValueContext<T, V> {
 	private ConstraintLocationKind constraintLocationKind;
 
 
-	ValueContext(ExecutableParameterNameProvider parameterNameProvider, ExecutablePropertyNodeNameProvider propertyNodeNameProvider,
+	ValueContext(ExecutableParameterNameProvider parameterNameProvider, PropertyNodeNameProvider propertyNodeNameProvider,
 				 T currentBean, Validatable validatable, PathImpl propertyPath) {
 		this.parameterNameProvider = parameterNameProvider;
 		this.propertyNodeNameProvider = propertyNodeNameProvider;
@@ -96,13 +97,13 @@ public class ValueContext<T, V> {
 
 	public final void appendNode(Cascadable node) {
 		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		node.appendTo(new InternalExecutablePropertyNodeNameProvider(propertyNodeNameProvider, currentBean), newPath );
+		node.appendTo(new ExecutablePropertyNodeNameProvider(propertyNodeNameProvider, currentBean), newPath );
 		propertyPath = newPath;
 	}
 
 	public final void appendNode(ConstraintLocation location) {
 		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		location.appendTo( parameterNameProvider, new InternalExecutablePropertyNodeNameProvider(propertyNodeNameProvider, currentBean), newPath );
+		location.appendTo( parameterNameProvider, new ExecutablePropertyNodeNameProvider(propertyNodeNameProvider, currentBean), newPath );
 		propertyPath = newPath;
 	}
 
@@ -208,21 +209,6 @@ public class ValueContext<T, V> {
 
 		public V getCurrentValue() {
 			return currentValue;
-		}
-	}
-
-	private static class InternalExecutablePropertyNodeNameProvider extends ExecutablePropertyNodeNameProvider {
-		private final Object currentBean;
-
-		private InternalExecutablePropertyNodeNameProvider(ExecutablePropertyNodeNameProvider provider, Object currentBean) {
-			super(provider.getDelegate());
-
-			this.currentBean = currentBean;
-		}
-
-		@Override
-		public String getName(String propertyName, Object object) {
-			return super.getName(propertyName, this.currentBean);
 		}
 	}
 }

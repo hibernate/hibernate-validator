@@ -6,22 +6,20 @@
  */
 package org.hibernate.validator.internal.util;
 
-import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
-
 import java.io.Serializable;
 
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
+
 public class ExecutablePropertyNodeNameProvider implements Serializable {
-	private final PropertyNodeNameProvider delegate;
+	private final PropertyNodeNameProvider propertyNodeNameProvider;
+	private final Object bean;
 
-	public ExecutablePropertyNodeNameProvider(PropertyNodeNameProvider delegate) {
-		this.delegate = delegate;
+	public ExecutablePropertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider, Object bean) {
+		this.propertyNodeNameProvider = propertyNodeNameProvider;
+		this.bean = bean;
 	}
 
-	public PropertyNodeNameProvider getDelegate() {
-		return this.delegate;
-	}
-
-	public String getName(String propertyName, Object object) {
-		return delegate.getName( propertyName, object );
+	public String getName(String propertyName) {
+		return propertyNodeNameProvider.getName( propertyName, bean );
 	}
 }

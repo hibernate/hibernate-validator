@@ -115,7 +115,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				configurationState.getMessageInterpolator(),
 				configurationState.getTraversableResolver(),
 				new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() ),
-				new ExecutablePropertyNodeNameProvider( hibernateSpecificConfig.getDefaultPropertyNodeNameProvider() ),
+				hibernateSpecificConfig.getDefaultPropertyNodeNameProvider(),
 				configurationState.getClockProvider(),
 				determineTemporalValidationTolerance( configurationState, properties ),
 				determineScriptEvaluatorFactory( configurationState, properties, externalClassLoader ),

@@ -15,6 +15,7 @@ import javax.validation.Validator;
 import org.hibernate.validator.internal.engine.ValidatorFactoryScopedContext;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
@@ -34,7 +35,7 @@ public class ValidatorScopedContext {
 	 */
 	private final ExecutableParameterNameProvider parameterNameProvider;
 
-	private final ExecutablePropertyNodeNameProvider propertyNodeNameProvider;
+	private final PropertyNodeNameProvider propertyNodeNameProvider;
 
 	/**
 	 * Provider for the current time when validating {@code @Future} or {@code @Past}
@@ -88,7 +89,7 @@ public class ValidatorScopedContext {
 		return this.parameterNameProvider;
 	}
 
-	public ExecutablePropertyNodeNameProvider getPropertyNodeNameProvider() {
+	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
 		return propertyNodeNameProvider;
 	}
 

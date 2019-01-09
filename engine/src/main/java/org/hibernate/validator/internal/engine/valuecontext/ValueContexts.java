@@ -11,6 +11,7 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 /**
  * @author Marko Bekhta
@@ -26,7 +27,7 @@ public final class ValueContexts {
 	 */
 	public static <T, V> ValueContext<T, V> getLocalExecutionContextForExecutable(
 			ExecutableParameterNameProvider parameterNameProvider,
-			ExecutablePropertyNodeNameProvider propertyNodeNameProvider,
+			PropertyNodeNameProvider propertyNodeNameProvider,
 			T value,
 			Validatable validatable,
 			PathImpl propertyPath) {
@@ -36,7 +37,7 @@ public final class ValueContexts {
 	@SuppressWarnings("unchecked")
 	public static <T, V> BeanValueContext<T, V> getLocalExecutionContextForBean(
 			ExecutableParameterNameProvider parameterNameProvider,
-			ExecutablePropertyNodeNameProvider propertyNodeNameProvider,
+			PropertyNodeNameProvider propertyNodeNameProvider,
 			T value,
 			BeanMetaData<?> currentBeanMetaData,
 			PathImpl propertyPath) {
@@ -46,7 +47,7 @@ public final class ValueContexts {
 	@SuppressWarnings("unchecked")
 	public static <T, V> BeanValueContext<T, V> getLocalExecutionContextForValueValidation(
 			ExecutableParameterNameProvider parameterNameProvider,
-			ExecutablePropertyNodeNameProvider propertyNodeNameProvider,
+			PropertyNodeNameProvider propertyNodeNameProvider,
 			BeanMetaData<?> currentBeanMetaData,
 			PathImpl propertyPath) {
 		return new BeanValueContext<>( parameterNameProvider, propertyNodeNameProvider, null, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
