@@ -51,7 +51,7 @@ public class AnnotationPropertyNodeNameProvider implements PropertyNodeNameProvi
 	}
 
 	private Field getField(String fieldName, Object object) {
-		for ( Field field : ( (Class) object ).getFields() ) {
+		for ( Field field : object.getClass().getFields() ) {
 			field.setAccessible( true );
 			String name = field.getName();
 

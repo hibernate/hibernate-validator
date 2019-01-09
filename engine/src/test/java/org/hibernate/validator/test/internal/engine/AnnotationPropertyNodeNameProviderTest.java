@@ -37,13 +37,6 @@ public class AnnotationPropertyNodeNameProviderTest {
 		HibernateConstraintViolation<Car> hibernateViolation = violation.unwrap( HibernateConstraintViolation.class );
 
 		assertEquals(hibernateViolation.getResolvedPropertyPath(), "null.car_model_field");
-
-
-
-//		assertEquals( 2, hibernateViolation.getResolvedPropertyPath().size() );
-//
-//		assertEquals( "model", hibernateViolation.getResolvedPropertyPath().get( 0 ) );
-//		assertEquals( "car_model_field", hibernateViolation.getResolvedPropertyPath().get( 1 ) );
 	}
 
 
