@@ -279,9 +279,9 @@ public class ResourceBundleMessageInterpolatorTest {
 				descriptor,
 				null,
 				null,
+				null,
 				Collections.<String, Object>emptyMap(),
-				Collections.<String, Object>emptyMap()
-		);
+				Collections.<String, Object>emptyMap() );
 	}
 
 	private void runInterpolation(boolean cachingEnabled) {

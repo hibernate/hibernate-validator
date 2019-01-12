@@ -228,6 +228,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 				messageTemplate,
 				valueContext.getCurrentValidatedValue(),
 				descriptor,
+				constraintViolationCreationContext.getPath(),
 				constraintViolationCreationContext.getMessageParameters(),
 				constraintViolationCreationContext.getExpressionVariables()
 		);
@@ -293,12 +294,14 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			String messageTemplate,
 			Object validatedValue,
 			ConstraintDescriptor<?> descriptor,
+			Path path,
 			Map<String, Object> messageParameters,
 			Map<String, Object> expressionVariables) {
 		MessageInterpolatorContext context = new MessageInterpolatorContext(
 				descriptor,
 				validatedValue,
 				getRootBeanClass(),
+				path,
 				messageParameters,
 				expressionVariables
 		);

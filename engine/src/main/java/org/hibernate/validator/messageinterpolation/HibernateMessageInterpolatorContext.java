@@ -9,6 +9,7 @@ package org.hibernate.validator.messageinterpolation;
 import java.util.Map;
 
 import javax.validation.MessageInterpolator;
+import javax.validation.Path;
 
 /**
  * Extension to {@code MessageInterpolator.Context} which provides functionality
@@ -40,4 +41,11 @@ public interface HibernateMessageInterpolatorContext extends MessageInterpolator
 	 * @since 5.4.1
 	 */
 	Map<String, Object> getExpressionVariables();
+
+	/**
+	 * @return the path to the validated constraint starting from the root bean
+	 *
+	 * @since 6.1
+	 */
+	Path getPropertyPath();
 }
