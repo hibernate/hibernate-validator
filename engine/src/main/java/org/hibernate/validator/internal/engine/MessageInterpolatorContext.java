@@ -11,6 +11,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.toImmutable
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
+import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.util.logging.Log;
@@ -33,19 +34,22 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private final Object validatedValue;
 	private final Class<?> rootBeanType;
+	private final Path propertyPath;
 	@Immutable
 	private final Map<String, Object> messageParameters;
 	@Immutable
 	private final Map<String, Object> expressionVariables;
 
 	public MessageInterpolatorContext(ConstraintDescriptor<?> constraintDescriptor,
-			Object validatedValue,
-			Class<?> rootBeanType,
-			Map<String, Object> messageParameters,
-			Map<String, Object> expressionVariables) {
+					Object validatedValue,
+					Class<?> rootBeanType,
+					Path propertyPath,
+					Map<String, Object> messageParameters,
+					Map<String, Object> expressionVariables) {
 		this.constraintDescriptor = constraintDescriptor;
 		this.validatedValue = validatedValue;
 		this.rootBeanType = rootBeanType;
+		this.propertyPath = propertyPath;
 		this.messageParameters = toImmutableMap( messageParameters );
 		this.expressionVariables = toImmutableMap( expressionVariables );
 	}
@@ -73,6 +77,11 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 	@Override
 	public Map<String, Object> getExpressionVariables() {
 		return expressionVariables;
+	}
+
+	@Override
+	public Path getPropertyPath() {
+		return propertyPath;
 	}
 
 	@Override
@@ -122,6 +131,8 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 		sb.append( "MessageInterpolatorContext" );
 		sb.append( "{constraintDescriptor=" ).append( constraintDescriptor );
 		sb.append( ", validatedValue=" ).append( validatedValue );
+		sb.append( ", rootBeanType=" ).append( rootBeanType.getName() );
+		sb.append( ", propertyPath=" ).append( propertyPath );
 		sb.append( ", messageParameters=" ).append( messageParameters );
 		sb.append( ", expressionVariables=" ).append( expressionVariables );
 		sb.append( '}' );

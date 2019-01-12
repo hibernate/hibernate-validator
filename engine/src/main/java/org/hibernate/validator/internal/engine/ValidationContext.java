@@ -320,6 +320,7 @@ public class ValidationContext<T> {
 				messageTemplate,
 				localContext.getCurrentValidatedValue(),
 				descriptor,
+				constraintViolationCreationContext.getPath(),
 				constraintViolationCreationContext.getMessageParameters(),
 				constraintViolationCreationContext.getExpressionVariables()
 		);
@@ -451,12 +452,14 @@ public class ValidationContext<T> {
 	private String interpolate(String messageTemplate,
 			Object validatedValue,
 			ConstraintDescriptor<?> descriptor,
+			Path path,
 			Map<String, Object> messageParameters,
 			Map<String, Object> expressionVariables) {
 		MessageInterpolatorContext context = new MessageInterpolatorContext(
 				descriptor,
 				validatedValue,
 				getRootBeanClass(),
+				path,
 				messageParameters,
 				expressionVariables
 		);
