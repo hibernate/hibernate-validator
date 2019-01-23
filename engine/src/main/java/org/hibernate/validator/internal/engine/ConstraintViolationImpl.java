@@ -9,11 +9,8 @@ package org.hibernate.validator.internal.engine;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
 
@@ -21,7 +18,6 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.engine.HibernateConstraintViolation;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.path.PropertyNode;
 
 /**
  * @author Emmanuel Bernard
@@ -247,17 +243,6 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		else {
 			return null;
 		}
-	}
-
-	@Override
-	public String getResolvedPropertyPath() {
-		return StreamSupport.stream( this.propertyPath.spliterator(), false )
-			.map( path -> {
-				if ( path.getKind() == ElementKind.PROPERTY ) {
-					return path.as( PropertyNode.class ).getResolvedName();
-				}
-				return path.getName();
-			} ).collect( Collectors.joining( "." ) );
 	}
 
 	/**

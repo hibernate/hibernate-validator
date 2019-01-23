@@ -212,7 +212,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		@Deprecated
 		public NodeBuilderDefinedContext addNode(String name) {
 			dropLeafNodeIfRequired();
-			propertyPath.addPropertyNode( name, "ConstraintViolationBuilderImpl.addNode" );
+			propertyPath.addPropertyNode( name );
 
 			return new NodeBuilder( messageTemplate, propertyPath );
 		}
@@ -375,7 +375,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 					propertyPath.addBeanNode();
 					break;
 				case PROPERTY:
-					propertyPath.addPropertyNode( leafNodeName, "ConstraintValidatorContextImpl.addLeafNode" );
+					propertyPath.addPropertyNode( leafNodeName );
 					break;
 				case CONTAINER_ELEMENT:
 					propertyPath.setLeafNodeTypeParameter( leafNodeContainerType, leafNodeTypeArgumentIndex );

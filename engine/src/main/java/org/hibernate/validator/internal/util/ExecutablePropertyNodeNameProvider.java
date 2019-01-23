@@ -20,6 +20,6 @@ public class ExecutablePropertyNodeNameProvider implements Serializable {
 	}
 
 	public String getName(String propertyName) {
-		return propertyNodeNameProvider.getName( propertyName, bean );
+		return propertyNodeNameProvider.getName( propertyName, () -> bean );
 	}
 }

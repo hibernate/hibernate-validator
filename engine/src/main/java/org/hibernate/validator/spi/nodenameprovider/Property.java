@@ -6,6 +6,6 @@
  */
 package org.hibernate.validator.spi.nodenameprovider;
 
-public interface PropertyNodeNameProvider {
-	String getName(String propertyName, Property property);
+public interface Property {
+	Object getObject();
 }

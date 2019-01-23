@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
+import org.hibernate.validator.spi.nodenameprovider.Property;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 class AnnotationPropertyNodeNameProvider implements PropertyNodeNameProvider, Serializable {
@@ -32,11 +33,10 @@ class AnnotationPropertyNodeNameProvider implements PropertyNodeNameProvider, Se
 	}
 
 	@Override
-	public String getName(String propertyName, Object object) {
+	public String getName(String propertyName, Property property) {
 		String resolvedName = propertyName;
 
-		Field field = getField( propertyName, object );
-
+		Field field = getField( propertyName, property.getObject() );
 		if ( field != null && field.isAnnotationPresent( annotationType ) ) {
 			Annotation a = field.getAnnotation( annotationType );
 

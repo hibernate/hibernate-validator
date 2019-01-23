@@ -151,12 +151,6 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	ResourceBundleLocator getDefaultResourceBundleLocator();
 
-	S propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider);
-
-	PropertyNodeNameProvider getDefaultPropertyNodeNameProvider();
-
-	PropertyNodeNameProvider getPropertyNodeNameProvider();
-
 	/**
 	 * Creates a new constraint mapping which can be used to programmatically configure the constraints for given types. After
 	 * the mapping has been set up, it must be added to this configuration via {@link #addMapping(ConstraintMapping)}.
@@ -343,4 +337,25 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	S getterPropertySelectionStrategy(GetterPropertySelectionStrategy getterPropertySelectionStrategy);
+
+	/**
+	 * Allows to set a property node name provider defining the way how the property node name will be resolved (e.g.
+	 * using the field name).
+	 *
+	 * @param propertyNodeNameProvider the {@link PropertyNodeNameProvider} to be used
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.1.0
+	 */
+	S propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider);
+
+	/**
+	 * Returns the property node name provider for this configuration.
+	 *
+	 * @return property node name provider instance or {@code null} if not defined
+	 *
+	 * @since 6.1.0
+	 */
+	PropertyNodeNameProvider getPropertyNodeNameProvider();
 }

@@ -21,7 +21,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Max;
 
 import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.engine.HibernateConstraintViolation;
+import org.hibernate.validator.constraints.Length;
 
 import org.testng.annotations.Test;
 
@@ -38,9 +38,8 @@ public class PropertyNodeNameProviderTest {
 
 		Set<ConstraintViolation<Car>> violations = validator.validateProperty( testInstance, "model.name" );
 		ConstraintViolation<Car> violation = violations.iterator().next();
-		HibernateConstraintViolation<Car> hibernateViolation = violation.unwrap( HibernateConstraintViolation.class );
 
-		assertEquals( hibernateViolation.getResolvedPropertyPath(), "null.car_model_field" );
+		assertEquals( violation.getPropertyPath().toString(), "model.car_model_field" );
 	}
 
 	@Test
@@ -55,10 +54,8 @@ public class PropertyNodeNameProviderTest {
 
 		Set<ConstraintViolation<Car>> violations = validator.validate( testInstance );
 		ConstraintViolation<Car> violation = violations.iterator().next();
-		HibernateConstraintViolation<Car> hibernateViolation = violation.unwrap( HibernateConstraintViolation.class );
 
-		assertEquals( hibernateViolation.getResolvedPropertyPath(), "model.car_model_field" );
-
+		assertEquals( violation.getPropertyPath().toString(), "model.car_model_field" );
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -81,7 +78,7 @@ public class PropertyNodeNameProviderTest {
 	}
 
 	private static class Model {
-		@Max(2)
+		@Length(max = 2)
 		@AlternativePropertyName(value = "car_model_field")
 		public String name;
 

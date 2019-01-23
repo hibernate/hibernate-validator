@@ -55,8 +55,7 @@ public abstract class AbstractPropertyConstraintLocation<T extends Property> imp
 
 	@Override
 	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, ExecutablePropertyNodeNameProvider propertyNodeNameProvider, PathImpl path) {
-		final String resolvedName = propertyNodeNameProvider.getName( property.getPropertyName() );
-		path.addPropertyNode( property.getPropertyName(), resolvedName );
+		path.addPropertyNode( propertyNodeNameProvider.getName( property.getPropertyName() ) );
 	}
 
 	@Override

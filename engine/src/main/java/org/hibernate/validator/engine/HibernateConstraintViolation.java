@@ -24,9 +24,4 @@ public interface HibernateConstraintViolation<T> extends ConstraintViolation<T> 
 	 * if the given type has been set.
 	 */
 	<C> C getDynamicPayload(Class<C> type);
-
-	/**
-	 * @return the property path to the value from {@code rootBean}
-	 */
-	String getResolvedPropertyPath();
 }

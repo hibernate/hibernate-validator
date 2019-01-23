@@ -552,11 +552,6 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	}
 
 	@Override
-	public PropertyNodeNameProvider getDefaultPropertyNodeNameProvider() {
-		return defaultPropertyNodeNameProvider;
-	}
-
-	@Override
 	public ClockProvider getDefaultClockProvider() {
 		return defaultClockProvider;
 	}
