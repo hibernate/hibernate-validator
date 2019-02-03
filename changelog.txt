@@ -1,6 +1,13 @@
 Hibernate Validator Changelog
 =============================
 
+5.4.3.Final (03-02-2019)
+-------------------------
+
+** Bug
+    * HV-1690 - engine     - Fix concurrency issue when using multiple custom constraint validator factories
+    * HV-1650 - validators - French translations are badly encoded
+
 5.4.2.Final (19-10-2017)
 -------------------------
 
