@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.util.logging;
 
 import static org.jboss.logging.Logger.Level.DEBUG;
+import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 
@@ -21,6 +22,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.ServiceConfigurationError;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
@@ -881,4 +883,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 250, value = "Uninitialized locale: %s. Please register your locale as a locale to initialize when initializing your ValidatorFactory.")
 	ValidationException uninitializedLocale(Locale locale);
+
+	@LogMessage(level = ERROR)
+	@Message(id = 251, value = "An error occurred while loading an instance of service %s.")
+	void unableToLoadInstanceOfService(String serviceName, @Cause ServiceConfigurationError e);
 }

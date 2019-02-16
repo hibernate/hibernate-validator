@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.internal.util.privilegedactions;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import java.lang.invoke.MethodHandles;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,6 +25,8 @@ public class GetInstancesFromServiceLoader<T> implements PrivilegedAction<List<T
 	private final ClassLoader primaryClassLoader;
 
 	private final Class<T> clazz;
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private GetInstancesFromServiceLoader(ClassLoader primaryClassLoader, Class<T> clazz) {
 		this.primaryClassLoader = primaryClassLoader;
@@ -57,6 +63,8 @@ public class GetInstancesFromServiceLoader<T> implements PrivilegedAction<List<T
 				// ignore, because it can happen when multiple
 				// services are present and some of them are not class loader
 				// compatible with our API.
+				// log an error still as it can hide a legitimate issue (see HV-1689)
+				LOG.unableToLoadInstanceOfService( loader.getClass().getName(), e );
 			}
 		}
 		return instances;
