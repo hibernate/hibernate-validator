@@ -3,6 +3,7 @@ Ahmed Al Hafoudh
 Alaa Nassef
 Andrey Derevyanko
 Andrey Rodionov
+Asutosh Pandya
 Benson Margulies
 Brent Douglas
 Carlos Vara
@@ -57,6 +58,7 @@ Sebastian Bayerl
 Shahram Goodarzi
 Shane Bryzak
 Shelly McGowan
+Sjaak Derksen
 Steve Ebersole
 Strong Liu
 Tadhg Pearson
