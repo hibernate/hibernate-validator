@@ -70,7 +70,7 @@ public class CrossParameterConstraintValidatorContextImpl extends ConstraintVali
 		}
 
 		private void dropLeafNode() {
-			propertyPath = propertyPath.getPathWithoutLeafNode();
+			propertyPath = PathImpl.createCopyWithoutLeafNode( propertyPath );
 		}
 	}
 }

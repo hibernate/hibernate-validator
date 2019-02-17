@@ -247,7 +247,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		 */
 		private void dropLeafNodeIfRequired() {
 			if ( propertyPath.getLeafNode().getKind() == ElementKind.BEAN ) {
-				propertyPath = propertyPath.getPathWithoutLeafNode();
+				propertyPath = PathImpl.createCopyWithoutLeafNode( propertyPath );
 			}
 		}
 	}

@@ -1277,7 +1277,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			return true;
 		}
 
-		Path pathToObject = path.getPathWithoutLeafNode();
+		Path pathToObject = PathImpl.createCopyWithoutLeafNode( path );
 		try {
 			return validationContext.getTraversableResolver().isReachable(
 					traversableObject,
@@ -1314,7 +1314,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			return false;
 		}
 
-		Path pathToObject = path.getPathWithoutLeafNode();
+		Path pathToObject = PathImpl.createCopyWithoutLeafNode( path );
 		try {
 			return validationContext.getTraversableResolver().isCascadable(
 					traversableObject,
