@@ -879,6 +879,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 250, value = "Uninitialized locale: %s. Please register your locale as a locale to initialize when initializing your ValidatorFactory.")
 	ValidationException uninitializedLocale(Locale locale);
 
-	@Message(id = 251, value = "An error occurred while loading an instance of service .")
-	void getServiceConfigurationErrorException(@FormatWith(ServiceLoader.class) Class<?> service, @Cause ServiceConfigurationError e);
+	@Message(id = 251, value = "An error occurred while loading an instance of service %s.")
+	void getServiceConfigurationErrorException(String serviceName, @Cause ServiceConfigurationError e);
 }
