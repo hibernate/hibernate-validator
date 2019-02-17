@@ -18,7 +18,11 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.time.Duration;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.ServiceConfigurationError;
 import java.util.regex.PatternSyntaxException;
 
 import javax.validation.ClockProvider;
@@ -879,6 +883,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 250, value = "Uninitialized locale: %s. Please register your locale as a locale to initialize when initializing your ValidatorFactory.")
 	ValidationException uninitializedLocale(Locale locale);
 
+	@LogMessage(level = INFO)
 	@Message(id = 251, value = "An error occurred while loading an instance of service %s.")
 	void getServiceConfigurationErrorException(String serviceName, @Cause ServiceConfigurationError e);
 }
