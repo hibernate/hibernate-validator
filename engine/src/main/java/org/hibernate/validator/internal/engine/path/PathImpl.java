@@ -105,12 +105,13 @@ public final class PathImpl implements Path, Serializable {
 		return new PathImpl( path );
 	}
 
-	public boolean isRootPath() {
-		return nodeList.size() == 1 && nodeList.get( 0 ).getName() == null;
+	public static PathImpl createCopyWithoutLeafNode(PathImpl path) {
+		return new PathImpl( path.nodeList.subList( 0, path.nodeList.size() - 1 ) );
 	}
 
-	public PathImpl getPathWithoutLeafNode() {
-		return new PathImpl( nodeList.subList( 0, nodeList.size() - 1 ) );
+
+	public boolean isRootPath() {
+		return nodeList.size() == 1 && nodeList.get( 0 ).getName() == null;
 	}
 
 	public NodeImpl addPropertyNode(String nodeName) {
