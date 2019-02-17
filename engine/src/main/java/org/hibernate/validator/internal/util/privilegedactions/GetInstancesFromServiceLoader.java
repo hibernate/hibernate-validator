@@ -63,7 +63,7 @@ public class GetInstancesFromServiceLoader<T> implements PrivilegedAction<List<T
 				// ignore, because it can happen when multiple
 				// services are present and some of them are not class loader
 				// compatible with our API.
-				LOG.error( "Error while loading Instances {}",e );
+				LOG.getServiceConfigurationErrorException( loader.getClass(), e );
 			}
 		}
 		return instances;
