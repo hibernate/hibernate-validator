@@ -452,6 +452,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 							validationSuccessful = validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz,
 									metaConstraints, defaultSequenceMember );
 						}
+
+						validationContext.markCurrentBeanAsProcessed( valueContext );
+
 						if ( !validationSuccessful ) {
 							break;
 						}
@@ -463,9 +466,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
 				validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, metaConstraints,
 						Group.DEFAULT_GROUP );
+				validationContext.markCurrentBeanAsProcessed( valueContext );
 			}
-
-			validationContext.markCurrentBeanAsProcessed( valueContext );
 
 			// all constraints in the hierarchy has been validated, stop validation.
 			if ( defaultGroupSequenceIsRedefined ) {
