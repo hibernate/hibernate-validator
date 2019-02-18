@@ -157,23 +157,13 @@
                         <id>wildfly-current-integration-test</id>
                         <goals>
                             <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
                         <configuration>
                             <systemPropertyVariables>
                                 <arquillian.launch>wildfly-current</arquillian.launch>
                             </systemPropertyVariables>
                             <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-current.xml</summaryFile>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>verify</id>
-                        <goals>
-                            <goal>verify</goal>
-                        </goals>
-                        <configuration>
-                            <summaryFiles>
-                                <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-current.xml</summaryFile>
-                            </summaryFiles>
                         </configuration>
                     </execution>
                 </executions>
@@ -321,24 +311,13 @@
                                 <id>wildfly-secondary-integration-test</id>
                                 <goals>
                                     <goal>integration-test</goal>
+                                    <goal>verify</goal>
                                 </goals>
                                 <configuration>
                                     <systemPropertyVariables>
                                         <arquillian.launch>wildfly-secondary</arquillian.launch>
                                     </systemPropertyVariables>
                                     <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-secondary.xml</summaryFile>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>verify</id>
-                                <goals>
-                                    <goal>verify</goal>
-                                </goals>
-                                <configuration>
-                                    <summaryFiles>
-                                        <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-current.xml</summaryFile>
-                                        <summaryFile>target/failsafe-reports/failsafe-summary-wildfly-secondary.xml</summaryFile>
-                                    </summaryFiles>
                                 </configuration>
                             </execution>
                         </executions>
