@@ -1,6 +1,26 @@
 Hibernate Validator Changelog
 =============================
 
+6.1.0.Alpha3 (18-02-2019)
+-------------------------
+
+** Bug
+    * HV-1692 - engine       - Custom group sequence might cause StackOverflowError on objects with cycles
+    * HV-1684 - validators   - StackOverflowError with Hibernate Validator 6.0.13.Final
+
+** Improvement
+    * HV-1691 - engine       - IndexOutOfBoundsException in PathImpl
+    * HV-1689 - engine       - In GetInstancesFromServiceLoader, do not hide ServiceConfigurationError 
+    * HV-1687 - engine       - Reduce bootstrap log verbosity
+    * HV-1686 - translations - Fix a few typos in the Dutch translation
+    * HV-1683 - build        - Upgrade javadoc plugin
+
+** New Feature
+    * HV-1657 - engine       - Make the “propertyPath” available via the “HibernateMessageInterpolatorContext”
+
+** Task
+    * HV-1685 - integration  - Upgrade the WildFly versions we generate patches for to 14.0.1.Final and 15.0.0.Final
+
 6.1.0.Alpha2 (19-12-2018)
 -------------------------
 
