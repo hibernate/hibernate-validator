@@ -1,6 +1,12 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.15.Final (18-02-2019)
+-------------------------
+
+** Bug
+    * HV-1692 - engine - Custom group sequence might cause StackOverflowError on objects with cycles
+
 6.0.14.Final (04-01-2019)
 -------------------------
 
