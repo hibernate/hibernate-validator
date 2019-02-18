@@ -86,12 +86,10 @@
         <module>test-utils</module>
         <module>build-config</module>
         <module>engine</module>
-        <module>cdi</module>
         <module>modules</module>
         <module>tck-runner</module>
         <module>annotation-processor</module>
         <module>performance</module>
-        <module>integration</module>
     </modules>
 
     <properties>
@@ -1212,6 +1210,7 @@
                 </pluginManagement>
             </build>
         </profile>
+        <!-- Only run the OSGi tests for JDK < 11 -->
         <profile>
             <id>jdk10-</id>
             <activation>
@@ -1219,6 +1218,18 @@
             </activation>
             <modules>
                 <module>osgi</module>
+            </modules>
+        </profile>
+        <!-- Only run the CDI and WildFly integration tests for JDK < 12 -->
+        <profile>
+            <id>jdk11-</id>
+            <activation>
+                <jdk>(,12)</jdk>
+            </activation>
+            <modules>
+                <!-- see https://github.com/jbossas/jboss-classfilewriter/issues/18 -->
+                <module>cdi</module>
+                <module>integration</module>
             </modules>
         </profile>
         <profile>
