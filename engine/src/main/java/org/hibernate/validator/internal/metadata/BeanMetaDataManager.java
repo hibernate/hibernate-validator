@@ -156,8 +156,20 @@ public class BeanMetaDataManager {
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
 		Contracts.assertNotNull( beanClass, MESSAGES.beanTypeCannotBeNull() );
 
-		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataCache.computeIfAbsent( beanClass,
-				bc -> createBeanMetaData( bc ) );
+		// First, let's do a simple lookup as it's the default case
+		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataCache.get( beanClass );
+
+		if ( beanMetaData != null ) {
+			return beanMetaData;
+		}
+
+		beanMetaData = createBeanMetaData( beanClass );
+		BeanMetaData<T> previousBeanMetaData = (BeanMetaData<T>) beanMetaDataCache.putIfAbsent( beanClass, beanMetaData );
+
+		// we return the previous value if not null
+		if ( previousBeanMetaData != null ) {
+			return previousBeanMetaData;
+		}
 
 		return beanMetaData;
 	}
