@@ -551,6 +551,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private Map<Class<?>, Class<?>> getGroupConversions(ConvertGroup groupConversion, ConvertGroup.List groupConversionList) {
+		if ( groupConversion == null && ( groupConversionList == null || groupConversionList.value().length == 0 ) ) {
+			return Collections.emptyMap();
+		}
+
 		Map<Class<?>, Class<?>> groupConversions = newHashMap();
 
 		if ( groupConversion != null ) {
