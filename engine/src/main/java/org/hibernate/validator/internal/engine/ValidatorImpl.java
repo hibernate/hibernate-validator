@@ -152,11 +152,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 		sanityCheckGroups( groups );
 
-		ValidationContext<T> validationContext = getValidationContextBuilder().forValidate( object );
+		@SuppressWarnings("unchecked")
+		Class<T> rootBeanClass = (Class<T>) object.getClass();
+		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
 
-		if ( !validationContext.getRootBeanMetaData().hasConstraints() ) {
+		if ( !rootBeanMetaData.hasConstraints() ) {
 			return Collections.emptySet();
 		}
+
+		ValidationContext<T> validationContext = getValidationContextBuilder().forValidate( rootBeanMetaData, object );
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 		ValueContext<?, Object> valueContext = ValueContext.getLocalExecutionContext(
@@ -175,13 +179,16 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		sanityCheckPropertyPath( propertyName );
 		sanityCheckGroups( groups );
 
-		ValidationContext<T> validationContext = getValidationContextBuilder().forValidateProperty( object );
+		@SuppressWarnings("unchecked")
+		Class<T> rootBeanClass = (Class<T>) object.getClass();
+		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
 
-		if ( !validationContext.getRootBeanMetaData().hasConstraints() ) {
+		if ( !rootBeanMetaData.hasConstraints() ) {
 			return Collections.emptySet();
 		}
 
 		PathImpl propertyPath = PathImpl.createPathFromString( propertyName );
+		ValidationContext<T> validationContext = getValidationContextBuilder().forValidateProperty( rootBeanMetaData, object );
 		ValueContext<?, Object> valueContext = getValueContextForPropertyValidation( validationContext, propertyPath );
 
 		if ( valueContext.getCurrentBean() == null ) {
@@ -199,11 +206,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		sanityCheckPropertyPath( propertyName );
 		sanityCheckGroups( groups );
 
-		ValidationContext<T> validationContext = getValidationContextBuilder().forValidateValue( beanType );
+		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( beanType );
 
-		if ( !validationContext.getRootBeanMetaData().hasConstraints() ) {
+		if ( !rootBeanMetaData.hasConstraints() ) {
 			return Collections.emptySet();
 		}
+
+		ValidationContext<T> validationContext = getValidationContextBuilder().forValidateValue( rootBeanMetaData );
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
@@ -251,16 +260,21 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private <T> Set<ConstraintViolation<T>> validateParameters(T object, Executable executable, Object[] parameterValues, Class<?>... groups) {
 		sanityCheckGroups( groups );
 
+		@SuppressWarnings("unchecked")
+		Class<T> rootBeanClass = object != null ? (Class<T>) object.getClass() : (Class<T>) executable.getDeclaringClass();
+		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
+
+		if ( !rootBeanMetaData.hasConstraints() ) {
+			return Collections.emptySet();
+		}
+
 		ValidationContext<T> validationContext = getValidationContextBuilder().forValidateParameters(
 				validatorScopedContext.getParameterNameProvider(),
+				rootBeanMetaData,
 				object,
 				executable,
 				parameterValues
 		);
-
-		if ( !validationContext.getRootBeanMetaData().hasConstraints() ) {
-			return Collections.emptySet();
-		}
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
@@ -272,15 +286,20 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private <T> Set<ConstraintViolation<T>> validateReturnValue(T object, Executable executable, Object returnValue, Class<?>... groups) {
 		sanityCheckGroups( groups );
 
+		@SuppressWarnings("unchecked")
+		Class<T> rootBeanClass = object != null ? (Class<T>) object.getClass() : (Class<T>) executable.getDeclaringClass();
+		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
+
+		if ( !rootBeanMetaData.hasConstraints() ) {
+			return Collections.emptySet();
+		}
+
 		ValidationContext<T> validationContext = getValidationContextBuilder().forValidateReturnValue(
+				rootBeanMetaData,
 				object,
 				executable,
 				returnValue
 		);
-
-		if ( !validationContext.getRootBeanMetaData().hasConstraints() ) {
-			return Collections.emptySet();
-		}
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
@@ -313,13 +332,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private ValidationContextBuilder getValidationContextBuilder() {
 		return ValidationContext.getValidationContextBuilder(
-				beanMetaDataManager,
 				constraintValidatorManager,
 				constraintValidatorFactory,
 				validatorScopedContext,
 				TraversableResolvers.wrapWithCachingForSingleValidation( traversableResolver, validatorScopedContext.isTraversableResolverResultCacheEnabled() ),
 				constraintValidatorInitializationContext
-
 		);
 	}
 
