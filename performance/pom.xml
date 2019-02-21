@@ -203,7 +203,7 @@
             </activation>
             <properties>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>6.0.8.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>6.0.15.Final</beanvalidation-impl.version>
             </properties>
             <dependencies>
                 <dependency>
@@ -245,7 +245,7 @@
             <properties>
                 <validation-api.version>1.1.0.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>5.4.2.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>5.4.3.Final</beanvalidation-impl.version>
             </properties>
             <dependencies>
                 <dependency>
