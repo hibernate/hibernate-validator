@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.performance.simple;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -54,13 +52,22 @@ public class SimpleValidation {
 	public static class ValidationState {
 		public volatile Validator validator;
 		public volatile Random random;
+		public volatile Driver[] drivers;
 
 		{
 			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 			validator = factory.getValidator();
 			random = new Random();
+
+			drivers = new Driver[100];
+			for ( int i = 0; i < 100; i++ ) {
+				drivers[i] = new DriverSetup( random ).getDriver();
+			}
 		}
 
+		public Driver nextDriver() {
+			return drivers[random.nextInt( 100 )];
+		}
 	}
 
 	@Benchmark
@@ -71,13 +78,13 @@ public class SimpleValidation {
 	@Warmup(iterations = 10)
 	@Measurement(iterations = 20)
 	public void testSimpleBeanValidation(ValidationState state, Blackhole bh) {
-		DriverSetup driverSetup = new DriverSetup( state );
-		Set<ConstraintViolation<Driver>> violations = state.validator.validate( driverSetup.getDriver() );
-		assertThat( violations ).hasSize( driverSetup.getExpectedViolationCount() );
+		Driver driver = state.nextDriver();
+		Set<ConstraintViolation<Driver>> violations = state.validator.validate( driver );
+		assert driver.getExpectedViolationCount() == violations.size();
 		bh.consume( violations );
 	}
 
-	public class Driver {
+	public static class Driver {
 		@NotNull
 		private String name;
 
@@ -87,10 +94,17 @@ public class SimpleValidation {
 		@AssertTrue
 		private boolean hasDrivingLicense;
 
-		public Driver(String name, int age, boolean hasDrivingLicense) {
+		private int expectedViolationCount;
+
+		public Driver(String name, int age, boolean hasDrivingLicense, int expectedViolationCount) {
 			this.name = name;
 			this.age = age;
 			this.hasDrivingLicense = hasDrivingLicense;
+			this.expectedViolationCount = expectedViolationCount;
+		}
+
+		public int getExpectedViolationCount() {
+			return expectedViolationCount;
 		}
 
 		@Override
@@ -105,34 +119,30 @@ public class SimpleValidation {
 		}
 	}
 
-	private class DriverSetup {
+	private static class DriverSetup {
 		private int expectedViolationCount;
 		private Driver driver;
 
-		public DriverSetup(ValidationState state) {
+		public DriverSetup(Random random) {
 			expectedViolationCount = 0;
 
-			String name = names[state.random.nextInt( 10 )];
+			String name = names[random.nextInt( 10 )];
 			if ( name == null ) {
 				expectedViolationCount++;
 			}
 
-			int randomAge = state.random.nextInt( 100 );
+			int randomAge = random.nextInt( 100 );
 			if ( randomAge < 18 ) {
 				expectedViolationCount++;
 			}
 
-			int rand = state.random.nextInt( 2 );
+			int rand = random.nextInt( 2 );
 			boolean hasLicense = rand == 1;
 			if ( !hasLicense ) {
 				expectedViolationCount++;
 			}
 
-			driver = new Driver( name, randomAge, hasLicense );
-		}
-
-		public int getExpectedViolationCount() {
-			return expectedViolationCount;
+			driver = new Driver( name, randomAge, hasLicense, expectedViolationCount );
 		}
 
 		public Driver getDriver() {
