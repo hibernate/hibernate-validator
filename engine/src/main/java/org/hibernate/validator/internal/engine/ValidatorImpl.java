@@ -161,10 +161,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidate( rootBeanClass, rootBeanMetaData, object );
 
-		if ( !validationContext.getRootBeanMetaData().hasConstraints() ) {
-			return Collections.emptySet();
-		}
-
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 		BeanValueContext<?, Object> valueContext = ValueContexts.getLocalExecutionContextForBean(
 				validatorScopedContext.getParameterNameProvider(),
@@ -270,6 +266,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Class<T> rootBeanClass = object != null ? (Class<T>) object.getClass() : (Class<T>) executable.getDeclaringClass();
 		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
 
+		if ( !rootBeanMetaData.hasConstraints() ) {
+			return Collections.emptySet();
+		}
+
 		ExecutableValidationContext<T> validationContext = getValidationContextBuilder().forValidateParameters(
 				rootBeanClass,
 				rootBeanMetaData,
@@ -277,10 +277,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				executable,
 				parameterValues
 		);
-
-		if ( !validationContext.getRootBeanMetaData().hasConstraints() ) {
-			return Collections.emptySet();
-		}
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
@@ -296,6 +292,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Class<T> rootBeanClass = object != null ? (Class<T>) object.getClass() : (Class<T>) executable.getDeclaringClass();
 		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
 
+		if ( !rootBeanMetaData.hasConstraints() ) {
+			return Collections.emptySet();
+		}
 
 		ExecutableValidationContext<T> validationContext = getValidationContextBuilder().forValidateReturnValue(
 				rootBeanClass,
@@ -304,10 +303,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				executable,
 				returnValue
 		);
-
-		if ( !validationContext.getRootBeanMetaData().hasConstraints() ) {
-			return Collections.emptySet();
-		}
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 

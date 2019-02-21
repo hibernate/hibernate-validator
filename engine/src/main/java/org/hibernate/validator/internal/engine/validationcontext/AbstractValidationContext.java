@@ -6,9 +6,8 @@
  */
 package org.hibernate.validator.internal.engine.validationcontext;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -35,6 +34,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 
 /**
  * Context object keeping track of all required data for a validation call.
@@ -73,26 +73,6 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	private final BeanMetaData<T> rootBeanMetaData;
 
 	/**
-	 * The set of already processed meta constraints per bean - path ({@link BeanPathMetaConstraintProcessedUnit}).
-	 */
-	private final Set<BeanPathMetaConstraintProcessedUnit> processedPathUnits;
-
-	/**
-	 * The set of already processed groups per bean ({@link BeanGroupProcessedUnit}).
-	 */
-	private final Set<BeanGroupProcessedUnit> processedGroupUnits;
-
-	/**
-	 * Maps an object to a list of paths in which it has been validated. The objects are the bean instances.
-	 */
-	private final Map<Object, Set<PathImpl>> processedPathsPerBean;
-
-	/**
-	 * Contains all failing constraints so far.
-	 */
-	private final Set<ConstraintViolation<T>> failingConstraintViolations;
-
-	/**
 	 * The constraint factory which should be used in this context.
 	 */
 	private final ConstraintValidatorFactory constraintValidatorFactory;
@@ -117,6 +97,30 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	 */
 	private final boolean disableAlreadyValidatedBeanTracking;
 
+	/**
+	 * The set of already processed meta constraints per bean - path ({@link BeanPathMetaConstraintProcessedUnit}).
+	 */
+	@Lazy
+	private Set<BeanPathMetaConstraintProcessedUnit> processedPathUnits;
+
+	/**
+	 * The set of already processed groups per bean ({@link BeanGroupProcessedUnit}).
+	 */
+	@Lazy
+	private Set<BeanGroupProcessedUnit> processedGroupUnits;
+
+	/**
+	 * Maps an object to a list of paths in which it has been validated. The objects are the bean instances.
+	 */
+	@Lazy
+	private Map<Object, Set<PathImpl>> processedPathsPerBean;
+
+	/**
+	 * Contains all failing constraints so far.
+	 */
+	@Lazy
+	private Set<ConstraintViolation<T>> failingConstraintViolations;
+
 	protected AbstractValidationContext(
 			ConstraintValidatorManager constraintValidatorManager,
 			ConstraintValidatorFactory constraintValidatorFactory,
@@ -137,11 +141,6 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		this.rootBean = rootBean;
 		this.rootBeanClass = rootBeanClass;
 		this.rootBeanMetaData = rootBeanMetaData;
-
-		this.processedGroupUnits = new HashSet<>();
-		this.processedPathUnits = new HashSet<>();
-		this.processedPathsPerBean = new IdentityHashMap<>();
-		this.failingConstraintViolations = newHashSet();
 
 		this.disableAlreadyValidatedBeanTracking = disableAlreadyValidatedBeanTracking;
 	}
@@ -214,6 +213,10 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 	@Override
 	public Set<ConstraintViolation<T>> getFailingConstraints() {
+		if ( failingConstraintViolations == null ) {
+			return Collections.emptySet();
+		}
+
 		return failingConstraintViolations;
 	}
 
@@ -235,7 +238,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		// at this point we make a copy of the path to avoid side effects
 		Path path = PathImpl.createCopy( constraintViolationCreationContext.getPath() );
 
-		this.failingConstraintViolations.add(
+		getInitializedFailingConstraintViolations().add(
 				createConstraintViolation(
 						messageTemplate,
 						interpolatedMessage,
@@ -263,7 +266,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			return false;
 		}
 
-		return processedPathUnits.contains( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
+		return getInitializedProcessedPathUnits().contains( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
 	}
 
 	@Override
@@ -274,7 +277,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			return;
 		}
 
-		processedPathUnits.add( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
+		getInitializedProcessedPathUnits().add( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
 	}
 
 	@Override
@@ -321,7 +324,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	}
 
 	private boolean isAlreadyValidatedForPath(Object value, PathImpl path) {
-		Set<PathImpl> pathSet = processedPathsPerBean.get( value );
+		Set<PathImpl> pathSet = getInitializedProcessedPathsPerBean().get( value );
 		if ( pathSet == null ) {
 			return false;
 		}
@@ -352,17 +355,52 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	}
 
 	private boolean isAlreadyValidatedForCurrentGroup(Object value, Class<?> group) {
-		return processedGroupUnits.contains( new BeanGroupProcessedUnit( value, group ) );
+		return getInitializedProcessedGroupUnits().contains( new BeanGroupProcessedUnit( value, group ) );
 	}
 
 	private void markCurrentBeanAsProcessedForCurrentPath(Object bean, PathImpl path) {
 		// HV-1031 The path object is mutated as we traverse the object tree, hence copy it before saving it
-		processedPathsPerBean.computeIfAbsent( bean, b -> new HashSet<>() )
-				.add( PathImpl.createCopy( path ) );
+		Map<Object, Set<PathImpl>> processedPathsPerBean = getInitializedProcessedPathsPerBean();
+
+		Set<PathImpl> processedPaths = processedPathsPerBean.get( bean );
+		if ( processedPaths == null ) {
+			processedPaths = new HashSet<>();
+			processedPathsPerBean.put( bean, processedPaths );
+		}
+
+		processedPaths.add( PathImpl.createCopy( path ) );
 	}
 
 	private void markCurrentBeanAsProcessedForCurrentGroup(Object bean, Class<?> group) {
-		processedGroupUnits.add( new BeanGroupProcessedUnit( bean, group ) );
+		getInitializedProcessedGroupUnits().add( new BeanGroupProcessedUnit( bean, group ) );
+	}
+
+	private Set<BeanPathMetaConstraintProcessedUnit> getInitializedProcessedPathUnits() {
+		if ( processedPathUnits == null ) {
+			processedPathUnits = new HashSet<>();
+		}
+		return processedPathUnits;
+	}
+
+	private Set<BeanGroupProcessedUnit> getInitializedProcessedGroupUnits() {
+		if ( processedGroupUnits == null ) {
+			processedGroupUnits = new HashSet<>();
+		}
+		return processedGroupUnits;
+	}
+
+	private Map<Object, Set<PathImpl>> getInitializedProcessedPathsPerBean() {
+		if ( processedPathsPerBean == null ) {
+			processedPathsPerBean = new IdentityHashMap<>();
+		}
+		return processedPathsPerBean;
+	}
+
+	private Set<ConstraintViolation<T>> getInitializedFailingConstraintViolations() {
+		if ( failingConstraintViolations == null ) {
+			failingConstraintViolations = new HashSet<>();
+		}
+		return failingConstraintViolations;
 	}
 
 	private static final class BeanPathMetaConstraintProcessedUnit {
