@@ -47,7 +47,7 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	HibernateValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider);
 
 	/**
-	 * TODO
+	 * @since 6.1
 	 */
 	HibernateValidatorContext propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider);
 

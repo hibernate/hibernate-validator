@@ -50,7 +50,8 @@ public class PropertyMetaDataTest {
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
 				new MethodValidationConfiguration.Builder().build(),
-				new DefaultPropertyNodeNameProvider() );
+				new DefaultPropertyNodeNameProvider()
+		);
 	}
 
 	@Test
