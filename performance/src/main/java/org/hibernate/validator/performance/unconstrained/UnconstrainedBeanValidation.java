@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.performance.unconstrained;
 
-import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import javax.validation.ConstraintViolation;
@@ -48,13 +48,13 @@ public class UnconstrainedBeanValidation {
 	@State(Scope.Benchmark)
 	public static class ValidationState {
 		public volatile Validator validator;
-		public volatile Random random;
+		public volatile ThreadLocalRandom random;
 		private volatile Driver[] drivers;
 
 		{
 			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 			validator = factory.getValidator();
-			random = new Random();
+			random = ThreadLocalRandom.current();
 
 			drivers = new Driver[100];
 			for ( int i = 0; i < 100; i++ ) {
@@ -109,7 +109,7 @@ public class UnconstrainedBeanValidation {
 
 		private Driver driver;
 
-		public DriverSetup(Random random) {
+		public DriverSetup(ThreadLocalRandom random) {
 			String name = names[random.nextInt( 10 )];
 
 			int randomAge = random.nextInt( 100 );
