@@ -19,7 +19,7 @@ public class JacksonAnnotationPropertyNodeNameProvider implements PropertyNodeNa
 
 	@Override
 	public String getName(String propertyName, Property property) {
-		JavaType type = objectMapper.constructType( property.getObject().getClass() );
+		JavaType type = objectMapper.constructType( property.get() );
 		BeanDescription desc = objectMapper.getSerializationConfig().introspect( type );
 
 		return desc.findProperties()

@@ -12,9 +12,9 @@ import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 public class ExecutablePropertyNodeNameProvider implements Serializable {
 	private final PropertyNodeNameProvider propertyNodeNameProvider;
-	private final Object bean;
+	private final Class bean;
 
-	public ExecutablePropertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider, Object bean) {
+	public ExecutablePropertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider, Class bean) {
 		this.propertyNodeNameProvider = propertyNodeNameProvider;
 		this.bean = bean;
 	}

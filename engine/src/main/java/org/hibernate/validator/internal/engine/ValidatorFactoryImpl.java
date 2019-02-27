@@ -170,7 +170,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.constraintCreationContext = new ConstraintCreationContext( constraintHelper, constraintValidatorManager, typeResolutionHelper, valueExtractorManager );
 
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
-		this.javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ) );
+		this.javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ), hibernateSpecificConfig.getPropertyNodeNameProvider() );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( configurationState.getMappingStreams().isEmpty() ) {
@@ -308,7 +308,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						javaBeanHelper,
 						validationOrderGenerator,
 						buildMetaDataProviders(),
-						methodValidationConfiguration
+						methodValidationConfiguration,
+						validatorFactoryScopedContext.getPropertyNodeNameProvider()
 				)
 		);
 

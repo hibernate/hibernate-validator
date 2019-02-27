@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManagerImpl;
@@ -55,10 +56,11 @@ public class BeanMetaDataManagerTest {
 				getDummyConstraintCreationContext(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider() ),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build()
+				new MethodValidationConfiguration.Builder().build(),
+				new DefaultPropertyNodeNameProvider()
 		);
 	}
 

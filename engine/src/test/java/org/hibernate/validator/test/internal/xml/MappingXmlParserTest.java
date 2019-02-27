@@ -23,6 +23,7 @@ import javax.validation.ValidationException;
 import javax.validation.constraints.DecimalMin;
 
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
+import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
@@ -44,7 +45,7 @@ public class MappingXmlParserTest {
 		constraintCreationContext = getDummyConstraintCreationContext();
 		xmlMappingParser = new MappingXmlParser(
 				constraintCreationContext,
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ), null
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider() ), null
 		);
 	}
 

@@ -10,7 +10,6 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 /**
  * @author Marko Bekhta
@@ -26,29 +25,26 @@ public final class ValueContexts {
 	 */
 	public static <T, V> ValueContext<T, V> getLocalExecutionContextForExecutable(
 			ExecutableParameterNameProvider parameterNameProvider,
-			PropertyNodeNameProvider propertyNodeNameProvider,
 			T value,
 			Validatable validatable,
 			PathImpl propertyPath) {
-		return new ValueContext<>( parameterNameProvider, propertyNodeNameProvider, value, validatable, propertyPath );
+		return new ValueContext<>( parameterNameProvider, value, validatable, propertyPath );
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T, V> BeanValueContext<T, V> getLocalExecutionContextForBean(
 			ExecutableParameterNameProvider parameterNameProvider,
-			PropertyNodeNameProvider propertyNodeNameProvider,
 			T value,
 			BeanMetaData<?> currentBeanMetaData,
 			PathImpl propertyPath) {
-		return new BeanValueContext<>( parameterNameProvider, propertyNodeNameProvider, value, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
+		return new BeanValueContext<>( parameterNameProvider, value, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T, V> BeanValueContext<T, V> getLocalExecutionContextForValueValidation(
 			ExecutableParameterNameProvider parameterNameProvider,
-			PropertyNodeNameProvider propertyNodeNameProvider,
 			BeanMetaData<?> currentBeanMetaData,
 			PathImpl propertyPath) {
-		return new BeanValueContext<>( parameterNameProvider, propertyNodeNameProvider, null, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
+		return new BeanValueContext<>( parameterNameProvider, null, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
 	}
 }

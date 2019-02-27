@@ -34,6 +34,7 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 /**
  * This manager is in charge of providing all constraint related meta data
@@ -107,7 +108,8 @@ public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 			JavaBeanHelper javaBeanHelper,
 			ValidationOrderGenerator validationOrderGenerator,
 			List<MetaDataProvider> optionalMetaDataProviders,
-			MethodValidationConfiguration methodValidationConfiguration) {
+			MethodValidationConfiguration methodValidationConfiguration,
+			PropertyNodeNameProvider propertyNodeNameProvider) {
 		this.constraintCreationContext = constraintCreationContext;
 		this.executableHelper = executableHelper;
 		this.parameterNameProvider = parameterNameProvider;
@@ -128,7 +130,8 @@ public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
 				constraintCreationContext,
 				javaBeanHelper,
-				annotationProcessingOptions
+				annotationProcessingOptions,
+				propertyNodeNameProvider
 		);
 		List<MetaDataProvider> tmpMetaDataProviders = new ArrayList<>( optionalMetaDataProviders.size() + 1 );
 		// We add the annotation based metadata provider at the first position so that the entire metadata model is assembled

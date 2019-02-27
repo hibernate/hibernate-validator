@@ -29,6 +29,7 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.path.PathImpl;
@@ -196,10 +197,11 @@ public class PathImplTest {
 				getDummyConstraintCreationContext(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider() ),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build()
+				new MethodValidationConfiguration.Builder().build(),
+				new DefaultPropertyNodeNameProvider()
 		);
 
 		ExecutableMetaData executableMetaData = beanMetaDataManager.getBeanMetaData( Container.class )

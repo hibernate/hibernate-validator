@@ -13,5 +13,7 @@ public interface Property extends Constrainable {
 
 	String getPropertyName();
 
+	String getResolvedPropertyName();
+
 	PropertyAccessor createAccessor();
 }

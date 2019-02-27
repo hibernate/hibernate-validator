@@ -12,7 +12,6 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
@@ -56,7 +55,7 @@ public class ParameterConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
-	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, ExecutablePropertyNodeNameProvider propertyNodeNameProvider, PathImpl path) {
+	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path) {
 		path.addParameterNode( callable.getParameterName( parameterNameProvider, index ), index );
 	}
 

@@ -29,6 +29,7 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
@@ -58,8 +59,9 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	public void setUpProvider() {
 		provider = new AnnotationMetaDataProvider(
 				getDummyConstraintCreationContext(),
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
-				new AnnotationProcessingOptionsImpl()
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider() ),
+				new AnnotationProcessingOptionsImpl(),
+				new DefaultPropertyNodeNameProvider()
 		);
 	}
 
@@ -100,7 +102,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		assertThat( createEvent.getCrossParameterConstraints() ).hasSize( 1 );
 
 		assertThat( createEvent.getCallable() ).isEqualTo(
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() )
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider() )
 						.findDeclaredMethod( Calendar.class, "createEvent", LocalDate.class, LocalDate.class )
 						.get()
 		);

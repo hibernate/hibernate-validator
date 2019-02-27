@@ -24,7 +24,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 
 /**
  * An aggregated view of the constraint related meta data for a single method
@@ -93,7 +92,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	}
 
 	@Override
-	public void appendTo(ExecutablePropertyNodeNameProvider provider, PathImpl path) {
+	public void appendTo(PathImpl path) {
 		path.addParameterNode( getName(), getIndex() );
 	}
 

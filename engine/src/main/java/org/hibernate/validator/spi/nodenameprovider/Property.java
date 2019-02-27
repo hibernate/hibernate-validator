@@ -7,5 +7,5 @@
 package org.hibernate.validator.spi.nodenameprovider;
 
 public interface Property {
-	Object getObject();
+	Class get();
 }

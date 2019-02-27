@@ -36,7 +36,7 @@ class AnnotationPropertyNodeNameProvider implements PropertyNodeNameProvider, Se
 	public String getName(String propertyName, Property property) {
 		String resolvedName = propertyName;
 
-		Field field = getField( propertyName, property.getObject() );
+		Field field = getField( propertyName, property.get() );
 		if ( field != null && field.isAnnotationPresent( annotationType ) ) {
 			Annotation a = field.getAnnotation( annotationType );
 
@@ -51,8 +51,8 @@ class AnnotationPropertyNodeNameProvider implements PropertyNodeNameProvider, Se
 		return resolvedName;
 	}
 
-	private Field getField(String fieldName, Object object) {
-		for ( Field field : object.getClass().getFields() ) {
+	private Field getField(String fieldName, Class clazz) {
+		for ( Field field : clazz.getFields() ) {
 			field.setAccessible( true );
 			String name = field.getName();
 

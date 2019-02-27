@@ -18,9 +18,7 @@ import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.TypeVariables;
-import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
@@ -33,8 +31,6 @@ import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 public class ValueContext<T, V> {
 
 	private final ExecutableParameterNameProvider parameterNameProvider;
-
-	private final PropertyNodeNameProvider propertyNodeNameProvider;
 
 	/**
 	 * The current bean which gets validated. This is the bean hosting the constraints which get validated.
@@ -64,10 +60,8 @@ public class ValueContext<T, V> {
 	private ConstraintLocationKind constraintLocationKind;
 
 
-	ValueContext(ExecutableParameterNameProvider parameterNameProvider, PropertyNodeNameProvider propertyNodeNameProvider,
-				 T currentBean, Validatable validatable, PathImpl propertyPath) {
+	ValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, Validatable validatable, PathImpl propertyPath) {
 		this.parameterNameProvider = parameterNameProvider;
-		this.propertyNodeNameProvider = propertyNodeNameProvider;
 		this.currentBean = currentBean;
 		this.currentValidatable = validatable;
 		this.propertyPath = propertyPath;
@@ -98,13 +92,13 @@ public class ValueContext<T, V> {
 
 	public final void appendNode(Cascadable node) {
 		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		node.appendTo( new ExecutablePropertyNodeNameProvider( propertyNodeNameProvider, currentBean ), newPath );
+		node.appendTo( newPath );
 		propertyPath = newPath;
 	}
 
 	public final void appendNode(ConstraintLocation location) {
 		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		location.appendTo( parameterNameProvider, new ExecutablePropertyNodeNameProvider( propertyNodeNameProvider, currentBean ), newPath );
+		location.appendTo( parameterNameProvider, newPath );
 		propertyPath = newPath;
 	}
 

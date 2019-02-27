@@ -18,10 +18,12 @@ import java.util.Optional;
 
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromGetterNameCandidates;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.ConstrainableExecutable;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 
@@ -34,9 +36,11 @@ import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 public class JavaBeanHelper {
 
 	private final GetterPropertySelectionStrategy getterPropertySelectionStrategy;
+	private final PropertyNodeNameProvider propertyNodeNameProvider;
 
-	public JavaBeanHelper(GetterPropertySelectionStrategy getterPropertySelectionStrategy) {
+	public JavaBeanHelper(GetterPropertySelectionStrategy getterPropertySelectionStrategy, PropertyNodeNameProvider propertyNodeNameProvider) {
 		this.getterPropertySelectionStrategy = getterPropertySelectionStrategy;
+		this.propertyNodeNameProvider = propertyNodeNameProvider;
 	}
 
 	public GetterPropertySelectionStrategy getGetterPropertySelectionStrategy() {
@@ -47,7 +51,9 @@ public class JavaBeanHelper {
 		Contracts.assertNotNull( declaringClass, MESSAGES.classCannotBeNull() );
 
 		Field field = run( GetDeclaredField.action( declaringClass, property ) );
-		return Optional.ofNullable( field ).map( JavaBeanField::new );
+		String name = new ExecutablePropertyNodeNameProvider( propertyNodeNameProvider, declaringClass ).getName( property );
+
+		return Optional.ofNullable( field ).map( f -> new JavaBeanField( f, name ) );
 	}
 
 	public Optional<JavaBeanGetter> findDeclaredGetter(Class<?> declaringClass, String property) {

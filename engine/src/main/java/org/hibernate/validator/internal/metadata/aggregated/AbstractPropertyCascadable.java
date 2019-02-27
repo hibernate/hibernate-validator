@@ -15,7 +15,6 @@ import org.hibernate.validator.internal.properties.Field;
 import org.hibernate.validator.internal.properties.Getter;
 import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.properties.PropertyAccessor;
-import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 
 /**
  * A {@link Cascadable} backed by a property of a Java bean.
@@ -48,8 +47,8 @@ public abstract class AbstractPropertyCascadable<T extends Property> implements 
 	}
 
 	@Override
-	public void appendTo(ExecutablePropertyNodeNameProvider provider, PathImpl path) {
-		path.addPropertyNode( provider.getName( property.getPropertyName() ) );
+	public void appendTo(PathImpl path) {
+		path.addPropertyNode( property.getResolvedPropertyName() );
 	}
 
 	@Override

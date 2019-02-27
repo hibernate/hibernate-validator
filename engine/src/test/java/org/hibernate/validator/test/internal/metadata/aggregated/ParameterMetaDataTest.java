@@ -25,6 +25,7 @@ import javax.validation.executable.ValidateOnExecution;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -61,10 +62,11 @@ public class ParameterMetaDataTest {
 				getDummyConstraintCreationContext(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider() ),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build()
+				new MethodValidationConfiguration.Builder().build(),
+				new DefaultPropertyNodeNameProvider()
 		);
 
 		beanMetaData = beanMetaDataManager.getBeanMetaData( CustomerRepository.class );
@@ -130,10 +132,11 @@ public class ParameterMetaDataTest {
 				getDummyConstraintCreationContext(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new ExecutableParameterNameProvider( new SkewedParameterNameProvider() ),
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy() ),
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider() ),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build()
+				new MethodValidationConfiguration.Builder().build(),
+				new DefaultPropertyNodeNameProvider()
 		);
 		BeanMetaData<ServiceImpl> localBeanMetaData = beanMetaDataManager.getBeanMetaData( ServiceImpl.class );
 

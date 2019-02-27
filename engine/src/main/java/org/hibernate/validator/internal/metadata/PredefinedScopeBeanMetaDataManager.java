@@ -35,6 +35,7 @@ import org.hibernate.validator.internal.util.classhierarchy.Filters;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 
@@ -55,12 +56,14 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 			List<MetaDataProvider> optionalMetaDataProviders,
 			MethodValidationConfiguration methodValidationConfiguration,
 			BeanMetaDataClassNormalizer beanMetaDataClassNormalizer,
-			Set<Class<?>> beanClassesToInitialize) {
+			Set<Class<?>> beanClassesToInitialize,
+			PropertyNodeNameProvider propertyNodeNameProvider) {
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders( optionalMetaDataProviders );
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
 				constraintCreationContext,
 				javaBeanHelper,
-				annotationProcessingOptions
+				annotationProcessingOptions,
+				propertyNodeNameProvider
 		);
 
 		List<MetaDataProvider> metaDataProviders = new ArrayList<>( optionalMetaDataProviders.size() + 1 );

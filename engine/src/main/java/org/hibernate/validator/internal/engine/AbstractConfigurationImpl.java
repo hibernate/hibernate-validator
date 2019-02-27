@@ -344,7 +344,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 			getterPropertySelectionStrategyToUse = getterPropertySelectionStrategy;
 		}
 
-		return new DefaultConstraintMapping( new JavaBeanHelper( getterPropertySelectionStrategyToUse ) );
+		return new DefaultConstraintMapping( new JavaBeanHelper( getterPropertySelectionStrategyToUse, defaultPropertyNodeNameProvider ) );
 	}
 
 	@Override
