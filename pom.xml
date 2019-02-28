@@ -1111,6 +1111,8 @@
                     <name>disableDocumentationBuild</name>
                     <value>!true</value>
                 </property>
+                <!-- Don't build docs on JDK 12 as we don't have the CDI artifact -->
+                <jdk>(,12)</jdk>
             </activation>
             <modules>
                 <module>documentation</module>
@@ -1123,6 +1125,8 @@
                     <name>disableDistributionBuild</name>
                     <value>!true</value>
                 </property>
+                <!-- Don't build distribution on JDK 12 as we don't have the CDI artifact -->
+                <jdk>(,12)</jdk>
             </activation>
             <modules>
                 <module>distribution</module>
