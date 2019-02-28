@@ -39,10 +39,6 @@
             <artifactId>hibernate-validator</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-validator-cdi</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.el</artifactId>
         </dependency>
@@ -235,6 +231,13 @@
                     <groupId>org.wildfly.arquillian</groupId>
                     <artifactId>wildfly-arquillian-container-managed</artifactId>
                     <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>hibernate-validator-modules</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>wildfly-${wildfly-tck.version}-patch</classifier>
+                    <type>zip</type>
                 </dependency>
             </dependencies>
             <build>
