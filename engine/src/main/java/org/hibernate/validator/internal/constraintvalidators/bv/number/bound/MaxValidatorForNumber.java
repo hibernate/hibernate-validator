@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.number.bound;
 
+import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityNumberComparatorHelper;
+
 /**
  * Check that the number being validated is less than or equal to the maximum
  * value specified.
@@ -16,6 +18,6 @@ public class MaxValidatorForNumber extends AbstractMaxValidator<Number> {
 
 	@Override
 	protected int compare(Number number) {
-		return NumberComparatorHelper.compare( number, maxValue );
+		return NumberComparatorHelper.compare( number, maxValue, InfinityNumberComparatorHelper.GREATER_THAN );
 	}
 }

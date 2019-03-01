@@ -6,6 +6,11 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
+import static org.testng.Assert.assertFalse;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Max;
 
@@ -77,6 +82,23 @@ public class MaxValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		DecimalMax m = descriptorBuilder.build().getAnnotation();
 		testDecimalMax( m, false );
 
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1699")
+	public void testIsValidNumberForFloatingPointOrBigNumbersStoredAsNumber() {
+		ConstraintAnnotationDescriptor.Builder<Max> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Max.class );
+		descriptorBuilder.setAttribute( "value", 1L );
+		Max m = descriptorBuilder.build().getAnnotation();
+		MaxValidatorForNumber validator = new MaxValidatorForNumber();
+		validator.initialize( m );
+
+		assertFalse( validator.isValid( 1.01, null ) );
+		assertFalse( validator.isValid( 1.01F, null ) );
+		assertFalse( validator.isValid( new BigDecimal( "1.01" ), null ) );
+		assertFalse( validator.isValid( new BigInteger( "2" ), null ) );
+		assertFalse( validator.isValid( Double.POSITIVE_INFINITY, null ) );
+		assertFalse( validator.isValid( Float.POSITIVE_INFINITY, null ) );
 	}
 
 	private void testDecimalMax(DecimalMax m, boolean inclusive) {
