@@ -98,6 +98,7 @@ public class BaseMinMaxValidatorForNumberTest {
 
 		assertTrue( constraint.isValid( null, null ) );
 		assertEquals( constraint.isValid( 14.99, null ), isMax );
+		assertEquals( constraint.isValid( 15.001, null ), !isMax );
 		assertEquals( constraint.isValid( -14.99, null ), isMax );
 		assertEquals( constraint.isValid( -1560000000D, null ), isMax );
 		assertEquals( constraint.isValid( Double.NEGATIVE_INFINITY, null ), isMax );
