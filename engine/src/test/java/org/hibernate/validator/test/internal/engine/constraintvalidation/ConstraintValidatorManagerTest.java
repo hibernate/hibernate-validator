@@ -12,6 +12,7 @@ import static org.hibernate.validator.testutils.ConstraintValidatorInitializatio
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotSame;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
@@ -458,6 +459,14 @@ public class ConstraintValidatorManagerTest {
 		}
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1698")
+	public void testConstraintValidatorWithPrivateConstructor() {
+		try ( ValidatorFactory factory = getConfiguration().buildValidatorFactory() ) {
+			assertFalse( factory.getValidator().validate( new Bar() ).isEmpty() );
+		}
+	}
+
 	private ConstraintDescriptorImpl<?> getConstraintDescriptorForProperty(String propertyName) {
 		return getSingleConstraintDescriptorForProperty( validator, Foo.class, propertyName );
 	}
@@ -482,6 +491,11 @@ public class ConstraintValidatorManagerTest {
 
 		@Size
 		String s2;
+	}
+
+	private static class Bar {
+		@ConstraintWithPrivateValidator
+		private Object object;
 	}
 
 	public class MyCustomValidatorFactory implements ConstraintValidatorFactory {

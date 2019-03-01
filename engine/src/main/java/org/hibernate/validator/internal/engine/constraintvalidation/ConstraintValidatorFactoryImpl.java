@@ -20,12 +20,11 @@ import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-//TODO Can we make the constructor non-public?
 public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactory {
 
 	@Override
 	public final <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
-		return run( NewInstance.action( key, "ConstraintValidator" ) );
+		return run( NewInstance.action( key, "ConstraintValidator", true ) );
 	}
 
 	@Override

@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.util.privilegedactions;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.PrivilegedAction;
 
@@ -25,20 +26,34 @@ public final class NewInstance<T> implements PrivilegedAction<T> {
 
 	private final Class<T> clazz;
 	private final String message;
+	private final boolean makeAccessible;
 
 	public static <T> NewInstance<T> action(Class<T> clazz, String message) {
-		return new NewInstance<T>( clazz, message );
+		return action( clazz, message, false );
 	}
 
-	private NewInstance(Class<T> clazz, String message) {
+	public static <T> NewInstance<T> action(Class<T> clazz, String message, boolean makeAccessible) {
+		return new NewInstance<T>( clazz, message, makeAccessible );
+	}
+
+	private NewInstance(Class<T> clazz, String message, boolean makeAccessible) {
 		this.clazz = clazz;
 		this.message = message;
+		this.makeAccessible = makeAccessible;
 	}
 
 	@Override
 	public T run() {
 		try {
-			return clazz.getConstructor().newInstance();
+			Constructor<T> constructor;
+			if ( makeAccessible ) {
+				constructor = clazz.getDeclaredConstructor();
+				constructor.setAccessible( true );
+			}
+			else {
+				constructor = clazz.getConstructor();
+			}
+			return constructor.newInstance();
 		}
 		catch (InstantiationException | NoSuchMethodException | InvocationTargetException e) {
 			throw LOG.getUnableToInstantiateException( message, clazz, e );
