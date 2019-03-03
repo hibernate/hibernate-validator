@@ -22,10 +22,13 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.Min
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.AbstractDecimalMinValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForByte;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForDouble;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForFloat;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForLong;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForShort;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
@@ -94,6 +97,18 @@ public class MinValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		constraint = new DecimalMinValidatorForBigInteger();
 		constraint.initialize( m );
 		testValidatorBigInteger( constraint, inclusive, false );
+
+		constraint = new DecimalMinValidatorForByte();
+		constraint.initialize( m );
+		testValidatorByte( constraint, inclusive, false );
+
+		constraint = new DecimalMinValidatorForShort();
+		constraint.initialize( m );
+		testValidatorShort( constraint, inclusive, false );
+
+		constraint = new DecimalMinValidatorForInteger();
+		constraint.initialize( m );
+		testValidatorInteger( constraint, inclusive, false );
 
 		constraint = new DecimalMinValidatorForLong();
 		constraint.initialize( m );
