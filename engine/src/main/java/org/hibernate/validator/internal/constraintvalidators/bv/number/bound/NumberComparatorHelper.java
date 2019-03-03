@@ -33,8 +33,9 @@ final class NumberComparatorHelper {
 	}
 
 	public static int compare(Number number, long value, OptionalInt treatNanAs) {
-		// In case of comparing numbers before we compare them as two longs:
-		// 1. We need to check for floating point number as it should be treated differently in such case:
+		// In case of comparing numbers we need to check for special cases:
+		// 1. Floating point numbers should consider nan/infinity as values hence they should
+		// be directed to corresponding overloaded methods:
 		if ( number instanceof Double ) {
 			return compare( (Double) number, value, treatNanAs );
 		}
@@ -42,7 +43,7 @@ final class NumberComparatorHelper {
 			return compare( (Float) number, value, treatNanAs );
 		}
 
-		// 2. We need to check for big numbers so that we don't lose data when converting them to long:
+		// 2. For big numbers we don't want to lose any data so we just cast them and call corresponding methods:
 		if ( number instanceof BigDecimal ) {
 			return compare( (BigDecimal) number, value );
 		}
@@ -50,7 +51,14 @@ final class NumberComparatorHelper {
 			return compare( (BigInteger) number, value );
 		}
 
-		return Long.compare( number.longValue(), value );
+		// 3. For any integer types we convert them to long as we would do that anyway
+		// when comparing with a long value. And use corresponding method for longs:
+		if ( number instanceof Byte || number instanceof Integer || number instanceof Long || number instanceof Short ) {
+			return compare( number.longValue(), value );
+		}
+
+		// 4. As a fallback we convert the number to double:
+		return compare( number.doubleValue(), value, treatNanAs );
 	}
 
 	public static int compare(Double number, long value, OptionalInt treatNanAs) {

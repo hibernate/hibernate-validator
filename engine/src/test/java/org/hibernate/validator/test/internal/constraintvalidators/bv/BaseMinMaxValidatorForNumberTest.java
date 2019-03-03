@@ -75,6 +75,51 @@ public class BaseMinMaxValidatorForNumberTest {
 		assertEquals( constraint.isValid( BigInteger.valueOf( 1560000000 ), null ), !isMax );
 	}
 
+	protected void testValidatorByte(ConstraintValidator<?, Byte> constraint, boolean inclusive, boolean isMax) {
+		if ( inclusive ) {
+			assertTrue( constraint.isValid( (byte) 15, null ) );
+		}
+		else {
+			assertFalse( constraint.isValid( (byte) 15, null ) );
+		}
+
+		assertTrue( constraint.isValid( null, null ) );
+		assertEquals( constraint.isValid( (byte) 14, null ), isMax );
+		assertEquals( constraint.isValid( (byte) 16, null ), !isMax );
+		assertEquals( constraint.isValid( Byte.MIN_VALUE, null ), isMax );
+		assertEquals( constraint.isValid( Byte.MAX_VALUE, null ), !isMax );
+	}
+
+	protected void testValidatorShort(ConstraintValidator<?, Short> constraint, boolean inclusive, boolean isMax) {
+		if ( inclusive ) {
+			assertTrue( constraint.isValid( (short) 15, null ) );
+		}
+		else {
+			assertFalse( constraint.isValid( (short) 15, null ) );
+		}
+
+		assertTrue( constraint.isValid( null, null ) );
+		assertEquals( constraint.isValid( (short) 14, null ), isMax );
+		assertEquals( constraint.isValid( (short) 16, null ), !isMax );
+		assertEquals( constraint.isValid( Short.MIN_VALUE, null ), isMax );
+		assertEquals( constraint.isValid( Short.MAX_VALUE, null ), !isMax );
+	}
+
+	protected void testValidatorInteger(ConstraintValidator<?, Integer> constraint, boolean inclusive, boolean isMax) {
+		if ( inclusive ) {
+			assertTrue( constraint.isValid( 15, null ) );
+		}
+		else {
+			assertFalse( constraint.isValid( 15, null ) );
+		}
+
+		assertTrue( constraint.isValid( null, null ) );
+		assertEquals( constraint.isValid( 14, null ), isMax );
+		assertEquals( constraint.isValid( 16, null ), !isMax );
+		assertEquals( constraint.isValid( Integer.MIN_VALUE, null ), isMax );
+		assertEquals( constraint.isValid( Integer.MAX_VALUE, null ), !isMax );
+	}
+
 	protected void testValidatorLong(ConstraintValidator<?, Long> constraint, boolean inclusive, boolean isMax) {
 		if ( inclusive ) {
 			assertTrue( constraint.isValid( 15L, null ) );

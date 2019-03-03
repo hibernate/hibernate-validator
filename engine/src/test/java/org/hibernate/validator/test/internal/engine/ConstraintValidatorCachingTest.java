@@ -41,7 +41,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCollection;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -78,7 +78,7 @@ public class ConstraintValidatorCachingTest {
 		constraintValidatorFactory.assertSize( 3 );
 
 		constraintValidatorFactory.assertKeyExists( SizeValidatorForCollection.class );
-		constraintValidatorFactory.assertKeyExists( MinValidatorForNumber.class );
+		constraintValidatorFactory.assertKeyExists( MinValidatorForInteger.class );
 		constraintValidatorFactory.assertKeyExists( NotNullValidator.class );
 
 		// getting a new validator from the same factory should have the same instances cached

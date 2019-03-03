@@ -115,16 +115,22 @@ import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmpt
 import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForMap;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForByte;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForDouble;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForFloat;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForLong;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForShort;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForByte;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForDouble;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForFloat;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForLong;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForShort;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForBigInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForDouble;
@@ -427,20 +433,26 @@ public class ConstraintHelper {
 			putConstraints( tmpConstraints, Max.class, Arrays.asList(
 					MaxValidatorForBigDecimal.class,
 					MaxValidatorForBigInteger.class,
+					MaxValidatorForByte.class,
 					MaxValidatorForDouble.class,
 					MaxValidatorForFloat.class,
+					MaxValidatorForInteger.class,
 					MaxValidatorForLong.class,
 					MaxValidatorForNumber.class,
+					MaxValidatorForShort.class,
 					MaxValidatorForCharSequence.class,
 					MaxValidatorForMonetaryAmount.class
 			) );
 			putConstraints( tmpConstraints, Min.class, Arrays.asList(
 					MinValidatorForBigDecimal.class,
 					MinValidatorForBigInteger.class,
+					MinValidatorForByte.class,
 					MinValidatorForDouble.class,
 					MinValidatorForFloat.class,
+					MinValidatorForInteger.class,
 					MinValidatorForLong.class,
 					MinValidatorForNumber.class,
+					MinValidatorForShort.class,
 					MinValidatorForCharSequence.class,
 					MinValidatorForMonetaryAmount.class
 			) );
@@ -458,10 +470,13 @@ public class ConstraintHelper {
 			putConstraints( tmpConstraints, Min.class, Arrays.asList(
 					MinValidatorForBigDecimal.class,
 					MinValidatorForBigInteger.class,
+					MinValidatorForByte.class,
 					MinValidatorForDouble.class,
 					MinValidatorForFloat.class,
+					MinValidatorForInteger.class,
 					MinValidatorForLong.class,
 					MinValidatorForNumber.class,
+					MinValidatorForShort.class,
 					MinValidatorForCharSequence.class
 			) );
 		}

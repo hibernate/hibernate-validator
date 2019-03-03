@@ -17,10 +17,13 @@ import javax.validation.constraints.Max;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.AbstractMaxValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForByte;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForDouble;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForFloat;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForLong;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForShort;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.AbstractDecimalMaxValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForBigInteger;
@@ -139,6 +142,18 @@ public class MaxValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		constraint = new MaxValidatorForBigInteger();
 		constraint.initialize( m );
 		testValidatorBigInteger( constraint, inclusive, true );
+
+		constraint = new MaxValidatorForByte();
+		constraint.initialize( m );
+		testValidatorByte( constraint, inclusive, true );
+
+		constraint = new MaxValidatorForShort();
+		constraint.initialize( m );
+		testValidatorShort( constraint, inclusive, true );
+
+		constraint = new MaxValidatorForInteger();
+		constraint.initialize( m );
+		testValidatorInteger( constraint, inclusive, true );
 
 		constraint = new MaxValidatorForLong();
 		constraint.initialize( m );
