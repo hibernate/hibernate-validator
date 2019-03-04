@@ -6,6 +6,14 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
+import java.math.BigDecimal;
+
+import javax.validation.Validator;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 
@@ -31,6 +39,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.dec
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForShort;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 /**
@@ -59,6 +68,29 @@ public class MinValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		DecimalMin m = descriptorBuilder.build().getAnnotation();
 
 		testDecimalMin( m, true );
+	}
+
+	@Test
+	public void testIsValidDecimalMinWithDecimalFractionInConstraint() {
+		class Foo {
+			@DecimalMin("15.0001")
+			private final Number num;
+
+			Foo(final Number num) {
+				this.num = num;
+			}
+		}
+
+		Validator validator = getValidator();
+
+		assertThat( validator.validate( new Foo( 15 ) ) ).containsOnlyViolations( violationOf( DecimalMin.class ) );
+		assertNoViolations( validator.validate( new Foo( 16 ) ) );
+
+		assertThat( validator.validate( new Foo( 15.00001 ) ) ).containsOnlyViolations( violationOf( DecimalMin.class ) );
+		assertNoViolations( validator.validate( new Foo( 15.01 ) ) );
+
+		assertThat( validator.validate( new Foo( BigDecimal.valueOf( 15.00001 ) ) ) ).containsOnlyViolations( violationOf( DecimalMin.class ) );
+		assertNoViolations( validator.validate( new Foo( BigDecimal.valueOf( 15.01 ) ) ) );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
