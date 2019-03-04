@@ -6,11 +6,16 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertFalse;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import javax.validation.Validator;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Max;
 
@@ -36,6 +41,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.dec
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForShort;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 /**
@@ -64,6 +70,29 @@ public class MaxValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		DecimalMax m = descriptorBuilder.build().getAnnotation();
 
 		testDecimalMax( m, true );
+	}
+
+	@Test
+	public void testIsValidDecimalMaxWithDecimalFractionInConstraint() {
+		class Foo {
+			@DecimalMax("15.0001")
+			private final Number num;
+
+			Foo(final Number num) {
+				this.num = num;
+			}
+		}
+
+		Validator validator = getValidator();
+
+		assertThat( validator.validate( new Foo( 16 ) ) ).containsOnlyViolations( violationOf( DecimalMax.class ) );
+		assertNoViolations( validator.validate( new Foo( 15 ) ) );
+
+		assertThat( validator.validate( new Foo( 15.01 ) ) ).containsOnlyViolations( violationOf( DecimalMax.class ) );
+		assertNoViolations( validator.validate( new Foo( 15.00001 ) ) );
+
+		assertThat( validator.validate( new Foo( BigDecimal.valueOf( 15.01 ) ) ) ).containsOnlyViolations( violationOf( DecimalMax.class ) );
+		assertNoViolations( validator.validate( new Foo( BigDecimal.valueOf( 15.00001 ) ) ) );
 	}
 
 	@Test

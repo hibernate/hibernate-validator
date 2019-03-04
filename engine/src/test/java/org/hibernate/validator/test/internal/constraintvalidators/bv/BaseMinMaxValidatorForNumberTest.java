@@ -13,6 +13,7 @@ import static org.testng.Assert.assertTrue;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
 import javax.validation.ConstraintValidator;
 
 /**
@@ -39,6 +40,18 @@ public class BaseMinMaxValidatorForNumberTest {
 		assertEquals( constraint.isValid( b, null ), isMax );
 		assertEquals( constraint.isValid( 14.99, null ), isMax );
 		assertEquals( constraint.isValid( -14.99, null ), isMax );
+		assertEquals( constraint.isValid( 14.99F, null ), isMax );
+		assertEquals( constraint.isValid( -14.99F, null ), isMax );
+		assertEquals( constraint.isValid( 14, null ), isMax );
+		assertEquals( constraint.isValid( 16, null ), !isMax );
+		assertEquals( constraint.isValid( (short) 14, null ), isMax );
+		assertEquals( constraint.isValid( (short) 16, null ), !isMax );
+		assertEquals( constraint.isValid( BigInteger.valueOf( 14L ), null ), isMax );
+		assertEquals( constraint.isValid( BigInteger.valueOf( 16L ), null ), !isMax );
+		assertEquals( constraint.isValid( BigDecimal.valueOf( 14L ), null ), isMax );
+		assertEquals( constraint.isValid( BigDecimal.valueOf( 16L ), null ), !isMax );
+		assertEquals( constraint.isValid( new BigDecimal( "14.99" ), null ), isMax );
+		assertEquals( constraint.isValid( new BigDecimal( "15.001" ), null ), !isMax );
 		assertEquals( constraint.isValid( bWrapper, null ), !isMax );
 		assertEquals( constraint.isValid( 20, null ), !isMax );
 	}
