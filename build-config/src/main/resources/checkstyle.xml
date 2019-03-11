@@ -10,8 +10,9 @@
 
 <module name="Checker">
 
+    <property name="cacheFile" value="${checkstyle.cache.file}"/>
+
     <module name="TreeWalker">
-        <property name="cacheFile" value="${checkstyle.cache.file}"/>
 
         <module name="RegexpSinglelineJava">
             <!-- do not allow a package declaration that contains ".target." or "target;"  -->
