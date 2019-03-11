@@ -184,7 +184,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>8.1</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>8.18</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
