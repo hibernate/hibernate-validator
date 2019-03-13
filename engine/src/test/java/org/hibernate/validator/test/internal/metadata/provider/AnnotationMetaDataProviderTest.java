@@ -60,8 +60,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		provider = new AnnotationMetaDataProvider(
 				getDummyConstraintCreationContext(),
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider() ),
-				new AnnotationProcessingOptionsImpl(),
-				new DefaultPropertyNodeNameProvider()
+				new AnnotationProcessingOptionsImpl()
 		);
 	}
 

@@ -18,11 +18,12 @@ import java.util.Optional;
 
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromGetterNameCandidates;
+import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
+import org.hibernate.validator.spi.nodenameprovider.Property;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.ConstrainableExecutable;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
@@ -51,7 +52,7 @@ public class JavaBeanHelper {
 		Contracts.assertNotNull( declaringClass, MESSAGES.classCannotBeNull() );
 
 		Field field = run( GetDeclaredField.action( declaringClass, property ) );
-		String name = new ExecutablePropertyNodeNameProvider( propertyNodeNameProvider, declaringClass ).getName( property );
+		String name = getPropertyName( declaringClass, property );
 
 		return Optional.ofNullable( field ).map( f -> new JavaBeanField( f, name ) );
 	}
@@ -129,6 +130,10 @@ public class JavaBeanHelper {
 		return new JavaBeanMethod( method );
 	}
 
+	public String resolvePropertyName(Property property) {
+		return propertyNodeNameProvider.getName( property );
+	}
+
 	/**
 	 * Runs the given privileged action, using a privileged block if required.
 	 *
@@ -161,5 +166,19 @@ public class JavaBeanHelper {
 		public Class<?>[] getParameterTypes() {
 			return method.getParameterTypes();
 		}
+	}
+
+	private String getPropertyName(Class<?> declaringClass, String property) {
+		return resolvePropertyName( new JavaBeanProperty() {
+			@Override
+			public Class<?> getDeclaringClass() {
+				return declaringClass;
+			}
+
+			@Override
+			public String getName() {
+				return property;
+			}
+		} );
 	}
 }

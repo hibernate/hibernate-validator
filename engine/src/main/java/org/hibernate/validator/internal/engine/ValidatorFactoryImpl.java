@@ -147,7 +147,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				configurationState.getMessageInterpolator(),
 				configurationState.getTraversableResolver(),
 				new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() ),
-				// check this
 				hibernateSpecificConfig.getPropertyNodeNameProvider(),
 				configurationState.getClockProvider(),
 				determineTemporalValidationTolerance( configurationState, properties ),
@@ -171,7 +170,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.constraintCreationContext = new ConstraintCreationContext( constraintHelper, constraintValidatorManager, typeResolutionHelper, valueExtractorManager );
 
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
-		this.javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ), hibernateSpecificConfig.getPropertyNodeNameProvider() );
+		this.javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ),
+				ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig ) );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( configurationState.getMappingStreams().isEmpty() ) {

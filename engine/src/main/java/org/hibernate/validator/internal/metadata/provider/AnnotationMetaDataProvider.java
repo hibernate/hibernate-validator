@@ -67,7 +67,6 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanParameter;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.ExecutablePropertyNodeNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -78,7 +77,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
 import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
-import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
+import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
 
 /**
  * {@code MetaDataProvider} which reads the metadata from annotations which is the default configuration source.
@@ -94,18 +93,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private final ConstraintCreationContext constraintCreationContext;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 	private final JavaBeanHelper javaBeanHelper;
-	private final PropertyNodeNameProvider propertyNodeNameProvider;
 
 	private final BeanConfiguration<Object> objectBeanConfiguration;
 
 	public AnnotationMetaDataProvider(ConstraintCreationContext constraintCreationContext,
 			JavaBeanHelper javaBeanHelper,
-			AnnotationProcessingOptions annotationProcessingOptions,
-			PropertyNodeNameProvider propertyNodeNameProvider) {
+			AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintCreationContext = constraintCreationContext;
 		this.javaBeanHelper = javaBeanHelper;
 		this.annotationProcessingOptions = annotationProcessingOptions;
-		this.propertyNodeNameProvider = propertyNodeNameProvider;
 
 		this.objectBeanConfiguration = retrieveBeanConfiguration( Object.class );
 	}
@@ -225,7 +221,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				continue;
 			}
 
-			String name = new ExecutablePropertyNodeNameProvider( propertyNodeNameProvider, beanClass ).getName( field.getName() );
+			String name = resolvePropertyName( beanClass, field );
 			JavaBeanField javaBeanField = new JavaBeanField( field, name );
 
 			if ( annotationProcessingOptions.areMemberConstraintsIgnoredFor( javaBeanField ) ) {
@@ -890,4 +886,17 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	}
 
+	private String resolvePropertyName(Class<?> beanClass, Field field) {
+		return javaBeanHelper.resolvePropertyName( new JavaBeanProperty() {
+			@Override
+			public Class<?> getDeclaringClass() {
+				return beanClass;
+			}
+
+			@Override
+			public String getName() {
+				return field.getName();
+			}
+		} );
+	}
 }

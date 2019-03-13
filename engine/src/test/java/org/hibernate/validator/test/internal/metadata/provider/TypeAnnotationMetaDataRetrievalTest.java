@@ -46,8 +46,7 @@ public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProvi
 		provider = new AnnotationMetaDataProvider(
 				getDummyConstraintCreationContext(),
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider() ),
-				new AnnotationProcessingOptionsImpl(),
-				new DefaultPropertyNodeNameProvider()
+				new AnnotationProcessingOptionsImpl()
 		);
 	}
 

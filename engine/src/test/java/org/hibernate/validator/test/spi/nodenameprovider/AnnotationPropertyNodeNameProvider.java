@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
+import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
 import org.hibernate.validator.spi.nodenameprovider.Property;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
@@ -33,10 +34,31 @@ class AnnotationPropertyNodeNameProvider implements PropertyNodeNameProvider, Se
 	}
 
 	@Override
-	public String getName(String propertyName, Property property) {
-		String resolvedName = propertyName;
+	public String getName(Property property) {
+		if ( property instanceof JavaBeanProperty ) {
+			return getJavaBeanPropertyName( (JavaBeanProperty) property );
+		}
 
-		Field field = getField( propertyName, property.get() );
+		return getDefaultName( property );
+	}
+
+	private Field getField(String fieldName, Class clazz) {
+		for ( Field field : clazz.getFields() ) {
+			field.setAccessible( true );
+			String name = field.getName();
+
+			if ( name.equals( fieldName ) ) {
+				return field;
+			}
+		}
+
+		return null;
+	}
+
+	private String getJavaBeanPropertyName(JavaBeanProperty property) {
+		String resolvedName = property.getName();
+
+		Field field = getField( resolvedName, property.getDeclaringClass() );
 		if ( field != null && field.isAnnotationPresent( annotationType ) ) {
 			Annotation a = field.getAnnotation( annotationType );
 
@@ -51,16 +73,7 @@ class AnnotationPropertyNodeNameProvider implements PropertyNodeNameProvider, Se
 		return resolvedName;
 	}
 
-	private Field getField(String fieldName, Class clazz) {
-		for ( Field field : clazz.getFields() ) {
-			field.setAccessible( true );
-			String name = field.getName();
-
-			if ( name.equals( fieldName ) ) {
-				return field;
-			}
-		}
-
-		return null;
+	private String getDefaultName(Property property) {
+		return property.getName();
 	}
 }

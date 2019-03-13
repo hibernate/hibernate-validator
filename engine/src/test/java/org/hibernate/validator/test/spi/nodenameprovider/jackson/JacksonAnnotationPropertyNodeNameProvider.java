@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.test.spi.nodenameprovider.jackson;
 
+import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
 import org.hibernate.validator.spi.nodenameprovider.Property;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
@@ -18,15 +19,27 @@ public class JacksonAnnotationPropertyNodeNameProvider implements PropertyNodeNa
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
-	public String getName(String propertyName, Property property) {
-		JavaType type = objectMapper.constructType( property.get() );
+	public String getName(Property property) {
+		if ( property instanceof JavaBeanProperty ) {
+			return getJavaBeanPropertyName( (JavaBeanProperty) property );
+		}
+
+		return getDefaultName( property );
+	}
+
+	private String getJavaBeanPropertyName(JavaBeanProperty property) {
+		JavaType type = objectMapper.constructType( property.getDeclaringClass() );
 		BeanDescription desc = objectMapper.getSerializationConfig().introspect( type );
 
 		return desc.findProperties()
 				.stream()
-				.filter( prop -> prop.getInternalName().equals( propertyName ) )
+				.filter( prop -> prop.getInternalName().equals( property.getName() ) )
 				.map( BeanPropertyDefinition::getName )
 				.findFirst()
-				.orElse( propertyName );
+				.orElse( property.getName() );
+	}
+
+	private String getDefaultName(Property property) {
+		return property.getName();
 	}
 }

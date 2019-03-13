@@ -49,8 +49,6 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 
 	@Override
 	public String getResolvedPropertyName() {
-		// or throw unsupported operation?
-		// or resolve the name
 		return propertyName;
 	}
 

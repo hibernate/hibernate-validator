@@ -29,10 +29,6 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 	private final Type typeForValidatorResolution;
 	private final Type type;
 
-	public JavaBeanField(Field field) {
-		this( field, field.getName() );
-	}
-
 	public JavaBeanField(Field field, String resolvedName) {
 		this.field = field;
 		this.type = ReflectionHelper.typeOf( field );

@@ -6,6 +6,6 @@
  */
 package org.hibernate.validator.spi.nodenameprovider;
 
-public interface Property {
-	String getName();
+public interface JavaBeanProperty extends Property {
+	Class<?> getDeclaringClass();
 }

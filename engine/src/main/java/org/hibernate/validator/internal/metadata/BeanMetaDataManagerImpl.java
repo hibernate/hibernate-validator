@@ -130,8 +130,7 @@ public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
 				constraintCreationContext,
 				javaBeanHelper,
-				annotationProcessingOptions,
-				propertyNodeNameProvider
+				annotationProcessingOptions
 		);
 		List<MetaDataProvider> tmpMetaDataProviders = new ArrayList<>( optionalMetaDataProviders.size() + 1 );
 		// We add the annotation based metadata provider at the first position so that the entire metadata model is assembled

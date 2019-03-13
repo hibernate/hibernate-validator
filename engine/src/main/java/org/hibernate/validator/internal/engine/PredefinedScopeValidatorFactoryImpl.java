@@ -173,8 +173,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				buildMetaDataProviders( constraintCreationContext, xmlMetaDataProvider, constraintMappings ),
 				methodValidationConfiguration,
 				determineBeanMetaDataClassNormalizer( hibernateSpecificConfig ),
-				hibernateSpecificConfig.getBeanClassesToInitialize(),
-				validatorFactoryScopedContext.getPropertyNodeNameProvider()
+				hibernateSpecificConfig.getBeanClassesToInitialize()
 		);
 
 		if ( LOG.isDebugEnabled() ) {

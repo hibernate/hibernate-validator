@@ -13,7 +13,7 @@ import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 public class DefaultPropertyNodeNameProvider implements PropertyNodeNameProvider, Serializable {
 	@Override
-	public String getName(String propertyName, Property property) {
-		return propertyName;
+	public String getName(Property property) {
+		return property.getName();
 	}
 }

@@ -39,6 +39,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -279,6 +280,16 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 
 		return new DefaultGetterPropertySelectionStrategy();
+	}
+
+	static PropertyNodeNameProvider determinePropertyNodeNameProvider(AbstractConfigurationImpl<?> hibernateSpecificConfig) {
+		if ( hibernateSpecificConfig.getPropertyNodeNameProvider() != null ) {
+			LOG.usingPropertyNodeNameProvider( hibernateSpecificConfig.getPropertyNodeNameProvider().getClass() );
+
+			return hibernateSpecificConfig.getPropertyNodeNameProvider();
+		}
+
+		return new DefaultPropertyNodeNameProvider();
 	}
 
 	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(PredefinedScopeConfigurationImpl hibernateSpecificConfig) {
