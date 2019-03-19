@@ -127,7 +127,7 @@
                         </goals>
                         <configuration>
                             <scripts>
-                                <script>file://${pom.basedir}/src/script/setupModules.groovy</script>
+                                <script>file:///${pom.basedir}/src/script/setupModules.groovy</script>
                             </scripts>
                             <properties>
                                 <wildflyPatchedTargetDir>${wildfly-main.patched.target-dir}</wildflyPatchedTargetDir>
@@ -143,7 +143,7 @@
                         </goals>
                         <configuration>
                             <scripts>
-                                <script>file://${pom.basedir}/src/script/setupModules.groovy</script>
+                                <script>file:///${pom.basedir}/src/script/setupModules.groovy</script>
                             </scripts>
                             <properties>
                                 <wildflyPatchedTargetDir>${wildfly-secondary.patched.target-dir}</wildflyPatchedTargetDir>
