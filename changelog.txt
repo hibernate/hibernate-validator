@@ -1,6 +1,22 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.16.Final (21-03-2019)
+-------------------------
+
+** Bug
+    * HV-1704 - build      - Build fails on Windows
+    * HV-1699 - validators - Rounding error when having a BigDecimal at runtime with @Max/@Min annotation set on a Number field
+
+** Improvement
+    * HV-1696 - engine     - Avoid using computeIfAbsent for the common case when getting bean metadata
+    * HV-1695 - engine     - Avoid creating an empty map for group conversions
+    * HV-1694 - engine     - Reduce memory allocation for unconstrained beans
+
+** Task
+    * HV-1705 - build      - Upgrade WildFly to 16.0.0.Final
+    * HV-1693 - build      - Test compatibility with JDK 12
+
 6.0.15.Final (18-02-2019)
 -------------------------
 
