@@ -11,6 +11,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -52,7 +53,7 @@ public class JavaBeanHelper {
 		Contracts.assertNotNull( declaringClass, MESSAGES.classCannotBeNull() );
 
 		Field field = run( GetDeclaredField.action( declaringClass, property ) );
-		String name = getPropertyName( declaringClass, property );
+		String name = propertyNodeNameProvider.getName( javaBeanPropertyFrom( declaringClass, property ) );
 
 		return Optional.ofNullable( field ).map( f -> new JavaBeanField( f, name ) );
 	}
@@ -81,9 +82,8 @@ public class JavaBeanHelper {
 			return Optional.empty();
 		}
 		else {
-			return Optional.of(
-					new JavaBeanGetter( declaringClass, getter, property )
-			);
+			return Optional.of( new JavaBeanGetter( declaringClass, getter, property, propertyNodeNameProvider.getName(
+					javaBeanPropertyFrom( declaringClass, property ) ) ) );
 		}
 	}
 
@@ -124,7 +124,8 @@ public class JavaBeanHelper {
 
 		Optional<String> correspondingProperty = getterPropertySelectionStrategy.getProperty( executable );
 		if ( correspondingProperty.isPresent() ) {
-			return new JavaBeanGetter( declaringClass, method, correspondingProperty.get() );
+			return new JavaBeanGetter( declaringClass, method, correspondingProperty.get(), propertyNodeNameProvider.getName(
+					javaBeanPropertyFrom( declaringClass, correspondingProperty.get() ) ) );
 		}
 
 		return new JavaBeanMethod( method );
@@ -132,6 +133,10 @@ public class JavaBeanHelper {
 
 	public String resolvePropertyName(Property property) {
 		return propertyNodeNameProvider.getName( property );
+	}
+
+	public Property javaBeanPropertyFrom(Class<?> declaringClass, String name) {
+		return new JavaBeanPropertyImpl( declaringClass, name );
 	}
 
 	/**
@@ -168,17 +173,27 @@ public class JavaBeanHelper {
 		}
 	}
 
-	private String getPropertyName(Class<?> declaringClass, String property) {
-		return resolvePropertyName( new JavaBeanProperty() {
-			@Override
-			public Class<?> getDeclaringClass() {
-				return declaringClass;
-			}
+	private static class JavaBeanPropertyImpl implements JavaBeanProperty {
+		private final Class<?> declaringClass;
+		private final String name;
 
-			@Override
-			public String getName() {
-				return property;
-			}
-		} );
+		private JavaBeanPropertyImpl(Member member) {
+			this( member.getDeclaringClass(), member.getName() );
+		}
+
+		private JavaBeanPropertyImpl(Class<?> declaringClass, String name) {
+			this.declaringClass = declaringClass;
+			this.name = name;
+		}
+
+		@Override
+		public Class<?> getDeclaringClass() {
+			return declaringClass;
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
 	}
 }

@@ -886,4 +886,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = INFO)
 	@Message(id = 251, value = "Using %s as property node name provider.")
 	void usingPropertyNodeNameProvider(@FormatWith(ClassObjectFormatter.class) Class<? extends PropertyNodeNameProvider> propertyNodeNameProviderClass);
+
+	@Message(id = 252, value = "Unable to instantiate property node name provider class %s.")
+	ValidationException getUnableToInstantiatePropertyNodeNameProviderClassException(String propertyNodeNameProviderClassName, @Cause Exception e);
 }

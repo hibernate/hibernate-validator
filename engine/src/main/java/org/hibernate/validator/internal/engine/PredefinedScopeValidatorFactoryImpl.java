@@ -140,7 +140,8 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				constraintValidatorManager, typeResolutionHelper, valueExtractorManager );
 
 		ExecutableHelper executableHelper = new ExecutableHelper( typeResolutionHelper );
-		JavaBeanHelper javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ), hibernateSpecificConfig.getPropertyNodeNameProvider() );
+		JavaBeanHelper javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ),
+				ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, externalClassLoader ) );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		XmlMetaDataProvider xmlMetaDataProvider;

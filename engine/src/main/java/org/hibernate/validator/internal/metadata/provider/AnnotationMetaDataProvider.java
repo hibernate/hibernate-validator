@@ -77,7 +77,6 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
 import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
-import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
 
 /**
  * {@code MetaDataProvider} which reads the metadata from annotations which is the default configuration source.
@@ -221,7 +220,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				continue;
 			}
 
-			String name = resolvePropertyName( beanClass, field );
+			String name = javaBeanHelper.resolvePropertyName( javaBeanHelper.javaBeanPropertyFrom(  beanClass, field.getName() ) );
 			JavaBeanField javaBeanField = new JavaBeanField( field, name );
 
 			if ( annotationProcessingOptions.areMemberConstraintsIgnoredFor( javaBeanField ) ) {
@@ -884,19 +883,5 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			return ConstraintLocation.forTypeArgument( parentLocation.toConstraintLocation(), typeParameter, typeOfAnnotatedElement );
 		}
 
-	}
-
-	private String resolvePropertyName(Class<?> beanClass, Field field) {
-		return javaBeanHelper.resolvePropertyName( new JavaBeanProperty() {
-			@Override
-			public Class<?> getDeclaringClass() {
-				return beanClass;
-			}
-
-			@Override
-			public String getName() {
-				return field.getName();
-			}
-		} );
 	}
 }

@@ -121,6 +121,15 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	String GETTER_PROPERTY_SELECTION_STRATEGY_CLASSNAME = "hibernate.validator.getter_property_selection_strategy";
 
 	/**
+	 * Property for configuring property node name provider, allowing to select an implementation of {@link PropertyNodeNameProvider}
+	 * which will be used for property name resolution when creating a property path.
+	 *
+	 * @since 6.1.0
+	 */
+	@Incubating
+	String PROPERTY_NODE_NAME_PROVIDER_CLASSNAME = "hibernate.validator.getter_property_selection_strategy";
+
+	/**
 	 * <p>
 	 * Returns the {@link ResourceBundleLocator} used by the
 	 * {@link Configuration#getDefaultMessageInterpolator() default message

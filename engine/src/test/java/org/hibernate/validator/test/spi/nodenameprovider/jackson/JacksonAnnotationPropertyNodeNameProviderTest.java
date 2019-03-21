@@ -49,13 +49,13 @@ public class JacksonAnnotationPropertyNodeNameProviderTest {
 	}
 
 	private static class Engine {
-		@Valid
 		private HorsePower horsePower;
 
 		Engine(int horsePower) {
 			this.horsePower = new HorsePower( horsePower );
 		}
 
+		@Valid
 		@JsonProperty("horse_power")
 		public HorsePower getHorsePower() {
 			return horsePower;
