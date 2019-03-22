@@ -83,7 +83,6 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		return this;
 	}
 
-
 	@Override
 	public HibernateValidatorContext clockProvider(ClockProvider clockProvider) {
 		validatorFactoryScopedContextBuilder.setClockProvider( clockProvider );

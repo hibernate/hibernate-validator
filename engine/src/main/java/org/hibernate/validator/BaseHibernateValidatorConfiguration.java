@@ -127,7 +127,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 *
 	 * @since 6.1.0
 	 */
-	String PROPERTY_NODE_NAME_PROVIDER_CLASSNAME = "hibernate.validator.getter_property_selection_strategy";
+	String PROPERTY_NODE_NAME_PROVIDER_CLASSNAME = "hibernate.validator.property_node_name_provider";
 
 	/**
 	 * <p>
