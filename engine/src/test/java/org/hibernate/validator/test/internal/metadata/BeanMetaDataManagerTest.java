@@ -59,8 +59,7 @@ public class BeanMetaDataManagerTest {
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider() ),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build(),
-				new DefaultPropertyNodeNameProvider()
+				new MethodValidationConfiguration.Builder().build()
 		);
 	}
 

@@ -37,7 +37,7 @@ public class ValidatorFactoryScopedContext {
 	private final ExecutableParameterNameProvider parameterNameProvider;
 
 	/**
-	 *  Property node name provider to be used for property name resolution
+	 *  {@link PropertyNodeNameProvider} to be used for property name resolution when constructing a property path
 	 */
 	private final PropertyNodeNameProvider propertyNodeNameProvider;
 

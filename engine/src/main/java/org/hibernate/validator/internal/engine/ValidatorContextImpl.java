@@ -83,11 +83,6 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		return this;
 	}
 
-	@Override
-	public HibernateValidatorContext propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider) {
-		validatorFactoryScopedContextBuilder.setPropertyNodeNameProvider( propertyNodeNameProvider );
-		return this;
-	}
 
 	@Override
 	public HibernateValidatorContext clockProvider(ClockProvider clockProvider) {
@@ -146,6 +141,12 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	@Override
 	public HibernateValidatorContext constraintValidatorPayload(Object dynamicPayload) {
 		validatorFactoryScopedContextBuilder.setConstraintValidatorPayload( dynamicPayload );
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorContext propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider) {
+		validatorFactoryScopedContextBuilder.setPropertyNodeNameProvider( propertyNodeNameProvider );
 		return this;
 	}
 

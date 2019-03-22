@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.util.Set;
 
 import javax.validation.Configuration;
+import javax.validation.ConstraintViolation;
 import javax.validation.TraversableResolver;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;
@@ -126,7 +127,6 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 *
 	 * @since 6.1.0
 	 */
-	@Incubating
 	String PROPERTY_NODE_NAME_PROVIDER_CLASSNAME = "hibernate.validator.getter_property_selection_strategy";
 
 	/**
@@ -348,8 +348,8 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	S getterPropertySelectionStrategy(GetterPropertySelectionStrategy getterPropertySelectionStrategy);
 
 	/**
-	 * Allows to set a property node name provider defining the way how the property node name will be resolved (e.g.
-	 * using the field name).
+	 * Allows to set a property node name provider, defining the way how the name of a property node will be resolved
+	 * when constructing property path, e.g. {@link ConstraintViolation#getPropertyPath()}
 	 *
 	 * @param propertyNodeNameProvider the {@link PropertyNodeNameProvider} to be used
 	 *
@@ -362,7 +362,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	/**
 	 * Returns the property node name provider for this configuration.
 	 *
-	 * @return property node name provider instance or {@code null} if not defined
+	 * @return {@link PropertyNodeNameProvider} instance or {@code null} if not defined
 	 *
 	 * @since 6.1.0
 	 */

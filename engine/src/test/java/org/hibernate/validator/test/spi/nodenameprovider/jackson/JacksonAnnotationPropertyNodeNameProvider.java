@@ -15,6 +15,11 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 
+/**
+ * An example of how a name can be resolved from an Jackson annotation
+ *
+ * @author Damir Alibegovic
+ */
 public class JacksonAnnotationPropertyNodeNameProvider implements PropertyNodeNameProvider {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 

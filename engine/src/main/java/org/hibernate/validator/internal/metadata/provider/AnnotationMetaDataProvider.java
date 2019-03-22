@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
@@ -220,8 +219,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				continue;
 			}
 
-			String name = javaBeanHelper.resolvePropertyName( javaBeanHelper.javaBeanPropertyFrom(  beanClass, field.getName() ) );
-			JavaBeanField javaBeanField = new JavaBeanField( field, name );
+			String resolvedName = javaBeanHelper.resolvePropertyName( javaBeanHelper.javaBeanPropertyFrom( beanClass, field.getName() ) );
+			JavaBeanField javaBeanField = new JavaBeanField( field, resolvedName );
 
 			if ( annotationProcessingOptions.areMemberConstraintsIgnoredFor( javaBeanField ) ) {
 				continue;

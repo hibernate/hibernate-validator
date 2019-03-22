@@ -282,6 +282,14 @@ final class ValidatorFactoryConfigurationHelper {
 		return new DefaultGetterPropertySelectionStrategy();
 	}
 
+	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(PredefinedScopeConfigurationImpl hibernateSpecificConfig) {
+		if ( hibernateSpecificConfig.getBeanMetaDataClassNormalizer() != null ) {
+			return hibernateSpecificConfig.getBeanMetaDataClassNormalizer();
+		}
+
+		return new DefaultBeanMetaDataClassNormalizer();
+	}
+
 	static PropertyNodeNameProvider determinePropertyNodeNameProvider(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
 			ClassLoader externalClassLoader) {
 		if ( hibernateSpecificConfig.getPropertyNodeNameProvider() != null ) {
@@ -306,14 +314,6 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 
 		return new DefaultPropertyNodeNameProvider();
-	}
-
-	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(PredefinedScopeConfigurationImpl hibernateSpecificConfig) {
-		if ( hibernateSpecificConfig.getBeanMetaDataClassNormalizer() != null ) {
-			return hibernateSpecificConfig.getBeanMetaDataClassNormalizer();
-		}
-
-		return new DefaultBeanMetaDataClassNormalizer();
 	}
 
 	static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,

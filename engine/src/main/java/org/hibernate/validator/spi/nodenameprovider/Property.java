@@ -6,6 +6,18 @@
  */
 package org.hibernate.validator.spi.nodenameprovider;
 
+
+/**
+ * Base interface for metadata about a property
+ *
+ * @author Damir Alibegovic
+ * @since 6.1.0
+ */
 public interface Property {
+	/**
+	 * Returns property name
+	 *
+	 * @return {@link String} representing the property name
+	 */
 	String getName();
 }

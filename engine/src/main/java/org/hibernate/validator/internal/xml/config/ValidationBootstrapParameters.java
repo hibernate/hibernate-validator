@@ -45,13 +45,13 @@ public class ValidationBootstrapParameters {
 	private MessageInterpolator messageInterpolator;
 	private TraversableResolver traversableResolver;
 	private ParameterNameProvider parameterNameProvider;
-	private PropertyNodeNameProvider propertyNodeNameProvider;
 	private ClockProvider clockProvider;
 	private ValidationProvider<?> provider;
 	private Class<? extends ValidationProvider<?>> providerClass = null;
 	private final Map<String, String> configProperties = new HashMap<>();
 	private final Set<InputStream> mappings = new HashSet<>();
 	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = new HashMap<>();
+	private PropertyNodeNameProvider propertyNodeNameProvider;
 
 	public ValidationBootstrapParameters() {
 	}
@@ -136,14 +136,6 @@ public class ValidationBootstrapParameters {
 		this.parameterNameProvider = parameterNameProvider;
 	}
 
-	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
-		return propertyNodeNameProvider;
-	}
-
-	public void setPropertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider) {
-		this.propertyNodeNameProvider = propertyNodeNameProvider;
-	}
-
 	public ClockProvider getClockProvider() {
 		return clockProvider;
 	}
@@ -158,6 +150,14 @@ public class ValidationBootstrapParameters {
 
 	public void addValueExtractorDescriptor(ValueExtractorDescriptor descriptor) {
 		valueExtractorDescriptors.put( descriptor.getKey(), descriptor );
+	}
+
+	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
+		return propertyNodeNameProvider;
+	}
+
+	public void setPropertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider) {
+		this.propertyNodeNameProvider = propertyNodeNameProvider;
 	}
 
 	@SuppressWarnings("unchecked")

@@ -58,6 +58,8 @@ public interface HibernateValidatorFactory extends ValidatorFactory {
 	@Incubating
 	GetterPropertySelectionStrategy getGetterPropertySelectionStrategy();
 
+	// do i need this?
+
 	/**
 	 * Returns a context for validator configuration via options from the
 	 * Bean Validation API as well as specific ones from Hibernate Validator.

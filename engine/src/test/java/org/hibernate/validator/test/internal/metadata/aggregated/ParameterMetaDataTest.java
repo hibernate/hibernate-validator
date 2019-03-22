@@ -65,8 +65,7 @@ public class ParameterMetaDataTest {
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider() ),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build(),
-				new DefaultPropertyNodeNameProvider()
+				new MethodValidationConfiguration.Builder().build()
 		);
 
 		beanMetaData = beanMetaDataManager.getBeanMetaData( CustomerRepository.class );
@@ -135,8 +134,7 @@ public class ParameterMetaDataTest {
 				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider() ),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration.Builder().build(),
-				new DefaultPropertyNodeNameProvider()
+				new MethodValidationConfiguration.Builder().build()
 		);
 		BeanMetaData<ServiceImpl> localBeanMetaData = beanMetaDataManager.getBeanMetaData( ServiceImpl.class );
 

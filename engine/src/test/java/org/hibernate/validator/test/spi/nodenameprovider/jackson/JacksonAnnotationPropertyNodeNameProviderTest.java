@@ -8,8 +8,6 @@ package org.hibernate.validator.test.spi.nodenameprovider.jackson;
 
 import static org.testng.Assert.assertEquals;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
@@ -17,57 +15,83 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import org.hibernate.validator.HibernateValidator;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+/**
+ * @author Damir Alibegovic
+ */
 public class JacksonAnnotationPropertyNodeNameProviderTest {
-	@Test
-	public void mapTest() {
+	private static final int VALID_HORSE_POWER = 150;
+	private static final int INVALID_HORSE_POWER = 250;
+
+	private Validator validator;
+
+	@BeforeMethod
+	public void setUp() {
 		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
 				.configure()
 				.propertyNodeNameProvider( new JacksonAnnotationPropertyNodeNameProvider() )
 				.buildValidatorFactory();
-		Validator validator = validatorFactory.getValidator();
 
-		Car testInstance = new Car();
-		testInstance.mapAsPropertyHolder.put( "engine_property", new Engine( 1000 ) );
+		validator = validatorFactory.getValidator();
+	}
+
+	@Test
+	public void jsonPropertyOnFieldIsUsedForPathResolution() {
+		Car testInstance = new Car( new Engine( INVALID_HORSE_POWER ) );
 
 		Set<ConstraintViolation<Car>> violations = validator.validate( testInstance );
 		ConstraintViolation<Car> violation = violations.iterator().next();
 
-		assertEquals(
-				violation.getPropertyPath().toString(), "map_as_property_holder[engine_property].horse_power.power" );
+		assertEquals( violation.getPropertyPath().toString(), "engine.horse_power" );
 	}
 
-	private static class Car {
+	@Test
+	public void jsonPropertyOnGetterIsUsedForPathResolution() {
+		int invalidNumberOfSeats = 0;
+		Car testInstance = new Car( new Engine( VALID_HORSE_POWER ), invalidNumberOfSeats );
+
+		Set<ConstraintViolation<Car>> violations = validator.validate( testInstance );
+		ConstraintViolation<Car> violation = violations.iterator().next();
+
+		assertEquals( violation.getPropertyPath().toString(), "number_of_seats" );
+	}
+
+	private class Car {
 		@Valid
-		@JsonProperty(value = "map_as_property_holder")
-		private Map<String, Object> mapAsPropertyHolder = new HashMap<>();
+		private final Engine engine;
+
+		@Min(1)
+		private final int numberOfSeats;
+
+		Car(Engine engine) {
+			this( engine, 4 );
+		}
+
+		Car(Engine engine, int numberOfSeats) {
+			this.engine = engine;
+			this.numberOfSeats = numberOfSeats;
+		}
+
+		@JsonProperty("number_of_seats")
+		public int getNumberOfSeats() {
+			return numberOfSeats;
+		}
 	}
 
-	private static class Engine {
-		private HorsePower horsePower;
+	private class Engine {
+		@JsonProperty("horse_power")
+		@Max(200)
+		private final int horsePower;
 
 		Engine(int horsePower) {
-			this.horsePower = new HorsePower( horsePower );
-		}
-
-		@Valid
-		@JsonProperty("horse_power")
-		public HorsePower getHorsePower() {
-			return horsePower;
-		}
-	}
-
-	private static class HorsePower {
-		@Max(500)
-		private int power;
-
-		HorsePower(int power) {
-			this.power = power;
+			this.horsePower = horsePower;
 		}
 	}
 }

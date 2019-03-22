@@ -309,8 +309,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						javaBeanHelper,
 						validationOrderGenerator,
 						buildMetaDataProviders(),
-						methodValidationConfiguration,
-						validatorFactoryScopedContext.getPropertyNodeNameProvider()
+						methodValidationConfiguration
 				)
 		);
 

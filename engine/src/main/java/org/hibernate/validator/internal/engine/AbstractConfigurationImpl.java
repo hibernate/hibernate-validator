@@ -23,7 +23,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
@@ -91,8 +90,8 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private final TraversableResolver defaultTraversableResolver;
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
 	private final ParameterNameProvider defaultParameterNameProvider;
-	private final PropertyNodeNameProvider defaultPropertyNodeNameProvider;
 	private final ClockProvider defaultClockProvider;
+	private final PropertyNodeNameProvider defaultPropertyNodeNameProvider;
 
 	private ValidationProviderResolver providerResolver;
 	private final ValidationBootstrapParameters validationBootstrapParameters;
@@ -141,8 +140,8 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		this.defaultTraversableResolver = TraversableResolvers.getDefault();
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
-		this.defaultPropertyNodeNameProvider = new DefaultPropertyNodeNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
+		this.defaultPropertyNodeNameProvider = new DefaultPropertyNodeNameProvider();
 	}
 
 	@Override
@@ -208,20 +207,6 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 			}
 		}
 		this.validationBootstrapParameters.setParameterNameProvider( parameterNameProvider );
-		return thisAsT();
-	}
-
-	@Override
-	public T propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider) {
-		if ( LOG.isDebugEnabled() ) {
-			if ( propertyNodeNameProvider != null ) {
-				LOG.debug(
-						"Setting custom PropertyNodeNameProvider of type " + propertyNodeNameProvider.getClass()
-								.getName()
-				);
-			}
-		}
-		this.validationBootstrapParameters.setPropertyNodeNameProvider( propertyNodeNameProvider );
 		return thisAsT();
 	}
 
@@ -324,6 +309,24 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 		this.getterPropertySelectionStrategy = getterPropertySelectionStrategy;
 		return thisAsT();
+	}
+
+	@Override
+	public T propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider) {
+		if ( LOG.isDebugEnabled() ) {
+			if ( propertyNodeNameProvider != null ) {
+				LOG.debug( "Setting custom PropertyNodeNameProvider of type " + propertyNodeNameProvider.getClass()
+						.getName() );
+			}
+		}
+		this.validationBootstrapParameters.setPropertyNodeNameProvider( propertyNodeNameProvider );
+
+		return thisAsT();
+	}
+
+	@Override
+	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
+		return validationBootstrapParameters.getPropertyNodeNameProvider();
 	}
 
 	public boolean isAllowParallelMethodsDefineParameterConstraints() {
@@ -474,11 +477,6 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	}
 
 	@Override
-	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
-		return validationBootstrapParameters.getPropertyNodeNameProvider();
-	}
-
-	@Override
 	public ClockProvider getClockProvider() {
 		return validationBootstrapParameters.getClockProvider();
 	}
@@ -585,11 +583,11 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 			if ( validationBootstrapParameters.getParameterNameProvider() == null ) {
 				validationBootstrapParameters.setParameterNameProvider( defaultParameterNameProvider );
 			}
-			if ( validationBootstrapParameters.getPropertyNodeNameProvider() == null ) {
-				validationBootstrapParameters.setPropertyNodeNameProvider( defaultPropertyNodeNameProvider );
-			}
 			if ( validationBootstrapParameters.getClockProvider() == null ) {
 				validationBootstrapParameters.setClockProvider( defaultClockProvider );
+			}
+			if ( validationBootstrapParameters.getPropertyNodeNameProvider() == null ) {
+				validationBootstrapParameters.setPropertyNodeNameProvider( defaultPropertyNodeNameProvider );
 			}
 		}
 		else {
@@ -650,6 +648,15 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 			}
 		}
 
+		if ( validationBootstrapParameters.getClockProvider() == null ) {
+			if ( xmlParameters.getClockProvider() != null ) {
+				validationBootstrapParameters.setClockProvider( xmlParameters.getClockProvider() );
+			}
+			else {
+				validationBootstrapParameters.setClockProvider( defaultClockProvider );
+			}
+		}
+
 		if ( validationBootstrapParameters.getPropertyNodeNameProvider() == null ) {
 			if ( xmlParameters.getPropertyNodeNameProvider() != null ) {
 				validationBootstrapParameters.setPropertyNodeNameProvider(
@@ -657,15 +664,6 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 			}
 			else {
 				validationBootstrapParameters.setPropertyNodeNameProvider( defaultPropertyNodeNameProvider );
-			}
-		}
-
-		if ( validationBootstrapParameters.getClockProvider() == null ) {
-			if ( xmlParameters.getClockProvider() != null ) {
-				validationBootstrapParameters.setClockProvider( xmlParameters.getClockProvider() );
-			}
-			else {
-				validationBootstrapParameters.setClockProvider( defaultClockProvider );
 			}
 		}
 

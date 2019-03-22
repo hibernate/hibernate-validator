@@ -25,15 +25,15 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 public class JavaBeanField implements org.hibernate.validator.internal.properties.Field, JavaBeanAnnotatedConstrainable {
 
 	private final Field field;
-	private final String resolvedName;
+	private final String resolvedPropertyName;
 	private final Type typeForValidatorResolution;
 	private final Type type;
 
-	public JavaBeanField(Field field, String resolvedName) {
+	public JavaBeanField(Field field, String resolvedPropertyName) {
 		this.field = field;
 		this.type = ReflectionHelper.typeOf( field );
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( this.type );
-		this.resolvedName = resolvedName;
+		this.resolvedPropertyName = resolvedPropertyName;
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 
 	@Override
 	public String getResolvedPropertyName() {
-		return resolvedName;
+		return resolvedPropertyName;
 	}
 
 	@Override

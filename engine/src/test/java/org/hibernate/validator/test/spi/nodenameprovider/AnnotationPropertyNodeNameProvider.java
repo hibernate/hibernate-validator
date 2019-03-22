@@ -15,14 +15,18 @@ import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
 import org.hibernate.validator.spi.nodenameprovider.Property;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
+/**
+ * An example of how a name can be resolved from an annotation
+ *
+ * @author Damir Alibegovic
+ */
 class AnnotationPropertyNodeNameProvider implements PropertyNodeNameProvider, Serializable {
 	private static final String VALUE = "value";
 
 	private final Class<? extends Annotation> annotationType;
 	private final String annotationMemberName;
 
-	private AnnotationPropertyNodeNameProvider(Class<? extends Annotation> annotationType,
-			String annotationMemberName) {
+	private AnnotationPropertyNodeNameProvider(Class<? extends Annotation> annotationType, String annotationMemberName) {
 		Objects.requireNonNull( annotationType );
 
 		this.annotationType = annotationType;
@@ -42,19 +46,6 @@ class AnnotationPropertyNodeNameProvider implements PropertyNodeNameProvider, Se
 		return getDefaultName( property );
 	}
 
-	private Field getField(String fieldName, Class clazz) {
-		for ( Field field : clazz.getFields() ) {
-			field.setAccessible( true );
-			String name = field.getName();
-
-			if ( name.equals( fieldName ) ) {
-				return field;
-			}
-		}
-
-		return null;
-	}
-
 	private String getJavaBeanPropertyName(JavaBeanProperty property) {
 		String resolvedName = property.getName();
 
@@ -71,6 +62,19 @@ class AnnotationPropertyNodeNameProvider implements PropertyNodeNameProvider, Se
 		}
 
 		return resolvedName;
+	}
+
+	private Field getField(String fieldName, Class clazz) {
+		for ( Field field : clazz.getFields() ) {
+			field.setAccessible( true );
+			String name = field.getName();
+
+			if ( name.equals( fieldName ) ) {
+				return field;
+			}
+		}
+
+		return null;
 	}
 
 	private String getDefaultName(Property property) {

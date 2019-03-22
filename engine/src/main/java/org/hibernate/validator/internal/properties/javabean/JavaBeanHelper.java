@@ -11,7 +11,6 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -53,9 +52,9 @@ public class JavaBeanHelper {
 		Contracts.assertNotNull( declaringClass, MESSAGES.classCannotBeNull() );
 
 		Field field = run( GetDeclaredField.action( declaringClass, property ) );
-		String name = propertyNodeNameProvider.getName( javaBeanPropertyFrom( declaringClass, property ) );
+		String resolvedName = propertyNodeNameProvider.getName( javaBeanPropertyFrom( declaringClass, property ) );
 
-		return Optional.ofNullable( field ).map( f -> new JavaBeanField( f, name ) );
+		return Optional.ofNullable( field ).map( f -> new JavaBeanField( f, resolvedName ) );
 	}
 
 	public Optional<JavaBeanGetter> findDeclaredGetter(Class<?> declaringClass, String property) {
@@ -176,10 +175,6 @@ public class JavaBeanHelper {
 	private static class JavaBeanPropertyImpl implements JavaBeanProperty {
 		private final Class<?> declaringClass;
 		private final String name;
-
-		private JavaBeanPropertyImpl(Member member) {
-			this( member.getDeclaringClass(), member.getName() );
-		}
 
 		private JavaBeanPropertyImpl(Class<?> declaringClass, String name) {
 			this.declaringClass = declaringClass;

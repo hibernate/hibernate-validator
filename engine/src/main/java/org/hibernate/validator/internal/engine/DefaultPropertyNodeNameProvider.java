@@ -11,6 +11,11 @@ import java.io.Serializable;
 import org.hibernate.validator.spi.nodenameprovider.Property;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
+/**
+ * A default {@link PropertyNodeNameProvider} implementation which returns the property name
+ *
+ * @author Damir Alibegovic
+ */
 public class DefaultPropertyNodeNameProvider implements PropertyNodeNameProvider, Serializable {
 	@Override
 	public String getName(Property property) {

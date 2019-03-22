@@ -54,11 +54,6 @@ public class PredefinedScopeValidatorContextImpl implements HibernateValidatorCo
 	}
 
 	@Override
-	public HibernateValidatorContext propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider) {
-		throw new IllegalStateException( "Defining a Validator-specific property node name provider is not supported by the predefined scope ValidatorFactory." );
-	}
-
-	@Override
 	public HibernateValidatorContext clockProvider(ClockProvider clockProvider) {
 		throw new IllegalStateException( "Defining a Validator-specific clock provider is not supported by the predefined scope ValidatorFactory." );
 	}
@@ -104,6 +99,11 @@ public class PredefinedScopeValidatorContextImpl implements HibernateValidatorCo
 	public HibernateValidatorContext constraintValidatorPayload(Object dynamicPayload) {
 		validatorFactoryScopedContextBuilder.setConstraintValidatorPayload( dynamicPayload );
 		return this;
+	}
+
+	@Override
+	public HibernateValidatorContext propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider) {
+		throw new IllegalStateException( "Defining a Validator-specific property node name provider is not supported by the predefined scope ValidatorFactory." );
 	}
 
 	@Override

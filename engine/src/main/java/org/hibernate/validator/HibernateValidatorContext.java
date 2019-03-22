@@ -11,6 +11,7 @@ import java.time.Duration;
 
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
+import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
@@ -45,11 +46,6 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 */
 	@Override
 	HibernateValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider);
-
-	/**
-	 * @since 6.1
-	 */
-	HibernateValidatorContext propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider);
 
 	/**
 	 * @since 6.0
@@ -173,4 +169,16 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 */
 	@Incubating
 	HibernateValidatorContext constraintValidatorPayload(Object constraintValidatorPayload);
+
+	/**
+	 * Allows to set a property node name provider, defining the way how the name of a property node will be resolved
+	 * when constructing property path, e.g. {@link ConstraintViolation#getPropertyPath()}
+	 *
+	 * @param propertyNodeNameProvider the {@link PropertyNodeNameProvider} to be used
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.1.0
+	 */
+	HibernateValidatorContext propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider);
 }
