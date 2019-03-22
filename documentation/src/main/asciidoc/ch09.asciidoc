@@ -545,8 +545,6 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CustomScri
 ----
 ====
 
-add here
-
 [[section-configuring-validator]]
 === Configuring a Validator
 
