@@ -35,7 +35,6 @@ public class ValidatorFactoryScopedContext {
 	 */
 	private final ExecutableParameterNameProvider parameterNameProvider;
 
-
 	/**
 	 * Provider for the current time when validating {@code @Future} or {@code @Past}
 	 */
