@@ -24,6 +24,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -31,6 +32,7 @@ import org.testng.annotations.Test;
 /**
  * @author Damir Alibegovic
  */
+@TestForIssue(jiraKey = "HV-823")
 public class PropertyNodeNameProviderTest {
 	private static final String INVALID_BRAND_NAME = "BMW";
 	private static final String VALID_BRAND_NAME = "Mercedes";

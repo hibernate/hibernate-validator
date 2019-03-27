@@ -7,12 +7,15 @@
 package org.hibernate.validator.spi.nodenameprovider;
 
 
+import org.hibernate.validator.Incubating;
+
 /**
  * Base interface for metadata about a property
  *
  * @author Damir Alibegovic
  * @since 6.1.0
  */
+@Incubating
 public interface Property {
 	/**
 	 * Returns property name

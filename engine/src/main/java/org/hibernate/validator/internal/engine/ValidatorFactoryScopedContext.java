@@ -17,7 +17,6 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 public class ValidatorFactoryScopedContext {
@@ -36,10 +35,6 @@ public class ValidatorFactoryScopedContext {
 	 */
 	private final ExecutableParameterNameProvider parameterNameProvider;
 
-	/**
-	 *  {@link PropertyNodeNameProvider} to be used for property name resolution when constructing a property path
-	 */
-	private final PropertyNodeNameProvider propertyNodeNameProvider;
 
 	/**
 	 * Provider for the current time when validating {@code @Future} or {@code @Past}
@@ -81,14 +76,13 @@ public class ValidatorFactoryScopedContext {
 	ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
-			PropertyNodeNameProvider propertyNodeNameProvider,
 			ClockProvider clockProvider,
 			Duration temporalValidationTolerance,
 			ScriptEvaluatorFactory scriptEvaluatorFactory,
 			boolean failFast,
 			boolean traversableResolverResultCacheEnabled,
 			Object constraintValidatorPayload) {
-		this( messageInterpolator, traversableResolver, parameterNameProvider, propertyNodeNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
+		this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
 				traversableResolverResultCacheEnabled, constraintValidatorPayload,
 				new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
 						temporalValidationTolerance ) );
@@ -97,7 +91,6 @@ public class ValidatorFactoryScopedContext {
 	private ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
-			PropertyNodeNameProvider propertyNodeNameProvider,
 			ClockProvider clockProvider,
 			Duration temporalValidationTolerance,
 			ScriptEvaluatorFactory scriptEvaluatorFactory,
@@ -108,7 +101,6 @@ public class ValidatorFactoryScopedContext {
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
 		this.parameterNameProvider = parameterNameProvider;
-		this.propertyNodeNameProvider = propertyNodeNameProvider;
 		this.clockProvider = clockProvider;
 		this.temporalValidationTolerance = temporalValidationTolerance;
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
@@ -128,10 +120,6 @@ public class ValidatorFactoryScopedContext {
 
 	public ExecutableParameterNameProvider getParameterNameProvider() {
 		return this.parameterNameProvider;
-	}
-
-	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
-		return this.propertyNodeNameProvider;
 	}
 
 	public ClockProvider getClockProvider() {
@@ -168,7 +156,6 @@ public class ValidatorFactoryScopedContext {
 		private MessageInterpolator messageInterpolator;
 		private TraversableResolver traversableResolver;
 		private ExecutableParameterNameProvider parameterNameProvider;
-		private PropertyNodeNameProvider propertyNodeNameProvider;
 		private ClockProvider clockProvider;
 		private ScriptEvaluatorFactory scriptEvaluatorFactory;
 		private Duration temporalValidationTolerance;
@@ -184,7 +171,6 @@ public class ValidatorFactoryScopedContext {
 			this.messageInterpolator = defaultContext.messageInterpolator;
 			this.traversableResolver = defaultContext.traversableResolver;
 			this.parameterNameProvider = defaultContext.parameterNameProvider;
-			this.propertyNodeNameProvider = defaultContext.propertyNodeNameProvider;
 			this.clockProvider = defaultContext.clockProvider;
 			this.scriptEvaluatorFactory = defaultContext.scriptEvaluatorFactory;
 			this.temporalValidationTolerance = defaultContext.temporalValidationTolerance;
@@ -221,16 +207,6 @@ public class ValidatorFactoryScopedContext {
 			}
 			else {
 				this.parameterNameProvider = new ExecutableParameterNameProvider( parameterNameProvider );
-			}
-			return this;
-		}
-
-		public ValidatorFactoryScopedContext.Builder setPropertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider) {
-			if ( propertyNodeNameProvider == null ) {
-				this.propertyNodeNameProvider = defaultContext.propertyNodeNameProvider;
-			}
-			else {
-				this.propertyNodeNameProvider = propertyNodeNameProvider;
 			}
 			return this;
 		}
@@ -280,7 +256,6 @@ public class ValidatorFactoryScopedContext {
 					messageInterpolator,
 					traversableResolver,
 					parameterNameProvider,
-					propertyNodeNameProvider,
 					clockProvider,
 					temporalValidationTolerance,
 					scriptEvaluatorFactory,

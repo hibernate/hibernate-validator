@@ -127,6 +127,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 *
 	 * @since 6.1.0
 	 */
+	@Incubating
 	String PROPERTY_NODE_NAME_PROVIDER_CLASSNAME = "hibernate.validator.property_node_name_provider";
 
 	/**
@@ -357,14 +358,6 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 *
 	 * @since 6.1.0
 	 */
+	@Incubating
 	S propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider);
-
-	/**
-	 * Returns the property node name provider for this configuration.
-	 *
-	 * @return {@link PropertyNodeNameProvider} instance or {@code null} if not defined
-	 *
-	 * @since 6.1.0
-	 */
-	PropertyNodeNameProvider getPropertyNodeNameProvider();
 }

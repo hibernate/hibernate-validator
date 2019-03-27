@@ -23,7 +23,6 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromGetterNameCandidates;
 import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
-import org.hibernate.validator.spi.nodenameprovider.Property;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.ConstrainableExecutable;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
@@ -52,9 +51,8 @@ public class JavaBeanHelper {
 		Contracts.assertNotNull( declaringClass, MESSAGES.classCannotBeNull() );
 
 		Field field = run( GetDeclaredField.action( declaringClass, property ) );
-		String resolvedName = propertyNodeNameProvider.getName( javaBeanPropertyFrom( declaringClass, property ) );
 
-		return Optional.ofNullable( field ).map( f -> new JavaBeanField( f, resolvedName ) );
+		return Optional.ofNullable( field ).map( this::field );
 	}
 
 	public Optional<JavaBeanGetter> findDeclaredGetter(Class<?> declaringClass, String property) {
@@ -82,7 +80,7 @@ public class JavaBeanHelper {
 		}
 		else {
 			return Optional.of( new JavaBeanGetter( declaringClass, getter, property, propertyNodeNameProvider.getName(
-					javaBeanPropertyFrom( declaringClass, property ) ) ) );
+					new JavaBeanPropertyImpl( declaringClass, property ) ) ) );
 		}
 	}
 
@@ -124,18 +122,14 @@ public class JavaBeanHelper {
 		Optional<String> correspondingProperty = getterPropertySelectionStrategy.getProperty( executable );
 		if ( correspondingProperty.isPresent() ) {
 			return new JavaBeanGetter( declaringClass, method, correspondingProperty.get(), propertyNodeNameProvider.getName(
-					javaBeanPropertyFrom( declaringClass, correspondingProperty.get() ) ) );
+					new JavaBeanPropertyImpl( declaringClass, correspondingProperty.get() ) ) );
 		}
 
 		return new JavaBeanMethod( method );
 	}
 
-	public String resolvePropertyName(Property property) {
-		return propertyNodeNameProvider.getName( property );
-	}
-
-	public Property javaBeanPropertyFrom(Class<?> declaringClass, String name) {
-		return new JavaBeanPropertyImpl( declaringClass, name );
+	public JavaBeanField field(Field field) {
+		return new JavaBeanField( field, propertyNodeNameProvider.getName( new JavaBeanPropertyImpl( field.getDeclaringClass(), field.getName() ) ) );
 	}
 
 	/**

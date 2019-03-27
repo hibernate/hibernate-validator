@@ -18,6 +18,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.testng.annotations.BeforeMethod;
@@ -26,6 +27,7 @@ import org.testng.annotations.Test;
 /**
  * @author Damir Alibegovic
  */
+@TestForIssue(jiraKey = "HV-823")
 public class JacksonAnnotationPropertyNodeNameProviderTest {
 	private static final int VALID_HORSE_POWER = 150;
 	private static final int INVALID_HORSE_POWER = 250;

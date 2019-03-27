@@ -6,12 +6,15 @@
  */
 package org.hibernate.validator.spi.nodenameprovider;
 
+import org.hibernate.validator.Incubating;
+
 /**
  * This interface is used to resolve the name of a property node when creating the property path.
  *
  * @author Damir Alibegovic
  * @since 6.1.0
  */
+@Incubating
 public interface PropertyNodeNameProvider {
 	/**
 	 * Returns resolved name of the property.

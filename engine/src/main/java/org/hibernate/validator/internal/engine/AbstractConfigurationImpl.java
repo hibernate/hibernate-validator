@@ -325,7 +325,6 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		return thisAsT();
 	}
 
-	@Override
 	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
 		return validationBootstrapParameters.getPropertyNodeNameProvider();
 	}

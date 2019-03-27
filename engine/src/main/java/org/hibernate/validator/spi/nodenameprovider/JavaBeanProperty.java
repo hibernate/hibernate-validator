@@ -6,12 +6,15 @@
  */
 package org.hibernate.validator.spi.nodenameprovider;
 
+import org.hibernate.validator.Incubating;
+
 /**
  * Contains metadata for a JavaBean property
  *
  * @author Damir Alibegovic
  * @since 6.1.0
  */
+@Incubating
 public interface JavaBeanProperty extends Property {
 	/**
 	 * Class object of the property holder

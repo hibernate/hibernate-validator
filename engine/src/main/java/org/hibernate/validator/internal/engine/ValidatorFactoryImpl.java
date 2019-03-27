@@ -147,7 +147,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				configurationState.getMessageInterpolator(),
 				configurationState.getTraversableResolver(),
 				new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() ),
-				hibernateSpecificConfig.getPropertyNodeNameProvider(),
 				configurationState.getClockProvider(),
 				determineTemporalValidationTolerance( configurationState, properties ),
 				determineScriptEvaluatorFactory( configurationState, properties, externalClassLoader ),
