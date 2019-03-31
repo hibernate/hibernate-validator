@@ -202,6 +202,23 @@ final class ValidatorFactoryConfigurationHelper {
 		return tmpFailFast;
 	}
 
+	static boolean determineFailFastOnPropertyViolation(AbstractConfigurationImpl<?> configuration, Map<String, String> properties) {
+		// check whether fail fast on property violation is programmatically enabled
+		boolean tmpFailFastOnPropertyViolation = configuration != null ? configuration.getFailFastOnPropertyViolation() : false;
+
+		String propertyStringValue = properties.get( HibernateValidatorConfiguration.FAIL_FAST_ON_PROPERTY_VIOLATION );
+		if ( propertyStringValue != null ) {
+			boolean configurationValue = Boolean.valueOf( propertyStringValue );
+			// throw an exception if the programmatic value is true and it overrides a false configured value
+			if ( tmpFailFastOnPropertyViolation && !configurationValue ) {
+				throw LOG.getInconsistentFailFastOnPropertyViolationConfigurationException();
+			}
+			tmpFailFastOnPropertyViolation = configurationValue;
+		}
+
+		return tmpFailFastOnPropertyViolation;
+	}
+
 	static ScriptEvaluatorFactory determineScriptEvaluatorFactory(ConfigurationState configurationState, Map<String, String> properties,
 			ClassLoader externalClassLoader) {
 		if ( configurationState instanceof AbstractConfigurationImpl ) {
