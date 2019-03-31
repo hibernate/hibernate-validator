@@ -117,6 +117,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	// HV-specific options
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
 	private boolean failFast;
+	private boolean failFastOnPropertyViolation;
 	private ClassLoader externalClassLoader;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 	private boolean traversableResolverResultCacheEnabled = true;
@@ -292,6 +293,12 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	@Override
 	public final T failFast(boolean failFast) {
 		this.failFast = failFast;
+		return thisAsT();
+	}
+
+	@Override
+	public T failFastOnPropertyViolation(boolean failFastOnPropertyViolation) {
+		this.failFastOnPropertyViolation = failFastOnPropertyViolation;
 		return thisAsT();
 	}
 
@@ -492,6 +499,10 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	public final boolean getFailFast() {
 		return failFast;
+	}
+
+	public final boolean getFailFastOnPropertyViolation() {
+		return this.failFastOnPropertyViolation;
 	}
 
 	@Override
