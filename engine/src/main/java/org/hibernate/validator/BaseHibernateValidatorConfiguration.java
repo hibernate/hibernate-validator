@@ -169,6 +169,15 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	String CUSTOM_VIOLATION_EXPRESSION_LANGUAGE_FEATURE_LEVEL = "hibernate.validator.custom_violation_expression_language_feature_level";
 
 	/**
+	 * Property corresponding to the {@link #failFastOnPropertyViolation} method.
+	 * Accepts {@code true} or {@code false}. Defaults to {@code false}.
+	 *
+	 * @since 6.2
+	 */
+	@Incubating
+	String FAIL_FAST_ON_PROPERTY_VIOLATION = "hibernate.validator.fail_fast_on_property_violation";
+
+	/**
 	 * <p>
 	 * Returns the {@link ResourceBundleLocator} used by the
 	 * {@link Configuration#getDefaultMessageInterpolator() default message
@@ -480,4 +489,18 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	S customViolationExpressionLanguageFeatureLevel(ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel);
+
+	/**
+	 * En- or disables the skipping of class level constraints based on validation of property level ones. When this
+	 * mode is enabled the validation of class level constraints will not be performed if any of the property level
+	 * constraints generated a violation.
+	 *
+	 * @param failFastOnPropertyViolation {@code true} to enable the skipping mode, {@code false} otherwise.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.2
+	 */
+	@Incubating
+	S failFastOnPropertyViolation(boolean failFastOnPropertyViolation);
 }

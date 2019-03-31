@@ -71,6 +71,12 @@ public class PredefinedScopeValidatorContextImpl implements HibernateValidatorCo
 	}
 
 	@Override
+	public HibernateValidatorContext failFastOnPropertyViolation(boolean failFastOnPropertyViolation) {
+		validatorFactoryScopedContextBuilder.setFailFastOnPropertyViolation( failFastOnPropertyViolation );
+		return this;
+	}
+
+	@Override
 	public HibernateValidatorContext allowOverridingMethodAlterParameterConstraint(boolean allow) {
 		throw new IllegalStateException( "Altering method validation configuration is not supported by the predefined scope ValidatorFactory." );
 	}
