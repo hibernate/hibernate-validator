@@ -178,4 +178,18 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 */
 	@Incubating
 	HibernateValidatorContext showValidatedValuesInTraceLogs(boolean enabled);
+
+	/**
+	 * En- or disables the skipping of class level constraints based on validation of property level ones. When this
+	 * mode is enabled the validation of class level constraints will not be performed if any of the property level
+	 * constraints generated a violation.
+	 *
+	 * @param failFastOnPropertyViolation {@code true} to enable the skipping mode, {@code false} otherwise.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 9.0
+	 */
+	@Incubating
+	HibernateValidatorContext failFastOnPropertyViolation(boolean failFastOnPropertyViolation);
 }

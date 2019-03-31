@@ -40,6 +40,8 @@ public interface ValidationContext<T> {
 
 	boolean isFailFastModeEnabled();
 
+	boolean isFailFastOnPropertyViolationModeEnabled();
+
 	boolean isShowValidatedValuesInTraceLogs();
 
 	ConstraintValidatorManager getConstraintValidatorManager();

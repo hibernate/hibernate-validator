@@ -167,6 +167,11 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	}
 
 	@Override
+	public boolean isFailFastOnPropertyViolationModeEnabled() {
+		return validatorScopedContext.isFailFastOnPropertyViolation();
+	}
+
+	@Override
 	public boolean isFailFastModeEnabled() {
 		return validatorScopedContext.isFailFast();
 	}

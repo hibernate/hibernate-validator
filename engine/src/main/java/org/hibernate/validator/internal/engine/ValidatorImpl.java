@@ -463,15 +463,19 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			// if the current class redefined the default group sequence, this sequence has to be applied to all the class hierarchy.
 			if ( defaultGroupSequenceIsRedefined ) {
 				Iterator<Sequence> defaultGroupSequence = hostingBeanMetaData.getDefaultValidationSequence( valueContext.getCurrentBean() );
-				Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getMetaConstraints();
+				Set<MetaConstraint<?>> classMetaConstraints = hostingBeanMetaData.getClassMetaConstraints();
+				Set<MetaConstraint<?>> propertyMetaConstraints = hostingBeanMetaData.getPropertyMetaConstraints();
 
 				while ( defaultGroupSequence.hasNext() ) {
 					for ( GroupWithInheritance groupOfGroups : defaultGroupSequence.next() ) {
 						boolean validationSuccessful = true;
 
 						for ( Group defaultSequenceMember : groupOfGroups ) {
-							validationSuccessful = validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz,
-									metaConstraints, defaultSequenceMember ) && validationSuccessful;
+							boolean propertyValidationResult = propertyMetaConstraints.isEmpty() || validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, propertyMetaConstraints, defaultSequenceMember );
+							validationSuccessful = propertyValidationResult && validationSuccessful;
+							if ( !validationContext.isFailFastOnPropertyViolationModeEnabled() || propertyValidationResult ) {
+								validationSuccessful = ( classMetaConstraints.isEmpty() || validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, classMetaConstraints, defaultSequenceMember ) ) && validationSuccessful;
+							}
 						}
 
 						validationContext.markCurrentBeanAsProcessed( valueContext );
@@ -484,9 +488,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 			// fast path in case the default group sequence hasn't been redefined
 			else {
-				Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
-				validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, metaConstraints,
-						Group.DEFAULT_GROUP );
+				boolean propertyValidationResult = validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, hostingBeanMetaData.getDirectPropertyMetaConstraints(), Group.DEFAULT_GROUP );
+				if ( !validationContext.isFailFastOnPropertyViolationModeEnabled() || propertyValidationResult ) {
+					validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, hostingBeanMetaData.getDirectClassMetaConstraints(), Group.DEFAULT_GROUP );
+				}
 				validationContext.markCurrentBeanAsProcessed( valueContext );
 			}
 
@@ -526,19 +531,23 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private void validateConstraintsForNonDefaultGroup(BaseBeanValidationContext<?> validationContext, BeanValueContext<?, Object> valueContext) {
-		validateMetaConstraints( validationContext, valueContext, valueContext.getCurrentBean(), valueContext.getCurrentBeanMetaData().getMetaConstraints() );
+		boolean propertyValidationResult = validateMetaConstraints( validationContext, valueContext, valueContext.getCurrentBean(), valueContext.getCurrentBeanMetaData().getPropertyMetaConstraints() );
+		if ( !validationContext.isFailFastOnPropertyViolationModeEnabled() || propertyValidationResult ) {
+			validateMetaConstraints( validationContext, valueContext, valueContext.getCurrentBean(), valueContext.getCurrentBeanMetaData().getClassMetaConstraints() );
+		}
 		validationContext.markCurrentBeanAsProcessed( valueContext );
 	}
 
-	private void validateMetaConstraints(BaseBeanValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent,
+	private boolean validateMetaConstraints(BaseBeanValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent,
 			Iterable<MetaConstraint<?>> constraints) {
-
+		boolean validationSuccessful = true;
 		for ( MetaConstraint<?> metaConstraint : constraints ) {
-			validateMetaConstraint( validationContext, valueContext, parent, metaConstraint );
+			validationSuccessful = validateMetaConstraint( validationContext, valueContext, parent, metaConstraint ) && validationSuccessful;
 			if ( shouldFailFast( validationContext ) ) {
 				break;
 			}
 		}
+		return validationSuccessful;
 	}
 
 	private boolean validateMetaConstraint(BaseBeanValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, MetaConstraint<?> metaConstraint) {
