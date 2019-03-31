@@ -468,7 +468,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 						for ( Group defaultSequenceMember : groupOfGroups ) {
 							validationSuccessful = validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz,
-									metaConstraints, defaultSequenceMember );
+									metaConstraints, defaultSequenceMember ) && validationSuccessful;
 						}
 
 						validationContext.markCurrentBeanAsProcessed( valueContext );
