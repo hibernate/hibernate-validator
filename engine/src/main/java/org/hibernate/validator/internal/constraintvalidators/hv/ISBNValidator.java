@@ -68,10 +68,11 @@ public class ISBNValidator implements ConstraintValidator<ISBN, CharSequence> {
 	private boolean checkChecksumISBN10(String isbn) {
 		int sum = 0;
 		for ( int i = 0; i < isbn.length() - 1; i++ ) {
-			sum += ( isbn.charAt( i ) - '0' ) * ( i + 1 );
+			sum += ( isbn.charAt( i ) - '0' ) * ( 10 - i );
 		}
-		char checkSum = isbn.charAt( 9 );
-		return sum % 11 == ( checkSum == 'X' ? 10 : checkSum - '0' );
+		sum += isbn.charAt( 9 ) == 'X' ? 10 : isbn.charAt( 9 ) - '0';
+
+		return ( sum % 11 ) == 0;
 	}
 
 	/**
@@ -80,10 +81,10 @@ public class ISBNValidator implements ConstraintValidator<ISBN, CharSequence> {
 	 */
 	private boolean checkChecksumISBN13(String isbn) {
 		int sum = 0;
-		for ( int i = 0; i < isbn.length() - 1; i++ ) {
+		for ( int i = 0; i < isbn.length(); i++ ) {
 			sum += ( isbn.charAt( i ) - '0' ) * ( i % 2 == 0 ? 1 : 3 );
 		}
-		char checkSum = isbn.charAt( 12 );
-		return 10 - sum % 10 == ( checkSum - '0' );
+
+		return ( sum % 10 ) == 0;
 	}
 }
