@@ -11,7 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
+import org.hibernate.validator.internal.engine.constrainedtype.JavaBeanConstrainedType;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -32,7 +34,7 @@ public class XmlMetaDataProvider implements MetaDataProvider {
 
 	// cached against the fqcn of a class. not a class instance itself (HV-479)
 	@Immutable
-	private final Map<String, BeanConfiguration<?>> configuredBeans;
+	private final Map<HibernateConstrainedType<?>, BeanConfiguration<?>> configuredBeans;
 
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
@@ -49,28 +51,30 @@ public class XmlMetaDataProvider implements MetaDataProvider {
 		annotationProcessingOptions = mappingParser.getAnnotationProcessingOptions();
 	}
 
-	private static Map<String, BeanConfiguration<?>> createBeanConfigurations(MappingXmlParser mappingParser) {
-		final Map<String, BeanConfiguration<?>> configuredBeans = new HashMap<>();
+	private static Map<HibernateConstrainedType<?>, BeanConfiguration<?>> createBeanConfigurations(MappingXmlParser mappingParser) {
+		final Map<HibernateConstrainedType<?>, BeanConfiguration<?>> configuredBeans = new HashMap<>();
 		for ( Class<?> clazz : mappingParser.getXmlConfiguredClasses() ) {
 			Set<ConstrainedElement> constrainedElements = mappingParser.getConstrainedElementsForClass( clazz );
 
+			JavaBeanConstrainedType<?> constrainedType = new JavaBeanConstrainedType<>( clazz );
+
 			BeanConfiguration<?> beanConfiguration = new BeanConfiguration<>(
 					ConfigurationSource.XML,
-					clazz,
+					constrainedType,
 					constrainedElements,
 					mappingParser.getDefaultSequenceForClass( clazz ),
 					null
 			);
 
-			configuredBeans.put( clazz.getName(), beanConfiguration );
+			configuredBeans.put( constrainedType, beanConfiguration );
 		}
 		return configuredBeans;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass) {
-		return (BeanConfiguration<T>) configuredBeans.get( beanClass.getName() );
+	public <T> BeanConfiguration<T> getBeanConfiguration(HibernateConstrainedType<T> constrainedType) {
+		return (BeanConfiguration<T>) configuredBeans.get( constrainedType );
 	}
 
 	@Override

@@ -23,6 +23,7 @@ import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
+import org.hibernate.validator.internal.engine.constrainedtype.JavaBeanConstrainedType;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
@@ -231,7 +232,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	BeanConfiguration<C> build(ConstraintCreationContext constraintCreationContext) {
 		return new BeanConfiguration<>(
 				ConfigurationSource.API,
-				beanClass,
+				new JavaBeanConstrainedType<>( beanClass ),
 				buildConstraintElements( constraintCreationContext ),
 				defaultGroupSequence,
 				getDefaultGroupSequenceProvider()

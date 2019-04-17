@@ -8,6 +8,8 @@ package org.hibernate.validator.internal.metadata.location;
 
 import java.lang.reflect.Type;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
+import org.hibernate.validator.internal.engine.constrainedtype.JavaBeanConstrainedType;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.properties.PropertyAccessor;
@@ -28,14 +30,17 @@ public abstract class AbstractPropertyConstraintLocation<T extends Property> imp
 
 	private final PropertyAccessor propertyAccessor;
 
+	private final HibernateConstrainedType<?> constrainedType;
+
 	AbstractPropertyConstraintLocation(T property) {
 		this.property = property;
 		this.propertyAccessor = property.createAccessor();
+		this.constrainedType = new JavaBeanConstrainedType<>( property.getDeclaringClass() );
 	}
 
 	@Override
-	public Class<?> getDeclaringClass() {
-		return property.getDeclaringClass();
+	public HibernateConstrainedType<?> getDeclaringConstrainedType() {
+		return constrainedType;
 	}
 
 	@Override

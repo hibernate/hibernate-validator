@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.test.internal.metadata;
 
+import static org.hibernate.validator.testutils.BeanMetadataManagerUtil.getBeanMetadata;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotSame;
@@ -73,9 +74,9 @@ public class BeanMetaDataManagerTest {
 			List<Object> memoryConsumer = new ArrayList<>();
 			for ( int i = 0; i < LOOP_COUNT; i++ ) {
 				Class<?> c = new CustomClassLoader().loadClass( Engine.class.getName() );
-				BeanMetaData<?> meta = metaDataManager.getBeanMetaData( c );
-				assertNotSame( meta.getBeanClass(), lastIterationsBean, "The classes should differ in each iteration" );
-				lastIterationsBean = meta.getBeanClass();
+				BeanMetaData<?> meta = getBeanMetadata( metaDataManager, c );
+				assertNotSame( meta.getConstrainedType().getActuallClass(), lastIterationsBean, "The classes should differ in each iteration" );
+				lastIterationsBean = meta.getConstrainedType().getActuallClass();
 				totalCreatedMetaDataInstances++;
 				cachedBeanMetaDataInstances = metaDataManager.numberOfCachedBeanMetaDataInstances();
 
@@ -103,14 +104,14 @@ public class BeanMetaDataManagerTest {
 
 	@Test
 	public void testGetMetaDataForConstrainedEntity() {
-		BeanMetaData<?> beanMetaData = metaDataManager.getBeanMetaData( Engine.class );
+		BeanMetaData<?> beanMetaData = getBeanMetadata( metaDataManager, Engine.class );
 		assertTrue( beanMetaData instanceof BeanMetaDataImpl );
 		assertTrue( beanMetaData.hasConstraints() );
 	}
 
 	@Test
 	public void testGetMetaDataForUnConstrainedEntity() {
-		BeanMetaData<?> beanMetaData = metaDataManager.getBeanMetaData( UnconstrainedEntity.class );
+		BeanMetaData<?> beanMetaData = getBeanMetadata( metaDataManager, UnconstrainedEntity.class );
 		assertTrue(
 				beanMetaData instanceof BeanMetaDataImpl,
 				"#getBeanMetaData should always return a valid BeanMetaData instance. Returned class: " + beanMetaData.getClass()

@@ -29,6 +29,7 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.internal.engine.constrainedtype.JavaBeanConstrainedType;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
@@ -65,7 +66,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 
 	@Test
 	public void testGetConstructorMetaData() throws Exception {
-		BeanConfiguration<Foo> beanConfiguration = provider.getBeanConfiguration( Foo.class );
+		BeanConfiguration<Foo> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( Foo.class ) );
 
 		ConstrainedExecutable constructor = findConstrainedConstructor( beanConfiguration, Foo.class, String.class );
 
@@ -82,7 +83,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	@Test
 	public void testGetCrossParameterMetaData() throws Exception {
 		//when
-		BeanConfiguration<Calendar> beanConfiguration = provider.getBeanConfiguration( Calendar.class );
+		BeanConfiguration<Calendar> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( Calendar.class ) );
 
 		ConstrainedExecutable createEvent = findConstrainedMethod(
 				beanConfiguration,
@@ -117,14 +118,14 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 
 	@Test
 	public void configurationsHaveAnnotationSource() {
-		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
+		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User.class ) );
 		assertThat( beanConfiguration.getSource() ).isEqualTo( ConfigurationSource.ANNOTATION );
 	}
 
 	@Test
 	public void noGroupConversionOnField() throws Exception {
 		//when
-		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
+		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User.class ) );
 		ConstrainedField field = findConstrainedField( beanConfiguration, User.class, "mail" );
 
 		//then
@@ -134,7 +135,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	@Test
 	public void singleGroupConversionOnField() throws Exception {
 		//when
-		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
+		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User.class ) );
 		ConstrainedField field = findConstrainedField( beanConfiguration, User.class, "phone" );
 
 		//then
@@ -147,7 +148,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	@Test
 	public void multipleGroupConversionsOnField() throws Exception {
 		//when
-		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
+		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User.class ) );
 		ConstrainedField field = findConstrainedField( beanConfiguration, User.class, "address" );
 
 		//then
@@ -160,13 +161,13 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
 	public void multipleGroupConversionsOnFieldWithSameFromCauseException() {
-		provider.getBeanConfiguration( User2.class );
+		provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User2.class ) );
 	}
 
 	@Test
 	public void noGroupConversionOnMethod() throws Exception {
 		//when
-		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
+		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User.class ) );
 		ConstrainedExecutable method = findConstrainedMethod( beanConfiguration, User.class, "getMail1" );
 
 		//then
@@ -176,7 +177,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	@Test
 	public void singleGroupConversionOnMethod() throws Exception {
 		//when
-		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
+		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User.class ) );
 		ConstrainedExecutable method = findConstrainedMethod( beanConfiguration, User.class, "getPhone1" );
 
 		//then
@@ -189,7 +190,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	@Test
 	public void multipleGroupConversionsOnMethod() throws Exception {
 		//when
-		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
+		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User.class ) );
 		ConstrainedExecutable method = findConstrainedMethod( beanConfiguration, User.class, "getAddress1" );
 
 		//then
@@ -203,7 +204,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	@Test
 	public void noGroupConversionOnParameter() throws Exception {
 		//when
-		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
+		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User.class ) );
 		ConstrainedExecutable method = findConstrainedMethod(
 				beanConfiguration,
 				User.class,
@@ -218,7 +219,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	@Test
 	public void singleGroupConversionOnParameter() throws Exception {
 		//when
-		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
+		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User.class ) );
 		ConstrainedExecutable method = findConstrainedMethod(
 				beanConfiguration,
 				User.class,
@@ -236,7 +237,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	@Test
 	public void multipleGroupConversionsOnParameter() throws Exception {
 		//when
-		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
+		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User.class ) );
 		ConstrainedExecutable method = findConstrainedMethod(
 				beanConfiguration,
 				User.class,
@@ -254,13 +255,13 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
 	public void multipleGroupConversionsOnParameterWithSameFromCauseException() {
-		provider.getBeanConfiguration( User4.class );
+		provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User4.class ) );
 	}
 
 	@Test
 	public void singleGroupConversionOnConstructor() throws Exception {
 		//when
-		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
+		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User.class ) );
 		ConstrainedExecutable constructor = findConstrainedConstructor( beanConfiguration, User.class );
 
 		//then
@@ -273,7 +274,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	@Test
 	public void multipleGroupConversionsOnConstructorParameter() throws Exception {
 		//when
-		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( User.class );
+		BeanConfiguration<User> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User.class ) );
 		ConstrainedExecutable constructor = findConstrainedConstructor( beanConfiguration, User.class, Address.class );
 
 		//then
@@ -287,7 +288,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	@Test
 	@TestForIssue(jiraKey = "HV-626")
 	public void onlyLocallyDefinedConstraintsAreConsidered() {
-		BeanConfiguration<Person> beanConfiguration = provider.getBeanConfiguration( Person.class );
+		BeanConfiguration<Person> beanConfiguration = provider.getBeanConfiguration( new JavaBeanConstrainedType<>( ( Person.class ) ) );
 
 		ConstrainedType personType = findConstrainedType( beanConfiguration, Person.class );
 		assertThat( personType.getConstraints() ).hasSize( 1 );
@@ -300,7 +301,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
 	public void groupConversionWithSameFromInSingleAndListAnnotationCauseException() {
-		provider.getBeanConfiguration( User3.class );
+		provider.getBeanConfiguration( new JavaBeanConstrainedType<>( User3.class ) );
 	}
 
 	private static class Foo {

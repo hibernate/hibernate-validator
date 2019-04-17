@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 
 /**
@@ -16,7 +17,7 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 */
 public interface BeanMetaDataManager {
 
-	<T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass);
+	<T> BeanMetaData<T> getBeanMetaData(HibernateConstrainedType<T> constrainedType);
 
 	void clear();
 }

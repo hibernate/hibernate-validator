@@ -9,6 +9,7 @@ package org.hibernate.validator.test.internal.engine.path;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.BeanMetadataManagerUtil.getBeanMetadata;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -202,7 +203,7 @@ public class PathImplTest {
 				new MethodValidationConfiguration.Builder().build()
 		);
 
-		ExecutableMetaData executableMetaData = beanMetaDataManager.getBeanMetaData( Container.class )
+		ExecutableMetaData executableMetaData = getBeanMetadata( beanMetaDataManager, Container.class )
 				.getMetaDataFor( executable ).get();
 
 		PathImpl methodParameterPath = PathImpl.createPathForExecutable( executableMetaData );

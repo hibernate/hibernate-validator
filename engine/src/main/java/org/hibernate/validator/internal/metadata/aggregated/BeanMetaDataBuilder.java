@@ -11,6 +11,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
@@ -38,7 +39,7 @@ public class BeanMetaDataBuilder<T> {
 
 	private final ConstraintCreationContext constraintCreationContext;
 	private final ValidationOrderGenerator validationOrderGenerator;
-	private final Class<T> beanClass;
+	private final HibernateConstrainedType<T> constrainedType;
 	private final Set<BuilderDelegate> builders = newHashSet();
 	private final ExecutableHelper executableHelper;
 	private final ExecutableParameterNameProvider parameterNameProvider;
@@ -55,13 +56,13 @@ public class BeanMetaDataBuilder<T> {
 			ExecutableHelper executableHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ValidationOrderGenerator validationOrderGenerator,
-			Class<T> beanClass,
+			HibernateConstrainedType<T> constrainedType,
 			MethodValidationConfiguration methodValidationConfiguration) {
-		this.beanClass = beanClass;
 		this.constraintCreationContext = constraintCreationContext;
 		this.validationOrderGenerator = validationOrderGenerator;
 		this.executableHelper = executableHelper;
 		this.parameterNameProvider = parameterNameProvider;
+		this.constrainedType = constrainedType;
 		this.methodValidationConfiguration = methodValidationConfiguration;
 	}
 
@@ -70,19 +71,19 @@ public class BeanMetaDataBuilder<T> {
 			ExecutableHelper executableHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ValidationOrderGenerator validationOrderGenerator,
-			Class<T> beanClass,
+			HibernateConstrainedType<T> constrainedType,
 			MethodValidationConfiguration methodValidationConfiguration) {
 		return new BeanMetaDataBuilder<>(
 				constraintCreationContext,
 				executableHelper,
 				parameterNameProvider,
 				validationOrderGenerator,
-				beanClass,
+				constrainedType,
 				methodValidationConfiguration );
 	}
 
 	public void add(BeanConfiguration<? super T> configuration) {
-		if ( configuration.getBeanClass().equals( beanClass ) ) {
+		if ( configuration.getConstrainedType().equals( constrainedType ) ) {
 			if ( configuration.getDefaultGroupSequence() != null
 					&& ( sequenceSource == null || configuration.getSource()
 					.getPriority() >= sequenceSource.getPriority() ) ) {
@@ -116,7 +117,7 @@ public class BeanMetaDataBuilder<T> {
 
 		builders.add(
 				new BuilderDelegate(
-						beanClass,
+						constrainedType,
 						constrainableElement,
 						constraintCreationContext,
 						executableHelper,
@@ -126,7 +127,7 @@ public class BeanMetaDataBuilder<T> {
 		);
 	}
 
-	public BeanMetaDataImpl<T> build() {
+	public BeanMetaDataImpl<T> build(List<BeanMetaData<?>> beanMetadataHierarchy) {
 		Set<ConstraintMetaData> aggregatedElements = newHashSet();
 
 		for ( BuilderDelegate builder : builders ) {
@@ -134,16 +135,17 @@ public class BeanMetaDataBuilder<T> {
 		}
 
 		return new BeanMetaDataImpl<>(
-				beanClass,
+				constrainedType,
 				defaultGroupSequence,
 				defaultGroupSequenceProvider,
 				aggregatedElements,
-				validationOrderGenerator
+				validationOrderGenerator,
+				beanMetadataHierarchy
 		);
 	}
 
 	private static class BuilderDelegate {
-		private final Class<?> beanClass;
+		private final HibernateConstrainedType<?> constrainedType;
 		private final ConstrainedElement constrainedElement;
 		private final ConstraintCreationContext constraintCreationContext;
 		private final ExecutableHelper executableHelper;
@@ -154,14 +156,14 @@ public class BeanMetaDataBuilder<T> {
 		private final int hashCode;
 
 		public BuilderDelegate(
-				Class<?> beanClass,
+				HibernateConstrainedType<?> constrainedType,
 				ConstrainedElement constrainedElement,
 				ConstraintCreationContext constraintCreationContext,
 				ExecutableHelper executableHelper,
 				ExecutableParameterNameProvider parameterNameProvider,
 				MethodValidationConfiguration methodValidationConfiguration
 		) {
-			this.beanClass = beanClass;
+			this.constrainedType = constrainedType;
 			this.constrainedElement = constrainedElement;
 			this.constraintCreationContext = constraintCreationContext;
 			this.executableHelper = executableHelper;
@@ -172,7 +174,7 @@ public class BeanMetaDataBuilder<T> {
 				case FIELD:
 					ConstrainedField constrainedField = (ConstrainedField) constrainedElement;
 					metaDataBuilder = new PropertyMetaData.Builder(
-							beanClass,
+							constrainedType,
 							constrainedField,
 							constraintCreationContext
 					);
@@ -185,9 +187,9 @@ public class BeanMetaDataBuilder<T> {
 
 					// HV-890 Not adding meta-data for private super-type methods to the method meta-data of this bean;
 					// It is not needed and it may conflict with sub-type methods of the same signature
-					if ( !callable.isPrivate() || beanClass == callable.getDeclaringClass() ) {
+					if ( !callable.isPrivate() || constrainedType.getActuallClass() == callable.getDeclaringClass() ) {
 						methodBuilder = new ExecutableMetaData.Builder(
-								beanClass,
+								constrainedType,
 								constrainedExecutable,
 								constraintCreationContext,
 								executableHelper,
@@ -198,17 +200,17 @@ public class BeanMetaDataBuilder<T> {
 
 					if ( constrainedElement.getKind() == ConstrainedElement.ConstrainedElementKind.GETTER ) {
 						metaDataBuilder = new PropertyMetaData.Builder(
-								beanClass,
+								constrainedType,
 								constrainedExecutable,
 								constraintCreationContext
 						);
 					}
 					break;
 				case TYPE:
-					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
+					ConstrainedType constrainedTypeElement = (ConstrainedType) constrainedElement;
 					metaDataBuilder = new ClassMetaData.Builder(
-							beanClass,
 							constrainedType,
+							constrainedTypeElement,
 							constraintCreationContext
 					);
 					break;
@@ -234,7 +236,7 @@ public class BeanMetaDataBuilder<T> {
 				if ( !added && constrainedElement.getKind().isMethod() && methodBuilder == null ) {
 					ConstrainedExecutable constrainedMethod = (ConstrainedExecutable) constrainedElement;
 					methodBuilder = new ExecutableMetaData.Builder(
-							beanClass,
+							constrainedType,
 							constrainedMethod,
 							constraintCreationContext,
 							executableHelper,
@@ -271,7 +273,7 @@ public class BeanMetaDataBuilder<T> {
 		private int buildHashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + beanClass.hashCode();
+			result = prime * result + constrainedType.hashCode();
 			result = prime * result + constrainedElement.hashCode();
 			return result;
 		}
@@ -288,7 +290,7 @@ public class BeanMetaDataBuilder<T> {
 				return false;
 			}
 			BuilderDelegate other = (BuilderDelegate) obj;
-			if ( !beanClass.equals( other.beanClass ) ) {
+			if ( !constrainedType.equals( other.constrainedType ) ) {
 				return false;
 			}
 			if ( !constrainedElement.equals( other.constrainedElement ) ) {

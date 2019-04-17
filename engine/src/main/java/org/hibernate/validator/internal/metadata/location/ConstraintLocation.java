@@ -10,6 +10,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Callable;
@@ -69,7 +70,7 @@ public interface ConstraintLocation {
 	/**
 	 * Returns the class hosting this location.
 	 */
-	Class<?> getDeclaringClass();
+	HibernateConstrainedType<?> getDeclaringConstrainedType();
 
 	/**
 	 * Returns the member represented by this location.

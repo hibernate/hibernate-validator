@@ -555,7 +555,7 @@ public class ConstraintMappingTest {
 		);
 
 		for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {
-			if ( beanConfiguration.getBeanClass() == type ) {
+			if ( beanConfiguration.getConstrainedType().getActuallClass() == type ) {
 				@SuppressWarnings("unchecked")
 				BeanConfiguration<T> configuration = (BeanConfiguration<T>) beanConfiguration;
 				return configuration;

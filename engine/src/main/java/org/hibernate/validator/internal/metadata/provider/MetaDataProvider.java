@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.provider;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 
@@ -36,5 +37,5 @@ public interface MetaDataProvider {
 	 * Returns a bean configuration for the given type or {@code null} if this provider has no meta-data on the given
 	 * type.
 	 */
-	<T> BeanConfiguration<? super T> getBeanConfiguration(Class<T> beanClass);
+	<T> BeanConfiguration<? super T> getBeanConfiguration(HibernateConstrainedType<T> constrainedType);
 }

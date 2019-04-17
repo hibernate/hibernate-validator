@@ -7,6 +7,7 @@
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.testutils.BeanMetadataManagerUtil.getBeanMetadata;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 
 import java.util.Collections;
@@ -54,21 +55,21 @@ public class PropertyMetaDataTest {
 
 	@Test
 	public void locallyDefinedGroupConversion() {
-		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( User1.class ).getMetaDataFor( "addresses" );
+		PropertyMetaData property = getBeanMetadata( beanMetaDataManager, User1.class ).getMetaDataFor( "addresses" );
 
 		assertThat( property.getCascadables().iterator().next().getCascadingMetaData().convertGroup( Default.class ) ).isEqualTo( BasicPostal.class );
 	}
 
 	@Test
 	public void groupConversionDefinedInHierarchy() {
-		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( User2.class ).getMetaDataFor( "addresses" );
+		PropertyMetaData property = getBeanMetadata( beanMetaDataManager, User2.class ).getMetaDataFor( "addresses" );
 
 		assertThat( property.getCascadables().iterator().next().getCascadingMetaData().convertGroup( Default.class ) ).isEqualTo( BasicPostal.class );
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
 	public void groupConversionInHierarchyWithSameFrom() {
-		beanMetaDataManager.getBeanMetaData( User3.class ).getMetaDataFor( "addresses" );
+		getBeanMetadata( beanMetaDataManager, User3.class ).getMetaDataFor( "addresses" );
 	}
 
 	public interface Complete extends Default {

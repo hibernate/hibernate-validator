@@ -14,6 +14,7 @@ import java.util.Set;
 
 import javax.validation.metadata.BeanDescriptor;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
@@ -30,7 +31,7 @@ public interface BeanMetaData<T> extends Validatable {
 	/**
 	 * @return the class of the bean.
 	 */
-	Class<T> getBeanClass();
+	HibernateConstrainedType<T> getConstrainedType();
 
 	/**
 	 * Returns {@code true} if the bean class for this bean meta data has any constraints at all, {@code false} otherwise.
@@ -112,5 +113,5 @@ public interface BeanMetaData<T> extends Validatable {
 	 * @return Returns a list of classes representing the class hierarchy for the entity. The list start with the
 	 *         element itself and goes up the hierarchy chain. Interfaces are not included.
 	 */
-	List<Class<? super T>> getClassHierarchy();
+	List<BeanMetaData<? super T>> getBeanMetadataHierarchy();
 }

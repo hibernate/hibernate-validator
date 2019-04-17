@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -113,11 +114,11 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		private Callable callableForNameRetrieval;
 		private CascadingMetaDataBuilder cascadingMetaDataBuilder;
 
-		public Builder(Class<?> beanClass,
+		public Builder(HibernateConstrainedType<?> constrainedType,
 				ConstrainedParameter constrainedParameter,
 				ConstraintCreationContext constraintCreationContext,
 				ExecutableParameterNameProvider parameterNameProvider) {
-			super( beanClass, constraintCreationContext );
+			super( constrainedType, constraintCreationContext );
 
 			this.parameterNameProvider = parameterNameProvider;
 			this.parameterType = constrainedParameter.getType();

@@ -12,9 +12,11 @@ import java.util.Set;
 import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.engine.constrainedtype.JavaBeanConstrainedType;
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
+import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 
 /**
  * An aggregated view of the cascading validation metadata. Note that it also includes the cascading validation metadata
@@ -59,4 +61,10 @@ public interface CascadingMetaData {
 	 * time.
 	 */
 	CascadingMetaData addRuntimeContainerSupport(ValueExtractorManager valueExtractorManager, Class<?> valueClass);
+
+	default BeanMetaData<?> getBeanMetaDataForCascadable(BeanMetaDataManager beanMetaDataManager, Object value) {
+		// TODO: for now it's ok to keep the impl here. But it should be eventually moved to corresponding classes.
+		// As this would be different for property holders.
+		return beanMetaDataManager.getBeanMetaData( new JavaBeanConstrainedType<>( value.getClass() ) );
+	}
 }

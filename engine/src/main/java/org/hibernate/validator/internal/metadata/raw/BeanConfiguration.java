@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.raw;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.validator.engine.HibernateConstrainedType;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
@@ -24,7 +25,7 @@ public class BeanConfiguration<T> {
 
 	private final ConfigurationSource source;
 
-	private final Class<T> beanClass;
+	private final HibernateConstrainedType<T> constrainedType;
 
 	private final Set<ConstrainedElement> constrainedElements;
 
@@ -36,7 +37,7 @@ public class BeanConfiguration<T> {
 	 * Creates a new bean configuration.
 	 *
 	 * @param source The source of this configuration.
-	 * @param beanClass The type represented by this configuration.
+	 * @param constrainedType The type represented by this configuration.
 	 * @param constrainedElements The constraint elements representing this type's fields,
 	 * methods etc.
 	 * @param defaultGroupSequence The default group sequence for the given type as configured by
@@ -46,13 +47,13 @@ public class BeanConfiguration<T> {
 	 */
 	public BeanConfiguration(
 			ConfigurationSource source,
-			Class<T> beanClass,
+			HibernateConstrainedType<T> constrainedType,
 			Set<? extends ConstrainedElement> constrainedElements,
 			List<Class<?>> defaultGroupSequence,
 			DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider) {
 
 		this.source = source;
-		this.beanClass = beanClass;
+		this.constrainedType = constrainedType;
 		this.constrainedElements = CollectionHelper.<ConstrainedElement>newHashSet( constrainedElements );
 		this.defaultGroupSequence = defaultGroupSequence;
 		this.defaultGroupSequenceProvider = defaultGroupSequenceProvider;
@@ -62,8 +63,8 @@ public class BeanConfiguration<T> {
 		return source;
 	}
 
-	public Class<T> getBeanClass() {
-		return beanClass;
+	public HibernateConstrainedType<T> getConstrainedType() {
+		return constrainedType;
 	}
 
 	public Set<ConstrainedElement> getConstrainedElements() {
@@ -80,7 +81,7 @@ public class BeanConfiguration<T> {
 
 	@Override
 	public String toString() {
-		return "BeanConfiguration [beanClass=" + beanClass.getSimpleName()
+		return "BeanConfiguration [beanClass=" + constrainedType.getActuallClass().getSimpleName()
 				+ ", source=" + source
 				+ ", constrainedElements=" + constrainedElements
 				+ ", defaultGroupSequence=" + defaultGroupSequence
@@ -93,7 +94,7 @@ public class BeanConfiguration<T> {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ( ( beanClass == null ) ? 0 : beanClass.hashCode() );
+				+ ( ( constrainedType == null ) ? 0 : constrainedType.hashCode() );
 		result = prime * result + ( ( source == null ) ? 0 : source.hashCode() );
 		return result;
 	}
@@ -110,12 +111,12 @@ public class BeanConfiguration<T> {
 			return false;
 		}
 		BeanConfiguration<?> other = (BeanConfiguration<?>) obj;
-		if ( beanClass == null ) {
-			if ( other.beanClass != null ) {
+		if ( constrainedType == null ) {
+			if ( other.constrainedType != null ) {
 				return false;
 			}
 		}
-		else if ( !beanClass.equals( other.beanClass ) ) {
+		else if ( !constrainedType.equals( other.constrainedType ) ) {
 			return false;
 		}
 		if ( source != other.source ) {
