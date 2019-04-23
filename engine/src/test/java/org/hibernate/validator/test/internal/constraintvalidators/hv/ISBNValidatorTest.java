@@ -25,6 +25,7 @@ import org.hibernate.validator.cfg.defs.ISBNDef;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.internal.constraintvalidators.hv.ISBNValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -314,6 +315,41 @@ public class ISBNValidatorTest {
 		assertInvalidISBN( "" );
 		assertInvalidISBN( "978-0-54560-4" );
 		assertInvalidISBN( "978-0-55555555555555" );
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HV-1707")
+	public void testValidISBNAny() {
+		validator.initialize( initializeAnnotation( ISBN.Type.ANY ) );
+
+		assertValidISBN( null );
+		// ISBN10
+		assertValidISBN( "99921-58-10-7" );
+		assertValidISBN( "9971-5-0210-0" );
+		assertValidISBN( "960-425-059-0" );
+		assertValidISBN( "80-902734-1-6" );
+		assertValidISBN( "0-9752298-0-X" );
+
+		// ISBN13
+		assertValidISBN( "978-123-456-789-7" );
+		assertValidISBN( "978-91-983989-1-5" );
+		assertValidISBN( "978-988-785-411-1" );
+		assertValidISBN( "978-1-56619-909-4" );
+		assertValidISBN( "978-1-4028-9462-6" );
+		assertValidISBN( "978-0-85131-041-1" );
+
+		// invalid cases
+		assertInvalidISBN( "978-0-85131-041-0" );
+		assertInvalidISBN( "80-902734-1-8" );
+		assertInvalidISBN( "978-0-85131-0401-0" );
+		assertInvalidISBN( "80-902734-10-8" );
+
+		// incorrect length:
+		assertInvalidISBN( "978-0-85" );
+		assertInvalidISBN( "80-902734-1-877777" );
+		assertInvalidISBN( "978-0-85131-0401-00074" );
+		assertInvalidISBN( "80-902734-1" );
+
 	}
 
 	@Test

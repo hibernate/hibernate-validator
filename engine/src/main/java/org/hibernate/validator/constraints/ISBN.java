@@ -67,9 +67,13 @@ public @interface ISBN {
 	/**
 	 * Defines the ISBN length. Valid lengths of ISBNs are {@code 10} and {@code 13}
 	 * which are represented as {@link Type#ISBN_10} and {@link Type#ISBN_13} respectively.
+	 * <p>
+	 * Using {@link Type#ANY} allows to validate values that could either be ISBN10 or ISBN13.
+	 * In such case, ISBN type would be determined by the length of the corresponding value.
 	 */
 	enum Type {
 		ISBN_10,
-		ISBN_13
+		ISBN_13,
+		ANY
 	}
 }
