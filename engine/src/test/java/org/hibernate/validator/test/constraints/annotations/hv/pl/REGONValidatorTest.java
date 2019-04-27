@@ -54,6 +54,21 @@ public class REGONValidatorTest extends AbstractConstrainedTest {
 	}
 
 	@Test
+	public void testIncorrectLengthRegon() {
+		// 10 digits must be rejected
+		assertThat( validator.validate( new Company( "1234567845" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" ) );
+	};
+
+	@Test
+	public void testNonDigitInRegon() {
+		assertThat( validator.validate( new Company( "4990553136851x" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" ) );
+	};
+
+	@Test
 	public void testIncorrectRegon9Number() {
 		assertThat( validator.validate( new Company( "123456784" ) ) )
 				.containsOnlyViolations(
