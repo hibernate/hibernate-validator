@@ -24,6 +24,30 @@ import org.testng.annotations.Test;
 public class PESELValidatorTest extends AbstractConstrainedTest {
 
 	@Test
+	public void testAdditionalCharactersNotAllowed() {
+		assertThat( validator.validate( new Person( "9204-190-37-90" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+		assertThat( validator.validate( new Person( "44-0-5-1-4-01359" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+	}
+
+	@Test
+	public void testIncorrectLength() {
+		assertThat( validator.validate( new Person( "920419795" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+		assertThat( validator.validate( new Person( "92041903790123" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+	}
+
+	@Test
 	public void testCorrectPESELNumber() {
 		assertNoViolations( validator.validate( new Person( "92041903790" ) ) );
 		assertNoViolations( validator.validate( new Person( "44051401359" ) ) );
