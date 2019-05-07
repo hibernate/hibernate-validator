@@ -24,6 +24,30 @@ import org.testng.annotations.Test;
 public class REGONValidatorTest extends AbstractConstrainedTest {
 
 	@Test
+	public void testAdditionalCharactersNotAllowed() {
+		assertThat( validator.validate( new Company( "123-456-785" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "6-9-1-6-5-7-1-8-2" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+	}
+
+	@Test
+	public void testIncorrectLength() {
+		assertThat( validator.validate( new Company( "1234567845" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+		assertThat( validator.validate( new Company( "12345673" ) ) )
+				.containsOnlyViolations(
+						violationOf( REGON.class ).withProperty( "regon" )
+				);
+	}
+
+	@Test
 	public void testCorrectRegon9Number() {
 		assertNoViolations( validator.validate( new Company( "123456785" ) ) );
 		assertNoViolations( validator.validate( new Company( "691657182" ) ) );

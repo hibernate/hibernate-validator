@@ -24,10 +24,26 @@ import org.testng.annotations.Test;
 public class NIPValidatorTest extends AbstractConstrainedTest {
 
 	@Test
-	public void testCorrectNipNumber() {
+	public void testAdditionalCharactersAreAllowed() {
 		assertNoViolations( validator.validate( new Person( "123-456-78-19" ) ) );
 		assertNoViolations( validator.validate( new Person( "123-45-67-819" ) ) );
 		assertNoViolations( validator.validate( new Person( "123-456-32-18" ) ) );
+	}
+
+	@Test
+	public void testIncorrectLength() {
+		assertThat( validator.validate( new Person( "123-456-78-14113-312-310" ) ) )
+				.containsOnlyViolations(
+						violationOf( NIP.class ).withProperty( "nip" )
+				);
+		assertThat( validator.validate( new Person( "123-45-62" ) ) )
+				.containsOnlyViolations(
+						violationOf( NIP.class ).withProperty( "nip" )
+				);
+	}
+
+	@Test
+	public void testCorrectNipNumber() {
 		assertNoViolations( validator.validate( new Person( "5931423811" ) ) );
 		assertNoViolations( validator.validate( new Person( "2596048500" ) ) );
 		assertNoViolations( validator.validate( new Person( "4163450312" ) ) );

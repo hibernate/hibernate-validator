@@ -27,8 +27,15 @@ public abstract class PolishNumberValidator<T extends Annotation> extends ModChe
 	public boolean isCheckDigitValid(List<Integer> digits, char checkDigit) {
 		Collections.reverse( digits );
 
+		int[] weights = getWeights( digits );
+
+		// if the length of the number is incorrect we can return fast
+		if ( weights.length != digits.size() ) {
+			return false;
+		}
+
 		// as we need sum % 11 rather than 11 - (sum % 11) returned by Mod11 algorithm:
-		int modResult = 11 - ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE, getWeights( digits ) );
+		int modResult = 11 - ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE, weights );
 		switch ( modResult ) {
 			case 10:
 			case 11:
