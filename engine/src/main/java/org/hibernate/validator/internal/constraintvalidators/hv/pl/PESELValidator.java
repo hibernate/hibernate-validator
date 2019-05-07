@@ -30,13 +30,18 @@ public class PESELValidator extends ModCheckBase implements ConstraintValidator<
 				0,
 				Integer.MAX_VALUE,
 				-1,
-				true
+				false
 		);
 	}
 
 	@Override
 	public boolean isCheckDigitValid(List<Integer> digits, char checkDigit) {
 		Collections.reverse( digits );
+
+		// if the length of the number is incorrect we can return fast
+		if ( digits.size() != WEIGHTS_PESEL.length  ) {
+			return false;
+		}
 
 		int modResult = ModUtil.calculateModXCheckWithWeights( digits, 10, Integer.MAX_VALUE, WEIGHTS_PESEL );
 		switch ( modResult ) {
