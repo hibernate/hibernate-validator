@@ -765,7 +765,7 @@ Otherwise, the default strategy will be used for the mappings added before defin
 ====
 
 [[section-property-node-name-provider]]
-==== Changing the way property names are resolved when the property path is constructed
+=== Customizing the property name resolution for constraint violations
 
 Imagine that we have a simple data class that has `@NotNull` constraints on some fields:
 [[example-person-class]]
@@ -798,16 +798,18 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/nodenamepr
 ====
 
 Notice how the names of the properties differ. In the Java object, we have `firstName` and `lastName`, whereas in the JSON output, we have
-`first_name` and `last_name`. We defined this behaviour through `@JsonProperty` annotations.
+`first_name` and `last_name`.
+We customized this behavior through `@JsonProperty` annotations.
 
-Now imagine, that we use this class in a REST environment, where a user can send <<example-person-json, person as json>> in the request body.
-It would be nice, when telling the user on which field the validation failed, to tell them the name they use in their JSON request, `first_name`,
+Now imagine that we use this class in a REST environment, where a user can send <<example-person-json, a `Person` instance as JSON>> in the request body.
+It would be nice, when indicating on which field the validation failed, to indicate the name they use in their JSON request, `first_name`,
 and not the name we use internally in our Java code, `firstName`.
 
-The `org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider` contract allows us to do this. By implementing it,
-we can define how the name of a property will be resolved during validation. In our case, we want to read the value from the Jackson configuration.
+The `org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider` contract allows us to do this.
+By implementing it, we can define how the name of a property will be resolved during validation.
+In our case, we want to read the value from the Jackson configuration.
 
-So, one example of how to do this is to leverage the Jackson API:
+One example of how to do this is to leverage the Jackson API:
 [[example-jackson-property-node-name-provider]]
 .JacksonPropertyNodeNameProvider implementation
 ====
@@ -829,7 +831,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/nodenamepr
 
 We can see that the property path now returns `first_name`.
 
-Note that this also works when the annotations are on the getter:
+Note that this also works when the annotations are on a getter:
 [[example-jackson-property-node-name-provider-getter]]
 .Annotation on a getter
 ====
@@ -850,6 +852,6 @@ There are two more interfaces that are worth mentioning:
 has a single `String getName()` method that can be used to get the "original" name of a property. This interface
 should be used as a default way of resolving the name (see how it is used in <<example-jackson-property-node-name-provider>>).
 
-- `org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty` is an interface that holds metada about a bean property. It
-extends `org.hibernate.validator.spi.nodenameprovider.Property` and provide some more data like `Class<?> getDeclaringClass()`
-which is the class that is the owner of the property. This additional metadata can be useful when revolving the name.
+- `org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty` is an interface that holds metadata about a bean property. It
+extends `org.hibernate.validator.spi.nodenameprovider.Property` and provide some additional methods like `Class<?> getDeclaringClass()`
+which returns the class that is the owner of the property.
