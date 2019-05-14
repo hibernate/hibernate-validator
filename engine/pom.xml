@@ -230,6 +230,7 @@
                             org.hibernate.validator.engine.*;version="${project.version}",
                             org.hibernate.validator.group;version="${project.version}",
                             org.hibernate.validator.messageinterpolation;version="${project.version}",
+                            org.hibernate.validator.metadata;version="${project.version}",
                             org.hibernate.validator.parameternameprovider;version="${project.version}",
                             org.hibernate.validator.path;version="${project.version}",
                             org.hibernate.validator.resourceloading;version="${project.version}",
