@@ -211,19 +211,13 @@
             </properties>
         </profile>
         <profile>
-            <id>jdk12+</id>
-            <activation>
-                <jdk>[12,)</jdk>
-            </activation>
-            <properties>
-                <javadoc.additional.options>-html5 -source 8</javadoc.additional.options>
-            </properties>
-        </profile>
-        <profile>
             <id>jdk11+</id>
             <activation>
                 <jdk>[11,)</jdk>
             </activation>
+            <properties>
+                <javadoc.additional.options>-html5 -source 8</javadoc.additional.options>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.openjfx</groupId>
