@@ -606,13 +606,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private void validateCascadedAnnotatedObjectForCurrentGroup(Object value, ValidationContext<?> validationContext, ValueContext<?, Object> valueContext,
 			CascadingMetaData cascadingMetaData) {
-		if ( validationContext.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath() ) ||
+		// We need to convert the group before checking if the bean was processed or not
+		// as group defines the processed status.
+		Class<?> originalGroup = valueContext.getCurrentGroup();
+		Class<?> currentGroup = cascadingMetaData.convertGroup( originalGroup );
+
+		if ( validationContext.isBeanAlreadyValidated( value, currentGroup, valueContext.getPropertyPath() ) ||
 				shouldFailFast( validationContext ) ) {
 			return;
 		}
-
-		Class<?> originalGroup = valueContext.getCurrentGroup();
-		Class<?> currentGroup = cascadingMetaData.convertGroup( originalGroup );
 
 		// expand the group only if was created by group conversion;
 		// otherwise we're looping through the right validation order
@@ -683,14 +685,16 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		private void doValidate(Object value, String nodeName) {
+			// We need to convert the group before checking if the bean was processed or not
+			// as group defines the processed status.
+			Class<?> originalGroup = valueContext.getCurrentGroup();
+			Class<?> currentGroup = cascadingMetaData.convertGroup( originalGroup );
+
 			if ( value == null ||
-					validationContext.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath() ) ||
+					validationContext.isBeanAlreadyValidated( value, currentGroup, valueContext.getPropertyPath() ) ||
 					shouldFailFast( validationContext ) ) {
 				return;
 			}
-
-			Class<?> originalGroup = valueContext.getCurrentGroup();
-			Class<?> currentGroup = cascadingMetaData.convertGroup( originalGroup );
 
 			// expand the group only if was created by group conversion;
 			// otherwise we're looping through the right validation order

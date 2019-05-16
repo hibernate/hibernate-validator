@@ -23,6 +23,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
 import javax.validation.Validator;
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.groups.ConvertGroup;
@@ -30,6 +31,7 @@ import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.testutils.CandidateForTck;
 import org.testng.annotations.Test;
 
 /**
@@ -214,6 +216,19 @@ public abstract class AbstractGroupConversionTest {
 		validator.validate( new User8() );
 	}
 
+	@Test
+	@CandidateForTck
+	public void sameBeanDifferentGroups() {
+		Set<ConstraintViolation<User9>> violations = validator.validate( new User9() );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( AssertTrue.class ).withPropertyPath( pathWith()
+						.property( "a" )
+						.property( "b" )
+				)
+		);
+	}
+
+
 	public interface Complete extends Default {
 	}
 
@@ -340,5 +355,13 @@ public abstract class AbstractGroupConversionTest {
 		@Valid
 		@ConvertGroup(from = PostalSequence.class, to = BasicPostal.class)
 		private final List<Address> addresses = Arrays.asList( new Address() );
+	}
+
+	private static class User9 {
+		@Valid
+		@ConvertGroup(from = Default.class, to = BasicNumber.class)
+		User9 a = this;
+		@AssertTrue(groups = BasicNumber.class)
+		boolean b;
 	}
 }
