@@ -181,7 +181,7 @@
 
         <groovy.version>2.4.12</groovy.version>
 
-        <guava.version>23.0</guava.version>
+        <guava.version>27.1-jre</guava.version>
         <spring-expression.version>4.3.10.RELEASE</spring-expression.version>
 
         <!-- Asciidoctor -->
