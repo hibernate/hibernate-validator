@@ -124,7 +124,7 @@
         <!-- Currently supported version of WildFly -->
         <version.wildfly>16.0.0.Final</version.wildfly>
         <!-- Used to create a patch file for the second version of WildFly we support -->
-        <version.wildfly.secondary>15.0.1.Final</version.wildfly.secondary>
+        <version.wildfly.secondary>17.0.0.Beta1</version.wildfly.secondary>
         <!-- Version used to run the TCK in incontainer mode -->
         <version.wildfly.tck>${version.wildfly}</version.wildfly.tck>
 
