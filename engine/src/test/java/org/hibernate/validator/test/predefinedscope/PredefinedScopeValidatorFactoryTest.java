@@ -79,7 +79,7 @@ public class PredefinedScopeValidatorFactoryTest {
 								.property( "email" ) ) );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000249:.*")
+	@Test
 	public void testValidationOnUnknownBean() throws NoSuchMethodException, SecurityException {
 		Validator validator = getValidator();
 
@@ -87,7 +87,7 @@ public class PredefinedScopeValidatorFactoryTest {
 		assertNoViolations( violations );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000249:.*")
+	@Test
 	public void testValidationOnUnknownBeanMethodParameter() throws NoSuchMethodException, SecurityException {
 		Validator validator = getValidator();
 
@@ -100,7 +100,7 @@ public class PredefinedScopeValidatorFactoryTest {
 		assertNoViolations( violations );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000249:.*")
+	@Test
 	public void testValidationOnUnknownBeanMethodReturnValue() throws NoSuchMethodException, SecurityException {
 		Validator validator = getValidator();
 
@@ -109,7 +109,7 @@ public class PredefinedScopeValidatorFactoryTest {
 		assertNoViolations( violations );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000249:.*")
+	@Test
 	public void testValidationOnUnknownBeanConstructorParameters() throws NoSuchMethodException, SecurityException {
 		Validator validator = getValidator();
 
@@ -119,7 +119,7 @@ public class PredefinedScopeValidatorFactoryTest {
 		assertNoViolations( violations );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000249:.*")
+	@Test
 	public void testValidationOnUnknownBeanConstructorReturnValue() throws NoSuchMethodException, SecurityException {
 		Validator validator = getValidator();
 
@@ -167,9 +167,10 @@ public class PredefinedScopeValidatorFactoryTest {
 	}
 
 	@TestForIssue(jiraKey = "HV-1681")
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000249:.*")
+	@Test
 	public void testValidOnUnknownBean() {
-		getValidator().validate( new AnotherBean() );
+		Set<ConstraintViolation<AnotherBean>> violations = getValidator().validate( new AnotherBean() );
+		assertNoViolations( violations );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000250:.*")
@@ -190,11 +191,26 @@ public class PredefinedScopeValidatorFactoryTest {
 		}
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000249:.*")
+	@Test
 	public void testBeanMetaDataClassNormalizerNoNormalizer() {
-		Validator validator = getValidator();
+		// In this case, as we haven't registered any metadata for the hierarchy, even if we have constraints,
+		// we won't have any violations.
+		Set<ConstraintViolation<Bean>> violations = getValidator().validate( new BeanProxy() );
+		assertNoViolations( violations );
 
-		validator.validate( new BeanProxy() );
+		// Now let's register the metadata for Bean and see how it goes
+		Set<Class<?>> beanMetaDataToInitialize = new HashSet<>();
+		beanMetaDataToInitialize.add( Bean.class );
+
+		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
+				.configure()
+				.initializeBeanMetaData( beanMetaDataToInitialize )
+				.initializeLocales( Collections.singleton( Locale.ENGLISH ) )
+				.buildValidatorFactory();
+
+		// As we don't have any metadata for BeanProxy, we consider it is not constrained at all.
+		violations = validatorFactory.getValidator().validate( new BeanProxy() );
+		assertNoViolations( violations );
 	}
 
 	@Test
