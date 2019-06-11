@@ -39,7 +39,8 @@ public class PredefinedScopeValidatorContextImpl implements HibernateValidatorCo
 
 	@Override
 	public HibernateValidatorContext traversableResolver(TraversableResolver traversableResolver) {
-		throw new IllegalStateException( "Defining a Validator-specific traversable resolver is not supported by the predefined scope ValidatorFactory." );
+		validatorFactoryScopedContextBuilder.setTraversableResolver( traversableResolver );
+		return this;
 	}
 
 	@Override

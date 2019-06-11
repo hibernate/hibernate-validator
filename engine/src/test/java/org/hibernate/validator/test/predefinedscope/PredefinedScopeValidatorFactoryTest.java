@@ -10,13 +10,18 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.testng.Assert.fail;
 
+import java.lang.annotation.ElementType;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.Path;
+import javax.validation.Path.Node;
+import javax.validation.TraversableResolver;
 import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.ValidationException;
@@ -25,6 +30,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
+import org.assertj.core.api.Assertions;
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -216,6 +222,28 @@ public class PredefinedScopeValidatorFactoryTest {
 				violationOf( NotNull.class ).withProperty( "property" ) );
 	}
 
+	@Test
+	public void validatorSpecificTraversableResolver() {
+		Set<Class<?>> beanMetaDataToInitialize = new HashSet<>();
+		beanMetaDataToInitialize.add( Bean.class );
+		beanMetaDataToInitialize.add( AnotherBean.class );
+
+		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
+				.configure()
+				.initializeBeanMetaData( beanMetaDataToInitialize )
+				.buildValidatorFactory();
+
+		try {
+			Validator validator = validatorFactory.usingContext().traversableResolver( new ThrowExceptionTraversableResolver() )
+					.getValidator();
+			validator.validate( new Bean() );
+			fail();
+		}
+		catch (ValidationException e) {
+			Assertions.assertThat( e ).hasCauseExactlyInstanceOf( ValidatorSpecificTraversableResolverUsedException.class );
+		}
+	}
+
 	private static Validator getValidator() {
 		Set<Class<?>> beanMetaDataToInitialize = new HashSet<>();
 		beanMetaDataToInitialize.add( Bean.class );
@@ -320,5 +348,23 @@ public class PredefinedScopeValidatorFactoryTest {
 	}
 
 	private static class BeanProxy extends Bean implements MyProxyInterface {
+	}
+
+	private static class ThrowExceptionTraversableResolver implements TraversableResolver {
+
+		@Override
+		public boolean isReachable(Object traversableObject, Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject,
+				ElementType elementType) {
+			throw new ValidatorSpecificTraversableResolverUsedException();
+		}
+
+		@Override
+		public boolean isCascadable(Object traversableObject, Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject,
+				ElementType elementType) {
+			throw new ValidatorSpecificTraversableResolverUsedException();
+		}
+	}
+
+	private static class ValidatorSpecificTraversableResolverUsedException extends RuntimeException {
 	}
 }
