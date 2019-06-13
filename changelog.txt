@@ -1,6 +1,20 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.17.Final (13-06-2019)
+-------------------------
+
+** Bug
+    * HV-1713 - engine     - Missing violation when a bean is validated with different groups
+    * HV-1709 - validators - Polish Identification numbers are not considering length of the value
+    * HV-1706 - validators - ISBN-13 algorithm does not handle checksum 10
+
+** Task
+    * HV-1717 - build      - Update test dependencies
+    * HV-1716 - build      - Update WildFly secondary version to 17.0.0.Beta1
+    * HV-1711 - build      - Fix aggregated javadoc build with recent JDK 11
+    * HV-1710 - build      - Remove settings-example.xml
+
 6.0.16.Final (21-03-2019)
 -------------------------
 
