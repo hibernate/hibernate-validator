@@ -1,6 +1,30 @@
 Hibernate Validator Changelog
 =============================
 
+6.1.0.Alpha5 (13-06-2019)
+-------------------------
+
+** Bug
+    * HV-1713 - engine       - Missing violation when a bean is validated with different groups
+    * HV-1709 - validators   - Polish Identification numbers are not considering length of the value
+    * HV-1706 - validators   - ISBN-13 algorithm does not handle checksum 10
+
+** Improvement
+    * HV-1719 - engine       - Accept setting per-validator TraversableResolver with PredefinedScopeValidatorFactoryImpl
+    * HV-1708 - translations - Add Danish translations of validation messages
+    * HV-1707 - validators   - Add ISBN.Type.ANY
+
+** New Feature
+    * HV-823 - engine       - Provide contract for customization of property names in constraint violation
+
+** Task
+    * HV-1718 - engine       - Predefined scope ValidatorFactory: uninitialized bean class shouldn't throw an exception
+    * HV-1717 - build        - Update test dependencies
+    * HV-1716 - build        - Update WildFly secondary version to 17.0.0.Beta1
+    * HV-1712 - engine       - Add org.hibernate.validator.metadata to OSGi manifest
+    * HV-1711 - build        - Fix aggregated javadoc build with recent JDK 11
+    * HV-1710 - build        - Remove settings-example.xml
+
 6.1.0.Alpha4 (22-03-2019)
 -------------------------
 
