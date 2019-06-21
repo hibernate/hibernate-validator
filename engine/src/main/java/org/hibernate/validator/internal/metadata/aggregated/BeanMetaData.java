@@ -94,6 +94,12 @@ public interface BeanMetaData<T> extends Validatable {
 	Set<MetaConstraint<?>> getPropertyMetaConstraints();
 
 	/**
+	 * @return A set of {@code MetaConstraint} instances encapsulating the information of all constraints
+	 *         defined on the bean. This collection includes constraints from super classes as well
+	 */
+	Set<MetaConstraint<?>> getAllMetaConstraints();
+
+	/**
 	 * @return A set of class level {@code MetaConstraint} instances encapsulating the information of all the constraints
 	 *         defined on the bean directly (including constraints defined on implemented interfaces). It does not
 	 *         contain constraints from super classes or interfaces implemented by super classes
@@ -107,6 +113,12 @@ public interface BeanMetaData<T> extends Validatable {
 	 */
 	Set<MetaConstraint<?>> getDirectPropertyMetaConstraints();
 
+	/**
+	 * @return A set of {@code MetaConstraint} instances encapsulating the information of all the constraints
+	 *         defined on the bean directly (including constraints defined on implemented interfaces). It does not
+	 *         contain constraints from super classes or interfaces implemented by super classes
+	 */
+	Set<MetaConstraint<?>> getAllDirectMetaConstraints();
 	/**
 	 * Returns the constraint-related metadata for the given executable of the
 	 * class represented by this bean metadata.
