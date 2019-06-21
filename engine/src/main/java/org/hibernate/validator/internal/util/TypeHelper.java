@@ -538,6 +538,7 @@ public final class TypeHelper {
 	 * <li>a parameterized type</li>
 	 * <li>a type variable</li>
 	 * <li>the null type</li>
+	 * <li>a wildcard type</li>
 	 * </ul>
 	 *
 	 * @param type the type to check
@@ -551,7 +552,8 @@ public final class TypeHelper {
 				|| type instanceof Class<?>
 				|| type instanceof ParameterizedType
 				|| type instanceof TypeVariable<?>
-				|| type instanceof GenericArrayType;
+				|| type instanceof GenericArrayType
+				|| type instanceof WildcardType;
 	}
 
 	private static boolean isArraySupertype(Class<?> type) {
