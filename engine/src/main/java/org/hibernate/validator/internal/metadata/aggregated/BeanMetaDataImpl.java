@@ -90,6 +90,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final Set<MetaConstraint<?>> propertyMetaConstraints;
 
 	/**
+	 * Combination of class and property level constraints for this bean type (defined on any implemented interfaces or super types)
+	 */
+	@Immutable
+	private final Set<MetaConstraint<?>> allMetaConstraints;
+
+	/**
 	 * Set of all class level constraints which are directly defined on the bean or any of the directly implemented interfaces
 	 */
 	@Immutable
@@ -100,6 +106,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	@Immutable
 	private final Set<MetaConstraint<?>> directPropertyMetaConstraints;
+
+	/**
+	 * Set of all constraints which are directly defined on the bean or any of the directly implemented interfaces
+	 */
+	@Immutable
+	private final Set<MetaConstraint<?>> allDirectMetaConstraints;
 
 	/**
 	 * Contains constrained related meta data for all the constrained methods and constructors of the type represented
@@ -233,6 +245,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.classMetaConstraints = CollectionHelper.toImmutableSet( classMetaConstraints );
 		this.propertyMetaConstraints = CollectionHelper.toImmutableSet( propertyMetaConstraints );
 
+		Set<MetaConstraint<?>> allMetaConstraints = newHashSet( classMetaConstraints.size() + propertyMetaConstraints.size() );
+		allMetaConstraints.addAll( classMetaConstraints );
+		allMetaConstraints.addAll( propertyMetaConstraints );
+
+		this.allMetaConstraints = CollectionHelper.toImmutableSet( allMetaConstraints );
+
 		this.classHierarchyWithoutInterfaces = CollectionHelper.toImmutableList( ClassHierarchyHelper.getHierarchy(
 				beanClass,
 				Filters.excludeInterfaces()
@@ -245,6 +263,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		this.directClassMetaConstraints = getDirectConstraints( classMetaConstraints );
 		this.directPropertyMetaConstraints = getDirectConstraints( propertyMetaConstraints );
+		this.allDirectMetaConstraints = getDirectConstraints( allMetaConstraints );
 
 		this.executableMetaDataMap = CollectionHelper.toImmutableMap( bySignature( executableMetaDataSet ) );
 		this.unconstrainedExecutables = CollectionHelper.toImmutableSet( tmpUnconstrainedExecutables );
@@ -316,6 +335,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	@Override
+	public Set<MetaConstraint<?>> getAllMetaConstraints() {
+		return allMetaConstraints;
+	}
+
+	@Override
 	public Set<MetaConstraint<?>> getDirectClassMetaConstraints() {
 		return directClassMetaConstraints;
 	}
@@ -323,6 +347,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@Override
 	public Set<MetaConstraint<?>> getDirectPropertyMetaConstraints() {
 		return directPropertyMetaConstraints;
+	}
+
+	@Override
+	public Set<MetaConstraint<?>> getAllDirectMetaConstraints() {
+		return allDirectMetaConstraints;
 	}
 
 	@Override
