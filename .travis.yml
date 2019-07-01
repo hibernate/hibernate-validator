@@ -16,8 +16,6 @@ addons:
 cache:
   directories:
     - $HOME/.m2
-before_install:
-  - BUILD_OPTIONS='-s settings-example.xml'
 install:
   # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
   - mvn -N io.takari:maven:wrapper
