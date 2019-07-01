@@ -51,15 +51,17 @@ final class ValidatorFactoryConfigurationHelper {
 	}
 
 	static ClassLoader determineExternalClassLoader(ConfigurationState configurationState) {
-		return ( configurationState instanceof ConfigurationImpl ) ? ( (ConfigurationImpl) configurationState ).getExternalClassLoader() : null;
+		return ( configurationState instanceof AbstractConfigurationImpl )
+				? ( (AbstractConfigurationImpl<?>) configurationState ).getExternalClassLoader()
+				: null;
 	}
 
 	static Set<DefaultConstraintMapping> determineConstraintMappings(TypeResolutionHelper typeResolutionHelper,
 			ConfigurationState configurationState, JavaBeanHelper javaBeanHelper, ClassLoader externalClassLoader) {
 		Set<DefaultConstraintMapping> constraintMappings = newHashSet();
 
-		if ( configurationState instanceof ConfigurationImpl ) {
-			ConfigurationImpl hibernateConfiguration = (ConfigurationImpl) configurationState;
+		if ( configurationState instanceof AbstractConfigurationImpl ) {
+			AbstractConfigurationImpl<?> hibernateConfiguration = (AbstractConfigurationImpl<?>) configurationState;
 
 			// programmatic config
 			/* We add these first so that constraint mapping created through DefaultConstraintMappingBuilder will take
@@ -192,8 +194,8 @@ final class ValidatorFactoryConfigurationHelper {
 
 	static ScriptEvaluatorFactory determineScriptEvaluatorFactory(ConfigurationState configurationState, Map<String, String> properties,
 			ClassLoader externalClassLoader) {
-		if ( configurationState instanceof ConfigurationImpl ) {
-			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
+		if ( configurationState instanceof AbstractConfigurationImpl ) {
+			AbstractConfigurationImpl<?> hibernateSpecificConfig = (AbstractConfigurationImpl<?>) configurationState;
 			if ( hibernateSpecificConfig.getScriptEvaluatorFactory() != null ) {
 				LOG.usingScriptEvaluatorFactory( hibernateSpecificConfig.getScriptEvaluatorFactory().getClass() );
 				return hibernateSpecificConfig.getScriptEvaluatorFactory();
@@ -221,8 +223,8 @@ final class ValidatorFactoryConfigurationHelper {
 	}
 
 	static Duration determineTemporalValidationTolerance(ConfigurationState configurationState, Map<String, String> properties) {
-		if ( configurationState instanceof ConfigurationImpl ) {
-			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
+		if ( configurationState instanceof AbstractConfigurationImpl ) {
+			AbstractConfigurationImpl<?> hibernateSpecificConfig = (AbstractConfigurationImpl<?>) configurationState;
 			if ( hibernateSpecificConfig.getTemporalValidationTolerance() != null ) {
 				LOG.logTemporalValidationTolerance( hibernateSpecificConfig.getTemporalValidationTolerance() );
 				return hibernateSpecificConfig.getTemporalValidationTolerance();
@@ -244,8 +246,8 @@ final class ValidatorFactoryConfigurationHelper {
 	}
 
 	static Object determineConstraintValidatorPayload(ConfigurationState configurationState) {
-		if ( configurationState instanceof ConfigurationImpl ) {
-			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
+		if ( configurationState instanceof AbstractConfigurationImpl ) {
+			AbstractConfigurationImpl<?> hibernateSpecificConfig = (AbstractConfigurationImpl<?>) configurationState;
 			if ( hibernateSpecificConfig.getConstraintValidatorPayload() != null ) {
 				LOG.logConstraintValidatorPayload( hibernateSpecificConfig.getConstraintValidatorPayload() );
 				return hibernateSpecificConfig.getConstraintValidatorPayload();
