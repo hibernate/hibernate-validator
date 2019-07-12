@@ -9,6 +9,7 @@ package org.hibernate.validator.ap.testmodel;
 import javax.money.MonetaryAmount;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Negative;
@@ -29,6 +30,7 @@ public class ModelWithJavaMoneyTypes {
 	@DecimalMin("0.00")
 	@Positive
 	@PositiveOrZero
+	@Digits(integer = 6, fraction = 2)
 	public MonetaryAmount monetaryAmount;
 
 	@Max(1000L)

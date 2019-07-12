@@ -254,6 +254,7 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.DECIMAL_MIN, Number.class, String.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.DECIMAL_MIN, JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.DIGITS, Number.class, String.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.DIGITS, JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.EMAIL, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE, Calendar.class, Date.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE, JodaTypes.READABLE_PARTIAL, JodaTypes.READABLE_INSTANT );
