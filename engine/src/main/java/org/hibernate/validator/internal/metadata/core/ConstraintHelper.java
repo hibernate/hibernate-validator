@@ -95,6 +95,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.PatternValidator
 import org.hibernate.validator.internal.constraintvalidators.bv.money.CurrencyValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMaxValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMinValidatorForMonetaryAmount;
+import org.hibernate.validator.internal.constraintvalidators.bv.money.DigitsValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MaxValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MinValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.NegativeOrZeroValidatorForMonetaryAmount;
@@ -366,6 +367,11 @@ public class ConstraintHelper {
 					DecimalMinValidatorForCharSequence.class,
 					DecimalMinValidatorForMonetaryAmount.class
 			) );
+			putConstraints( tmpConstraints, Digits.class, Arrays.asList(
+					DigitsValidatorForCharSequence.class,
+					DigitsValidatorForNumber.class,
+					DigitsValidatorForMonetaryAmount.class
+			) );
 		}
 		else {
 			putConstraints( tmpConstraints, DecimalMax.class, Arrays.asList(
@@ -392,9 +398,12 @@ public class ConstraintHelper {
 					DecimalMinValidatorForShort.class,
 					DecimalMinValidatorForCharSequence.class
 			) );
+			putConstraints( tmpConstraints, Digits.class, Arrays.asList(
+					DigitsValidatorForCharSequence.class,
+					DigitsValidatorForNumber.class
+			) );
 		}
 
-		putConstraints( tmpConstraints, Digits.class, DigitsValidatorForCharSequence.class, DigitsValidatorForNumber.class );
 		putConstraint( tmpConstraints, Email.class, EmailValidator.class );
 
 		List<Class<? extends ConstraintValidator<Future, ?>>> futureValidators = new ArrayList<>( 18 );

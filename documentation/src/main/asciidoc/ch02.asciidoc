@@ -580,7 +580,7 @@ impact portability of your application between Bean Validation providers.
 	Hibernate metadata impact::: None
 
 `@Digits(integer=, fraction=)`:: Checks whether the annotated value is a number having up to `integer` digits and `fraction` fractional digits
-	Supported data types::: BigDecimal, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `Number`
+	Supported data types::: BigDecimal, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `Number` and `javax.money.MonetaryAmount`
 	Hibernate metadata impact::: Defines column precision and scale
 
 `@Email`:: Checks whether the specified character sequence is a valid email address. The optional parameters `regexp` and `flags` allow to specify an additional regular expression (including regular expression flags) which the email must match.
