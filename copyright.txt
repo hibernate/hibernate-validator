@@ -12,6 +12,7 @@ Chris Beckey
 Christian Ivan
 Dag Hovland
 Damir Alibegovic
+Dario Seidl
 Davide D'Alto
 Davide Marchignoli
 Denis Tiago
