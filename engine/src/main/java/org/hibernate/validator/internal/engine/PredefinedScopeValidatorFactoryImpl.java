@@ -240,8 +240,9 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 
 	@Override
 	public <T> T unwrap(Class<T> type) {
-		//allow unwrapping into public super types
-		if ( type.isAssignableFrom( HibernateValidatorFactory.class ) ) {
+		// allow unwrapping into public super types
+		if ( type.isAssignableFrom( PredefinedScopeHibernateValidatorFactory.class )
+				|| type.isAssignableFrom( HibernateValidatorFactory.class ) ) {
 			return type.cast( this );
 		}
 		throw LOG.getTypeNotSupportedForUnwrappingException( type );
