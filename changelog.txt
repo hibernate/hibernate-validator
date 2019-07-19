@@ -1,6 +1,20 @@
 Hibernate Validator Changelog
 =============================
 
+6.1.0.Alpha6 (19-07-2019)
+-------------------------
+
+** Bug
+    * HV-1722 - engine     - Remove settings-example.xml reference from .travis.yml
+    * HV-1721 - engine     - Take into account Hibernate Validator-specific configuration with PredefinedScopeValidatorFactoryImpl
+    * HV-1720 - engine     - Support bounded wildcard types in container value unwrapping
+
+** New Feature
+    * HV-1723 - validators - Provide a DigitsValidatorForMonetaryAmount to support @Digits on MonetaryAmounts
+
+** Task
+    * HV-1726 - engine     - Make PredefinedScopeHibernateValidatorFactory extend HibernateValidatorFactory
+
 6.1.0.Alpha5 (13-06-2019)
 -------------------------
 
