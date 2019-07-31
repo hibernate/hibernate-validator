@@ -54,7 +54,7 @@
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
-            <artifactId>javax.el</artifactId>
+            <artifactId>jakarta.el</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -63,8 +63,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -99,8 +99,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -258,7 +258,7 @@
                         <bvVersion>${bv.api.version}</bvVersion>
                         <jbossLoggingVersion>${jboss.logging.version}</jbossLoggingVersion>
                         <classmateVersion>${classmate.version}</classmateVersion>
-                        <javaxElVersion>${javax.el.version}</javaxElVersion>
+                        <javaxElVersion>${jakarta.el.version}</javaxElVersion>
 
                         <wildflyVersion>${wildfly.version}</wildflyVersion>
                         <wildflySecondaryVersion>${wildfly-secondary.version}</wildflySecondaryVersion>

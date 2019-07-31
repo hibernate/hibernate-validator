@@ -108,14 +108,14 @@
         <!-- No need to build the javadocs per module. Aggregated javadocs are build in the distribution module. See also HV-894 -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
-        <bv.api.version>2.0.1.Final</bv.api.version>
-        <tck.version>2.0.4.Final</tck.version>
+        <bv.api.version>2.0.2</bv.api.version>
+        <tck.version>2.0.5</tck.version>
 
         <!-- Version to be used as baseline for API/SPI change reports -->
-        <previous.stable>6.0.9.Final</previous.stable>
+        <previous.stable>6.0.16.Final</previous.stable>
 
         <paranamer.version>2.8</paranamer.version>
-        <javax.el.version>3.0.1-b09</javax.el.version>
+        <jakarta.el.version>3.0.2</jakarta.el.version>
         <jboss.logging.version>3.3.2.Final</jboss.logging.version>
         <jboss.logging.processor.version>2.1.0.Final</jboss.logging.processor.version>
 
@@ -134,23 +134,24 @@
         <jsoup.version>1.8.3</jsoup.version>
         <joda-time.version>2.9.7</joda-time.version>
         <slf4j.version>1.7.22</slf4j.version>
-        <javax.persistence-api.version>2.2</javax.persistence-api.version>
+        <jakarta.persistence-api.version>2.2.2</jakarta.persistence-api.version>
 
         <!--
             These dependencies are used for integration tests with WildFly.
             They should be aligned with the ones from the Wildfly version we support
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
-        <cdi-api.version>2.0.SP1</cdi-api.version>
+        <jakarta.enterprise.cdi-api.version>2.0.1</jakarta.enterprise.cdi-api.version>
         <weld.version>3.1.1.Final</weld.version>
         <wildfly-arquillian.version>2.2.0.Final</wildfly-arquillian.version>
-        <jboss-ejb-api_3.2_spec.version>1.0.2.Final</jboss-ejb-api_3.2_spec.version>
+        <jakarta.ejb-api.version>3.2.5</jakarta.ejb-api.version>
+        <jakarta.interceptor-api.version>1.2.4</jakarta.interceptor-api.version>
 
         <!-- JavaMoney dependencies -->
         <javax-money.version>1.0.1</javax-money.version>
         <moneta.version>1.1</moneta.version>
         <!-- Used in the Karaf features file: it is a dependency of Moneta, and for the documentation -->
-        <javax-annotation-api.version>1.2</javax-annotation-api.version>
+        <jakarta.annotation-api.version>1.3.4</jakarta.annotation-api.version>
 
         <!-- WildFly patching infrastructure -->
         <wildfly-patch-gen-maven-plugin.version>2.0.1.Final</wildfly-patch-gen-maven-plugin.version>
@@ -256,8 +257,8 @@
                 <type>zip</type>
             </dependency>
             <dependency>
-                <groupId>javax.validation</groupId>
-                <artifactId>validation-api</artifactId>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
                 <version>${bv.api.version}</version>
             </dependency>
             <dependency>
@@ -277,8 +278,8 @@
             </dependency>
             <dependency>
                 <groupId>org.glassfish</groupId>
-                <artifactId>javax.el</artifactId>
-                <version>${javax.el.version}</version>
+                <artifactId>jakarta.el</artifactId>
+                <version>${jakarta.el.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml</groupId>
@@ -326,9 +327,9 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>javax.persistence</groupId>
-                <artifactId>javax.persistence-api</artifactId>
-                <version>${javax.persistence-api.version}</version>
+                <groupId>jakarta.persistence</groupId>
+                <artifactId>jakarta.persistence-api</artifactId>
+                <version>${jakarta.persistence-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -363,32 +364,32 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
-                <version>${javax-annotation-api.version}</version>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>${jakarta.annotation-api.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.jboss.spec.javax.interceptor</groupId>
-                <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
-                <version>1.0.0.Final</version>
+                <groupId>jakarta.interceptor</groupId>
+                <artifactId>jakarta.interceptor-api</artifactId>
+                <version>${jakarta.interceptor-api.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.jboss.spec.javax.ejb</groupId>
-                <artifactId>jboss-ejb-api_3.2_spec</artifactId>
-                <version>${jboss-ejb-api_3.2_spec.version}</version>
+                <groupId>jakarta.ejb</groupId>
+                <artifactId>jakarta.ejb-api</artifactId>
+                <version>${jakarta.ejb-api.version}</version>
             </dependency>
             <dependency>
-                <groupId>javax.enterprise</groupId>
-                <artifactId>cdi-api</artifactId>
-                <version>${cdi-api.version}</version>
+                <groupId>jakarta.enterprise</groupId>
+                <artifactId>jakarta.enterprise.cdi-api</artifactId>
+                <version>${jakarta.enterprise.cdi-api.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>javax.interceptor</groupId>
-                        <artifactId>javax.interceptor-api</artifactId>
+                        <groupId>jakarta.interceptor</groupId>
+                        <artifactId>jakarta.interceptor-api</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>javax.el</groupId>
-                        <artifactId>javax.el-api</artifactId>
+                        <groupId>jakarta.el</groupId>
+                        <artifactId>jakarta.el-api</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

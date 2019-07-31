@@ -21,10 +21,10 @@ def removeDependency(File file, String dependencyToRemove) {
     file.write( file.text.replaceAll( /<module name="${dependencyToRemove}"[^\/]*\/>/, '' ) )
 }
 
-// BV API
+// Jakarta Bean Validation API
 bvModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/javax/validation/api/main/module.xml' )
-def bvArtifactName = 'validation-api-' + project.properties['bv.api.version'] + '.jar';
-println "[INFO] Using BV version " + bvArtifactName;
+def bvArtifactName = 'jakarta.validation-api-' + project.properties['bv.api.version'] + '.jar';
+println "[INFO] Using Jakarta Bean Validation version " + bvArtifactName;
 processFileInplace( bvModuleXml ) { text ->
     text.replaceAll( /validation-api.*jar/, bvArtifactName )
 }

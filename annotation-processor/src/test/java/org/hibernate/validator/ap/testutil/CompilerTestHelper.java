@@ -49,7 +49,7 @@ public class CompilerTestHelper {
 
 		HIBERNATE_VALIDATOR( "hibernate-validator.jar" ),
 
-		VALIDATION_API( "validation-api.jar" ),
+		VALIDATION_API( "jakarta.validation-api.jar" ),
 
 		JODA_TIME( "joda-time.jar" ),
 
