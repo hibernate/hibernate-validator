@@ -33,10 +33,10 @@
         <dependencySet>
             <outputDirectory>dist/lib/required</outputDirectory>
             <includes>
-                <include>javax.validation:validation-api</include>
+                <include>jakarta.validation:jakarta.validation-api</include>
                 <include>org.jboss.logging:jboss-logging</include>
                 <include>com.fasterxml:classmate</include>
-                <include>org.glassfish:javax.el</include>
+                <include>org.glassfish:jakarta.el</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -44,7 +44,7 @@
             <includes>
                 <include>log4j:log4j</include>
                 <include>joda-time:joda-time</include>
-                <include>javax.persistence:javax.persistence-api</include>
+                <include>jakarta.persistence:jakarta.persistence-api</include>
                 <include>org.jsoup:jsoup</include>
                 <include>com.thoughtworks.paranamer:paranamer</include>
             </includes>

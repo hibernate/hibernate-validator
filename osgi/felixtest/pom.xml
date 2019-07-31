@@ -48,13 +48,13 @@
         </dependency>
     
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -163,6 +163,15 @@
                                     <type>jar</type>
                                     <outputDirectory>${project.build.directory}/payara5/glassfish/modules</outputDirectory>
                                     <destFileName>hibernate-validator-cdi.jar</destFileName>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>jakarta.validation</groupId>
+                                    <artifactId>jakarta.validation-api</artifactId>
+                                    <version>${bv.api.version}</version>
+                                    <type>jar</type>
+                                    <outputDirectory>${project.build.directory}/payara5/glassfish/modules</outputDirectory>
+                                    <destFileName>validation-api.jar</destFileName>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
                             </artifactItems>

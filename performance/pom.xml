@@ -53,8 +53,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -166,8 +166,8 @@
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>javax.validation</groupId>
-                    <artifactId>validation-api</artifactId>
+                    <groupId>jakarta.validation</groupId>
+                    <artifactId>jakarta.validation-api</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -176,7 +176,7 @@
                 </dependency>
                 <dependency>
                     <groupId>org.glassfish</groupId>
-                    <artifactId>javax.el</artifactId>
+                    <artifactId>jakarta.el</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>log4j</groupId>
@@ -243,6 +243,7 @@
                 </property>
             </activation>
             <properties>
+                <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>6.0.16.Final</beanvalidation-impl.version>
             </properties>
@@ -250,6 +251,7 @@
                 <dependency>
                     <groupId>javax.validation</groupId>
                     <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -259,6 +261,7 @@
                 <dependency>
                     <groupId>org.glassfish</groupId>
                     <artifactId>javax.el</artifactId>
+                    <version>3.0.1-b11</version>
                 </dependency>
                 <dependency>
                     <groupId>log4j</groupId>
@@ -302,6 +305,7 @@
                 <dependency>
                     <groupId>org.glassfish</groupId>
                     <artifactId>javax.el</artifactId>
+                    <version>3.0.1-b11</version>
                 </dependency>
                 <dependency>
                     <groupId>log4j</groupId>
