@@ -5,8 +5,8 @@
 
 ## What is it?
 
-This is the reference implementation of [JSR-380 - Bean Validation 2.0](http://beanvalidation.org/).
-Bean Validation defines a metadata model and API for JavaBean as well as method validation.
+This is the reference implementation of [Jakarta Bean Validation 2.0](http://beanvalidation.org/).
+Jakarta Bean Validation defines a metadata model and API for JavaBean as well as method validation.
 The default metadata source are annotations, with the ability to override and extend
 the metadata through the use of XML validation descriptors.
 
@@ -47,7 +47,7 @@ Logging will delegate any log requests to that provider.
            <version>3.0.1-b09</version>
         </dependency>
 
-* Bean Validation defines integration points with [CDI](http://jcp.org/en/jsr/detail?id=346). If your application runs
+* Jakarta Bean Validation defines integration points with [CDI](http://jcp.org/en/jsr/detail?id=346). If your application runs
 in an environment which does not provide this integration out of the box, you may use the Hibernate Validator CDI portable
 extension by adding the following dependency:
 
@@ -63,7 +63,7 @@ documentation](https://docs.jboss.org/hibernate/stable/validator/reference/en-US
 
 ## Licensing
 
-Hibernate Validator itself as well as the Bean Validation API and TCK are all provided and distributed under
+Hibernate Validator itself as well as the Jakarta Bean Validation API and TCK are all provided and distributed under
 the Apache Software License 2.0. Refer to license.txt for more information.
 
 ## Build from Source
@@ -84,7 +84,7 @@ We provide a `.travis.yml` file so that you can enable CI for your GitHub fork b
 ## Hibernate Validator URLs
 
 * [Home Page](http://hibernate.org/validator/)
-* [Bean Validation Home](http://beanvalidation.org/)
+* [Jakarta Bean Validation Home](http://beanvalidation.org/)
 * [Downloads](http://hibernate.org/validator/downloads/)
 * [Mailing Lists](http://hibernate.org/community/)
 * [Issue Tracking](https://hibernate.atlassian.net/browse/HV)
