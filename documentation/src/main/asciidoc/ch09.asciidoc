@@ -30,7 +30,7 @@ Hibernate Validator uses the factory as context for caching constraint metadata 
 work with one factory instance within an application.
 ====
 
-Bean Validation supports working with several providers such as Hibernate Validator within one
+Jakarta Bean Validation supports working with several providers such as Hibernate Validator within one
 application. If more than one provider is present on the classpath, it is not guaranteed which one
 is chosen when creating a factory via `buildDefaultValidatorFactory()`.
 
@@ -71,7 +71,7 @@ If a `ValidatorFactory` instance is no longer in use, it should be disposed by c
 [[section-validation-provider-resolver]]
 ==== `ValidationProviderResolver`
 
-By default, available Bean Validation providers are discovered using the
+By default, available Jakarta Bean Validation providers are discovered using the
 {javaTechnotesBaseUrl}/guides/jar/jar.html#Service_Provider[Java
 Service Provider] mechanism.
 
@@ -114,7 +114,7 @@ If you want to disable the XML based configuration, you can do so by invoking
 
 The different values of the XML configuration can be accessed via
 `Configuration#getBootstrapConfiguration()`. This can for instance be helpful if you want to integrate
-Bean Validation into a managed environment and want to create managed instances of the objects
+Jakarta Bean Validation into a managed environment and want to create managed instances of the objects
 configured via XML.
 
 Using the fluent configuration API, you can override one or more of the settings when bootstrapping

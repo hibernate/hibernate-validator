@@ -31,7 +31,7 @@
         <asciidoctor.osgi-integrationtest-source-dir>${basedir}/../osgi/integrationtest/src/test/java</asciidoctor.osgi-integrationtest-source-dir>
 
         <html.meta.description>Hibernate Validator, Annotation based constraints for your domain model - Reference Documentation</html.meta.description>
-        <html.meta.keywords>hibernate, validator, hibernate validator, validation, bean validation</html.meta.keywords>
+        <html.meta.keywords>hibernate, validator, hibernate validator, validation, jakarta bean validation, bean validation</html.meta.keywords>
         <html.meta.project-key>validator</html.meta.project-key>
         <html.google-analytics.id>UA-45270411-3</html.google-analytics.id>
         <html.google-analytics.tag-manager.id>GTM-NJWS5L</html.google-analytics.tag-manager.id>
@@ -258,7 +258,7 @@
                         <bvVersion>${bv.api.version}</bvVersion>
                         <jbossLoggingVersion>${jboss.logging.version}</jbossLoggingVersion>
                         <classmateVersion>${classmate.version}</classmateVersion>
-                        <javaxElVersion>${jakarta.el.version}</javaxElVersion>
+                        <jakartaElVersion>${jakarta.el.version}</jakartaElVersion>
 
                         <wildflyVersion>${wildfly.version}</wildflyVersion>
                         <wildflySecondaryVersion>${wildfly-secondary.version}</wildflySecondaryVersion>

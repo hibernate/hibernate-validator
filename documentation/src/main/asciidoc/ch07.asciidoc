@@ -27,7 +27,7 @@ Built-in value extractors are present for all the following container types:
 
 The complete list of built-in value extractors with all the details on how they
 behave can be found in the
-{bvSpecUrl}#valueextractordefinition-builtinvalueextractors[Bean Validation specification].
+{bvSpecUrl}#valueextractordefinition-builtinvalueextractors[Jakarta Bean Validation specification].
 
 === Implementing a `ValueExtractor`
 
@@ -178,7 +178,7 @@ annotation allows to provide this information to the validation engine.
 Then you have to tell the validation engine that the `Min` constraint you want to
 add to the `OptionalInt` property relates to the wrapped value and not the wrapper.
 
-Bean Validation provides the `Unwrapping.Unwrap` payload for this situation:
+Jakarta Bean Validation provides the `Unwrapping.Unwrap` payload for this situation:
 
 [[example-valueextraction-optionalint-unwrapping]]
 .Using `Unwrapping.Unwrap` payload
@@ -319,7 +319,7 @@ given at lower priorities.
 
 In most cases, you should not have to worry about this but, if you are overriding
 existing value extractors, you can find a detailed description of the value
-extractors resolution algorithms in the Bean Validation specification:
+extractors resolution algorithms in the Jakarta Bean Validation specification:
 
  * for {bvSpecUrl}#constraintdeclarationvalidationprocess-validationroutine-valueextractorresolution-algorithm-constraints[container element constraints],
  * for {bvSpecUrl}#constraintdeclarationvalidationprocess-validationroutine-valueextractorresolution-algorithm-cascaded[cascaded validation],
