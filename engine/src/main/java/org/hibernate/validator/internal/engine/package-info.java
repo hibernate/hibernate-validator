@@ -6,6 +6,6 @@
  */
 
 /**
- * Implementations for the core interfaces of JSR-380.
+ * Implementations for the core interfaces of Jakarta Bean Validation.
  */
 package org.hibernate.validator.internal.engine;
