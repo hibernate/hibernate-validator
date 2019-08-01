@@ -18,7 +18,7 @@
     <artifactId>hibernate-validator</artifactId>
 
     <name>Hibernate Validator Engine</name>
-    <description>Hibernate's Bean Validation (JSR-380) reference implementation.</description>
+    <description>Hibernate's Jakarta Bean Validation reference implementation.</description>
 
     <properties>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>

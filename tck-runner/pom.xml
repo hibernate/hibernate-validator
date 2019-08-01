@@ -18,7 +18,7 @@
     <artifactId>hibernate-validator-tck-runner</artifactId>
 
     <name>Hibernate Validator TCK Runner</name>
-    <description>Aggregates dependencies and runs the JSR-380 TCK</description>
+    <description>Aggregates dependencies and runs the Jakarta Bean Validation TCK</description>
 
     <properties>
         <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-tests-suite.xml</tck.suite.file>
