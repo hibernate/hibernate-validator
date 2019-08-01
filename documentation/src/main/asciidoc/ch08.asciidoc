@@ -1,9 +1,9 @@
 [[chapter-xml-configuration]]
 == Configuring via XML
 
-So far we have used the default configuration source for Bean Validation, namely annotations.
+So far we have used the default configuration source for Jakarta Bean Validation, namely annotations.
 However, there also exist two kinds of XML descriptors allowing configuration via XML. The first
-descriptor describes general Bean Validation behaviour and is provided as _META-INF/validation.xml_.
+descriptor describes general Jakarta Bean Validation behaviour and is provided as _META-INF/validation.xml_.
 The second one describes constraint declarations and closely matches the constraint declaration
 approach via annotations. Let's have a look at these two document types.
 
@@ -14,7 +14,7 @@ http://xmlns.jcp.org/xml/ns/validation/configuration and
 http://xmlns.jcp.org/xml/ns/validation/mapping.
 
 More information about the XML schemas can be found on the
-http://beanvalidation.org/xml/ns/validation/[Bean Validation website].
+http://beanvalidation.org/xml/ns/validation/[Jakarta Bean Validation website].
 ====
 
 [[section-configuration-validation-xml]]
@@ -51,7 +51,7 @@ There must only be one file named _META-INF/validation.xml_ on the classpath. If
 found an exception is thrown.
 ====
 
-The node `default-provider` allows to choose the Bean Validation provider. This is useful if there is
+The node `default-provider` allows to choose the Jakarta Bean Validation provider. This is useful if there is
 more than one provider on the classpath. `message-interpolator`, `traversable-resolver`,
 `constraint-validator-factory`, `parameter-name-provider` and `clock-provider` allow to customize
 the used implementations for the interfaces `MessageInterpolator`, `TraversableResolver`,
@@ -64,7 +64,7 @@ interfaces.
 container types or to override the built-in value extractors. See <<chapter-valueextraction>> for
 more information about how to implement `javax.validation.valueextraction.ValueExtractor`.
 
-`executable-validation` and its subnodes define defaults for method validation. The Bean Validation
+`executable-validation` and its subnodes define defaults for method validation. The Jakarta Bean Validation
 specification defines constructor and non getter methods as defaults. The enabled attribute acts as
 global switch to turn method validation on and off (see also <<chapter-method-constraints>>).
 
@@ -136,7 +136,7 @@ The nodes `class`, `field`, `getter`, `container-element-type`, `constructor` an
 The `valid` node is used to enable cascaded validation and the `constraint` node to add a constraint
 on the corresponding level.
 Each constraint definition must define the class via the `annotation` attribute.
-The constraint attributes required by the Bean Validation specification (`message`, `groups` and
+The constraint attributes required by the Jakarta Bean Validation specification (`message`, `groups` and
 `payload`) have dedicated nodes. All other constraint specific attributes are configured using the
 `element` node.
 

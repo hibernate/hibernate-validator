@@ -1,7 +1,7 @@
 [[validator-customconstraints]]
 == Creating custom constraints
 
-The Bean Validation API defines a whole set of standard constraint annotations such as `@NotNull`,
+The Jakarta Bean Validation API defines a whole set of standard constraint annotations such as `@NotNull`,
 `@Size` etc. In cases where these built-in constraints are not sufficient, you can easily create
 custom constraints tailored to your specific validation requirements.
 
@@ -46,7 +46,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CheckCase.
 ====
 
 An annotation type is defined using the `@interface` keyword. All attributes of an annotation type are
-declared in a method-like manner. The specification of the Bean Validation API demands, that any
+declared in a method-like manner. The specification of the Jakarta Bean Validation API demands, that any
 constraint annotation defines:
 
 * an attribute `message` that returns the default key for creating error messages in case the
@@ -55,7 +55,7 @@ constraint is violated
 * an attribute `groups` that allows the specification of validation groups, to which this constraint
 belongs (see <<chapter-groups>>). This must default to an empty array of type Class<?>.
 
-* an attribute `payload` that can be used by clients of the Bean Validation API to assign custom
+* an attribute `payload` that can be used by clients of the Jakarta Bean Validation API to assign custom
 payload objects to a constraint. This attribute is not used by the API itself. An example for a
 custom payload could be the definition of a severity:
 +
@@ -109,14 +109,14 @@ same place, usually with a different configuration. `List` is the containing ann
 
 This containing annotation type named `List` is also shown in the example. It allows to specify several
 `@CheckCase` annotations on the same element, e.g. with different validation groups and messages.
-While another name could be used, the Bean Validation specification recommends to use the name
+While another name could be used, the Jakarta Bean Validation specification recommends to use the name
 `List` and make the annotation an inner annotation of the corresponding constraint type.
 
 [[section-constraint-validator]]
 ==== The constraint validator
 
 Having defined the annotation, you need to create a constraint validator, which is able to validate
-elements with a `@CheckCase` annotation. To do so, implement the Bean Validation interface `ConstraintValidator`
+elements with a `@CheckCase` annotation. To do so, implement the Jakarta Bean Validation interface `ConstraintValidator`
 as shown below:
 
 [[example-constraint-validator]]
@@ -140,7 +140,7 @@ validator as shown in the example.
 
 The `isValid()` method contains the actual validation logic. For `@CheckCase` this is the check whether
 a given string is either completely lower case or upper case, depending on the case mode retrieved
-in `initialize()`. Note that the Bean Validation specification recommends to consider null values as
+in `initialize()`. Note that the Jakarta Bean Validation specification recommends to consider null values as
 being valid. If `null` is not a valid value for an element, it should be annotated with `@NotNull`
 explicitly.
 
@@ -183,7 +183,7 @@ sensitive data.
 
 If you need to integrate user input, you should:
 
- * either escape it by using the http://beanvalidation.org/2.0/spec/#validationapi-message-defaultmessageinterpolation[Bean Validation message interpolation escaping rules];
+ * either escape it by using the http://beanvalidation.org/2.0/spec/#validationapi-message-defaultmessageinterpolation[Jakarta Bean Validation message interpolation escaping rules];
  * or, even better, <<section-hibernateconstraintvalidatorcontext,pass it as message parameters or expression variables>> by unwrapping the context to `HibernateConstraintValidatorContext`.
 ====
 
@@ -206,7 +206,7 @@ The `initialize()` method of `HibernateConstraintValidator` takes two parameters
    information, such as the clock provider or the temporal validation tolerance.
 
 This extension is marked as incubating so it might be subject to change.
-The plan is to standardize it and to include it in Bean Validation in the future.
+The plan is to standardize it and to include it in Jakarta Bean Validation in the future.
 
 The example below shows how to base your validators on `HibernateConstraintValidator`:
 
@@ -384,7 +384,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/custompath
 [[section-cross-parameter-constraints]]
 === Cross-parameter constraints
 
-Bean Validation distinguishes between two different kinds of constraints.
+Jakarta Bean Validation distinguishes between two different kinds of constraints.
 
 Generic constraints (which have been discussed so far) apply to the annotated element, e.g. a type,
 field, container element, method parameter or return value etc.

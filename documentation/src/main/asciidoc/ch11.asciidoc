@@ -98,7 +98,7 @@ configuration in _hibernate.cfg.xml_:
 ==== JPA
 
 If you are using JPA 2 and Hibernate Validator is in the classpath, the JPA2 specification requires
-that Bean Validation gets enabled. The properties `javax.persistence.validation.group.pre-persist`,
+that Jakarta Bean Validation gets enabled. The properties `javax.persistence.validation.group.pre-persist`,
 `javax.persistence.validation.group.pre-update` and `javax.persistence.validation.group.pre-remove` as
 described in <<validator-checkconstraints-orm-hibernateevent>> can in this case be configured in
 _persistence.xml_. _persistence.xml_ also defines a node validation-mode which can be set to `AUTO`,
@@ -108,7 +108,7 @@ _persistence.xml_. _persistence.xml_ also defines a node validation-mode which c
 
 === JSF & Seam
 
-When working with JSF2 or JBoss Seam and Hibernate Validator (Bean Validation) is present in the
+When working with JSF2 or JBoss Seam and Hibernate Validator (Jakarta Bean Validation) is present in the
 runtime environment, validation is triggered for every field in the application. <<example-jsf2>>
 shows an example of the `f:validateBean` tag in a JSF page. The `validationGroups` attribute is optional
 and can be used to specify a comma separated list of validation groups. The default is
@@ -117,7 +117,7 @@ specification.
 
 
 [[example-jsf2]]
-.Usage of Bean Validation within JSF2
+.Usage of Jakarta Bean Validation within JSF2
 ====
 [source, XML]
 ----
@@ -137,12 +137,12 @@ specification.
 
 [TIP]
 ====
-The integration between JSF 2 and Bean Validation is described in the "Bean Validation Integration"
+The integration between JSF 2 and Jakarta Bean Validation is described in the "Jakarta Bean Validation Integration"
 chapter of http://jcp.org/en/jsr/detail?id=314[JSR-314]. It is interesting to know that JSF
 2 implements a custom `MessageInterpolator` to ensure proper localization. To encourage the use
-of the Bean Validation message facility, JSF 2 will per default only display the generated Bean
+of the Jakarta Bean Validation message facility, JSF 2 will per default only display the generated Bean
 Validation message. This can, however, be configured via the application resource bundle by
-providing the following configuration (`{0}` is replaced with the Bean Validation message and `{1}` is
+providing the following configuration (`{0}` is replaced with the Jakarta Bean Validation message and `{1}` is
 replaced with the JSF component label):
 
 ----
@@ -160,8 +160,8 @@ javax.faces.validator.BeanValidator.MESSAGE={0}
 [[section-integration-with-cdi]]
 === CDI
 
-As of version 1.1, Bean Validation is integrated with CDI (Contexts and Dependency Injection for
-Java^TM^ EE).
+As of version 1.1, Bean Validation (and therefore Jakarta Bean Validation) is integrated with CDI
+(Contexts and Dependency Injection for Jakarta EE).
 
 This integration provides CDI managed beans for `Validator` and `ValidatorFactory` and enables
 dependency injection in constraint validators as well as custom message interpolators, traversable
@@ -192,10 +192,10 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/cdi/valida
 ====
 
 The injected beans are the default validator factory and validator instances. In order to configure
-them - e.g. to use a custom message interpolator - you can use the Bean Validation XML descriptors
+them - e.g. to use a custom message interpolator - you can use the Jakarta Bean Validation XML descriptors
 as discussed in <<chapter-xml-configuration>>.
 
-If you are working with several Bean Validation providers, you can make sure that factory and
+If you are working with several Jakarta Bean Validation providers, you can make sure that factory and
 validator from Hibernate Validator are injected by annotating the injection points with the
 `@HibernateValidator` qualifier which is demonstrated in <<example-dependency-injection-using-hv>>.
 
@@ -217,7 +217,7 @@ used for selecting Hibernate Validator when working with the bootstrapping API (
 <<section-retrieving-validator-factory-validator>>).
 ====
 
-Via `@Inject` you also can inject dependencies into constraint validators and other Bean Validation
+Via `@Inject` you also can inject dependencies into constraint validators and other Jakarta Bean Validation
 objects such as `MessageInterpolator` implementations etc.
 
 <<example-constraint-validator-injected-bean>>
@@ -237,7 +237,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/cdi/inject
 
 ==== Method validation
 
-The method interception facilities of CDI allow for a very tight integration with Bean Validation's
+The method interception facilities of CDI allow for a very tight integration with Jakarta Bean Validation's
 method validation functionality. Just put constraint annotations to the parameters and return values
 of the executables of your CDI beans and they will be validated automatically before (parameter
 constraints) and after (return value constraints) a method or constructor is invoked.
@@ -283,7 +283,7 @@ value is marked with `@Valid`.
 
 ===== Validated executable types
 
-Bean Validation allows for a fine-grained control of the executable types which are automatically
+Jakarta Bean Validation allows for a fine-grained control of the executable types which are automatically
 validated. By default, constraints on constructors and non-getter methods are validated. Therefore
 the `@NotNull` constraint on the method `RentalStation#getAvailableCars()` in
 <<example-cdi-method-validation>> does not get validated when the method is invoked.

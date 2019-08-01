@@ -1,7 +1,7 @@
 [[validator-gettingstarted]]
 == Getting started
 
-This chapter will show you how to get started with Hibernate Validator, the reference implementation (RI) of Bean Validation. For the following quick-start you need:
+This chapter will show you how to get started with Hibernate Validator, the reference implementation (RI) of Jakarta Bean Validation. For the following quick-start you need:
 
 * A JDK 8
 * http://maven.apache.org/[Apache Maven]
@@ -26,18 +26,18 @@ your __pom.xml__:
 ----
 ====
 
-This transitively pulls in the dependency to the Bean Validation API
-(`javax.validation:validation-api:{bvVersion}`).
+This transitively pulls in the dependency to the Jakarta Bean Validation API
+(`jakarta.validation:jakarta.validation-api:{bvVersion}`).
 
 [[validator-gettingstarted-uel]]
 ==== Unified EL
 
-Hibernate Validator requires an implementation of the Unified Expression Language
-(http://jcp.org/en/jsr/detail?id=341[JSR 341]) for evaluating dynamic expressions in constraint
+Hibernate Validator requires an implementation of https://projects.eclipse.org/projects/ee4j.el[Jakarta Expression Language]
+for evaluating dynamic expressions in constraint
 violation messages (see <<section-message-interpolation>>). When your application runs in a Java EE
 container such as JBoss AS, an EL implementation is already provided by the container. In a Java SE
 environment, however, you have to add an implementation as dependency to your POM file. For instance
-you can add the following dependency to use the JSR 341 https://javaee.github.io/uel-ri/[reference
+you can add the following dependency to use the Jakarta EL https://github.com/eclipse-ee4j/el-ri[reference
 implementation]:
 
 .Maven dependencies for Unified EL reference implementation
@@ -47,8 +47,8 @@ implementation]:
 ----
 <dependency>
     <groupId>org.glassfish</groupId>
-    <artifactId>javax.el</artifactId>
-    <version>{javaxElVersion}</version>
+    <artifactId>jakarta.el</artifactId>
+    <version>{jakartaElVersion}</version>
 </dependency>
 ----
 ====
@@ -57,14 +57,15 @@ implementation]:
 ====
 For environments where one cannot provide a EL implementation Hibernate Validator is offering a
 <<non-el-message-interpolator>>. However, the use of this interpolator
-is not Bean Validation specification compliant.
+is not Jakarta Bean Validation specification compliant.
 ====
 
 [[section-getting-started-cdi]]
 ==== CDI
 
-Bean Validation defines integration points with CDI (Contexts and Dependency Injection for Java ^TM^
-EE, http://jcp.org/en/jsr/detail?id=346[JSR 346]). If your application runs in an
+Jakarta Bean Validation defines integration points with CDI
+(https://projects.eclipse.org/projects/ee4j.cdi[Contexts and Dependency Injection for Jakarta EE]).
+If your application runs in an
 environment which does not provide this integration out of the box, you may use the Hibernate
 Validator CDI portable extension by adding the following Maven dependency to your POM:
 
@@ -82,14 +83,14 @@ Validator CDI portable extension by adding the following Maven dependency to you
 ====
 
 Note that adding this dependency is usually not required for applications running on a Java EE
-application server. You can learn more about the integration of Bean Validation and CDI in
+application server. You can learn more about the integration of Jakarta Bean Validation and CDI in
 <<section-integration-with-cdi>>.
 
 [[section-getting-started-security-manager]]
 ==== Running with a security manager
 
 Hibernate Validator supports running with a {javaTechnotesBaseUrl}/guides/security/index.html[security manager] being enabled.
-To do so, you must assign several permissions to the code bases of Hibernate Validator, the Bean Validation API, Classmate and JBoss Logging and also to the code base calling Bean Validation.
+To do so, you must assign several permissions to the code bases of Hibernate Validator, the Jakarta Bean Validation API, Classmate and JBoss Logging and also to the code base calling Jakarta Bean Validation.
 The following shows how to do this via a {javaTechnotesBaseUrl}/guides/security/PolicyFiles.html[policy file] as processed by the Java default policy implementation:
 
 .Policy file for using Hibernate Validator with a security manager
@@ -108,7 +109,7 @@ grant codeBase "file:path/to/hibernate-validator-{hvVersion}.jar" {
     permission java.util.PropertyPermission "mapAnyUriToUri", "read";
 };
 
-grant codeBase "file:path/to/validation-api-{bvVersion}.jar" {
+grant codeBase "file:path/to/jakarta.validation-api-{bvVersion}.jar" {
     permission java.io.FilePermission "path/to/hibernate-validator-{hvVersion}.jar", "read";
 };
 
@@ -130,7 +131,7 @@ grant codeBase "file:path/to/validation-caller-x.y.z.jar" {
 ==== Updating Hibernate Validator in WildFly
 
 The http://wildfly.org/[WildFly application server] contains Hibernate Validator out of the box.
-In order to update the server modules for Bean Validation API and Hibernate Validator to the latest and greatest, the patch mechanism of WildFly can be used.
+In order to update the server modules for Jakarta Bean Validation API and Hibernate Validator to the latest and greatest, the patch mechanism of WildFly can be used.
 
 You can download the patch file from http://sourceforge.net/projects/hibernate/files/hibernate-validator[SourceForge] or from Maven Central using the following dependency:
 
@@ -198,7 +199,7 @@ There are no JPMS module descriptors provided yet, but Hibernate Validator is us
 
 These are the module names as declared using the `Automatic-Module-Name` header:
 
-* Bean Validation API: `java.validation`
+* Jakarta Bean Validation API: `java.validation`
 * Hibernate Validator core: `org.hibernate.validator`
 * Hibernate Validator CDI extension: `org.hibernate.validator.cdi`
 * Hibernate Validator test utilities: `org.hibernate.validator.testutils`
@@ -209,14 +210,14 @@ These module names are preliminary and may be changed when providing real module
 [WARNING]
 ====
 When using Hibernate Validator with CDI, be careful to not enable the `java.xml.ws.annotation` module of the JDK.
-This module contains a subset of the JSR 250 API ("Commons Annotations"), but some annotations such as `javax.annotation.Priority` are missing.
+This module contains a subset of Jakarta Annotations, but some annotations such as `javax.annotation.Priority` are missing.
 This causes the method validation interceptor of Hibernate Validator to not be registered, i.e. method validation won't work.
 
-Instead, add the full JSR 250 API to the unnamed module (i.e. the classpath), e.g. by pulling in the _javax.annotation:javax.annotation-api_ dependency
-(there already is a transitive dependency to the JSR 250 API when depending on _org.hibernate.validator:hibernate-validator-cdi_).
+Instead, add the full Jakarta Annotations API to the unnamed module (i.e. the classpath), e.g. by pulling in the _jakarta.annotation:jakarta.annotation-api_ dependency
+(there already is a transitive dependency to the Jakarta Annotations API when depending on _org.hibernate.validator:hibernate-validator-cdi_).
 
 If you need to enable the `java.xml.ws.annotation` module for some reason, you should patch it with the contents of the full API
-by appending `--patch-module java.xml.ws.annotation=/path/to/complete-jsr250-api.jar` to your _java_ invocation.
+by appending `--patch-module java.xml.ws.annotation=/path/to/complete-jakarta.annotation-api.jar` to your _java_ invocation.
 ====
 
 [[validator-gettingstarted-createmodel]]
@@ -284,11 +285,11 @@ code.
 [[validator-gettingstarted-whatsnext]]
 === Where to go next?
 
-That concludes the 5 minutes tour through the world of Hibernate Validator and Bean Validation.
+That concludes the 5 minutes tour through the world of Hibernate Validator and Jakarta Bean Validation.
 Continue exploring the code examples or look at further examples referenced in
 <<validator-further-reading>>.
 
 To learn more about the validation of beans and properties, just continue reading
-<<chapter-bean-constraints>>. If you are interested in using Bean Validation for the validation of
+<<chapter-bean-constraints>>. If you are interested in using Jakarta Bean Validation for the validation of
 method pre- and postcondition refer to <<chapter-method-constraints>>. In case your application has
 specific validation requirements have a look at <<validator-customconstraints>>.
