@@ -1,7 +1,7 @@
 [[chapter-message-interpolation]]
 == Interpolating constraint error messages
 
-Message interpolation is the process of creating error messages for violated Bean Validation
+Message interpolation is the process of creating error messages for violated Jakarta Bean Validation
 constraints. In this chapter you will learn how such messages are defined and resolved and how you
 can plug in custom message interpolators in case the default algorithm is not sufficient for your
 requirements.
@@ -42,7 +42,7 @@ this bundle, such as _$$ValidationMessages_en_US.properties$$_. By default, the 
 (`Locale#getDefault()`) will be used when looking up messages in the bundle.
 
 . Resolve any message parameters by using them as key for a resource bundle containing the standard
-error messages for the built-in constraints as defined in Appendix B of the Bean Validation
+error messages for the built-in constraints as defined in Appendix B of the Jakarta Bean Validation
 specification. In the case of Hibernate Validator, this bundle is named
 `org.hibernate.validator.ValidationMessages`. If this step triggers a replacement, step 1 is executed
 again, otherwise step 3 is applied.
@@ -61,7 +61,7 @@ Unified EL in error messages.
 ====
 You can find the formal definition of the interpolation algorithm in section
 {bvSpecUrl}#validationapi-message-defaultmessageinterpolation-resolutionalgorithm[6.3.1.1]
-of the Bean Validation specification.
+of the Jakarta Bean Validation specification.
 ====
 
 [[section-special-characters]]
@@ -79,8 +79,8 @@ escaped if you want to use them literally. The following rules apply:
 [[section-interpolation-with-message-expressions]]
 ==== Interpolation with message expressions
 
-As of Hibernate Validator 5 (Bean Validation 1.1) it is possible to use the Unified Expression
-Language (as defined by link:http://jcp.org/en/jsr/detail?id=341[JSR 341]) in constraint
+As of Hibernate Validator 5 (Bean Validation 1.1) it is possible to use the
+https://projects.eclipse.org/projects/ee4j.el[Jakarta Expression Language] in constraint
 violation messages. This allows to define error messages based on conditional logic and also enables
 advanced formatting options. The validation engine makes the following objects available in the EL
 context:
@@ -111,7 +111,7 @@ Validating an invalid `Car` instance yields constraint violations with the messa
 assertions in <<example-expected-error-messages>>:
 
 * the `@NotNull` constraint on the `manufacturer` field causes the error message "must not be null", as
-this is the default message defined by the Bean Validation specification and no specific descriptor
+this is the default message defined by the Jakarta Bean Validation specification and no specific descriptor
 is given in the message attribute
 
 * the `@Size` constraint on the `licensePlate` field shows the interpolation of message parameters
@@ -157,7 +157,7 @@ final implementation to the default interpolator, which can be obtained via
 `Configuration#getDefaultMessageInterpolator()`.
 
 In order to use a custom message interpolator it must be registered either by configuring it in the
-Bean Validation XML descriptor _META-INF/validation.xml_ (see
+Jakarta Bean Validation XML descriptor _META-INF/validation.xml_ (see
 <<section-configuration-validation-xml>>) or by passing it when bootstrapping a `ValidatorFactory` or
 `Validator` (see <<section-validator-factory-message-interpolator>> and
 <<section-configuring-validator>>, respectively).

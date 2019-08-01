@@ -3,11 +3,11 @@
 
 Last but not least, a few pointers to further information.
 
-A great source for examples is the Bean Validation TCK which is available for anonymous access on
+A great source for examples is the Jakarta Bean Validation TCK which is available for anonymous access on
 https://github.com/beanvalidation/beanvalidation-tck/[GitHub]. In particular the TCK's
 https://github.com/beanvalidation/beanvalidation-tck/tree/master/tests[tests] might be
-of interest. {bvSpecUrl}[The JSR 380] specification itself
-is also a great way to deepen your understanding of Bean Validation and Hibernate Validator.
+of interest. {bvSpecUrl}[The Jakarta Bean Validation] specification itself
+is also a great way to deepen your understanding of Jakarta Bean Validation and Hibernate Validator.
 
 If you have any further questions about Hibernate Validator or want to share some of your use cases,
 have a look at the http://community.jboss.org/en/hibernate/validator[Hibernate Validator

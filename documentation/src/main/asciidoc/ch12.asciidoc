@@ -2,7 +2,7 @@
 == Hibernate Validator Specifics
 
 In this chapter you will learn how to make use of several features provided by Hibernate Validator
-in addition to the functionality defined by the Bean Validation specification. This includes the
+in addition to the functionality defined by the Jakarta Bean Validation specification. This includes the
 fail fast mode, the API for programmatic constraint configuration and the boolean composition of
 constraints.
 
@@ -16,7 +16,7 @@ Validator.
 [NOTE]
 ====
 Using the features described in the following sections may result in application code which is not
-portable between Bean Validation providers.
+portable between Jakarta Bean Validation providers.
 ====
 
 === Public API
@@ -25,13 +25,13 @@ Let's start, however, with a look at the public API of Hibernate Validator. Belo
 Note that when a package is part of the public API this is not necessarily true for its sub-packages.
 
 `org.hibernate.validator`::
-			Classes used by the Bean Validation bootstrap mechanism (eg. validation provider, configuration class); for more details see <<chapter-bootstrapping>>.
+			Classes used by the Jakarta Bean Validation bootstrap mechanism (eg. validation provider, configuration class); for more details see <<chapter-bootstrapping>>.
 
 `org.hibernate.validator.cfg`, `org.hibernate.validator.cfg.context`, `org.hibernate.validator.cfg.defs`, `org.hibernate.validator.spi.cfg`::
 			Hibernate Validator's fluent API for constraint declaration; in `org.hibernate.validator.cfg` you will find the `ConstraintMapping` interface, in `org.hibernate.validator.cfg.defs` all constraint definitions and in `org.hibernate.validator.spi.cfg` a callback for using the API for configuring the default validator factory. Refer to <<section-programmatic-api>> for the details.
 
 `org.hibernate.validator.constraints`, `org.hibernate.validator.constraints.br`, `org.hibernate.validator.constraints.pl`::
-			Some useful custom constraints provided by Hibernate Validator in addition to the built-in constraints defined by the Bean Validation specification; the constraints are described in detail in <<validator-defineconstraints-hv-constraints>>.
+			Some useful custom constraints provided by Hibernate Validator in addition to the built-in constraints defined by the Jakarta Bean Validation specification; the constraints are described in detail in <<validator-defineconstraints-hv-constraints>>.
 
 `org.hibernate.validator.constraintvalidation`::
 			Extended constraint validator context which allows to set custom attributes for message interpolation. <<section-hibernateconstraintvalidatorcontext>> describes how to make use of that feature.
@@ -107,13 +107,13 @@ fail fast mode when bootstrapping a validator.
 [[section-method-validation-prerequisite-relaxation]]
 === Relaxation of requirements for method validation in class hierarchies
 
-The Bean Validation specification defines a set of preconditions which apply when defining
+The Jakarta Bean Validation specification defines a set of preconditions which apply when defining
 constraints on methods within class hierarchies. These preconditions are defined in
 {bvSpecUrl}#constraintdeclarationvalidationprocess-methodlevelconstraints-inheritance[section 5.6.5]
-of the Bean Validation 2.0 specification. See also <<section-method-constraints-inheritance-hierarchies>>
+of the Jakarta Bean Validation 2.0 specification. See also <<section-method-constraints-inheritance-hierarchies>>
 in this guide.
 
-As per specification, a Bean Validation provider is allowed to relax these preconditions.
+As per specification, a Jakarta Bean Validation provider is allowed to relax these preconditions.
 With Hibernate Validator you can do this in one of two ways.
 
 First you can use the configuration properties _hibernate.validator.allow_parameter_constraint_override_,
@@ -154,7 +154,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/relaxation
 ====
 
 By default, all of these properties are false, implementing the default behavior as defined in the
-Bean Validation specification.
+Jakarta Bean Validation specification.
 
 [WARNING]
 ====
@@ -166,7 +166,7 @@ requires changes to the default behaviour.
 [[section-programmatic-api]]
 === Programmatic constraint definition and declaration
 
-As per the Bean Validation specification, you can define and declare constraints using Java annotations and XML
+As per the Jakarta Bean Validation specification, you can define and declare constraints using Java annotations and XML
 based constraint mappings.
 
 In addition, Hibernate Validator provides a fluent API which allows for the programmatic
@@ -333,7 +333,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/purelycomp
 [[section-boolean-constraint-composition]]
 ==== Boolean composition of constraints
 
-Bean Validation specifies that the constraints of a composed constraint (see
+Jakarta Bean Validation specifies that the constraints of a composed constraint (see
 <<section-constraint-composition>>) are all combined via a logical _AND_. This means all of the
 composing constraints need to return true to obtain an overall successful validation.
 
@@ -421,7 +421,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/dynamicpay
 
 Hibernate Validator requires per default an implementation of the Unified EL (see
 <<validator-gettingstarted-uel>>) to be available. This is needed to allow the interpolation
-of constraint error messages using EL expressions as defined by the Bean Validation specification.
+of constraint error messages using EL expressions as defined by the Jakarta Bean Validation specification.
 
 For environments where you cannot or do not want to provide an EL implementation, Hibernate Validator
 offers a non EL based message interpolator - `org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator`.
@@ -445,7 +445,7 @@ interpolation algorithm as defined by the specification. Refer to
 
 === Custom contexts
 
-The Bean Validation specification offers at several points in its API the possibility to unwrap a
+The Jakarta Bean Validation specification offers at several points in its API the possibility to unwrap a
 given interface to an implementor specific subtype. In the case of constraint violation creation in
 `ConstraintValidator` implementations as well as message interpolation in `MessageInterpolator`
 instances, there exist `unwrap()` methods for the provided context instances -
@@ -546,7 +546,7 @@ Alternatively you can specify a `Paranamer` implementation of your choice when c
 [[section-constraint-definition-contribution]]
 === Providing constraint definitions
 
-Bean Validation allows to (re-)define constraint definitions via XML in its constraint mapping
+Jakarta Bean Validation allows to (re-)define constraint definitions via XML in its constraint mapping
 files. See <<section-mapping-xml-constraints>> for more information and <<example-constraints-car>>
 for an example. While this approach is sufficient for many use cases,  it has its shortcomings
 in others. Imagine for example a constraint library wanting to contribute constraint
