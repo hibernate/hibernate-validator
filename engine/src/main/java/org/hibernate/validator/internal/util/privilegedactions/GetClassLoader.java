@@ -16,10 +16,13 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Emmanuel Bernard
  */
 public final class GetClassLoader implements PrivilegedAction<ClassLoader> {
+
+	private static final GetClassLoader CONTEXT = new GetClassLoader( null );
+
 	private final Class<?> clazz;
 
 	public static GetClassLoader fromContext() {
-		return new GetClassLoader( null );
+		return CONTEXT;
 	}
 
 	public static GetClassLoader fromClass(Class<?> clazz) {
