@@ -13,8 +13,11 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import static org.testng.Assert.fail;
 
 import java.lang.annotation.ElementType;
+import java.util.AbstractCollection;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 
@@ -243,6 +246,7 @@ public class PredefinedScopeValidatorFactoryTest {
 		Set<Class<?>> beanMetaDataToInitialize = new HashSet<>();
 		beanMetaDataToInitialize.add( Bean.class );
 		beanMetaDataToInitialize.add( AnotherBean.class );
+		beanMetaDataToInitialize.add( SomeEnum.class );
 
 		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
@@ -258,6 +262,23 @@ public class PredefinedScopeValidatorFactoryTest {
 		catch (ValidationException e) {
 			Assertions.assertThat( e ).hasCauseExactlyInstanceOf( ValidatorSpecificTraversableResolverUsedException.class );
 		}
+	}
+
+	@Test
+	public void variousObjectTypes() {
+		Set<Class<?>> beanMetaDataToInitialize = new HashSet<>();
+		beanMetaDataToInitialize.add( Bean.class );
+		beanMetaDataToInitialize.add( AnotherBean.class );
+		beanMetaDataToInitialize.add( SomeEnum.class );
+		beanMetaDataToInitialize.add( Values.Itr.class );
+
+		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
+				.configure()
+				.initializeBeanMetaData( beanMetaDataToInitialize )
+				.buildValidatorFactory();
+
+		Validator validator = validatorFactory.getValidator();
+		validator.validate( new Bean() );
 	}
 
 	private static Validator getValidator() {
@@ -284,6 +305,40 @@ public class PredefinedScopeValidatorFactoryTest {
 				.buildValidatorFactory();
 
 		return validatorFactory.getValidator();
+	}
+
+	private enum SomeEnum {
+		VALUE;
+	}
+
+	final class Values extends AbstractCollection<String> implements Collection<String> {
+		public Iterator<String> iterator() {
+			return new Itr( null );
+		}
+
+		public int size() {
+			return 0;
+		}
+
+		public boolean isEmpty() {
+			return true;
+		}
+
+		final class Itr implements Iterator<String> {
+			private final Iterator<String> iterator;
+
+			Itr(final Iterator<String> iterator) {
+				this.iterator = iterator;
+			}
+
+			public boolean hasNext() {
+				return iterator.hasNext();
+			}
+
+			public String next() {
+				return "";
+			}
+		}
 	}
 
 	private static class Bean {
