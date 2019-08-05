@@ -205,19 +205,30 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 			int explicitlyDeclaredParameterIndex = 0;
 
 			for ( int i = 0; i < parameterArray.length; i++ ) {
-				if ( parameterArray[i].isSynthetic() || parameterArray[i].isImplicit() ) {
-					// in this case, the parameter is not present in genericParameterTypes
-					parameters.add( new JavaBeanParameter( i, parameterArray[i], parameterTypes[i], parameterTypes[i] ) );
-				}
-				else {
+				if ( explicitlyDeclaredParameterIndex < genericParameterTypes.length // we might already be out of the bounds of generic params array
+						&& isExplicit( parameterArray[i] )
+						&& parameterTypesMatch( parameterTypes[i], genericParameterTypes[explicitlyDeclaredParameterIndex] ) ) {
+					// in this case we have a parameter that is present and matches ("most likely") to the one in the generic parameter types list
 					parameters.add( new JavaBeanParameter( i, parameterArray[i], parameterTypes[i],
 							getErasedTypeIfTypeVariable( genericParameterTypes[explicitlyDeclaredParameterIndex] ) ) );
 					explicitlyDeclaredParameterIndex++;
+				}
+				else {
+					// in this case, the parameter is not present in genericParameterTypes, or the types doesn't match
+					parameters.add( new JavaBeanParameter( i, parameterArray[i], parameterTypes[i], parameterTypes[i] ) );
 				}
 			}
 		}
 
 		return CollectionHelper.toImmutableList( parameters );
+	}
+
+	private static boolean parameterTypesMatch(Class<?> paramType, Type genericParamType) {
+		return TypeHelper.getErasedType( genericParamType ).equals( paramType );
+	}
+
+	private static boolean isExplicit(Parameter parameter) {
+		return !parameter.isSynthetic() && !parameter.isImplicit();
 	}
 
 	private static Type getErasedTypeIfTypeVariable(Type genericType) {
