@@ -102,6 +102,27 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>copy-tck-bv-api-signature-file</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.hibernate.beanvalidation.tck</groupId>
+                                    <artifactId>beanvalidation-tck-tests</artifactId>
+                                    <version>${version.org.hibernate.beanvalidation.tck}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                            </artifactItems>
+                            <!-- We just need the signature file and nothing else -->
+                            <includes>**/*.sig</includes>
+                            <outputDirectory>${project.build.directory}/api-signature</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>copy-tck-test-suite-file</id>
                         <phase>generate-test-sources</phase>
                         <goals>
@@ -154,6 +175,25 @@
                 <configuration>
                     <outputDirectory>${project.build.directory}/surefire-reports</outputDirectory>
                     <outputName>test-report</outputName>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.netbeans.tools</groupId>
+                <artifactId>sigtest-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <action>strictcheck</action>
+                    <packages>javax.validation,javax.validation.bootstrap,javax.validation.constraints,
+                        javax.validation.constraintvalidation,javax.validation.executable,javax.validation.groups,
+                        javax.validation.metadata,javax.validation.spi,javax.validation.valueextraction
+                    </packages>
+                    <sigfile>${project.build.directory}/api-signature/validation-api-java8.sig</sigfile>
                 </configuration>
             </plugin>
         </plugins>
