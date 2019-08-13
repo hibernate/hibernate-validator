@@ -222,7 +222,7 @@
         <version.release.plugin>2.5.3</version.release.plugin>
         <version.resources.plugin>3.0.2</version.resources.plugin>
         <version.shade.plugin>3.1.0</version.shade.plugin>
-        <version.sigtest.plugin>1.0</version.sigtest.plugin>
+        <version.sigtest.plugin>1.2</version.sigtest.plugin>
         <version.source.plugin>3.0.1</version.source.plugin>
         <version.surefire.plugin>2.21.0</version.surefire.plugin>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
