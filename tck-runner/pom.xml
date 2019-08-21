@@ -177,25 +177,6 @@
                     <outputName>test-report</outputName>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.netbeans.tools</groupId>
-                <artifactId>sigtest-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <action>strictcheck</action>
-                    <packages>javax.validation,javax.validation.bootstrap,javax.validation.constraints,
-                        javax.validation.constraintvalidation,javax.validation.executable,javax.validation.groups,
-                        javax.validation.metadata,javax.validation.spi,javax.validation.valueextraction
-                    </packages>
-                    <sigfile>${project.build.directory}/api-signature/validation-api-java8.sig</sigfile>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
@@ -378,6 +359,32 @@
                             <systemPropertyVariables>
                                 <arquillian.launch>incontainer</arquillian.launch>
                             </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>sigtest</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.netbeans.tools</groupId>
+                        <artifactId>sigtest-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <action>strictcheck</action>
+                            <packages>javax.validation,javax.validation.bootstrap,javax.validation.constraints,
+                                javax.validation.constraintvalidation,javax.validation.executable,javax.validation.groups,
+                                javax.validation.metadata,javax.validation.spi,javax.validation.valueextraction
+                            </packages>
+                            <sigfile>${project.build.directory}/api-signature/validation-api-java8.sig</sigfile>
                         </configuration>
                     </plugin>
                 </plugins>
