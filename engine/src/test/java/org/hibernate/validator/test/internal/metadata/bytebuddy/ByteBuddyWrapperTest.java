@@ -40,7 +40,6 @@ import org.testng.annotations.Test;
  */
 public class ByteBuddyWrapperTest {
 
-
 	@Test
 	public void testByteBuddy() throws Exception {
 		Class<?> clazz = Foo.class;
@@ -53,13 +52,13 @@ public class ByteBuddyWrapperTest {
 		Class<?> aClass = new ByteBuddy().rebase( clazz )
 				.implement( HibernateValidatorEnhancedBean.class )
 				.method(
-						named( "getFieldValue" )
+						named( HibernateValidatorEnhancedBean.GET_FIELD_VALUE_METHOD_NAME )
 								.and( ElementMatchers.takesArguments( String.class ) )
 								.and( ElementMatchers.returns( Object.class ) )
 				)
 				.intercept( new Implementation.Simple( new GetFieldValue( clazz ) ) )
 				.method(
-						named( "getGetterValue" )
+						named( HibernateValidatorEnhancedBean.GET_GETTER_VALUE_METHOD_NAME )
 								.and( ElementMatchers.takesArguments( String.class ) )
 								.and( ElementMatchers.returns( Object.class ) )
 				)
@@ -70,13 +69,13 @@ public class ByteBuddyWrapperTest {
 
 		Object object = aClass.newInstance();
 
-		Method getFieldValue = aClass.getMethod( "getFieldValue", String.class );
+		Method getFieldValue = aClass.getMethod( HibernateValidatorEnhancedBean.GET_FIELD_VALUE_METHOD_NAME, String.class );
 
 		assertThat( getFieldValue.invoke( object, "num" ) ).isEqualTo( -1 );
 		assertThat( getFieldValue.invoke( object, "string" ) ).isEqualTo( "test" );
 		assertThat( getFieldValue.invoke( object, "looooong" ) ).isEqualTo( 100L );
 
-		Method getGetterValue = aClass.getMethod( "getGetterValue", String.class );
+		Method getGetterValue = aClass.getMethod( HibernateValidatorEnhancedBean.GET_GETTER_VALUE_METHOD_NAME, String.class );
 
 		assertThat( getGetterValue.invoke( object, "getMessage" ) ).isEqualTo( "messssssage" );
 		assertThat( getGetterValue.invoke( object, "getKey" ) ).isEqualTo( false );
@@ -84,10 +83,12 @@ public class ByteBuddyWrapperTest {
 
 	private static class GetFieldValue implements ByteCodeAppender {
 
+		@SuppressWarnings("rawtypes")
 		private final Class clazz;
 
 		private final Field[] fields;
 
+		@SuppressWarnings("rawtypes")
 		public GetFieldValue(Class clazz) {
 			this.clazz = clazz;
 			this.fields = clazz.getDeclaredFields();
@@ -204,10 +205,12 @@ public class ByteBuddyWrapperTest {
 
 	private static class GetGetterValue implements ByteCodeAppender {
 
+		@SuppressWarnings("rawtypes")
 		private final Class clazz;
 
 		private final Method[] methods;
 
+		@SuppressWarnings("rawtypes")
 		public GetGetterValue(Class clazz) {
 			this.clazz = clazz;
 			this.methods = clazz.getDeclaredMethods();
@@ -324,6 +327,7 @@ public class ByteBuddyWrapperTest {
 	}
 
 
+	@SuppressWarnings("unused")
 	public static class Foo {
 		private String string;
 		private Integer num;
@@ -348,7 +352,7 @@ public class ByteBuddyWrapperTest {
 		}
 	}
 
-
+	@SuppressWarnings("unused")
 	public static class Bar extends Foo {
 		private final List<String> strings;
 

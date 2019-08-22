@@ -8,8 +8,8 @@ package org.hibernate.validator.engine;
 
 /**
  * Hibernate Validator specific marker interface. Beans implementing this interface
- * would use corresponding {@link HibernateValidatorEnhancedBean#getFieldValue(String)}
- * and {@link HibernateValidatorEnhancedBean#getGetterValue(String)} methods to retrieve
+ * would use corresponding {@link HibernateValidatorEnhancedBean#$$_hibernateValidator_getFieldValue(String)}
+ * and {@link HibernateValidatorEnhancedBean#$$_hibernateValidator_getGetterValue(String)} methods to retrieve
  * bean property values instead of using reflection or any other means.
  * <p>
  * It is important to keep in mind that in case of explicit implementation of this interface
@@ -21,6 +21,11 @@ package org.hibernate.validator.engine;
  * @since 6.1
  */
 public interface HibernateValidatorEnhancedBean {
+
+	String GET_FIELD_VALUE_METHOD_NAME = "$$_hibernateValidator_getFieldValue";
+
+	String GET_GETTER_VALUE_METHOD_NAME = "$$_hibernateValidator_getGetterValue";
+
 	/**
 	 * @param name the name of a field property of interest.
 	 *
@@ -28,7 +33,7 @@ public interface HibernateValidatorEnhancedBean {
 	 *
 	 * @throws IllegalArgumentException in case no field could be found for the given name.
 	 */
-	Object getFieldValue(String name);
+	Object $$_hibernateValidator_getFieldValue(String name);
 
 	/**
 	 * @param name the name of a getter of interest.
@@ -37,5 +42,5 @@ public interface HibernateValidatorEnhancedBean {
 	 *
 	 * @throws IllegalArgumentException in case when no getter property could be found for the given name.
 	 */
-	Object getGetterValue(String name);
+	Object $$_hibernateValidator_getGetterValue(String name);
 }

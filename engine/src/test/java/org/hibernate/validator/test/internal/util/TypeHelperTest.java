@@ -883,12 +883,12 @@ public class TypeHelperTest {
 		}
 		class Bar implements HibernateValidatorEnhancedBean {
 			@Override
-			public Object getFieldValue(String name) {
+			public Object $$_hibernateValidator_getFieldValue(String name) {
 				return null;
 			}
 
 			@Override
-			public Object getGetterValue(String name) {
+			public Object $$_hibernateValidator_getGetterValue(String name) {
 				return null;
 			}
 		}
