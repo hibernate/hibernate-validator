@@ -148,7 +148,7 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 		@Override
 		public Object getValueFrom(Object bean) {
 			// we don't do an instanceof check here as it should already be applied when the accessor was created.
-			return ( (HibernateValidatorEnhancedBean) bean ).getFieldValue( name );
+			return ( (HibernateValidatorEnhancedBean) bean ).$$_hibernateValidator_getFieldValue( name );
 		}
 	}
 

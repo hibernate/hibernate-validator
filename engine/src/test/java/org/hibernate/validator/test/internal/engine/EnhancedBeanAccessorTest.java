@@ -59,11 +59,11 @@ public class EnhancedBeanAccessorTest {
 		}
 
 		@Override
-		public Object getFieldValue(String name) {
+		public Object $$_hibernateValidator_getFieldValue(String name) {
 			if ( "strings".equals( name ) ) {
 				return strings;
 			}
-			return super.getFieldValue( name );
+			return super.$$_hibernateValidator_getFieldValue( name );
 		}
 	}
 
@@ -96,7 +96,7 @@ public class EnhancedBeanAccessorTest {
 		}
 
 		@Override
-		public Object getFieldValue(String name) {
+		public Object $$_hibernateValidator_getFieldValue(String name) {
 			if ( "string".equals( name ) ) {
 				return string;
 			}
@@ -110,7 +110,7 @@ public class EnhancedBeanAccessorTest {
 		}
 
 		@Override
-		public Object getGetterValue(String name) {
+		public Object $$_hibernateValidator_getGetterValue(String name) {
 			if ( "getKey".equals( name ) ) {
 				return getKey();
 			}

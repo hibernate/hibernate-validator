@@ -129,7 +129,7 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 		@Override
 		public Object getValueFrom(Object bean) {
 			// we don't do an instanceof check here as it should already be applied when the accessor was created.
-			return ( (HibernateValidatorEnhancedBean) bean ).getGetterValue( getterFullName );
+			return ( (HibernateValidatorEnhancedBean) bean ).$$_hibernateValidator_getGetterValue( getterFullName );
 		}
 	}
 	private static class GetterAccessor implements PropertyAccessor {
