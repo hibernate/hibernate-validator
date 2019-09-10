@@ -36,6 +36,10 @@ import net.bytebuddy.matcher.ElementMatchers;
 import org.testng.annotations.Test;
 
 /**
+ * Note that this implementation is not complete and is only for testing purposes.
+ * <p>
+ * It typically doesn't implement the support for instrumented parent classes.
+ *
  * @author Marko Bekhta
  */
 public class ByteBuddyWrapperTest {
