@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.engine;
 
+import org.hibernate.validator.Incubating;
+
 /**
  * Hibernate Validator specific marker interface. Beans implementing this interface
  * would use corresponding {@link HibernateValidatorEnhancedBean#$$_hibernateValidator_getFieldValue(String)}
@@ -20,6 +22,7 @@ package org.hibernate.validator.engine;
  * @author Marko Bekhta
  * @since 6.1
  */
+@Incubating
 public interface HibernateValidatorEnhancedBean {
 
 	String GET_FIELD_VALUE_METHOD_NAME = "$$_hibernateValidator_getFieldValue";
