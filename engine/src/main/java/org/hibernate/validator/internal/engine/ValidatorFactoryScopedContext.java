@@ -58,6 +58,12 @@ public class ValidatorFactoryScopedContext {
 	private final boolean failFast;
 
 	/**
+	 * Hibernate Validator specific flag to skip validation of class level constraints if any of property ones generated
+	 * a constraint violation.
+	 */
+	private final boolean failFastOnPropertyViolation;
+
+	/**
 	 * Hibernate Validator specific flag to disable the {@code TraversableResolver} result cache.
 	 */
 	private final boolean traversableResolverResultCacheEnabled;
@@ -79,10 +85,11 @@ public class ValidatorFactoryScopedContext {
 			Duration temporalValidationTolerance,
 			ScriptEvaluatorFactory scriptEvaluatorFactory,
 			boolean failFast,
+			boolean failFastOnPropertyViolation,
 			boolean traversableResolverResultCacheEnabled,
 			Object constraintValidatorPayload) {
 		this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
-				traversableResolverResultCacheEnabled, constraintValidatorPayload,
+				failFastOnPropertyViolation, traversableResolverResultCacheEnabled, constraintValidatorPayload,
 				new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
 						temporalValidationTolerance ) );
 	}
@@ -94,6 +101,7 @@ public class ValidatorFactoryScopedContext {
 			Duration temporalValidationTolerance,
 			ScriptEvaluatorFactory scriptEvaluatorFactory,
 			boolean failFast,
+			boolean failFastOnPropertyViolation,
 			boolean traversableResolverResultCacheEnabled,
 			Object constraintValidatorPayload,
 			HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext) {
@@ -104,6 +112,7 @@ public class ValidatorFactoryScopedContext {
 		this.temporalValidationTolerance = temporalValidationTolerance;
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.failFast = failFast;
+		this.failFastOnPropertyViolation = failFastOnPropertyViolation;
 		this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
 		this.constraintValidatorPayload = constraintValidatorPayload;
 		this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
@@ -137,6 +146,10 @@ public class ValidatorFactoryScopedContext {
 		return this.failFast;
 	}
 
+	public boolean isFailFastOnPropertyViolation() {
+		return this.failFastOnPropertyViolation;
+	}
+
 	public boolean isTraversableResolverResultCacheEnabled() {
 		return this.traversableResolverResultCacheEnabled;
 	}
@@ -159,6 +172,7 @@ public class ValidatorFactoryScopedContext {
 		private ScriptEvaluatorFactory scriptEvaluatorFactory;
 		private Duration temporalValidationTolerance;
 		private boolean failFast;
+		private boolean failFastOnPropertyViolation;
 		private boolean traversableResolverResultCacheEnabled;
 		private Object constraintValidatorPayload;
 		private HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
@@ -174,6 +188,7 @@ public class ValidatorFactoryScopedContext {
 			this.scriptEvaluatorFactory = defaultContext.scriptEvaluatorFactory;
 			this.temporalValidationTolerance = defaultContext.temporalValidationTolerance;
 			this.failFast = defaultContext.failFast;
+			this.failFastOnPropertyViolation = defaultContext.failFastOnPropertyViolation;
 			this.traversableResolverResultCacheEnabled = defaultContext.traversableResolverResultCacheEnabled;
 			this.constraintValidatorPayload = defaultContext.constraintValidatorPayload;
 			this.constraintValidatorInitializationContext = defaultContext.constraintValidatorInitializationContext;
@@ -240,6 +255,11 @@ public class ValidatorFactoryScopedContext {
 			return this;
 		}
 
+		public ValidatorFactoryScopedContext.Builder setFailFastOnPropertyViolation(boolean failFastOnPropertyViolation) {
+			this.failFastOnPropertyViolation = failFastOnPropertyViolation;
+			return this;
+		}
+
 		public ValidatorFactoryScopedContext.Builder setTraversableResolverResultCacheEnabled(boolean traversableResolverResultCacheEnabled) {
 			this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
 			return this;
@@ -259,6 +279,7 @@ public class ValidatorFactoryScopedContext {
 					temporalValidationTolerance,
 					scriptEvaluatorFactory,
 					failFast,
+					failFastOnPropertyViolation,
 					traversableResolverResultCacheEnabled,
 					constraintValidatorPayload,
 					HibernateConstraintValidatorInitializationContextImpl.of(

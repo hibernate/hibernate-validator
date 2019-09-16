@@ -892,4 +892,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 253, value = "Unable to instantiate property node name provider class %s.")
 	ValidationException getUnableToInstantiatePropertyNodeNameProviderClassException(String propertyNodeNameProviderClassName, @Cause Exception e);
+
+	@Message(id = 254, value = "Inconsistent fail fast on property violation mode configuration. It is enabled via programmatic API, but explicitly disabled via properties.")
+	ValidationException getInconsistentFailFastOnPropertyViolationConfigurationException();
 }

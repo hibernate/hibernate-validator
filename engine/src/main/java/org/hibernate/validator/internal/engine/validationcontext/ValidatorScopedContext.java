@@ -56,6 +56,12 @@ public class ValidatorScopedContext {
 	private final boolean failFast;
 
 	/**
+	 * Hibernate Validator specific flag to skip validation of class level constraints if any of property ones generated
+	 * a constraint violation.
+	 */
+	private final boolean failFastOnPropertyViolation;
+
+	/**
 	 * Hibernate Validator specific flag to disable the {@code TraversableResolver} result cache.
 	 */
 	private final boolean traversableResolverResultCacheEnabled;
@@ -72,6 +78,7 @@ public class ValidatorScopedContext {
 		this.temporalValidationTolerance = validatorFactoryScopedContext.getTemporalValidationTolerance();
 		this.scriptEvaluatorFactory = validatorFactoryScopedContext.getScriptEvaluatorFactory();
 		this.failFast = validatorFactoryScopedContext.isFailFast();
+		this.failFastOnPropertyViolation = validatorFactoryScopedContext.isFailFastOnPropertyViolation();
 		this.traversableResolverResultCacheEnabled = validatorFactoryScopedContext.isTraversableResolverResultCacheEnabled();
 		this.constraintValidatorPayload = validatorFactoryScopedContext.getConstraintValidatorPayload();
 	}
@@ -98,6 +105,10 @@ public class ValidatorScopedContext {
 
 	public boolean isFailFast() {
 		return this.failFast;
+	}
+
+	public boolean isFailFastOnPropertyViolation() {
+		return this.failFastOnPropertyViolation;
 	}
 
 	public boolean isTraversableResolverResultCacheEnabled() {

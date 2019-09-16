@@ -107,6 +107,12 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
+	public HibernateValidatorContext failFastOnPropertyViolation(boolean failFastOnPropertyViolation) {
+		validatorFactoryScopedContextBuilder.setFailFastOnPropertyViolation( failFastOnPropertyViolation );
+		return this;
+	}
+
+	@Override
 	public HibernateValidatorContext allowOverridingMethodAlterParameterConstraint(boolean allow) {
 		methodValidationConfigurationBuilder.allowOverridingMethodAlterParameterConstraint( allow );
 		return this;

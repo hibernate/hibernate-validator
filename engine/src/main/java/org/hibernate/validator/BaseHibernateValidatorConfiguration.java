@@ -131,6 +131,15 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	String PROPERTY_NODE_NAME_PROVIDER_CLASSNAME = "hibernate.validator.property_node_name_provider";
 
 	/**
+	 * Property corresponding to the {@link #failFastOnPropertyViolation} method.
+	 * Accepts {@code true} or {@code false}. Defaults to {@code false}.
+	 *
+	 * @since 6.1.0
+	 */
+	@Incubating
+	String FAIL_FAST_ON_PROPERTY_VIOLATION = "hibernate.validator.fail_fast_on_property_violation";
+
+	/**
 	 * <p>
 	 * Returns the {@link ResourceBundleLocator} used by the
 	 * {@link Configuration#getDefaultMessageInterpolator() default message
@@ -360,4 +369,18 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	S propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider);
+
+	/**
+	 * En- or disables the skipping of class level constraints based on validation of property level ones. When this
+	 * mode is enabled the validation of class level constraints will not be performed if any of the property level
+	 * constraints generated a violation.
+	 *
+	 * @param failFastOnPropertyViolation {@code true} to enable the skipping mode, {@code false} otherwise.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.1.0
+	 */
+	@Incubating
+	S failFastOnPropertyViolation(boolean failFastOnPropertyViolation);
 }
