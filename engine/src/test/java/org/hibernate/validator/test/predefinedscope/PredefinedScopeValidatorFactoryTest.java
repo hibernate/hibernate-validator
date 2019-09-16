@@ -211,7 +211,7 @@ public class PredefinedScopeValidatorFactoryTest {
 		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
 				.initializeBeanMetaData( beanMetaDataToInitialize )
-				.initializeLocales( Collections.singleton( Locale.ENGLISH ) )
+				.initializeLocales( Collections.singleton( Locale.getDefault() ) )
 				.buildValidatorFactory();
 
 		// As we don't have any metadata for BeanProxy, we consider it is not constrained at all.
@@ -227,7 +227,7 @@ public class PredefinedScopeValidatorFactoryTest {
 		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
 				.initializeBeanMetaData( beanMetaDataToInitialize )
-				.initializeLocales( Collections.singleton( Locale.ENGLISH ) )
+				.initializeLocales( Collections.singleton( Locale.getDefault() ) )
 				.beanMetaDataClassNormalizer( new MyProxyInterfaceBeanMetaDataClassNormalizer() )
 				.buildValidatorFactory();
 
