@@ -214,7 +214,7 @@ public class PredefinedScopeValidatorFactoryTest {
 		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
 				.initializeBeanMetaData( beanMetaDataToInitialize )
-				.initializeLocales( Collections.singleton( Locale.ENGLISH ) )
+				.initializeLocales( Collections.singleton( Locale.getDefault() ) )
 				.buildValidatorFactory();
 
 		// As we don't have any metadata for BeanProxy, we consider it is not constrained at all.
@@ -230,7 +230,7 @@ public class PredefinedScopeValidatorFactoryTest {
 		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
 				.initializeBeanMetaData( beanMetaDataToInitialize )
-				.initializeLocales( Collections.singleton( Locale.ENGLISH ) )
+				.initializeLocales( Collections.singleton( Locale.getDefault() ) )
 				.beanMetaDataClassNormalizer( new MyProxyInterfaceBeanMetaDataClassNormalizer() )
 				.buildValidatorFactory();
 
@@ -246,7 +246,6 @@ public class PredefinedScopeValidatorFactoryTest {
 		Set<Class<?>> beanMetaDataToInitialize = new HashSet<>();
 		beanMetaDataToInitialize.add( Bean.class );
 		beanMetaDataToInitialize.add( AnotherBean.class );
-		beanMetaDataToInitialize.add( SomeEnum.class );
 
 		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
@@ -271,6 +270,7 @@ public class PredefinedScopeValidatorFactoryTest {
 		beanMetaDataToInitialize.add( AnotherBean.class );
 		beanMetaDataToInitialize.add( SomeEnum.class );
 		beanMetaDataToInitialize.add( Values.Itr.class );
+		beanMetaDataToInitialize.add( Gender.class );
 
 		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
@@ -309,6 +309,14 @@ public class PredefinedScopeValidatorFactoryTest {
 
 	private enum SomeEnum {
 		VALUE;
+	}
+
+	public enum Gender {
+		MALE, FEMALE, OTHER;
+
+		public static Gender fromCode(@NotNull String code) {
+			return Gender.valueOf( code );
+		}
 	}
 
 	final class Values extends AbstractCollection<String> implements Collection<String> {
