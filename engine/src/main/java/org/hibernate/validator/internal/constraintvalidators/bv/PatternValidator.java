@@ -7,6 +7,8 @@
 package org.hibernate.validator.internal.constraintvalidators.bv;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
 import javax.validation.ConstraintValidator;
@@ -25,6 +27,8 @@ public class PatternValidator implements ConstraintValidator<Pattern, CharSequen
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
+	private static final ConcurrentMap<String, java.util.regex.Pattern> PATTERN_CACHE = new ConcurrentHashMap<>();
+
 	private java.util.regex.Pattern pattern;
 	private String escapedRegexp;
 
@@ -36,8 +40,16 @@ public class PatternValidator implements ConstraintValidator<Pattern, CharSequen
 			intFlag = intFlag | flag.getValue();
 		}
 
+		String patternCacheKey = parameters.regexp() + "_" + intFlag;
+		pattern = PATTERN_CACHE.get( patternCacheKey );
+		if ( pattern != null ) {
+			escapedRegexp = InterpolationHelper.escapeMessageParameter( parameters.regexp() );
+			return;
+		}
+
 		try {
 			pattern = java.util.regex.Pattern.compile( parameters.regexp(), intFlag );
+			PATTERN_CACHE.put( patternCacheKey, pattern );
 		}
 		catch (PatternSyntaxException e) {
 			throw LOG.getInvalidRegularExpressionException( e );
