@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.properties.javabean;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
@@ -24,12 +25,16 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * @author Marko Bekhta
  * @author Guillaume Smet
  */
 public abstract class JavaBeanExecutable<T extends Executable> implements Callable, JavaBeanAnnotatedConstrainable {
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected final T executable;
 	private final Type typeForValidatorResolution;
@@ -202,6 +207,15 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 		}
 		else {
 			// in this case, we have synthetic or implicit parameters
+
+			// do we have the information about which parameter is synthetic/implicit?
+			// (this metadata is only included when classes are compiled with the '-parameters' flag)
+			boolean hasParameterModifierInfo = isAnyParameterCarryingMetadata( parameterArray );
+
+			if ( ! hasParameterModifierInfo ) {
+				LOG.missingParameterMetadataWithSyntheticOrImplicitParameters( executable );
+			}
+
 			int explicitlyDeclaredParameterIndex = 0;
 
 			for ( int i = 0; i < parameterArray.length; i++ ) {
@@ -221,6 +235,15 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 		}
 
 		return CollectionHelper.toImmutableList( parameters );
+	}
+
+	private static boolean isAnyParameterCarryingMetadata(Parameter[] parameterArray) {
+		for ( Parameter parameter : parameterArray ) {
+			if ( parameter.isSynthetic() || parameter.isImplicit() ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static boolean parameterTypesMatch(Class<?> paramType, Type genericParamType) {
