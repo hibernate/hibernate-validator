@@ -892,4 +892,12 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 253, value = "Unable to instantiate property node name provider class %s.")
 	ValidationException getUnableToInstantiatePropertyNodeNameProviderClassException(String propertyNodeNameProviderClassName, @Cause Exception e);
+
+	@LogMessage(level = WARN)
+	@Message(id = 254, value = "Missing parameter metadata for %s, which declares implicit or synthetic parameters."
+			+ " Automatic resolution of generic type information for method parameters"
+			+ " may yield incorrect results if multiple parameters have the same erasure."
+			+ " To solve this, compile your code with the '-parameters' flag."
+	)
+	void missingParameterMetadataWithSyntheticOrImplicitParameters(@FormatWith(ExecutableFormatter.class) Executable executable);
 }
