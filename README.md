@@ -39,12 +39,12 @@ Logging will delegate any log requests to that provider.
         </dependency>
 
   You also need an API and implementation of the Unified Expression Language. These dependencies must be explicitly added in an SE environment.
-  In an EE environment they are often already provided.
+  In a Jakarta EE environment, they are often already provided.
 
         <dependency>
            <groupId>org.glassfish</groupId>
-           <artifactId>javax.el</artifactId>
-           <version>3.0.1-b09</version>
+           <artifactId>jakarta.el</artifactId>
+           <version>3.0.3</version>
         </dependency>
 
 * Jakarta Bean Validation defines integration points with [CDI](http://jcp.org/en/jsr/detail?id=346). If your application runs
