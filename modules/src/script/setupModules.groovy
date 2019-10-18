@@ -26,10 +26,10 @@ bvModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/jav
 def bvArtifactName = 'jakarta.validation-api-' + project.properties['version.jakarta.validation-api'] + '.jar';
 println "[INFO] Using Jakarta Bean Validation version " + bvArtifactName;
 processFileInplace( bvModuleXml ) { text ->
-    text.replaceAll( /validation-api.*jar/, bvArtifactName )
+    text.replaceAll( /<resource-root path=".*validation-api.*jar/, '<resource-root path="' + bvArtifactName )
 }
 
-deleteFiles( new FileNameFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/javax/validation/api/main', 'validation-api-*.jar' ) )
+deleteFiles( new FileNameFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/javax/validation/api/main', '*.jar' ) )
 
 // HV
 hvModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/org/hibernate/validator/main/module.xml' )
