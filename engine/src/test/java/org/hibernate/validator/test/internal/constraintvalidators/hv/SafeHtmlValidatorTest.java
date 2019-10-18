@@ -58,6 +58,44 @@ public class SafeHtmlValidatorTest {
 	}
 
 	@Test
+	// A "downlevel revealed" conditional 'comment' is not an (X)HTML comment at all,
+	// despite the misleading name, it is default Microsoft syntax.
+	// The tag is unrecognized by therefore executed
+	public void testDownlevelRevealedConditionalComment() throws Exception {
+		descriptorBuilder.setAttribute( "whitelistType", WhiteListType.BASIC );
+
+		assertFalse( getSafeHtmlValidator().isValid( "<![if !IE]>\n<SCRIPT>alert{'XSS'};</SCRIPT>\n<![endif]>", null ) );
+	}
+
+	@Test
+	public void testDownlevelHiddenConditionalComment() throws Exception {
+		descriptorBuilder.setAttribute( "whitelistType", WhiteListType.BASIC );
+
+		assertFalse( getSafeHtmlValidator().isValid( "<!--[if gte IE 4]>\n<SCRIPT>alert{'XSS'};</SCRIPT>\n<![endif]-->", null ) );
+	}
+
+	@Test
+	public void testSimpleComment() throws Exception {
+		descriptorBuilder.setAttribute( "whitelistType", WhiteListType.BASIC );
+
+		assertFalse( getSafeHtmlValidator().isValid( "<!-- Just a comment -->", null ) );
+	}
+
+	@Test
+	public void testServerSideIncludesSSI() throws Exception {
+		descriptorBuilder.setAttribute( "whitelistType", WhiteListType.BASIC );
+
+		assertFalse( getSafeHtmlValidator().isValid( "<? echo{'<SCR}'; echo{'IPT>alert{\"XSS\"}</SCRIPT>'}; ?>", null ) );
+	}
+
+	@Test
+	public void testPHPScript() throws Exception {
+		descriptorBuilder.setAttribute( "whitelistType", WhiteListType.BASIC );
+
+		assertFalse( getSafeHtmlValidator().isValid( "<? echo{'<SCR}'; echo{'IPT>alert{\"XSS\"}</SCRIPT>'}; ?>", null ) );
+	}
+
+	@Test
 	public void testInvalidIncompleteImgTagWithScriptIncluded() {
 		descriptorBuilder.setAttribute( "whitelistType", WhiteListType.BASIC );
 

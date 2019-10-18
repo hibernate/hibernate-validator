@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
-import java.util.Iterator;
+import java.util.List;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -14,7 +14,7 @@ import javax.validation.ConstraintValidatorContext;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.parser.Parser;
 import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
@@ -91,9 +91,9 @@ public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequ
 		Document document = Document.createShell( baseURI );
 
 		// add the fragment's nodes to the body of resulting document
-		Iterator<Element> nodes = fragment.children().iterator();
-		while ( nodes.hasNext() ) {
-			document.body().appendChild( nodes.next() );
+		List<Node> childNodes = fragment.childNodes();
+		for ( Node node : childNodes ) {
+			document.body().appendChild( node.clone() );
 		}
 
 		return document;
