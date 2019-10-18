@@ -27,7 +27,9 @@ import org.jsoup.safety.Whitelist;
  * @author George Gastaldi
  * @author Hardy Ferentschik
  * @author Marko Bekhta
+ * @deprecated {@code @SafeHtml} support will be removed in a future version
  */
+@Deprecated
 public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequence> {
 	private Whitelist whitelist;
 
