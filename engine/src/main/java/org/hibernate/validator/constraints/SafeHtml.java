@@ -34,12 +34,14 @@ import org.hibernate.validator.constraints.SafeHtml.List;
  * {@code body} tags to the used whitelist as required.
  *
  * @author George Gastaldi
+ * @deprecated {@code @SafeHtml} support will be removed in a future version
  */
 @Documented
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
+@Deprecated
 public @interface SafeHtml {
 
 	String message() default "{org.hibernate.validator.constraints.SafeHtml.message}";

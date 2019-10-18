@@ -12,7 +12,9 @@ import org.hibernate.validator.constraints.SafeHtml;
 
 /**
  * @author Marko Bekta
+ * @deprecated {@code @SafeHtml} support will be removed in a future version
  */
+@Deprecated
 public class SafeHtmlDef extends ConstraintDef<SafeHtmlDef, SafeHtml> {
 
 	public SafeHtmlDef() {
