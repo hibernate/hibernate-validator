@@ -286,7 +286,7 @@ final class ValidatorFactoryConfigurationHelper {
 		return new DefaultGetterPropertySelectionStrategy();
 	}
 
-	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(PredefinedScopeConfigurationImpl hibernateSpecificConfig) {
+	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(AbstractConfigurationImpl<?> hibernateSpecificConfig) {
 		if ( hibernateSpecificConfig.getBeanMetaDataClassNormalizer() != null ) {
 			return hibernateSpecificConfig.getBeanMetaDataClassNormalizer();
 		}

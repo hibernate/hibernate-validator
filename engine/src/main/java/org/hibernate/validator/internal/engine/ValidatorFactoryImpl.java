@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.engine;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowMultipleCascadedValidationOnReturnValues;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowOverridingMethodAlterParameterConstraint;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowParallelMethodsDefineParameterConstraints;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineBeanMetaDataClassNormalizer;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintMappings;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintValidatorPayload;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineExternalClassLoader;
@@ -59,6 +60,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
+import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -122,6 +124,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private final JavaBeanHelper javaBeanHelper;
 
+	private final BeanMetaDataClassNormalizer beanMetadataClassNormalizer;
+
 	private final ValidationOrderGenerator validationOrderGenerator;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
@@ -171,6 +175,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
 		this.javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ),
 				ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, externalClassLoader ) );
+		this.beanMetadataClassNormalizer = determineBeanMetaDataClassNormalizer( hibernateSpecificConfig );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( configurationState.getMappingStreams().isEmpty() ) {
@@ -306,6 +311,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						executableHelper,
 						validatorFactoryScopedContext.getParameterNameProvider(),
 						javaBeanHelper,
+						beanMetadataClassNormalizer,
 						validationOrderGenerator,
 						buildMetaDataProviders(),
 						methodValidationConfiguration

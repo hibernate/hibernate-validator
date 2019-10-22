@@ -57,6 +57,7 @@ import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLo
 import org.hibernate.validator.internal.xml.config.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.config.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
@@ -118,6 +119,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private Set<Locale> locales = Collections.emptySet();
 	private Locale defaultLocale = Locale.getDefault();
 	private LocaleResolver localeResolver;
+	private BeanMetaDataClassNormalizer beanMetaDataClassNormalizer;
 
 	protected AbstractConfigurationImpl(BootstrapState state) {
 		this();
@@ -596,6 +598,18 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	public Set<ValueExtractor<?>> getDefaultValueExtractors() {
 		return ValueExtractorManager.getDefaultValueExtractors();
 	}
+
+	@Override
+	public T beanMetaDataClassNormalizer(
+			BeanMetaDataClassNormalizer beanMetaDataClassNormalizer) {
+		this.beanMetaDataClassNormalizer = beanMetaDataClassNormalizer;
+		return thisAsT();
+	}
+
+	public BeanMetaDataClassNormalizer getBeanMetaDataClassNormalizer() {
+		return beanMetaDataClassNormalizer;
+	}
+
 
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {
 		return programmaticMappings;
