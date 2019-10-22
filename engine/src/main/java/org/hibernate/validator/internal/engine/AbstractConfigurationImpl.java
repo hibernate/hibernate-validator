@@ -600,8 +600,13 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	}
 
 	@Override
-	public T beanMetaDataClassNormalizer(
-			BeanMetaDataClassNormalizer beanMetaDataClassNormalizer) {
+	public T beanMetaDataClassNormalizer(BeanMetaDataClassNormalizer beanMetaDataClassNormalizer) {
+		if ( LOG.isDebugEnabled() ) {
+			if ( beanMetaDataClassNormalizer != null ) {
+				LOG.debug( "Setting custom BeanMetaDataClassNormalizer of type " + beanMetaDataClassNormalizer.getClass()
+						.getName() );
+			}
+		}
 		this.beanMetaDataClassNormalizer = beanMetaDataClassNormalizer;
 		return thisAsT();
 	}
