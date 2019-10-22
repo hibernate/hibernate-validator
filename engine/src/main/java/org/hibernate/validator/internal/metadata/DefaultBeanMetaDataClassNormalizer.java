@@ -18,7 +18,7 @@ import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 public class DefaultBeanMetaDataClassNormalizer implements BeanMetaDataClassNormalizer {
 
 	@Override
-	public Class<?> normalize(Class<?> beanClass) {
+	public <T> Class<T> normalize(Class<T> beanClass) {
 		return beanClass;
 	}
 }

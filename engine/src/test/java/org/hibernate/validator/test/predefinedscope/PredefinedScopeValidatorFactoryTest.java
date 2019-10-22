@@ -455,7 +455,7 @@ public class PredefinedScopeValidatorFactoryTest {
 	private static class MyProxyInterfaceBeanMetaDataClassNormalizer implements BeanMetaDataClassNormalizer {
 
 		@Override
-		public Class<?> normalize(Class<?> beanClass) {
+		public <T> Class<? super T> normalize(Class<T> beanClass) {
 			if ( MyProxyInterface.class.isAssignableFrom( beanClass ) ) {
 				return beanClass.getSuperclass();
 			}
