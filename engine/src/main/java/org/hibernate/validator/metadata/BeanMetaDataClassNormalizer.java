@@ -35,5 +35,5 @@ public interface BeanMetaDataClassNormalizer {
 	 * @param beanClass the original bean class
 	 * @return the normalized class
 	 */
-	Class<?> normalize(Class<?> beanClass);
+	<T> Class<? super T> normalize(Class<T> beanClass);
 }
