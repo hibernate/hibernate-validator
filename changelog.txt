@@ -1,6 +1,32 @@
 Hibernate Validator Changelog
 =============================
 
+6.1.0.Final (25-10-2019)
+-------------------------
+
+** Bug
+    * HV-1730 - engine      - JavaBeanExecutable fails to initialize for enum type
+    * HV-1715 - engine      - Validation can sometimes proceed to the next group in sequence even after one of the constraints generated a violation
+
+** Improvement
+    * HV-1729 - performance - Skip allocation of an action for each need to access the context classloader
+
+** Task
+    * HV-1743 - build       - Upgrade maven-compiler-plugin to 3.8.1
+    * HV-1742 - build       - Upgrade to WildFly 18.0.0.Final
+    * HV-1741 - build       - Upgrade ByteBuddy test dependency to 1.10.2
+    * HV-1740 - engine      - Deprecate @SafeHtml
+    * HV-1739 - engine      - CVE-2019-10219 Security issue with @SafeHtml
+    * HV-1738 - build       - Update Jackson test dependency to 2.9.10
+    * HV-1733 - tests       - Fix locale settings of PredefinedScopeValidatorFactoryTest
+    * HV-1732 - build       - Change tarLongFileMode to posix for assembly building
+    * HV-1731 - tck-runner  - Move TCK signature check to tck-runner module
+    * HV-1728 - build       - Upgrade to WildFly 17.0.1.Final
+    * HV-1727 - build       - Update Jackson Databind test dependency to 2.9.9.2
+    * HV-1725 - build       - Switch to using Jakarta EE artifacts
+    * HV-1724 - build       - Update to OpenJFX 11.0.2
+    * HV-1680 - engine      - Avoid reflection by using instrumentation - build the enhancer
+
 6.1.0.Alpha6 (19-07-2019)
 -------------------------
 
