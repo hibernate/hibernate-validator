@@ -1,6 +1,24 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.18.Final (25-10-2019)
+-------------------------
+
+** Bug
+    * HV-1722 - engine      - Remove settings-example.xml reference from .travis.yml
+    * HV-1720 - engine      - Support bounded wildcard types in container value unwrapping
+    * HV-1715 - engine      - Validation can sometimes proceed to the next group in sequence even after one of the constraints generated a violation
+
+** Improvement
+    * HV-1729 - performance - Skip allocation of an action for each need to access the context classloader
+
+** Task
+    * HV-1740 - engine      - Deprecate @SafeHtml
+    * HV-1739 - engine      - CVE-2019-10219 Security issue with @SafeHtml
+    * HV-1731 - tck-runner  - Move TCK signature check to tck-runner module
+    * HV-1728 - build       - Upgrade to WildFly 17.0.1.Final
+    * HV-1724 - build       - Update to OpenJFX 11.0.2
+
 6.0.17.Final (13-06-2019)
 -------------------------
 
