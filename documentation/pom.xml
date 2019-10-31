@@ -195,6 +195,21 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>copy-script-to-html-output</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${asciidoctor.base-output-dir}/html_single/script/</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>copy-images-to-html-output</id>
                         <phase>generate-resources</phase>
                         <goals>
