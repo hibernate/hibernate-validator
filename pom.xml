@@ -186,7 +186,7 @@
         <spring-expression.version>4.3.10.RELEASE</spring-expression.version>
 
         <!-- Asciidoctor -->
-        <hibernate-asciidoctor-theme.version>1.0.1.Final</hibernate-asciidoctor-theme.version>
+        <hibernate-asciidoctor-theme.version>1.0.3.Final</hibernate-asciidoctor-theme.version>
         <hibernate-asciidoctor-extensions.version>1.0.3.Final</hibernate-asciidoctor-extensions.version>
         <asciidoctor-maven-plugin.version>1.5.5</asciidoctor-maven-plugin.version>
         <jruby.version>9.1.8.0</jruby.version>
