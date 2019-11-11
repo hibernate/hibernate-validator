@@ -101,12 +101,81 @@ public class PESELValidatorTest extends AbstractConstrainedTest {
 				);
 	}
 
-	public static class Person {
+	@Test
+	public void testIncorrectDateInPESELNumber() {
+
+		assertThat( validator.validate( new Person("20223003433" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+
+		assertThat( validator.validate( new Person("19222903431" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+
+		assertThat( validator.validate( new Person("75123203434" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+
+		assertThat( validator.validate( new Person("25273203437" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+
+		assertThat( validator.validate( new Person("25370203433" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+
+		assertThat( validator.validate( new Person("13443101230" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+
+		assertThat( validator.validate( new Person("14551204561" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+
+		assertThat( validator.validate( new Person("15613201234" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+
+		assertThat( validator.validate( new Person("15771001231" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+
+		assertThat( validator.validate( new Person("15874201235" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+
+		assertThat( validator.validate( new Person("15951001235" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+
+		assertThat( validator.validate( new Person( "85023003436" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+
+		assertThat( validator.validate( new Person( "85023003436" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+	}
+
+	static class Person {
 
 		@PESEL
-		private String pesel;
+		final private String pesel;
 
-		public Person(String pesel) {
+		Person(String pesel) {
 			this.pesel = pesel;
 		}
 	}
