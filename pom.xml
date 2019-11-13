@@ -172,7 +172,7 @@
         <version.com.google.guava>27.1-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>4.3.10.RELEASE</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-se-embedded-1.1>1.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-se-embedded-1.1>
-        <version.com.fasterxml.jackson.core.jackson-databind>2.9.10</version.com.fasterxml.jackson.core.jackson-databind>
+        <version.com.fasterxml.jackson.core.jackson-databind>2.9.10.1</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.9.10</version.com.fasterxml.jackson.core.jackson-annotations>
         <version.net.bytebuddy.byte-buddy>1.10.2</version.net.bytebuddy.byte-buddy>
 
