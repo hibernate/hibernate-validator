@@ -34,7 +34,8 @@ public class PredefinedScopeValidatorContextImpl implements HibernateValidatorCo
 
 	@Override
 	public HibernateValidatorContext messageInterpolator(MessageInterpolator messageInterpolator) {
-		throw new IllegalStateException( "Defining a Validator-specific message interpolator is not supported by the predefined scope ValidatorFactory." );
+		validatorFactoryScopedContextBuilder.setMessageInterpolator( messageInterpolator );
+		return this;
 	}
 
 	@Override
