@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.MessageInterpolator;
 import javax.validation.Path;
 import javax.validation.Path.Node;
 import javax.validation.TraversableResolver;
@@ -189,7 +190,22 @@ public class PredefinedScopeValidatorFactoryTest {
 		try {
 			Locale.setDefault( Locale.FRANCE );
 
-			Validator validator = getValidatorWithInitializedLocale( Locale.ENGLISH );
+			ValidatorFactory validatorFactory = getValidatorFactoryWithInitializedLocale( Locale.ENGLISH );
+
+			Validator validator = validatorFactory
+					.usingContext()
+					.messageInterpolator( new MessageInterpolator() {
+
+						@Override
+						public String interpolate(String messageTemplate, Context context, Locale locale) {
+							return validatorFactory.getMessageInterpolator().interpolate( messageTemplate, context, locale );
+						}
+
+						@Override
+						public String interpolate(String messageTemplate, Context context) {
+							return validatorFactory.getMessageInterpolator().interpolate( messageTemplate, context, Locale.GERMAN );
+						}
+					} ).getValidator();
 
 			Set<ConstraintViolation<Bean>> violations = validator.validate( new Bean( "", "invalid" ) );
 			assertThat( violations ).containsOnlyViolations(
@@ -294,17 +310,19 @@ public class PredefinedScopeValidatorFactoryTest {
 		return validatorFactory.getValidator();
 	}
 
-	private static Validator getValidatorWithInitializedLocale(Locale locale) {
+	private static ValidatorFactory getValidatorFactoryWithInitializedLocale(Locale locale) {
 		Set<Class<?>> beanMetaDataToInitialize = new HashSet<>();
 		beanMetaDataToInitialize.add( Bean.class );
 
-		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
+		return Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
 				.initializeBeanMetaData( beanMetaDataToInitialize )
 				.initializeLocales( Collections.singleton( locale ) )
 				.buildValidatorFactory();
+	}
 
-		return validatorFactory.getValidator();
+	private static Validator getValidatorWithInitializedLocale(Locale locale) {
+		return getValidatorFactoryWithInitializedLocale( locale ).getValidator();
 	}
 
 	private enum SomeEnum {

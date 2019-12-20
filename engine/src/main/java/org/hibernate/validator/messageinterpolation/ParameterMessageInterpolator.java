@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.internal.engine.messageinterpolation.ParameterTermResolver;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -28,11 +29,15 @@ public class ParameterMessageInterpolator extends AbstractMessageInterpolator {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	public ParameterMessageInterpolator() {
-		this( Collections.emptySet() );
+		this( Collections.emptySet(), Locale.getDefault() );
 	}
 
-	public ParameterMessageInterpolator(Set<Locale> localesToInitialize) {
-		super( localesToInitialize );
+	/**
+	 * @since 6.1.1
+	 */
+	@Incubating
+	public ParameterMessageInterpolator(Set<Locale> localesToInitialize, Locale defaultLocale) {
+		super( localesToInitialize, defaultLocale );
 	}
 
 	@Override

@@ -16,6 +16,7 @@ import java.util.Set;
 import javax.el.ELManager;
 import javax.el.ExpressionFactory;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -40,69 +41,99 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	private final ExpressionFactory expressionFactory;
 
 	public ResourceBundleMessageInterpolator() {
-		this( Collections.emptySet() );
+		this( Collections.emptySet(), Locale.getDefault() );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
-		this( userResourceBundleLocator, Collections.emptySet() );
+		this( userResourceBundleLocator, Collections.emptySet(), Locale.getDefault() );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator) {
-		this( userResourceBundleLocator, contributorResourceBundleLocator, Collections.emptySet() );
+		this( userResourceBundleLocator, contributorResourceBundleLocator, Collections.emptySet(), Locale.getDefault() );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator,
 			boolean cachingEnabled) {
-		this( userResourceBundleLocator, contributorResourceBundleLocator, Collections.emptySet(), cachingEnabled );
+		this( userResourceBundleLocator, contributorResourceBundleLocator, Collections.emptySet(), Locale.getDefault(), cachingEnabled );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cachingEnabled) {
-		this( userResourceBundleLocator, null, Collections.emptySet(), cachingEnabled );
+		this( userResourceBundleLocator, null, Collections.emptySet(), Locale.getDefault(), cachingEnabled );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			boolean cachingEnabled,
 			ExpressionFactory expressionFactory) {
-		this( userResourceBundleLocator, null, Collections.emptySet(), cachingEnabled );
+		this( userResourceBundleLocator, null, Collections.emptySet(), Locale.getDefault(), cachingEnabled );
 	}
 
-	public ResourceBundleMessageInterpolator(Set<Locale> localesToInitialize) {
-		super( localesToInitialize );
+	/**
+	 * @since 6.1.1
+	 */
+	@Incubating
+	public ResourceBundleMessageInterpolator(Set<Locale> localesToInitialize, Locale defaultLocale) {
+		super( localesToInitialize, defaultLocale );
 		this.expressionFactory = buildExpressionFactory();
 	}
 
-	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, Set<Locale> localesToInitialize) {
-		super( userResourceBundleLocator, localesToInitialize );
+	/**
+	 * @since 6.1.1
+	 */
+	@Incubating
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, Set<Locale> localesToInitialize, Locale defaultLocale) {
+		super( userResourceBundleLocator, localesToInitialize, defaultLocale );
 		this.expressionFactory = buildExpressionFactory();
 	}
 
-	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
-			ResourceBundleLocator contributorResourceBundleLocator,
-			Set<Locale> localesToInitialize) {
-		super( userResourceBundleLocator, contributorResourceBundleLocator, localesToInitialize );
-		this.expressionFactory = buildExpressionFactory();
-	}
-
+	/**
+	 * @since 6.1.1
+	 */
+	@Incubating
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator,
 			Set<Locale> localesToInitialize,
+			Locale defaultLocale) {
+		super( userResourceBundleLocator, contributorResourceBundleLocator, localesToInitialize, defaultLocale );
+		this.expressionFactory = buildExpressionFactory();
+	}
+
+	/**
+	 * @since 6.1.1
+	 */
+	@Incubating
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			ResourceBundleLocator contributorResourceBundleLocator,
+			Set<Locale> localesToInitialize,
+			Locale defaultLocale,
 			boolean cachingEnabled) {
-		super( userResourceBundleLocator, contributorResourceBundleLocator, localesToInitialize, cachingEnabled );
+		super( userResourceBundleLocator, contributorResourceBundleLocator, localesToInitialize, defaultLocale, cachingEnabled );
 		this.expressionFactory = buildExpressionFactory();
 	}
 
-	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, Set<Locale> localesToInitialize, boolean cachingEnabled) {
-		super( userResourceBundleLocator, null, localesToInitialize, cachingEnabled );
-		this.expressionFactory = buildExpressionFactory();
-	}
-
+	/**
+	 * @since 6.1.1
+	 */
+	@Incubating
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			Set<Locale> localesToInitialize,
+			Locale defaultLocale,
+			boolean cachingEnabled) {
+		super( userResourceBundleLocator, null, localesToInitialize, defaultLocale, cachingEnabled );
+		this.expressionFactory = buildExpressionFactory();
+	}
+
+	/**
+	 * @since 6.1.1
+	 */
+	@Incubating
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			Set<Locale> localesToInitialize,
+			Locale defaultLocale,
 			boolean cachingEnabled,
 			ExpressionFactory expressionFactory) {
-		super( userResourceBundleLocator, null, localesToInitialize, cachingEnabled );
+		super( userResourceBundleLocator, null, localesToInitialize, defaultLocale, cachingEnabled );
 		this.expressionFactory = expressionFactory;
 	}
 
