@@ -297,17 +297,45 @@ public class PredefinedScopeValidatorFactoryTest {
 		validator.validate( new Bean() );
 	}
 
-	private static Validator getValidator() {
+	@Test
+	public void customizingMessageInterpolator() {
+		ValidatorFactory validatorFactory = getValidatorFactory();
+
+		Validator validator = validatorFactory.getValidator();
+		Set<ConstraintViolation<Bean>> violations = validator.validate( new Bean( null, null ) );
+		assertThat( violations ).containsOnlyViolations( violationOf( NotNull.class ).withMessage( "must not be null" ) );
+
+		validator = validatorFactory.usingContext()
+				.messageInterpolator( new MessageInterpolator() {
+
+					@Override
+					public String interpolate(String messageTemplate, Context context, Locale locale) {
+						return "another string";
+					}
+
+					@Override
+					public String interpolate(String messageTemplate, Context context) {
+						return "another string";
+					}
+				} ).getValidator();
+
+		violations = validator.validate( new Bean( null, null ) );
+		assertThat( violations ).containsOnlyViolations( violationOf( NotNull.class ).withMessage( "another string" ) );
+	}
+
+	private static ValidatorFactory getValidatorFactory() {
 		Set<Class<?>> beanMetaDataToInitialize = new HashSet<>();
 		beanMetaDataToInitialize.add( Bean.class );
 		beanMetaDataToInitialize.add( AnotherBean.class );
 
-		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
+		return Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
 				.initializeBeanMetaData( beanMetaDataToInitialize )
 				.buildValidatorFactory();
+	}
 
-		return validatorFactory.getValidator();
+	private static Validator getValidator() {
+		return getValidatorFactory().getValidator();
 	}
 
 	private static ValidatorFactory getValidatorFactoryWithInitializedLocale(Locale locale) {
