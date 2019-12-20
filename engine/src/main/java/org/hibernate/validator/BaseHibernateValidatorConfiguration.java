@@ -7,6 +7,7 @@
 package org.hibernate.validator;
 
 import java.time.Duration;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.validation.Configuration;
@@ -360,4 +361,14 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	S propertyNodeNameProvider(PropertyNodeNameProvider propertyNodeNameProvider);
+
+	/**
+	 * Allows setting the default locale used to interpolate the constraint violation messages.
+	 * <p>
+	 * If not set, defaults to the system locale obtained via {@link Locale#getDefault()}.
+	 *
+	 * @since 6.1.1
+	 */
+	@Incubating
+	S defaultLocale(Locale defaultLocale);
 }

@@ -113,8 +113,8 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private Object constraintValidatorPayload;
 	private GetterPropertySelectionStrategy getterPropertySelectionStrategy;
 
-	// locales to initialize eagerly
-	private Set<Locale> localesToInitialize = Collections.emptySet();
+	// the default locale
+	private Locale defaultLocale = Locale.getDefault();
 
 	protected AbstractConfigurationImpl(BootstrapState state) {
 		this();
@@ -325,6 +325,14 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		return thisAsT();
 	}
 
+	@Override
+	public T defaultLocale(Locale defaultLocale) {
+		Contracts.assertNotNull( defaultLocale, MESSAGES.parameterMustNotBeNull( "defaultLocale" ) );
+
+		this.defaultLocale = defaultLocale;
+		return thisAsT();
+	}
+
 	public boolean isAllowParallelMethodsDefineParameterConstraints() {
 		return this.methodValidationConfigurationBuilder.isAllowParallelMethodsDefineParameterConstraints();
 	}
@@ -518,7 +526,8 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	@Override
 	public final MessageInterpolator getDefaultMessageInterpolator() {
 		if ( defaultMessageInterpolator == null ) {
-			defaultMessageInterpolator = new ResourceBundleMessageInterpolator( getDefaultResourceBundleLocator(), localesToInitialize );
+			defaultMessageInterpolator = new ResourceBundleMessageInterpolator( getDefaultResourceBundleLocator(), getAllLocalesToInitialize(),
+					defaultLocale );
 		}
 
 		return defaultMessageInterpolator;
@@ -538,7 +547,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	public final ResourceBundleLocator getDefaultResourceBundleLocator() {
 		if ( defaultResourceBundleLocator == null ) {
 			defaultResourceBundleLocator = new PlatformResourceBundleLocator(
-					ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES, localesToInitialize );
+					ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES, getAllLocalesToInitialize() );
 		}
 
 		return defaultResourceBundleLocator;
@@ -688,12 +697,12 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		if ( externalClassLoader != null ) {
 			PlatformResourceBundleLocator userResourceBundleLocator = new PlatformResourceBundleLocator(
 					ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES,
-					localesToInitialize,
+					getAllLocalesToInitialize(),
 					externalClassLoader
 			);
 			PlatformResourceBundleLocator contributorResourceBundleLocator = new PlatformResourceBundleLocator(
 					ResourceBundleMessageInterpolator.CONTRIBUTOR_VALIDATION_MESSAGES,
-					localesToInitialize,
+					getAllLocalesToInitialize(),
 					externalClassLoader,
 					true
 			);
@@ -707,7 +716,8 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 				return new ResourceBundleMessageInterpolator(
 						userResourceBundleLocator,
 						contributorResourceBundleLocator,
-						localesToInitialize
+						getAllLocalesToInitialize(),
+						defaultLocale
 				);
 			}
 			finally {
@@ -719,8 +729,13 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		}
 	}
 
-	protected void setLocalesToInitialize(Set<Locale> localesToInitialize) {
-		this.localesToInitialize = localesToInitialize;
+	protected final Locale getDefaultLocale() {
+		return defaultLocale;
+	}
+
+	protected Set<Locale> getAllLocalesToInitialize() {
+		// By default, we return an empty set meaning that we will dynamically initialize the locales.
+		return Collections.emptySet();
 	}
 
 	@SuppressWarnings("unchecked")
