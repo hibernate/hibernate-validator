@@ -25,6 +25,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
+import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.metadata.DefaultBeanMetaDataClassNormalizer;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -39,6 +40,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
+import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -316,6 +318,32 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 
 		return new DefaultPropertyNodeNameProvider();
+	}
+
+	static LocaleResolver determineLocaleResolver(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
+			ClassLoader externalClassLoader) {
+		if ( hibernateSpecificConfig.getLocaleResolver() != null ) {
+			LOG.usingLocaleResolver( hibernateSpecificConfig.getLocaleResolver().getClass() );
+
+			return hibernateSpecificConfig.getLocaleResolver();
+		}
+
+		String localeResolverFqcn = properties.get( HibernateValidatorConfiguration.LOCALE_RESOLVER_CLASSNAME );
+		if ( localeResolverFqcn != null ) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<? extends LocaleResolver> clazz = (Class<? extends LocaleResolver>) run( LoadClass.action( localeResolverFqcn, externalClassLoader ) );
+				LocaleResolver localeResolver = run( NewInstance.action( clazz, "locale resolver class" ) );
+				LOG.usingLocaleResolver( clazz );
+
+				return localeResolver;
+			}
+			catch (Exception e) {
+				throw LOG.getUnableToInstantiateLocaleResolverClassException( localeResolverFqcn, e );
+			}
+		}
+
+		return new DefaultLocaleResolver();
 	}
 
 	static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,

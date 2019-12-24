@@ -23,6 +23,8 @@ import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
 
 import org.hibernate.validator.Incubating;
+import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
+import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolverContext;
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
 import org.hibernate.validator.internal.engine.messageinterpolation.LocalizedMessage;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
@@ -34,6 +36,8 @@ import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
+import org.hibernate.validator.spi.messageinterpolation.LocaleResolverContext;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
@@ -85,9 +89,14 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	public static final String CONTRIBUTOR_VALIDATION_MESSAGES = "ContributorValidationMessages";
 
 	/**
-	 * The default locale in the current JVM.
+	 * The locale resolver.
 	 */
-	private final Locale defaultLocale;
+	private final LocaleResolver localeResolver;
+
+	/**
+	 * The execution context of the locale resolver.
+	 */
+	private final LocaleResolverContext localeResolverContext;
 
 	/**
 	 * Loads user-specified resource bundles.
@@ -133,7 +142,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 * {@code MessageInterpolator} using the default resource bundle locators.
 	 */
 	public AbstractMessageInterpolator() {
-		this( Collections.emptySet(), Locale.getDefault() );
+		this( Collections.emptySet(), Locale.getDefault(), new DefaultLocaleResolver() );
 	}
 
 	/**
@@ -142,7 +151,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
 	 */
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
-		this( userResourceBundleLocator, Collections.emptySet(), Locale.getDefault() );
+		this( userResourceBundleLocator, Collections.emptySet(), Locale.getDefault(), new DefaultLocaleResolver() );
 	}
 
 	/**
@@ -154,7 +163,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 */
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator) {
-		this( userResourceBundleLocator, contributorResourceBundleLocator, Collections.emptySet(), Locale.getDefault() );
+		this( userResourceBundleLocator, contributorResourceBundleLocator, Collections.emptySet(), Locale.getDefault(), new DefaultLocaleResolver() );
 	}
 
 	/**
@@ -168,7 +177,8 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator,
 			boolean cacheMessages) {
-		this( userResourceBundleLocator, contributorResourceBundleLocator, Collections.emptySet(), Locale.getDefault(), cacheMessages );
+		this( userResourceBundleLocator, contributorResourceBundleLocator, Collections.emptySet(), Locale.getDefault(), new DefaultLocaleResolver(),
+				cacheMessages );
 	}
 
 	/**
@@ -176,12 +186,13 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 *
 	 * @param localesToInitialize the set of locales to initialize at bootstrap
 	 * @param defaultLocale the default locale
+	 * @param localeResolver the locale resolver
 	 *
 	 * @since 6.1.1
 	 */
 	@Incubating
-	public AbstractMessageInterpolator(Set<Locale> localesToInitialize, Locale defaultLocale) {
-		this( null, localesToInitialize, defaultLocale );
+	public AbstractMessageInterpolator(Set<Locale> localesToInitialize, Locale defaultLocale, LocaleResolver localeResolver) {
+		this( null, localesToInitialize, defaultLocale, localeResolver );
 	}
 
 	/**
@@ -190,12 +201,16 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
 	 * @param localesToInitialize the set of locales to initialize at bootstrap
 	 * @param defaultLocale the default locale
+	 * @param localeResolver the locale resolver
 	 *
 	 * @since 6.1.1
 	 */
 	@Incubating
-	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, Set<Locale> localesToInitialize, Locale defaultLocale) {
-		this( userResourceBundleLocator, null, localesToInitialize, defaultLocale );
+	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			Set<Locale> localesToInitialize,
+			Locale defaultLocale,
+			LocaleResolver localeResolver) {
+		this( userResourceBundleLocator, null, localesToInitialize, defaultLocale, localeResolver );
 	}
 
 	/**
@@ -205,14 +220,17 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 * @param contributorResourceBundleLocator {@code ResourceBundleLocator} used to load resource bundle of constraint contributor
 	 * @param localesToInitialize the set of locales to initialize at bootstrap
 	 * @param defaultLocale the default locale
+	 * @param localeResolver the locale resolver
 	 *
 	 * @since 6.1.1
 	 */
 	@Incubating
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
-			ResourceBundleLocator contributorResourceBundleLocator, Set<Locale> localesToInitialize,
-			Locale defaultLocale) {
-		this( userResourceBundleLocator, contributorResourceBundleLocator, localesToInitialize, defaultLocale, true );
+			ResourceBundleLocator contributorResourceBundleLocator,
+			Set<Locale> localesToInitialize,
+			Locale defaultLocale,
+			LocaleResolver localeResolver) {
+		this( userResourceBundleLocator, contributorResourceBundleLocator, localesToInitialize, defaultLocale, localeResolver, true );
 	}
 
 	/**
@@ -223,6 +241,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 * @param localesToInitialize the set of locales to initialize at bootstrap
 	 * @param defaultLocale the default locale
 	 * @param cacheMessages whether resolved messages should be cached or not
+	 * @param localeResolver the locale resolver
 	 *
 	 * @since 6.1.1
 	 */
@@ -231,11 +250,14 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			ResourceBundleLocator contributorResourceBundleLocator,
 			Set<Locale> localesToInitialize,
 			Locale defaultLocale,
+			LocaleResolver localeResolver,
 			boolean cacheMessages) {
 		Contracts.assertNotNull( localesToInitialize, MESSAGES.parameterMustNotBeNull( "localesToInitialize" ) );
 		Contracts.assertNotNull( defaultLocale, MESSAGES.parameterMustNotBeNull( "defaultLocale" ) );
+		Contracts.assertNotNull( localeResolver, MESSAGES.parameterMustNotBeNull( "localeResolver" ) );
 
-		this.defaultLocale = defaultLocale;
+		this.localeResolverContext = new DefaultLocaleResolverContext( localesToInitialize, defaultLocale );
+		this.localeResolver = localeResolver;
 
 		if ( userResourceBundleLocator == null ) {
 			this.userResourceBundleLocator = new PlatformResourceBundleLocator( USER_VALIDATION_MESSAGES, localesToInitialize );
@@ -298,7 +320,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		// is immutable and uniquely built per Validation definition, the comparison has to be based on == and not equals though
 		String interpolatedMessage = message;
 		try {
-			interpolatedMessage = interpolateMessage( message, context, defaultLocale );
+			interpolatedMessage = interpolateMessage( message, context, localeResolver.resolve( localeResolverContext ) );
 		}
 		catch (MessageDescriptorFormatException e) {
 			LOG.warn( e.getMessage() );

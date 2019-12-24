@@ -57,6 +57,7 @@ import org.hibernate.validator.internal.xml.config.ValidationBootstrapParameters
 import org.hibernate.validator.internal.xml.config.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
@@ -112,9 +113,8 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private Duration temporalValidationTolerance;
 	private Object constraintValidatorPayload;
 	private GetterPropertySelectionStrategy getterPropertySelectionStrategy;
-
-	// the default locale
 	private Locale defaultLocale = Locale.getDefault();
+	private LocaleResolver localeResolver;
 
 	protected AbstractConfigurationImpl(BootstrapState state) {
 		this();
@@ -231,6 +231,19 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 			}
 		}
 		this.validationBootstrapParameters.setPropertyNodeNameProvider( propertyNodeNameProvider );
+
+		return thisAsT();
+	}
+
+	@Override
+	public T localeResolver(LocaleResolver localeResolver) {
+		if ( LOG.isDebugEnabled() ) {
+			if ( localeResolver != null ) {
+				LOG.debug( "Setting custom LocaleResolver of type " + localeResolver.getClass()
+						.getName() );
+			}
+		}
+		this.localeResolver = localeResolver;
 
 		return thisAsT();
 	}
@@ -489,6 +502,10 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		return validationBootstrapParameters.getPropertyNodeNameProvider();
 	}
 
+	public LocaleResolver getLocaleResolver() {
+		return localeResolver;
+	}
+
 	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
 		return scriptEvaluatorFactory;
 	}
@@ -527,7 +544,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	public final MessageInterpolator getDefaultMessageInterpolator() {
 		if ( defaultMessageInterpolator == null ) {
 			defaultMessageInterpolator = new ResourceBundleMessageInterpolator( getDefaultResourceBundleLocator(), getAllLocalesToInitialize(),
-					defaultLocale );
+					defaultLocale, ValidatorFactoryConfigurationHelper.determineLocaleResolver( this, this.getProperties(), externalClassLoader ) );
 		}
 
 		return defaultMessageInterpolator;
@@ -717,7 +734,8 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 						userResourceBundleLocator,
 						contributorResourceBundleLocator,
 						getAllLocalesToInitialize(),
-						defaultLocale
+						defaultLocale,
+						ValidatorFactoryConfigurationHelper.determineLocaleResolver( this, this.getProperties(), externalClassLoader )
 				);
 			}
 			finally {
