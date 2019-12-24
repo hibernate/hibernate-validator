@@ -63,6 +63,7 @@ import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatt
 import org.hibernate.validator.internal.util.logging.formatter.ObjectArrayFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
 import org.hibernate.validator.internal.xml.mapping.ContainerElementTypePath;
+import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
@@ -900,4 +901,11 @@ public interface Log extends BasicLogger {
 			+ " To solve this, compile your code with the '-parameters' flag."
 	)
 	void missingParameterMetadataWithSyntheticOrImplicitParameters(@FormatWith(ExecutableFormatter.class) Executable executable);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = 255, value = "Using %s as locale resolver.")
+	void usingLocaleResolver(@FormatWith(ClassObjectFormatter.class) Class<? extends LocaleResolver> localeResolverClass);
+
+	@Message(id = 256, value = "Unable to instantiate locale resolver class %s.")
+	ValidationException getUnableToInstantiateLocaleResolverClassException(String localeResolverClassName, @Cause Exception e);
 }

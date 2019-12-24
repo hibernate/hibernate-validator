@@ -22,6 +22,7 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
@@ -130,6 +131,15 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	String PROPERTY_NODE_NAME_PROVIDER_CLASSNAME = "hibernate.validator.property_node_name_provider";
+
+	/**
+	 * Property for configuring the locale resolver, allowing to select an implementation of {@link LocaleResolver}
+	 * which will be used for locale resolution when interpolating a message.
+	 *
+	 * @since 6.1.1
+	 */
+	@Incubating
+	String LOCALE_RESOLVER_CLASSNAME = "hibernate.validator.locale_resolver";
 
 	/**
 	 * <p>
@@ -371,4 +381,16 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	S defaultLocale(Locale defaultLocale);
+
+	/**
+	 * Allows setting a locale resolver, defining how the locale will be resolved when interpolating the message of a constraint violation.
+	 *
+	 * @param localeResolver the {@link LocaleResolver} to be used
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.1.1
+	 */
+	@Incubating
+	S localeResolver(LocaleResolver localeResolver);
 }

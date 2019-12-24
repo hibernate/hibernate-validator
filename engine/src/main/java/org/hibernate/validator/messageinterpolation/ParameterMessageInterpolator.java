@@ -12,16 +12,19 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.hibernate.validator.Incubating;
+import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.internal.engine.messageinterpolation.ParameterTermResolver;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 
 /**
  * Resource bundle message interpolator, it does not support EL expression
  * and does support parameter value expression
  *
  * @author Adam Stawicki
+ * @author Guillaume Smet
  * @since 5.2
  */
 public class ParameterMessageInterpolator extends AbstractMessageInterpolator {
@@ -29,7 +32,7 @@ public class ParameterMessageInterpolator extends AbstractMessageInterpolator {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	public ParameterMessageInterpolator() {
-		this( Collections.emptySet(), Locale.getDefault() );
+		this( Collections.emptySet(), Locale.getDefault(), new DefaultLocaleResolver() );
 	}
 
 	/**
@@ -37,7 +40,15 @@ public class ParameterMessageInterpolator extends AbstractMessageInterpolator {
 	 */
 	@Incubating
 	public ParameterMessageInterpolator(Set<Locale> localesToInitialize, Locale defaultLocale) {
-		super( localesToInitialize, defaultLocale );
+		this( localesToInitialize, defaultLocale, new DefaultLocaleResolver() );
+	}
+
+	/**
+	 * @since 6.1.1
+	 */
+	@Incubating
+	public ParameterMessageInterpolator(Set<Locale> localesToInitialize, Locale defaultLocale, LocaleResolver localeResolver) {
+		super( localesToInitialize, defaultLocale, localeResolver );
 	}
 
 	@Override
