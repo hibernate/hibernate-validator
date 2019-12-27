@@ -739,12 +739,12 @@ If you have to implement a country specific constraint, consider making it a con
 Hibernate Validator!
 ====
 
-`@CNPJ`:: Checks that the annotated character sequence represents a Brazilian corporate tax payer registry number (Cadastro de Pessoa Juríeddica)
+`@CNPJ`:: Checks that the annotated character sequence represents a Brazilian corporate tax payer registry number (Cadastro de Pessoa Jurídica)
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 	Country::: Brazil
 
-`@CPF`:: Checks that the annotated character sequence represents a Brazilian individual taxpayer registry number (Cadastro de Pessoa Fídsica)
+`@CPF`:: Checks that the annotated character sequence represents a Brazilian individual taxpayer registry number (Cadastro de Pessoa Física)
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 	Country::: Brazil
