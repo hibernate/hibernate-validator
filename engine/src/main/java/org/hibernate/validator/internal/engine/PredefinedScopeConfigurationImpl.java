@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.engine;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
@@ -31,13 +30,6 @@ public class PredefinedScopeConfigurationImpl extends AbstractConfigurationImpl<
 
 	private BeanMetaDataClassNormalizer beanMetaDataClassNormalizer;
 
-	/**
-	 * Locales to initialize eagerly.
-	 * <p>
-	 * We will always include the default locale in the final list.
-	 */
-	private Set<Locale> localesToInitialize = Collections.emptySet();
-
 	public PredefinedScopeConfigurationImpl(BootstrapState state) {
 		super( state );
 	}
@@ -59,7 +51,7 @@ public class PredefinedScopeConfigurationImpl extends AbstractConfigurationImpl<
 	@Override
 	public PredefinedScopeHibernateValidatorConfiguration initializeLocales(Set<Locale> localesToInitialize) {
 		Contracts.assertNotNull( localesToInitialize, MESSAGES.parameterMustNotBeNull( "localesToInitialize" ) );
-		this.localesToInitialize = localesToInitialize;
+		locales( localesToInitialize );
 		return thisAsT();
 	}
 
@@ -74,14 +66,7 @@ public class PredefinedScopeConfigurationImpl extends AbstractConfigurationImpl<
 	}
 
 	@Override
-	protected Set<Locale> getAllLocalesToInitialize() {
-		if ( localesToInitialize.isEmpty() ) {
-			return Collections.singleton( getDefaultLocale() );
-		}
-
-		Set<Locale> allLocales = CollectionHelper.newHashSet( localesToInitialize.size() + 1 );
-		allLocales.addAll( localesToInitialize );
-		allLocales.add( getDefaultLocale() );
-		return Collections.unmodifiableSet( allLocales );
+	protected boolean preloadResourceBundles() {
+		return true;
 	}
 }
