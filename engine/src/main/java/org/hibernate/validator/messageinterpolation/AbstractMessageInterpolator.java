@@ -12,6 +12,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -23,6 +24,7 @@ import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
 
 import org.hibernate.validator.Incubating;
+import org.hibernate.validator.internal.engine.PredefinedScopeValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
 import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolverContext;
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
@@ -31,6 +33,7 @@ import org.hibernate.validator.internal.engine.messageinterpolation.parser.Messa
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.Token;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.TokenCollector;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.TokenIterator;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -142,7 +145,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 * {@code MessageInterpolator} using the default resource bundle locators.
 	 */
 	public AbstractMessageInterpolator() {
-		this( Collections.emptySet(), Locale.getDefault(), new DefaultLocaleResolver() );
+		this( Collections.emptySet(), Locale.getDefault(), new DefaultLocaleResolver(), false );
 	}
 
 	/**
@@ -151,7 +154,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
 	 */
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
-		this( userResourceBundleLocator, Collections.emptySet(), Locale.getDefault(), new DefaultLocaleResolver() );
+		this( userResourceBundleLocator, Collections.emptySet(), Locale.getDefault(), new DefaultLocaleResolver(), false );
 	}
 
 	/**
@@ -163,7 +166,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 */
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator) {
-		this( userResourceBundleLocator, contributorResourceBundleLocator, Collections.emptySet(), Locale.getDefault(), new DefaultLocaleResolver() );
+		this( userResourceBundleLocator, contributorResourceBundleLocator, Collections.emptySet(), Locale.getDefault(), new DefaultLocaleResolver(), false );
 	}
 
 	/**
@@ -184,33 +187,38 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	/**
 	 * {@code MessageInterpolator} using the default resource bundle locators.
 	 *
-	 * @param localesToInitialize the set of locales to initialize at bootstrap
+	 * @param locales the set of locales to initialize at bootstrap
 	 * @param defaultLocale the default locale
 	 * @param localeResolver the locale resolver
+	 * @param preloadResourceBundles if the resource bundled should be initialized at initialization time, this is useful in the case of a
+	 * {@link PredefinedScopeValidatorFactoryImpl}
 	 *
 	 * @since 6.1.1
 	 */
 	@Incubating
-	public AbstractMessageInterpolator(Set<Locale> localesToInitialize, Locale defaultLocale, LocaleResolver localeResolver) {
-		this( null, localesToInitialize, defaultLocale, localeResolver );
+	public AbstractMessageInterpolator(Set<Locale> locales, Locale defaultLocale, LocaleResolver localeResolver, boolean preloadResourceBundles) {
+		this( null, locales, defaultLocale, localeResolver, preloadResourceBundles );
 	}
 
 	/**
 	 * {@code MessageInterpolator} taking a resource bundle locator.
 	 *
 	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
-	 * @param localesToInitialize the set of locales to initialize at bootstrap
+	 * @param locales the set of locales to initialize at bootstrap
 	 * @param defaultLocale the default locale
 	 * @param localeResolver the locale resolver
+	 * @param preloadResourceBundles if the resource bundled should be initialized at initialization time, this is useful in the case of a
+	 * {@link PredefinedScopeValidatorFactoryImpl}
 	 *
 	 * @since 6.1.1
 	 */
 	@Incubating
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
-			Set<Locale> localesToInitialize,
+			Set<Locale> locales,
 			Locale defaultLocale,
-			LocaleResolver localeResolver) {
-		this( userResourceBundleLocator, null, localesToInitialize, defaultLocale, localeResolver );
+			LocaleResolver localeResolver,
+			boolean preloadResourceBundles) {
+		this( userResourceBundleLocator, null, locales, defaultLocale, localeResolver, preloadResourceBundles );
 	}
 
 	/**
@@ -221,27 +229,8 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 * @param localesToInitialize the set of locales to initialize at bootstrap
 	 * @param defaultLocale the default locale
 	 * @param localeResolver the locale resolver
-	 *
-	 * @since 6.1.1
-	 */
-	@Incubating
-	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
-			ResourceBundleLocator contributorResourceBundleLocator,
-			Set<Locale> localesToInitialize,
-			Locale defaultLocale,
-			LocaleResolver localeResolver) {
-		this( userResourceBundleLocator, contributorResourceBundleLocator, localesToInitialize, defaultLocale, localeResolver, true );
-	}
-
-	/**
-	 * {@code MessageInterpolator} taking two resource bundle locators.
-	 *
-	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
-	 * @param contributorResourceBundleLocator {@code ResourceBundleLocator} used to load resource bundle of constraint contributor
-	 * @param localesToInitialize the set of locales to initialize at bootstrap
-	 * @param defaultLocale the default locale
-	 * @param cacheMessages whether resolved messages should be cached or not
-	 * @param localeResolver the locale resolver
+	 * @param preloadResourceBundles if the resource bundled should be initialized at initialization time, this is useful in the case of a
+	 * {@link PredefinedScopeValidatorFactoryImpl}
 	 *
 	 * @since 6.1.1
 	 */
@@ -251,16 +240,47 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			Set<Locale> localesToInitialize,
 			Locale defaultLocale,
 			LocaleResolver localeResolver,
+			boolean preloadResourceBundles) {
+		this( userResourceBundleLocator, contributorResourceBundleLocator, localesToInitialize, defaultLocale, localeResolver, preloadResourceBundles, true );
+	}
+
+	/**
+	 * {@code MessageInterpolator} taking two resource bundle locators.
+	 *
+	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
+	 * @param contributorResourceBundleLocator {@code ResourceBundleLocator} used to load resource bundle of constraint
+	 * contributor
+	 * @param locales the set of locales to initialize at bootstrap
+	 * @param defaultLocale the default locale
+	 * @param cacheMessages whether resolved messages should be cached or not
+	 * @param localeResolver the locale resolver
+	 * @param preloadResourceBundles if the resource bundled should be initialized at initialization time, this is useful in the case of a
+	 * {@link PredefinedScopeValidatorFactoryImpl}
+	 *
+	 * @since 6.1.1
+	 */
+	@Incubating
+	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			ResourceBundleLocator contributorResourceBundleLocator,
+			Set<Locale> locales,
+			Locale defaultLocale,
+			LocaleResolver localeResolver,
+			boolean preloadResourceBundles,
 			boolean cacheMessages) {
-		Contracts.assertNotNull( localesToInitialize, MESSAGES.parameterMustNotBeNull( "localesToInitialize" ) );
+		Contracts.assertNotNull( locales, MESSAGES.parameterMustNotBeNull( "localesToInitialize" ) );
 		Contracts.assertNotNull( defaultLocale, MESSAGES.parameterMustNotBeNull( "defaultLocale" ) );
 		Contracts.assertNotNull( localeResolver, MESSAGES.parameterMustNotBeNull( "localeResolver" ) );
 
-		this.localeResolverContext = new DefaultLocaleResolverContext( localesToInitialize, defaultLocale );
+		Set<Locale> allLocales = CollectionHelper.toImmutableSet( getAllLocales( locales, defaultLocale ) );
+
+		this.localeResolverContext = new DefaultLocaleResolverContext( allLocales, defaultLocale );
 		this.localeResolver = localeResolver;
 
+		Set<Locale> allLocalesToInitialize = preloadResourceBundles ? allLocales : Collections.emptySet();
+
 		if ( userResourceBundleLocator == null ) {
-			this.userResourceBundleLocator = new PlatformResourceBundleLocator( USER_VALIDATION_MESSAGES, localesToInitialize );
+			this.userResourceBundleLocator = new PlatformResourceBundleLocator( USER_VALIDATION_MESSAGES,
+					preloadResourceBundles, allLocalesToInitialize );
 		}
 		else {
 			this.userResourceBundleLocator = userResourceBundleLocator;
@@ -269,7 +289,8 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		if ( contributorResourceBundleLocator == null ) {
 			this.contributorResourceBundleLocator = new PlatformResourceBundleLocator(
 					CONTRIBUTOR_VALIDATION_MESSAGES,
-					localesToInitialize,
+					preloadResourceBundles,
+					allLocalesToInitialize,
 					null,
 					true
 			);
@@ -278,7 +299,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			this.contributorResourceBundleLocator = contributorResourceBundleLocator;
 		}
 
-		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator( DEFAULT_VALIDATION_MESSAGES, localesToInitialize );
+		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator( DEFAULT_VALIDATION_MESSAGES, preloadResourceBundles, allLocalesToInitialize );
 
 		this.cachingEnabled = cacheMessages;
 		if ( cachingEnabled ) {
@@ -338,6 +359,17 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			LOG.warn( e.getMessage() );
 		}
 		return interpolatedMessage;
+	}
+
+	private Set<Locale> getAllLocales(Set<Locale> localesToInitialize, Locale defaultLocale) {
+		if ( localesToInitialize.contains( defaultLocale ) ) {
+			return localesToInitialize;
+		}
+
+		Set<Locale> allLocales = new HashSet<>( localesToInitialize.size() + 1 );
+		allLocales.addAll( localesToInitialize );
+		allLocales.add( defaultLocale );
+		return allLocales;
 	}
 
 	/**

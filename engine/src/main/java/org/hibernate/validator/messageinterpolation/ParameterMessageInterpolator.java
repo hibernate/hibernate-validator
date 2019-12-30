@@ -32,23 +32,23 @@ public class ParameterMessageInterpolator extends AbstractMessageInterpolator {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	public ParameterMessageInterpolator() {
-		this( Collections.emptySet(), Locale.getDefault(), new DefaultLocaleResolver() );
+		this( Collections.emptySet(), Locale.getDefault(), new DefaultLocaleResolver(), false );
 	}
 
 	/**
 	 * @since 6.1.1
 	 */
 	@Incubating
-	public ParameterMessageInterpolator(Set<Locale> localesToInitialize, Locale defaultLocale) {
-		this( localesToInitialize, defaultLocale, new DefaultLocaleResolver() );
+	public ParameterMessageInterpolator(Set<Locale> locales, Locale defaultLocale, boolean preloadResourceBundles) {
+		this( locales, defaultLocale, new DefaultLocaleResolver(), preloadResourceBundles );
 	}
 
 	/**
 	 * @since 6.1.1
 	 */
 	@Incubating
-	public ParameterMessageInterpolator(Set<Locale> localesToInitialize, Locale defaultLocale, LocaleResolver localeResolver) {
-		super( localesToInitialize, defaultLocale, localeResolver );
+	public ParameterMessageInterpolator(Set<Locale> locales, Locale defaultLocale, LocaleResolver localeResolver, boolean preloadResourceBundles) {
+		super( locales, defaultLocale, localeResolver, preloadResourceBundles );
 	}
 
 	@Override

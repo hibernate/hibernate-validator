@@ -25,7 +25,11 @@ public interface PredefinedScopeHibernateValidatorConfiguration extends BaseHibe
 	@Incubating
 	PredefinedScopeHibernateValidatorConfiguration initializeBeanMetaData(Set<Class<?>> beanClassesToInitialize);
 
+	/**
+	 * @deprecated Planned for removal, use {@link BaseHibernateValidatorConfiguration#locales(Set)} instead.
+	 */
 	@Incubating
+	@Deprecated
 	PredefinedScopeHibernateValidatorConfiguration initializeLocales(Set<Locale> locales);
 
 	@Incubating

@@ -20,6 +20,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Chris Beckey &lt;cbeckey@paypal.com&gt;
+ * @author Guillaume Smet
  */
 public class ConfigurationImpl extends AbstractConfigurationImpl<HibernateValidatorConfiguration> implements HibernateValidatorConfiguration, ConfigurationState {
 
@@ -29,5 +30,10 @@ public class ConfigurationImpl extends AbstractConfigurationImpl<HibernateValida
 
 	public ConfigurationImpl(ValidationProvider<?> provider) {
 		super( provider );
+	}
+
+	@Override
+	protected boolean preloadResourceBundles() {
+		return false;
 	}
 }

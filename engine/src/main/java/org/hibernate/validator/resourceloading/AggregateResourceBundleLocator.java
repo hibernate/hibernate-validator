@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
@@ -42,7 +43,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 * first bundle containing the key.
 	 */
 	public AggregateResourceBundleLocator(List<String> bundleNames) {
-		this( bundleNames, Collections.emptySet(), null );
+		this( bundleNames, false, Collections.emptySet(), null );
 	}
 
 	/**
@@ -58,7 +59,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 * source bundles.
 	 */
 	public AggregateResourceBundleLocator(List<String> bundleNames, ResourceBundleLocator delegate) {
-		this( bundleNames, Collections.emptySet(), delegate, null );
+		this( bundleNames, false, Collections.emptySet(), delegate, null );
 	}
 
 	/**
@@ -77,7 +78,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 */
 	public AggregateResourceBundleLocator(List<String> bundleNames, ResourceBundleLocator delegate,
 			ClassLoader classLoader) {
-		this( bundleNames, Collections.emptySet(), delegate, classLoader );
+		this( bundleNames, false, Collections.emptySet(), delegate, classLoader );
 	}
 
 	/**
@@ -88,12 +89,14 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 * contain all entries from all source bundles. In case a key occurs
 	 * in multiple source bundles, the value will be taken from the
 	 * first bundle containing the key.
-	 * @param localesToInitialize The set of locales to initialize at bootstrap.
+	 * @param preloadResourceBundles if resource bundles should be initialized when initializing the locator
+	 * @param localesToInitialize The set of locales to initialize at bootstrap
 	 *
-	 * @since 6.1
+	 * @since 6.1.1
 	 */
-	public AggregateResourceBundleLocator(List<String> bundleNames, Set<Locale> localesToInitialize) {
-		this( bundleNames, localesToInitialize, null );
+	@Incubating
+	public AggregateResourceBundleLocator(List<String> bundleNames, boolean preloadResourceBundles, Set<Locale> localesToInitialize) {
+		this( bundleNames, preloadResourceBundles, localesToInitialize, null );
 	}
 
 	/**
@@ -104,15 +107,20 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 * contain all keys from all source bundles. In case a key occurs
 	 * in multiple source bundles, the value will be taken from the
 	 * first bundle containing the key.
-	 * @param localesToInitialize The set of locales to initialize at bootstrap.
+	 * @param preloadResourceBundles if resource bundles should be initialized when initializing the locator
+	 * @param localesToInitialize The set of locales to initialize at bootstrap
 	 * @param delegate A delegate resource bundle locator. The bundle returned by
 	 * this locator will be added to the aggregate bundle after all
 	 * source bundles.
 	 *
-	 * @since 6.1
+	 * @since 6.1.1
 	 */
-	public AggregateResourceBundleLocator(List<String> bundleNames, Set<Locale> localesToInitialize, ResourceBundleLocator delegate) {
-		this( bundleNames, localesToInitialize, delegate, null );
+	@Incubating
+	public AggregateResourceBundleLocator(List<String> bundleNames,
+			boolean preloadResourceBundles,
+			Set<Locale> localesToInitialize,
+			ResourceBundleLocator delegate) {
+		this( bundleNames, preloadResourceBundles, localesToInitialize, delegate, null );
 	}
 
 	/**
@@ -123,22 +131,27 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 * contain all keys from all source bundles. In case a key occurs
 	 * in multiple source bundles, the value will be taken from the
 	 * first bundle containing the key.
-	 * @param localesToInitialize The set of locales to initialize at bootstrap.
+	 * @param preloadResourceBundles if resource bundles should be initialized when initializing the locator
+	 * @param localesToInitialize The set of locales to initialize at bootstrap
 	 * @param delegate A delegate resource bundle locator. The bundle returned by
 	 * this locator will be added to the aggregate bundle after all
 	 * source bundles.
 	 * @param classLoader The classloader to use for loading the bundle.
 	 *
-	 * @since 6.1
+	 * @since 6.1.1
 	 */
-	public AggregateResourceBundleLocator(List<String> bundleNames, Set<Locale> localesToInitialize, ResourceBundleLocator delegate,
+	@Incubating
+	public AggregateResourceBundleLocator(List<String> bundleNames,
+			boolean preloadResourceBundles,
+			Set<Locale> localesToInitialize,
+			ResourceBundleLocator delegate,
 			ClassLoader classLoader) {
 		super( delegate );
 		Contracts.assertValueNotNull( bundleNames, "bundleNames" );
 
 		List<PlatformResourceBundleLocator> tmpBundleLocators = new ArrayList<>( bundleNames.size() );
 		for ( String bundleName : bundleNames ) {
-			tmpBundleLocators.add( new PlatformResourceBundleLocator( bundleName, localesToInitialize, classLoader ) );
+			tmpBundleLocators.add( new PlatformResourceBundleLocator( bundleName, preloadResourceBundles, localesToInitialize, classLoader ) );
 		}
 		this.resourceBundleLocators = CollectionHelper.toImmutableList( tmpBundleLocators );
 	}
