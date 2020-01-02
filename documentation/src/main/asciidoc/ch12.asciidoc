@@ -51,6 +51,9 @@ Note that when a package is part of the public API this is not necessarily true 
 `org.hibernate.validator.spi.constraintdefinition`::
 			An SPI for registering additional constraint validators programmatically, see <<section-constraint-definition-contribution>>.
 
+`org.hibernate.validator.spi.messageinterpolation`::
+			An SPI that can be used to tweak the resolution of the locale when interpolating the constraint violation messages. See <<section-locale-resolver>>.
+
 `org.hibernate.validator.spi.nodenameprovider`::
 			An SPI that can be used to alter how the names of properties will be resolved when the property path is constructed. See <<section-property-node-name-provider>>.
 
@@ -442,6 +445,55 @@ With `ResourceBundleLocator`, Hibernate Validator provides an additional SPI whi
 error messages from other resource bundles than _ValidationMessages_ while still using the actual
 interpolation algorithm as defined by the specification. Refer to
 <<section-resource-bundle-locator>> to learn how to make use of that SPI.
+
+[[section-locale-resolver]]
+=== Customizing the locale resolution
+
+[WARNING]
+====
+These contracts are marked as `@Incubating` so they might be subject to change in the future.
+====
+
+Hibernate Validator provides several extension points to build a custom locale resolution strategy.
+The resolved locale is used when interpolating the constraint violation messages.
+
+The default behavior of Hibernate Validator is to always use the system default locale (as obtained via `Locale.getDefault()`).
+This might not be the desired behavior if, for example, you usually set your system locale to `en-US` but want your application to provide messages in French.
+
+The following example shows how to set the Hibernate Validator default locale to `fr-FR`:
+
+[[example-configure-default-locale]]
+.Configure the default locale
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/localization/LocalizationTest.java[tags=default-locale]
+----
+====
+
+While this is already a nice improvement, in a fully internationalized application, this is not sufficient:
+you need Hibernate Validator to select the locale depending on the user context.
+
+Hibernate Validator provides the `org.hibernate.validator.spi.messageinterpolation.LocaleResolver` SPI
+which allows to fine-tune the resolution of the locale.
+Typically, in a JAX-RS environment, you can resolve the locale to use from the `Accept-Language` HTTP header.
+
+In the following example, we use a hardcoded value but, for instance, in the case of a RESTEasy application,
+you could extract the header from the `ResteasyContext`.
+
+[[example-locale-resolver]]
+.Fine tune the locale used to interpolate the messages via a `LocaleResolver`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/localization/LocalizationTest.java[tags=locale-resolver]
+----
+====
+
+[NOTE]
+====
+When using the `LocaleResolver`, you have to define the list of supported locales via the `locales()` method.
+====
 
 === Custom contexts
 
