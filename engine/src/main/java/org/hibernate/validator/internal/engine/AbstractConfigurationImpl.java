@@ -576,7 +576,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	public final ResourceBundleLocator getDefaultResourceBundleLocator() {
 		if ( defaultResourceBundleLocator == null ) {
 			defaultResourceBundleLocator = new PlatformResourceBundleLocator(
-					ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES, preloadResourceBundles(), getAllSupportedLocales() );
+					ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES, preloadResourceBundles() ? getAllSupportedLocales() : Collections.emptySet() );
 		}
 
 		return defaultResourceBundleLocator;
@@ -726,14 +726,12 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		if ( externalClassLoader != null ) {
 			PlatformResourceBundleLocator userResourceBundleLocator = new PlatformResourceBundleLocator(
 					ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES,
-					preloadResourceBundles(),
-					getAllSupportedLocales(),
+					preloadResourceBundles() ? getAllSupportedLocales() : Collections.emptySet(),
 					externalClassLoader
 			);
 			PlatformResourceBundleLocator contributorResourceBundleLocator = new PlatformResourceBundleLocator(
 					ResourceBundleMessageInterpolator.CONTRIBUTOR_VALIDATION_MESSAGES,
-					preloadResourceBundles(),
-					getAllSupportedLocales(),
+					preloadResourceBundles() ? getAllSupportedLocales() : Collections.emptySet(),
 					externalClassLoader,
 					true
 			);

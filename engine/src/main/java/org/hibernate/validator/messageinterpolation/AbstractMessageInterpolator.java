@@ -280,7 +280,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 
 		if ( userResourceBundleLocator == null ) {
 			this.userResourceBundleLocator = new PlatformResourceBundleLocator( USER_VALIDATION_MESSAGES,
-					preloadResourceBundles, allLocalesToInitialize );
+					allLocalesToInitialize );
 		}
 		else {
 			this.userResourceBundleLocator = userResourceBundleLocator;
@@ -289,7 +289,6 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		if ( contributorResourceBundleLocator == null ) {
 			this.contributorResourceBundleLocator = new PlatformResourceBundleLocator(
 					CONTRIBUTOR_VALIDATION_MESSAGES,
-					preloadResourceBundles,
 					allLocalesToInitialize,
 					null,
 					true
@@ -299,7 +298,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			this.contributorResourceBundleLocator = contributorResourceBundleLocator;
 		}
 
-		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator( DEFAULT_VALIDATION_MESSAGES, preloadResourceBundles, allLocalesToInitialize );
+		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator( DEFAULT_VALIDATION_MESSAGES, allLocalesToInitialize );
 
 		this.cachingEnabled = cacheMessages;
 		if ( cachingEnabled ) {

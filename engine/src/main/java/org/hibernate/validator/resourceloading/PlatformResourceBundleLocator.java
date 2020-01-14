@@ -43,6 +43,7 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 
@@ -53,7 +54,6 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	private final ClassLoader classLoader;
 	private final boolean aggregate;
 
-	private final boolean preloadResourceBundles;
 	@Immutable
 	private final Map<Locale, ResourceBundle> preloadedResourceBundles;
 
@@ -63,7 +63,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 * @param bundleName the name of the bundle to load
 	 */
 	public PlatformResourceBundleLocator(String bundleName) {
-		this( bundleName, false, Collections.emptySet() );
+		this( bundleName, Collections.emptySet() );
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 * @since 5.2
 	 */
 	public PlatformResourceBundleLocator(String bundleName, ClassLoader classLoader) {
-		this( bundleName, false, Collections.emptySet(), classLoader );
+		this( bundleName, Collections.emptySet(), classLoader );
 	}
 
 	/**
@@ -92,46 +92,42 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 * @since 5.2
 	 */
 	public PlatformResourceBundleLocator(String bundleName, ClassLoader classLoader, boolean aggregate) {
-		this( bundleName, false, Collections.emptySet(), classLoader, aggregate );
+		this( bundleName, Collections.emptySet(), classLoader, aggregate );
 	}
 
 	/**
 	 * Creates a new {@link PlatformResourceBundleLocator}.
 	 *
 	 * @param bundleName the name of the bundle to load
-	 * @param preloadResourceBundles if resource bundles should be initialized when initializing the locator
 	 * @param localesToInitialize the set of locales to initialize at bootstrap
 	 *
 	 * @since 6.1.1
 	 */
 	@Incubating
-	public PlatformResourceBundleLocator(String bundleName, boolean preloadResourceBundles, Set<Locale> localesToInitialize) {
-		this( bundleName, preloadResourceBundles, localesToInitialize, null );
+	public PlatformResourceBundleLocator(String bundleName, Set<Locale> localesToInitialize) {
+		this( bundleName, localesToInitialize, null );
 	}
 
 	/**
 	 * Creates a new {@link PlatformResourceBundleLocator}.
 	 *
 	 * @param bundleName the name of the bundle to load
-	 * @param preloadResourceBundles if resource bundles should be initialized when initializing the locator
 	 * @param localesToInitialize the set of locales to initialize at bootstrap
 	 * @param classLoader the classloader to be used for loading the bundle. If {@code null}, the current thread context
 	 * classloader and finally Hibernate Validator's own classloader will be used for loading the specified
 	 * bundle.
-	 * @param preloadResourceBundles if resource bundles should be initialized when initializing the locator
 	 *
 	 * @since 6.1.1
 	 */
 	@Incubating
-	public PlatformResourceBundleLocator(String bundleName, boolean preloadResourceBundles, Set<Locale> localesToInitialize, ClassLoader classLoader) {
-		this( bundleName, preloadResourceBundles, localesToInitialize, classLoader, false );
+	public PlatformResourceBundleLocator(String bundleName, Set<Locale> localesToInitialize, ClassLoader classLoader) {
+		this( bundleName, localesToInitialize, classLoader, false );
 	}
 
 	/**
 	 * Creates a new {@link PlatformResourceBundleLocator}.
 	 *
 	 * @param bundleName the name of the bundle to load
-	 * @param preloadResourceBundles if resource bundles should be initialized when initializing the locator
 	 * @param localesToInitialize the set of locales to initialize at bootstrap
 	 * @param classLoader the classloader to be used for loading the bundle. If {@code null}, the current thread context
 	 * classloader and finally Hibernate Validator's own classloader will be used for loading the specified
@@ -142,7 +138,6 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 */
 	@Incubating
 	public PlatformResourceBundleLocator(String bundleName,
-			boolean preloadResourceBundles,
 			Set<Locale> localesToInitialize,
 			ClassLoader classLoader,
 			boolean aggregate) {
@@ -153,11 +148,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 
 		this.aggregate = aggregate && RESOURCE_BUNDLE_CONTROL_INSTANTIABLE;
 
-		this.preloadResourceBundles = preloadResourceBundles;
-
-		if ( preloadResourceBundles ) {
-			Contracts.assertNotEmpty( localesToInitialize, "localesToInitialize may not be empty if resource bundles have to be preloaded" );
-
+		if ( !localesToInitialize.isEmpty() ) {
 			Map<Locale, ResourceBundle> tmpPreloadedResourceBundles = CollectionHelper.newHashMap( localesToInitialize.size() );
 			for ( Locale localeToPreload : localesToInitialize ) {
 				tmpPreloadedResourceBundles.put( localeToPreload, doGetResourceBundle( localeToPreload ) );
@@ -179,7 +170,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 */
 	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
-		if ( preloadResourceBundles ) {
+		if ( !preloadedResourceBundles.isEmpty() ) {
 			// we need to use containsKey() as the cached resource bundle can be null
 			if ( preloadedResourceBundles.containsKey( locale ) ) {
 				return preloadedResourceBundles.get( locale );
