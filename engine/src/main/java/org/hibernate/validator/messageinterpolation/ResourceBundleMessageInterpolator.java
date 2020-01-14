@@ -171,7 +171,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 		}
 		catch (Throwable e) {
 			LOG.debugv( e, "Failed to load expression factory via classloader {0}",
-					Thread.currentThread().getContextClassLoader() );
+					run( GetClassLoader.fromContext() ) );
 			return false;
 		}
 	}
