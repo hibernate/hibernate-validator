@@ -151,7 +151,8 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 
 		List<PlatformResourceBundleLocator> tmpBundleLocators = new ArrayList<>( bundleNames.size() );
 		for ( String bundleName : bundleNames ) {
-			tmpBundleLocators.add( new PlatformResourceBundleLocator( bundleName, preloadResourceBundles, localesToInitialize, classLoader ) );
+			tmpBundleLocators
+					.add( new PlatformResourceBundleLocator( bundleName, preloadResourceBundles ? localesToInitialize : Collections.emptySet(), classLoader ) );
 		}
 		this.resourceBundleLocators = CollectionHelper.toImmutableList( tmpBundleLocators );
 	}
