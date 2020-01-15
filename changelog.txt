@@ -1,6 +1,21 @@
 Hibernate Validator Changelog
 =============================
 
+6.1.1.Final (15-01-2020)
+-------------------------
+
+** Improvement
+    * HV-1750 - engine        - Add debug log when expression factory has failed to load
+    * HV-1747 - engine        - Allow overriding the message interpolator in PredefinedScopeValidatorFactory context
+    * HV-1744 - documentation - Use auto-expanding entries in the documentation TOC
+
+** New Feature
+    * HV-1749 - engine        - Introduce a LocaleResolver SPI
+    * HV-1748 - engine        - Improve localization support via Locale.LanguageRange
+
+** Task
+    * HV-1745 - tests         - Bump Jackson test dependency to 2.10.1
+
 6.1.0.Final (25-10-2019)
 -------------------------
 
