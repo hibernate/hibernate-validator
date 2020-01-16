@@ -142,7 +142,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 			if ( beanMetaDataClassNormalizerInstance.isResolvable() ) {
 				BeanMetaDataClassNormalizer normalizer = beanMetaDataClassNormalizerInstance.get();
 				destructibleResources.add( new DestructibleBeanInstance<>( beanManager, normalizer ) );
-				
+
 				hvConfig.beanMetaDataClassNormalizer( normalizer );
 			}
 		}
