@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.literal.NamedLiteral;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
@@ -37,12 +39,15 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cdi.spi.BeanNames;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.GetInstancesFromServiceLoader;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 
 /**
  * A {@link Bean} representing a {@link ValidatorFactory}. There is one instance of this type representing the default
@@ -125,6 +130,22 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		config.traversableResolver( createTraversableResolver( config ) );
 		config.parameterNameProvider( createParameterNameProvider( config ) );
 		config.clockProvider( createClockProvider( config ) );
+
+		if ( config instanceof HibernateValidatorConfiguration ) {
+			HibernateValidatorConfiguration hvConfig = (HibernateValidatorConfiguration) config;
+			Instance<BeanMetaDataClassNormalizer> beanMetaDataClassNormalizerInstance =
+					beanManager.createInstance()
+							.select(
+									BeanMetaDataClassNormalizer.class,
+									NamedLiteral.of( BeanNames.BEAN_META_DATA_CLASS_NORMALIZER )
+							);
+			if ( beanMetaDataClassNormalizerInstance.isResolvable() ) {
+				BeanMetaDataClassNormalizer normalizer = beanMetaDataClassNormalizerInstance.get();
+				destructibleResources.add( new DestructibleBeanInstance<>( beanManager, normalizer ) );
+				
+				hvConfig.beanMetaDataClassNormalizer( normalizer );
+			}
+		}
 
 		addValueExtractorBeans( config );
 
