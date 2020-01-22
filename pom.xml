@@ -244,6 +244,10 @@
         <jboss.snapshots.repo.id>jboss-snapshots-repository</jboss.snapshots.repo.id>
         <jboss.snapshots.repo.url>https://repository.jboss.org/nexus/content/repositories/snapshots/</jboss.snapshots.repo.url>
 
+        <!-- Maven Central repository -->
+
+        <mavencentral.repo.url>https://repo.maven.apache.org/maven2/</mavencentral.repo.url>
+
         <!-- Build settings -->
 
         <hibernate-validator-parent.path>.</hibernate-validator-parent.path>
