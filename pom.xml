@@ -216,6 +216,9 @@
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
         <forbiddenapis.jdk.target>10</forbiddenapis.jdk.target>
 
+        <!-- Maven Central repository -->
+        <mavencentral.repo.url>https://repo.maven.apache.org/maven2/</mavencentral.repo.url>
+
         <hibernate-validator-parent.path>.</hibernate-validator-parent.path>
     </properties>
 
