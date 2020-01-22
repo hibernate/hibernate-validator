@@ -168,6 +168,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <reuseForks>false</reuseForks>
+                    <systemPropertyVariables>
+                        <maven.mavencentral.repo.url>${mavencentral.repo.url}</maven.mavencentral.repo.url>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>

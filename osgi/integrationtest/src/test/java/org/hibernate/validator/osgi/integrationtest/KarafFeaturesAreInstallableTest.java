@@ -67,6 +67,8 @@ public class KarafFeaturesAreInstallableTest {
 				.type( "xml" )
 				.versionAsInProject();
 
+		String mavenCentralRepository = System.getProperty( "maven.mavencentral.repo.url" );
+
 		return options(
 				when( DEBUG ).useOptions( debugConfiguration( "5005", true ) ),
 				when( JavaVersionUtil.getMajorVersion() >= 9 ).useOptions( JAVA_9.options() ),
@@ -91,6 +93,11 @@ public class KarafFeaturesAreInstallableTest {
 						"etc/org.apache.karaf.features.cfg",
 						"featuresBoot",
 						"system"
+				),
+				editConfigurationFilePut( // Erase the defaults: Maven Central uses HTTP by default...
+						"etc/org.ops4j.pax.url.mvn.cfg",
+						"org.ops4j.pax.url.mvn.repositories",
+						mavenCentralRepository + "@id=central"
 				),
 				systemProperty( "validatorRepositoryUrl" ).value( hibernateValidatorFeature.getURL() )
 		);
