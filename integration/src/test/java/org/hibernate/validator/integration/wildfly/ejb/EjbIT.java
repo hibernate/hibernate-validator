@@ -23,6 +23,11 @@ import io.restassured.filter.log.ErrorLoggingFilter;
 import io.restassured.http.ContentType;
 import org.testng.annotations.Test;
 
+/**
+ * This is a reproducer for WFL-11566, but fixing the problem requires changes in WildFly.
+ * Thus it is ignored for now.
+ * See HV-1754.
+ */
 public class EjbIT extends AbstractArquillianIT {
 	private static final String WAR_FILE_NAME = EjbIT.class.getSimpleName() + ".war";
 	private static final String APPLICATION_PATH = EjbIT.class.getSimpleName();
@@ -42,7 +47,7 @@ public class EjbIT extends AbstractArquillianIT {
 				);
 	}
 
-	@Test
+	@Test(enabled = false)
 	@RunAsClient
 	public void testRestEasyWorks() {
 		given()
@@ -55,7 +60,7 @@ public class EjbIT extends AbstractArquillianIT {
 				.body( equalTo( "Hello bars a, b, c" ) );
 	}
 
-	@Test
+	@Test(enabled = false)
 	@RunAsClient
 	public void testValidationWorks() {
 		given()
