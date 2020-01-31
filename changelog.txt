@@ -1,6 +1,15 @@
 Hibernate Validator Changelog
 =============================
 
+6.1.2.Final (31-01-2020)
+-------------------------
+
+** Bug
+    * HV-1756 - translations - Incorrect variables in the newly added translations
+
+** Task
+    * HV-1753 - tests        - Force Pax-Exam and Karaf to use Maven Central repository with SSL enabled
+
 6.1.1.Final (15-01-2020)
 -------------------------
 
