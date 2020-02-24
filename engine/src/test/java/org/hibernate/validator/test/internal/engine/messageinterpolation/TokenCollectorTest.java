@@ -8,7 +8,11 @@ package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.Token;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.TokenCollector;
+
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ListAssert;
 import org.testng.annotations.Test;
 
 /**
@@ -29,8 +33,23 @@ public class TokenCollectorTest {
 	}
 
 	@Test(expectedExceptions = MessageDescriptorFormatException.class, expectedExceptionsMessageRegExp = "HV000168.*")
-	public void testELExpressionWithoutOpeningBraceThrowsException() throws Exception {
+	public void testELExpressionDollarThenClosingBraceThrowsException() throws Exception {
 		new TokenCollector( "$}", InterpolationTermType.EL );
+	}
+
+	@Test
+	public void testELExpressionDollarThenEscapeInterpretedAsLiterals() {
+		ListAssert<Token> assertion = Assertions.assertThat(
+				new TokenCollector( "$\\A{1+1}", InterpolationTermType.EL )
+						.getTokenList()
+		)
+				.hasSize( 2 );
+		assertion.element( 0 )
+				.returns( "$\\A", Token::getTokenValue )
+				.returns( false, Token::isParameter );
+		assertion.element( 1 )
+				.returns( "{1+1}", Token::getTokenValue )
+				.returns( false, Token::isParameter );
 	}
 
 	@Test(expectedExceptions = MessageDescriptorFormatException.class, expectedExceptionsMessageRegExp = "HV000168.*")
