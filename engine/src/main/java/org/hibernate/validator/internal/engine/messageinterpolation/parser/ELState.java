@@ -56,7 +56,11 @@ public class ELState implements ParserState {
 	@Override
 	public void handleEscapeCharacter(char character, TokenCollector tokenCollector)
 			throws MessageDescriptorFormatException {
-		tokenCollector.transitionState( new EscapedState( this ) );
+		tokenCollector.appendToToken( EL_DESIGNATOR );
+		tokenCollector.appendToToken( character );
+		// Do not go back to this state after the escape: $\ is not the start of an EL expression
+		ParserState stateAfterEscape = new MessageState();
+		tokenCollector.transitionState( new EscapedState( stateAfterEscape ) );
 	}
 
 	@Override
