@@ -208,6 +208,20 @@ public class ConstraintValidatorContextTest {
 		}
 	}
 
+	@Test
+	public void testInjectionCausedByRecklessConcatenation() {
+		String maliciousPayload = "$\\A{1 + 1}";
+
+		// Simulate user entry, through a web form for example
+		MyObjectWithELInjectionRiskCausedByRecklessConcatenation object = new MyObjectWithELInjectionRiskCausedByRecklessConcatenation();
+		object.field1 = maliciousPayload;
+		Set<ConstraintViolation<MyObjectWithELInjectionRiskCausedByRecklessConcatenation>> constraintViolations = validator.validate( object );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ValidationWithELInjectionRiskCausedByRecklessConcatenation.class )
+						.withMessage( "Value '" + maliciousPayload + "' is invalid" )
+		);
+	}
+
 	@MyClassLevelValidation
 	private static class MyObject {
 		@NotNull
@@ -276,6 +290,13 @@ public class ConstraintValidatorContextTest {
 		public String getName() {
 			return null;
 		}
+	}
+
+	@ValidationWithELInjectionRiskCausedByRecklessConcatenation
+	private static class MyObjectWithELInjectionRiskCausedByRecklessConcatenation {
+
+		String field1;
+
 	}
 
 	@Retention(RUNTIME)
@@ -483,6 +504,36 @@ public class ConstraintValidatorContextTest {
 						.addConstraintViolation();
 
 				return false;
+			}
+		}
+	}
+
+	@Retention(RUNTIME)
+	@Constraint(validatedBy = ValidationWithELInjectionRiskCausedByRecklessConcatenation.Validator.class)
+	public @interface ValidationWithELInjectionRiskCausedByRecklessConcatenation {
+		String message() default "failed";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
+
+		class Validator
+				implements ConstraintValidator<ValidationWithELInjectionRiskCausedByRecklessConcatenation, MyObjectWithELInjectionRiskCausedByRecklessConcatenation> {
+
+			@Override
+			public boolean isValid(MyObjectWithELInjectionRiskCausedByRecklessConcatenation value, ConstraintValidatorContext context) {
+				context.disableDefaultConstraintViolation();
+
+				// This is bad practice: message parameters should be used instead.
+				// Regardless, it can happen and should work as well as possible.
+				context.buildConstraintViolationWithTemplate( "Value '" + escape( value.field1 ) + "' is invalid" )
+						.addConstraintViolation();
+
+				return false;
+			}
+
+			private String escape(String value) {
+				return value.replaceAll( "\\$+\\{", "{" );
 			}
 		}
 	}
