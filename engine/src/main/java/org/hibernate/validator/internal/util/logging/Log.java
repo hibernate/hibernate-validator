@@ -606,8 +606,8 @@ public interface Log extends BasicLogger {
 	ValidationException getOverridingConstraintDefinitionsInMultipleMappingFilesException(String constraintClassName);
 
 	@Message(id = 168,
-			value = "The message descriptor '%1$s' contains an unbalanced meta character '%2$c' parameter.")
-	MessageDescriptorFormatException getNonTerminatedParameterException(String messageDescriptor, char character);
+			value = "The message descriptor '%1$s' contains an unbalanced meta character '%2$c'.")
+	MessageDescriptorFormatException getUnbalancedBeginEndParameterException(String messageDescriptor, char character);
 
 	@Message(id = 169,
 			value = "The message descriptor '%1$s' has nested parameters.")

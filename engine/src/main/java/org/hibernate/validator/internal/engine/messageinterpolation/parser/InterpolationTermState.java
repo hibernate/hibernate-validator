@@ -22,7 +22,7 @@ public class InterpolationTermState implements ParserState {
 
 	@Override
 	public void terminate(TokenCollector tokenCollector) throws MessageDescriptorFormatException {
-		throw LOG.getNonTerminatedParameterException(
+		throw LOG.getUnbalancedBeginEndParameterException(
 				tokenCollector.getOriginalMessageDescriptor(),
 				BEGIN_TERM
 		);
