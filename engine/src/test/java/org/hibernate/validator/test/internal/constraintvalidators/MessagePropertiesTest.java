@@ -206,6 +206,11 @@ public class MessagePropertiesTest {
 						"Message for constraint " + violation.getConstraintDescriptor().getAnnotation().annotationType() + " and locale " + locale
 								+ " contains a curly brace: " + violation.getMessage() );
 			}
+			if ( violation.getMessage().contains( "$" ) ) {
+				invalidMessages.add(
+						"Message for constraint " + violation.getConstraintDescriptor().getAnnotation().annotationType() + " and locale " + locale
+								+ " contains a dollar sign: " + violation.getMessage() );
+			}
 		}
 	}
 
