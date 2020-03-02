@@ -1,6 +1,6 @@
 package org.hibernate.validator.referenceguide.chapter12.relaxation;
 
-import javax.validation.Validation;
+import jakarta.validation.Validation;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;

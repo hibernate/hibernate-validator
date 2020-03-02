@@ -1,6 +1,6 @@
 package org.hibernate.validator.referenceguide.chapter11.cdi.injection;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class VehicleRegistry {

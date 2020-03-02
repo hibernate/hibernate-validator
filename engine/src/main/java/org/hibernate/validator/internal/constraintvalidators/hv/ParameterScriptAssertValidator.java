@@ -13,10 +13,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraintvalidation.SupportedValidationTarget;
-import javax.validation.constraintvalidation.ValidationTarget;
-import javax.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraintvalidation.SupportedValidationTarget;
+import jakarta.validation.constraintvalidation.ValidationTarget;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;

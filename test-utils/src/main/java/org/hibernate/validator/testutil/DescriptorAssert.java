@@ -11,12 +11,12 @@ import static org.testng.Assert.fail;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.validation.metadata.GroupConversionDescriptor;
+import jakarta.validation.metadata.GroupConversionDescriptor;
 
 import org.assertj.core.api.IterableAssert;
 
 /**
- * Provides assertion methods for testing {@link javax.validation.metadata.ElementDescriptor}
+ * Provides assertion methods for testing {@link jakarta.validation.metadata.ElementDescriptor}
  * implementations and collections thereof.
  *
  * @author Gunnar Morling

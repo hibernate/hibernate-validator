@@ -21,10 +21,10 @@ import java.time.chrono.JapaneseDate;
 import java.time.chrono.MinguoDate;
 import java.time.chrono.ThaiBuddhistDate;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.PastOrPresent;
 
 /**
  * @author Khalid Alqinyah

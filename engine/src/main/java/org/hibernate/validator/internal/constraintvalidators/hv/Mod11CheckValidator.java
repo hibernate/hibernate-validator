@@ -9,7 +9,7 @@ package org.hibernate.validator.internal.constraintvalidators.hv;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.List;
-import javax.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidator;
 
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Mod11Check.ProcessingDirection;

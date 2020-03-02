@@ -7,7 +7,7 @@
 
 package org.hibernate.validator;
 
-import javax.validation.ValidatorFactory;
+import jakarta.validation.ValidatorFactory;
 
 /**
  * Provides Hibernate Validator extensions to {@link ValidatorFactory} in the context of a predefined scope.

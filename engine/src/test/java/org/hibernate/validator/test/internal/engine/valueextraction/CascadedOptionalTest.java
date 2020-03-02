@@ -16,10 +16,10 @@ import static org.testng.Assert.assertTrue;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeClass;

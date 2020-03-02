@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.valueextraction.model;
 
-import javax.validation.valueextraction.ExtractedValue;
-import javax.validation.valueextraction.ValueExtractor;
+import jakarta.validation.valueextraction.ExtractedValue;
+import jakarta.validation.valueextraction.ValueExtractor;
 
 /**
  * @author Gunnar Morling

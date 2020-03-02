@@ -9,11 +9,11 @@ package org.hibernate.validator.test.internal.metadata;
 import java.time.LocalDate;
 import java.util.Set;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotNull;
-import javax.validation.groups.ConvertGroup;
-import javax.validation.groups.Default;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.groups.ConvertGroup;
+import jakarta.validation.groups.Default;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 

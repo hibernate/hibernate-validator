@@ -4,8 +4,8 @@ package org.hibernate.validator.referenceguide.chapter03.cascaded.containereleme
 //end::include[]
 
 import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 //tag::include[]
 public class Garage {

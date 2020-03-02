@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.cdi.internal.methodvalidation.getter;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author Hardy Ferentschik

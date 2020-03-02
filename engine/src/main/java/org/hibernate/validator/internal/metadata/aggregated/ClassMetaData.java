@@ -9,7 +9,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ElementKind;
+import jakarta.validation.ElementKind;
 
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;

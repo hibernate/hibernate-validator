@@ -347,8 +347,8 @@ public class AnnotationApiHelper {
 	}
 
 	/**
-	 * Checks the annotation's payload for unwrapping option ({@code javax.validation.valueextraction.Unwrapping.Unwrap},
-	 * {@code javax.validation.valueextraction.Unwrapping.Skip}) of constraint.
+	 * Checks the annotation's payload for unwrapping option ({@code jakarta.validation.valueextraction.Unwrapping.Unwrap},
+	 * {@code jakarta.validation.valueextraction.Unwrapping.Skip}) of constraint.
 	 *
 	 * @param annotationMirror constraint annotation mirror under check
 	 * @return unwrapping option, if one is present in the annotation payload, {@link UnwrapMode#NONE} otherwise
@@ -359,7 +359,7 @@ public class AnnotationApiHelper {
 				.map( type -> (TypeMirror) type )
 				.map( typeUtils::asElement )
 				.map( elem -> ( (TypeElement) elem ).getQualifiedName() )
-				.filter( name -> name.toString().startsWith( "javax.validation.valueextraction.Unwrapping." ) )
+				.filter( name -> name.toString().startsWith( "jakarta.validation.valueextraction.Unwrapping." ) )
 				.map( UnwrapMode::of )
 				.findAny().orElse( UnwrapMode.NONE );
 	}
@@ -368,10 +368,10 @@ public class AnnotationApiHelper {
 		UNWRAP, SKIP, NONE;
 
 		public static UnwrapMode of(Name qualifiedName) {
-			if ( "javax.validation.valueextraction.Unwrapping.Unwrap".equals( qualifiedName.toString() ) ) {
+			if ( "jakarta.validation.valueextraction.Unwrapping.Unwrap".equals( qualifiedName.toString() ) ) {
 				return UNWRAP;
 			}
-			else if ( "javax.validation.valueextraction.Unwrapping.Skip".equals( qualifiedName.toString() ) ) {
+			else if ( "jakarta.validation.valueextraction.Unwrapping.Skip".equals( qualifiedName.toString() ) ) {
 				return SKIP;
 			}
 			else {

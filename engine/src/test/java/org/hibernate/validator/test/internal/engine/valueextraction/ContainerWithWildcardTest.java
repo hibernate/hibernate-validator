@@ -15,8 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
 

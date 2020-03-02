@@ -11,7 +11,7 @@ package org.hibernate.validator.path;
  *
  * @author Guillaume Smet
  */
-public interface ContainerElementNode extends javax.validation.Path.ContainerElementNode {
+public interface ContainerElementNode extends jakarta.validation.Path.ContainerElementNode {
 
 	/**
 	 * @return Returns the value of the container element represented by this node.

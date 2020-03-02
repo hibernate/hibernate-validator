@@ -8,7 +8,7 @@ package org.hibernate.validator.cfg;
 
 import java.lang.annotation.Annotation;
 
-import javax.validation.Payload;
+import jakarta.validation.Payload;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 

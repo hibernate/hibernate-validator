@@ -8,8 +8,8 @@ package org.hibernate.validator.internal.constraintvalidators.hv;
 
 import java.util.List;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.SafeHtml;
 import org.jsoup.Jsoup;

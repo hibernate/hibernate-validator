@@ -17,12 +17,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.constraints.NotNull;
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.MethodDescriptor;
-import javax.validation.metadata.ParameterDescriptor;
-import javax.validation.metadata.Scope;
+import jakarta.validation.ConstraintDeclarationException;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.metadata.MethodDescriptor;
+import jakarta.validation.metadata.ParameterDescriptor;
+import jakarta.validation.metadata.Scope;
 
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;

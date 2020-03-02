@@ -3,8 +3,8 @@ package org.hibernate.validator.referenceguide.chapter03.cascaded;
 
 //end::include[]
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 //tag::include[]
 public class Car {

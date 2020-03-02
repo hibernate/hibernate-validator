@@ -9,7 +9,7 @@ package org.hibernate.validator.test.internal.metadata.core;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.List;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.Pattern;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

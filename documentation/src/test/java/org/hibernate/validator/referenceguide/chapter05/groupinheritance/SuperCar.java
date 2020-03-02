@@ -2,7 +2,7 @@
 package org.hibernate.validator.referenceguide.chapter05.groupinheritance;
 
 //end::include[]
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 
 import org.hibernate.validator.referenceguide.chapter05.Car;
 

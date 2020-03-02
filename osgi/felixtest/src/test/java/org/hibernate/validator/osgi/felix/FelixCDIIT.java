@@ -8,7 +8,7 @@ package org.hibernate.validator.osgi.felix;
 
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;

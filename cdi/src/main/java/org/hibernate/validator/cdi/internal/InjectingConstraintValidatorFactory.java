@@ -9,10 +9,10 @@ package org.hibernate.validator.cdi.internal;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorFactory;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.inject.Inject;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorFactory;
 
 import org.hibernate.validator.internal.util.Contracts;
 

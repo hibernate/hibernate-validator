@@ -14,8 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.GroupSequence;
-import javax.validation.groups.Default;
+import jakarta.validation.GroupSequence;
+import jakarta.validation.groups.Default;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;

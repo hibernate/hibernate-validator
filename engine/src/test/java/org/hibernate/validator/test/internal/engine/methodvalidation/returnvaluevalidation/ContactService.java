@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.returnvaluevalidation;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * @author Hardy Ferentschik

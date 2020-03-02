@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.constraints.boolcomposition.localconstrval;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * Test mode for HV-390.

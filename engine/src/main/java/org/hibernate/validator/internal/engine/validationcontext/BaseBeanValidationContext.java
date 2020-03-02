@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.internal.engine.validationcontext;
 
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
-import javax.validation.Validator;
+import jakarta.validation.Path;
+import jakarta.validation.TraversableResolver;
+import jakarta.validation.Validator;
 
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;

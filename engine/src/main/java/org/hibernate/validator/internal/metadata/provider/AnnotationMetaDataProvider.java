@@ -34,9 +34,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.GroupSequence;
-import javax.validation.Valid;
-import javax.validation.groups.ConvertGroup;
+import jakarta.validation.GroupSequence;
+import jakarta.validation.Valid;
+import jakarta.validation.groups.ConvertGroup;
 
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;

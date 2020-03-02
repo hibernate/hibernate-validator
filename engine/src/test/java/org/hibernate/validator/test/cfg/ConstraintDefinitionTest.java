@@ -21,14 +21,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Set;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.ConstraintViolation;
-import javax.validation.Payload;
-import javax.validation.UnexpectedTypeException;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
+import jakarta.validation.Constraint;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Payload;
+import jakarta.validation.UnexpectedTypeException;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -67,7 +67,7 @@ public class ConstraintDefinitionTest {
 
 	@Test(
 			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: The annotation type must be annotated with @javax.validation.Constraint when creating a constraint definition."
+			expectedExceptionsMessageRegExp = "HV[0-9]*: The annotation type must be annotated with @jakarta.validation.Constraint when creating a constraint definition."
 	)
 	public void testNonConstraintAnnotation() {
 		mapping.constraintDefinition( NonConstraintAnnotation.class );

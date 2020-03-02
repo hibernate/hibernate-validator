@@ -1,9 +1,9 @@
 package org.hibernate.validator.referenceguide.chapter04.complete;
 
 import java.math.BigDecimal;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 
 /**
  * Exception thrown in case the message descriptor is invalid, for example unbalanced braces or escape characters

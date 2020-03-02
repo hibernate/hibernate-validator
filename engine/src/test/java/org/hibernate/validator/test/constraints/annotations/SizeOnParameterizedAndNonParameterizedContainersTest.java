@@ -16,8 +16,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.constraints.Size;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.testutil.TestForIssue;
 

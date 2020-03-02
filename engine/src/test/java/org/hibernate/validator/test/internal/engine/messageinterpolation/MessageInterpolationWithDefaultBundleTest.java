@@ -12,12 +12,12 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import java.util.Locale;
 import java.util.Set;
 
-import javax.validation.Configuration;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Email;
+import jakarta.validation.Configuration;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Email;
 
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;

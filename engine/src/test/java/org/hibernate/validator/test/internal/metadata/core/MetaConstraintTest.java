@@ -12,7 +12,7 @@ import static org.testng.Assert.assertEquals;
 import java.lang.reflect.Method;
 import java.util.Collections;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;

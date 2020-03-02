@@ -19,8 +19,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.valueextraction.ValueExtractor;
+import jakarta.validation.ConstraintDeclarationException;
+import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.aggregated.ContainerCascadingMetaData;

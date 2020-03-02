@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.test.internal.engine.traversableresolver;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.Valid;
-import javax.validation.GroupSequence;
-import javax.validation.groups.Default;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.Valid;
+import jakarta.validation.GroupSequence;
+import jakarta.validation.groups.Default;
 
 /**
  * @author Emmanuel Bernard

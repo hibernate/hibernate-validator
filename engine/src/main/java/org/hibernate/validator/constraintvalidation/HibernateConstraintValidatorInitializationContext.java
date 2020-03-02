@@ -9,7 +9,7 @@ package org.hibernate.validator.constraintvalidation;
 import java.time.Clock;
 import java.time.Duration;
 
-import javax.validation.ClockProvider;
+import jakarta.validation.ClockProvider;
 
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;

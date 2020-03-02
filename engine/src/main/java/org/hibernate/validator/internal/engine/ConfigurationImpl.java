@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import javax.validation.spi.BootstrapState;
-import javax.validation.spi.ConfigurationState;
-import javax.validation.spi.ValidationProvider;
+import jakarta.validation.spi.BootstrapState;
+import jakarta.validation.spi.ConfigurationState;
+import jakarta.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 

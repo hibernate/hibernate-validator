@@ -8,8 +8,8 @@ package org.hibernate.validator.integration.cdi.configuration;
 
 import java.lang.annotation.ElementType;
 import javax.inject.Inject;
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
+import jakarta.validation.Path;
+import jakarta.validation.TraversableResolver;
 
 import org.hibernate.validator.integration.cdi.service.PingService;
 

@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
-import javax.validation.GroupSequence;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Min.List;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.GroupSequence;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Min.List;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup1;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup2;

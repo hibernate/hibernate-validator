@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;

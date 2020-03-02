@@ -10,10 +10,10 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.time.LocalDate;
 
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.ConstraintDeclarationException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
 

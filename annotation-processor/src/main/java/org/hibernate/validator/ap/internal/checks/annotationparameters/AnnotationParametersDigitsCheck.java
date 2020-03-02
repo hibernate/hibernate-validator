@@ -17,7 +17,7 @@ import org.hibernate.validator.ap.internal.util.CollectionHelper;
 import org.hibernate.validator.ap.internal.util.TypeNames;
 
 /**
- * Checks that the parameters used on {@code javax.validation.constraints.Digits} annotations are valid.
+ * Checks that the parameters used on {@code jakarta.validation.constraints.Digits} annotations are valid.
  *
  * @author Marko Bekhta
  */

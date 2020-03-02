@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.metadata.ElementDescriptor;
+import jakarta.validation.metadata.ElementDescriptor;
 
 /**
  * Describes a validated type class-level constraints.

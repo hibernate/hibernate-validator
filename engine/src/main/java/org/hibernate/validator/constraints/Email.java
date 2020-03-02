@@ -19,11 +19,11 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.validation.Constraint;
-import javax.validation.OverridesAttribute;
-import javax.validation.Payload;
-import javax.validation.ReportAsSingleViolation;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.Constraint;
+import jakarta.validation.OverridesAttribute;
+import jakarta.validation.Payload;
+import jakarta.validation.ReportAsSingleViolation;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * The string has to be a well-formed email address.
@@ -31,7 +31,7 @@ import javax.validation.constraints.Pattern;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  *
- * @deprecated use the standard {@link javax.validation.constraints.Email} constraint instead
+ * @deprecated use the standard {@link jakarta.validation.constraints.Email} constraint instead
  */
 @Documented
 @Constraint(validatedBy = { })

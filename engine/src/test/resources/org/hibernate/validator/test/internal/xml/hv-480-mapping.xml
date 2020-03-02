@@ -13,7 +13,7 @@
 
     <bean class="org.hibernate.validator.test.internal.xml.Customer" ignore-annotations="false">
         <getter name="firstName">
-            <constraint annotation="javax.validation.constraints.Size">
+            <constraint annotation="jakarta.validation.constraints.Size">
                 <element name="min">1</element>
                 <element name="max">10</element>
             </constraint>

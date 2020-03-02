@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.validationordergenerator;
 
-import javax.validation.GroupSequence;
+import jakarta.validation.GroupSequence;
 
 /**
  * @author Hardy Ferentschik

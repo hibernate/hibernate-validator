@@ -18,16 +18,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintViolation;
-import javax.validation.GroupSequence;
-import javax.validation.Valid;
-import javax.validation.Validator;
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.validation.groups.ConvertGroup;
-import javax.validation.groups.Default;
+import jakarta.validation.ConstraintDeclarationException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.GroupSequence;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.groups.ConvertGroup;
+import jakarta.validation.groups.Default;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;

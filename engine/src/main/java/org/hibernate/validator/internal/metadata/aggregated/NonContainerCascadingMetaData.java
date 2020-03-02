@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.TypeVariable;
 import java.util.Set;
 
-import javax.validation.metadata.GroupConversionDescriptor;
+import jakarta.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;

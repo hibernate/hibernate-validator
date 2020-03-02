@@ -3,11 +3,11 @@ package org.hibernate.validator.referenceguide.chapter12.nodenameprovider;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.HibernateValidator;
 

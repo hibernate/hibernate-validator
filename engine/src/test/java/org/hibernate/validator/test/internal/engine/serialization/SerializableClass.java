@@ -9,8 +9,8 @@ package org.hibernate.validator.test.internal.engine.serialization;
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.validation.Payload;
-import javax.validation.constraints.Size;
+import jakarta.validation.Payload;
+import jakarta.validation.constraints.Size;
 
 /**
  * @author Hardy Ferentschik

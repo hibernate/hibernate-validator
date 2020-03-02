@@ -12,18 +12,18 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.annotation.Priority;
-import javax.inject.Inject;
-import javax.interceptor.AroundConstruct;
-import javax.interceptor.AroundInvoke;
-import javax.interceptor.Interceptor;
-import javax.interceptor.InvocationContext;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.ElementKind;
-import javax.validation.Path;
-import javax.validation.Validator;
-import javax.validation.executable.ExecutableValidator;
+import jakarta.annotation.Priority;
+import jakarta.inject.Inject;
+import jakarta.interceptor.AroundConstruct;
+import jakarta.interceptor.AroundInvoke;
+import jakarta.interceptor.Interceptor;
+import jakarta.interceptor.InvocationContext;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ElementKind;
+import jakarta.validation.Path;
+import jakarta.validation.Validator;
+import jakarta.validation.executable.ExecutableValidator;
 
 /**
  * An interceptor which performs a validation of the Bean Validation constraints specified at the parameters and/or return

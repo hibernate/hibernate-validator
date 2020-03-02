@@ -4,7 +4,7 @@ package org.hibernate.validator.referenceguide.chapter03.crossparameter.constrai
 //end::include[]
 
 import java.util.List;
-import javax.validation.ConstraintTarget;
+import jakarta.validation.ConstraintTarget;
 
 //tag::include[]
 public class Garage {

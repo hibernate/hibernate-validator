@@ -7,7 +7,7 @@
 
 package org.hibernate.validator.cfg.defs;
 
-import javax.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMax;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 

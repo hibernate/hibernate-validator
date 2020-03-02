@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import javax.inject.Inject;
-import javax.validation.ParameterNameProvider;
+import jakarta.validation.ParameterNameProvider;
 
 import org.hibernate.validator.integration.cdi.service.PingService;
 

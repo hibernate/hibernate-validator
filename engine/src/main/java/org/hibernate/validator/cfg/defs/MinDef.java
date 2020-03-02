@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 

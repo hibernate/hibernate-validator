@@ -6,7 +6,7 @@ package org.hibernate.validator.referenceguide.chapter09;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
-import javax.validation.ParameterNameProvider;
+import jakarta.validation.ParameterNameProvider;
 
 //tag::include[]
 public class MyParameterNameProvider implements ParameterNameProvider {

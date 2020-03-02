@@ -18,10 +18,10 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ElementKind;
-import javax.validation.Path;
-import javax.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ElementKind;
+import jakarta.validation.Path;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.IterableAssert;

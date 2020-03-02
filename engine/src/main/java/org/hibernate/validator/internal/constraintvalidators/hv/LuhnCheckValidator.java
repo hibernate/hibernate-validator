@@ -7,7 +7,7 @@
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
 import java.util.List;
-import javax.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidator;
 
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.internal.util.ModUtil;

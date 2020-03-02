@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.fail;
 
 import javax.inject.Inject;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
 import org.hibernate.validator.integration.AbstractArquillianIT;

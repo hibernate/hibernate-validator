@@ -4,8 +4,8 @@ package org.hibernate.validator.referenceguide.chapter11.cdi.methodvalidation;
 //end::include[]
 
 import java.util.Date;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 
 //tag::include[]
 @RequestScoped

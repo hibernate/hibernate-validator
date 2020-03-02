@@ -8,7 +8,7 @@ package org.hibernate.validator.test.constraints.annotations;
 
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
-import javax.validation.Validator;
+import jakarta.validation.Validator;
 
 import org.testng.annotations.BeforeMethod;
 

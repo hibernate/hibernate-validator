@@ -1,7 +1,7 @@
 package org.hibernate.validator.referenceguide.chapter06.crossparameter;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class ScriptAssertObjectValidator implements
 		ConstraintValidator<ScriptAssert, Object> {

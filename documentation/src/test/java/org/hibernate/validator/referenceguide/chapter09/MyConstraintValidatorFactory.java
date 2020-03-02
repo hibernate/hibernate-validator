@@ -3,8 +3,8 @@ package org.hibernate.validator.referenceguide.chapter09;
 
 //end::include[]
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorFactory;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorFactory;
 
 //tag::include[]
 public class MyConstraintValidatorFactory implements ConstraintValidatorFactory {

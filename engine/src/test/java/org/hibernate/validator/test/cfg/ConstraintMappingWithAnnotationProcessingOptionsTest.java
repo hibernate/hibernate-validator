@@ -22,17 +22,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Set;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintTarget;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.ConstraintViolation;
-import javax.validation.Payload;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-import javax.validation.metadata.ConstructorDescriptor;
-import javax.validation.metadata.MethodDescriptor;
-import javax.validation.metadata.MethodType;
+import jakarta.validation.Constraint;
+import jakarta.validation.ConstraintTarget;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Payload;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.metadata.ConstructorDescriptor;
+import jakarta.validation.metadata.MethodDescriptor;
+import jakarta.validation.metadata.MethodType;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;

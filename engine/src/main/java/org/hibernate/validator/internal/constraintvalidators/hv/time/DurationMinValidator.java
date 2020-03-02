@@ -8,8 +8,8 @@ package org.hibernate.validator.internal.constraintvalidators.hv.time;
 
 import java.time.Duration;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.time.DurationMin;
 

@@ -12,10 +12,10 @@ import static org.testng.Assert.fail;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.testutil.TestForIssue;

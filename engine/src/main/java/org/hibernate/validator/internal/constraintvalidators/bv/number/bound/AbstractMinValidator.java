@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.number.bound;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Min;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraints.Min;
 
 /**
  * Check that the number being validated is greater than or equal to the minimum

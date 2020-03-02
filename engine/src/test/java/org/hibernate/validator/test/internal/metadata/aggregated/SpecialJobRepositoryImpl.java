@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author Gunnar Morling

@@ -10,9 +10,9 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Min;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForCharSequence;

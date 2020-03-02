@@ -7,8 +7,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 import java.util.Map;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 

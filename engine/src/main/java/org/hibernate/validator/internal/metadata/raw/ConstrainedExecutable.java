@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;

@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.groups;
 
-import javax.validation.groups.Default;
+import jakarta.validation.groups.Default;
 
 /**
  * Encapsulates a single group.

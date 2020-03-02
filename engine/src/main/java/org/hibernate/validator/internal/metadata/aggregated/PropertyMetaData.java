@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.ElementKind;
+import jakarta.validation.ElementKind;
 
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;

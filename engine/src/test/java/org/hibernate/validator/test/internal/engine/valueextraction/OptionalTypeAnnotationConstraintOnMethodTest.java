@@ -26,15 +26,15 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintViolation;
-import javax.validation.Payload;
-import javax.validation.ReportAsSingleViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import javax.validation.valueextraction.Unwrapping;
+import jakarta.validation.Constraint;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Payload;
+import jakarta.validation.ReportAsSingleViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+import jakarta.validation.valueextraction.Unwrapping;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;

@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.past;
 
 import java.time.Duration;
 
-import javax.validation.constraints.Past;
+import jakarta.validation.constraints.Past;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractEpochBasedTimeValidator;
 

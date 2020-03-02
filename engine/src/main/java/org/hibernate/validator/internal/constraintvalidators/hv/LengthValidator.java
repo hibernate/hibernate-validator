@@ -8,8 +8,8 @@ package org.hibernate.validator.internal.constraintvalidators.hv;
 
 import java.lang.invoke.MethodHandles;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.internal.util.logging.Log;

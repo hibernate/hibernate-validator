@@ -1,10 +1,10 @@
 package org.hibernate.validator.referenceguide.chapter03.inheritance.parameter;
 
 import java.lang.reflect.Method;
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.Validation;
-import javax.validation.ValidatorFactory;
-import javax.validation.executable.ExecutableValidator;
+import jakarta.validation.ConstraintDeclarationException;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.executable.ExecutableValidator;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

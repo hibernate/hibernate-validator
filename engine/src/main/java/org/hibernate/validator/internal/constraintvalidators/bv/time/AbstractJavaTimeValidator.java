@@ -12,9 +12,9 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.temporal.TemporalAccessor;
 
-import javax.validation.ClockProvider;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.ClockProvider;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;

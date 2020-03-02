@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.integration.wildfly.generictype;
 
-import javax.validation.executable.ExecutableType;
-import javax.validation.executable.ValidateOnExecution;
+import jakarta.validation.executable.ExecutableType;
+import jakarta.validation.executable.ValidateOnExecution;
 
 @ValidateOnExecution(type = ExecutableType.ALL)
 public class StringImpl implements StringInterface {

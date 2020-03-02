@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.xml.mixedconfiguration.annotation;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 public abstract class Game {
 

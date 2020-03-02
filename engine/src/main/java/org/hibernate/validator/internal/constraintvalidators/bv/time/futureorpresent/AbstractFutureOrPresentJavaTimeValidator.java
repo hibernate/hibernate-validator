@@ -9,7 +9,7 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpr
 import java.time.Duration;
 import java.time.temporal.TemporalAccessor;
 
-import javax.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.FutureOrPresent;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractJavaTimeValidator;
 

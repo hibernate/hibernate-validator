@@ -12,9 +12,9 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.constraints.NotNull;
-import javax.validation.executable.ExecutableValidator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;

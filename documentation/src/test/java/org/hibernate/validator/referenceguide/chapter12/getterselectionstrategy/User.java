@@ -2,8 +2,8 @@
 package org.hibernate.validator.referenceguide.chapter12.getterselectionstrategy;
 
 //end::include[]
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 
 //tag::include[]
 public class User {

@@ -29,11 +29,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import javax.validation.Validator;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.PastOrPresent;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.PastOrPresent;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.joda.time.ReadableInstant;

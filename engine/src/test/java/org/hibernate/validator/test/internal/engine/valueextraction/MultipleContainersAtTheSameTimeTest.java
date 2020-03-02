@@ -21,14 +21,14 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.ConstraintDeclarationException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.test.internal.engine.valueextraction.model.ContainerWithAdditionalConstraints;
 import org.hibernate.validator.test.internal.engine.valueextraction.model.ContainerWithAdditionalConstraintsExtractor;

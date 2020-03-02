@@ -10,8 +10,8 @@ import java.lang.annotation.ElementType;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
+import jakarta.validation.Path;
+import jakarta.validation.TraversableResolver;
 
 /**
  * Cache results of a delegated traversable resolver to optimize calls.

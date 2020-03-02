@@ -9,8 +9,8 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorFactory;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorFactory;
 
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 

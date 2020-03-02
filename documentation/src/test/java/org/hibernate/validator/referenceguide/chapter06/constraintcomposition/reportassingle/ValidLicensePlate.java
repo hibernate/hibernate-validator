@@ -3,8 +3,8 @@ package org.hibernate.validator.referenceguide.chapter06.constraintcomposition.r
 
 //end::include[]
 
-import javax.validation.Payload;
-import javax.validation.ReportAsSingleViolation;
+import jakarta.validation.Payload;
+import jakarta.validation.ReportAsSingleViolation;
 
 //tag::include[]
 //...

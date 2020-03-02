@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.descriptor;
 
-import javax.validation.metadata.GroupConversionDescriptor;
+import jakarta.validation.metadata.GroupConversionDescriptor;
 
 /**
  * Describes a group conversion rule.

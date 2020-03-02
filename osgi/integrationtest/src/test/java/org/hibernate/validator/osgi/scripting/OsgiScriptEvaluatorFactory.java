@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.spi.scripting.AbstractCachingScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEngineScriptEvaluator;

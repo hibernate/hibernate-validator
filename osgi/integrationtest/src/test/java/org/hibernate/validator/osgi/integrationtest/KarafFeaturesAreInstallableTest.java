@@ -24,7 +24,7 @@ import java.io.File;
 import java.net.URI;
 import java.util.Locale;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.karaf.features.Feature;
 import org.apache.karaf.features.FeaturesService;

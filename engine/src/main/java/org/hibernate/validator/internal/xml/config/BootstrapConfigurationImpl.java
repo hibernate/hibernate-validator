@@ -13,8 +13,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.BootstrapConfiguration;
-import javax.validation.executable.ExecutableType;
+import jakarta.validation.BootstrapConfiguration;
+import jakarta.validation.executable.ExecutableType;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;

@@ -10,7 +10,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-import javax.validation.ParameterNameProvider;
+import jakarta.validation.ParameterNameProvider;
 
 import com.thoughtworks.paranamer.AdaptiveParanamer;
 import com.thoughtworks.paranamer.CachingParanamer;

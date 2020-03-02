@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.util.Collection;
 
-import javax.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidator;
 
 import org.hibernate.validator.internal.engine.validationcontext.ValidationContext;
 import org.hibernate.validator.internal.engine.valuecontext.ValueContext;

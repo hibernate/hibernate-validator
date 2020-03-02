@@ -1,6 +1,6 @@
 package org.hibernate.validator.referenceguide.chapter12.propertypath;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 public class Apartment {
 

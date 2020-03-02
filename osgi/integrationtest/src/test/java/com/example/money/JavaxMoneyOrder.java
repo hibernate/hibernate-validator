@@ -7,8 +7,8 @@
 package com.example.money;
 
 import javax.money.MonetaryAmount;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 
 import org.hibernate.validator.constraints.Currency;
 

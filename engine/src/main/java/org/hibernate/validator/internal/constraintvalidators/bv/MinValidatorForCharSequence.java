@@ -7,9 +7,9 @@
 package org.hibernate.validator.internal.constraintvalidators.bv;
 
 import java.math.BigDecimal;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Min;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraints.Min;
 
 /**
  * Check that the character sequence (e.g. string) being validated represents a number, and has a value

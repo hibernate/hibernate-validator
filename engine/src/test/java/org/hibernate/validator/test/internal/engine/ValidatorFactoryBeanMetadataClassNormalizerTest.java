@@ -13,13 +13,13 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.constraints.Email;
-import javax.validation.valueextraction.Unwrapping;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.valueextraction.Unwrapping;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;

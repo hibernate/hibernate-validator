@@ -12,7 +12,7 @@
             <parameter type="[Ljava.lang.Object;" />
             <return-value>
                 <container-element-type type-argument-index="0">
-                    <constraint annotation="javax.validation.constraints.Size">
+                    <constraint annotation="jakarta.validation.constraints.Size">
                         <element name="max">
                             <value>5</value>
                         </element>

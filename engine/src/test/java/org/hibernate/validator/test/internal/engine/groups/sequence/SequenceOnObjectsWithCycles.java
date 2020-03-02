@@ -8,10 +8,10 @@ package org.hibernate.validator.test.internal.engine.groups.sequence;
 
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.GroupSequence;
-import javax.validation.Valid;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.GroupSequence;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;

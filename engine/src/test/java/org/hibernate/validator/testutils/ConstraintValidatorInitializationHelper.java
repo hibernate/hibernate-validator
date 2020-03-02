@@ -10,8 +10,8 @@ import java.lang.annotation.Annotation;
 import java.time.Duration;
 import java.util.Collections;
 
-import javax.validation.ClockProvider;
-import javax.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.ClockProvider;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;

@@ -9,9 +9,9 @@ package org.hibernate.validator.internal.engine.resolver;
 import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles;
 
-import javax.persistence.Persistence;
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
+import jakarta.persistence.Persistence;
+import jakarta.validation.Path;
+import jakarta.validation.TraversableResolver;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;

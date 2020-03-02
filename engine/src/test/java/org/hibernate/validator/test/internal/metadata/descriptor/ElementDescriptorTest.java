@@ -8,11 +8,11 @@ package org.hibernate.validator.test.internal.metadata.descriptor;
 
 import java.lang.annotation.ElementType;
 import java.util.Set;
-import javax.validation.Validator;
-import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.ElementDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
+import jakarta.validation.Validator;
+import jakarta.validation.metadata.BeanDescriptor;
+import jakarta.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.metadata.ElementDescriptor;
+import jakarta.validation.metadata.PropertyDescriptor;
 
 import org.testng.annotations.Test;
 

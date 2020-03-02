@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.validation.ElementKind;
-import javax.validation.metadata.ParameterDescriptor;
+import jakarta.validation.ElementKind;
+import jakarta.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
@@ -451,7 +451,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 * on the overridden method.
 		 * </p>
 		 *
-		 * @throws javax.validation.ConstraintDeclarationException In case any of the rules mandated by the
+		 * @throws jakarta.validation.ConstraintDeclarationException In case any of the rules mandated by the
 		 * specification are violated.
 		 */
 		private void assertCorrectnessOfConfiguration() {

@@ -4,7 +4,7 @@ package org.hibernate.validator.referenceguide.chapter02.containerelement.map;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 //tag::include[]
 public class Car {

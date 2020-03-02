@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 

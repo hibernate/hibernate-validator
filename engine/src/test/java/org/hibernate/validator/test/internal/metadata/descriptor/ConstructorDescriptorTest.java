@@ -12,10 +12,10 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getConstructorDesc
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.ConstructorDescriptor;
-import javax.validation.metadata.ParameterDescriptor;
-import javax.validation.metadata.ReturnValueDescriptor;
+import jakarta.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.metadata.ConstructorDescriptor;
+import jakarta.validation.metadata.ParameterDescriptor;
+import jakarta.validation.metadata.ReturnValueDescriptor;
 
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;

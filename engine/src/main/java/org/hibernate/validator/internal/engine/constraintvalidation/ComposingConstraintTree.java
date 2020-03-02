@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidator;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.internal.engine.validationcontext.ValidationContext;

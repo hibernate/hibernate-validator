@@ -7,9 +7,9 @@
 package org.hibernate.validator.test.constraints.boolcomposition.localconstrval;
 
 import java.lang.annotation.Retention;
-import javax.validation.Constraint;
-import javax.validation.Payload;
-import javax.validation.constraints.Size;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.ConstraintComposition;
 

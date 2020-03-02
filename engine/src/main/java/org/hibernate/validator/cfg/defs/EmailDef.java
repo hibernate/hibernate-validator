@@ -7,8 +7,8 @@
 
 package org.hibernate.validator.cfg.defs;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 

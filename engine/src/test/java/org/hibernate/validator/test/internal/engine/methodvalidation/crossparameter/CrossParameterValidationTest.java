@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.crossparameter;
 
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintDefinitionException;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintDeclarationException;
+import jakarta.validation.ConstraintDefinitionException;
+import jakarta.validation.Validator;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;

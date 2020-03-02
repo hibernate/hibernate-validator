@@ -9,7 +9,7 @@ package org.hibernate.validator.test.parameternameprovider;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.validation.ParameterNameProvider;
+import jakarta.validation.ParameterNameProvider;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

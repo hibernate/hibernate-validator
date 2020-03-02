@@ -8,8 +8,8 @@ package org.hibernate.validator.test.cdi.internal.methodvalidation;
 
 import static org.testng.Assert.fail;
 
-import javax.inject.Inject;
-import javax.validation.ConstraintViolationException;
+import jakarta.inject.Inject;
+import jakarta.validation.ConstraintViolationException;
 
 import org.hibernate.validator.test.util.TestHelper;
 import org.jboss.arquillian.container.test.api.Deployment;

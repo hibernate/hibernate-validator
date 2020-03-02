@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.MessageInterpolator;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.MessageInterpolator;
+import jakarta.validation.Validator;
 
 import org.assertj.core.api.Assertions;
 import org.hibernate.validator.HibernateValidatorConfiguration;

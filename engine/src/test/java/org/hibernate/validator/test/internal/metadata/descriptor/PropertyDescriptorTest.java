@@ -7,8 +7,8 @@
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
 import java.util.Set;
-import javax.validation.metadata.GroupConversionDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
+import jakarta.validation.metadata.GroupConversionDescriptor;
+import jakarta.validation.metadata.PropertyDescriptor;
 
 import org.testng.annotations.Test;
 

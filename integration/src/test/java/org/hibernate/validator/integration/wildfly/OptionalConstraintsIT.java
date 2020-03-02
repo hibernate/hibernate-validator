@@ -12,10 +12,10 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.money.MonetaryAmount;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.Future;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.Future;
 
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.SafeHtml;

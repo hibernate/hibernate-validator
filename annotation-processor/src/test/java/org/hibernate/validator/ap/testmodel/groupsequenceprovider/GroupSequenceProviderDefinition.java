@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.ap.testmodel.groupsequenceprovider;
 
-import javax.validation.GroupSequence;
+import jakarta.validation.GroupSequence;
 
 import org.hibernate.validator.group.GroupSequenceProvider;
 

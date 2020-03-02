@@ -13,12 +13,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.Configuration;
-import javax.validation.ConstraintViolation;
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
-import javax.validation.Valid;
-import javax.validation.Validator;
+import jakarta.validation.Configuration;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Path;
+import jakarta.validation.TraversableResolver;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.constraints.ScriptAssert;

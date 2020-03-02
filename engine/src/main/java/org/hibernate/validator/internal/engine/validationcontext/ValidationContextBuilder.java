@@ -8,8 +8,8 @@ package org.hibernate.validator.internal.engine.validationcontext;
 
 import java.lang.reflect.Executable;
 
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.TraversableResolver;
+import jakarta.validation.ConstraintValidatorFactory;
+import jakarta.validation.TraversableResolver;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;

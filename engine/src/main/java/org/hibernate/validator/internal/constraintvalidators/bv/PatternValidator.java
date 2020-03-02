@@ -9,9 +9,9 @@ package org.hibernate.validator.internal.constraintvalidators.bv;
 import java.lang.invoke.MethodHandles;
 import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper;

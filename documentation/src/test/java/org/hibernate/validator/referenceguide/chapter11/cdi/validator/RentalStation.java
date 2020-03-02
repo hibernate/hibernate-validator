@@ -3,10 +3,10 @@ package org.hibernate.validator.referenceguide.chapter11.cdi.validator;
 
 //end::include[]
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 //tag::include[]
 @ApplicationScoped

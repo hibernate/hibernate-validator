@@ -9,8 +9,8 @@ package org.hibernate.validator.internal.engine.resolver;
 import java.lang.annotation.ElementType;
 import java.util.HashMap;
 
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
+import jakarta.validation.Path;
+import jakarta.validation.TraversableResolver;
 
 /**
  * Cache results of a delegated {@link JPATraversableResolver} to optimize calls.

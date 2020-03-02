@@ -11,9 +11,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.jboss.arquillian.container.test.api.Deployer;
@@ -73,7 +73,7 @@ public class JaxpContainedInDeploymentIT extends AbstractArquillianIT {
 						.createField()
 							.name( "brand" )
 							.createConstraint()
-								.annotation( "javax.validation.constraints.NotNull" )
+								.annotation( "jakarta.validation.constraints.NotNull" )
 						.up()
 					.up()
 				.up()

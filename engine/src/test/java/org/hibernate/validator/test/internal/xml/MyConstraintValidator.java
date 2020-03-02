@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class MyConstraintValidator implements ConstraintValidator<MyConstraint, Object> {
 

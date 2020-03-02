@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.defaultgroupsequenceprovider;
 
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.Pattern;
 
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.constraints.Length;

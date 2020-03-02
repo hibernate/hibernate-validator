@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import javax.validation.constraints.Max;
+import jakarta.validation.constraints.Max;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 

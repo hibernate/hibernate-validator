@@ -3,8 +3,8 @@ package org.hibernate.validator.referenceguide.chapter02.containerelement.custom
 
 //end::include[]
 
-import javax.validation.valueextraction.ExtractedValue;
-import javax.validation.valueextraction.ValueExtractor;
+import jakarta.validation.valueextraction.ExtractedValue;
+import jakarta.validation.valueextraction.ValueExtractor;
 
 //tag::include[]
 public class GearBoxValueExtractor implements ValueExtractor<GearBox<@ExtractedValue ?>> {

@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.valueextraction.model;
 
-import javax.validation.constraints.Size;
-import javax.validation.valueextraction.Unwrapping;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.valueextraction.Unwrapping;
 
 /**
  * @author Gunnar Morling

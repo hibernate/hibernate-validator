@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.metadata.ValidateUnwrappedValue;
+import jakarta.validation.metadata.ValidateUnwrappedValue;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;

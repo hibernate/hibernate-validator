@@ -10,9 +10,9 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.metadata.ContainerElementTypeDescriptor;
-import javax.validation.metadata.GroupConversionDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
+import jakarta.validation.metadata.ContainerElementTypeDescriptor;
+import jakarta.validation.metadata.GroupConversionDescriptor;
+import jakarta.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;

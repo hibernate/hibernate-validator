@@ -7,7 +7,7 @@
 package org.hibernate.validator.ap.testmodel;
 
 import java.util.Date;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 public class MethodLevelValidationUsingBuiltInConstraints {
 	@Size(min = 10)

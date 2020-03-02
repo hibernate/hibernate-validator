@@ -10,8 +10,8 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ElementKind;
-import javax.validation.metadata.ParameterDescriptor;
+import jakarta.validation.ElementKind;
+import jakarta.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;

@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraints.PositiveOrZero;
 
 /**
  * Check that the number being validated positive.

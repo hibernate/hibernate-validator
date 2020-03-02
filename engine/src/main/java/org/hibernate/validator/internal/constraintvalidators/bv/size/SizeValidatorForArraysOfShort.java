@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.size;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Size;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraints.Size;
 
 /**
  * @author Hardy Ferentschik

@@ -5,9 +5,9 @@ package org.hibernate.validator.referenceguide.chapter07.nongeneric;
 
 import java.util.OptionalInt;
 
-import javax.validation.valueextraction.ExtractedValue;
-import javax.validation.valueextraction.UnwrapByDefault;
-import javax.validation.valueextraction.ValueExtractor;
+import jakarta.validation.valueextraction.ExtractedValue;
+import jakarta.validation.valueextraction.UnwrapByDefault;
+import jakarta.validation.valueextraction.ValueExtractor;
 
 //tag::include[]
 @UnwrapByDefault

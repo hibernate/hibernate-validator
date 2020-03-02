@@ -10,9 +10,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.EnumSet;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.constraintvalidation.ValidationTarget;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorFactory;
+import jakarta.validation.constraintvalidation.ValidationTarget;
 
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext.ValidationCallable;
 

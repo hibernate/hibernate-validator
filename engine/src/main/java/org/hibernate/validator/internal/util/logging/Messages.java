@@ -94,7 +94,7 @@ public interface Messages {
 			format = Message.Format.NO_FORMAT)
 	String annotationTypeMustNotBeNull();
 
-	@Message(value = "The annotation type must be annotated with @javax.validation.Constraint when creating a constraint definition.",
+	@Message(value = "The annotation type must be annotated with @jakarta.validation.Constraint when creating a constraint definition.",
 			format = Message.Format.NO_FORMAT)
 	String annotationTypeMustBeAnnotatedWithConstraint();
 }

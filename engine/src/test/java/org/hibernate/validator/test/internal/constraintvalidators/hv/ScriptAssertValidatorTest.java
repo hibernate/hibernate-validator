@@ -18,10 +18,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
 
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintDeclarationException;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;

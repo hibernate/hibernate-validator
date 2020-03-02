@@ -17,8 +17,8 @@
 
     <bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Competition" ignore-annotations="true">
         <field name="name">
-            <constraint annotation="javax.validation.constraints.NotNull"/>
-            <constraint annotation="javax.validation.constraints.Size">
+            <constraint annotation="jakarta.validation.constraints.NotNull"/>
+            <constraint annotation="jakarta.validation.constraints.Size">
                 <element name="min">1</element>
             </constraint>
         </field>
@@ -29,14 +29,14 @@
     <bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Game" ignore-annotations="true">
         <field name="detail">
             <valid/>
-            <constraint annotation="javax.validation.constraints.NotNull"/>
+            <constraint annotation="jakarta.validation.constraints.NotNull"/>
         </field>
     </bean>
 
     <bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.GameDetail" ignore-annotations="true">
         <field name="competition">
             <valid/>
-            <constraint annotation="javax.validation.constraints.NotNull"/>
+            <constraint annotation="jakarta.validation.constraints.NotNull"/>
         </field>
     </bean>
     <bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Fixture"/>

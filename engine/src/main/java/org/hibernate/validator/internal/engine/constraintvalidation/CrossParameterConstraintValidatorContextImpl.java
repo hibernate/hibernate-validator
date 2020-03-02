@@ -8,9 +8,9 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import java.util.List;
 
-import javax.validation.ClockProvider;
-import javax.validation.ElementKind;
-import javax.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.ClockProvider;
+import jakarta.validation.ElementKind;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateCrossParameterConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;

@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
-import javax.validation.Configuration;
-import javax.validation.ValidationException;
+import jakarta.validation.Configuration;
+import jakarta.validation.ValidationException;
 
 import org.testng.annotations.Test;
 

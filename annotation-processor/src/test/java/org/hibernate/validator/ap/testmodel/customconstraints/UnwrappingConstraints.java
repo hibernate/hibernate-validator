@@ -10,9 +10,9 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Past;
-import javax.validation.valueextraction.Unwrapping;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.valueextraction.Unwrapping;
 
 public class UnwrappingConstraints {
 

@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import javax.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.PastOrPresent;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 

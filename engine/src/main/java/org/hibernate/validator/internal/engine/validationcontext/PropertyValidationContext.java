@@ -8,12 +8,12 @@ package org.hibernate.validator.internal.engine.validationcontext;
 
 import java.util.Objects;
 
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.ConstraintViolation;
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
-import javax.validation.Validator;
-import javax.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.ConstraintValidatorFactory;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Path;
+import jakarta.validation.TraversableResolver;
+import jakarta.validation.Validator;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;

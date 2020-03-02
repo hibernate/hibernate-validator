@@ -1,6 +1,6 @@
 package org.hibernate.validator.referenceguide.chapter06.payload;
 
-import javax.validation.Payload;
+import jakarta.validation.Payload;
 
 //tag::include[]
 public class Severity {

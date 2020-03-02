@@ -17,12 +17,12 @@ import static org.testng.Assert.assertTrue;
 import java.io.InputStream;
 import java.util.Set;
 
-import javax.validation.Configuration;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.Pattern.Flag;
+import jakarta.validation.Configuration;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorFactory;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.Pattern.Flag;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;

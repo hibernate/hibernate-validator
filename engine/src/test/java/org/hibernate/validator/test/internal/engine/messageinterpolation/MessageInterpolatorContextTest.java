@@ -16,18 +16,18 @@ import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import javax.validation.Configuration;
-import javax.validation.ConstraintViolation;
-import javax.validation.MessageInterpolator;
-import javax.validation.MessageInterpolator.Context;
-import javax.validation.Path;
-import javax.validation.Valid;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
-import javax.validation.constraints.Size;
-import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
+import jakarta.validation.Configuration;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.MessageInterpolator;
+import jakarta.validation.MessageInterpolator.Context;
+import jakarta.validation.Path;
+import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.metadata.BeanDescriptor;
+import jakarta.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.metadata.PropertyDescriptor;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -295,7 +295,7 @@ public class MessageInterpolatorContextTest {
 			// add some test messages
 			testResources.put( "Employee.address.street", "Employee Street" );
 			testResources.put( "Employee.employer.address.street", "Company Street" );
-			testResources.put( "javax.validation.constraints.Size.message", "#path# should be smaller than {max}" );
+			testResources.put( "jakarta.validation.constraints.Size.message", "#path# should be smaller than {max}" );
 			iter = testResources.keySet().iterator();
 		}
 

@@ -4,7 +4,7 @@ package org.hibernate.validator.referenceguide.chapter09;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 
-import javax.validation.ClockProvider;
+import jakarta.validation.ClockProvider;
 
 //tag::include[]
 public class FixedClockProvider implements ClockProvider {

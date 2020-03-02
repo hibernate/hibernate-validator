@@ -8,7 +8,7 @@ package org.hibernate.validator.integration.wildfly.jpa;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.validation.TraversableResolver;
+import jakarta.validation.TraversableResolver;
 
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.internal.engine.resolver.JPATraversableResolver;

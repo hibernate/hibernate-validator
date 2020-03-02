@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.constraintvalidation;
 
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.Incubating;
@@ -64,7 +64,7 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 * variable will be available for interpolation for all constraint violations generated for this constraint.
 	 * This includes the default one as well as all violations created by the {@link ConstraintViolationBuilder}.
 	 * To create multiple constraint violations with different variable values, this method can be called
-	 * between successive calls to {@link javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder#addConstraintViolation()}.
+	 * between successive calls to {@link jakarta.validation.ConstraintValidatorContext.ConstraintViolationBuilder#addConstraintViolation()}.
 	 * <p>
 	 * For example:
 	 * <pre>
@@ -100,7 +100,7 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 * Allows to set an object that may further describe the violation.
 	 *
 	 * The user is responsible himself to ensure that this payload is serializable in case the
-	 * {@code javax.validation.ConstraintViolation} has to be serialized.
+	 * {@code jakarta.validation.ConstraintViolation} has to be serialized.
 	 *
 	 * @param payload an object representing additional information about the violation
 	 *

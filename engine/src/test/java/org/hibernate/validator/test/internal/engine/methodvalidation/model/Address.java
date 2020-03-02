@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.model;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author Gunnar Morling

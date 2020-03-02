@@ -49,7 +49,7 @@ public class AnnotationPayloadUnwrappingCheck extends AnnotationParametersAbstra
 				.map( type -> (TypeMirror) type )
 				.map( typeUtils::asElement )
 				.map( elem -> ( (TypeElement) elem ).getQualifiedName() )
-				.filter( name -> name.toString().startsWith( "javax.validation.valueextraction.Unwrapping." ) )
+				.filter( name -> name.toString().startsWith( "jakarta.validation.valueextraction.Unwrapping." ) )
 				.distinct()
 				.count() > 1 ) {
 			return CollectionHelper.asSet(

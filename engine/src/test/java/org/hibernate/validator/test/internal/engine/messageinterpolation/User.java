@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
-import javax.validation.constraints.Email;
+import jakarta.validation.constraints.Email;
 
 import org.hibernate.validator.constraints.Range;
 

@@ -15,11 +15,11 @@ import java.lang.annotation.Target;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.Payload;
-import javax.validation.valueextraction.Unwrapping;
+import jakarta.validation.Constraint;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.Payload;
+import jakarta.validation.valueextraction.Unwrapping;
 
 /**
  * @author Marko Bekhta

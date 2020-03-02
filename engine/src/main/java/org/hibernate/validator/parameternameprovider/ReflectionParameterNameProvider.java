@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
 
-import javax.validation.ParameterNameProvider;
+import jakarta.validation.ParameterNameProvider;
 
 /**
  * @author Khalid Alqinyah

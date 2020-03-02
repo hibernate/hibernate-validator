@@ -8,9 +8,9 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.sign;
 
 import java.math.BigDecimal;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Negative;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraints.Negative;
 
 /**
  * Check that the number being validated is negative.

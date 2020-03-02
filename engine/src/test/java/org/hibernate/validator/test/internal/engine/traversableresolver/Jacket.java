@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.traversableresolver;
 
-import javax.validation.constraints.Max;
+import jakarta.validation.constraints.Max;
 
 
 /**

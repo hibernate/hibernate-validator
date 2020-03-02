@@ -13,12 +13,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
-import javax.validation.Validator;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.valueextraction.Unwrapping;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.valueextraction.Unwrapping;
 
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
 import org.hibernate.validator.testutil.TestForIssue;

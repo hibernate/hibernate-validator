@@ -9,7 +9,7 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpres
 import java.time.Duration;
 import java.time.temporal.TemporalAccessor;
 
-import javax.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.PastOrPresent;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractJavaTimeValidator;
 

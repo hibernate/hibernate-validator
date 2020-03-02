@@ -8,11 +8,11 @@ package org.hibernate.validator.test.cfg;
 
 import java.lang.reflect.Field;
 
-import javax.validation.Configuration;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.bootstrap.GenericBootstrap;
+import jakarta.validation.Configuration;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.bootstrap.GenericBootstrap;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;

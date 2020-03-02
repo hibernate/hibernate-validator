@@ -16,11 +16,11 @@
 
     <bean class="org.hibernate.validator.test.internal.xml.Child" ignore-annotations="false">
         <getter name="parentAttribute">
-            <constraint annotation="javax.validation.constraints.NotNull"/>
+            <constraint annotation="jakarta.validation.constraints.NotNull"/>
         </getter>
         <getter name="parentListAttribute">
             <container-element-type type-argument-index="0">
-                <constraint annotation="javax.validation.constraints.NotNull"/>
+                <constraint annotation="jakarta.validation.constraints.NotNull"/>
             </container-element-type>
         </getter>
     </bean>

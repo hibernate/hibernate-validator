@@ -113,8 +113,8 @@
 
         <!-- Dependencies versions -->
 
-        <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
-        <version.org.hibernate.beanvalidation.tck>2.0.5</version.org.hibernate.beanvalidation.tck>
+        <version.jakarta.validation-api>3.0.0-M1</version.jakarta.validation-api>
+        <version.org.hibernate.beanvalidation.tck>3.0.0-SNAPSHOT</version.org.hibernate.beanvalidation.tck>
 
         <version.com.thoughtworks.paranamer>2.8</version.com.thoughtworks.paranamer>
         <version.org.glassfish.jakarta.el>3.0.3</version.org.glassfish.jakarta.el>
@@ -137,24 +137,26 @@
         <version.joda-time>2.9.7</version.joda-time>
         <version.org.slf4j>1.7.22</version.org.slf4j>
         <version.log4j>1.2.17</version.log4j>
-        <version.jakarta.persistence-api>2.2.3</version.jakarta.persistence-api>
 
         <!--
             These dependencies are used for integration tests with WildFly.
             They should be aligned with the ones from the Wildfly version we support
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
-        <version.jakarta.enterprise.cdi-api>2.0.1</version.jakarta.enterprise.cdi-api>
+        <version.jakarta.enterprise.cdi-api>3.0.0-M1</version.jakarta.enterprise.cdi-api>
         <version.org.jboss.weld.weld>3.1.1.Final</version.org.jboss.weld.weld>
         <version.org.wildfly.arquillian>2.2.0.Final</version.org.wildfly.arquillian>
-        <version.jakarta.ejb-api>3.2.5</version.jakarta.ejb-api>
-        <version.jakarta.interceptor-api>1.2.4</version.jakarta.interceptor-api>
-        <version.jakarta.annotation-api>1.3.5</version.jakarta.annotation-api>
+        <version.jakarta.ejb-api>4.0.0-RC1</version.jakarta.ejb-api>
+        <version.jakarta.interceptor-api>2.0.0-RC2</version.jakarta.interceptor-api>
+        <version.jakarta.annotation-api>2.0.0-RC1</version.jakarta.annotation-api>
+        <version.jakarta.inject-api>2.0.0.RC1</version.jakarta.inject-api>
         <version.jakarta.ws.rs-api>2.1.6</version.jakarta.ws.rs-api>
+        <version.jakarta.persistence-api>3.0.0-RC1</version.jakarta.persistence-api>
 
         <!-- JavaMoney dependencies -->
         <version.javax.money>1.0.1</version.javax.money>
         <version.org.javamoney.moneta>1.1</version.org.javamoney.moneta>
+        <version.javax.annotation-api>1.3.2</version.javax.annotation-api>
 
         <!-- Used in the Karaf features file: it is a dependency of Moneta, and for the documentation -->
         <version.javax.annotation>1.2</version.javax.annotation>
@@ -450,6 +452,16 @@
                 <version>${version.jakarta.annotation-api}</version>
             </dependency>
             <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${version.javax.annotation-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.inject</groupId>
+                <artifactId>jakarta.inject-api</artifactId>
+                <version>${version.jakarta.inject-api}</version>
+            </dependency>
+            <dependency>
                 <groupId>jakarta.ws.rs</groupId>
                 <artifactId>jakarta.ws.rs-api</artifactId>
                 <version>${version.jakarta.ws.rs-api}</version>
@@ -561,6 +573,9 @@
                                         <exclude>javax.enterprise:cdi-api</exclude>
                                         <exclude>javax.persistence:javax.persistence-api</exclude>
                                     </excludes>
+                                    <includes>
+                                        <include>javax.annotation:javax.annotation-api:*:*:test</include>
+                                    </includes>
                                 </bannedDependencies>
                             </rules>
                         </configuration>

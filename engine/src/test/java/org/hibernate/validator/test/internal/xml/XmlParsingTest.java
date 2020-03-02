@@ -11,9 +11,9 @@ import static org.testng.Assert.assertEquals;
 
 import java.util.Set;
 
-import javax.validation.Validator;
-import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.Validator;
+import jakarta.validation.metadata.BeanDescriptor;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.assertj.core.api.Assertions;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;

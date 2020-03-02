@@ -13,13 +13,13 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.GroupSequence;
-import javax.validation.Validator;
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.groups.Default;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.GroupSequence;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.groups.Default;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.ap.testmodel.annotationparameters;
 
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * @author Marko Bekhta

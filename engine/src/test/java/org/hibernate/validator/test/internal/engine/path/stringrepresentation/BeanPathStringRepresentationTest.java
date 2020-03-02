@@ -10,7 +10,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertC
 
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 import org.testng.annotations.Test;
 

@@ -21,9 +21,9 @@ import java.lang.annotation.Target;
 
 import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
-import javax.validation.Constraint;
-import javax.validation.Payload;
-import javax.validation.ReportAsSingleViolation;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+import jakarta.validation.ReportAsSingleViolation;
 
 import org.hibernate.validator.constraints.Currency.List;
 

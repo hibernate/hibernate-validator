@@ -7,8 +7,8 @@
 package org.hibernate.validator.ap.testmodel.composedconstraint2;
 
 import java.util.GregorianCalendar;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class ComposingConstraint1ValidatorForGregorianCalendar
 		implements ConstraintValidator<ComposingConstraint1, GregorianCalendar> {

@@ -7,8 +7,8 @@
 package org.hibernate.validator.ap.testmodel;
 
 import java.util.Date;
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.Past;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Past;
 
 public class ModelWithDateConstraints {
 

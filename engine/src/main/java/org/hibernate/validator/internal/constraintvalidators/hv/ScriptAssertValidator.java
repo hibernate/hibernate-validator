@@ -8,8 +8,8 @@ package org.hibernate.validator.internal.constraintvalidators.hv;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;

@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.engine.valuecontext;
 
 import java.lang.reflect.TypeVariable;
 
-import javax.validation.groups.Default;
+import jakarta.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;

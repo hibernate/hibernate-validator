@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.xml.exception;
 
-import javax.validation.Configuration;
-import javax.validation.ValidationException;
+import jakarta.validation.Configuration;
+import jakarta.validation.ValidationException;
 
 import org.testng.annotations.Test;
 
@@ -38,7 +38,7 @@ public class XmlConfigurationExceptionTest {
 			Throwable cause = e.getCause();
 			assertEquals(
 					cause.getMessage(),
-					"HV000085: No value provided for attribute 'regexp' of annotation @javax.validation.constraints.Pattern.",
+					"HV000085: No value provided for attribute 'regexp' of annotation @jakarta.validation.constraints.Pattern.",
 					"Wrong error message"
 			);
 		}

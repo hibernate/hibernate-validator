@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.testutil.TestForIssue;

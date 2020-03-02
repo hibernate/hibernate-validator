@@ -13,13 +13,13 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-import javax.validation.valueextraction.ExtractedValue;
-import javax.validation.valueextraction.ValueExtractor;
-import javax.validation.valueextraction.ValueExtractorDefinitionException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.valueextraction.ExtractedValue;
+import jakarta.validation.valueextraction.ValueExtractor;
+import jakarta.validation.valueextraction.ValueExtractorDefinitionException;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.testutil.TestForIssue;

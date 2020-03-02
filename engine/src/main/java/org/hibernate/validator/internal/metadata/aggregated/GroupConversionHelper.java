@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.validation.metadata.GroupConversionDescriptor;
+import jakarta.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.metadata.descriptor.GroupConversionDescriptorImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;

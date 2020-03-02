@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.engine;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 

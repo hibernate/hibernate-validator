@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.validation.MessageInterpolator;
+import jakarta.validation.MessageInterpolator;
 
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.internal.engine.PredefinedScopeValidatorFactoryImpl;

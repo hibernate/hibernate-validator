@@ -28,7 +28,7 @@ public abstract class MethodConfigurationRule {
 	 * @param method The first method to check.
 	 * @param otherMethod The other method to check.
 	 *
-	 * @throws javax.validation.ConstraintDeclarationException If this rule is violated by the two given methods.
+	 * @throws jakarta.validation.ConstraintDeclarationException If this rule is violated by the two given methods.
 	 */
 	public abstract void apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod);
 

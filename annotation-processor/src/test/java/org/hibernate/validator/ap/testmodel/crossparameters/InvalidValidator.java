@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.ap.testmodel.crossparameters;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraintvalidation.SupportedValidationTarget;
-import javax.validation.constraintvalidation.ValidationTarget;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraintvalidation.SupportedValidationTarget;
+import jakarta.validation.constraintvalidation.ValidationTarget;
 
 @SupportedValidationTarget(ValidationTarget.PARAMETERS)
 public class InvalidValidator implements ConstraintValidator<InvalidValidatorConstraint, String> {

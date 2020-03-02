@@ -12,8 +12,8 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 
 import org.hibernate.validator.testutil.TestForIssue;
 

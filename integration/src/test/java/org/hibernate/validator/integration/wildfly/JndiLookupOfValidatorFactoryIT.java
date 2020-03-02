@@ -12,7 +12,7 @@ import static org.testng.Assert.fail;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.validation.ValidatorFactory;
+import jakarta.validation.ValidatorFactory;
 
 import org.apache.log4j.Logger;
 import org.hibernate.validator.integration.AbstractArquillianIT;

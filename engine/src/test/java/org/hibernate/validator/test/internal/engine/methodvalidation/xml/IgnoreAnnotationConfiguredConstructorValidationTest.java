@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
-import javax.validation.Configuration;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.metadata.BeanDescriptor;
+import jakarta.validation.Configuration;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.metadata.BeanDescriptor;
 
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;

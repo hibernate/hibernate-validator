@@ -1,7 +1,7 @@
 package org.hibernate.validator.referenceguide.chapter03.cascaded.containerelement;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class Car {
 

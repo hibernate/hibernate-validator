@@ -16,14 +16,14 @@
 
         <constructor>
             <parameter type="java.lang.String">
-                <constraint annotation="javax.validation.constraints.NotNull"/>
+                <constraint annotation="jakarta.validation.constraints.NotNull"/>
             </parameter>
         </constructor>
 
         <method name="getCustomers">
             <return-value>
-                <constraint annotation="javax.validation.constraints.NotNull"/>
-                <constraint annotation="javax.validation.constraints.Size">
+                <constraint annotation="jakarta.validation.constraints.NotNull"/>
+                <constraint annotation="jakarta.validation.constraints.Size">
                     <element name="min">1</element>
                 </constraint>
             </return-value>
@@ -31,14 +31,14 @@
 
         <method name="rentCar">
             <parameter type="Customer">
-                <constraint annotation="javax.validation.constraints.NotNull"/>
+                <constraint annotation="jakarta.validation.constraints.NotNull"/>
             </parameter>
             <parameter type="java.util.Date">
-                <constraint annotation="javax.validation.constraints.NotNull"/>
-                <constraint annotation="javax.validation.constraints.Future"/>
+                <constraint annotation="jakarta.validation.constraints.NotNull"/>
+                <constraint annotation="jakarta.validation.constraints.Future"/>
             </parameter>
             <parameter type="int">
-                <constraint annotation="javax.validation.constraints.Min">
+                <constraint annotation="jakarta.validation.constraints.Min">
                     <element name="value">1</element>
                 </constraint>
             </parameter>
@@ -48,7 +48,7 @@
             <parameter type="java.util.List">
                 <container-element-type>
                     <valid/>
-                    <constraint annotation="javax.validation.constraints.NotNull"/>
+                    <constraint annotation="jakarta.validation.constraints.NotNull"/>
                 </container-element-type>
             </parameter>
         </method>

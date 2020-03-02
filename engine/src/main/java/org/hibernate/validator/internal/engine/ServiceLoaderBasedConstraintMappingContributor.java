@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import javax.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidator;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;

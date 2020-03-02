@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.cdi.internal.methodvalidation.inheritance;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 /**
  * @author Hardy Ferentschik

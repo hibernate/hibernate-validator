@@ -9,8 +9,8 @@ package org.hibernate.validator.test.internal.engine.groups.validationorder;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.GroupDefinitionException;
-import javax.validation.groups.Default;
+import jakarta.validation.GroupDefinitionException;
+import jakarta.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.groups.DefaultValidationOrder;
 import org.hibernate.validator.internal.engine.groups.Group;

@@ -12,10 +12,10 @@ import static org.hibernate.validator.testutils.ConstraintValidatorInitializatio
 import java.util.Collections;
 import java.util.Set;
 
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.Valid;
-import javax.validation.groups.ConvertGroup;
-import javax.validation.groups.Default;
+import jakarta.validation.ConstraintDeclarationException;
+import jakarta.validation.Valid;
+import jakarta.validation.groups.ConvertGroup;
+import jakarta.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;

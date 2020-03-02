@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
-import javax.validation.Configuration;
+import jakarta.validation.Configuration;
 
 import org.testng.annotations.BeforeMethod;
 

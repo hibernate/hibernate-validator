@@ -40,7 +40,7 @@ import org.hibernate.validator.ap.internal.util.TypeNames.HibernateValidatorType
  * <li>The annotation defines a default group sequence provider class for a
  * (super-)type of the annotated class.</li>
  * <li>The class hosting the annotation is not already annotated with
- * {@link javax.validation.GroupSequence}.</li>
+ * {@link jakarta.validation.GroupSequence}.</li>
  * </ul>
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI

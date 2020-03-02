@@ -8,7 +8,7 @@ package org.hibernate.validator.cfg.context;
 
 import java.lang.annotation.Annotation;
 
-import javax.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidator;
 
 import org.hibernate.validator.Incubating;
 
@@ -25,7 +25,7 @@ public interface ConstraintDefinitionContext<A extends Annotation> extends Const
 
 	/**
 	 * Specifies whether validators already mapped to this constraint (i.e. defined in the annotation declaration
-	 * through {@link javax.validation.Constraint#validatedBy()} or the validation engine defaults) should
+	 * through {@link jakarta.validation.Constraint#validatedBy()} or the validation engine defaults) should
 	 * be included or not.
 	 *
 	 * @param includeExistingValidators Whether or not to use already-mapped validators when validating this constraint.

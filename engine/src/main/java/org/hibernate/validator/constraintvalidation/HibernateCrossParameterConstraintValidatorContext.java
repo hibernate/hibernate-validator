@@ -8,7 +8,7 @@ package org.hibernate.validator.constraintvalidation;
 
 import java.util.List;
 
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.Incubating;
 

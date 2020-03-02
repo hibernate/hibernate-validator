@@ -9,17 +9,17 @@ package org.hibernate.validator;
 
 import java.time.Duration;
 
-import javax.validation.ClockProvider;
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.MessageInterpolator;
-import javax.validation.ParameterNameProvider;
-import javax.validation.TraversableResolver;
-import javax.validation.ValidatorContext;
-import javax.validation.valueextraction.ValueExtractor;
+import jakarta.validation.ClockProvider;
+import jakarta.validation.ConstraintValidatorFactory;
+import jakarta.validation.MessageInterpolator;
+import jakarta.validation.ParameterNameProvider;
+import jakarta.validation.TraversableResolver;
+import jakarta.validation.ValidatorContext;
+import jakarta.validation.valueextraction.ValueExtractor;
 
 /**
  * Represents a Hibernate Validator specific context that is used to create
- * {@link javax.validation.Validator} instances. Adds additional configuration options to those
+ * {@link jakarta.validation.Validator} instances. Adds additional configuration options to those
  * provided by {@link ValidatorContext}.
  *
  * @author Emmanuel Bernard

@@ -14,7 +14,7 @@ import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.cfg.AnnotationDef;
 import org.hibernate.validator.cfg.ConstraintDef;

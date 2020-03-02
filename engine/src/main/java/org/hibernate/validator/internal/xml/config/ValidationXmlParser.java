@@ -14,7 +14,7 @@ import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.validation.BootstrapConfiguration;
+import jakarta.validation.BootstrapConfiguration;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.stream.StreamSource;

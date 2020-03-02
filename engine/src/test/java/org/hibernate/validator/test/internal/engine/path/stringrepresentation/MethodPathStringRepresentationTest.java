@@ -11,10 +11,10 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertC
 import java.lang.reflect.Method;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 

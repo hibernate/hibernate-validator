@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidator;
 
 import org.hibernate.validator.engine.HibernateValidatorEnhancedBean;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;

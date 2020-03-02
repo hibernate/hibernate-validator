@@ -12,9 +12,9 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;

@@ -8,9 +8,9 @@ package org.hibernate.validator.internal.constraintvalidators.bv.notempty;
 
 import java.util.Collection;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  * Check that the collection is not null and not empty.

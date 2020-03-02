@@ -1,7 +1,7 @@
 package org.hibernate.validator.referenceguide.chapter12.classloading;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 import org.hibernate.validator.HibernateValidator;
 import org.junit.Test;

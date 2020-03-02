@@ -6,8 +6,8 @@
  */
 
 /**
- * Contains {@link javax.validation.ConstraintValidator} implementations for
- * {@link javax.validation.constraints.DecimalMin} and {@link javax.validation.constraints.DecimalMax}
+ * Contains {@link jakarta.validation.ConstraintValidator} implementations for
+ * {@link jakarta.validation.constraints.DecimalMin} and {@link jakarta.validation.constraints.DecimalMax}
  * constraints.
  *
  * @author Marko Bekhta

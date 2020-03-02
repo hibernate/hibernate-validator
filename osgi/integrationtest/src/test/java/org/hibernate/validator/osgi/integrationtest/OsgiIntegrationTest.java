@@ -32,11 +32,11 @@ import javax.el.ELManager;
 import javax.el.ExpressionFactory;
 import javax.money.spi.Bootstrap;
 import javax.script.ScriptEngineFactory;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.ValidationProviderResolver;
-import javax.validation.Validator;
-import javax.validation.spi.ValidationProvider;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidationProviderResolver;
+import jakarta.validation.Validator;
+import jakarta.validation.spi.ValidationProvider;
 
 import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
 import org.hibernate.validator.HibernateValidator;

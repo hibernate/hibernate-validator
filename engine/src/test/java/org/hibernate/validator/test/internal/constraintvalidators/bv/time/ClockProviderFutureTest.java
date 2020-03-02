@@ -14,10 +14,10 @@ import java.time.Clock;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import javax.validation.ClockProvider;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.constraints.Future;
+import jakarta.validation.ClockProvider;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.constraints.Future;
 
 import org.hibernate.validator.testutil.TestForIssue;
 

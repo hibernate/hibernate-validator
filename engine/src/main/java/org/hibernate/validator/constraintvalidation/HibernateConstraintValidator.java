@@ -8,10 +8,10 @@ package org.hibernate.validator.constraintvalidation;
 
 import java.lang.annotation.Annotation;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidatorFactory;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.Incubating;
 

@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Checks that the parameters used on {@code javax.validation.constraints.Size} and
+ * Checks that the parameters used on {@code jakarta.validation.constraints.Size} and
  * {@code org.hibernate.validator.constraints.Length} annotations are valid.
  *
  * @author Marko Bekhta

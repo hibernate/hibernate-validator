@@ -9,7 +9,7 @@ package org.hibernate.validator.integration.wildfly;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.jboss.arquillian.container.test.api.Deployment;

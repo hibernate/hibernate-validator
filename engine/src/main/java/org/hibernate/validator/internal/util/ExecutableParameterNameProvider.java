@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 
-import javax.validation.ParameterNameProvider;
+import jakarta.validation.ParameterNameProvider;
 
 /**
  * Allows to obtain parameter names from {@link Executable}s in a uniform fashion. Delegates to the configured

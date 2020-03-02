@@ -9,8 +9,8 @@ package org.hibernate.validator.internal.util.annotation;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import javax.validation.ConstraintTarget;
-import javax.validation.Payload;
+import jakarta.validation.ConstraintTarget;
+import jakarta.validation.Payload;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 

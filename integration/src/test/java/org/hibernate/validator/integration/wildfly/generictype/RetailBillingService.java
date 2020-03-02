@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.integration.wildfly.generictype;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 public class RetailBillingService implements BillingService<String> {
 

@@ -16,7 +16,7 @@
 
     <bean class="org.hibernate.validator.test.internal.xml.exception.TestEntity" ignore-annotations="true">
         <field name="testString">
-            <constraint annotation="javax.validation.constraints.Pattern"/>
+            <constraint annotation="jakarta.validation.constraints.Pattern"/>
         </field>
     </bean>
 

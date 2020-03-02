@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
-import javax.validation.Validation;
-import javax.validation.ValidationException;
-import javax.validation.ValidatorFactory;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidationException;
+import jakarta.validation.ValidatorFactory;
 
 import org.testng.annotations.Test;
 

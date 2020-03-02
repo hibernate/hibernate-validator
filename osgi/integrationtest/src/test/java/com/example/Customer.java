@@ -6,8 +6,8 @@
  */
 package com.example;
 
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 
 /**
  * @author Gunnar Morling

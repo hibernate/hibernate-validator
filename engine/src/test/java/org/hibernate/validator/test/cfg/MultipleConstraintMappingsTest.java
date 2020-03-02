@@ -14,10 +14,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.validation.GroupDefinitionException;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
-import javax.validation.metadata.BeanDescriptor;
+import jakarta.validation.GroupDefinitionException;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
+import jakarta.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;

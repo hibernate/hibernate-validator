@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
-import javax.validation.GroupSequence;
+import jakarta.validation.GroupSequence;
 
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup1;
 

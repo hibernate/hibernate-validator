@@ -2,8 +2,8 @@ package org.hibernate.validator.referenceguide.chapter09;
 
 import java.util.Map.Entry;
 
-import javax.validation.valueextraction.ExtractedValue;
-import javax.validation.valueextraction.ValueExtractor;
+import jakarta.validation.valueextraction.ExtractedValue;
+import jakarta.validation.valueextraction.ValueExtractor;
 
 import com.google.common.collect.Multimap;
 

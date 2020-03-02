@@ -12,7 +12,7 @@
             <container-element-type type-argument-index="0">
                 <container-element-type type-argument-index="1">
                     <container-element-type type-argument-index="0">
-                        <constraint annotation="javax.validation.constraints.NotNull" />
+                        <constraint annotation="jakarta.validation.constraints.NotNull" />
                     </container-element-type>
                 </container-element-type>
             </container-element-type>

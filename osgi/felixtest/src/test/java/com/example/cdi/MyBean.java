@@ -6,7 +6,7 @@
  */
 package com.example.cdi;
 
-import javax.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.RequestScoped;
 
 @RequestScoped
 public class MyBean {

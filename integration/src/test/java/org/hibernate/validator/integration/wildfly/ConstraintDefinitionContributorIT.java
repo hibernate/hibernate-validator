@@ -12,8 +12,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
