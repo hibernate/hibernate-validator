@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.path.specexample;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 @SecurityChecking
 public class Author {

@@ -8,8 +8,8 @@ package org.hibernate.validator.test.constraintvalidator;
 
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
-import javax.validation.ConstraintDefinitionException;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintDefinitionException;
+import jakarta.validation.Validator;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeMethod;

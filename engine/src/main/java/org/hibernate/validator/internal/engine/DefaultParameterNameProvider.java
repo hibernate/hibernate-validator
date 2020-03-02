@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.validation.ParameterNameProvider;
+import jakarta.validation.ParameterNameProvider;
 
 /**
  * A default {@link ParameterNameProvider} implementation which returns parameter names obtained from the Java

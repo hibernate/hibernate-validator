@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.engine.messageinterpolation;
 
 import java.util.Arrays;
 
-import javax.validation.MessageInterpolator.Context;
+import jakarta.validation.MessageInterpolator.Context;
 
 import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
 

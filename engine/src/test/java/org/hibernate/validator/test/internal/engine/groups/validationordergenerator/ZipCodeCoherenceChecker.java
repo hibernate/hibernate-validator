@@ -9,7 +9,7 @@ package org.hibernate.validator.test.internal.engine.groups.validationordergener
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import javax.validation.Constraint;
+import jakarta.validation.Constraint;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.TYPE;

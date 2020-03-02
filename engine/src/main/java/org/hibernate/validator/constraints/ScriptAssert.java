@@ -14,8 +14,8 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
 import org.hibernate.validator.constraints.ScriptAssert.List;
 
@@ -85,7 +85,7 @@ public @interface ScriptAssert {
 	/**
 	 * @return The name of the script language used by this constraint as
 	 *         expected by the JSR 223 {@link javax.script.ScriptEngineManager}. A
-	 *         {@link javax.validation.ConstraintDeclarationException} will be thrown upon script
+	 *         {@link jakarta.validation.ConstraintDeclarationException} will be thrown upon script
 	 *         evaluation, if no engine for the given language could be found.
 	 */
 	String lang();
@@ -95,7 +95,7 @@ public @interface ScriptAssert {
 	 *         {@code Boolean.TRUE}, if the annotated element could
 	 *         successfully be validated, otherwise {@code Boolean.FALSE}.
 	 *         Returning null or any type other than Boolean will cause a
-	 *         {@link javax.validation.ConstraintDeclarationException} upon validation. Any
+	 *         {@link jakarta.validation.ConstraintDeclarationException} upon validation. Any
 	 *         exception occurring during script evaluation will be wrapped into
 	 *         a ConstraintDeclarationException, too. Within the script, the
 	 *         validated object can be accessed from the {@link javax.script.ScriptContext

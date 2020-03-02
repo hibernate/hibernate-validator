@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Validate that the object is not {@code null}.

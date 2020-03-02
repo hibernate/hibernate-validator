@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.proxy;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 
 interface A {
 	@Min(5)

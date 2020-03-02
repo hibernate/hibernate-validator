@@ -10,8 +10,8 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import javax.money.MonetaryAmount;
-import javax.validation.ConstraintValidator;
-import javax.validation.constraints.Min;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.constraints.Min;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MinValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;

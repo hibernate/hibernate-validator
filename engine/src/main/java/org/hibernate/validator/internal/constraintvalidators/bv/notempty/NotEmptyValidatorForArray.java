@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.notempty;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  * Check that the array is not null and not empty.

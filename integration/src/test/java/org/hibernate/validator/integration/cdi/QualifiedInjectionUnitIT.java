@@ -10,10 +10,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Serializable;
 
-import javax.enterprise.context.SessionScoped;
+import jakarta.enterprise.context.SessionScoped;
 import javax.inject.Inject;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.integration.AbstractArquillianIT;

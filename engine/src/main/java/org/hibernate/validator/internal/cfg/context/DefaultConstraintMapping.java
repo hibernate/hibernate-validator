@@ -13,7 +13,7 @@ import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
-import javax.validation.Constraint;
+import jakarta.validation.Constraint;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;

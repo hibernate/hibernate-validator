@@ -6,9 +6,9 @@
  */
 
 /**
- * Contains {@link javax.validation.ConstraintValidator} implementations for
- * {@link javax.validation.constraints.Positive}, {@link javax.validation.constraints.PositiveOrZero},
- * {@link javax.validation.constraints.Negative} and {@link javax.validation.constraints.NegativeOrZero}
+ * Contains {@link jakarta.validation.ConstraintValidator} implementations for
+ * {@link jakarta.validation.constraints.Positive}, {@link jakarta.validation.constraints.PositiveOrZero},
+ * {@link jakarta.validation.constraints.Negative} and {@link jakarta.validation.constraints.NegativeOrZero}
  * constraints.
  *
  * @author Marko Bekhta

@@ -1,6 +1,6 @@
 package org.hibernate.validator.referenceguide.chapter12.propertypath;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 public class Person {
 

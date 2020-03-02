@@ -16,10 +16,10 @@ import static org.testng.Assert.assertTrue;
 
 import java.time.LocalDate;
 import java.util.Set;
-import javax.validation.groups.Default;
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.CrossParameterDescriptor;
-import javax.validation.metadata.Scope;
+import jakarta.validation.groups.Default;
+import jakarta.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.metadata.CrossParameterDescriptor;
+import jakarta.validation.metadata.Scope;
 
 import org.testng.annotations.Test;
 

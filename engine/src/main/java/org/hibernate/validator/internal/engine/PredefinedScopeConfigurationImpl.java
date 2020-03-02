@@ -11,9 +11,9 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.validation.spi.BootstrapState;
-import javax.validation.spi.ConfigurationState;
-import javax.validation.spi.ValidationProvider;
+import jakarta.validation.spi.BootstrapState;
+import jakarta.validation.spi.ConfigurationState;
+import jakarta.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.PredefinedScopeHibernateValidatorConfiguration;
 import org.hibernate.validator.internal.util.CollectionHelper;

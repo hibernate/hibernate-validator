@@ -12,7 +12,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;

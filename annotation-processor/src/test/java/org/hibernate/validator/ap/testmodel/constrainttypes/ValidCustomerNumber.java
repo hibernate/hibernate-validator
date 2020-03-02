@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.ap.testmodel.constrainttypes;
 
-import javax.validation.Payload;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.Payload;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /**
  * Constraint annotations are not allowed here, as ValidCustomerNumber isn't a

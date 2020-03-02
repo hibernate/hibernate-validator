@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpr
 
 import java.time.Duration;
 
-import javax.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.FutureOrPresent;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractEpochBasedTimeValidator;
 

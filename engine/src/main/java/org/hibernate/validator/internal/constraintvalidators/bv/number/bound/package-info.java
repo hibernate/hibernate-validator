@@ -6,7 +6,7 @@
  */
 
 /**
- * Contains {@link javax.validation.ConstraintValidator} implementations for
+ * Contains {@link jakarta.validation.ConstraintValidator} implementations for
  * min and max constraints for numbers.
  *
  * @author Marko Bekhta

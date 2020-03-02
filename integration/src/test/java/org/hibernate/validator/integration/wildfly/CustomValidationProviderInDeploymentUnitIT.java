@@ -9,8 +9,8 @@ package org.hibernate.validator.integration.wildfly;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.inject.Inject;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 import org.apache.log4j.Logger;
 import org.hibernate.validator.integration.AbstractArquillianIT;

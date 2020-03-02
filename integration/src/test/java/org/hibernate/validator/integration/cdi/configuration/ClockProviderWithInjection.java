@@ -9,7 +9,7 @@ package org.hibernate.validator.integration.cdi.configuration;
 import java.time.Clock;
 
 import javax.inject.Inject;
-import javax.validation.ClockProvider;
+import jakarta.validation.ClockProvider;
 
 import org.hibernate.validator.integration.cdi.service.PingService;
 

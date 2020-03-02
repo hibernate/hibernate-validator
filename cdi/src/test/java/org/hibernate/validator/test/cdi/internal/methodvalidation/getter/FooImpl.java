@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.cdi.internal.methodvalidation.getter;
 
-import javax.validation.executable.ExecutableType;
-import javax.validation.executable.ValidateOnExecution;
+import jakarta.validation.executable.ExecutableType;
+import jakarta.validation.executable.ValidateOnExecution;
 
 /**
  * @author Hardy Ferentschik

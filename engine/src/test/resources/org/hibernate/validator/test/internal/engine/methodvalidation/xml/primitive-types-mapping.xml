@@ -15,49 +15,49 @@
           ignore-annotations="true">
         <method name="setBoolean">
             <parameter type="boolean">
-                <constraint annotation="javax.validation.constraints.NotNull"/>
+                <constraint annotation="jakarta.validation.constraints.NotNull"/>
             </parameter>
         </method>
 
         <method name="setChar">
             <parameter type="char">
-                <constraint annotation="javax.validation.constraints.NotNull"/>
+                <constraint annotation="jakarta.validation.constraints.NotNull"/>
             </parameter>
         </method>
 
         <method name="setDouble">
             <parameter type="double">
-                <constraint annotation="javax.validation.constraints.NotNull"/>
+                <constraint annotation="jakarta.validation.constraints.NotNull"/>
             </parameter>
         </method>
 
         <method name="setFloat">
             <parameter type="float">
-                <constraint annotation="javax.validation.constraints.NotNull"/>
+                <constraint annotation="jakarta.validation.constraints.NotNull"/>
             </parameter>
         </method>
 
         <method name="setLong">
             <parameter type="long">
-                <constraint annotation="javax.validation.constraints.NotNull"/>
+                <constraint annotation="jakarta.validation.constraints.NotNull"/>
             </parameter>
         </method>
 
         <method name="setInt">
             <parameter type="int">
-                <constraint annotation="javax.validation.constraints.NotNull"/>
+                <constraint annotation="jakarta.validation.constraints.NotNull"/>
             </parameter>
         </method>
 
         <method name="setShort">
             <parameter type="short">
-                <constraint annotation="javax.validation.constraints.NotNull"/>
+                <constraint annotation="jakarta.validation.constraints.NotNull"/>
             </parameter>
         </method>
 
         <method name="setByte">
             <parameter type="byte">
-                <constraint annotation="javax.validation.constraints.NotNull"/>
+                <constraint annotation="jakarta.validation.constraints.NotNull"/>
             </parameter>
         </method>
 

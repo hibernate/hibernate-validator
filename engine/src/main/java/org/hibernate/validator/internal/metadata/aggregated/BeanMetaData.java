@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.validation.metadata.BeanDescriptor;
+import jakarta.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;

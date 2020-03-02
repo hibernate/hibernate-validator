@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.constraintvalidators.bv.size;
 
 import java.lang.invoke.MethodHandles;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;

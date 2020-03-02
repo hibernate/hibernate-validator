@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.packageprivateconstraint;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * @author Gunnar Morling

@@ -8,8 +8,8 @@ package org.hibernate.validator.ap.testmodel.crossparameters;
 
 import java.lang.annotation.Annotation;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class GenericNormalValidator implements ConstraintValidator<Annotation, Object> {
 

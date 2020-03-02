@@ -8,8 +8,8 @@ package org.hibernate.validator.internal.metadata.raw;
 
 import java.util.Set;
 
-import javax.validation.Valid;
-import javax.validation.groups.ConvertGroup;
+import jakarta.validation.Valid;
+import jakarta.validation.groups.ConvertGroup;
 
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;

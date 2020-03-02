@@ -12,8 +12,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * Check that the code point length of a character sequence is between min and max.

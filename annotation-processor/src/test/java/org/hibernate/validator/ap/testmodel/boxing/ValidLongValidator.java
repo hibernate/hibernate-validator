@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.ap.testmodel.boxing;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class ValidLongValidator implements ConstraintValidator<ValidLong, Long> {
 	@Override

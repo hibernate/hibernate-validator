@@ -11,7 +11,7 @@
         <method name="test5">
             <parameter type="[Ljava.lang.String;">
                 <container-element-type>
-                    <constraint annotation="javax.validation.constraints.Size">
+                    <constraint annotation="jakarta.validation.constraints.Size">
                         <element name="max">
                             <value>5</value>
                         </element>

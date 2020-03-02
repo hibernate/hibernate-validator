@@ -8,9 +8,9 @@ package org.hibernate.validator.internal.engine.validationcontext;
 
 import java.time.Duration;
 
-import javax.validation.ClockProvider;
-import javax.validation.MessageInterpolator;
-import javax.validation.Validator;
+import jakarta.validation.ClockProvider;
+import jakarta.validation.MessageInterpolator;
+import jakarta.validation.Validator;
 
 import org.hibernate.validator.internal.engine.ValidatorFactoryScopedContext;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;

@@ -11,9 +11,9 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.validation.UnexpectedTypeException;
-import javax.validation.Validator;
-import javax.validation.constraints.Size;
+import jakarta.validation.UnexpectedTypeException;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.testutil.TestForIssue;

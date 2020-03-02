@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.redefiningdefaultgroup;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Min;
 
 /**
  * @author Hardy Ferentschik

@@ -10,9 +10,9 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.Max;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.Max;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMaxValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForCharSequence;

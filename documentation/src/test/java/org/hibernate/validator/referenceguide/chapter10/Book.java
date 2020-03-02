@@ -3,7 +3,7 @@ package org.hibernate.validator.referenceguide.chapter10;
 
 //end::include[]
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 //tag::include[]
 public class Book {

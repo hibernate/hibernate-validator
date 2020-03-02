@@ -14,9 +14,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintValidator;
-import javax.validation.ValidationException;
+import jakarta.validation.ConstraintDeclarationException;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.internal.engine.valuecontext.ValueContext;
 import org.hibernate.validator.internal.engine.validationcontext.ValidationContext;

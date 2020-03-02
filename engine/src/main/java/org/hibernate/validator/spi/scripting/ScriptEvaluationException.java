@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.spi.scripting;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.Incubating;
 

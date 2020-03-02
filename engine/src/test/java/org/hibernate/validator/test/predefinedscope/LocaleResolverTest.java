@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Locale.LanguageRange;
 
-import javax.validation.MessageInterpolator;
-import javax.validation.Validation;
-import javax.validation.ValidatorFactory;
-import javax.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.MessageInterpolator;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
@@ -35,7 +35,7 @@ public class LocaleResolverTest {
 
 		StaticFieldLocaleResolver.acceptLanguage = "fr-FR,fr;q=0.9";
 
-		assertThat( messageInterpolator.interpolate( "{javax.validation.constraints.AssertFalse.message}", new TestContext() ) )
+		assertThat( messageInterpolator.interpolate( "{jakarta.validation.constraints.AssertFalse.message}", new TestContext() ) )
 				.isEqualTo( "doit avoir la valeur faux" );
 	}
 
@@ -46,7 +46,7 @@ public class LocaleResolverTest {
 
 		StaticFieldLocaleResolver.acceptLanguage = "hr-HR,hr;q=0.9,es;q=0.7";
 
-		assertThat( messageInterpolator.interpolate( "{javax.validation.constraints.AssertFalse.message}", new TestContext() ) )
+		assertThat( messageInterpolator.interpolate( "{jakarta.validation.constraints.AssertFalse.message}", new TestContext() ) )
 				.isEqualTo( "debe ser falso" );
 	}
 
@@ -58,14 +58,14 @@ public class LocaleResolverTest {
 
 		StaticFieldLocaleResolver.acceptLanguage = "hr-HR,hr;q=0.9";
 
-		assertThat( messageInterpolator.interpolate( "{javax.validation.constraints.AssertFalse.message}", new TestContext() ) )
+		assertThat( messageInterpolator.interpolate( "{jakarta.validation.constraints.AssertFalse.message}", new TestContext() ) )
 				.isEqualTo( "must be false" );
 
 		// Defaults to fr_FR if we define it as the default locale
 		validatorFactory = getValidatorFactoryWithDefaultLocaleAndInitializedLocales( Locale.FRANCE, Locale.forLanguageTag( "es_ES" ) );
 		messageInterpolator = validatorFactory.getMessageInterpolator();
 
-		assertThat( messageInterpolator.interpolate( "{javax.validation.constraints.AssertFalse.message}", new TestContext() ) )
+		assertThat( messageInterpolator.interpolate( "{jakarta.validation.constraints.AssertFalse.message}", new TestContext() ) )
 				.isEqualTo( "doit avoir la valeur faux" );
 	}
 

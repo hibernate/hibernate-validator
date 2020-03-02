@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.internal.engine.valueextraction;
 
-import javax.validation.valueextraction.ExtractedValue;
-import javax.validation.valueextraction.ValueExtractor;
+import jakarta.validation.valueextraction.ExtractedValue;
+import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 

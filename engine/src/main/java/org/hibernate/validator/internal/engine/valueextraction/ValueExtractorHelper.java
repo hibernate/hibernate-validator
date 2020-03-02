@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.ValidationException;
-import javax.validation.valueextraction.ValueExtractor;
+import jakarta.validation.ValidationException;
+import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;

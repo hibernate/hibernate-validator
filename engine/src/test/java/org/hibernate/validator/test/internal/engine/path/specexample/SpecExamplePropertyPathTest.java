@@ -20,21 +20,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ElementKind;
-import javax.validation.Path;
-import javax.validation.Path.BeanNode;
-import javax.validation.Path.ConstructorNode;
-import javax.validation.Path.ContainerElementNode;
-import javax.validation.Path.MethodNode;
-import javax.validation.Path.ParameterNode;
-import javax.validation.Path.PropertyNode;
-import javax.validation.Validator;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.validation.executable.ExecutableValidator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ElementKind;
+import jakarta.validation.Path;
+import jakarta.validation.Path.BeanNode;
+import jakarta.validation.Path.ConstructorNode;
+import jakarta.validation.Path.ContainerElementNode;
+import jakarta.validation.Path.MethodNode;
+import jakarta.validation.Path.ParameterNode;
+import jakarta.validation.Path.PropertyNode;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.executable.ExecutableValidator;
 
 import org.testng.annotations.Test;
 

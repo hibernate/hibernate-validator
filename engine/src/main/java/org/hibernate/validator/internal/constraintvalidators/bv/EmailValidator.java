@@ -10,9 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
 
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 
 import org.hibernate.validator.internal.constraintvalidators.AbstractEmailValidator;
 import org.hibernate.validator.internal.util.logging.Log;

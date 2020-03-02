@@ -8,8 +8,8 @@ package org.hibernate.validator.test.internal.constraintvalidators.bv.time;
 
 import java.util.Calendar;
 import java.util.Date;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.Past;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Past;
 
 /**
  * @author Hardy Ferentschik

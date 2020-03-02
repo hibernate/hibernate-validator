@@ -11,8 +11,8 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import javax.validation.TraversableResolver;
-import javax.validation.ValidationException;
+import jakarta.validation.TraversableResolver;
+import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;

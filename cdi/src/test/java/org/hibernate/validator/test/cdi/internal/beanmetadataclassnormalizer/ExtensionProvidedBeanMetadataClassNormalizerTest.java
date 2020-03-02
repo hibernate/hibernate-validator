@@ -8,11 +8,11 @@ package org.hibernate.validator.test.cdi.internal.beanmetadataclassnormalizer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.inject.Inject;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.NotNull;
+import jakarta.inject.Inject;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.cdi.HibernateValidator;
 
@@ -34,7 +34,7 @@ public class ExtensionProvidedBeanMetadataClassNormalizerTest extends Arquillian
 				// Register the CDI extension that provides the normalizer bean
 				.addAsManifestResource(
 						new StringAsset( CustomProxyBeanMetadataClassNormalizerCdiExtension.class.getName() ),
-						"services/javax.enterprise.inject.spi.Extension"
+						"services/jakarta.enterprise.inject.spi.Extension"
 				);
 	}
 

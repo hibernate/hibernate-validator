@@ -10,8 +10,8 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertC
 import java.lang.reflect.Constructor;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.constraints.Size;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 

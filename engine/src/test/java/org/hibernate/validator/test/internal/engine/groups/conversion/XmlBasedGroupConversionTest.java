@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.conversion;
 
-import javax.validation.Configuration;
-import javax.validation.ValidatorFactory;
+import jakarta.validation.Configuration;
+import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeMethod;

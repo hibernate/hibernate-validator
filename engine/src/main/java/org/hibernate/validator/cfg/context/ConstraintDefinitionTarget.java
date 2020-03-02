@@ -22,7 +22,7 @@ public interface ConstraintDefinitionTarget {
 	 *
 	 * @param <A> The annotation type to select.
 	 * @param annotationType The annotation type to select. This type must be an {@code @interface} annotated with
-	 * {@code javax.validation.Constraint}.
+	 * {@code jakarta.validation.Constraint}.
 	 *
 	 * @return A creational context representing the selected constraint.
 	 */

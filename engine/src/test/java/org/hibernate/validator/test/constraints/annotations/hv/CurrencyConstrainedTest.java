@@ -13,7 +13,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import java.util.Set;
 
 import javax.money.MonetaryAmount;
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;

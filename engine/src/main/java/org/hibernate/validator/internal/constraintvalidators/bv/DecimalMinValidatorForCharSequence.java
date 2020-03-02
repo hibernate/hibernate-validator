@@ -8,9 +8,9 @@ package org.hibernate.validator.internal.constraintvalidators.bv;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.DecimalMin;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraints.DecimalMin;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;

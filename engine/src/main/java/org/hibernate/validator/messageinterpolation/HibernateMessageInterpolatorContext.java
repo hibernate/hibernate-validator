@@ -8,8 +8,8 @@ package org.hibernate.validator.messageinterpolation;
 
 import java.util.Map;
 
-import javax.validation.MessageInterpolator;
-import javax.validation.Path;
+import jakarta.validation.MessageInterpolator;
+import jakarta.validation.Path;
 
 /**
  * Extension to {@code MessageInterpolator.Context} which provides functionality

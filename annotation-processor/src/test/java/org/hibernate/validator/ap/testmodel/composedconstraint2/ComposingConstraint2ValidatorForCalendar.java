@@ -8,8 +8,8 @@ package org.hibernate.validator.ap.testmodel.composedconstraint2;
 
 import java.util.Calendar;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class ComposingConstraint2ValidatorForCalendar implements ConstraintValidator<ComposingConstraint2, Calendar> {
 

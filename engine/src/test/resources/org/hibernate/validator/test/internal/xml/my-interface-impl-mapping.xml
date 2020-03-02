@@ -12,7 +12,7 @@
     <default-package>org.hibernate.validator.internal.xml</default-package>
     <bean class="org.hibernate.validator.test.internal.xml.MyInterfaceImpl" ignore-annotations="true">
         <getter name="id" ignore-annotations="true">
-            <constraint annotation="javax.validation.constraints.NotNull"/>
+            <constraint annotation="jakarta.validation.constraints.NotNull"/>
         </getter>
     </bean>
 </constraint-mappings>

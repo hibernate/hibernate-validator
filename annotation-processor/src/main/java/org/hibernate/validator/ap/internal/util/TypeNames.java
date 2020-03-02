@@ -17,7 +17,7 @@ public class TypeNames {
 
 	public static class BeanValidationTypes {
 
-		public static final String JAVAX_VALIDATION = "javax.validation";
+		public static final String JAVAX_VALIDATION = "jakarta.validation";
 
 		public static final String CONSTRAINT = JAVAX_VALIDATION + ".Constraint";
 		public static final String CONSTRAINT_TARGET = JAVAX_VALIDATION + ".ConstraintTarget";
@@ -26,7 +26,7 @@ public class TypeNames {
 		public static final String PAYLOAD = JAVAX_VALIDATION + ".Payload";
 		public static final String VALID = JAVAX_VALIDATION + ".Valid";
 
-		public static final String JAVAX_VALIDATION_CONSTRAINTS = "javax.validation.constraints";
+		public static final String JAVAX_VALIDATION_CONSTRAINTS = "jakarta.validation.constraints";
 
 		public static final String ASSERT_FALSE = JAVAX_VALIDATION_CONSTRAINTS + ".AssertFalse";
 		public static final String ASSERT_TRUE = JAVAX_VALIDATION_CONSTRAINTS + ".AssertTrue";
@@ -51,7 +51,7 @@ public class TypeNames {
 		public static final String POSITIVE_OR_ZERO = JAVAX_VALIDATION_CONSTRAINTS + ".PositiveOrZero";
 		public static final String SIZE = JAVAX_VALIDATION_CONSTRAINTS + ".Size";
 
-		public static final String CONSTRAINTVALIDATION = "javax.validation.constraintvalidation";
+		public static final String CONSTRAINTVALIDATION = "jakarta.validation.constraintvalidation";
 
 		public static final String SUPPORTED_VALIDATION_TARGET = CONSTRAINTVALIDATION + ".SupportedValidationTarget";
 	}

@@ -15,8 +15,8 @@ import static org.testng.Assert.assertTrue;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.ValidationException;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;

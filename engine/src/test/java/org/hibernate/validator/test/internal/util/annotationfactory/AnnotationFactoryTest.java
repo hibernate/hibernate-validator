@@ -8,8 +8,8 @@ package org.hibernate.validator.test.internal.util.annotationfactory;
 
 import static org.testng.Assert.assertEquals;
 
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.testng.annotations.Test;

@@ -8,8 +8,8 @@ package org.hibernate.validator.test.internal.engine.methodvalidation.returnvalu
 
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 
-import javax.validation.ConstraintViolationException;
-import javax.validation.groups.Default;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.groups.Default;
 
 import org.testng.annotations.Test;
 

@@ -11,11 +11,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.metadata.ConstructorDescriptor;
-import javax.validation.metadata.CrossParameterDescriptor;
-import javax.validation.metadata.MethodDescriptor;
-import javax.validation.metadata.ParameterDescriptor;
-import javax.validation.metadata.ReturnValueDescriptor;
+import jakarta.validation.metadata.ConstructorDescriptor;
+import jakarta.validation.metadata.CrossParameterDescriptor;
+import jakarta.validation.metadata.MethodDescriptor;
+import jakarta.validation.metadata.ParameterDescriptor;
+import jakarta.validation.metadata.ReturnValueDescriptor;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;

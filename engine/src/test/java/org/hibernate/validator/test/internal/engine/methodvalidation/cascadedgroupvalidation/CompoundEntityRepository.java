@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.cascadedgroupvalidation;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * @author Jan-Willem Willebrands

@@ -14,9 +14,9 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 import java.time.LocalDate;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.AssertTrue;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;

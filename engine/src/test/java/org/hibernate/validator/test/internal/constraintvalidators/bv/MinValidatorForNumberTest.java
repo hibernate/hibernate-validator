@@ -13,9 +13,9 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.math.BigDecimal;
 
-import javax.validation.Validator;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Min;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.AbstractMinValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForBigDecimal;

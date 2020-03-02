@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.GroupDefinitionException;
+import jakarta.validation.GroupDefinitionException;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -92,7 +92,7 @@ public final class DefaultValidationOrder implements ValidationOrder {
 	 *
 	 * @param defaultGroupSequence the default group sequence of the bean currently validated
 	 *
-	 * @throws javax.validation.GroupDefinitionException in case {@code defaultGroupSequence} cannot be expanded into one of the group sequences
+	 * @throws jakarta.validation.GroupDefinitionException in case {@code defaultGroupSequence} cannot be expanded into one of the group sequences
 	 * which need to be validated
 	 */
 	@Override

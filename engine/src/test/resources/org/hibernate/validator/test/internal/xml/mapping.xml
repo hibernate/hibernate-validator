@@ -16,7 +16,7 @@
 
     <bean class="org.hibernate.validator.test.internal.xml.Person" ignore-annotations="false">
         <getter name="firstName">
-            <constraint annotation="javax.validation.constraints.NotNull"/>
+            <constraint annotation="jakarta.validation.constraints.NotNull"/>
         </getter>
     </bean>
 

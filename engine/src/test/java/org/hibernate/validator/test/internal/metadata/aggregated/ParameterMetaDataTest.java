@@ -18,11 +18,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ParameterNameProvider;
-import javax.validation.constraints.NotNull;
-import javax.validation.executable.ExecutableType;
-import javax.validation.executable.ValidateOnExecution;
-import javax.validation.groups.Default;
+import jakarta.validation.ParameterNameProvider;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ExecutableType;
+import jakarta.validation.executable.ValidateOnExecution;
+import jakarta.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;

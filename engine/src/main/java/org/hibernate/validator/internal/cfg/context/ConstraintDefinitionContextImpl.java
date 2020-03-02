@@ -10,7 +10,7 @@ import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidator;
 
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;

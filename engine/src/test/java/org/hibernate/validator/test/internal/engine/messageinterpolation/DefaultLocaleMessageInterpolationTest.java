@@ -10,10 +10,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Locale;
 
-import javax.validation.MessageInterpolator;
-import javax.validation.Validation;
-import javax.validation.ValidatorFactory;
-import javax.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.MessageInterpolator;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.HibernateValidator;
 import org.testng.annotations.Test;
@@ -28,7 +28,7 @@ public class DefaultLocaleMessageInterpolationTest {
 
 		MessageInterpolator messageInterpolator = validatorFactory.getMessageInterpolator();
 
-		assertThat( messageInterpolator.interpolate( "{javax.validation.constraints.AssertFalse.message}", new TestContext() ) )
+		assertThat( messageInterpolator.interpolate( "{jakarta.validation.constraints.AssertFalse.message}", new TestContext() ) )
 						.isEqualTo( "must be false" );
 	}
 
@@ -41,7 +41,7 @@ public class DefaultLocaleMessageInterpolationTest {
 
 		MessageInterpolator messageInterpolator = validatorFactory.getMessageInterpolator();
 
-		assertThat( messageInterpolator.interpolate( "{javax.validation.constraints.AssertFalse.message}", new TestContext() ) )
+		assertThat( messageInterpolator.interpolate( "{jakarta.validation.constraints.AssertFalse.message}", new TestContext() ) )
 						.isEqualTo( "doit avoir la valeur faux" );
 
 		validatorFactory = Validation.byProvider( HibernateValidator.class )
@@ -51,7 +51,7 @@ public class DefaultLocaleMessageInterpolationTest {
 
 		messageInterpolator = validatorFactory.getMessageInterpolator();
 
-		assertThat( messageInterpolator.interpolate( "{javax.validation.constraints.AssertFalse.message}", new TestContext() ) )
+		assertThat( messageInterpolator.interpolate( "{jakarta.validation.constraints.AssertFalse.message}", new TestContext() ) )
 						.isEqualTo( "deve essere false" );
 	}
 

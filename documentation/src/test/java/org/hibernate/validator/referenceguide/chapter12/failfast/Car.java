@@ -2,8 +2,8 @@
 package org.hibernate.validator.referenceguide.chapter12.failfast;
 
 //end::include[]
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 
 //tag::include[]
 public class Car {

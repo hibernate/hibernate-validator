@@ -21,11 +21,11 @@ import java.security.PrivilegedAction;
 import java.util.Set;
 
 import javax.el.ExpressionFactory;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
-import javax.validation.constraints.Min;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.Min;
 
 import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;

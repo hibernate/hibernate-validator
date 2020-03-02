@@ -8,11 +8,11 @@ package org.hibernate.validator.test.internal.xml.mixedconfiguration;
 
 import java.lang.annotation.Annotation;
 import java.util.Set;
-import javax.validation.Configuration;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Configuration;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.constraints.NotNull;
 
 import org.testng.annotations.Test;
 

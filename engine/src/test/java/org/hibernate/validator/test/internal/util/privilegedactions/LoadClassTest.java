@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.util.privilegedactions;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 
 import org.testng.annotations.Test;
 
@@ -43,7 +43,7 @@ public class LoadClassTest {
 	private void runLoadClass(LoadClass action) {
 		try {
 			action.run();
-			fail( "Should have thrown javax.validation.ValidationException" );
+			fail( "Should have thrown jakarta.validation.ValidationException" );
 		}
 		catch (ValidationException e) {
 			String expectedMessageId = "HV000065";

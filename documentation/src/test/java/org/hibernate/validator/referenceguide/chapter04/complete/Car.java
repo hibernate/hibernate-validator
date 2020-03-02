@@ -4,10 +4,10 @@ package org.hibernate.validator.referenceguide.chapter04.complete;
 //end::include[]
 
 import java.math.BigDecimal;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 //tag::include[]
 public class Car {

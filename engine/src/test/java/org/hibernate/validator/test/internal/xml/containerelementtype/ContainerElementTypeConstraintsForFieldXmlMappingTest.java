@@ -18,11 +18,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.validation.Configuration;
-import javax.validation.ConstraintViolation;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
-import javax.validation.constraints.Size;
+import jakarta.validation.Configuration;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;

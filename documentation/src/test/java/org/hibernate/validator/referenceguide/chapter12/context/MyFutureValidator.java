@@ -3,9 +3,9 @@ package org.hibernate.validator.referenceguide.chapter12.context;
 
 import java.time.Instant;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Future;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraints.Future;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 

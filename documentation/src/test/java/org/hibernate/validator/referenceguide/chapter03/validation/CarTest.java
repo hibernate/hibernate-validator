@@ -10,16 +10,16 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Path.MethodNode;
-import javax.validation.Path.Node;
-import javax.validation.Path.ParameterNode;
-import javax.validation.Validation;
-import javax.validation.ValidatorFactory;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.validation.executable.ExecutableValidator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Path.MethodNode;
+import jakarta.validation.Path.Node;
+import jakarta.validation.Path.ParameterNode;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.executable.ExecutableValidator;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

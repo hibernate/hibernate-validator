@@ -19,10 +19,10 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
-import javax.validation.ReportAsSingleViolation;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+import jakarta.validation.ReportAsSingleViolation;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Validate that the annotated string is not {@code null} or empty.
@@ -30,7 +30,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author Hardy Ferentschik
  *
- * @deprecated use the standard {@link javax.validation.constraints.NotBlank} constraint instead
+ * @deprecated use the standard {@link jakarta.validation.constraints.NotBlank} constraint instead
  */
 @Documented
 @Constraint(validatedBy = { })

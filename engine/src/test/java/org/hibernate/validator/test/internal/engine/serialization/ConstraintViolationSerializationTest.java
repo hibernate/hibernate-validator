@@ -20,13 +20,13 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.Size;
-import javax.validation.executable.ExecutableValidator;
-import javax.validation.groups.Default;
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.ValidateUnwrappedValue;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.executable.ExecutableValidator;
+import jakarta.validation.groups.Default;
+import jakarta.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.metadata.ValidateUnwrappedValue;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCharSequence;
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -131,7 +131,7 @@ public class ConstraintViolationSerializationTest {
 		assertEquals( constraintViolation.getRootBean(), testInstance );
 		assertEquals( constraintViolation.getRootBeanClass(), SerializableClass.class );
 		assertEquals( constraintViolation.getMessage(), "size must be between 5 and 2147483647" );
-		assertEquals( constraintViolation.getMessageTemplate(), "{javax.validation.constraints.Size.message}" );
+		assertEquals( constraintViolation.getMessageTemplate(), "{jakarta.validation.constraints.Size.message}" );
 		assertEquals( constraintViolation.getInvalidValue(), "s" );
 		assertEquals( constraintViolation.getExecutableParameters(), executableParameters );
 		assertEquals( constraintViolation.getExecutableReturnValue(), executableReturnValue );
@@ -139,7 +139,7 @@ public class ConstraintViolationSerializationTest {
 		ConstraintDescriptor<?> constraintDescriptor = constraintViolation.getConstraintDescriptor();
 		assertEquals( constraintDescriptor.getAnnotation().annotationType(), Size.class );
 		assertEquals( constraintDescriptor.getGroups(), CollectionHelper.asSet( Default.class ) );
-		assertEquals( constraintDescriptor.getMessageTemplate(), "{javax.validation.constraints.Size.message}" );
+		assertEquals( constraintDescriptor.getMessageTemplate(), "{jakarta.validation.constraints.Size.message}" );
 		assertEquals( constraintDescriptor.getPayload(), CollectionHelper.asSet( TestPayload.class ) );
 		assertEquals( constraintDescriptor.getValidationAppliesTo(), null );
 		assertEquals( constraintDescriptor.getValueUnwrapping(), ValidateUnwrappedValue.DEFAULT );

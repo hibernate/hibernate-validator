@@ -8,8 +8,8 @@ package org.hibernate.validator.ap.testmodel;
 
 import java.util.Date;
 
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Pattern.List;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Pattern.List;
 
 public class MultipleConstraintsOfSameType {
 

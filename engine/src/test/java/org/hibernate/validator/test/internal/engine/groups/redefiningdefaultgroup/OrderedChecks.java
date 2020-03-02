@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.redefiningdefaultgroup;
 
-import javax.validation.GroupSequence;
-import javax.validation.groups.Default;
+import jakarta.validation.GroupSequence;
+import jakarta.validation.groups.Default;
 
 /**
  * @author Hardy Ferentschik

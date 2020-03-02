@@ -7,8 +7,8 @@
 package org.hibernate.validator.performance.statistical;
 
 import java.lang.annotation.Annotation;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * @author Hardy Ferentschik

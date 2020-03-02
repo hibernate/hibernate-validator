@@ -3,8 +3,8 @@ package org.hibernate.validator.referenceguide.chapter06.classlevel;
 
 //end::include[]
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 //tag::include[]
 public class ValidPassengerCountValidator

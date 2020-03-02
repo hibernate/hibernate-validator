@@ -21,8 +21,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.validation.Payload;
-import javax.validation.ValidationException;
+import jakarta.validation.Payload;
+import jakarta.validation.ValidationException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;

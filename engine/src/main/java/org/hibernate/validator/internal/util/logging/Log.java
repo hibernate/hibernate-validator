@@ -26,24 +26,24 @@ import java.util.ServiceConfigurationError;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
-import javax.validation.ClockProvider;
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintDefinitionException;
-import javax.validation.ConstraintTarget;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.ElementKind;
-import javax.validation.GroupDefinitionException;
-import javax.validation.MessageInterpolator;
-import javax.validation.ParameterNameProvider;
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
-import javax.validation.UnexpectedTypeException;
-import javax.validation.ValidationException;
-import javax.validation.spi.ValidationProvider;
-import javax.validation.valueextraction.ValueExtractor;
-import javax.validation.valueextraction.ValueExtractorDeclarationException;
-import javax.validation.valueextraction.ValueExtractorDefinitionException;
+import jakarta.validation.ClockProvider;
+import jakarta.validation.ConstraintDeclarationException;
+import jakarta.validation.ConstraintDefinitionException;
+import jakarta.validation.ConstraintTarget;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorFactory;
+import jakarta.validation.ElementKind;
+import jakarta.validation.GroupDefinitionException;
+import jakarta.validation.MessageInterpolator;
+import jakarta.validation.ParameterNameProvider;
+import jakarta.validation.Path;
+import jakarta.validation.TraversableResolver;
+import jakarta.validation.UnexpectedTypeException;
+import jakarta.validation.ValidationException;
+import jakarta.validation.spi.ValidationProvider;
+import jakarta.validation.valueextraction.ValueExtractor;
+import jakarta.validation.valueextraction.ValueExtractorDeclarationException;
+import jakarta.validation.valueextraction.ValueExtractorDefinitionException;
 import javax.xml.stream.XMLStreamException;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
@@ -423,7 +423,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 113, value = "%s, %s, %s are reserved parameter names.")
 	ValidationException getReservedParameterNamesException(String messageParameterName, String groupsParameterName, String payloadParameterName);
 
-	@Message(id = 114, value = "Specified payload class %s does not implement javax.validation.Payload")
+	@Message(id = 114, value = "Specified payload class %s does not implement jakarta.validation.Payload")
 	ValidationException getWrongPayloadClassException(@FormatWith(ClassObjectFormatter.class) Class<?> payloadClass);
 
 	@Message(id = 115, value = "Error parsing mapping file.")
@@ -568,7 +568,7 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint);
 
 	@Message(id = 157,
-			value = "Return type of the attribute validationAppliesTo() of the constraint %s must be javax.validation.ConstraintTarget.")
+			value = "Return type of the attribute validationAppliesTo() of the constraint %s must be jakarta.validation.ConstraintTarget.")
 	ConstraintDefinitionException getValidationAppliesToParameterMustHaveReturnTypeConstraintTargetException(
 			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint);
 

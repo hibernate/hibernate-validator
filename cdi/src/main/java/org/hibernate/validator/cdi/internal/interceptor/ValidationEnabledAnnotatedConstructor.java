@@ -7,7 +7,7 @@
 package org.hibernate.validator.cdi.internal.interceptor;
 
 import java.lang.reflect.Constructor;
-import javax.enterprise.inject.spi.AnnotatedConstructor;
+import jakarta.enterprise.inject.spi.AnnotatedConstructor;
 
 /**
  * @author Hardy Ferentschik

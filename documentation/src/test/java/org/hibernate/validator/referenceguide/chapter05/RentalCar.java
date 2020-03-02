@@ -3,8 +3,8 @@ package org.hibernate.validator.referenceguide.chapter05;
 
 //end::include[]
 
-import javax.validation.GroupSequence;
-import javax.validation.constraints.AssertFalse;
+import jakarta.validation.GroupSequence;
+import jakarta.validation.constraints.AssertFalse;
 
 //tag::include[]
 @GroupSequence({ RentalChecks.class, CarChecks.class, RentalCar.class })

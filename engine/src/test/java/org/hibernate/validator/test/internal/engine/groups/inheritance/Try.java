@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.inheritance;
 
-import javax.validation.GroupSequence;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.GroupSequence;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author Hardy Ferentschik

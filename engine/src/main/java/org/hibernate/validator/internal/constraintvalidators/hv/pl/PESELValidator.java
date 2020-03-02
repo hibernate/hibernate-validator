@@ -9,7 +9,7 @@ package org.hibernate.validator.internal.constraintvalidators.hv.pl;
 import java.util.Collections;
 import java.util.List;
 
-import javax.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidator;
 
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckBase;

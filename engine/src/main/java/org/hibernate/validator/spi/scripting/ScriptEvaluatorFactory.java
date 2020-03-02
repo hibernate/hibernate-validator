@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.spi.scripting;
 
-import javax.validation.ValidatorFactory;
+import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.constraints.ParameterScriptAssert;

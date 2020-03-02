@@ -14,7 +14,7 @@ import javax.el.ELException;
 import javax.el.ExpressionFactory;
 import javax.el.PropertyNotFoundException;
 import javax.el.ValueExpression;
-import javax.validation.MessageInterpolator;
+import jakarta.validation.MessageInterpolator;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.el.RootResolver;
 import org.hibernate.validator.internal.engine.messageinterpolation.el.SimpleELContext;

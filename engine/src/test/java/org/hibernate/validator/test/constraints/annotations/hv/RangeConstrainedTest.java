@@ -15,7 +15,7 @@ import java.math.BigInteger;
 import java.util.Set;
 
 import javax.money.MonetaryAmount;
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;

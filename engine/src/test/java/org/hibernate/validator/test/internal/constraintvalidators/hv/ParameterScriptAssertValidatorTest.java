@@ -18,9 +18,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.executable.ExecutableValidator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;

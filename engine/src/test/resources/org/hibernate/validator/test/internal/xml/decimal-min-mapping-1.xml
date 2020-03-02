@@ -11,7 +11,7 @@
         xmlns="https://xmlns.jakarta.ee/xml/ns/validation/mapping"
         version="3.0">
 
-    <constraint-definition annotation="javax.validation.constraints.DecimalMin">
+    <constraint-definition annotation="jakarta.validation.constraints.DecimalMin">
         <validated-by include-existing-validators="true">
             <value>org.hibernate.validator.test.internal.xml.MappingXmlParserTest$DecimalMinValidatorForFoo</value>
         </validated-by>

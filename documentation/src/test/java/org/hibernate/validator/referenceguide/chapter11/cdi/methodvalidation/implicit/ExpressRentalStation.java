@@ -5,10 +5,10 @@ package org.hibernate.validator.referenceguide.chapter11.cdi.methodvalidation.im
 
 import java.util.Date;
 import java.util.List;
-import javax.enterprise.context.ApplicationScoped;
-import javax.validation.constraints.Min;
-import javax.validation.executable.ExecutableType;
-import javax.validation.executable.ValidateOnExecution;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.executable.ExecutableType;
+import jakarta.validation.executable.ValidateOnExecution;
 
 //tag::include[]
 @ApplicationScoped

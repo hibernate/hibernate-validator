@@ -7,8 +7,8 @@
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
 import java.net.MalformedURLException;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * Validate that the character sequence (e.g. string) is a valid URL using the {@code java.net.URL} constructor.

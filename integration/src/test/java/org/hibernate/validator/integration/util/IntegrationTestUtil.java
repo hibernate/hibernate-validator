@@ -20,9 +20,9 @@ public class IntegrationTestUtil {
 	// a dependency to the hibernate-validator jar file since the version string in org.hibernate.validator.util.Version
 	// works with byte code enhancement
 	private static final String CUSTOM_BV_JAR_NAME = "dummy-bean-validation-provider.jar";
-	private static final String VALIDATION_PROVIDER_SERVICE_FILE_PATH = "META-INF/services/javax.validation.spi.ValidationProvider";
+	private static final String VALIDATION_PROVIDER_SERVICE_FILE_PATH = "META-INF/services/jakarta.validation.spi.ValidationProvider";
 
-	private static final String CONSTRAINT_CONTRIBUTOR_SERVICE_FILE_PATH = "META-INF/services/javax.validation.ConstraintValidator";
+	private static final String CONSTRAINT_CONTRIBUTOR_SERVICE_FILE_PATH = "META-INF/services/jakarta.validation.ConstraintValidator";
 	private static final String CONTRIBUTOR_BUNDLE_NAME = "ContributorValidationMessages.properties";
 	private static final String OX_BERRY_CUSTOM_VALIDATOR_JAR_NAME = "oxberry.jar";
 	private static final String ACME_CUSTOM_VALIDATOR_JAR_NAME = "acme.jar";
@@ -43,7 +43,7 @@ public class IntegrationTestUtil {
 						MyValidationProvider.class
 				)
 				.addAsResource(
-						"javax.validation.spi.ValidationProvider",
+						"jakarta.validation.spi.ValidationProvider",
 						VALIDATION_PROVIDER_SERVICE_FILE_PATH
 				);
 	}
@@ -58,7 +58,7 @@ public class IntegrationTestUtil {
 						OxBerryConstraintValidator.class
 				)
 				.addAsResource(
-						"javax.validation.ConstraintValidator-OxBerry",
+						"jakarta.validation.ConstraintValidator-OxBerry",
 						CONSTRAINT_CONTRIBUTOR_SERVICE_FILE_PATH
 				)
 				.addAsResource(
@@ -77,7 +77,7 @@ public class IntegrationTestUtil {
 						AcmeConstraintValidator.class
 				)
 				.addAsResource(
-						"javax.validation.ConstraintValidator-Acme",
+						"jakarta.validation.ConstraintValidator-Acme",
 						CONSTRAINT_CONTRIBUTOR_SERVICE_FILE_PATH
 				)
 				.addAsResource(

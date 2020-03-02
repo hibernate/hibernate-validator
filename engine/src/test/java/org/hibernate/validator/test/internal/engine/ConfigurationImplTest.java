@@ -9,11 +9,11 @@ package org.hibernate.validator.test.internal.engine;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.ElementType;
-import javax.validation.Configuration;
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
-import javax.validation.ValidationException;
-import javax.validation.ValidatorFactory;
+import jakarta.validation.Configuration;
+import jakarta.validation.Path;
+import jakarta.validation.TraversableResolver;
+import jakarta.validation.ValidationException;
+import jakarta.validation.ValidatorFactory;
 
 import org.testng.annotations.Test;
 

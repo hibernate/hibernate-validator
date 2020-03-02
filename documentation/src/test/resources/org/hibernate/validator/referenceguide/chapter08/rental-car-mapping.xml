@@ -8,13 +8,13 @@
     <default-package>org.hibernate.validator.referenceguide.chapter05</default-package>
     <bean class="Car" ignore-annotations="true">
         <field name="manufacturer">
-            <constraint annotation="javax.validation.constraints.NotNull"/>
+            <constraint annotation="jakarta.validation.constraints.NotNull"/>
         </field>
         <field name="licensePlate">
-            <constraint annotation="javax.validation.constraints.NotNull"/>
+            <constraint annotation="jakarta.validation.constraints.NotNull"/>
         </field>
         <field name="seatCount">
-            <constraint annotation="javax.validation.constraints.Min">
+            <constraint annotation="jakarta.validation.constraints.Min">
                 <element name="value">2</element>
             </constraint>
         </field>
@@ -28,12 +28,12 @@
             <container-element-type type-argument-index="1">
                 <container-element-type>
                     <valid/>
-                    <constraint annotation="javax.validation.constraints.NotNull"/>
+                    <constraint annotation="jakarta.validation.constraints.NotNull"/>
                 </container-element-type>
             </container-element-type>
         </field>
         <getter name="passedVehicleInspection" ignore-annotations="true">
-            <constraint annotation="javax.validation.constraints.AssertTrue">
+            <constraint annotation="jakarta.validation.constraints.AssertTrue">
                 <message>The car has to pass the vehicle inspection first</message>
                 <groups>
                     <value>CarChecks</value>

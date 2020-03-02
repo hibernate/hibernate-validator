@@ -9,7 +9,7 @@ package org.hibernate.validator.test.internal.constraintvalidators.bv;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.Pattern;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.PatternValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;

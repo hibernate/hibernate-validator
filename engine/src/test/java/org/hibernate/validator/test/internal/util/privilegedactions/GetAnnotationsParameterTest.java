@@ -12,10 +12,10 @@ import static org.testng.Assert.fail;
 
 import java.lang.annotation.Annotation;
 
-import javax.validation.Payload;
-import javax.validation.ValidationException;
-import javax.validation.constraints.NotNull;
-import javax.validation.groups.Default;
+import jakarta.validation.Payload;
+import jakarta.validation.ValidationException;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.groups.Default;
 
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttribute;
 import org.testng.annotations.Test;

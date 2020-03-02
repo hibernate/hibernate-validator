@@ -3,7 +3,7 @@ package org.hibernate.validator.referenceguide.chapter12.propertypath;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 public class Building {
 

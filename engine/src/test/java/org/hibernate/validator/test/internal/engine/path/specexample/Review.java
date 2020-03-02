@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.path.specexample;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 public class Review {
 

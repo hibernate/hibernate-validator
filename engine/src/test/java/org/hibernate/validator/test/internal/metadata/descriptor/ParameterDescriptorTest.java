@@ -14,12 +14,12 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.groups.Default;
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.GroupConversionDescriptor;
-import javax.validation.metadata.ParameterDescriptor;
-import javax.validation.metadata.Scope;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.groups.Default;
+import jakarta.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.metadata.GroupConversionDescriptor;
+import jakarta.validation.metadata.ParameterDescriptor;
+import jakarta.validation.metadata.Scope;
 
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;

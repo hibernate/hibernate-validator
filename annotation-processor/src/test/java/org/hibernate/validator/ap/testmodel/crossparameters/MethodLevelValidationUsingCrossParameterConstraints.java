@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.ap.testmodel.crossparameters;
 
-import javax.validation.ConstraintTarget;
-import javax.validation.constraints.Size;
+import jakarta.validation.ConstraintTarget;
+import jakarta.validation.constraints.Size;
 
 public class MethodLevelValidationUsingCrossParameterConstraints {
 

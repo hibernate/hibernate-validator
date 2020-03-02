@@ -9,13 +9,13 @@ package org.hibernate.validator.test.spi.nodenameprovider.jackson;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Valid;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.testutil.TestForIssue;

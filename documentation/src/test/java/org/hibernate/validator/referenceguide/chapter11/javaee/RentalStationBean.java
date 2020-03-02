@@ -3,10 +3,9 @@ package org.hibernate.validator.referenceguide.chapter11.javaee;
 
 //end::include[]
 
-import javax.annotation.Resource;
-
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import jakarta.annotation.Resource;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 //tag::include[]
 public class RentalStationBean {

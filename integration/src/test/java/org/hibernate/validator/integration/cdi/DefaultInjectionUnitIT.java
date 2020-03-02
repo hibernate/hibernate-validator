@@ -8,9 +8,9 @@ package org.hibernate.validator.integration.cdi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
-import javax.validation.ValidatorFactory;
+import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.jboss.arquillian.container.test.api.Deployment;

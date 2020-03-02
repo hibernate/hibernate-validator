@@ -1,6 +1,6 @@
 package org.hibernate.validator.referenceguide.chapter06.payload;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 //tag::include[]
 public class ContactDetails {

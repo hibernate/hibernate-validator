@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.ap.testmodel.annotationparameters;
 
-import javax.validation.GroupSequence;
+import jakarta.validation.GroupSequence;
 
 /**
  * @author Marko Bekhta

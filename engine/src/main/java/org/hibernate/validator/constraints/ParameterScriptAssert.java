@@ -15,8 +15,8 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert.List;
 
@@ -33,7 +33,7 @@ import org.hibernate.validator.constraints.ParameterScriptAssert.List;
  * ("Scripting for the Java<sup>TM</sup> Platform") compatible engine can be
  * found on the classpath. To refer to a parameter within the scripting
  * expression, use its name as obtained by the active
- * {@link javax.validation.ParameterNameProvider}. The default provider will
+ * {@link jakarta.validation.ParameterNameProvider}. The default provider will
  * return the actual parameter names, if the -parameters compiler option
  * has been enabled, and {@code arg0}, {@code arg1} etc. otherwise.
  * </p>
@@ -68,7 +68,7 @@ public @interface ParameterScriptAssert {
 	/**
 	 * @return The name of the script language used by this constraint as
 	 *         expected by the JSR 223 {@link javax.script.ScriptEngineManager}. A
-	 *         {@link javax.validation.ConstraintDeclarationException} will be thrown upon script
+	 *         {@link jakarta.validation.ConstraintDeclarationException} will be thrown upon script
 	 *         evaluation, if no engine for the given language could be found.
 	 */
 	String lang();
@@ -78,11 +78,11 @@ public @interface ParameterScriptAssert {
 	 *         {@code Boolean.TRUE}, if the executable parameters could
 	 *         successfully be validated, otherwise {@code Boolean.FALSE}.
 	 *         Returning null or any type other than Boolean will cause a
-	 *         {@link javax.validation.ConstraintDeclarationException} upon validation. Any
+	 *         {@link jakarta.validation.ConstraintDeclarationException} upon validation. Any
 	 *         exception occurring during script evaluation will be wrapped into
 	 *         a ConstraintDeclarationException, too. Within the script, the
 	 *         validated parameters can be accessed using their names as retrieved from the
-	 *         active {@link javax.validation.ParameterNameProvider}.
+	 *         active {@link jakarta.validation.ParameterNameProvider}.
 	 */
 	String script();
 

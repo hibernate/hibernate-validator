@@ -9,12 +9,12 @@ package org.hibernate.validator.test.cdi.internal.methodvalidation.inheritance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.fail;
 
-import javax.enterprise.inject.spi.AnnotatedType;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.ProcessAnnotatedType;
-import javax.enterprise.inject.spi.configurator.AnnotatedTypeConfigurator;
-import javax.inject.Inject;
-import javax.validation.ValidationException;
+import jakarta.enterprise.inject.spi.AnnotatedType;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.ProcessAnnotatedType;
+import jakarta.enterprise.inject.spi.configurator.AnnotatedTypeConfigurator;
+import jakarta.inject.Inject;
+import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.cdi.ValidationExtension;
 import org.jboss.arquillian.container.test.api.Deployment;

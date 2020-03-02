@@ -11,10 +11,10 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.AbstractMaxValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForNumber;

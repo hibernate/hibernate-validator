@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import javax.xml.namespace.QName;
 
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;

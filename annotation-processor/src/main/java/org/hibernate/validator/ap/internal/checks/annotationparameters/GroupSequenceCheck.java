@@ -159,7 +159,7 @@ public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 	}
 
 	/**
-	 * Find a {@code javax.validation.GroupSequence} annotation if one is present on given type ({@link TypeMirror}).
+	 * Find a {@code jakarta.validation.GroupSequence} annotation if one is present on given type ({@link TypeMirror}).
 	 */
 	private AnnotationMirror getGroupSequence(TypeMirror typeMirror) {
 		// the annotation can be present only on TypeKind.DECLARED elements

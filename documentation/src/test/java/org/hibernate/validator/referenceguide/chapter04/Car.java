@@ -3,7 +3,7 @@ package org.hibernate.validator.referenceguide.chapter04;
 
 //end::include[]
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 //tag::include[]
 public class Car {

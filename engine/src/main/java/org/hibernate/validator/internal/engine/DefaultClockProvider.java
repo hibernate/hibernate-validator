@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.engine;
 
 import java.time.Clock;
 
-import javax.validation.ClockProvider;
+import jakarta.validation.ClockProvider;
 
 /**
  * A default {@link ClockProvider} implementation which returns the current system time in the default time zone using

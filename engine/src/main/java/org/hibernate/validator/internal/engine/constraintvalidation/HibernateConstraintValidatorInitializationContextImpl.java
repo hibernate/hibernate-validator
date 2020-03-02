@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import java.time.Duration;
 
-import javax.validation.ClockProvider;
+import jakarta.validation.ClockProvider;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;

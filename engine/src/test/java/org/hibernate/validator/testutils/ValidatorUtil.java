@@ -12,16 +12,16 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.Locale;
 
-import javax.validation.Configuration;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.ConstructorDescriptor;
-import javax.validation.metadata.MethodDescriptor;
-import javax.validation.metadata.ParameterDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
-import javax.validation.metadata.ReturnValueDescriptor;
-import javax.validation.spi.ValidationProvider;
+import jakarta.validation.Configuration;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.metadata.BeanDescriptor;
+import jakarta.validation.metadata.ConstructorDescriptor;
+import jakarta.validation.metadata.MethodDescriptor;
+import jakarta.validation.metadata.ParameterDescriptor;
+import jakarta.validation.metadata.PropertyDescriptor;
+import jakarta.validation.metadata.ReturnValueDescriptor;
+import jakarta.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -115,7 +115,7 @@ public final class ValidatorUtil {
 	 *
 	 * @return an instance of {@code PropertyDescriptor} or {@code null} if does not exists or has no constraint.
 	 *
-	 * @see javax.validation.metadata.BeanDescriptor#getConstraintsForProperty(String)
+	 * @see jakarta.validation.metadata.BeanDescriptor#getConstraintsForProperty(String)
 	 */
 	public static PropertyDescriptor getPropertyDescriptor(Class<?> clazz, String property) {
 		return getValidator().getConstraintsForClass( clazz ).getConstraintsForProperty( property );

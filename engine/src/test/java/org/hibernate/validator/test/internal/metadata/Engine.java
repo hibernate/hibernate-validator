@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.metadata;
 
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.Pattern;
 
 
 /**

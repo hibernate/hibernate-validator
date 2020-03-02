@@ -9,7 +9,7 @@ package org.hibernate.validator.cdi.internal.util;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-import javax.validation.ValidatorFactory;
+import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;

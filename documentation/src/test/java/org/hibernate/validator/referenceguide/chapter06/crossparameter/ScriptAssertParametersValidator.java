@@ -1,9 +1,9 @@
 package org.hibernate.validator.referenceguide.chapter06.crossparameter;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraintvalidation.SupportedValidationTarget;
-import javax.validation.constraintvalidation.ValidationTarget;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraintvalidation.SupportedValidationTarget;
+import jakarta.validation.constraintvalidation.ValidationTarget;
 
 @SupportedValidationTarget(ValidationTarget.PARAMETERS)
 public class ScriptAssertParametersValidator implements

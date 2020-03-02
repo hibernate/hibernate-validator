@@ -11,7 +11,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
-import javax.validation.constraints.Digits;
+import jakarta.validation.constraints.Digits;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForNumber;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;

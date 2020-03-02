@@ -12,9 +12,9 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.Size;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.hibernate.validator.testutil.MessageLoggedAssertionLogger;

@@ -20,14 +20,14 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * <p>
  * Note:
  * <ul>
- * <li>It is not allowed to use {@code GroupSequenceProvider} and {@link javax.validation.GroupSequence} together on
+ * <li>It is not allowed to use {@code GroupSequenceProvider} and {@link jakarta.validation.GroupSequence} together on
  * the same type.</li>
  * <li>{@code GroupSequenceProvider} is a Hibernate Validator specific annotation and not portable.</li>
  * </ul>
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Hardy Ferentschik
- * @see javax.validation.GroupSequence
+ * @see jakarta.validation.GroupSequence
  */
 @Retention(RUNTIME)
 @Target({ TYPE })

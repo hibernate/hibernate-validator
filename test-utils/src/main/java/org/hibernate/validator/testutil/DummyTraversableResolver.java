@@ -7,8 +7,8 @@
 package org.hibernate.validator.testutil;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
+import jakarta.validation.Path;
+import jakarta.validation.TraversableResolver;
 
 /**
  * A dummy traversable resolver which returns always {@code true}. This resolver is used by default by all test cases.

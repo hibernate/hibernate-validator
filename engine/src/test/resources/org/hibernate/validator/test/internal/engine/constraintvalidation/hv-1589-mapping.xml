@@ -14,16 +14,16 @@
 
     <bean class="org.hibernate.validator.test.internal.engine.constraintvalidation.User" ignore-annotations="false">
         <field name="firstName">
-            <constraint annotation="javax.validation.constraints.NotNull"/>
+            <constraint annotation="jakarta.validation.constraints.NotNull"/>
         </field>
         <field name="middleName">
-            <constraint annotation="javax.validation.constraints.Size">
+            <constraint annotation="jakarta.validation.constraints.Size">
                 <element name="min">5</element>
                 <element name="max">10</element>
             </constraint>
         </field>
         <field name="address2">
-            <constraint annotation="javax.validation.constraints.Size">
+            <constraint annotation="jakarta.validation.constraints.Size">
                 <element name="min">5</element>
                 <element name="max">50</element>
             </constraint>

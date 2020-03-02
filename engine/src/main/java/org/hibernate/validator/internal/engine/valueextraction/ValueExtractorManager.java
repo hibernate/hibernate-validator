@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ValidationException;
-import javax.validation.valueextraction.ValueExtractor;
+import jakarta.validation.ConstraintDeclarationException;
+import jakarta.validation.ValidationException;
+import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;

@@ -33,13 +33,13 @@ public interface ConstraintMapping {
 	<C> TypeConstraintMappingContext<C> type(Class<C> beanClass);
 
 	/**
-	 * Starts defining {@link javax.validation.ConstraintValidator}s to be executed for the specified constraint (i.e. annotation class).
+	 * Starts defining {@link jakarta.validation.ConstraintValidator}s to be executed for the specified constraint (i.e. annotation class).
 	 * Each constraint may only be configured once within all constraint mappings used for configuring one validator
 	 * factory.
 	 *
 	 * @param <A> The annotation type to be configured.
 	 * @param annotationClass The annotation class on which to define the validators. This type must be an
-	 * {@code @interface} annotated with {@code javax.validation.Constraint}. All validators defined after calling
+	 * {@code @interface} annotated with {@code jakarta.validation.Constraint}. All validators defined after calling
 	 * this method are added to the annotation of the type {@code annotationClass} until the next call
 	 * of {@code type} or {@code annotation}.
 	 *

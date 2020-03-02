@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation;
 
-import javax.validation.MessageInterpolator;
+import jakarta.validation.MessageInterpolator;
 
 /**
  * Resolves a given term.

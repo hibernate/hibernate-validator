@@ -40,7 +40,7 @@ public interface DefaultGroupSequenceProvider<T> {
 	 * </p>
 	 *
 	 * @param object the instance being validated. This value can be {@code null} in case this method was called as part of
-	 * {@linkplain javax.validation.Validator#validateValue(Class, String, Object, Class[]) Validator#validateValue}.
+	 * {@linkplain jakarta.validation.Validator#validateValue(Class, String, Object, Class[]) Validator#validateValue}.
 	 *
 	 * @return a list of classes specifying the default group sequence. The same constraints to the redefined group list
 	 *         apply as for lists defined via {@code GroupSequence}. In particular the list has to contain the type T.

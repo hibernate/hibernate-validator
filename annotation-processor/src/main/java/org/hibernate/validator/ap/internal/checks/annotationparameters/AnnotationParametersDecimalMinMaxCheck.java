@@ -18,8 +18,8 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Checks that the parameters used on {@code javax.validation.constraints.DecimalMin} and
- * {@code javax.validation.constraints.DecimalMax} annotations are valid.
+ * Checks that the parameters used on {@code jakarta.validation.constraints.DecimalMin} and
+ * {@code jakarta.validation.constraints.DecimalMax} annotations are valid.
  *
  * @author Marko Bekhta
  */

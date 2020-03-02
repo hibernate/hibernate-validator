@@ -7,7 +7,7 @@
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
 import java.lang.reflect.Method;
-import javax.validation.executable.ExecutableValidator;
+import jakarta.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.test.internal.bootstrap.Customer;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepository;

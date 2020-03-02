@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;

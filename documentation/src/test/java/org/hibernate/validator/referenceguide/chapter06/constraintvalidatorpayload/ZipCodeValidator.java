@@ -3,8 +3,8 @@ package org.hibernate.validator.referenceguide.chapter06.constraintvalidatorpayl
 
 //end::include[]
 
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 

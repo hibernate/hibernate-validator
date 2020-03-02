@@ -11,8 +11,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.toImmutable
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
-import javax.validation.Path;
-import javax.validation.metadata.ConstraintDescriptor;
+import jakarta.validation.Path;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;

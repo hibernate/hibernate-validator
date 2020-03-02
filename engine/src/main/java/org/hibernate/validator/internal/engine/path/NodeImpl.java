@@ -12,16 +12,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.ElementKind;
-import javax.validation.Path;
-import javax.validation.Path.BeanNode;
-import javax.validation.Path.ConstructorNode;
-import javax.validation.Path.ContainerElementNode;
-import javax.validation.Path.CrossParameterNode;
-import javax.validation.Path.MethodNode;
-import javax.validation.Path.ParameterNode;
-import javax.validation.Path.PropertyNode;
-import javax.validation.Path.ReturnValueNode;
+import jakarta.validation.ElementKind;
+import jakarta.validation.Path;
+import jakarta.validation.Path.BeanNode;
+import jakarta.validation.Path.ConstructorNode;
+import jakarta.validation.Path.ContainerElementNode;
+import jakarta.validation.Path.CrossParameterNode;
+import jakarta.validation.Path.MethodNode;
+import jakarta.validation.Path.ParameterNode;
+import jakarta.validation.Path.PropertyNode;
+import jakarta.validation.Path.ReturnValueNode;
 
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeVariables;

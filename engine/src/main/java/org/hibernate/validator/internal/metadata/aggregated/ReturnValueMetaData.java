@@ -11,8 +11,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ElementKind;
-import javax.validation.metadata.ReturnValueDescriptor;
+import jakarta.validation.ElementKind;
+import jakarta.validation.metadata.ReturnValueDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;

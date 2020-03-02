@@ -4,7 +4,7 @@ package org.hibernate.validator.referenceguide.chapter09;
 //end::include[]
 
 import java.util.Locale;
-import javax.validation.MessageInterpolator;
+import jakarta.validation.MessageInterpolator;
 
 //tag::include[]
 public class MyMessageInterpolator implements MessageInterpolator {

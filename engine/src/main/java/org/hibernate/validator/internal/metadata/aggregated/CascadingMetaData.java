@@ -9,8 +9,8 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import java.lang.reflect.TypeVariable;
 import java.util.Set;
 
-import javax.validation.metadata.GroupConversionDescriptor;
-import javax.validation.valueextraction.ValueExtractor;
+import jakarta.validation.metadata.GroupConversionDescriptor;
+import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;

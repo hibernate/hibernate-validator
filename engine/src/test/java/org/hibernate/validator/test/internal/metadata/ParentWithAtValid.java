@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.metadata;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * @author Gunnar Morling

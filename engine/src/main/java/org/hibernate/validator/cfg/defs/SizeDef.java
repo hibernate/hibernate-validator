@@ -7,7 +7,7 @@
 
 package org.hibernate.validator.cfg.defs;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 

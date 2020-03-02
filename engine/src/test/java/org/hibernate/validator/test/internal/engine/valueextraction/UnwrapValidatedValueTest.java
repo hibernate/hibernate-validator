@@ -12,13 +12,13 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import java.lang.reflect.Method;
 import java.util.Set;
 
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintViolation;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Size;
-import javax.validation.valueextraction.Unwrapping;
+import jakarta.validation.ConstraintDeclarationException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.valueextraction.Unwrapping;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;

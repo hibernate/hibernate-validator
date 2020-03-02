@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
- * Checks that the parameters used on {@code javax.validation.constraints.Pattern} annotations are valid.
+ * Checks that the parameters used on {@code jakarta.validation.constraints.Pattern} annotations are valid.
  *
  * @author Marko Bekhta
  */

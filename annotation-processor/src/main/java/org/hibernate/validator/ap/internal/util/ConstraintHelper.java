@@ -625,7 +625,7 @@ public class ConstraintHelper {
 
 	/**
 	 * Checks whether the given annotation mirror represents a multi-valued
-	 * constraint such as {@link javax.validation.constraints.Pattern.List}.
+	 * constraint such as {@link jakarta.validation.constraints.Pattern.List}.
 	 * That is the case if the annotation has an array-typed attribute with name
 	 * "value", that exclusively contains constraint annotations.
 	 *
@@ -976,7 +976,7 @@ public class ConstraintHelper {
 		//here. The Eclipse JSR 269 implementation unfortunately doesn't always create the type hierarchy
 		//properly though.
 		//TODO GM: create and report an isolated test case
-		throw new IllegalStateException( "Expected type " + type + " to implement javax.validation.ConstraintValidator, but it doesn't." );
+		throw new IllegalStateException( "Expected type " + type + " to implement jakarta.validation.ConstraintValidator, but it doesn't." );
 	}
 
 	/**

@@ -4,8 +4,8 @@ package org.hibernate.validator.referenceguide.chapter09;
 //end::include[]
 
 import java.util.List;
-import javax.validation.ValidationProviderResolver;
-import javax.validation.spi.ValidationProvider;
+import jakarta.validation.ValidationProviderResolver;
+import jakarta.validation.spi.ValidationProvider;
 
 //tag::include[]
 public class OsgiServiceDiscoverer implements ValidationProviderResolver {

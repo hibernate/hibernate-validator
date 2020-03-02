@@ -22,7 +22,7 @@
           ignore-annotations="true">
         <constructor>
             <parameter type="foo">
-                <constraint annotation="javax.validation.constraints.NotNull">
+                <constraint annotation="jakarta.validation.constraints.NotNull">
                     <message>xml configured not null constraint</message>
                 </constraint>
             </parameter>

@@ -9,10 +9,10 @@ package org.hibernate.validator.test.internal.engine.traversableresolver;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.validation.Valid;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.validation.Valid;
 
 /**
  * @author Hardy Ferentschik

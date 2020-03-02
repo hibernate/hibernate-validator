@@ -13,7 +13,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import java.time.Duration;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 import org.hibernate.validator.constraints.time.DurationMax;
 import org.hibernate.validator.constraints.time.DurationMin;

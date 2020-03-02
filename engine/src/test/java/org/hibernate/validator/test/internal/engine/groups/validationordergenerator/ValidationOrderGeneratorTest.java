@@ -10,10 +10,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.validation.GroupDefinitionException;
-import javax.validation.GroupSequence;
-import javax.validation.ValidationException;
-import javax.validation.groups.Default;
+import jakarta.validation.GroupDefinitionException;
+import jakarta.validation.GroupSequence;
+import jakarta.validation.ValidationException;
+import jakarta.validation.groups.Default;
 
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;

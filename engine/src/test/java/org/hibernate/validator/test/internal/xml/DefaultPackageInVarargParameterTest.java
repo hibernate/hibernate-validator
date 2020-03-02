@@ -8,13 +8,13 @@ package org.hibernate.validator.test.internal.xml;
 
 import java.util.List;
 import java.util.Set;
-import javax.validation.Configuration;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.MethodDescriptor;
-import javax.validation.metadata.MethodType;
-import javax.validation.metadata.ParameterDescriptor;
+import jakarta.validation.Configuration;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.metadata.BeanDescriptor;
+import jakarta.validation.metadata.MethodDescriptor;
+import jakarta.validation.metadata.MethodType;
+import jakarta.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;

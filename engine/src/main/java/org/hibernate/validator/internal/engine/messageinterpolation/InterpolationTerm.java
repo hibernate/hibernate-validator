@@ -9,7 +9,7 @@ package org.hibernate.validator.internal.engine.messageinterpolation;
 import java.util.Locale;
 
 import javax.el.ExpressionFactory;
-import javax.validation.MessageInterpolator;
+import jakarta.validation.MessageInterpolator;
 
 /**
  * Helper class dealing with the interpolation of a single message parameter or expression extracted from a message

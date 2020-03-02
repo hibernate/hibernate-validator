@@ -7,8 +7,8 @@
 package org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution;
 
 import java.util.Collection;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class SizeValidatorForCollection implements ConstraintValidator<Size, Collection<?>> {
 

@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.validation.ParameterNameProvider;
+import jakarta.validation.ParameterNameProvider;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.testng.annotations.BeforeClass;

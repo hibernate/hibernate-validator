@@ -8,8 +8,8 @@ package org.hibernate.validator.test.internal.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.Valid;
-import javax.validation.groups.ConvertGroup;
+import jakarta.validation.Valid;
+import jakarta.validation.groups.ConvertGroup;
 
 import org.hibernate.validator.test.internal.metadata.Order.OrderBasic;
 import org.hibernate.validator.test.internal.metadata.Order.OrderComplex;

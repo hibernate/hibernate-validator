@@ -7,9 +7,9 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.money;
 
 import javax.money.MonetaryAmount;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Positive;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraints.Positive;
 
 /**
  * Check that the number being validated positive.

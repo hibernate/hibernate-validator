@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.ap.testmodel.inheritedvalidator;
 
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class CustomConstraintValidator extends AbstractCustomConstraintValidator {
 

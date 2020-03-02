@@ -8,7 +8,7 @@ package org.hibernate.validator.test.internal.engine.valueextraction;
 
 import java.time.LocalDate;
 import java.util.Optional;
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 
 /**
  * @author Hardy Ferentschik

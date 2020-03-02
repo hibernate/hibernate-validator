@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.resolver;
 
-import javax.validation.Path;
+import jakarta.validation.Path;
 
 abstract class AbstractTraversableHolder {
 

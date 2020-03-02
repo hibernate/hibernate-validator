@@ -13,9 +13,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.validation.ParameterNameProvider;
-import javax.validation.Validation;
-import javax.validation.Validator;
+import jakarta.validation.ParameterNameProvider;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
