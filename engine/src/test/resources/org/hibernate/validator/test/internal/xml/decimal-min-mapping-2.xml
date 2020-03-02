@@ -7,8 +7,9 @@
   -->
 <constraint-mappings
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.0.xsd"
-        xmlns="http://jboss.org/xml/ns/javax/validation/mapping">
+        xsi:schemaLocation="https://xmlns.jakarta.ee/xml/ns/validation/mapping validation-mapping-3.0.xsd"
+        xmlns="https://xmlns.jakarta.ee/xml/ns/validation/mapping"
+        version="3.0">
 
     <constraint-definition annotation="javax.validation.constraints.DecimalMin">
         <validated-by include-existing-validators="true">

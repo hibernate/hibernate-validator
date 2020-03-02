@@ -68,6 +68,7 @@ public class MappingXmlParser {
 		schemasByVersion.put( "1.0", "META-INF/validation-mapping-1.0.xsd" );
 		schemasByVersion.put( "1.1", "META-INF/validation-mapping-1.1.xsd" );
 		schemasByVersion.put( "2.0", "META-INF/validation-mapping-2.0.xsd" );
+		schemasByVersion.put( "3.0", "META-INF/validation-mapping-3.0.xsd" );
 
 		return schemasByVersion;
 	}
