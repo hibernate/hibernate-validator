@@ -296,7 +296,7 @@ Provided by the validation engine itself::
     See <<section-valueextraction-builtinvalueextractors>>.
 
 Via the Java service loader mechanism::
-    The file `META-INF/services/javax.validation.valueextraction.ValueExtractor`
+    The file `META-INF/services/jakarta.validation.valueextraction.ValueExtractor`
     must be provided, with the fully-qualified names of one or more value
     extractor implementations as its contents, each on a separate line.
 

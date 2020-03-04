@@ -443,7 +443,7 @@ Otherwise a `ConstraintViolation` instance is added for each violated constraint
 
 All the validation methods have a var-args parameter which can be used to specify which validation
 groups shall be considered when performing the validation. If the parameter is not specified, the
-default validation group (`javax.validation.groups.Default`) is used. The topic of validation groups
+default validation group (`jakarta.validation.groups.Default`) is used. The topic of validation groups
 is discussed in detail in <<chapter-groups>>.
 
 ===== `Validator#validate()`

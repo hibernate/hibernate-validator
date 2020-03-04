@@ -46,7 +46,7 @@ Note that when a package is part of the public API this is not necessarily true 
 			A `ParameterNameProvider` based on the Paranamer library, see <<section-paranamer-parameternameprovider>>.
 
 `org.hibernate.validator.propertypath`::
-			Extensions to the `javax.validation.Path` API, see <<section-extensions-path-api>>.
+			Extensions to the `jakarta.validation.Path` API, see <<section-extensions-path-api>>.
 
 `org.hibernate.validator.spi.constraintdefinition`::
 			An SPI for registering additional constraint validators programmatically, see <<section-constraint-definition-contribution>>.
@@ -132,10 +132,10 @@ _hibernate.validator.allow_parallel_method_parameter_constraint_ in _validation.
 ----
 <?xml version="1.0" encoding="UTF-8"?>
 <validation-config
-        xmlns="http://xmlns.jcp.org/xml/ns/validation/configuration"
+        xmlns="https://xmlns.jakarta.ee/xml/ns/validation/configuration"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/validation/configuration validation-configuration-2.0.xsd"
-        version="2.0">
+        xsi:schemaLocation="https://xmlns.jakarta.ee/xml/ns/validation/configuration validation-configuration-3.0.xsd"
+        version="3.0">
     <default-provider>org.hibernate.validator.HibernateValidator</default-provider>
 
     <property name="hibernate.validator.allow_parameter_constraint_override">true</property>
@@ -366,7 +366,7 @@ reported in case validation of the constraint composition fails.
 [[section-extensions-path-api]]
 === Extensions of the Path API
 
-Hibernate Validator provides an extension to the `javax.validation.Path` API.
+Hibernate Validator provides an extension to the `jakarta.validation.Path` API.
 For nodes of `ElementKind.PROPERTY` and `ElementKind.CONTAINER_ELEMENT` it allows to obtain the value of the
 represented property.
 To do so, narrow down a given node to the type `org.hibernate.validator.path.PropertyNode` or
@@ -395,7 +395,7 @@ resolve the violation.
 
 Dynamic payloads can be set in <<validator-customconstraints,custom constraints>> using `HibernateConstraintValidatorContext`.
 This is shown in example <<example-constraint-validator-setting-dynamic-payload>> where the
-`javax.validation.ConstraintValidatorContext` is unwrapped to `HibernateConstraintValidatorContext` in order to call
+`jakarta.validation.ConstraintValidatorContext` is unwrapped to `HibernateConstraintValidatorContext` in order to call
 `withDynamicPayload`.
 
 [[example-constraint-validator-setting-dynamic-payload]]
@@ -407,7 +407,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/dynamicpay
 ----
 ====
 
-On the constraint violation processing side, a `javax.validation.ConstraintViolation` can then in turn be
+On the constraint violation processing side, a `jakarta.validation.ConstraintViolation` can then in turn be
 unwrapped to `HibernateConstraintViolation` in order to retrieve the dynamic payload for further processing.
 
 [[example-retrieving-dynamic-payload]]
@@ -616,14 +616,14 @@ useful and whether they meet your needs.
 Hibernate Validator allows to utilize Java's
 {javaApiDocsUrl}?java/util/ServiceLoader.html[ServiceLoader]
 mechanism to register additional constraint definitions. All you have to do is to add the file
-_javax.validation.ConstraintValidator_ to _META-INF/services_. In this service file you list the
+_jakarta.validation.ConstraintValidator_ to _META-INF/services_. In this service file you list the
 fully qualified classnames of your constraint validator classes (one per line). Hibernate Validator
 will automatically infer the constraint types they apply to.
 See <<example-using-service-file-for-constraint-definitions,Constraint definition via service file>>
 for an example.
 
 [[example-using-service-file-for-constraint-definitions]]
-._META-INF/services/javax.validation.ConstraintValidator_
+._META-INF/services/jakarta.validation.ConstraintValidator_
 ====
 [source]
 ----

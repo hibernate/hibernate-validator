@@ -10,8 +10,8 @@ approach via annotations. Let's have a look at these two document types.
 [NOTE]
 ====
 The XSD files are available via
-http://xmlns.jcp.org/xml/ns/validation/configuration and
-http://xmlns.jcp.org/xml/ns/validation/mapping.
+https://xmlns.jakarta.ee/xml/ns/validation/configuration and
+https://xmlns.jakarta.ee/xml/ns/validation/mapping.
 
 More information about the XML schemas can be found on the
 http://beanvalidation.org/xml/ns/validation/[Jakarta Bean Validation website].
@@ -31,7 +31,7 @@ image::validation-configuration-2.0.png[validation-configuration-2.0.xsd]
 
 <<example-validation-xml>>
 shows the several configuration options of _validation.xml_. All settings are optional and the same
-configuration options are also available programmatically through `javax.validation.Configuration`. In
+configuration options are also available programmatically through `jakarta.validation.Configuration`. In
 fact, the XML configuration will be overridden by values explicitly specified via the programmatic
 API. It is even possible to ignore the XML configuration completely via
 `Configuration#ignoreXmlConfiguration()`. See also <<section-configuring-validator-factory>>.
@@ -56,13 +56,13 @@ more than one provider on the classpath. `message-interpolator`, `traversable-re
 `constraint-validator-factory`, `parameter-name-provider` and `clock-provider` allow to customize
 the used implementations for the interfaces `MessageInterpolator`, `TraversableResolver`,
 `ConstraintValidatorFactory`, `ParameterNameProvider` and `ClockProvider` defined in the
-`javax.validation` package.
+`jakarta.validation` package.
 See the sub-sections of <<section-configuring-validator-factory>> for more information about these
 interfaces.
 
 `value-extractor` allows to declare additional value extractors either to extract values from custom
 container types or to override the built-in value extractors. See <<chapter-valueextraction>> for
-more information about how to implement `javax.validation.valueextraction.ValueExtractor`.
+more information about how to implement `jakarta.validation.valueextraction.ValueExtractor`.
 
 `executable-validation` and its subnodes define defaults for method validation. The Jakarta Bean Validation
 specification defines constructor and non getter methods as defaults. The enabled attribute acts as
