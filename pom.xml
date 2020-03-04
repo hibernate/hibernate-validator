@@ -187,6 +187,8 @@
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <version.fish.payara>5.181</version.fish.payara>
         <version.fish.payara.arquillian>1.0.Beta3</version.fish.payara.arquillian>
+        <!-- Used in the Karaf tests -->
+        <version.javax.inject>1</version.javax.inject>
 
         <!--
             Please don't change the name of this property, it may be used and
@@ -541,6 +543,11 @@
                 <artifactId>jackson-annotations</artifactId>
                 <version>${version.com.fasterxml.jackson.core.jackson-annotations}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>${version.javax.inject}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

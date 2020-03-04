@@ -21,6 +21,9 @@
 
     <properties>
         <hibernate-validator-parent.path>../..</hibernate-validator-parent.path>
+
+        <!-- Temporary until we can get a Paraya version supporting jakarta.validation -->
+        <skipTests>true</skipTests>
     </properties>
 
     <dependencyManagement>
@@ -78,6 +81,11 @@
             <artifactId>arquillian-payara-server-4-managed</artifactId> 
             <version>${version.fish.payara.arquillian}</version>
             <scope>test</scope>
+        </dependency>
+        <!-- For injection in tests -->
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
         </dependency>
     </dependencies>
 
