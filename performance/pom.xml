@@ -202,13 +202,15 @@
                 </property>
             </activation>
             <properties>
+                <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>6.1.0.Alpha4</beanvalidation-impl.version>
+                <beanvalidation-impl.version>6.1.2.Final</beanvalidation-impl.version>
             </properties>
             <dependencies>
                 <dependency>
                     <groupId>javax.validation</groupId>
                     <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
