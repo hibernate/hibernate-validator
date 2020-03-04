@@ -151,7 +151,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter04/complete/C
 If the default message interpolation algorithm does not fit your requirements, it is also possible to
 plug in a custom `MessageInterpolator` implementation.
 
-Custom interpolators must implement the interface `javax.validation.MessageInterpolator`. Note that
+Custom interpolators must implement the interface `jakarta.validation.MessageInterpolator`. Note that
 implementations must be thread-safe. It is recommended that custom message interpolators delegate
 final implementation to the default interpolator, which can be obtained via
 `Configuration#getDefaultMessageInterpolator()`.

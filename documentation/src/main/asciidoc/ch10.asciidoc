@@ -4,7 +4,7 @@
 The Jakarta Bean Validation specification provides not only a validation engine, but also an API for
 retrieving constraint metadata in a uniform way, no matter whether the constraints are declared
 using annotations or via XML mappings. Read this chapter to learn more about this API and its
-possibilities. You can find all the metadata API types in the package `javax.validation.metadata`.
+possibilities. You can find all the metadata API types in the package `jakarta.validation.metadata`.
 
 The examples presented in this chapter are based on the classes and constraint declarations shown in
 <<metadata-example-car>>.
@@ -42,7 +42,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/Book.java[
 === `BeanDescriptor`
 
 The entry point into the metadata API is the method `Validator#getConstraintsForClass()`, which
-returns an instance of the {bvApiDocsUrl}?javax/validation/metadata/BeanDescriptor.html[`BeanDescriptor`] interface. Using this
+returns an instance of the {bvApiDocsUrl}?jakarta/validation/metadata/BeanDescriptor.html[`BeanDescriptor`] interface. Using this
 descriptor, you can obtain metadata for constraints declared directly on the bean itself (class- or
 property-level), but also retrieve metadata descriptors representing single properties, methods and
 constructors.
@@ -94,7 +94,7 @@ methods to be returned (getters, non-getters or both).
 === `PropertyDescriptor`
 
 The interface
-{bvApiDocsUrl}?javax/validation/metadata/PropertyDescriptor.html[`PropertyDescriptor`] represents one given property of a
+{bvApiDocsUrl}?jakarta/validation/metadata/PropertyDescriptor.html[`PropertyDescriptor`] represents one given property of a
 class. It is transparent whether constraints are declared on a field or a property getter, provided
 the JavaBeans naming conventions are respected. <<metadata-example-using-propertydescriptor>> shows
 how to use the `PropertyDescriptor` interface.
@@ -117,8 +117,8 @@ XML), `false` otherwise. Any configured group conversions are returned by `getGr
 === `MethodDescriptor` and `ConstructorDescriptor`
 
 Constrained methods and constructors are represented by the interfaces
-{bvApiDocsUrl}?javax/validation/metadata/MethodDescriptor.html[`MethodDescriptor`]
-{bvApiDocsUrl}?javax/validation/metadata/ConstructorDescriptor.html[`ConstructorDescriptor`], respectively.
+{bvApiDocsUrl}?jakarta/validation/metadata/MethodDescriptor.html[`MethodDescriptor`]
+{bvApiDocsUrl}?jakarta/validation/metadata/ConstructorDescriptor.html[`ConstructorDescriptor`], respectively.
 <<metadata-example-using-methodandconstructordescriptor>> demonstrates how to work with these
 descriptors.
 
@@ -163,7 +163,7 @@ getter's `MethodDescriptor` (e.g.
 [[validator-metadata-api-elementdescriptor]]
 === `ElementDescriptor`
 
-The {bvApiDocsUrl}?javax/validation/metadata/ElementDescriptor.html[`ElementDescriptor`]
+The {bvApiDocsUrl}?jakarta/validation/metadata/ElementDescriptor.html[`ElementDescriptor`]
 interface is the common base class for the
 individual descriptor types such as `BeanDescriptor`, `PropertyDescriptor` etc. Besides
 `getConstraintDescriptors()` it provides some more methods common to all descriptors.
@@ -225,7 +225,7 @@ sequence are.
 
 === `ContainerDescriptor` and `ContainerElementTypeDescriptor`
 
-The {bvApiDocsUrl}?javax/validation/metadata/ContainerDescriptor.html[`ContainerDescriptor`]
+The {bvApiDocsUrl}?jakarta/validation/metadata/ContainerDescriptor.html[`ContainerDescriptor`]
 interface is the common interface for all the elements that support container element constraints and cascading
 validation (`PropertyDescriptor`, `ParameterDescriptor`, `ReturnValueDescriptor`).
 
@@ -254,7 +254,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/LibraryTes
 All those descriptor types that represent elements which can be subject of cascaded validation
 (i.e., `PropertyDescriptor`, `ParameterDescriptor` and `ReturnValueDescriptor`) provide access to the
 element's group conversions via `getGroupConversions()`. The returned set contains a
-{bvApiDocsUrl}?javax/validation//metadata/GroupConversionDescriptor.html[`GroupConversionDescriptor`]
+{bvApiDocsUrl}?jakarta/validation//metadata/GroupConversionDescriptor.html[`GroupConversionDescriptor`]
 for each configured conversion, allowing to retrieve
 source and target groups of the conversion. <<metadata-example-using-groupconversiondescriptor>>
 shows an example.
@@ -272,7 +272,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/CarTest.ja
 === `ConstraintDescriptor`
 
 Last but not least, the
-{bvApiDocsUrl}?javax/validation/metadata/ConstraintDescriptor.html[`ConstraintDescriptor`]
+{bvApiDocsUrl}?jakarta/validation/metadata/ConstraintDescriptor.html[`ConstraintDescriptor`]
 interface describes a
 single constraint together with its composing constraints. Via an instance of this interface you get
 access to the constraint annotation and its parameters.

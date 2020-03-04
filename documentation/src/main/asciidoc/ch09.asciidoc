@@ -3,13 +3,13 @@
 
 In <<section-obtaining-validator>>, you already saw one way of creating a `Validator` instance - via
 `Validation#buildDefaultValidatorFactory()`. In this chapter, you will learn how to use the other
-methods in `javax.validation.Validation` in order to bootstrap specifically configured validators.
+methods in `jakarta.validation.Validation` in order to bootstrap specifically configured validators.
 
 [[section-retrieving-validator-factory-validator]]
 === Retrieving `ValidatorFactory` and `Validator`
 
 You obtain a `Validator` by retrieving a `ValidatorFactory` via one of the static methods on
-`javax.validation.Validation` and calling `getValidator()` on the factory instance.
+`jakarta.validation.Validation` and calling `getValidator()` on the factory instance.
 
 <<example-build-default-validator-factory>> shows how to obtain a validator from the default
 validator factory:
@@ -76,7 +76,7 @@ By default, available Jakarta Bean Validation providers are discovered using the
 Service Provider] mechanism.
 
 For that purpose, each provider includes the file _META-
-INF/services/javax.validation.spi.ValidationProvider_, containing the fully qualified classname of
+INF/services/jakarta.validation.spi.ValidationProvider_, containing the fully qualified classname of
 its `ValidationProvider` implementation. In the case of Hibernate Validator, this is
 `org.hibernate.validator.HibernateValidator`.
 

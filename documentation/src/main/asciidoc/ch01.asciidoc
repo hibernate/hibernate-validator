@@ -207,19 +207,6 @@ These are the module names as declared using the `Automatic-Module-Name` header:
 
 These module names are preliminary and may be changed when providing real module descriptors in a future release.
 
-[WARNING]
-====
-When using Hibernate Validator with CDI, be careful to not enable the `java.xml.ws.annotation` module of the JDK.
-This module contains a subset of Jakarta Annotations, but some annotations such as `javax.annotation.Priority` are missing.
-This causes the method validation interceptor of Hibernate Validator to not be registered, i.e. method validation won't work.
-
-Instead, add the full Jakarta Annotations API to the unnamed module (i.e. the classpath), e.g. by pulling in the _jakarta.annotation:jakarta.annotation-api_ dependency
-(there already is a transitive dependency to the Jakarta Annotations API when depending on _org.hibernate.validator:hibernate-validator-cdi_).
-
-If you need to enable the `java.xml.ws.annotation` module for some reason, you should patch it with the contents of the full API
-by appending `--patch-module java.xml.ws.annotation=/path/to/complete-jakarta.annotation-api.jar` to your _java_ invocation.
-====
-
 [[validator-gettingstarted-createmodel]]
 === Applying constraints
 
@@ -278,7 +265,7 @@ constraint violations:
 
 If the object validates successfully, `validate()` returns an empty set as you can see in `carIsValid()`.
 
-Note that only classes from the package `javax.validation` are used. These are provided from the Bean
+Note that only classes from the package `jakarta.validation` are used. These are provided from the Bean
 Validation API. No classes from Hibernate Validator are directly referenced, resulting in portable
 code.
 

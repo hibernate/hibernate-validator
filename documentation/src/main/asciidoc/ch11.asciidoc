@@ -44,8 +44,8 @@ which is part of Hibernate ORM. Whenever a `PreInsertEvent`,
 instance and throw an exception if any constraint is violated. Per default, objects will be checked
 before any inserts or updates are made by Hibernate ORM. Pre deletion events will per default not
 trigger a validation. You can configure the groups to be validated per event type using the
-properties `javax.persistence.validation.group.pre-persist`,
-`javax.persistence.validation.group.pre-update` and `javax.persistence.validation.group.pre-remove`.
+properties `jakarta.persistence.validation.group.pre-persist`,
+`jakarta.persistence.validation.group.pre-update` and `jakarta.persistence.validation.group.pre-remove`.
 The values of these properties are the comma-separated fully specified class names of the groups
 to validate. <<example-beanvalidationeventlistener-config>> shows the default values for these
 properties. In this case they could also be omitted.
@@ -55,7 +55,7 @@ a set of `ConstraintViolation` instances describing each failure.
 
 If Hibernate Validator is present in the classpath, Hibernate ORM will use it transparently.
 To avoid validation even though Hibernate Validator is in the classpath, set
-`javax.persistence.validation.mode` to none.
+`jakarta.persistence.validation.mode` to none.
 
 [NOTE]
 ====
@@ -73,13 +73,13 @@ configuration in _hibernate.cfg.xml_:
 <hibernate-configuration>
     <session-factory>
         ...
-        <property name="javax.persistence.validation.group.pre-persist">
-            javax.validation.groups.Default
+        <property name="jakarta.persistence.validation.group.pre-persist">
+            jakarta.validation.groups.Default
         </property>
-        <property name="javax.persistence.validation.group.pre-update">
-            javax.validation.groups.Default
+        <property name="jakarta.persistence.validation.group.pre-update">
+            jakarta.validation.groups.Default
         </property>
-        <property name="javax.persistence.validation.group.pre-remove"></property>
+        <property name="jakarta.persistence.validation.group.pre-remove"></property>
         ...
         <event type="pre-update">
             <listener class="org.hibernate.cfg.beanvalidation.BeanValidationEventListener"/>
@@ -98,8 +98,8 @@ configuration in _hibernate.cfg.xml_:
 ==== JPA
 
 If you are using JPA 2 and Hibernate Validator is in the classpath, the JPA2 specification requires
-that Jakarta Bean Validation gets enabled. The properties `javax.persistence.validation.group.pre-persist`,
-`javax.persistence.validation.group.pre-update` and `javax.persistence.validation.group.pre-remove` as
+that Jakarta Bean Validation gets enabled. The properties `jakarta.persistence.validation.group.pre-persist`,
+`jakarta.persistence.validation.group.pre-update` and `jakarta.persistence.validation.group.pre-remove` as
 described in <<validator-checkconstraints-orm-hibernateevent>> can in this case be configured in
 _persistence.xml_. _persistence.xml_ also defines a node validation-mode which can be set to `AUTO`,
 `CALLBACK` or `NONE`. The default is `AUTO`.
@@ -112,7 +112,7 @@ When working with JSF2 or JBoss Seam and Hibernate Validator (Jakarta Bean Valid
 runtime environment, validation is triggered for every field in the application. <<example-jsf2>>
 shows an example of the `f:validateBean` tag in a JSF page. The `validationGroups` attribute is optional
 and can be used to specify a comma separated list of validation groups. The default is
-`javax.validation.groups.Default`. For more information refer to the Seam documentation or the JSF 2
+`jakarta.validation.groups.Default`. For more information refer to the Seam documentation or the JSF 2
 specification.
 
 
@@ -123,7 +123,7 @@ specification.
 ----
 <h:form>
 
-  <f:validateBean validationGroups="javax.validation.groups.Default">
+  <f:validateBean validationGroups="jakarta.validation.groups.Default">
 
     <h:inputText value=#{model.property}/>
     <h:selectOneRadio value=#{model.radioProperty}> ... </h:selectOneRadio>
@@ -146,13 +146,13 @@ providing the following configuration (`{0}` is replaced with the Jakarta Bean V
 replaced with the JSF component label):
 
 ----
-javax.faces.validator.BeanValidator.MESSAGE={1}: {0}
+jakarta.faces.validator.BeanValidator.MESSAGE={1}: {0}
 ----
 
 The default is:
 
 ----
-javax.faces.validator.BeanValidator.MESSAGE={0}
+jakarta.faces.validator.BeanValidator.MESSAGE={0}
 ----
 ====
 
@@ -180,7 +180,7 @@ class path as described in <<section-getting-started-cdi>>.
 
 CDI's dependency injection mechanism makes it very easy to retrieve `ValidatorFactory` and `Validator`
 instances and use them in your managed beans. Just annotate instance fields of your bean with
-`@javax.inject.Inject` as shown in <<example-dependency-injection>>.
+`@jakarta.inject.Inject` as shown in <<example-dependency-injection>>.
 
 [[example-dependency-injection]]
 .Retrieving validator factory and validator via `@Inject`

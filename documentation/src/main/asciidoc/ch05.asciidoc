@@ -14,12 +14,12 @@ method.
 
 Let's have a look at an example. The class `Person` in <<example-person>> has a `@NotNull`
 constraint on `name`. Since no group is specified for this annotation the default group
-`javax.validation.groups.Default` is assumed.
+`jakarta.validation.groups.Default` is assumed.
 
 [NOTE]
 ====
 When more than one group is requested, the order in which the groups are evaluated is not
-deterministic. If no group is specified the default group `javax.validation.groups.Default` is
+deterministic. If no group is specified the default group `jakarta.validation.groups.Default` is
 assumed.
 ====
 
