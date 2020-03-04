@@ -30,7 +30,7 @@
         <feature>hibernate-validator</feature>
         <bundle>mvn:javax.money/money-api/${version.javax.money}</bundle>
         <bundle>mvn:org.javamoney/moneta/${version.org.javamoney.moneta}</bundle>
-        <bundle>mvn:jakarta.annotation/jakarta.annotation-api/${version.jakarta.annotation-api}</bundle>
+        <bundle>mvn:javax.annotation/javax.annotation-api/${version.javax.annotation-api}</bundle>
     </feature>
     <feature name="hibernate-validator-groovy" version="${project.version}">
         <feature>hibernate-validator</feature>

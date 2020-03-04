@@ -76,6 +76,11 @@
             <artifactId>jakarta.annotation-api</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- For injection in tests -->
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+        </dependency>
 
         <!-- script engines -->
         <dependency>
