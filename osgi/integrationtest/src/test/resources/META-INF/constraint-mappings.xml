@@ -7,14 +7,15 @@
   -->
 <constraint-mappings
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.0.xsd"
-    xmlns="http://jboss.org/xml/ns/javax/validation/mapping">
+    xsi:schemaLocation="https://xmlns.jakarta.ee/xml/ns/validation/mapping validation-mapping-3.0.xsd"
+    xmlns="https://xmlns.jakarta.ee/xml/ns/validation/mapping"
+    version="3.0">
 
     <default-package>com.example</default-package>
 
     <bean class="Customer" ignore-annotations="true">
         <field name="status">
-            <constraint annotation="javax.validation.constraints.Min">
+            <constraint annotation="jakarta.validation.constraints.Min">
                 <element name="value">2</element>
             </constraint>
         </field>
