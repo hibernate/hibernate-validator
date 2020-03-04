@@ -28,6 +28,9 @@
         <wildfly-secondary.modules-dir>${wildfly-secondary.target-dir}/modules/system/layers/base</wildfly-secondary.modules-dir>
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+
+        <!-- Temporary, should be removed as soon as we have a Jakarta EE 9 WildFly -->
+        <skipTests>true</skipTests>
     </properties>
 
     <dependencies>
