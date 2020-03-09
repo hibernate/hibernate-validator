@@ -28,8 +28,8 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.el.ELManager;
-import javax.el.ExpressionFactory;
+import jakarta.el.ELManager;
+import jakarta.el.ExpressionFactory;
 import javax.money.spi.Bootstrap;
 import javax.script.ScriptEngineFactory;
 import jakarta.validation.ConstraintViolation;

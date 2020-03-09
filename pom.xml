@@ -117,7 +117,7 @@
         <version.org.hibernate.beanvalidation.tck>3.0.0-SNAPSHOT</version.org.hibernate.beanvalidation.tck>
 
         <version.com.thoughtworks.paranamer>2.8</version.com.thoughtworks.paranamer>
-        <version.org.glassfish.jakarta.el>3.0.3</version.org.glassfish.jakarta.el>
+        <version.org.glassfish.jakarta.el>4.0.0-RC1</version.org.glassfish.jakarta.el>
         <version.org.jboss.logging.jboss-logging>3.3.2.Final</version.org.jboss.logging.jboss-logging>
         <version.org.jboss.logging.jboss-logging-tools>2.1.0.Final</version.org.jboss.logging.jboss-logging-tools>
 

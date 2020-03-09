@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.engine.messageinterpolation;
 
 import java.util.Locale;
 
-import javax.el.ExpressionFactory;
+import jakarta.el.ExpressionFactory;
 import jakarta.validation.MessageInterpolator;
 
 /**

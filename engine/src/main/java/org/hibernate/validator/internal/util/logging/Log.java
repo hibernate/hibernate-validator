@@ -668,7 +668,7 @@ public interface Log extends BasicLogger {
 	ValidationException getNoUnwrapperFoundForTypeException(Type type);
 
 	@Message(id = 183,
-			value = "Unable to initialize 'javax.el.ExpressionFactory'. Check that you have the EL dependencies on the classpath, or use ParameterMessageInterpolator instead")
+			value = "Unable to initialize 'jakarta.el.ExpressionFactory'. Check that you have the EL dependencies on the classpath, or use ParameterMessageInterpolator instead")
 	ValidationException getUnableToInitializeELExpressionFactoryException(@Cause Throwable e);
 
 	@LogMessage(level = WARN)
