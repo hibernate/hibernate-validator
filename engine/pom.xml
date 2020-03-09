@@ -240,7 +240,6 @@
                             jakarta.validation.*;version="[3.0.0,4.0.0)",
                             javax.script.*;version="0",
                             javax.xml.*;version="0",
-                            javax.el.*;version="[2.0.0,4.0.0)";resolution:=optional,
                             jakarta.el.*;version="[4.0.0,5.0.0)";resolution:=optional,
                             org.xml.sax.*;version="0",
                             org.jboss.logging.*;version="[3.1.0,4.0.0)",

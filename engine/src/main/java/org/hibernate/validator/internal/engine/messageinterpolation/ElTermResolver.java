@@ -10,10 +10,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.el.ELException;
-import javax.el.ExpressionFactory;
-import javax.el.PropertyNotFoundException;
-import javax.el.ValueExpression;
+import jakarta.el.ELException;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.PropertyNotFoundException;
+import jakarta.el.ValueExpression;
 import jakarta.validation.MessageInterpolator;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.el.RootResolver;

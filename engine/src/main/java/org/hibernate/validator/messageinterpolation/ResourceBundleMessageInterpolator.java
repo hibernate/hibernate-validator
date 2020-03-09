@@ -13,8 +13,8 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.el.ELManager;
-import javax.el.ExpressionFactory;
+import jakarta.el.ELManager;
+import jakarta.el.ExpressionFactory;
 
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
@@ -160,7 +160,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	}
 
 	/**
-	 * The javax.el FactoryFinder uses the TCCL to load the {@link ExpressionFactory} implementation so we need to be
+	 * The jakarta.el FactoryFinder uses the TCCL to load the {@link ExpressionFactory} implementation so we need to be
 	 * extra careful when initializing it.
 	 *
 	 * @return the {@link ExpressionFactory}

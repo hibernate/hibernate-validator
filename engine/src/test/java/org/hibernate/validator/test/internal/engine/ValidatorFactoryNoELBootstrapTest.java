@@ -20,7 +20,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Set;
 
-import javax.el.ExpressionFactory;
+import jakarta.el.ExpressionFactory;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.ValidationException;
@@ -41,7 +41,7 @@ import org.testng.annotations.Test;
  */
 public class ValidatorFactoryNoELBootstrapTest {
 
-	private final String EL_PACKAGE_PREFIX = "javax.el";
+	private final String EL_PACKAGE_PREFIX = "jakarta.el";
 
 	private final String EL_IMPL_PACKAGE_PREFIX = "com.sun.el";
 
@@ -146,7 +146,7 @@ public class ValidatorFactoryNoELBootstrapTest {
 		@Override
 		@IgnoreForbiddenApisErrors(reason = "getPackage() is deprecated but getDefinedPackage() is only available from JDK 9.")
 		public Class<?> loadClass(String className) throws ClassNotFoundException {
-			// This is what we in the end want to achieve. Throw ClassNotFoundException for javax.el classes
+			// This is what we in the end want to achieve. Throw ClassNotFoundException for jakarta.el classes
 			if ( className.startsWith( packageMissing ) ) {
 				throw new ClassNotFoundException();
 			}
@@ -222,7 +222,7 @@ public class ValidatorFactoryNoELBootstrapTest {
 	/**
 	 * Loads the given class using the EL-ignoring class loader and executes it.
 	 *
-	 * We need to override the Thread context class loader temporarily as {@link javax.el.FactoryFinder} is directly using it to load the
+	 * We need to override the Thread context class loader temporarily as {@link jakarta.el.FactoryFinder} is directly using it to load the
 	 * {@link ExpressionFactory} in {@link ExpressionFactory#newInstance(java.util.Properties)}.
 	 */
 	private void runWithoutElLibs(Class<?> delegateType, String packageMissing) throws Throwable {
