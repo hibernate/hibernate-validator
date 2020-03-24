@@ -52,9 +52,9 @@
             <artifactId>testng</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate.beanvalidation.tck</groupId>
+            <groupId>jakarta.validation</groupId>
             <artifactId>beanvalidation-tck-tests</artifactId>
-            <version>${version.org.hibernate.beanvalidation.tck}</version>
+            <version>${version.jakarta.validation.beanvalidation-tck}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.test-audit</groupId>
@@ -110,9 +110,9 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.hibernate.beanvalidation.tck</groupId>
+                                    <groupId>jakarta.validation</groupId>
                                     <artifactId>beanvalidation-tck-tests</artifactId>
-                                    <version>${version.org.hibernate.beanvalidation.tck}</version>
+                                    <version>${version.jakarta.validation.beanvalidation-tck}</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
@@ -132,7 +132,7 @@
                             <stripVersion>true</stripVersion>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.hibernate.beanvalidation.tck</groupId>
+                                    <groupId>jakarta.validation</groupId>
                                     <artifactId>beanvalidation-tck-tests</artifactId>
                                     <type>xml</type>
                                     <classifier>suite</classifier>
@@ -199,9 +199,9 @@
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>org.hibernate.beanvalidation.tck</groupId>
+                    <groupId>jakarta.validation</groupId>
                     <artifactId>beanvalidation-standalone-container-adapter</artifactId>
-                    <version>${version.org.hibernate.beanvalidation.tck}</version>
+                    <version>${version.jakarta.validation.beanvalidation-tck}</version>
                 </dependency>
             </dependencies>
             <build>
