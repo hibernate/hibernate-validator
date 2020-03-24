@@ -114,7 +114,7 @@
         <!-- Dependencies versions -->
 
         <version.jakarta.validation-api>3.0.0-M1</version.jakarta.validation-api>
-        <version.org.hibernate.beanvalidation.tck>3.0.0-SNAPSHOT</version.org.hibernate.beanvalidation.tck>
+        <version.jakarta.validation.beanvalidation-tck>3.0.0-M1</version.jakarta.validation.beanvalidation-tck>
 
         <version.com.thoughtworks.paranamer>2.8</version.com.thoughtworks.paranamer>
         <version.org.glassfish.jakarta.el>4.0.0-RC1</version.org.glassfish.jakarta.el>
