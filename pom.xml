@@ -1374,5 +1374,26 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>jakarta-staging</id>
+            <activation>
+                <property>
+                    <name>jakarta-staging</name>
+                </property>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>jakarta-staging</id>
+                    <name>Jakarta Staging Repository</name>
+                    <url>https://jakarta.oss.sonatype.org/content/repositories/staging/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
     </profiles>
 </project>
