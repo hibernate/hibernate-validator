@@ -1,6 +1,16 @@
 Hibernate Validator Changelog
 =============================
 
+7.0.0.Alpha1 (25-03-2020)
+-------------------------
+
+** Bug
+    * HV-1758 - translations               - Extra dollar sign in validation messages for ModCheck
+
+** New Feature
+    * HV-1759 - build, engine, integration - Switch to the new jakarta.* packages
+    * HV-1755 - engine                     - Introduce the notion of BeanMetaDataClassNormalizer in the standard ValidatorFactory
+
 6.1.2.Final (31-01-2020)
 -------------------------
 
