@@ -34,6 +34,7 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
+import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 
 /**
  * This manager is in charge of providing all constraint related meta data
@@ -103,6 +104,8 @@ public class BeanMetaDataManager {
 	 */
 	private final ExecutableHelper executableHelper;
 
+	private final BeanMetaDataClassNormalizer beanMetaDataClassNormalizer;
+
 	private final ValidationOrderGenerator validationOrderGenerator;
 
 	/**
@@ -117,6 +120,7 @@ public class BeanMetaDataManager {
 			TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ValueExtractorManager valueExtractorManager,
+			BeanMetaDataClassNormalizer beanMetaDataClassNormalizer,
 			ValidationOrderGenerator validationOrderGenerator,
 			List<MetaDataProvider> optionalMetaDataProviders,
 			MethodValidationConfiguration methodValidationConfiguration) {
@@ -125,6 +129,7 @@ public class BeanMetaDataManager {
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
 		this.parameterNameProvider = parameterNameProvider;
+		this.beanMetaDataClassNormalizer = beanMetaDataClassNormalizer;
 		this.validationOrderGenerator = validationOrderGenerator;
 
 		this.metaDataProviders = newArrayList();
@@ -152,26 +157,30 @@ public class BeanMetaDataManager {
 		this.metaDataProviders.add( defaultProvider );
 	}
 
+	// TODO Some of these casts from BeanMetadata<? super T> to BeanMetadata<T> may not be safe.
+	//  Maybe we should return a wrapper around the BeanMetadata if the normalized class is different from beanClass?
 	@SuppressWarnings("unchecked")
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
 		Contracts.assertNotNull( beanClass, MESSAGES.beanTypeCannotBeNull() );
 
+		Class<? super T> normalizedBeanClass = beanMetaDataClassNormalizer.normalize( beanClass );
+
 		// First, let's do a simple lookup as it's the default case
-		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataCache.get( beanClass );
+		BeanMetaData<? super T> beanMetaData = (BeanMetaData<? super T>) beanMetaDataCache.get( normalizedBeanClass );
 
 		if ( beanMetaData != null ) {
-			return beanMetaData;
+			return (BeanMetaData<T>) beanMetaData;
 		}
 
-		beanMetaData = createBeanMetaData( beanClass );
-		BeanMetaData<T> previousBeanMetaData = (BeanMetaData<T>) beanMetaDataCache.putIfAbsent( beanClass, beanMetaData );
+		beanMetaData = createBeanMetaData( normalizedBeanClass );
+		BeanMetaData<? super T> previousBeanMetaData = (BeanMetaData<? super T>) beanMetaDataCache.putIfAbsent( normalizedBeanClass, beanMetaData );
 
 		// we return the previous value if not null
 		if ( previousBeanMetaData != null ) {
-			return previousBeanMetaData;
+			return (BeanMetaData<T>) previousBeanMetaData;
 		}
 
-		return beanMetaData;
+		return (BeanMetaData<T>) beanMetaData;
 	}
 
 	public void clear() {

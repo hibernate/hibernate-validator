@@ -20,6 +20,7 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -311,4 +312,16 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	@Incubating
 	HibernateValidatorConfiguration constraintValidatorPayload(Object constraintValidatorPayload);
+
+	/**
+	 * Allows to set a {@link BeanMetaDataClassNormalizer} that will be used to normalize the class before
+	 * accessing the metadata.
+	 *
+	 * @param beanMetaDataClassNormalizer the {@code BeanMetaDataClassNormalizer} to use
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.0.19
+	 */
+	@Incubating
+	HibernateValidatorConfiguration beanMetaDataClassNormalizer(BeanMetaDataClassNormalizer beanMetaDataClassNormalizer);
 }
