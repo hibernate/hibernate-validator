@@ -43,6 +43,7 @@ import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.DefaultBeanMetaDataClassNormalizer;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
@@ -59,6 +60,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
+import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -132,6 +134,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private final ValueExtractorManager valueExtractorManager;
 
+	private final BeanMetaDataClassNormalizer beanMetadataClassNormalizer;
+
 	private final ValidationOrderGenerator validationOrderGenerator;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
@@ -197,6 +201,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		);
 
 		this.validationOrderGenerator = new ValidationOrderGenerator();
+
+		this.beanMetadataClassNormalizer = hibernateSpecificConfig.getBeanMetaDataClassNormalizer() != null ?
+				hibernateSpecificConfig.getBeanMetaDataClassNormalizer() :
+					new DefaultBeanMetaDataClassNormalizer();
 
 		if ( LOG.isDebugEnabled() ) {
 			logValidatorFactoryScopedConfiguration( validatorFactoryScopedContext );
@@ -347,6 +355,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						typeResolutionHelper,
 						validatorFactoryScopedContext.getParameterNameProvider(),
 						valueExtractorManager,
+						beanMetadataClassNormalizer,
 						validationOrderGenerator,
 						buildDataProviders(),
 						methodValidationConfiguration

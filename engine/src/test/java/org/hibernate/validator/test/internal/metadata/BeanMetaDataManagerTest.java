@@ -25,6 +25,7 @@ import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.DefaultBeanMetaDataClassNormalizer;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -56,6 +57,7 @@ public class BeanMetaDataManagerTest {
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptySet() ),
+				new DefaultBeanMetaDataClassNormalizer(),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
 				new MethodValidationConfiguration.Builder().build()

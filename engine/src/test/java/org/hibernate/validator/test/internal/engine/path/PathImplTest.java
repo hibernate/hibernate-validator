@@ -33,6 +33,7 @@ import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.DefaultBeanMetaDataClassNormalizer;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
@@ -40,7 +41,6 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
 import org.testng.annotations.Test;
 
 /**
@@ -197,6 +197,7 @@ public class PathImplTest {
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptySet() ),
+				new DefaultBeanMetaDataClassNormalizer(),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
 				new MethodValidationConfiguration.Builder().build()

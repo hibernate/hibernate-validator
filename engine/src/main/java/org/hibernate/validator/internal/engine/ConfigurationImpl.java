@@ -52,6 +52,7 @@ import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLo
 import org.hibernate.validator.internal.xml.config.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.config.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -103,6 +104,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private ScriptEvaluatorFactory scriptEvaluatorFactory;
 	private Duration temporalValidationTolerance;
 	private Object constraintValidatorPayload;
+	private BeanMetaDataClassNormalizer beanMetaDataClassNormalizer;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -329,6 +331,23 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.externalClassLoader = externalClassLoader;
 
 		return this;
+	}
+
+	@Override
+	public HibernateValidatorConfiguration beanMetaDataClassNormalizer(
+			BeanMetaDataClassNormalizer beanMetaDataClassNormalizer) {
+		if ( LOG.isDebugEnabled() ) {
+			if ( beanMetaDataClassNormalizer != null ) {
+				LOG.debug( "Setting custom BeanMetaDataClassNormalizer of type " + beanMetaDataClassNormalizer.getClass()
+						.getName() );
+			}
+		}
+		this.beanMetaDataClassNormalizer = beanMetaDataClassNormalizer;
+		return this;
+	}
+
+	public BeanMetaDataClassNormalizer getBeanMetaDataClassNormalizer() {
+		return beanMetaDataClassNormalizer;
 	}
 
 	@Override
