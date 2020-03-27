@@ -1,6 +1,19 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.19.Final (27-03-2020)
+-------------------------
+
+** Bug
+    * HV-1758 - translations - Extra dollar sign in validation messages for ModCheck
+    * HV-1756 - translations - Incorrect variables in the newly added translations
+
+** New Feature
+    * HV-1755 - engine       - Introduce the notion of BeanMetaDataClassNormalizer in the standard ValidatorFactory
+
+** Task
+    * HV-1753 - tests        - Force Pax-Exam and Karaf to use Maven Central repository with SSL enabled
+
 6.0.18.Final (25-10-2019)
 -------------------------
 
