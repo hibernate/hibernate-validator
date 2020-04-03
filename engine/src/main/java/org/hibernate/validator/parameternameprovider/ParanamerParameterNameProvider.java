@@ -56,7 +56,7 @@ public class ParanamerParameterNameProvider implements ParameterNameProvider {
 		}
 
 		//either null or an empty array is returned if no names could be retrieved
-		if ( parameterNames != null && parameterNames.length == constructor.getParameterTypes().length ) {
+		if ( parameterNames != null && parameterNames.length == constructor.getParameterCount() ) {
 			return Arrays.asList( parameterNames );
 		}
 
@@ -71,7 +71,7 @@ public class ParanamerParameterNameProvider implements ParameterNameProvider {
 			parameterNames = paranamer.lookupParameterNames( method, false );
 		}
 
-		if ( parameterNames != null && parameterNames.length == method.getParameterTypes().length ) {
+		if ( parameterNames != null && parameterNames.length == method.getParameterCount() ) {
 			return Arrays.asList( parameterNames );
 		}
 
