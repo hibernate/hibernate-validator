@@ -30,12 +30,12 @@ public class PrefixableParameterNameProvider implements ParameterNameProvider {
 
 	@Override
 	public List<String> getParameterNames(Constructor<?> constructor) {
-		return getParameterNames( constructor.getParameterTypes().length );
+		return getParameterNames( constructor.getParameterCount() );
 	}
 
 	@Override
 	public List<String> getParameterNames(Method method) {
-		return getParameterNames( method.getParameterTypes().length );
+		return getParameterNames( method.getParameterCount() );
 	}
 
 	private List<String> getParameterNames(int parameterCount) {

@@ -72,7 +72,7 @@ public final class ExecutableHelper {
 			return false;
 		}
 
-		if ( subTypeMethod.getParameterTypes().length != superTypeMethod.getParameterTypes().length ) {
+		if ( subTypeMethod.getParameterCount() != superTypeMethod.getParameterCount() ) {
 			return false;
 		}
 
@@ -133,7 +133,7 @@ public final class ExecutableHelper {
 			return false;
 		}
 
-		if ( left.getParameterTypes().length != right.getParameterTypes().length ) {
+		if ( left.getParameterCount() != right.getParameterCount() ) {
 			return false;
 		}
 
@@ -219,7 +219,7 @@ public final class ExecutableHelper {
 	}
 
 	private boolean instanceMethodParametersResolveToSameTypes(Class<?> mainSubType, Method left, Method right) {
-		if ( left.getParameterTypes().length == 0 ) {
+		if ( left.getParameterCount() == 0 ) {
 			return true;
 		}
 

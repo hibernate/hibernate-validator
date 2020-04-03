@@ -172,9 +172,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass) {
 		Method[] providerMethods = run( GetMethods.action( providerClass ) );
 		for ( Method method : providerMethods ) {
-			Class<?>[] paramTypes = method.getParameterTypes();
 			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
-					&& paramTypes.length == 1 && paramTypes[0].isAssignableFrom( beanClass ) ) {
+					&& method.getParameterCount() == 1 && method.getParameterTypes()[0].isAssignableFrom( beanClass ) ) {
 
 				return run(
 						NewInstance.action( providerClass, "the default group sequence provider" )
