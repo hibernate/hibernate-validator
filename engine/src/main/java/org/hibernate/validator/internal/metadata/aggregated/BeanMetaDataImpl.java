@@ -308,7 +308,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			return Optional.empty();
 		}
 
-		ExecutableMetaData executableMetaData = executableMetaDataMap.get( ExecutableHelper.getSignature( executable ) );
+		ExecutableMetaData executableMetaData = executableMetaDataMap.get( signature );
 
 		if ( executableMetaData == null ) {
 			// there is no executable metadata - specified object and method do not match
