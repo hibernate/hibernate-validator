@@ -21,6 +21,9 @@
     <description>Hibernate Validator performance tests.</description>
 
     <properties>
+        <!-- Disable enforcer as we are using banned dependencies for old versions -->
+        <enforcer.skip>true</enforcer.skip>
+
         <!--
         Need to specify something, since the plugin cannot handle empty options. Using something which does not have
         any runtime effects. The actual profiling options are either passed via the command line or set via a profile.
@@ -203,12 +206,12 @@
             </activation>
             <properties>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>6.1.0.Alpha4</beanvalidation-impl.version>
+                <beanvalidation-impl.version>6.1.2.Final</beanvalidation-impl.version>
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>javax.validation</groupId>
-                    <artifactId>validation-api</artifactId>
+                    <groupId>jakarta.validation</groupId>
+                    <artifactId>jakarta.validation-api</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -217,7 +220,7 @@
                 </dependency>
                 <dependency>
                     <groupId>org.glassfish</groupId>
-                    <artifactId>javax.el</artifactId>
+                    <artifactId>jakarta.el</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>log4j</groupId>
@@ -245,7 +248,7 @@
             <properties>
                 <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>6.0.16.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>6.0.19.Final</beanvalidation-impl.version>
             </properties>
             <dependencies>
                 <dependency>
