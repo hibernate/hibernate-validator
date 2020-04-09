@@ -36,6 +36,7 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
+import org.hibernate.validator.internal.properties.Signature;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
@@ -100,14 +101,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * meta-data will be stored).
 	 */
 	@Immutable
-	private final Map<String, ExecutableMetaData> executableMetaDataMap;
+	private final Map<Signature, ExecutableMetaData> executableMetaDataMap;
 
 	/**
 	 * The set of unconstrained executables of the bean. It contains all the relevant signatures, following the same
 	 * rules as {@code executableMetaDataMap}.
 	 */
 	@Immutable
-	private final Set<String> unconstrainedExecutables;
+	private final Set<Signature> unconstrainedExecutables;
 
 	/**
 	 * Property meta data keyed against the property name
@@ -181,7 +182,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Set<PropertyMetaData> propertyMetaDataSet = newHashSet();
 
 		Set<ExecutableMetaData> executableMetaDataSet = newHashSet();
-		Set<String> tmpUnconstrainedExecutables = newHashSet();
+		Set<Signature> tmpUnconstrainedExecutables = newHashSet();
 
 		boolean hasConstraints = false;
 		Set<MetaConstraint<?>> allMetaConstraints = newHashSet();
@@ -302,7 +303,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	@Override
 	public Optional<ExecutableMetaData> getMetaDataFor(Executable executable) {
-		String signature = ExecutableHelper.getSignature( executable );
+		Signature signature = ExecutableHelper.getSignature( executable );
 
 		if ( unconstrainedExecutables.contains( signature ) ) {
 			return Optional.empty();
@@ -357,7 +358,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private static BeanDescriptor createBeanDescriptor(Class<?> beanClass, Set<MetaConstraint<?>> allMetaConstraints,
-			Map<String, PropertyMetaData> propertyMetaDataMap, Map<String, ExecutableMetaData> executableMetaDataMap, boolean defaultGroupSequenceRedefined,
+			Map<String, PropertyMetaData> propertyMetaDataMap, Map<Signature, ExecutableMetaData> executableMetaDataMap,
+			boolean defaultGroupSequenceRedefined,
 			List<Class<?>> resolvedDefaultGroupSequence) {
 		Map<String, PropertyDescriptor> propertyDescriptors = getConstrainedPropertiesAsDescriptors(
 				propertyMetaDataMap,
@@ -365,13 +367,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				resolvedDefaultGroupSequence
 		);
 
-		Map<String, ExecutableDescriptorImpl> methodsDescriptors = getConstrainedMethodsAsDescriptors(
+		Map<Signature, ExecutableDescriptorImpl> methodsDescriptors = getConstrainedMethodsAsDescriptors(
 				executableMetaDataMap,
 				defaultGroupSequenceRedefined,
 				resolvedDefaultGroupSequence
 		);
 
-		Map<String, ConstructorDescriptor> constructorsDescriptors = getConstrainedConstructorsAsDescriptors(
+		Map<Signature, ConstructorDescriptor> constructorsDescriptors = getConstrainedConstructorsAsDescriptors(
 				executableMetaDataMap,
 				defaultGroupSequenceRedefined,
 				resolvedDefaultGroupSequence
@@ -414,9 +416,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return theValue;
 	}
 
-	private static Map<String, ExecutableDescriptorImpl> getConstrainedMethodsAsDescriptors(Map<String, ExecutableMetaData> executableMetaDataMap,
+	private static Map<Signature, ExecutableDescriptorImpl> getConstrainedMethodsAsDescriptors(
+			Map<Signature, ExecutableMetaData> executableMetaDataMap,
 			boolean defaultGroupSequenceIsRedefined, List<Class<?>> resolvedDefaultGroupSequence) {
-		Map<String, ExecutableDescriptorImpl> constrainedMethodDescriptors = newHashMap();
+		Map<Signature, ExecutableDescriptorImpl> constrainedMethodDescriptors = newHashMap();
 
 		for ( ExecutableMetaData executableMetaData : executableMetaDataMap.values() ) {
 			if ( executableMetaData.getKind() == ElementKind.METHOD
@@ -426,7 +429,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 						resolvedDefaultGroupSequence
 				);
 
-				for ( String signature : executableMetaData.getSignatures() ) {
+				for ( Signature signature : executableMetaData.getSignatures() ) {
 					constrainedMethodDescriptors.put( signature, descriptor );
 				}
 			}
@@ -435,9 +438,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return constrainedMethodDescriptors;
 	}
 
-	private static Map<String, ConstructorDescriptor> getConstrainedConstructorsAsDescriptors(Map<String, ExecutableMetaData> executableMetaDataMap,
+	private static Map<Signature, ConstructorDescriptor> getConstrainedConstructorsAsDescriptors(Map<Signature, ExecutableMetaData> executableMetaDataMap,
 			boolean defaultGroupSequenceIsRedefined, List<Class<?>> resolvedDefaultGroupSequence) {
-		Map<String, ConstructorDescriptor> constrainedMethodDescriptors = newHashMap();
+		Map<Signature, ConstructorDescriptor> constrainedMethodDescriptors = newHashMap();
 
 		for ( ExecutableMetaData executableMetaData : executableMetaDataMap.values() ) {
 			if ( executableMetaData.getKind() == ElementKind.CONSTRUCTOR && executableMetaData.isConstrained() ) {
@@ -501,11 +504,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Builds up the method meta data for this type; each meta-data entry will be stored under the signature of the
 	 * represented method and all the methods it overrides.
 	 */
-	private Map<String, ExecutableMetaData> bySignature(Set<ExecutableMetaData> executables) {
-		Map<String, ExecutableMetaData> theValue = newHashMap();
+	private Map<Signature, ExecutableMetaData> bySignature(Set<ExecutableMetaData> executables) {
+		Map<Signature, ExecutableMetaData> theValue = newHashMap();
 
 		for ( ExecutableMetaData executableMetaData : executables ) {
-			for ( String signature : executableMetaData.getSignatures() ) {
+			for ( Signature signature : executableMetaData.getSignatures() ) {
 				theValue.put( signature, executableMetaData );
 			}
 		}

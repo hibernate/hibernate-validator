@@ -31,7 +31,7 @@ public interface Callable extends Constrainable {
 
 	boolean isPrivate();
 
-	String getSignature();
+	Signature getSignature();
 
 	boolean overrides(ExecutableHelper executableHelper, Callable superTypeMethod);
 

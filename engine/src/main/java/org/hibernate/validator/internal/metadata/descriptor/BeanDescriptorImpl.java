@@ -21,6 +21,7 @@ import jakarta.validation.metadata.MethodDescriptor;
 import jakarta.validation.metadata.MethodType;
 import jakarta.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.internal.properties.Signature;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
@@ -37,15 +38,15 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 	@Immutable
 	private final Map<String, PropertyDescriptor> constrainedProperties;
 	@Immutable
-	private final Map<String, ExecutableDescriptorImpl> constrainedMethods;
+	private final Map<Signature, ExecutableDescriptorImpl> constrainedMethods;
 	@Immutable
-	private final Map<String, ConstructorDescriptor> constrainedConstructors;
+	private final Map<Signature, ConstructorDescriptor> constrainedConstructors;
 
 	public BeanDescriptorImpl(Type beanClass,
 							  Set<ConstraintDescriptorImpl<?>> classLevelConstraints,
 							  Map<String, PropertyDescriptor> constrainedProperties,
-							  Map<String, ExecutableDescriptorImpl> constrainedMethods,
-							  Map<String, ConstructorDescriptor> constrainedConstructors,
+							  Map<Signature, ExecutableDescriptorImpl> constrainedMethods,
+							  Map<Signature, ConstructorDescriptor> constrainedConstructors,
 							  boolean defaultGroupSequenceRedefined,
 							  List<Class<?>> defaultGroupSequence) {
 		super( beanClass, classLevelConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
