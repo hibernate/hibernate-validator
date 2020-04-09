@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Signature;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -91,7 +92,7 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 	}
 
 	@Override
-	public String getSignature() {
+	public Signature getSignature() {
 		return ExecutableHelper.getSignature( executable );
 	}
 

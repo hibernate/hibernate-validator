@@ -31,6 +31,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Signature;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -72,7 +73,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 * overrides a super type method with generic parameters, in which case the signature of the super-type and the
 	 * sub-type method will differ.
 	 */
-	private final Set<String> signatures;
+	private final Set<Signature> signatures;
 
 	private final ReturnValueMetaData returnValueMetaData;
 	private final ElementKind kind;
@@ -82,7 +83,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Type returnType,
 			Class<?>[] parameterTypes,
 			ElementKind kind,
-			Set<String> signatures,
+			Set<Signature> signatures,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Set<MetaConstraint<?>> returnValueContainerElementConstraints,
 			List<ParameterMetaData> parameterMetaDataList,
@@ -137,7 +138,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 * method represents a sub-type method overriding a super-type method using a generic type parameter in its
 	 * parameters.
 	 */
-	public Set<String> getSignatures() {
+	public Set<Signature> getSignatures() {
 		return signatures;
 	}
 
@@ -249,7 +250,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
 	 */
 	public static class Builder extends MetaDataBuilder {
-		private final Set<String> signatures = newHashSet();
+		private final Set<Signature> signatures = newHashSet();
 
 		/**
 		 * Either CONSTRUCTOR, METHOD or GETTER.
