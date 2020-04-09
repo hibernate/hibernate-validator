@@ -14,8 +14,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
@@ -181,10 +179,26 @@ public final class ExecutableHelper {
 		return getSignature( getSimpleName( executable ), executable.getParameterTypes() );
 	}
 
+	/**
+	 * This method needs to be fast.
+	 * <p>
+	 * The purpose of it is to get uniqueness, we don't really care about prettiness.
+	 */
 	public static String getSignature(String name, Class<?>[] parameterTypes) {
-		return Stream.of( parameterTypes )
-			.map( t -> t.getName() )
-			.collect( Collectors.joining( ",", name + "(", ")" ) );
+		StringBuilder signature = new StringBuilder( name.length() + 2 + parameterTypes.length * 25 );
+		signature.append( name ).append( '(' );
+		boolean separator = false;
+		for ( Class<?> parameterType : parameterTypes ) {
+			if ( separator ) {
+				signature.append( ',' );
+			}
+			else {
+				separator = true;
+			}
+			signature.append( parameterType.getName() );
+		}
+		signature.append( ')' );
+		return signature.toString();
 	}
 
 	/**
@@ -197,9 +211,20 @@ public final class ExecutableHelper {
 	 * @return A string representation of the given executable.
 	 */
 	public static String getExecutableAsString(String name, Class<?>... parameterTypes) {
-		return Stream.of( parameterTypes )
-			.map( t -> t.getSimpleName() )
-			.collect( Collectors.joining( ", ", name + "(", ")" ) );
+		StringBuilder signature = new StringBuilder( name.length() + 2 + parameterTypes.length * 25 );
+		signature.append( name ).append( '(' );
+		boolean separator = false;
+		for ( Class<?> parameterType : parameterTypes ) {
+			if ( separator ) {
+				signature.append( ", " );
+			}
+			else {
+				separator = true;
+			}
+			signature.append( parameterType.getSimpleName() );
+		}
+		signature.append( ')' );
+		return signature.toString();
 	}
 
 	public static ElementType getElementType(Executable executable) {
