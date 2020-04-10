@@ -18,7 +18,7 @@ standaloneXml = new File( getPropertyValue('wildfly.target-dir'), 'standalone/co
 println "[INFO] Add javafx.api as global module"
 
 processFileInplace( standaloneXml ) { text ->
-    text.replaceAll( /<subsystem xmlns="urn:jboss:domain:ee:4\.0">/, '<subsystem xmlns="urn:jboss:domain:ee:4.0">\n            <global-modules>\n                <module name="javafx.api" slot="main" />\n            </global-modules>' )
+    text.replaceAll( /<subsystem xmlns="urn:jboss:domain:ee:([^"]+)">/, '<subsystem xmlns="urn:jboss:domain:ee:$1">\n            <global-modules>\n                <module name="javafx.api" slot="main" />\n            </global-modules>' )
 }
 
 println "[INFO] ------------------------------------------------------------------------";
