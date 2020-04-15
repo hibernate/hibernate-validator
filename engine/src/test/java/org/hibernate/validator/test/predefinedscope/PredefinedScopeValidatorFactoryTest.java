@@ -14,6 +14,7 @@ import static org.testng.Assert.fail;
 
 import java.lang.annotation.ElementType;
 import java.util.AbstractCollection;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -245,6 +246,7 @@ public class PredefinedScopeValidatorFactoryTest {
 
 		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
+				.builtinConstraints( new HashSet<>( Arrays.asList( Email.class.getName(), NotNull.class.getName() ) ) )
 				.initializeBeanMetaData( beanMetaDataToInitialize )
 				.locales( Collections.singleton( Locale.getDefault() ) )
 				.beanMetaDataClassNormalizer( new MyProxyInterfaceBeanMetaDataClassNormalizer() )
@@ -266,6 +268,7 @@ public class PredefinedScopeValidatorFactoryTest {
 
 		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
+				.builtinConstraints( new HashSet<>( Arrays.asList( Email.class.getName(), NotNull.class.getName() ) ) )
 				.initializeBeanMetaData( beanMetaDataToInitialize )
 				.buildValidatorFactory();
 
@@ -290,6 +293,7 @@ public class PredefinedScopeValidatorFactoryTest {
 
 		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
+				.builtinConstraints( new HashSet<>( Arrays.asList( Email.class.getName(), NotNull.class.getName() ) ) )
 				.initializeBeanMetaData( beanMetaDataToInitialize )
 				.buildValidatorFactory();
 
@@ -330,6 +334,7 @@ public class PredefinedScopeValidatorFactoryTest {
 
 		return Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
+				.builtinConstraints( new HashSet<>( Arrays.asList( Email.class.getName(), NotNull.class.getName() ) ) )
 				.initializeBeanMetaData( beanMetaDataToInitialize )
 				.buildValidatorFactory();
 	}
@@ -344,6 +349,7 @@ public class PredefinedScopeValidatorFactoryTest {
 
 		return Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
+				.builtinConstraints( new HashSet<>( Arrays.asList( Email.class.getName(), NotNull.class.getName() ) ) )
 				.initializeBeanMetaData( beanMetaDataToInitialize )
 				.locales( Collections.singleton( locale ) )
 				.buildValidatorFactory();

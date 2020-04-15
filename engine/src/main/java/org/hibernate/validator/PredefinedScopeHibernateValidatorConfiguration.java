@@ -21,6 +21,9 @@ import java.util.Set;
 public interface PredefinedScopeHibernateValidatorConfiguration extends BaseHibernateValidatorConfiguration<PredefinedScopeHibernateValidatorConfiguration> {
 
 	@Incubating
+	PredefinedScopeHibernateValidatorConfiguration builtinConstraints(Set<String> constraints);
+
+	@Incubating
 	PredefinedScopeHibernateValidatorConfiguration initializeBeanMetaData(Set<Class<?>> beanClassesToInitialize);
 
 	/**

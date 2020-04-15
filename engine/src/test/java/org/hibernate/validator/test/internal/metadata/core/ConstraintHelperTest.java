@@ -31,7 +31,7 @@ public class ConstraintHelperTest {
 
 	@BeforeClass
 	public static void init() {
-		constraintHelper = new ConstraintHelper();
+		constraintHelper = ConstraintHelper.forAllBuiltinConstraints();
 	}
 
 	@Test

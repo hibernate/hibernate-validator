@@ -167,7 +167,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.validationOrderGenerator = new ValidationOrderGenerator();
 
 		ValueExtractorManager valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
-		ConstraintHelper constraintHelper = new ConstraintHelper();
+		ConstraintHelper constraintHelper = ConstraintHelper.forAllBuiltinConstraints();
 		TypeResolutionHelper typeResolutionHelper = new TypeResolutionHelper();
 
 		this.constraintCreationContext = new ConstraintCreationContext( constraintHelper, constraintValidatorManager, typeResolutionHelper, valueExtractorManager );
