@@ -52,7 +52,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		// Create some annotations for testing using AnnotationProxies
 		ConstraintAnnotationDescriptor.Builder<NotNull> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( NotNull.class );
 		notNullDescriptor = new ConstraintDescriptorImpl<>(
-				new ConstraintHelper(),
+				ConstraintHelper.forAllBuiltinConstraints(),
 				null,
 				descriptorBuilder.build(),
 				ConstraintLocationKind.FIELD
@@ -60,7 +60,7 @@ public class ResourceBundleMessageInterpolatorTest {
 
 		ConstraintAnnotationDescriptor.Builder<Size> sizeAnnotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<Size>( Size.class );
 		sizeDescriptor = new ConstraintDescriptorImpl<>(
-				new ConstraintHelper(),
+				ConstraintHelper.forAllBuiltinConstraints(),
 				null,
 				sizeAnnotationDescriptorBuilder.build(),
 				ConstraintLocationKind.FIELD
@@ -214,7 +214,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		ConstraintAnnotationDescriptor<Max> descriptor = descriptorBuilder.build();
 
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
-				new ConstraintHelper(),
+				ConstraintHelper.forAllBuiltinConstraints(),
 				null,
 				descriptorBuilder.build(),
 				ConstraintLocationKind.FIELD
@@ -243,7 +243,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		ConstraintAnnotationDescriptor<Max> maxDescriptor = descriptorBuilder.build();
 
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
-				new ConstraintHelper(),
+				ConstraintHelper.forAllBuiltinConstraints(),
 				null,
 				maxDescriptor,
 				ConstraintLocationKind.FIELD
