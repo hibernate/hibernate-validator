@@ -6,6 +6,55 @@
  */
 package org.hibernate.validator.internal.metadata.core;
 
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_ASSERT_FALSE;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_ASSERT_TRUE;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_DECIMAL_MAX;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_DECIMAL_MIN;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_DIGITS;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_EMAIL;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_FUTURE;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_FUTURE_OR_PRESENT;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_MAX;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_MIN;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_NEGATIVE;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_NEGATIVE_OR_ZERO;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_NOT_BLANK;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_NOT_EMPTY;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_NOT_NULL;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_NULL;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_PAST;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_PAST_OR_PRESENT;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_PATTERN;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_POSITIVE;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_POSITIVE_OR_ZERO;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_SIZE;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CNPJ;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CPF;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_TITULO_ELEITORAL;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CODE_POINT_LENGTH;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CREDIT_CARD_NUMBER;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CURRENCY;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EAN;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EMAIL;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ISBN;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LENGTH;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LUHN_CHECK;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD10_CHECK;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD11_CHECK;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD_CHECK;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NOT_BLANK;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NOT_EMPTY;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PARAMETER_SCRIPT_ASSERT;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_NIP;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_PESEL;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_REGON;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RANGE;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SAFE_HTML;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SCRIPT_ASSERT;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MAX;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MIN;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UNIQUE_ELEMENTS;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_URL;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.Annotation;
@@ -17,6 +66,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -310,6 +360,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Guillaume Smet
  */
 public class ConstraintHelper {
+
 	public static final String GROUPS = "groups";
 	public static final String PAYLOAD = "payload";
 	public static final String MESSAGE = "message";
@@ -323,7 +374,7 @@ public class ConstraintHelper {
 	private static final String JSOUP_CLASS_NAME = "org.jsoup.Jsoup";
 
 	@Immutable
-	private final Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> builtinConstraints;
+	private final Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> enabledBuiltinConstraints;
 
 	private final ConcurrentMap<Class<? extends Annotation>, Boolean> externalConstraints = new ConcurrentHashMap<>();
 
@@ -331,405 +382,425 @@ public class ConstraintHelper {
 
 	private final ValidatorDescriptorMap validatorDescriptors = new ValidatorDescriptorMap();
 
+	public static ConstraintHelper forAllBuiltinConstraints() {
+		return new ConstraintHelper( new HashSet<>( Arrays.asList( BuiltinConstraint.values() ) ) );
+	}
+
+	public static ConstraintHelper forBuiltinConstraints(Set<String> enabledConstraints) {
+		return new ConstraintHelper( BuiltinConstraint.resolve( enabledConstraints ) );
+	}
+
 	@SuppressWarnings("deprecation")
-	public ConstraintHelper() {
+	private ConstraintHelper(Set<BuiltinConstraint> enabledBuiltinConstraints) {
+		if ( enabledBuiltinConstraints.isEmpty() ) {
+			this.enabledBuiltinConstraints = Collections.emptyMap();
+			return;
+		}
+
 		Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> tmpConstraints = new HashMap<>();
 
 		// Bean Validation constraints
 
-		putConstraint( tmpConstraints, AssertFalse.class, AssertFalseValidator.class );
-		putConstraint( tmpConstraints, AssertTrue.class, AssertTrueValidator.class );
-
-		if ( isJavaMoneyInClasspath() ) {
-			putConstraints( tmpConstraints, DecimalMax.class,  Arrays.asList(
-					DecimalMaxValidatorForBigDecimal.class,
-					DecimalMaxValidatorForBigInteger.class,
-					DecimalMaxValidatorForByte.class,
-					DecimalMaxValidatorForDouble.class,
-					DecimalMaxValidatorForFloat.class,
-					DecimalMaxValidatorForLong.class,
-					DecimalMaxValidatorForInteger.class,
-					DecimalMaxValidatorForNumber.class,
-					DecimalMaxValidatorForShort.class,
-					DecimalMaxValidatorForCharSequence.class,
-					DecimalMaxValidatorForMonetaryAmount.class
-			) );
-			putConstraints( tmpConstraints, DecimalMin.class, Arrays.asList(
-					DecimalMinValidatorForBigDecimal.class,
-					DecimalMinValidatorForBigInteger.class,
-					DecimalMinValidatorForByte.class,
-					DecimalMinValidatorForDouble.class,
-					DecimalMinValidatorForFloat.class,
-					DecimalMinValidatorForLong.class,
-					DecimalMinValidatorForInteger.class,
-					DecimalMinValidatorForNumber.class,
-					DecimalMinValidatorForShort.class,
-					DecimalMinValidatorForCharSequence.class,
-					DecimalMinValidatorForMonetaryAmount.class
-			) );
-			putConstraints( tmpConstraints, Digits.class, Arrays.asList(
-					DigitsValidatorForCharSequence.class,
-					DigitsValidatorForNumber.class,
-					DigitsValidatorForMonetaryAmount.class
-			) );
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_ASSERT_FALSE ) ) {
+			putConstraint( tmpConstraints, AssertFalse.class, AssertFalseValidator.class );
 		}
-		else {
-			putConstraints( tmpConstraints, DecimalMax.class, Arrays.asList(
-					DecimalMaxValidatorForBigDecimal.class,
-					DecimalMaxValidatorForBigInteger.class,
-					DecimalMaxValidatorForByte.class,
-					DecimalMaxValidatorForDouble.class,
-					DecimalMaxValidatorForFloat.class,
-					DecimalMaxValidatorForLong.class,
-					DecimalMaxValidatorForInteger.class,
-					DecimalMaxValidatorForNumber.class,
-					DecimalMaxValidatorForShort.class,
-					DecimalMaxValidatorForCharSequence.class
-			) );
-			putConstraints( tmpConstraints, DecimalMin.class, Arrays.asList(
-					DecimalMinValidatorForBigDecimal.class,
-					DecimalMinValidatorForBigInteger.class,
-					DecimalMinValidatorForByte.class,
-					DecimalMinValidatorForDouble.class,
-					DecimalMinValidatorForFloat.class,
-					DecimalMinValidatorForLong.class,
-					DecimalMinValidatorForInteger.class,
-					DecimalMinValidatorForNumber.class,
-					DecimalMinValidatorForShort.class,
-					DecimalMinValidatorForCharSequence.class
-			) );
-			putConstraints( tmpConstraints, Digits.class, Arrays.asList(
-					DigitsValidatorForCharSequence.class,
-					DigitsValidatorForNumber.class
-			) );
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_ASSERT_TRUE ) ) {
+			putConstraint( tmpConstraints, AssertTrue.class, AssertTrueValidator.class );
 		}
 
-		putConstraint( tmpConstraints, Email.class, EmailValidator.class );
-
-		List<Class<? extends ConstraintValidator<Future, ?>>> futureValidators = new ArrayList<>( 18 );
-		futureValidators.add( FutureValidatorForCalendar.class );
-		futureValidators.add( FutureValidatorForDate.class );
-		if ( isJodaTimeInClasspath() ) {
-			futureValidators.add( FutureValidatorForReadableInstant.class );
-			futureValidators.add( FutureValidatorForReadablePartial.class );
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_DECIMAL_MAX ) ) {
+			List<Class<? extends ConstraintValidator<DecimalMax, ?>>> decimalMaxValidators = new ArrayList<>();
+			decimalMaxValidators.add( DecimalMaxValidatorForBigDecimal.class );
+			decimalMaxValidators.add( DecimalMaxValidatorForBigInteger.class );
+			decimalMaxValidators.add( DecimalMaxValidatorForByte.class );
+			decimalMaxValidators.add( DecimalMaxValidatorForDouble.class );
+			decimalMaxValidators.add( DecimalMaxValidatorForFloat.class );
+			decimalMaxValidators.add( DecimalMaxValidatorForLong.class );
+			decimalMaxValidators.add( DecimalMaxValidatorForInteger.class );
+			decimalMaxValidators.add( DecimalMaxValidatorForNumber.class );
+			decimalMaxValidators.add( DecimalMaxValidatorForShort.class );
+			decimalMaxValidators.add( DecimalMaxValidatorForCharSequence.class );
+			if ( isJavaMoneyInClasspath() ) {
+				decimalMaxValidators.add( DecimalMaxValidatorForMonetaryAmount.class );
+			}
+			putConstraints( tmpConstraints, DecimalMax.class, decimalMaxValidators );
 		}
-		// Java 8 date/time API validators
-		futureValidators.add( FutureValidatorForHijrahDate.class );
-		futureValidators.add( FutureValidatorForInstant.class );
-		futureValidators.add( FutureValidatorForJapaneseDate.class );
-		futureValidators.add( FutureValidatorForLocalDate.class );
-		futureValidators.add( FutureValidatorForLocalDateTime.class );
-		futureValidators.add( FutureValidatorForLocalTime.class );
-		futureValidators.add( FutureValidatorForMinguoDate.class );
-		futureValidators.add( FutureValidatorForMonthDay.class );
-		futureValidators.add( FutureValidatorForOffsetDateTime.class );
-		futureValidators.add( FutureValidatorForOffsetTime.class );
-		futureValidators.add( FutureValidatorForThaiBuddhistDate.class );
-		futureValidators.add( FutureValidatorForYear.class );
-		futureValidators.add( FutureValidatorForYearMonth.class );
-		futureValidators.add( FutureValidatorForZonedDateTime.class );
-
-		putConstraints( tmpConstraints, Future.class, futureValidators );
-
-		List<Class<? extends ConstraintValidator<FutureOrPresent, ?>>> futureOrPresentValidators = new ArrayList<>( 18 );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForCalendar.class );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForDate.class );
-		if ( isJodaTimeInClasspath() ) {
-			futureOrPresentValidators.add( FutureOrPresentValidatorForReadableInstant.class );
-			futureOrPresentValidators.add( FutureOrPresentValidatorForReadablePartial.class );
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_DECIMAL_MIN ) ) {
+			List<Class<? extends ConstraintValidator<DecimalMin, ?>>> decimalMinValidators = new ArrayList<>();
+			decimalMinValidators.add( DecimalMinValidatorForBigDecimal.class );
+			decimalMinValidators.add( DecimalMinValidatorForBigInteger.class );
+			decimalMinValidators.add( DecimalMinValidatorForByte.class );
+			decimalMinValidators.add( DecimalMinValidatorForDouble.class );
+			decimalMinValidators.add( DecimalMinValidatorForFloat.class );
+			decimalMinValidators.add( DecimalMinValidatorForLong.class );
+			decimalMinValidators.add( DecimalMinValidatorForInteger.class );
+			decimalMinValidators.add( DecimalMinValidatorForNumber.class );
+			decimalMinValidators.add( DecimalMinValidatorForShort.class );
+			decimalMinValidators.add( DecimalMinValidatorForCharSequence.class );
+			if ( isJavaMoneyInClasspath() ) {
+				decimalMinValidators.add( DecimalMinValidatorForMonetaryAmount.class );
+			}
+			putConstraints( tmpConstraints, DecimalMin.class, decimalMinValidators );
 		}
-		// Java 8 date/time API validators
-		futureOrPresentValidators.add( FutureOrPresentValidatorForHijrahDate.class );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForInstant.class );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForJapaneseDate.class );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForLocalDate.class );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForLocalDateTime.class );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForLocalTime.class );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForMinguoDate.class );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForMonthDay.class );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForOffsetDateTime.class );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForOffsetTime.class );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForThaiBuddhistDate.class );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForYear.class );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForYearMonth.class );
-		futureOrPresentValidators.add( FutureOrPresentValidatorForZonedDateTime.class );
-
-		putConstraints( tmpConstraints, FutureOrPresent.class, futureOrPresentValidators );
-
-		if ( isJavaMoneyInClasspath() ) {
-			putConstraints( tmpConstraints, Max.class, Arrays.asList(
-					MaxValidatorForBigDecimal.class,
-					MaxValidatorForBigInteger.class,
-					MaxValidatorForByte.class,
-					MaxValidatorForDouble.class,
-					MaxValidatorForFloat.class,
-					MaxValidatorForInteger.class,
-					MaxValidatorForLong.class,
-					MaxValidatorForNumber.class,
-					MaxValidatorForShort.class,
-					MaxValidatorForCharSequence.class,
-					MaxValidatorForMonetaryAmount.class
-			) );
-			putConstraints( tmpConstraints, Min.class, Arrays.asList(
-					MinValidatorForBigDecimal.class,
-					MinValidatorForBigInteger.class,
-					MinValidatorForByte.class,
-					MinValidatorForDouble.class,
-					MinValidatorForFloat.class,
-					MinValidatorForInteger.class,
-					MinValidatorForLong.class,
-					MinValidatorForNumber.class,
-					MinValidatorForShort.class,
-					MinValidatorForCharSequence.class,
-					MinValidatorForMonetaryAmount.class
-			) );
-		}
-		else {
-			putConstraints( tmpConstraints, Max.class, Arrays.asList(
-					MaxValidatorForBigDecimal.class,
-					MaxValidatorForBigInteger.class,
-					MaxValidatorForDouble.class,
-					MaxValidatorForFloat.class,
-					MaxValidatorForLong.class,
-					MaxValidatorForNumber.class,
-					MaxValidatorForCharSequence.class
-			) );
-			putConstraints( tmpConstraints, Min.class, Arrays.asList(
-					MinValidatorForBigDecimal.class,
-					MinValidatorForBigInteger.class,
-					MinValidatorForByte.class,
-					MinValidatorForDouble.class,
-					MinValidatorForFloat.class,
-					MinValidatorForInteger.class,
-					MinValidatorForLong.class,
-					MinValidatorForNumber.class,
-					MinValidatorForShort.class,
-					MinValidatorForCharSequence.class
-			) );
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_DIGITS ) ) {
+			List<Class<? extends ConstraintValidator<Digits, ?>>> digitsValidators = new ArrayList<>();
+			digitsValidators.add( DigitsValidatorForCharSequence.class );
+			digitsValidators.add( DigitsValidatorForNumber.class );
+			if ( isJavaMoneyInClasspath() ) {
+				digitsValidators.add( DigitsValidatorForMonetaryAmount.class );
+			}
+			putConstraints( tmpConstraints, Digits.class, digitsValidators );
 		}
 
-		if ( isJavaMoneyInClasspath() ) {
-			putConstraints( tmpConstraints, Negative.class, Arrays.asList(
-					NegativeValidatorForBigDecimal.class,
-					NegativeValidatorForBigInteger.class,
-					NegativeValidatorForDouble.class,
-					NegativeValidatorForFloat.class,
-					NegativeValidatorForLong.class,
-					NegativeValidatorForInteger.class,
-					NegativeValidatorForShort.class,
-					NegativeValidatorForByte.class,
-					NegativeValidatorForNumber.class,
-					NegativeValidatorForMonetaryAmount.class ) );
-
-			putConstraints( tmpConstraints, NegativeOrZero.class, Arrays.asList(
-					NegativeOrZeroValidatorForBigDecimal.class,
-					NegativeOrZeroValidatorForBigInteger.class,
-					NegativeOrZeroValidatorForDouble.class,
-					NegativeOrZeroValidatorForFloat.class,
-					NegativeOrZeroValidatorForLong.class,
-					NegativeOrZeroValidatorForInteger.class,
-					NegativeOrZeroValidatorForShort.class,
-					NegativeOrZeroValidatorForByte.class,
-					NegativeOrZeroValidatorForNumber.class,
-					NegativeOrZeroValidatorForMonetaryAmount.class ) );
-		}
-		else {
-			putConstraints( tmpConstraints, Negative.class, Arrays.asList(
-					NegativeValidatorForBigDecimal.class,
-					NegativeValidatorForBigInteger.class,
-					NegativeValidatorForDouble.class,
-					NegativeValidatorForFloat.class,
-					NegativeValidatorForLong.class,
-					NegativeValidatorForInteger.class,
-					NegativeValidatorForShort.class,
-					NegativeValidatorForByte.class,
-					NegativeValidatorForNumber.class
-			) );
-
-			putConstraints( tmpConstraints, NegativeOrZero.class, Arrays.asList(
-					NegativeOrZeroValidatorForBigDecimal.class,
-					NegativeOrZeroValidatorForBigInteger.class,
-					NegativeOrZeroValidatorForDouble.class,
-					NegativeOrZeroValidatorForFloat.class,
-					NegativeOrZeroValidatorForLong.class,
-					NegativeOrZeroValidatorForInteger.class,
-					NegativeOrZeroValidatorForShort.class,
-					NegativeOrZeroValidatorForByte.class,
-					NegativeOrZeroValidatorForNumber.class
-			) );
-		}
-		putConstraint( tmpConstraints, NotBlank.class, NotBlankValidator.class );
-
-		List<Class<? extends ConstraintValidator<NotEmpty, ?>>> notEmptyValidators = new ArrayList<>( 11 );
-		notEmptyValidators.add( NotEmptyValidatorForCharSequence.class );
-		notEmptyValidators.add( NotEmptyValidatorForCollection.class );
-		notEmptyValidators.add( NotEmptyValidatorForArray.class );
-		notEmptyValidators.add( NotEmptyValidatorForMap.class );
-		notEmptyValidators.add( NotEmptyValidatorForArraysOfBoolean.class );
-		notEmptyValidators.add( NotEmptyValidatorForArraysOfByte.class );
-		notEmptyValidators.add( NotEmptyValidatorForArraysOfChar.class );
-		notEmptyValidators.add( NotEmptyValidatorForArraysOfDouble.class );
-		notEmptyValidators.add( NotEmptyValidatorForArraysOfFloat.class );
-		notEmptyValidators.add( NotEmptyValidatorForArraysOfInt.class );
-		notEmptyValidators.add( NotEmptyValidatorForArraysOfLong.class );
-		notEmptyValidators.add( NotEmptyValidatorForArraysOfShort.class );
-		putConstraints( tmpConstraints, NotEmpty.class, notEmptyValidators );
-
-		putConstraint( tmpConstraints, NotNull.class, NotNullValidator.class );
-		putConstraint( tmpConstraints, Null.class, NullValidator.class );
-
-		List<Class<? extends ConstraintValidator<Past, ?>>> pastValidators = new ArrayList<>( 18 );
-		pastValidators.add( PastValidatorForCalendar.class );
-		pastValidators.add( PastValidatorForDate.class );
-		if ( isJodaTimeInClasspath() ) {
-			pastValidators.add( PastValidatorForReadableInstant.class );
-			pastValidators.add( PastValidatorForReadablePartial.class );
-		}
-		// Java 8 date/time API validators
-		pastValidators.add( PastValidatorForHijrahDate.class );
-		pastValidators.add( PastValidatorForInstant.class );
-		pastValidators.add( PastValidatorForJapaneseDate.class );
-		pastValidators.add( PastValidatorForLocalDate.class );
-		pastValidators.add( PastValidatorForLocalDateTime.class );
-		pastValidators.add( PastValidatorForLocalTime.class );
-		pastValidators.add( PastValidatorForMinguoDate.class );
-		pastValidators.add( PastValidatorForMonthDay.class );
-		pastValidators.add( PastValidatorForOffsetDateTime.class );
-		pastValidators.add( PastValidatorForOffsetTime.class );
-		pastValidators.add( PastValidatorForThaiBuddhistDate.class );
-		pastValidators.add( PastValidatorForYear.class );
-		pastValidators.add( PastValidatorForYearMonth.class );
-		pastValidators.add( PastValidatorForZonedDateTime.class );
-
-		putConstraints( tmpConstraints, Past.class, pastValidators );
-
-		List<Class<? extends ConstraintValidator<PastOrPresent, ?>>> pastOrPresentValidators = new ArrayList<>( 18 );
-		pastOrPresentValidators.add( PastOrPresentValidatorForCalendar.class );
-		pastOrPresentValidators.add( PastOrPresentValidatorForDate.class );
-		if ( isJodaTimeInClasspath() ) {
-			pastOrPresentValidators.add( PastOrPresentValidatorForReadableInstant.class );
-			pastOrPresentValidators.add( PastOrPresentValidatorForReadablePartial.class );
-		}
-		// Java 8 date/time API validators
-		pastOrPresentValidators.add( PastOrPresentValidatorForHijrahDate.class );
-		pastOrPresentValidators.add( PastOrPresentValidatorForInstant.class );
-		pastOrPresentValidators.add( PastOrPresentValidatorForJapaneseDate.class );
-		pastOrPresentValidators.add( PastOrPresentValidatorForLocalDate.class );
-		pastOrPresentValidators.add( PastOrPresentValidatorForLocalDateTime.class );
-		pastOrPresentValidators.add( PastOrPresentValidatorForLocalTime.class );
-		pastOrPresentValidators.add( PastOrPresentValidatorForMinguoDate.class );
-		pastOrPresentValidators.add( PastOrPresentValidatorForMonthDay.class );
-		pastOrPresentValidators.add( PastOrPresentValidatorForOffsetDateTime.class );
-		pastOrPresentValidators.add( PastOrPresentValidatorForOffsetTime.class );
-		pastOrPresentValidators.add( PastOrPresentValidatorForThaiBuddhistDate.class );
-		pastOrPresentValidators.add( PastOrPresentValidatorForYear.class );
-		pastOrPresentValidators.add( PastOrPresentValidatorForYearMonth.class );
-		pastOrPresentValidators.add( PastOrPresentValidatorForZonedDateTime.class );
-
-		putConstraints( tmpConstraints, PastOrPresent.class, pastOrPresentValidators );
-
-		putConstraint( tmpConstraints, Pattern.class, PatternValidator.class );
-		if ( isJavaMoneyInClasspath() ) {
-			putConstraints( tmpConstraints, Positive.class, Arrays.asList(
-					PositiveValidatorForBigDecimal.class,
-					PositiveValidatorForBigInteger.class,
-					PositiveValidatorForDouble.class,
-					PositiveValidatorForFloat.class,
-					PositiveValidatorForLong.class,
-					PositiveValidatorForInteger.class,
-					PositiveValidatorForShort.class,
-					PositiveValidatorForByte.class,
-					PositiveValidatorForNumber.class,
-					PositiveValidatorForMonetaryAmount.class ) );
-
-			putConstraints( tmpConstraints, PositiveOrZero.class, Arrays.asList(
-					PositiveOrZeroValidatorForBigDecimal.class,
-					PositiveOrZeroValidatorForBigInteger.class,
-					PositiveOrZeroValidatorForDouble.class,
-					PositiveOrZeroValidatorForFloat.class,
-					PositiveOrZeroValidatorForLong.class,
-					PositiveOrZeroValidatorForInteger.class,
-					PositiveOrZeroValidatorForShort.class,
-					PositiveOrZeroValidatorForByte.class,
-					PositiveOrZeroValidatorForNumber.class,
-					PositiveOrZeroValidatorForMonetaryAmount.class ) );
-		}
-		else {
-			putConstraints( tmpConstraints, Positive.class, Arrays.asList(
-					PositiveValidatorForBigDecimal.class,
-					PositiveValidatorForBigInteger.class,
-					PositiveValidatorForDouble.class,
-					PositiveValidatorForFloat.class,
-					PositiveValidatorForLong.class,
-					PositiveValidatorForInteger.class,
-					PositiveValidatorForShort.class,
-					PositiveValidatorForByte.class,
-					PositiveValidatorForNumber.class
-			) );
-
-			putConstraints( tmpConstraints, PositiveOrZero.class, Arrays.asList(
-					PositiveOrZeroValidatorForBigDecimal.class,
-					PositiveOrZeroValidatorForBigInteger.class,
-					PositiveOrZeroValidatorForDouble.class,
-					PositiveOrZeroValidatorForFloat.class,
-					PositiveOrZeroValidatorForLong.class,
-					PositiveOrZeroValidatorForInteger.class,
-					PositiveOrZeroValidatorForShort.class,
-					PositiveOrZeroValidatorForByte.class,
-					PositiveOrZeroValidatorForNumber.class
-			) );
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_EMAIL ) ) {
+			putConstraint( tmpConstraints, Email.class, EmailValidator.class );
 		}
 
-		List<Class<? extends ConstraintValidator<Size, ?>>> sizeValidators = new ArrayList<>( 11 );
-		sizeValidators.add( SizeValidatorForCharSequence.class );
-		sizeValidators.add( SizeValidatorForCollection.class );
-		sizeValidators.add( SizeValidatorForArray.class );
-		sizeValidators.add( SizeValidatorForMap.class );
-		sizeValidators.add( SizeValidatorForArraysOfBoolean.class );
-		sizeValidators.add( SizeValidatorForArraysOfByte.class );
-		sizeValidators.add( SizeValidatorForArraysOfChar.class );
-		sizeValidators.add( SizeValidatorForArraysOfDouble.class );
-		sizeValidators.add( SizeValidatorForArraysOfFloat.class );
-		sizeValidators.add( SizeValidatorForArraysOfInt.class );
-		sizeValidators.add( SizeValidatorForArraysOfLong.class );
-		sizeValidators.add( SizeValidatorForArraysOfShort.class );
-		putConstraints( tmpConstraints, Size.class, sizeValidators );
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_FUTURE ) ) {
+			List<Class<? extends ConstraintValidator<Future, ?>>> futureValidators = new ArrayList<>( 18 );
+			futureValidators.add( FutureValidatorForCalendar.class );
+			futureValidators.add( FutureValidatorForDate.class );
+			if ( isJodaTimeInClasspath() ) {
+				futureValidators.add( FutureValidatorForReadableInstant.class );
+				futureValidators.add( FutureValidatorForReadablePartial.class );
+			}
+			// Java 8 date/time API validators
+			futureValidators.add( FutureValidatorForHijrahDate.class );
+			futureValidators.add( FutureValidatorForInstant.class );
+			futureValidators.add( FutureValidatorForJapaneseDate.class );
+			futureValidators.add( FutureValidatorForLocalDate.class );
+			futureValidators.add( FutureValidatorForLocalDateTime.class );
+			futureValidators.add( FutureValidatorForLocalTime.class );
+			futureValidators.add( FutureValidatorForMinguoDate.class );
+			futureValidators.add( FutureValidatorForMonthDay.class );
+			futureValidators.add( FutureValidatorForOffsetDateTime.class );
+			futureValidators.add( FutureValidatorForOffsetTime.class );
+			futureValidators.add( FutureValidatorForThaiBuddhistDate.class );
+			futureValidators.add( FutureValidatorForYear.class );
+			futureValidators.add( FutureValidatorForYearMonth.class );
+			futureValidators.add( FutureValidatorForZonedDateTime.class );
+
+			putConstraints( tmpConstraints, Future.class, futureValidators );
+		}
+
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_FUTURE_OR_PRESENT ) ) {
+			List<Class<? extends ConstraintValidator<FutureOrPresent, ?>>> futureOrPresentValidators = new ArrayList<>( 18 );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForCalendar.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForDate.class );
+			if ( isJodaTimeInClasspath() ) {
+				futureOrPresentValidators.add( FutureOrPresentValidatorForReadableInstant.class );
+				futureOrPresentValidators.add( FutureOrPresentValidatorForReadablePartial.class );
+			}
+			// Java 8 date/time API validators
+			futureOrPresentValidators.add( FutureOrPresentValidatorForHijrahDate.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForInstant.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForJapaneseDate.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForLocalDate.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForLocalDateTime.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForLocalTime.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForMinguoDate.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForMonthDay.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForOffsetDateTime.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForOffsetTime.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForThaiBuddhistDate.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForYear.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForYearMonth.class );
+			futureOrPresentValidators.add( FutureOrPresentValidatorForZonedDateTime.class );
+
+			putConstraints( tmpConstraints, FutureOrPresent.class, futureOrPresentValidators );
+		}
+
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_MAX ) ) {
+			List<Class<? extends ConstraintValidator<Max, ?>>> maxValidators = new ArrayList<>();
+			maxValidators.add( MaxValidatorForBigDecimal.class );
+			maxValidators.add( MaxValidatorForBigInteger.class );
+			maxValidators.add( MaxValidatorForByte.class );
+			maxValidators.add( MaxValidatorForDouble.class );
+			maxValidators.add( MaxValidatorForFloat.class );
+			maxValidators.add( MaxValidatorForInteger.class );
+			maxValidators.add( MaxValidatorForLong.class );
+			maxValidators.add( MaxValidatorForNumber.class );
+			maxValidators.add( MaxValidatorForShort.class );
+			maxValidators.add( MaxValidatorForCharSequence.class );
+			if ( isJavaMoneyInClasspath() ) {
+				maxValidators.add( MaxValidatorForMonetaryAmount.class );
+			}
+			putConstraints( tmpConstraints, Max.class, maxValidators );
+		}
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_MIN ) ) {
+			List<Class<? extends ConstraintValidator<Min, ?>>> minValidators = new ArrayList<>();
+			minValidators.add( MinValidatorForBigDecimal.class );
+			minValidators.add( MinValidatorForBigInteger.class );
+			minValidators.add( MinValidatorForByte.class );
+			minValidators.add( MinValidatorForDouble.class );
+			minValidators.add( MinValidatorForFloat.class );
+			minValidators.add( MinValidatorForInteger.class );
+			minValidators.add( MinValidatorForLong.class );
+			minValidators.add( MinValidatorForNumber.class );
+			minValidators.add( MinValidatorForShort.class );
+			minValidators.add( MinValidatorForCharSequence.class );
+			if ( isJavaMoneyInClasspath() ) {
+				minValidators.add( MinValidatorForMonetaryAmount.class );
+			}
+			putConstraints( tmpConstraints, Min.class, minValidators );
+		}
+
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_NEGATIVE ) ) {
+			List<Class<? extends ConstraintValidator<Negative, ?>>> negativeValidators = new ArrayList<>();
+			negativeValidators.add( NegativeValidatorForBigDecimal.class );
+			negativeValidators.add( NegativeValidatorForBigInteger.class );
+			negativeValidators.add( NegativeValidatorForDouble.class );
+			negativeValidators.add( NegativeValidatorForFloat.class );
+			negativeValidators.add( NegativeValidatorForLong.class );
+			negativeValidators.add( NegativeValidatorForInteger.class );
+			negativeValidators.add( NegativeValidatorForShort.class );
+			negativeValidators.add( NegativeValidatorForByte.class );
+			negativeValidators.add( NegativeValidatorForNumber.class );
+			if ( isJavaMoneyInClasspath() ) {
+				negativeValidators.add( NegativeValidatorForMonetaryAmount.class );
+			}
+			putConstraints( tmpConstraints, Negative.class, negativeValidators );
+		}
+
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_NEGATIVE_OR_ZERO ) ) {
+			List<Class<? extends ConstraintValidator<NegativeOrZero, ?>>> negativeOrZeroValidators = new ArrayList<>();
+			negativeOrZeroValidators.add( NegativeOrZeroValidatorForBigDecimal.class );
+			negativeOrZeroValidators.add( NegativeOrZeroValidatorForBigInteger.class );
+			negativeOrZeroValidators.add( NegativeOrZeroValidatorForDouble.class );
+			negativeOrZeroValidators.add( NegativeOrZeroValidatorForFloat.class );
+			negativeOrZeroValidators.add( NegativeOrZeroValidatorForLong.class );
+			negativeOrZeroValidators.add( NegativeOrZeroValidatorForInteger.class );
+			negativeOrZeroValidators.add( NegativeOrZeroValidatorForShort.class );
+			negativeOrZeroValidators.add( NegativeOrZeroValidatorForByte.class );
+			negativeOrZeroValidators.add( NegativeOrZeroValidatorForNumber.class );
+			if ( isJavaMoneyInClasspath() ) {
+				negativeOrZeroValidators.add( NegativeOrZeroValidatorForMonetaryAmount.class );
+			}
+			putConstraints( tmpConstraints, NegativeOrZero.class, negativeOrZeroValidators );
+		}
+
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_NOT_BLANK ) ) {
+			putConstraint( tmpConstraints, NotBlank.class, NotBlankValidator.class );
+		}
+
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_NOT_EMPTY ) ) {
+			List<Class<? extends ConstraintValidator<NotEmpty, ?>>> notEmptyValidators = new ArrayList<>( 11 );
+			notEmptyValidators.add( NotEmptyValidatorForCharSequence.class );
+			notEmptyValidators.add( NotEmptyValidatorForCollection.class );
+			notEmptyValidators.add( NotEmptyValidatorForArray.class );
+			notEmptyValidators.add( NotEmptyValidatorForMap.class );
+			notEmptyValidators.add( NotEmptyValidatorForArraysOfBoolean.class );
+			notEmptyValidators.add( NotEmptyValidatorForArraysOfByte.class );
+			notEmptyValidators.add( NotEmptyValidatorForArraysOfChar.class );
+			notEmptyValidators.add( NotEmptyValidatorForArraysOfDouble.class );
+			notEmptyValidators.add( NotEmptyValidatorForArraysOfFloat.class );
+			notEmptyValidators.add( NotEmptyValidatorForArraysOfInt.class );
+			notEmptyValidators.add( NotEmptyValidatorForArraysOfLong.class );
+			notEmptyValidators.add( NotEmptyValidatorForArraysOfShort.class );
+			putConstraints( tmpConstraints, NotEmpty.class, notEmptyValidators );
+		}
+
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_NOT_NULL ) ) {
+			putConstraint( tmpConstraints, NotNull.class, NotNullValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_NULL ) ) {
+			putConstraint( tmpConstraints, Null.class, NullValidator.class );
+		}
+
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_PAST ) ) {
+			List<Class<? extends ConstraintValidator<Past, ?>>> pastValidators = new ArrayList<>( 18 );
+			pastValidators.add( PastValidatorForCalendar.class );
+			pastValidators.add( PastValidatorForDate.class );
+			if ( isJodaTimeInClasspath() ) {
+				pastValidators.add( PastValidatorForReadableInstant.class );
+				pastValidators.add( PastValidatorForReadablePartial.class );
+			}
+			// Java 8 date/time API validators
+			pastValidators.add( PastValidatorForHijrahDate.class );
+			pastValidators.add( PastValidatorForInstant.class );
+			pastValidators.add( PastValidatorForJapaneseDate.class );
+			pastValidators.add( PastValidatorForLocalDate.class );
+			pastValidators.add( PastValidatorForLocalDateTime.class );
+			pastValidators.add( PastValidatorForLocalTime.class );
+			pastValidators.add( PastValidatorForMinguoDate.class );
+			pastValidators.add( PastValidatorForMonthDay.class );
+			pastValidators.add( PastValidatorForOffsetDateTime.class );
+			pastValidators.add( PastValidatorForOffsetTime.class );
+			pastValidators.add( PastValidatorForThaiBuddhistDate.class );
+			pastValidators.add( PastValidatorForYear.class );
+			pastValidators.add( PastValidatorForYearMonth.class );
+			pastValidators.add( PastValidatorForZonedDateTime.class );
+
+			putConstraints( tmpConstraints, Past.class, pastValidators );
+		}
+
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_PAST_OR_PRESENT ) ) {
+			List<Class<? extends ConstraintValidator<PastOrPresent, ?>>> pastOrPresentValidators = new ArrayList<>( 18 );
+			pastOrPresentValidators.add( PastOrPresentValidatorForCalendar.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForDate.class );
+			if ( isJodaTimeInClasspath() ) {
+				pastOrPresentValidators.add( PastOrPresentValidatorForReadableInstant.class );
+				pastOrPresentValidators.add( PastOrPresentValidatorForReadablePartial.class );
+			}
+			// Java 8 date/time API validators
+			pastOrPresentValidators.add( PastOrPresentValidatorForHijrahDate.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForInstant.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForJapaneseDate.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForLocalDate.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForLocalDateTime.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForLocalTime.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForMinguoDate.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForMonthDay.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForOffsetDateTime.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForOffsetTime.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForThaiBuddhistDate.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForYear.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForYearMonth.class );
+			pastOrPresentValidators.add( PastOrPresentValidatorForZonedDateTime.class );
+
+			putConstraints( tmpConstraints, PastOrPresent.class, pastOrPresentValidators );
+		}
+
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_PATTERN ) ) {
+			putConstraint( tmpConstraints, Pattern.class, PatternValidator.class );
+		}
+
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_POSITIVE ) ) {
+			List<Class<? extends ConstraintValidator<Positive, ?>>> positiveValidators = new ArrayList<>();
+			positiveValidators.add( PositiveValidatorForBigDecimal.class );
+			positiveValidators.add( PositiveValidatorForBigInteger.class );
+			positiveValidators.add( PositiveValidatorForDouble.class );
+			positiveValidators.add( PositiveValidatorForFloat.class );
+			positiveValidators.add( PositiveValidatorForLong.class );
+			positiveValidators.add( PositiveValidatorForInteger.class );
+			positiveValidators.add( PositiveValidatorForShort.class );
+			positiveValidators.add( PositiveValidatorForByte.class );
+			positiveValidators.add( PositiveValidatorForNumber.class );
+			if ( isJavaMoneyInClasspath() ) {
+				positiveValidators.add( PositiveValidatorForMonetaryAmount.class );
+			}
+			putConstraints( tmpConstraints, Positive.class, positiveValidators );
+		}
+
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_POSITIVE_OR_ZERO ) ) {
+			List<Class<? extends ConstraintValidator<PositiveOrZero, ?>>> positiveOrZeroValidators = new ArrayList<>();
+			positiveOrZeroValidators.add( PositiveOrZeroValidatorForBigDecimal.class );
+			positiveOrZeroValidators.add( PositiveOrZeroValidatorForBigInteger.class );
+			positiveOrZeroValidators.add( PositiveOrZeroValidatorForDouble.class );
+			positiveOrZeroValidators.add( PositiveOrZeroValidatorForFloat.class );
+			positiveOrZeroValidators.add( PositiveOrZeroValidatorForLong.class );
+			positiveOrZeroValidators.add( PositiveOrZeroValidatorForInteger.class );
+			positiveOrZeroValidators.add( PositiveOrZeroValidatorForShort.class );
+			positiveOrZeroValidators.add( PositiveOrZeroValidatorForByte.class );
+			positiveOrZeroValidators.add( PositiveOrZeroValidatorForNumber.class );
+			if ( isJavaMoneyInClasspath() ) {
+				positiveOrZeroValidators.add( PositiveOrZeroValidatorForMonetaryAmount.class );
+			}
+			putConstraints( tmpConstraints, PositiveOrZero.class, positiveOrZeroValidators );
+		}
+
+		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_SIZE ) ) {
+			List<Class<? extends ConstraintValidator<Size, ?>>> sizeValidators = new ArrayList<>( 11 );
+			sizeValidators.add( SizeValidatorForCharSequence.class );
+			sizeValidators.add( SizeValidatorForCollection.class );
+			sizeValidators.add( SizeValidatorForArray.class );
+			sizeValidators.add( SizeValidatorForMap.class );
+			sizeValidators.add( SizeValidatorForArraysOfBoolean.class );
+			sizeValidators.add( SizeValidatorForArraysOfByte.class );
+			sizeValidators.add( SizeValidatorForArraysOfChar.class );
+			sizeValidators.add( SizeValidatorForArraysOfDouble.class );
+			sizeValidators.add( SizeValidatorForArraysOfFloat.class );
+			sizeValidators.add( SizeValidatorForArraysOfInt.class );
+			sizeValidators.add( SizeValidatorForArraysOfLong.class );
+			sizeValidators.add( SizeValidatorForArraysOfShort.class );
+			putConstraints( tmpConstraints, Size.class, sizeValidators );
+		}
 
 		// Hibernate Validator specific constraints
 
-		putConstraint( tmpConstraints, CNPJ.class, CNPJValidator.class );
-		putConstraint( tmpConstraints, CPF.class, CPFValidator.class );
-		if ( isJavaMoneyInClasspath() ) {
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CNPJ ) ) {
+			putConstraint( tmpConstraints, CNPJ.class, CNPJValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CPF ) ) {
+			putConstraint( tmpConstraints, CPF.class, CPFValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CURRENCY ) && isJavaMoneyInClasspath() ) {
 			putConstraint( tmpConstraints, Currency.class, CurrencyValidatorForMonetaryAmount.class );
 		}
-		putConstraint( tmpConstraints, CreditCardNumber.class );
-		putConstraint( tmpConstraints, DurationMax.class, DurationMaxValidator.class );
-		putConstraint( tmpConstraints, DurationMin.class, DurationMinValidator.class );
-		putConstraint( tmpConstraints, EAN.class, EANValidator.class );
-		putConstraint( tmpConstraints, org.hibernate.validator.constraints.Email.class, org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator.class );
-		putConstraint( tmpConstraints, ISBN.class, ISBNValidator.class );
-		putConstraint( tmpConstraints, Length.class, LengthValidator.class );
-		putConstraint( tmpConstraints, CodePointLength.class, CodePointLengthValidator.class );
-		putConstraint( tmpConstraints, LuhnCheck.class, LuhnCheckValidator.class );
-		putConstraint( tmpConstraints, ModCheck.class, ModCheckValidator.class );
-		putConstraint( tmpConstraints, Mod10Check.class, Mod10CheckValidator.class );
-		putConstraint( tmpConstraints, Mod11Check.class, Mod11CheckValidator.class );
-		putConstraint( tmpConstraints, NIP.class, NIPValidator.class );
-		putConstraint( tmpConstraints, org.hibernate.validator.constraints.NotBlank.class, org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator.class );
-		putConstraint( tmpConstraints, org.hibernate.validator.constraints.NotEmpty.class );
-		putConstraint( tmpConstraints, ParameterScriptAssert.class, ParameterScriptAssertValidator.class );
-		putConstraint( tmpConstraints, PESEL.class, PESELValidator.class );
-		putConstraint( tmpConstraints, Range.class );
-		putConstraint( tmpConstraints, REGON.class, REGONValidator.class );
-		if ( isJsoupInClasspath() ) {
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CREDIT_CARD_NUMBER ) ) {
+			putConstraint( tmpConstraints, CreditCardNumber.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MAX ) ) {
+			putConstraint( tmpConstraints, DurationMax.class, DurationMaxValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MIN ) ) {
+			putConstraint( tmpConstraints, DurationMin.class, DurationMinValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EAN ) ) {
+			putConstraint( tmpConstraints, EAN.class, EANValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EMAIL ) ) {
+			putConstraint( tmpConstraints, org.hibernate.validator.constraints.Email.class, org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ISBN ) ) {
+			putConstraint( tmpConstraints, ISBN.class, ISBNValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LENGTH ) ) {
+			putConstraint( tmpConstraints, Length.class, LengthValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CODE_POINT_LENGTH ) ) {
+			putConstraint( tmpConstraints, CodePointLength.class, CodePointLengthValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LUHN_CHECK ) ) {
+			putConstraint( tmpConstraints, LuhnCheck.class, LuhnCheckValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD_CHECK ) ) {
+			putConstraint( tmpConstraints, ModCheck.class, ModCheckValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD10_CHECK ) ) {
+			putConstraint( tmpConstraints, Mod10Check.class, Mod10CheckValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD11_CHECK ) ) {
+			putConstraint( tmpConstraints, Mod11Check.class, Mod11CheckValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_NIP ) ) {
+			putConstraint( tmpConstraints, NIP.class, NIPValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NOT_BLANK ) ) {
+			putConstraint( tmpConstraints, org.hibernate.validator.constraints.NotBlank.class, org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NOT_EMPTY ) ) {
+			putConstraint( tmpConstraints, org.hibernate.validator.constraints.NotEmpty.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PARAMETER_SCRIPT_ASSERT ) ) {
+			putConstraint( tmpConstraints, ParameterScriptAssert.class, ParameterScriptAssertValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_PESEL ) ) {
+			putConstraint( tmpConstraints, PESEL.class, PESELValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RANGE ) ) {
+			putConstraint( tmpConstraints, Range.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_REGON ) ) {
+			putConstraint( tmpConstraints, REGON.class, REGONValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SAFE_HTML ) && isJsoupInClasspath() ) {
 			putConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
 		}
-		putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
-		putConstraint( tmpConstraints, TituloEleitoral.class );
-		putConstraint( tmpConstraints, UniqueElements.class, UniqueElementsValidator.class );
-		putConstraint( tmpConstraints, URL.class, URLValidator.class );
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SCRIPT_ASSERT ) ) {
+			putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_TITULO_ELEITORAL ) ) {
+			putConstraint( tmpConstraints, TituloEleitoral.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UNIQUE_ELEMENTS ) ) {
+			putConstraint( tmpConstraints, UniqueElements.class, UniqueElementsValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_URL ) ) {
+			putConstraint( tmpConstraints, URL.class, URLValidator.class );
+		}
 
-		this.builtinConstraints = Collections.unmodifiableMap( tmpConstraints );
+		this.enabledBuiltinConstraints = Collections.unmodifiableMap( tmpConstraints );
 	}
 
 	private static <A extends Annotation> void putConstraint(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
@@ -764,11 +835,11 @@ public class ConstraintHelper {
 	}
 
 	private boolean isBuiltinConstraint(Class<? extends Annotation> annotationType) {
-		return builtinConstraints.containsKey( annotationType );
+		return BuiltinConstraint.isBuiltin( annotationType.getName() );
 	}
 
-	public Set<Class<? extends Annotation>> getBuiltinConstraints() {
-		return CollectionHelper.toImmutableSet( builtinConstraints.keySet() );
+	public static Set<String> getBuiltinConstraints() {
+		return BuiltinConstraint.set();
 	}
 
 	/**
@@ -1055,7 +1126,7 @@ public class ConstraintHelper {
 	@SuppressWarnings("unchecked")
 	private <A extends Annotation> List<ConstraintValidatorDescriptor<A>> getDefaultValidatorDescriptors(Class<A> annotationType) {
 		//safe cause all CV for a given annotation A are CV<A, ?>
-		final List<ConstraintValidatorDescriptor<A>> builtInValidators = (List<ConstraintValidatorDescriptor<A>>) builtinConstraints
+		final List<ConstraintValidatorDescriptor<A>> builtInValidators = (List<ConstraintValidatorDescriptor<A>>) enabledBuiltinConstraints
 				.get( annotationType );
 
 		if ( builtInValidators != null ) {

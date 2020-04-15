@@ -34,7 +34,7 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
  */
 public class ConstraintValidatorInitializationHelper {
 
-	private static final ConstraintHelper CONSTRAINT_HELPER = new ConstraintHelper();
+	private static final ConstraintHelper CONSTRAINT_HELPER = ConstraintHelper.forAllBuiltinConstraints();
 
 	private static final HibernateConstraintValidatorInitializationContext DUMMY_CONSTRAINT_VALIDATOR_INITIALIZATION_CONTEXT =
 			getConstraintValidatorInitializationContext( new DefaultScriptEvaluatorFactory( null ), DefaultClockProvider.INSTANCE, Duration.ZERO );
@@ -73,7 +73,7 @@ public class ConstraintValidatorInitializationHelper {
 	}
 
 	public static ConstraintCreationContext getDummyConstraintCreationContext() {
-		return new ConstraintCreationContext( new ConstraintHelper(),
+		return new ConstraintCreationContext( ConstraintHelper.forAllBuiltinConstraints(),
 				new ConstraintValidatorManagerImpl( new ConstraintValidatorFactoryImpl(), getDummyConstraintValidatorInitializationContext() ),
 				new TypeResolutionHelper(),
 				new ValueExtractorManager( Collections.emptySet() ) );

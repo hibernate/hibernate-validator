@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.engine;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
@@ -25,6 +26,8 @@ import org.hibernate.validator.internal.util.Contracts;
 public class PredefinedScopeConfigurationImpl extends AbstractConfigurationImpl<PredefinedScopeHibernateValidatorConfiguration>
 		implements PredefinedScopeHibernateValidatorConfiguration, ConfigurationState {
 
+	private Set<String> builtinConstraints = Collections.emptySet();
+
 	private Set<Class<?>> beanClassesToInitialize;
 
 	public PredefinedScopeConfigurationImpl(BootstrapState state) {
@@ -36,9 +39,19 @@ public class PredefinedScopeConfigurationImpl extends AbstractConfigurationImpl<
 	}
 
 	@Override
+	public PredefinedScopeHibernateValidatorConfiguration builtinConstraints(Set<String> constraints) {
+		this.builtinConstraints = CollectionHelper.toImmutableSet( constraints );
+		return thisAsT();
+	}
+
+	@Override
 	public PredefinedScopeHibernateValidatorConfiguration initializeBeanMetaData(Set<Class<?>> beanMetaDataToInitialize) {
 		beanClassesToInitialize = CollectionHelper.toImmutableSet( beanMetaDataToInitialize );
 		return thisAsT();
+	}
+
+	public Set<String> getBuiltinConstraints() {
+		return builtinConstraints;
 	}
 
 	public Set<Class<?>> getBeanClassesToInitialize() {

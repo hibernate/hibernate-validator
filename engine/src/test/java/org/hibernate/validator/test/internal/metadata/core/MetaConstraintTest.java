@@ -45,7 +45,7 @@ public class MetaConstraintTest {
 
 	@BeforeClass
 	public void setUp() throws Exception {
-		constraintHelper = new ConstraintHelper();
+		constraintHelper = ConstraintHelper.forAllBuiltinConstraints();
 		typeResolutionHelper = new TypeResolutionHelper();
 		valueExtractorManager = new ValueExtractorManager( Collections.emptySet() );
 		constraintValidatorManager = new ConstraintValidatorManagerImpl( new ConstraintValidatorFactoryImpl(), getDummyConstraintValidatorInitializationContext() );

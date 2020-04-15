@@ -42,7 +42,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 		// Create some annotations for testing using AnnotationProxies
 		ConstraintAnnotationDescriptor.Builder<NotNull> notNullAnnotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( NotNull.class );
 		notNullDescriptor = new ConstraintDescriptorImpl<>(
-				new ConstraintHelper(),
+				ConstraintHelper.forAllBuiltinConstraints(),
 				null,
 				notNullAnnotationDescriptorBuilder.build(),
 				ConstraintLocationKind.FIELD
@@ -50,7 +50,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		ConstraintAnnotationDescriptor.Builder<Size> sizeAnnotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Size.class );
 		sizeDescriptor = new ConstraintDescriptorImpl<>(
-				new ConstraintHelper(),
+				ConstraintHelper.forAllBuiltinConstraints(),
 				null,
 				sizeAnnotationDescriptorBuilder.build(),
 				ConstraintLocationKind.FIELD
