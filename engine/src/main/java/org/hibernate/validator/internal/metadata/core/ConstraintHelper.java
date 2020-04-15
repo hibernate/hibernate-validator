@@ -814,16 +814,6 @@ public class ConstraintHelper {
 	}
 
 	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
-			Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType1, Class<? extends ConstraintValidator<A, ?>> validatorType2) {
-		List<ConstraintValidatorDescriptor<?>> descriptors = new ArrayList<>( 2 );
-
-		descriptors.add( ConstraintValidatorDescriptor.forClass( validatorType1, constraintType ) );
-		descriptors.add( ConstraintValidatorDescriptor.forClass( validatorType2, constraintType ) );
-
-		validators.put( constraintType, CollectionHelper.toImmutableList( descriptors ) );
-	}
-
-	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
 			Class<A> constraintType, List<Class<? extends ConstraintValidator<A, ?>>> validatorTypes) {
 		List<ConstraintValidatorDescriptor<?>> descriptors = new ArrayList<>( validatorTypes.size() );
 
