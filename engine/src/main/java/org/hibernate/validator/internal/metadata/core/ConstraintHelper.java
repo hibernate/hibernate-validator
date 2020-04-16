@@ -407,10 +407,10 @@ public class ConstraintHelper {
 		// Bean Validation constraints
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_ASSERT_FALSE ) ) {
-			putConstraint( tmpConstraints, AssertFalse.class, AssertFalseValidator.class );
+			putBuiltinConstraint( tmpConstraints, AssertFalse.class, AssertFalseValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_ASSERT_TRUE ) ) {
-			putConstraint( tmpConstraints, AssertTrue.class, AssertTrueValidator.class );
+			putBuiltinConstraint( tmpConstraints, AssertTrue.class, AssertTrueValidator.class );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_DECIMAL_MAX ) ) {
@@ -428,7 +428,7 @@ public class ConstraintHelper {
 			if ( isJavaMoneyInClasspath() ) {
 				decimalMaxValidators.add( DecimalMaxValidatorForMonetaryAmount.class );
 			}
-			putConstraints( tmpConstraints, DecimalMax.class, decimalMaxValidators );
+			putBuiltinConstraints( tmpConstraints, DecimalMax.class, decimalMaxValidators );
 		}
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_DECIMAL_MIN ) ) {
 			List<Class<? extends ConstraintValidator<DecimalMin, ?>>> decimalMinValidators = new ArrayList<>();
@@ -445,7 +445,7 @@ public class ConstraintHelper {
 			if ( isJavaMoneyInClasspath() ) {
 				decimalMinValidators.add( DecimalMinValidatorForMonetaryAmount.class );
 			}
-			putConstraints( tmpConstraints, DecimalMin.class, decimalMinValidators );
+			putBuiltinConstraints( tmpConstraints, DecimalMin.class, decimalMinValidators );
 		}
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_DIGITS ) ) {
 			List<Class<? extends ConstraintValidator<Digits, ?>>> digitsValidators = new ArrayList<>();
@@ -454,11 +454,11 @@ public class ConstraintHelper {
 			if ( isJavaMoneyInClasspath() ) {
 				digitsValidators.add( DigitsValidatorForMonetaryAmount.class );
 			}
-			putConstraints( tmpConstraints, Digits.class, digitsValidators );
+			putBuiltinConstraints( tmpConstraints, Digits.class, digitsValidators );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_EMAIL ) ) {
-			putConstraint( tmpConstraints, Email.class, EmailValidator.class );
+			putBuiltinConstraint( tmpConstraints, Email.class, EmailValidator.class );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_FUTURE ) ) {
@@ -485,7 +485,7 @@ public class ConstraintHelper {
 			futureValidators.add( FutureValidatorForYearMonth.class );
 			futureValidators.add( FutureValidatorForZonedDateTime.class );
 
-			putConstraints( tmpConstraints, Future.class, futureValidators );
+			putBuiltinConstraints( tmpConstraints, Future.class, futureValidators );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_FUTURE_OR_PRESENT ) ) {
@@ -512,7 +512,7 @@ public class ConstraintHelper {
 			futureOrPresentValidators.add( FutureOrPresentValidatorForYearMonth.class );
 			futureOrPresentValidators.add( FutureOrPresentValidatorForZonedDateTime.class );
 
-			putConstraints( tmpConstraints, FutureOrPresent.class, futureOrPresentValidators );
+			putBuiltinConstraints( tmpConstraints, FutureOrPresent.class, futureOrPresentValidators );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_MAX ) ) {
@@ -530,7 +530,7 @@ public class ConstraintHelper {
 			if ( isJavaMoneyInClasspath() ) {
 				maxValidators.add( MaxValidatorForMonetaryAmount.class );
 			}
-			putConstraints( tmpConstraints, Max.class, maxValidators );
+			putBuiltinConstraints( tmpConstraints, Max.class, maxValidators );
 		}
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_MIN ) ) {
 			List<Class<? extends ConstraintValidator<Min, ?>>> minValidators = new ArrayList<>();
@@ -547,7 +547,7 @@ public class ConstraintHelper {
 			if ( isJavaMoneyInClasspath() ) {
 				minValidators.add( MinValidatorForMonetaryAmount.class );
 			}
-			putConstraints( tmpConstraints, Min.class, minValidators );
+			putBuiltinConstraints( tmpConstraints, Min.class, minValidators );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_NEGATIVE ) ) {
@@ -564,7 +564,7 @@ public class ConstraintHelper {
 			if ( isJavaMoneyInClasspath() ) {
 				negativeValidators.add( NegativeValidatorForMonetaryAmount.class );
 			}
-			putConstraints( tmpConstraints, Negative.class, negativeValidators );
+			putBuiltinConstraints( tmpConstraints, Negative.class, negativeValidators );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_NEGATIVE_OR_ZERO ) ) {
@@ -581,11 +581,11 @@ public class ConstraintHelper {
 			if ( isJavaMoneyInClasspath() ) {
 				negativeOrZeroValidators.add( NegativeOrZeroValidatorForMonetaryAmount.class );
 			}
-			putConstraints( tmpConstraints, NegativeOrZero.class, negativeOrZeroValidators );
+			putBuiltinConstraints( tmpConstraints, NegativeOrZero.class, negativeOrZeroValidators );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_NOT_BLANK ) ) {
-			putConstraint( tmpConstraints, NotBlank.class, NotBlankValidator.class );
+			putBuiltinConstraint( tmpConstraints, NotBlank.class, NotBlankValidator.class );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_NOT_EMPTY ) ) {
@@ -602,14 +602,14 @@ public class ConstraintHelper {
 			notEmptyValidators.add( NotEmptyValidatorForArraysOfInt.class );
 			notEmptyValidators.add( NotEmptyValidatorForArraysOfLong.class );
 			notEmptyValidators.add( NotEmptyValidatorForArraysOfShort.class );
-			putConstraints( tmpConstraints, NotEmpty.class, notEmptyValidators );
+			putBuiltinConstraints( tmpConstraints, NotEmpty.class, notEmptyValidators );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_NOT_NULL ) ) {
-			putConstraint( tmpConstraints, NotNull.class, NotNullValidator.class );
+			putBuiltinConstraint( tmpConstraints, NotNull.class, NotNullValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_NULL ) ) {
-			putConstraint( tmpConstraints, Null.class, NullValidator.class );
+			putBuiltinConstraint( tmpConstraints, Null.class, NullValidator.class );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_PAST ) ) {
@@ -636,7 +636,7 @@ public class ConstraintHelper {
 			pastValidators.add( PastValidatorForYearMonth.class );
 			pastValidators.add( PastValidatorForZonedDateTime.class );
 
-			putConstraints( tmpConstraints, Past.class, pastValidators );
+			putBuiltinConstraints( tmpConstraints, Past.class, pastValidators );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_PAST_OR_PRESENT ) ) {
@@ -663,11 +663,11 @@ public class ConstraintHelper {
 			pastOrPresentValidators.add( PastOrPresentValidatorForYearMonth.class );
 			pastOrPresentValidators.add( PastOrPresentValidatorForZonedDateTime.class );
 
-			putConstraints( tmpConstraints, PastOrPresent.class, pastOrPresentValidators );
+			putBuiltinConstraints( tmpConstraints, PastOrPresent.class, pastOrPresentValidators );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_PATTERN ) ) {
-			putConstraint( tmpConstraints, Pattern.class, PatternValidator.class );
+			putBuiltinConstraint( tmpConstraints, Pattern.class, PatternValidator.class );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_POSITIVE ) ) {
@@ -684,7 +684,7 @@ public class ConstraintHelper {
 			if ( isJavaMoneyInClasspath() ) {
 				positiveValidators.add( PositiveValidatorForMonetaryAmount.class );
 			}
-			putConstraints( tmpConstraints, Positive.class, positiveValidators );
+			putBuiltinConstraints( tmpConstraints, Positive.class, positiveValidators );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_POSITIVE_OR_ZERO ) ) {
@@ -701,7 +701,7 @@ public class ConstraintHelper {
 			if ( isJavaMoneyInClasspath() ) {
 				positiveOrZeroValidators.add( PositiveOrZeroValidatorForMonetaryAmount.class );
 			}
-			putConstraints( tmpConstraints, PositiveOrZero.class, positiveOrZeroValidators );
+			putBuiltinConstraints( tmpConstraints, PositiveOrZero.class, positiveOrZeroValidators );
 		}
 
 		if ( enabledBuiltinConstraints.contains( JAKARTA_VALIDATION_CONSTRAINTS_SIZE ) ) {
@@ -718,107 +718,107 @@ public class ConstraintHelper {
 			sizeValidators.add( SizeValidatorForArraysOfInt.class );
 			sizeValidators.add( SizeValidatorForArraysOfLong.class );
 			sizeValidators.add( SizeValidatorForArraysOfShort.class );
-			putConstraints( tmpConstraints, Size.class, sizeValidators );
+			putBuiltinConstraints( tmpConstraints, Size.class, sizeValidators );
 		}
 
 		// Hibernate Validator specific constraints
 
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CNPJ ) ) {
-			putConstraint( tmpConstraints, CNPJ.class, CNPJValidator.class );
+			putBuiltinConstraint( tmpConstraints, CNPJ.class, CNPJValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CPF ) ) {
-			putConstraint( tmpConstraints, CPF.class, CPFValidator.class );
+			putBuiltinConstraint( tmpConstraints, CPF.class, CPFValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CURRENCY ) && isJavaMoneyInClasspath() ) {
-			putConstraint( tmpConstraints, Currency.class, CurrencyValidatorForMonetaryAmount.class );
+			putBuiltinConstraint( tmpConstraints, Currency.class, CurrencyValidatorForMonetaryAmount.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CREDIT_CARD_NUMBER ) ) {
-			putConstraint( tmpConstraints, CreditCardNumber.class );
+			putBuiltinConstraint( tmpConstraints, CreditCardNumber.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MAX ) ) {
-			putConstraint( tmpConstraints, DurationMax.class, DurationMaxValidator.class );
+			putBuiltinConstraint( tmpConstraints, DurationMax.class, DurationMaxValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MIN ) ) {
-			putConstraint( tmpConstraints, DurationMin.class, DurationMinValidator.class );
+			putBuiltinConstraint( tmpConstraints, DurationMin.class, DurationMinValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EAN ) ) {
-			putConstraint( tmpConstraints, EAN.class, EANValidator.class );
+			putBuiltinConstraint( tmpConstraints, EAN.class, EANValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EMAIL ) ) {
-			putConstraint( tmpConstraints, org.hibernate.validator.constraints.Email.class, org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator.class );
+			putBuiltinConstraint( tmpConstraints, org.hibernate.validator.constraints.Email.class, org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ISBN ) ) {
-			putConstraint( tmpConstraints, ISBN.class, ISBNValidator.class );
+			putBuiltinConstraint( tmpConstraints, ISBN.class, ISBNValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LENGTH ) ) {
-			putConstraint( tmpConstraints, Length.class, LengthValidator.class );
+			putBuiltinConstraint( tmpConstraints, Length.class, LengthValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CODE_POINT_LENGTH ) ) {
-			putConstraint( tmpConstraints, CodePointLength.class, CodePointLengthValidator.class );
+			putBuiltinConstraint( tmpConstraints, CodePointLength.class, CodePointLengthValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LUHN_CHECK ) ) {
-			putConstraint( tmpConstraints, LuhnCheck.class, LuhnCheckValidator.class );
+			putBuiltinConstraint( tmpConstraints, LuhnCheck.class, LuhnCheckValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD_CHECK ) ) {
-			putConstraint( tmpConstraints, ModCheck.class, ModCheckValidator.class );
+			putBuiltinConstraint( tmpConstraints, ModCheck.class, ModCheckValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD10_CHECK ) ) {
-			putConstraint( tmpConstraints, Mod10Check.class, Mod10CheckValidator.class );
+			putBuiltinConstraint( tmpConstraints, Mod10Check.class, Mod10CheckValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD11_CHECK ) ) {
-			putConstraint( tmpConstraints, Mod11Check.class, Mod11CheckValidator.class );
+			putBuiltinConstraint( tmpConstraints, Mod11Check.class, Mod11CheckValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_NIP ) ) {
-			putConstraint( tmpConstraints, NIP.class, NIPValidator.class );
+			putBuiltinConstraint( tmpConstraints, NIP.class, NIPValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NOT_BLANK ) ) {
-			putConstraint( tmpConstraints, org.hibernate.validator.constraints.NotBlank.class, org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator.class );
+			putBuiltinConstraint( tmpConstraints, org.hibernate.validator.constraints.NotBlank.class, org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NOT_EMPTY ) ) {
-			putConstraint( tmpConstraints, org.hibernate.validator.constraints.NotEmpty.class );
+			putBuiltinConstraint( tmpConstraints, org.hibernate.validator.constraints.NotEmpty.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PARAMETER_SCRIPT_ASSERT ) ) {
-			putConstraint( tmpConstraints, ParameterScriptAssert.class, ParameterScriptAssertValidator.class );
+			putBuiltinConstraint( tmpConstraints, ParameterScriptAssert.class, ParameterScriptAssertValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_PESEL ) ) {
-			putConstraint( tmpConstraints, PESEL.class, PESELValidator.class );
+			putBuiltinConstraint( tmpConstraints, PESEL.class, PESELValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RANGE ) ) {
-			putConstraint( tmpConstraints, Range.class );
+			putBuiltinConstraint( tmpConstraints, Range.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_REGON ) ) {
-			putConstraint( tmpConstraints, REGON.class, REGONValidator.class );
+			putBuiltinConstraint( tmpConstraints, REGON.class, REGONValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SAFE_HTML ) && isJsoupInClasspath() ) {
-			putConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
+			putBuiltinConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SCRIPT_ASSERT ) ) {
-			putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
+			putBuiltinConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_TITULO_ELEITORAL ) ) {
-			putConstraint( tmpConstraints, TituloEleitoral.class );
+			putBuiltinConstraint( tmpConstraints, TituloEleitoral.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UNIQUE_ELEMENTS ) ) {
-			putConstraint( tmpConstraints, UniqueElements.class, UniqueElementsValidator.class );
+			putBuiltinConstraint( tmpConstraints, UniqueElements.class, UniqueElementsValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_URL ) ) {
-			putConstraint( tmpConstraints, URL.class, URLValidator.class );
+			putBuiltinConstraint( tmpConstraints, URL.class, URLValidator.class );
 		}
 
 		this.enabledBuiltinConstraints = Collections.unmodifiableMap( tmpConstraints );
 	}
 
-	private static <A extends Annotation> void putConstraint(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
+	private static <A extends Annotation> void putBuiltinConstraint(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
 			Class<A> constraintType) {
 		validators.put( constraintType, Collections.emptyList() );
 	}
 
-	private static <A extends Annotation> void putConstraint(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
+	private static <A extends Annotation> void putBuiltinConstraint(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
 			Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType) {
 		validators.put( constraintType, Collections.singletonList( ConstraintValidatorDescriptor.forClass( validatorType, constraintType ) ) );
 	}
 
-	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
+	private static <A extends Annotation> void putBuiltinConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
 			Class<A> constraintType, List<Class<? extends ConstraintValidator<A, ?>>> validatorTypes) {
 		List<ConstraintValidatorDescriptor<?>> descriptors = new ArrayList<>( validatorTypes.size() );
 
