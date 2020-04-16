@@ -76,34 +76,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jakarta.validation.Constraint;
-import jakarta.validation.ConstraintTarget;
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ValidationException;
-import jakarta.validation.constraints.AssertFalse;
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Negative;
-import jakarta.validation.constraints.NegativeOrZero;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
-import jakarta.validation.constraintvalidation.ValidationTarget;
-
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.CreditCardNumber;
@@ -348,8 +320,35 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttribute;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.internal.util.privilegedactions.IsClassPresent;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
+
+import jakarta.validation.Constraint;
+import jakarta.validation.ConstraintTarget;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.constraints.AssertFalse;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Negative;
+import jakarta.validation.constraints.NegativeOrZero;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraintvalidation.ValidationTarget;
 
 /**
  * Keeps track of builtin constraints and their validator implementations, as well as already resolved validator definitions.
@@ -381,6 +380,12 @@ public class ConstraintHelper {
 	private final ConcurrentMap<Class<? extends Annotation>, Boolean> multiValueConstraints = new ConcurrentHashMap<>();
 
 	private final ValidatorDescriptorMap validatorDescriptors = new ValidatorDescriptorMap();
+
+	private Boolean javaMoneyInClasspath;
+
+	private Boolean jodaTimeInClassPath;
+
+	private Boolean jsoupInClasspath;
 
 	public static ConstraintHelper forAllBuiltinConstraints() {
 		return new ConstraintHelper( new HashSet<>( Arrays.asList( BuiltinConstraint.values() ) ) );
@@ -1092,16 +1097,25 @@ public class ConstraintHelper {
 		multiValueConstraints.clear();
 	}
 
-	private static boolean isJodaTimeInClasspath() {
-		return isClassPresent( JODA_TIME_CLASS_NAME );
+	private boolean isJodaTimeInClasspath() {
+		if ( jodaTimeInClassPath == null ) {
+			jodaTimeInClassPath = isClassPresent( JODA_TIME_CLASS_NAME );
+		}
+		return jodaTimeInClassPath.booleanValue();
 	}
 
-	private static boolean isJavaMoneyInClasspath() {
-		return isClassPresent( JAVA_MONEY_CLASS_NAME );
+	private boolean isJavaMoneyInClasspath() {
+		if ( javaMoneyInClasspath == null ) {
+			javaMoneyInClasspath = isClassPresent( JAVA_MONEY_CLASS_NAME );
+		}
+		return javaMoneyInClasspath.booleanValue();
 	}
 
-	private static boolean isJsoupInClasspath() {
-		return isClassPresent( JSOUP_CLASS_NAME );
+	private boolean isJsoupInClasspath() {
+		if ( jsoupInClasspath == null ) {
+			jsoupInClasspath = isClassPresent( JSOUP_CLASS_NAME );
+		}
+		return jsoupInClasspath.booleanValue();
 	}
 
 	/**
@@ -1133,13 +1147,7 @@ public class ConstraintHelper {
 	}
 
 	private static boolean isClassPresent(String className) {
-		try {
-			run( LoadClass.action( className, ConstraintHelper.class.getClassLoader(), false ) );
-			return true;
-		}
-		catch (ValidationException e) {
-			return false;
-		}
+		return run( IsClassPresent.action( className, ConstraintHelper.class.getClassLoader() ) ).booleanValue();
 	}
 
 	/**
