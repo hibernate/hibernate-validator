@@ -52,6 +52,15 @@ class ClassBasedValidatorDescriptor<A extends Annotation> implements ConstraintV
 		return new ClassBasedValidatorDescriptor<T>( validatorClass );
 	}
 
+	/**
+	 * Constraint checking is relaxed for built-in constraints as they have been carefully crafted so we are sure types
+	 * are right.
+	 */
+	public static <T extends Annotation> ClassBasedValidatorDescriptor<T> ofBuiltin(Class<? extends ConstraintValidator<T, ?>> validatorClass,
+			Class<? extends Annotation> registeredConstraintAnnotationType) {
+		return new ClassBasedValidatorDescriptor<T>( validatorClass );
+	}
+
 	private static EnumSet<ValidationTarget> determineValidationTargets(Class<? extends ConstraintValidator<?, ?>> validatorClass) {
 		SupportedValidationTarget supportedTargetAnnotation = validatorClass.getAnnotation(
 				SupportedValidationTarget.class );
