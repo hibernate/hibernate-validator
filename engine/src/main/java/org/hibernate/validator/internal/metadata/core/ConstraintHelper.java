@@ -79,7 +79,6 @@ import java.util.stream.Stream;
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
 import javax.validation.ConstraintValidator;
-import javax.validation.ValidationException;
 import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.DecimalMax;
@@ -348,7 +347,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttribute;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.internal.util.privilegedactions.IsClassPresent;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -381,6 +380,12 @@ public class ConstraintHelper {
 	private final ConcurrentMap<Class<? extends Annotation>, Boolean> multiValueConstraints = new ConcurrentHashMap<>();
 
 	private final ValidatorDescriptorMap validatorDescriptors = new ValidatorDescriptorMap();
+
+	private Boolean javaMoneyInClasspath;
+
+	private Boolean jodaTimeInClassPath;
+
+	private Boolean jsoupInClasspath;
 
 	public static ConstraintHelper forAllBuiltinConstraints() {
 		return new ConstraintHelper( new HashSet<>( Arrays.asList( BuiltinConstraint.values() ) ) );
@@ -1092,16 +1097,25 @@ public class ConstraintHelper {
 		multiValueConstraints.clear();
 	}
 
-	private static boolean isJodaTimeInClasspath() {
-		return isClassPresent( JODA_TIME_CLASS_NAME );
+	private boolean isJodaTimeInClasspath() {
+		if ( jodaTimeInClassPath == null ) {
+			jodaTimeInClassPath = isClassPresent( JODA_TIME_CLASS_NAME );
+		}
+		return jodaTimeInClassPath.booleanValue();
 	}
 
-	private static boolean isJavaMoneyInClasspath() {
-		return isClassPresent( JAVA_MONEY_CLASS_NAME );
+	private boolean isJavaMoneyInClasspath() {
+		if ( javaMoneyInClasspath == null ) {
+			javaMoneyInClasspath = isClassPresent( JAVA_MONEY_CLASS_NAME );
+		}
+		return javaMoneyInClasspath.booleanValue();
 	}
 
-	private static boolean isJsoupInClasspath() {
-		return isClassPresent( JSOUP_CLASS_NAME );
+	private boolean isJsoupInClasspath() {
+		if ( jsoupInClasspath == null ) {
+			jsoupInClasspath = isClassPresent( JSOUP_CLASS_NAME );
+		}
+		return jsoupInClasspath.booleanValue();
 	}
 
 	/**
@@ -1133,13 +1147,7 @@ public class ConstraintHelper {
 	}
 
 	private static boolean isClassPresent(String className) {
-		try {
-			run( LoadClass.action( className, ConstraintHelper.class.getClassLoader(), false ) );
-			return true;
-		}
-		catch (ValidationException e) {
-			return false;
-		}
+		return run( IsClassPresent.action( className, ConstraintHelper.class.getClassLoader() ) ).booleanValue();
 	}
 
 	/**
