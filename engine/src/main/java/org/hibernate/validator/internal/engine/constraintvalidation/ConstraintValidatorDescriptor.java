@@ -49,6 +49,11 @@ public interface ConstraintValidatorDescriptor<A extends Annotation> {
 		return ClassBasedValidatorDescriptor.of( validatorClass, constraintAnnotationType );
 	}
 
+	static <A extends Annotation> ConstraintValidatorDescriptor<A> forBuiltinClass(Class<? extends ConstraintValidator<A, ?>> validatorClass,
+			Class<? extends Annotation> constraintAnnotationType) {
+		return ClassBasedValidatorDescriptor.ofBuiltin( validatorClass, constraintAnnotationType );
+	}
+
 	static <A extends Annotation, T> ConstraintValidatorDescriptor<A> forLambda(Class<A> annotationType, Type validatedType, ValidationCallable<T> lambda) {
 		return new LambdaBasedValidatorDescriptor<>( validatedType, lambda );
 	}
