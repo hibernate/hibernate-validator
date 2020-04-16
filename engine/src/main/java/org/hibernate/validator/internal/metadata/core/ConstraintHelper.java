@@ -815,7 +815,7 @@ public class ConstraintHelper {
 
 	private static <A extends Annotation> void putBuiltinConstraint(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
 			Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType) {
-		validators.put( constraintType, Collections.singletonList( ConstraintValidatorDescriptor.forClass( validatorType, constraintType ) ) );
+		validators.put( constraintType, Collections.singletonList( ConstraintValidatorDescriptor.forBuiltinClass( validatorType, constraintType ) ) );
 	}
 
 	private static <A extends Annotation> void putBuiltinConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
@@ -823,7 +823,7 @@ public class ConstraintHelper {
 		List<ConstraintValidatorDescriptor<?>> descriptors = new ArrayList<>( validatorTypes.size() );
 
 		for ( Class<? extends ConstraintValidator<A, ?>> validatorType : validatorTypes ) {
-			descriptors.add( ConstraintValidatorDescriptor.forClass( validatorType, constraintType ) );
+			descriptors.add( ConstraintValidatorDescriptor.forBuiltinClass( validatorType, constraintType ) );
 		}
 
 		validators.put( constraintType, CollectionHelper.toImmutableList( descriptors ) );
