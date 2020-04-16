@@ -54,6 +54,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.GetInstancesFromServiceLoader;
 import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.hibernate.validator.internal.xml.config.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.config.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
@@ -88,11 +89,19 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	/**
 	 * Built lazily so RBMI and its dependency on EL is only initialized if actually needed
 	 */
+	@Lazy
 	private ResourceBundleLocator defaultResourceBundleLocator;
+	@Lazy
 	private MessageInterpolator defaultMessageInterpolator;
+	@Lazy
 	private MessageInterpolator messageInterpolator;
 
-	private final TraversableResolver defaultTraversableResolver;
+	/**
+	 * Created lazily to avoid fishing in the classpath if one has been defined.
+	 */
+	@Lazy
+	private TraversableResolver defaultTraversableResolver;
+
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
 	private final ParameterNameProvider defaultParameterNameProvider;
 	private final ClockProvider defaultClockProvider;
@@ -143,7 +152,6 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private AbstractConfigurationImpl() {
 		this.validationBootstrapParameters = new ValidationBootstrapParameters();
 
-		this.defaultTraversableResolver = TraversableResolvers.getDefault();
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
@@ -566,6 +574,9 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	@Override
 	public final TraversableResolver getDefaultTraversableResolver() {
+		if ( defaultTraversableResolver == null ) {
+			defaultTraversableResolver = TraversableResolvers.getDefault();
+		}
 		return defaultTraversableResolver;
 	}
 
@@ -632,7 +643,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 			LOG.ignoringXmlConfiguration();
 
 			if ( validationBootstrapParameters.getTraversableResolver() == null ) {
-				validationBootstrapParameters.setTraversableResolver( defaultTraversableResolver );
+				validationBootstrapParameters.setTraversableResolver( getDefaultTraversableResolver() );
 			}
 			if ( validationBootstrapParameters.getConstraintValidatorFactory() == null ) {
 				validationBootstrapParameters.setConstraintValidatorFactory( defaultConstraintValidatorFactory );
@@ -681,7 +692,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 				validationBootstrapParameters.setTraversableResolver( xmlParameters.getTraversableResolver() );
 			}
 			else {
-				validationBootstrapParameters.setTraversableResolver( defaultTraversableResolver );
+				validationBootstrapParameters.setTraversableResolver( getDefaultTraversableResolver() );
 			}
 		}
 
