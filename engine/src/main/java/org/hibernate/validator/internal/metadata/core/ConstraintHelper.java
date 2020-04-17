@@ -202,6 +202,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.dec
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForBigInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForByte;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForDouble;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForFloat;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForInteger;
@@ -211,6 +212,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.Nega
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForBigInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForByte;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForDouble;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForFloat;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForInteger;
@@ -220,6 +222,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.Nega
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForBigInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForByte;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForDouble;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForFloat;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForInteger;
@@ -229,6 +232,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.Posi
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForBigInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForByte;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForDouble;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForFloat;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForInteger;
@@ -561,6 +565,7 @@ public class ConstraintHelper {
 			negativeValidators.add( NegativeValidatorForShort.class );
 			negativeValidators.add( NegativeValidatorForByte.class );
 			negativeValidators.add( NegativeValidatorForNumber.class );
+			negativeValidators.add( NegativeValidatorForCharSequence.class );
 			if ( isJavaMoneyInClasspath() ) {
 				negativeValidators.add( NegativeValidatorForMonetaryAmount.class );
 			}
@@ -578,6 +583,7 @@ public class ConstraintHelper {
 			negativeOrZeroValidators.add( NegativeOrZeroValidatorForShort.class );
 			negativeOrZeroValidators.add( NegativeOrZeroValidatorForByte.class );
 			negativeOrZeroValidators.add( NegativeOrZeroValidatorForNumber.class );
+			negativeOrZeroValidators.add( NegativeOrZeroValidatorForCharSequence.class );
 			if ( isJavaMoneyInClasspath() ) {
 				negativeOrZeroValidators.add( NegativeOrZeroValidatorForMonetaryAmount.class );
 			}
@@ -681,6 +687,7 @@ public class ConstraintHelper {
 			positiveValidators.add( PositiveValidatorForShort.class );
 			positiveValidators.add( PositiveValidatorForByte.class );
 			positiveValidators.add( PositiveValidatorForNumber.class );
+			positiveValidators.add( PositiveValidatorForCharSequence.class );
 			if ( isJavaMoneyInClasspath() ) {
 				positiveValidators.add( PositiveValidatorForMonetaryAmount.class );
 			}
@@ -698,6 +705,7 @@ public class ConstraintHelper {
 			positiveOrZeroValidators.add( PositiveOrZeroValidatorForShort.class );
 			positiveOrZeroValidators.add( PositiveOrZeroValidatorForByte.class );
 			positiveOrZeroValidators.add( PositiveOrZeroValidatorForNumber.class );
+			positiveOrZeroValidators.add( PositiveOrZeroValidatorForCharSequence.class );
 			if ( isJavaMoneyInClasspath() ) {
 				positiveOrZeroValidators.add( PositiveOrZeroValidatorForMonetaryAmount.class );
 			}
