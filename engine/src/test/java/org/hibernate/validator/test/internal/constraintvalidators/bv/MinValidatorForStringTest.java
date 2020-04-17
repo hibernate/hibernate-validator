@@ -14,8 +14,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
