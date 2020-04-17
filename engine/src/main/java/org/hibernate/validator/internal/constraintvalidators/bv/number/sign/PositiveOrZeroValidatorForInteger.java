@@ -11,7 +11,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.constraints.PositiveOrZero;
 
 /**
- * Check that the number being validated positive.
+ * Check that the number being validated positive or zero.
  *
  * @author Hardy Ferentschik
  * @author Xavier Sosnovsky

@@ -13,7 +13,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityNumberComparatorHelper;
 
 /**
- * Check that the number being validated is positive.
+ * Check that the number being validated is positive or zero.
  *
  * @author Hardy Ferentschik
  * @author Xavier Sosnovsky
