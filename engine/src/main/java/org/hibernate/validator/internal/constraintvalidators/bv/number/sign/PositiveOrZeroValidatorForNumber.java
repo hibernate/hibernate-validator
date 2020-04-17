@@ -11,7 +11,7 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.PositiveOrZero;
 
 /**
- * Check that the number being validated is positive.
+ * Check that the number being validated is positive or zero.
  *
  * @author Hardy Ferentschik
  * @author Xavier Sosnovsky

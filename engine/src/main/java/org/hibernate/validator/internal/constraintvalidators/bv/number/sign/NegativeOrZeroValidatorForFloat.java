@@ -13,7 +13,7 @@ import javax.validation.constraints.NegativeOrZero;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityNumberComparatorHelper;
 
 /**
- * Check that the number being validated is negative.
+ * Check that the number being validated is negative or zero.
  *
  * @author Hardy Ferentschik
  * @author Xavier Sosnovsky
