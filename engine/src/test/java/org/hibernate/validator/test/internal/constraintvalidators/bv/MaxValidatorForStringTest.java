@@ -14,8 +14,8 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.Max;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMaxValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MaxValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.DecimalMaxValidatorForNumber;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
