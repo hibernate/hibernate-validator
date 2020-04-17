@@ -1,6 +1,17 @@
 Hibernate Validator Changelog
 =============================
 
+6.1.4.Final (17-04-2020)
+-------------------------
+
+** Bug
+    * HV-1760 - validators - @Negative*/@Positive* do not support CharSequence as documented
+
+** Improvement
+    * HV-1770 - engine     - Relax constraint consistency checking for built-in constraints
+    * HV-1769 - engine     - Only create the default TraversableResolver if none has been specified
+    * HV-1767 - engine     - Reduce the overhead of ConstraintHelper initialization in the predefined scope case
+
 6.1.3.Final (10-04-2020)
 -------------------------
 
