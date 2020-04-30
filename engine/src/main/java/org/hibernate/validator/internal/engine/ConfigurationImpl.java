@@ -330,6 +330,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		Contracts.assertNotNull( externalClassLoader, MESSAGES.parameterMustNotBeNull( "externalClassLoader" ) );
 		this.externalClassLoader = externalClassLoader;
 
+		// we need to reset the messageInterpolator field as it might vary depending on the class loader
+		this.messageInterpolator = null;
+
 		return this;
 	}
 
@@ -406,15 +409,13 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final MessageInterpolator getMessageInterpolator() {
+		// apply explicitly given MI, otherwise use default one
+		MessageInterpolator selectedInterpolator = validationBootstrapParameters.getMessageInterpolator();
+		if ( selectedInterpolator != null ) {
+			return selectedInterpolator;
+		}
 		if ( messageInterpolator == null ) {
-			// apply explicitly given MI, otherwise use default one
-			MessageInterpolator interpolator = validationBootstrapParameters.getMessageInterpolator();
-			if ( interpolator != null ) {
-				messageInterpolator = interpolator;
-			}
-			else {
-				messageInterpolator = getDefaultMessageInterpolatorConfiguredWithClassLoader();
-			}
+			messageInterpolator = getDefaultMessageInterpolatorConfiguredWithClassLoader();
 		}
 
 		return messageInterpolator;
