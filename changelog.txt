@@ -1,6 +1,16 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.20.Final (06-05-2020)
+-------------------------
+
+** Bug
+    * HV-1774 - engine        - Invalid parsing of EL expression can lead to invalid EL expressions considered valid
+    * HV-1772 - engine        - Building multiple ValidatorFactory instances from a single Configuration violates specification for MessageInterpolator
+
+** Improvement
+    * HV-1773 - documentation - Be more explicit about issues with EL injection and how to avoid them
+
 6.0.19.Final (27-03-2020)
 -------------------------
 
