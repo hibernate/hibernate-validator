@@ -143,15 +143,16 @@
             They should be aligned with the ones from the Wildfly version we support
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
-        <version.jakarta.enterprise.cdi-api>3.0.0-M1</version.jakarta.enterprise.cdi-api>
-        <version.org.jboss.weld.weld>3.1.1.Final</version.org.jboss.weld.weld>
+        <version.jakarta.enterprise.cdi-api>3.0.0-M2</version.jakarta.enterprise.cdi-api>
+        <version.org.jboss.weld.weld>4.0.0.Alpha2</version.org.jboss.weld.weld>
         <version.org.wildfly.arquillian>2.2.0.Final</version.org.wildfly.arquillian>
-        <version.jakarta.ejb-api>4.0.0-RC1</version.jakarta.ejb-api>
+        <version.jakarta.ejb-api>4.0.0-RC2</version.jakarta.ejb-api>
         <version.jakarta.interceptor-api>2.0.0-RC2</version.jakarta.interceptor-api>
         <version.jakarta.annotation-api>2.0.0-RC1</version.jakarta.annotation-api>
-        <version.jakarta.inject-api>2.0.0.RC1</version.jakarta.inject-api>
+        <version.jakarta.inject-api>2.0.0-RC3</version.jakarta.inject-api>
+        <version.jakarta.persistence-api>3.0.0-RC2</version.jakarta.persistence-api>
+        <!-- do not update for now, this is used for the WildFly IT -->
         <version.jakarta.ws.rs-api>2.1.6</version.jakarta.ws.rs-api>
-        <version.jakarta.persistence-api>3.0.0-RC1</version.jakarta.persistence-api>
 
         <!-- JavaMoney dependencies -->
         <version.javax.money>1.0.1</version.javax.money>
