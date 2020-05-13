@@ -1,6 +1,31 @@
 Hibernate Validator Changelog
 =============================
 
+7.0.0.Alpha2 (13-05-2020)
+-------------------------
+
+** Bug
+    * HV-1776 - annotation-processor - Rename annotation processor service file for new jakarta package
+    * HV-1775 - integration          - Rename CDI extension service file for new jakarta package
+    * HV-1774 - engine               - Invalid parsing of EL expression can lead to invalid EL expressions considered valid
+    * HV-1772 - engine               - Building multiple ValidatorFactory instances from a single Configuration violates specification for MessageInterpolator
+    * HV-1771 - translations         - Fix DecimalMin message German translation
+    * HV-1760 - validators           - @Negative*/@Positive* do not support CharSequence as documented
+
+** Improvement
+    * HV-1773 - documentation        - Be more explicit about issues with EL injection and how to avoid them
+    * HV-1770 - engine               - Relax constraint consistency checking for built-in constraints
+    * HV-1769 - engine               - Only create the default TraversableResolver if none has been specified
+    * HV-1767 - engine               - Reduce the overhead of ConstraintHelper initialization in the predefined scope case
+    * HV-1763 - engine               - Improve performances of ExecutableHelper#getSignature
+    * HV-1762 - engine               - Avoid cloning overhead from Method.getParameterTypes()
+
+** Task
+    * HV-1778 - extensions           - Reenable CDI extension testing
+    * HV-1777 - build                - Upgrade Jakarta dependencies to latest
+    * HV-1765 - integration          - Upgrade WildFly versions to 18.0.1.Final and 19.0.0.Final
+    * HV-1764 - tests                - Upgrade Jackson test dependencies to 2.10.3
+
 7.0.0.Alpha1 (25-03-2020)
 -------------------------
 
