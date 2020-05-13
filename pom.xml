@@ -176,7 +176,7 @@
         <version.org.codehaus.groovy>2.4.12</version.org.codehaus.groovy>
         <version.com.google.guava>27.1-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>4.3.10.RELEASE</version.org.springframework.spring-expression>
-        <version.org.jboss.arquillian.container.arquillian-weld-se-embedded-1.1>1.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-se-embedded-1.1>
+        <version.org.jboss.arquillian.container.arquillian-weld-embedded>3.0.0.Alpha1</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.10.3</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.10.3</version.com.fasterxml.jackson.core.jackson-annotations>
         <version.net.bytebuddy.byte-buddy>1.10.2</version.net.bytebuddy.byte-buddy>
@@ -512,8 +512,8 @@
             </dependency>
             <dependency>
                 <groupId>org.jboss.arquillian.container</groupId>
-                <artifactId>arquillian-weld-se-embedded-1.1</artifactId>
-                <version>${version.org.jboss.arquillian.container.arquillian-weld-se-embedded-1.1}</version>
+                <artifactId>arquillian-weld-embedded</artifactId>
+                <version>${version.org.jboss.arquillian.container.arquillian-weld-embedded}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
