@@ -707,6 +707,10 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
+`@Normalized(form=)`:: Validates that the annotated character sequence is normalized according to the given `form`.
+        Supported data types::: `CharSequence`
+        Hibernate metadata impact::: None
+
 `@Range(min=, max=)`:: Checks whether the annotated value lies between (inclusive) the specified minimum and maximum
 	Supported data types::: `BigDecimal`, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types
 	Hibernate metadata impact::: None
