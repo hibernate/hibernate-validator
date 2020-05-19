@@ -56,6 +56,7 @@ import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.ModCheck;
+import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.SafeHtml;
@@ -157,6 +158,7 @@ public class MessagePropertiesTest {
 							violationOf( Mod10Check.class ),
 							violationOf( Mod11Check.class ),
 							violationOf( ModCheck.class ),
+							violationOf( Normalized.class ),
 							violationOf( org.hibernate.validator.constraints.NotBlank.class ),
 							violationOf( org.hibernate.validator.constraints.NotEmpty.class ),
 							violationOf( Range.class ),
@@ -307,6 +309,9 @@ public class MessagePropertiesTest {
 
 		@ModCheck(multiplier = 2, modType = ModCheck.ModType.MOD10)
 		private String modCheck = "4";
+
+		@Normalized(form = java.text.Normalizer.Form.NFKC)
+		private String normalized = "\uFE64script\uFE65";
 
 		@org.hibernate.validator.constraints.NotBlank
 		private String hvNotBlank = "";
