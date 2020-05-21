@@ -28,7 +28,7 @@ public class TraversableResolvers {
 	/**
 	 * Class to load to check whether JPA is on the classpath.
 	 */
-	private static final String PERSISTENCE_CLASS_NAME = "javax.persistence.Persistence";
+	private static final String PERSISTENCE_CLASS_NAME = "jakarta.persistence.Persistence";
 
 	/**
 	 * Method to check whether the found {@code Persistence} class is of the version 2
