@@ -1,6 +1,12 @@
 Hibernate Validator Changelog
 =============================
 
+7.0.0.Alpha3 (26-05-2020)
+-------------------------
+
+** Bug
+    * HV-1781 - engine - Fix Jakarta Persistence class presence test
+
 7.0.0.Alpha2 (13-05-2020)
 -------------------------
 
