@@ -166,7 +166,7 @@
         <version.org.openjfx>11.0.2</version.org.openjfx>
 
         <!-- Test dependencies -->
-        <version.org.jboss.arquillian>1.1.11.Final</version.org.jboss.arquillian>
+        <version.org.jboss.arquillian>1.7.0.Alpha1</version.org.jboss.arquillian>
         <version.org.testng>6.8</version.org.testng>
         <!-- it must be the exact same version than the one used in the Bean Validation TCK -->
         <version.org.assertj.assertj-core>3.8.0</version.org.assertj.assertj-core>
