@@ -5,7 +5,7 @@
 
 ## What is it?
 
-This is the reference implementation of [Jakarta Bean Validation 2.0](http://beanvalidation.org/).
+This is the reference implementation of [Jakarta Bean Validation 3.0](http://beanvalidation.org/).
 Jakarta Bean Validation defines a metadata model and API for JavaBean as well as method validation.
 The default metadata source are annotations, with the ability to override and extend
 the metadata through the use of XML validation descriptors.
