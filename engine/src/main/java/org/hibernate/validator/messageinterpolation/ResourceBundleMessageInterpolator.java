@@ -13,9 +13,6 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
-import jakarta.el.ELManager;
-import jakarta.el.ExpressionFactory;
-
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
@@ -25,6 +22,11 @@ import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+
+import com.sun.el.ExpressionFactoryImpl;
+
+import jakarta.el.ELManager;
+import jakarta.el.ExpressionFactory;
 
 /**
  * Resource bundle backed message interpolator.
@@ -186,12 +188,21 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 				return expressionFactory;
 			}
 
-			// Finally we try the CL of the EL module itself; the EL RI uses the TCCL to load the implementation from
-			// its own module, so this should work
+			// We try the CL of the EL module itself; the EL RI uses the TCCL to load the implementation from
+			// its own module, so this should work.
 			run( SetContextClassLoader.action( ELManager.class.getClassLoader() ) );
 			if ( canLoadExpressionFactory() ) {
 				ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
 				LOG.debug( "Loaded expression factory via EL classloader" );
+				return expressionFactory;
+			}
+
+			// Finally we try the CL of the EL implementation itself. This is necessary for OSGi now that the
+			// implementation is separated from the API.
+			run( SetContextClassLoader.action( ExpressionFactoryImpl.class.getClassLoader() ) );
+			if ( canLoadExpressionFactory() ) {
+				ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
+				LOG.debug( "Loaded expression factory via com.sun.el classloader" );
 				return expressionFactory;
 			}
 		}
