@@ -1,6 +1,20 @@
 Hibernate Validator Changelog
 =============================
 
+7.0.0.Alpha4 (29-06-2020)
+-------------------------
+
+** Improvement
+    * HV-1782 - translations - Remove trailing dot from @Max constraint German translation
+
+** New Feature
+    * HV-1780 - validators   - Add @Normalized contraint that validates if text is normalized in a given form
+
+** Task
+    * HV-1787 - build        - Upgrade Jakarta EE dependencies
+    * HV-1786 - tck-runner   - Upgrade Bean Validation TCK to 3.0.0-M2
+    * HV-1783 - tests        - Upgrade to Arquillian 1.7.0.Alpha1
+
 7.0.0.Alpha3 (26-05-2020)
 -------------------------
 
