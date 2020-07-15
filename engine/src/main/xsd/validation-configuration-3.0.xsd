@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Hibernate Validator, declare and validate application constraints
+  ~ Jakarta Bean Validation API
   ~
   ~ License: Apache License, Version 2.0
   ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
   -->
 <xs:schema attributeFormDefault="unqualified"
            elementFormDefault="qualified"
-           targetNamespace="https://xmlns.jakarta.ee/xml/ns/validation/configuration"
+           targetNamespace="https://jakarta.ee/xml/ns/validation/configuration"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:config="https://xmlns.jakarta.ee/xml/ns/validation/configuration"
+           xmlns:config="https://jakarta.ee/xml/ns/validation/configuration"
            version="3.0">
 
     <xs:annotation>
@@ -20,17 +20,17 @@
             Jakarta Bean Validation configuration files must indicate the Jakarta Bean Validation
             XML schema by using the validation namespace:
 
-            https://xmlns.jakarta.ee/xml/ns/validation/configuration
+            https://jakarta.ee/xml/ns/validation/configuration
 
             and indicate the version of the schema by using the version attribute
             as shown below:
 
             <validation-config
-                xmlns="https://xmlns.jakarta.ee/xml/ns/validation/configuration"
+                xmlns="https://jakarta.ee/xml/ns/validation/configuration"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xsi:schemaLocation="
-                    https://xmlns.jakarta.ee/xml/ns/validation/configuration
-                    https://xmlns.jakarta.ee/xml/ns/validation/configuration/validation-configuration-3.0.xsd"
+                    https://jakarta.ee/xml/ns/validation/configuration
+                    https://jakarta.ee/xml/ns/validation/validation-configuration-3.0.xsd"
                 version="3.0">
                 [...]
             </validation-config>

@@ -9,12 +9,7 @@ approach via annotations. Let's have a look at these two document types.
 
 [NOTE]
 ====
-The XSD files are available via
-https://xmlns.jakarta.ee/xml/ns/validation/configuration and
-https://xmlns.jakarta.ee/xml/ns/validation/mapping.
-
-More information about the XML schemas can be found on the
-http://beanvalidation.org/xml/ns/validation/[Jakarta Bean Validation website].
+The XSD files are available on the https://jakarta.ee/xml/ns/validation/ page.
 ====
 
 [[section-configuration-validation-xml]]

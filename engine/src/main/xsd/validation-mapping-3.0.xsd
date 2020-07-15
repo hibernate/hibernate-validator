@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Hibernate Validator, declare and validate application constraints
+  ~ Jakarta Bean Validation API
   ~
   ~ License: Apache License, Version 2.0
   ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
   -->
 <xs:schema attributeFormDefault="unqualified"
            elementFormDefault="qualified"
-           targetNamespace="https://xmlns.jakarta.ee/xml/ns/validation/mapping"
+           targetNamespace="https://jakarta.ee/xml/ns/validation/mapping"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:map="https://xmlns.jakarta.ee/xml/ns/validation/mapping"
+           xmlns:map="https://jakarta.ee/xml/ns/validation/mapping"
            version="3.0">
 
     <xs:annotation>
@@ -19,17 +19,17 @@
             Jakarta Bean Validation constraint mapping files must indicate the Jakarta Bean Validation
             XML schema by using the constraint mapping namespace:
 
-            https://xmlns.jakarta.ee/xml/ns/validation/mapping
+            https://jakarta.ee/xml/ns/validation/mapping
 
             and indicate the version of the schema by using the version attribute
             as shown below:
 
             <constraint-mappings
-                xmlns="https://xmlns.jakarta.ee/xml/ns/validation/mapping"
+                xmlns="https://jakarta.ee/xml/ns/validation/mapping"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xsi:schemaLocation="
-                    https://xmlns.jakarta.ee/xml/ns/validation/mapping
-                    https://xmlns.jakarta.ee/xml/ns/validation/mapping/validation-mapping-3.0.xsd"
+                    https://jakarta.ee/xml/ns/validation/mapping
+                    https://jakarta.ee/xml/ns/validation/validation-mapping-3.0.xsd"
                 version="3.0">
                 ...
             </constraint-mappings>

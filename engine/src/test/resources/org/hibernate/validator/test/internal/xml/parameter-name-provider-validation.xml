@@ -6,9 +6,9 @@
   ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
   -->
 <validation-config
-    xmlns="https://xmlns.jakarta.ee/xml/ns/validation/configuration"
+    xmlns="https://jakarta.ee/xml/ns/validation/configuration"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="https://xmlns.jakarta.ee/xml/ns/validation/configuration validation-configuration-3.0.xsd"
+    xsi:schemaLocation="https://jakarta.ee/xml/ns/validation/configuration https://jakarta.ee/xml/ns/validation/validation-configuration-3.0.xsd"
     version="3.0">
 
     <parameter-name-provider>org.hibernate.validator.test.internal.xml.CustomParameterNameProvider</parameter-name-provider>
