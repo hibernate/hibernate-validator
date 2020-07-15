@@ -59,7 +59,6 @@ import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Range;
-import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -162,7 +161,6 @@ public class MessagePropertiesTest {
 							violationOf( org.hibernate.validator.constraints.NotBlank.class ),
 							violationOf( org.hibernate.validator.constraints.NotEmpty.class ),
 							violationOf( Range.class ),
-							violationOf( SafeHtml.class ),
 							violationOf( UniqueElements.class ),
 							violationOf( URL.class ),
 							violationOf( CNPJ.class ),
@@ -321,9 +319,6 @@ public class MessagePropertiesTest {
 
 		@Range(min = 2, max = 4)
 		private int range = 6;
-
-		@SafeHtml
-		private String safeHtml = "<script></script>";
 
 		@UniqueElements
 		private List<String> uniqueElements = Arrays.asList( "a", "a" );

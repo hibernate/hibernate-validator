@@ -136,12 +136,6 @@ public class KarafFeaturesAreInstallableTest {
 	}
 
 	@Test
-	public void canInstallFeatureHibernateValidatorJsoup() throws Exception {
-		featuresService.addRepository( new URI( System.getProperty( "validatorRepositoryUrl" ) ) );
-		canInstallFeature( "hibernate-validator-jsoup" );
-	}
-
-	@Test
 	public void canInstallFeatureHibernateValidatorJodaTime() throws Exception {
 		featuresService.addRepository( new URI( System.getProperty( "validatorRepositoryUrl" ) ) );
 		canInstallFeature( "hibernate-validator-joda-time" );
