@@ -12,13 +12,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.money.MonetaryAmount;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.Future;
 
 import org.hibernate.validator.constraints.Currency;
-import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.javamoney.moneta.Money;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -27,8 +22,13 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.joda.time.DateTime;
 import org.testng.annotations.Test;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.Future;
+
 /**
- * Asserts that the constraints based on the JodaTime and JSoup server modules can be used.
+ * Asserts that the constraints based on the JodaTime and Javax Money server modules can be used.
  *
  * @author Gunnar Morling
  * @author Guillaume Smet
@@ -58,14 +58,6 @@ public class OptionalConstraintsIT extends AbstractArquillianIT {
 	}
 
 	@Test
-	public void canUseJsoupBasedConstraint() {
-		Set<ConstraintViolation<Item>> violations = validator.validate( new Item() );
-
-		assertThat( violations.size() ).isEqualTo( 1 );
-		assertThat( violations.iterator().next().getConstraintDescriptor().getAnnotation().annotationType() ).isEqualTo( SafeHtml.class );
-	}
-
-	@Test
 	public void canUseJavaMoneyBasedConstraint() {
 		Set<ConstraintViolation<Order>> violations = validator.validate( new Order( Money.of( 1200.0, "EUR" ) ) );
 
@@ -82,12 +74,6 @@ public class OptionalConstraintsIT extends AbstractArquillianIT {
 
 		@Future
 		public DateTime deliveryDate = new DateTime( 2014, 10, 21, 0, 0, 0, 0 );
-	}
-
-	private static class Item {
-
-		@SafeHtml
-		public String descriptionHtml = "<script>Cross-site scripting https://en.wikipedia.org/wiki/42<script/>";
 	}
 
 	private static class Order {

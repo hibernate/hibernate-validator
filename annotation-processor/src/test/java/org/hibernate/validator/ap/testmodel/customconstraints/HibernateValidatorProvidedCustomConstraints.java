@@ -19,7 +19,6 @@ import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.Range;
-import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.br.CNPJ;
@@ -48,7 +47,6 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@NotBlank
 	@NotEmpty
 	@Range
-	@SafeHtml
 	@URL
 	@CNPJ
 	@CPF
@@ -75,7 +73,6 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@NotBlank
 	@NotEmpty
 	@Range
-	@SafeHtml
 	@URL
 	@CNPJ
 	@CPF

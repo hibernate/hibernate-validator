@@ -15,20 +15,12 @@ import static org.testng.Assert.fail;
 import java.lang.annotation.Annotation;
 import java.util.Set;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.LuhnCheckDef;
 import org.hibernate.validator.cfg.defs.ParameterScriptAssertDef;
-import org.hibernate.validator.cfg.defs.SafeHtmlDef;
-import org.hibernate.validator.cfg.defs.SafeHtmlDef.AttributeDef;
-import org.hibernate.validator.cfg.defs.SafeHtmlDef.TagDef;
 import org.hibernate.validator.cfg.defs.br.CNPJDef;
 import org.hibernate.validator.cfg.defs.br.CPFDef;
 import org.hibernate.validator.cfg.defs.br.TituloEleitoralDef;
@@ -36,16 +28,19 @@ import org.hibernate.validator.cfg.defs.pl.NIPDef;
 import org.hibernate.validator.cfg.defs.pl.PESELDef;
 import org.hibernate.validator.cfg.defs.pl.REGONDef;
 import org.hibernate.validator.constraints.LuhnCheck;
-import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
-import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 import org.testng.annotations.Test;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 /**
  * @author Marko Bekhta
@@ -65,104 +60,6 @@ public class ProgrammaticConstraintDefinitionsTest {
 		doProgrammaticTest( PESEL.class, new PESELDef(), "12252918020", "44051401358", "invalid Polish National Identification Number (PESEL)" );
 		doProgrammaticTest( NIP.class, new NIPDef(), "1786052059", "2596048505", "invalid VAT Identification Number (NIP)" );
 
-	}
-
-	@Test
-	@SuppressWarnings("deprecation")
-	public void safeHtmlProgrammaticDefinition() {
-		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.BASIC ), "<td>1234qwertd>", 1 );
-		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE ), "test", 0 );
-		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ), "<td>1234qwer</td>", 0 );
-		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE ).additionalTags( "td" ), "<td>1234qwer</td>", 0 );
-
-		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ), "<img src='/some/relative/url/image.png' />", 1 );
-		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ).baseURI( "http://localhost" ),
-				"<img src='/some/relative/url/image.png' />", 0
-		);
-
-		// disallowed attribute
-		doProgrammaticTest(
-				SafeHtml.class,
-				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTags( new TagDef( "img" )
-								.attributes( "src" )
-						),
-				"<img href='snafu' />", 1
-		);
-
-		// allowed attribute, no restrictions on protocols
-		doProgrammaticTest(
-				SafeHtml.class,
-				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTags( new TagDef( "img" )
-								.attributes( "src" )
-						),
-				"<img src='data:image/png;base64,100101' />", 0
-		);
-
-		// allowed attribute, allowed protocol
-		doProgrammaticTest(
-				SafeHtml.class,
-				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTags( new TagDef( "img" )
-								.attributes( new AttributeDef( "src", "data" ) )
-						),
-				"<img src='data:image/png;base64,100101' />", 0
-		);
-
-		// allowed attribute, disallowed protocol
-		doProgrammaticTest(
-				SafeHtml.class,
-				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTags( new TagDef( "img" )
-								.attributes( new AttributeDef( "src", "data" ) )
-						),
-				"<img src='not_data:image/png;base64,100101' />", 1
-		);
-
-		// multiple allowed attributes and protocols
-		doProgrammaticTest(
-				SafeHtml.class,
-				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTags( new TagDef( "img" )
-								.attributes(
-										new AttributeDef( "src", "data", "data2" ),
-										new AttributeDef( "href", "http", "http2" )
-								)
-						),
-				"<img src='data:image/png;base64,100101' href='http://foo'/>", 0
-		);
-
-		doProgrammaticTest(
-				SafeHtml.class,
-				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTags( new TagDef( "td" ).attributes( "class", "id" ) ),
-				"<td class='class' id='tableId'>1234qwer</td>", 0
-		);
-		doProgrammaticTest(
-				SafeHtml.class,
-				new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-						.additionalTags( new TagDef( "td" ).attributes( "class", "id" ) ),
-				"<td class='class' id='tableId' otherAttribute='value'>1234qwer</td>", 1
-		);
-
-		// Deprecated, kept to ensure backwards compatibility (or at least ensure we are aware we break something if we decide to do so)
-		AnnotationDescriptor.Builder<SafeHtml.Tag> tagDescriptorBuilder = new AnnotationDescriptor.Builder<>( SafeHtml.Tag.class );
-		tagDescriptorBuilder.setAttribute( "name", "td" );
-		tagDescriptorBuilder.setAttribute( "attributes", new String[]{ "class", "id" } );
-		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-				.additionalTagsWithAttributes( tagDescriptorBuilder.build().getAnnotation() ), "<td class='class' id='tableId'>1234qwer</td>", 0 );
-
-		AnnotationDescriptor.Builder<SafeHtml.Attribute> attributeDescriptorBuilder = new AnnotationDescriptor.Builder<>( SafeHtml.Attribute.class );
-		attributeDescriptorBuilder.setAttribute( "name", "src" );
-		attributeDescriptorBuilder.setAttribute( "protocols", new String[]{ "data" } );
-
-		tagDescriptorBuilder = new AnnotationDescriptor.Builder<>( SafeHtml.Tag.class );
-		tagDescriptorBuilder.setAttribute( "name", "img" );
-		tagDescriptorBuilder.setAttribute( "attributesWithProtocols", new SafeHtml.Attribute[]{ attributeDescriptorBuilder.build().getAnnotation() } );
-
-		doProgrammaticTest( SafeHtml.class, new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
-				.additionalTagsWithAttributes( tagDescriptorBuilder.build().getAnnotation() ), "<img src='data:image/png;base64,100101' />", 0 );
 	}
 
 	@Test

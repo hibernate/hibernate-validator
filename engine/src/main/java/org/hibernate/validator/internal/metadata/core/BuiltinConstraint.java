@@ -73,7 +73,6 @@ enum BuiltinConstraint {
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PARAMETER_SCRIPT_ASSERT("org.hibernate.validator.constraints.ParameterScriptAssert"),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RANGE("org.hibernate.validator.constraints.Range",
 			Arrays.asList( JAKARTA_VALIDATION_CONSTRAINTS_MIN, JAKARTA_VALIDATION_CONSTRAINTS_MAX )),
-	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SAFE_HTML("org.hibernate.validator.constraints.SafeHtml"),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SCRIPT_ASSERT("org.hibernate.validator.constraints.ScriptAssert"),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_URL("org.hibernate.validator.constraints.URL",
 			Arrays.asList( JAKARTA_VALIDATION_CONSTRAINTS_PATTERN )),
