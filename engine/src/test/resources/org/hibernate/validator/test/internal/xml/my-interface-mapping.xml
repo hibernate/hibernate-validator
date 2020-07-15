@@ -6,8 +6,8 @@
   ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
   -->
 <constraint-mappings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                     xsi:schemaLocation="https://xmlns.jakarta.ee/xml/ns/validation/mapping validation-mapping-3.0.xsd"
-                     xmlns="https://xmlns.jakarta.ee/xml/ns/validation/mapping"
+                     xsi:schemaLocation="https://jakarta.ee/xml/ns/validation/mapping https://jakarta.ee/xml/ns/validation/validation-mapping-3.0.xsd"
+                     xmlns="https://jakarta.ee/xml/ns/validation/mapping"
                      version="3.0">
     <default-package>org.hibernate.validator.internal.xml</default-package>
     <bean class="org.hibernate.validator.test.internal.xml.MyInterface" ignore-annotations="true">
