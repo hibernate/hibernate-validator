@@ -715,11 +715,6 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `BigDecimal`, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types
 	Hibernate metadata impact::: None
 
-`@SafeHtml(whitelistType= , additionalTags=, additionalTagsWithAttributes=, baseURI=)`:: Checks whether the annotated value contains potentially malicious fragments such as `<script/>`. In order to use this constraint, the http://jsoup.org/[jsoup] library must be part of the class path. With the `whitelistType` attribute a predefined whitelist type can be chosen which can be refined via `additionalTags` or `additionalTagsWithAttributes`. The former allows to add tags without any attributes, whereas the latter allows to specify tags and optionally allowed attributes as well as accepted protocols for the attributes using the annotation `@SafeHtml.Tag`.
-In addition, `baseURI` allows to specify the base URI used to resolve relative URIs.
-	Supported data types::: `CharSequence`
-	Hibernate metadata impact::: None
-
 `@ScriptAssert(lang=, script=, alias=, reportOn=)`:: Checks whether the given script can successfully be evaluated against the annotated element. In order to use this constraint, an implementation of the Java Scripting API as defined by JSR 223 ("Scripting for the Java^TM^ Platform") must be a part of the class path. The expressions to be evaluated can be written in any scripting or expression language, for which a JSR 223 compatible engine can be found in the class path. Even though this is a class-level constraint, one can use the `reportOn` attribute to report a constraint violation on a specific property rather than the whole object.
 	Supported data types::: Any type
 	Hibernate metadata impact::: None

@@ -18,10 +18,6 @@
         <bundle>mvn:com.fasterxml/classmate/${version.com.fasterxml.classmate}</bundle>
         <bundle>mvn:org.glassfish/jakarta.el/${version.org.glassfish.jakarta.el}</bundle>
     </feature>
-    <feature name="hibernate-validator-jsoup" version="${project.version}">
-        <feature>hibernate-validator</feature>
-        <bundle>mvn:org.jsoup/jsoup/${version.jsoup}</bundle>
-    </feature>
     <feature name="hibernate-validator-joda-time" version="${project.version}">
         <feature>hibernate-validator</feature>
         <bundle>mvn:joda-time/joda-time/${version.joda-time}</bundle>
