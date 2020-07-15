@@ -19,6 +19,36 @@ import java.util.Locale;
 import java.util.Set;
 
 import javax.money.MonetaryAmount;
+
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.constraints.CodePointLength;
+import org.hibernate.validator.constraints.CreditCardNumber;
+import org.hibernate.validator.constraints.Currency;
+import org.hibernate.validator.constraints.EAN;
+import org.hibernate.validator.constraints.ISBN;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.LuhnCheck;
+import org.hibernate.validator.constraints.Mod10Check;
+import org.hibernate.validator.constraints.Mod11Check;
+import org.hibernate.validator.constraints.ModCheck;
+import org.hibernate.validator.constraints.Normalized;
+import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.Range;
+import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraints.URL;
+import org.hibernate.validator.constraints.UniqueElements;
+import org.hibernate.validator.constraints.br.CNPJ;
+import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.constraints.br.TituloEleitoral;
+import org.hibernate.validator.constraints.pl.NIP;
+import org.hibernate.validator.constraints.pl.PESEL;
+import org.hibernate.validator.constraints.pl.REGON;
+import org.hibernate.validator.constraints.time.DurationMax;
+import org.hibernate.validator.constraints.time.DurationMin;
+import org.hibernate.validator.testutil.ConstraintViolationAssert;
+import org.javamoney.moneta.Money;
+import org.testng.annotations.Test;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -44,36 +74,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-
-import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.constraints.CodePointLength;
-import org.hibernate.validator.constraints.CreditCardNumber;
-import org.hibernate.validator.constraints.Currency;
-import org.hibernate.validator.constraints.EAN;
-import org.hibernate.validator.constraints.ISBN;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.LuhnCheck;
-import org.hibernate.validator.constraints.Mod10Check;
-import org.hibernate.validator.constraints.Mod11Check;
-import org.hibernate.validator.constraints.ModCheck;
-import org.hibernate.validator.constraints.Normalized;
-import org.hibernate.validator.constraints.ParameterScriptAssert;
-import org.hibernate.validator.constraints.Range;
-import org.hibernate.validator.constraints.SafeHtml;
-import org.hibernate.validator.constraints.ScriptAssert;
-import org.hibernate.validator.constraints.URL;
-import org.hibernate.validator.constraints.UniqueElements;
-import org.hibernate.validator.constraints.br.CNPJ;
-import org.hibernate.validator.constraints.br.CPF;
-import org.hibernate.validator.constraints.br.TituloEleitoral;
-import org.hibernate.validator.constraints.pl.NIP;
-import org.hibernate.validator.constraints.pl.PESEL;
-import org.hibernate.validator.constraints.pl.REGON;
-import org.hibernate.validator.constraints.time.DurationMax;
-import org.hibernate.validator.constraints.time.DurationMin;
-import org.hibernate.validator.testutil.ConstraintViolationAssert;
-import org.javamoney.moneta.Money;
-import org.testng.annotations.Test;
 
 /**
  * Test that all the messages of all the constraints are properly interpolated for all the supported locales.
@@ -162,7 +162,6 @@ public class MessagePropertiesTest {
 							violationOf( org.hibernate.validator.constraints.NotBlank.class ),
 							violationOf( org.hibernate.validator.constraints.NotEmpty.class ),
 							violationOf( Range.class ),
-							violationOf( SafeHtml.class ),
 							violationOf( UniqueElements.class ),
 							violationOf( URL.class ),
 							violationOf( CNPJ.class ),
@@ -321,9 +320,6 @@ public class MessagePropertiesTest {
 
 		@Range(min = 2, max = 4)
 		private int range = 6;
-
-		@SafeHtml
-		private String safeHtml = "<script></script>";
 
 		@UniqueElements
 		private List<String> uniqueElements = Arrays.asList( "a", "a" );

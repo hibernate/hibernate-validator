@@ -81,7 +81,6 @@ public class TypeNames {
 		public static final String NORMALIZED = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Normalized";
 		public static final String NOT_BLANK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotBlank";
 		public static final String NOT_EMPTY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotEmpty";
-		public static final String SAFE_HTML = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".SafeHtml";
 		public static final String SCRIPT_ASSERT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ScriptAssert";
 		public static final String UNIQUE_ELEMENTS = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".UniqueElements";
 		public static final String URL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".URL";

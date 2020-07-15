@@ -50,7 +50,6 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_PESEL;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_REGON;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RANGE;
-import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SAFE_HTML;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SCRIPT_ASSERT;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MAX;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MIN;
@@ -91,7 +90,6 @@ import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Range;
-import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -308,7 +306,6 @@ import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValida
 import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.NormalizedValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.SafeHtmlValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.UniqueElementsValidator;
@@ -377,7 +374,6 @@ public class ConstraintHelper {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
 	private static final String JAVA_MONEY_CLASS_NAME = "javax.money.MonetaryAmount";
-	private static final String JSOUP_CLASS_NAME = "org.jsoup.Jsoup";
 
 	@Immutable
 	private final Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> enabledBuiltinConstraints;
@@ -391,8 +387,6 @@ public class ConstraintHelper {
 	private Boolean javaMoneyInClasspath;
 
 	private Boolean jodaTimeInClassPath;
-
-	private Boolean jsoupInClasspath;
 
 	public static ConstraintHelper forAllBuiltinConstraints() {
 		return new ConstraintHelper( new HashSet<>( Arrays.asList( BuiltinConstraint.values() ) ) );
@@ -803,9 +797,6 @@ public class ConstraintHelper {
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_REGON ) ) {
 			putBuiltinConstraint( tmpConstraints, REGON.class, REGONValidator.class );
 		}
-		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SAFE_HTML ) && isJsoupInClasspath() ) {
-			putBuiltinConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
-		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SCRIPT_ASSERT ) ) {
 			putBuiltinConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
 		}
@@ -1123,13 +1114,6 @@ public class ConstraintHelper {
 			javaMoneyInClasspath = isClassPresent( JAVA_MONEY_CLASS_NAME );
 		}
 		return javaMoneyInClasspath.booleanValue();
-	}
-
-	private boolean isJsoupInClasspath() {
-		if ( jsoupInClasspath == null ) {
-			jsoupInClasspath = isClassPresent( JSOUP_CLASS_NAME );
-		}
-		return jsoupInClasspath.booleanValue();
 	}
 
 	/**

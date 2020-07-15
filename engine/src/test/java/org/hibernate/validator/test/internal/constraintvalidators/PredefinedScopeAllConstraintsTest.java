@@ -33,7 +33,6 @@ import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Range;
-import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -122,7 +121,6 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( org.hibernate.validator.constraints.NotBlank.class, new HvNotBlankBean() );
 		testConstraint( org.hibernate.validator.constraints.NotEmpty.class, new HvNotEmptyBean() );
 		testConstraint( Range.class, new RangeBean() );
-		testConstraint( SafeHtml.class, new SafeHtmlBean() );
 		testConstraint( UniqueElements.class, new UniqueElementsBean() );
 		testConstraint( URL.class, new URLBean() );
 		testConstraint( CNPJ.class, new CNPJBean() );
@@ -382,12 +380,6 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@Range(min = 2, max = 4)
 		private int range = 6;
-	}
-
-	private static class SafeHtmlBean {
-
-		@SafeHtml
-		private String safeHtml = "<script></script>";
 	}
 
 	private static class UniqueElementsBean {
