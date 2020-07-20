@@ -1,6 +1,18 @@
 Hibernate Validator Changelog
 =============================
 
+7.0.0.Alpha5 (20-07-2020)
+-------------------------
+
+** Bug
+    * HV-1761 - engine             - Interpolation of primitive arrays causes a ClassCastException
+
+** Remove Feature
+    * HV-1790 - engine, validators - Remove the SafeHtml constraint
+
+** Task
+    * HV-1789 - engine, tests      - Upgrade to Bean Validation 3.0.0 and update the XML namespaces
+
 7.0.0.Alpha4 (29-06-2020)
 -------------------------
 
