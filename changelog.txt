@@ -1,6 +1,12 @@
 Hibernate Validator Changelog
 =============================
 
+7.0.0.Alpha6 (22-07-2020)
+-------------------------
+
+** Task
+    * HV-1792 - tck-runner - Upgrade Bean Validation TCK to 3.0.0
+
 7.0.0.Alpha5 (20-07-2020)
 -------------------------
 
