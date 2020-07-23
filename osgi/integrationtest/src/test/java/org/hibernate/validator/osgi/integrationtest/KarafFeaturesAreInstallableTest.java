@@ -121,12 +121,6 @@ public class KarafFeaturesAreInstallableTest {
 	}
 
 	@Test
-	public void canInstallFeatureHibernateValidatorJavaxMoney() throws Exception {
-		featuresService.addRepository( new URI( System.getProperty( "validatorRepositoryUrl" ) ) );
-		canInstallFeature( "hibernate-validator-javax-money" );
-	}
-
-	@Test
 	public void canInstallFeatureHibernateValidatorGroovy() throws Exception {
 		featuresService.addRepository( new URI( System.getProperty( "validatorRepositoryUrl" ) ) );
 		canInstallFeature( "hibernate-validator-groovy" );

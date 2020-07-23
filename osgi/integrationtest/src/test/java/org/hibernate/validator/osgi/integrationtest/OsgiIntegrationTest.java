@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 
 import jakarta.el.ELManager;
 import jakarta.el.ExpressionFactory;
-import javax.money.spi.Bootstrap;
 import javax.script.ScriptEngineFactory;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -46,8 +45,6 @@ import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpo
 import org.hibernate.validator.osgi.scripting.MultiClassLoaderScriptEvaluatorFactory;
 import org.hibernate.validator.osgi.scripting.OsgiScriptEvaluatorFactory;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
-import org.javamoney.moneta.Money;
-import org.javamoney.moneta.spi.MonetaryConfig;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,8 +62,6 @@ import com.example.Order;
 import com.example.RetailOrder;
 import com.example.constraintvalidator.Bean;
 import com.example.constraintvalidator.MustMatch;
-import com.example.money.ExternalClassLoaderJavaxMoneyServiceProvider;
-import com.example.money.JavaxMoneyOrder;
 
 /**
  * Integration test for Bean Validation and Hibernate Validator under OSGi.
@@ -236,27 +231,6 @@ public class OsgiIntegrationTest {
 
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals( "Not a valid retail order name", constraintViolations.iterator().next().getMessage() );
-	}
-
-	@Test
-	public void canUseJavaxMoneyConstraints() {
-		Bootstrap.init( new ExternalClassLoaderJavaxMoneyServiceProvider( MonetaryConfig.class.getClassLoader() ) );
-
-		Validator validator = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.externalClassLoader( getClass().getClassLoader() )
-				.buildValidatorFactory()
-				.getValidator();
-
-		Set<ConstraintViolation<JavaxMoneyOrder>> constraintViolations = validator.validate( new JavaxMoneyOrder( "Order 1", Money.of( 0, "EUR" ) ) );
-
-		assertEquals( 1, constraintViolations.size() );
-		assertEquals( "must be greater than or equal to 100", constraintViolations.iterator().next().getMessage() );
-
-		constraintViolations = validator.validate( new JavaxMoneyOrder( "Order 1", Money.of( 120, "USD" ) ) );
-
-		assertEquals( 1, constraintViolations.size() );
-		assertEquals( "invalid currency (must be one of [EUR])", constraintViolations.iterator().next().getMessage() );
 	}
 
 	@Test

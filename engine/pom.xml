@@ -139,8 +139,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.javamoney</groupId>
-            <artifactId>moneta</artifactId>
+            <groupId>org.javamoney.moneta</groupId>
+            <artifactId>moneta-core</artifactId>
             <scope>test</scope>
             <exclusions>
                 <exclusion>

@@ -23,12 +23,6 @@
         <feature>hibernate-validator</feature>
         <bundle>mvn:joda-time/joda-time/${version.joda-time}</bundle>
     </feature>
-    <feature name="hibernate-validator-javax-money" version="${project.version}">
-        <feature>hibernate-validator</feature>
-        <bundle>mvn:javax.money/money-api/${version.javax.money}</bundle>
-        <bundle>mvn:org.javamoney/moneta/${version.org.javamoney.moneta}</bundle>
-        <bundle>mvn:javax.annotation/javax.annotation-api/${version.javax.annotation-api}</bundle>
-    </feature>
     <feature name="hibernate-validator-groovy" version="${project.version}">
         <feature>hibernate-validator</feature>
         <bundle>mvn:org.codehaus.groovy/groovy-all/${version.org.codehaus.groovy}</bundle>
