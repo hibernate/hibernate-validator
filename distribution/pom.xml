@@ -119,7 +119,7 @@
                         <link>${java.api-docs.base-url}</link>
                         <link>${javaee.api-docs.base-url}</link>
                         <link>${bv.api-docs.base-url}</link>
-                        <link>${javamoney.api-docs.base-url}</link>
+                        <!--<link>${javamoney.api-docs.base-url}</link>-->
                     </links>
                     <tags>
                         <tag>
