@@ -10,9 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.fail;
 
 import javax.inject.Inject;
-import jakarta.validation.ConstraintViolationException;
 
-import org.apache.log4j.Logger;
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
@@ -23,6 +21,8 @@ import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.testng.annotations.Test;
 
+import jakarta.validation.ConstraintViolationException;
+
 /**
  * Tests the usage of HV by JPA, applying a custom validation.xml. Also making sure that the VF is CDI-enabled.
  *
@@ -32,7 +32,6 @@ import org.testng.annotations.Test;
 public class CustomValidatorFactoryInPersistenceUnitIT extends AbstractArquillianIT {
 
 	private static final String WAR_FILE_NAME = CustomValidatorFactoryInPersistenceUnitIT.class.getSimpleName() + ".war";
-	private static final Logger log = Logger.getLogger( CustomValidatorFactoryInPersistenceUnitIT.class );
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
@@ -64,8 +63,6 @@ public class CustomValidatorFactoryInPersistenceUnitIT extends AbstractArquillia
 
 	@Test
 	public void testValidatorFactoryPassedToPersistenceUnitIsCorrectlyConfigured() throws Exception {
-		log.debug( "Running testValidatorFactoryPassedToPersistenceUnitIsCorrectlyConfigured..." );
-
 		try {
 			magicianService.storeMagician();
 			fail( "Expected exception wasn't raised" );
@@ -79,8 +76,6 @@ public class CustomValidatorFactoryInPersistenceUnitIT extends AbstractArquillia
 			assertThat( constraintViolationException.getConstraintViolations().iterator().next().getMessage() )
 					.isEqualTo( "Invalid magician name" );
 		}
-
-		log.debug( "testValidatorFactoryPassedToPersistenceUnitIsCorrectlyConfigured completed" );
 	}
 
 	/**
@@ -90,8 +85,6 @@ public class CustomValidatorFactoryInPersistenceUnitIT extends AbstractArquillia
 	// TODO How to make that work reliably also after a HV upgrade within WF?
 	@Test
 	public void testValidatorFactoryPassedToPersistenceUnitIsContributedFromPortableExtensionOfCurrentModuleZip() throws Exception {
-		log.debug( "Running testValidatorFactoryPassedToPersistenceUnitIsContributedFromPortableExtensionOfCurrentModuleZip..." );
-
 		try {
 			magicianService.storeWand();
 			fail( "Expected exception wasn't raised" );
@@ -105,8 +98,6 @@ public class CustomValidatorFactoryInPersistenceUnitIT extends AbstractArquillia
 			assertThat( constraintViolationException.getConstraintViolations().iterator().next().getMessage() )
 					.isEqualTo( "size must be between 5 and 2147483647" );
 		}
-
-		log.debug( "testValidatorFactoryPassedToPersistenceUnitIsContributedFromPortableExtensionOfCurrentModuleZip completed" );
 	}
 
 	private Throwable getRootException(Throwable throwable) {
