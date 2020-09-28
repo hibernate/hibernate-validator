@@ -14,7 +14,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.validation.ValidatorFactory;
 
-import org.apache.log4j.Logger;
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -28,7 +27,6 @@ import org.testng.annotations.Test;
  */
 public class JndiLookupOfValidatorFactoryIT extends AbstractArquillianIT {
 	private static final String WAR_FILE_NAME = JndiLookupOfValidatorFactoryIT.class.getSimpleName() + ".war";
-	private static final Logger log = Logger.getLogger( JndiLookupOfValidatorFactoryIT.class );
 	private static final String DEFAULT_JNDI_NAME_OF_VALIDATOR_FACTORY = "java:comp/ValidatorFactory";
 
 	@Deployment
@@ -38,7 +36,6 @@ public class JndiLookupOfValidatorFactoryIT extends AbstractArquillianIT {
 
 	@Test
 	public void testDefaultValidatorFactoryLookup() throws Exception {
-		log.debug( "Running testDefaultValidatorFactoryLookup..." );
 		try {
 			Context ctx = new InitialContext();
 			Object obj = ctx.lookup( DEFAULT_JNDI_NAME_OF_VALIDATOR_FACTORY );
@@ -51,6 +48,5 @@ public class JndiLookupOfValidatorFactoryIT extends AbstractArquillianIT {
 		catch (NamingException e) {
 			fail( "The default validator factory should be bound" );
 		}
-		log.debug( "testDefaultValidatorFactoryLookup completed" );
 	}
 }
