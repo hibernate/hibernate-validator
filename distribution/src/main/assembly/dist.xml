@@ -42,7 +42,7 @@
         <dependencySet>
             <outputDirectory>dist/lib/optional</outputDirectory>
             <includes>
-                <include>log4j:log4j</include>
+                <include>org.apache.logging.log4j:log4j-core</include>
                 <include>joda-time:joda-time</include>
                 <include>javax.persistence:javax.persistence-api</include>
                 <include>org.jsoup:jsoup</include>

@@ -182,6 +182,7 @@
         <groovy.version>2.4.12</groovy.version>
 
         <guava.version>27.1-jre</guava.version>
+        <log4j.version>2.17.1</log4j.version>
         <spring-expression.version>4.3.10.RELEASE</spring-expression.version>
 
         <!-- Asciidoctor -->
@@ -330,9 +331,15 @@
                 <version>${jsoup.version}</version>
             </dependency>
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.17</version>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <type>test-jar</type>
+                <version>${log4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -340,9 +347,9 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${log4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.persistence</groupId>
