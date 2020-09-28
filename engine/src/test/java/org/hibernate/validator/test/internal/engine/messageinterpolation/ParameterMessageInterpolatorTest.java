@@ -9,6 +9,7 @@ package org.hibernate.validator.test.internal.engine.messageinterpolation;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.testng.Assert.assertTrue;
 
 import java.util.Set;
 
@@ -16,11 +17,13 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.Size;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.test.appender.ListAppender;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
-import org.hibernate.validator.testutil.MessageLoggedAssertionLogger;
 import org.hibernate.validator.testutil.TestForIssue;
-
-import org.apache.log4j.Logger;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -34,12 +37,24 @@ public class ParameterMessageInterpolatorTest {
 
 	Validator validator;
 
+	ListAppender listAppender;
+
 	@BeforeTest
 	public void setUp() {
+		LoggerContext context = LoggerContext.getContext( false );
+		Logger logger = context.getLogger( ParameterMessageInterpolator.class.getName() );
+		listAppender = (ListAppender) logger.getAppenders().get( "List" );
+		listAppender.clear();
+
 		validator = getConfiguration()
 				.messageInterpolator( new ParameterMessageInterpolator() )
 				.buildValidatorFactory()
 				.getValidator();
+	}
+
+	@AfterTest
+	public void tearDown() {
+		listAppender.clear();
 	}
 
 	@Test
@@ -55,20 +70,17 @@ public class ParameterMessageInterpolatorTest {
 
 	@Test
 	public void testParameterMessageInterpolatorIgnoresELExpressions() {
-		Logger log4jRootLogger = Logger.getRootLogger();
-		MessageLoggedAssertionLogger assertingLogger = new MessageLoggedAssertionLogger( "HV000185" );
-		log4jRootLogger.addAppender( assertingLogger );
-
 		Foo foo = new Foo();
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validateProperty( foo, "bar" );
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( Size.class )
 						.withProperty( "bar" )
-						.withMessage( "${validatedValue}" )
-		);
+						.withMessage( "${validatedValue}" ) );
 
-		assertingLogger.assertMessageLogged();
-		log4jRootLogger.removeAppender( assertingLogger );
+		assertTrue( listAppender.getEvents().stream()
+				.filter( event -> event.getLevel().equals( Level.WARN ) )
+				.map( event -> event.getMessage().getFormattedMessage() )
+				.anyMatch( m -> m.startsWith( "HV000185" ) ) );
 	}
 
 	public static class Foo {
