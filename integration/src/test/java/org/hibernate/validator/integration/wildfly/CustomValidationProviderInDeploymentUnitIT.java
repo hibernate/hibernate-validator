@@ -9,10 +9,7 @@ package org.hibernate.validator.integration.wildfly;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.inject.Inject;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 
-import org.apache.log4j.Logger;
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
 import org.hibernate.validator.integration.util.MyValidator;
@@ -21,6 +18,9 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.testng.annotations.Test;
+
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 /**
  * Tests the usage of a custom validation provider coming as part of the deployment unit.
@@ -31,7 +31,6 @@ import org.testng.annotations.Test;
 public class CustomValidationProviderInDeploymentUnitIT extends AbstractArquillianIT {
 
 	private static final String WAR_FILE_NAME = CustomValidationProviderInDeploymentUnitIT.class.getSimpleName() + ".war";
-	private static final Logger log = Logger.getLogger( CustomValidationProviderInDeploymentUnitIT.class );
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
@@ -49,8 +48,6 @@ public class CustomValidationProviderInDeploymentUnitIT extends AbstractArquilli
 
 	@Test
 	public void testValidatorFactoryFromCustomValidationProvider() throws Exception {
-		log.debug( "Running testValidatorFactoryFromCustomValidationProvider..." );
-
 		Validator validator = validatorFactory.getValidator();
 
 		// Asserting the validator type as the VF is the wrapper type used within WildFly (LazyValidatorFactory)
@@ -58,7 +55,5 @@ public class CustomValidationProviderInDeploymentUnitIT extends AbstractArquilli
 				.as( "The custom validator implementation as retrieved from the default provider configured in META-INF/validation.xml should be used but actually "
 						+ validator + " is used" )
 				.isInstanceOf( MyValidator.class );
-
-		log.debug( "testValidatorFactoryFromCustomValidationProvider completed" );
 	}
 }
