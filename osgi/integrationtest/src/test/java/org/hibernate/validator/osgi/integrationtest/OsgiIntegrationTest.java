@@ -90,6 +90,7 @@ public class OsgiIntegrationTest {
 				.type( "xml" )
 				.versionAsInProject();
 
+		String mavenLocalRepository = System.getProperty( "maven.settings.localRepository" );
 		String mavenCentralRepository = System.getProperty( "maven.mavencentral.repo.url" );
 
 		return options(
@@ -116,6 +117,26 @@ public class OsgiIntegrationTest {
 						"etc/org.apache.karaf.features.cfg",
 						"featuresBoot",
 						"system"
+				),
+				/*
+				 * Use the same local Maven repository as the build job.
+				 * This allows to retrieve the just-installed artifacts in case
+				 * the local repo was overridden from the command line.
+				 *
+				 * See https://ops4j1.jira.com/wiki/spaces/paxurl/pages/3833866/Mvn+Protocol for more information
+				 * on the configuration below.
+				 */
+				editConfigurationFilePut(
+						"etc/org.ops4j.pax.url.mvn.cfg",
+						"org.ops4j.pax.url.mvn.defaultRepositories",
+						"file://" + mavenLocalRepository
+								+ "@snapshots"
+								+ "@id=local-repo-from-maven-settings"
+				),
+				editConfigurationFilePut(
+						"etc/org.ops4j.pax.url.mvn.cfg",
+						"org.ops4j.pax.url.mvn.localRepository",
+						mavenLocalRepository
 				),
 				editConfigurationFilePut( // Erase the defaults: Maven Central uses HTTP by default...
 						"etc/org.ops4j.pax.url.mvn.cfg",
