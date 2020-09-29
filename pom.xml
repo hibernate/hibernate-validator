@@ -171,7 +171,7 @@
 
         <!-- OSGi dependencies -->
         <pax.exam.version>4.12.0</pax.exam.version>
-        <pax.url.version>2.5.2</pax.url.version>
+        <pax.url.version>2.5.4</pax.url.version>
         <apache.karaf.version>4.2.0</apache.karaf.version>
         <osgi-core.version>6.0.0</osgi-core.version>
         <payara.version>5.181</payara.version>
