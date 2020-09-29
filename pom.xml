@@ -279,8 +279,16 @@
         <surefire.jvm.args.additional></surefire.jvm.args.additional>
         <surefire.jvm.args.illegal-access></surefire.jvm.args.illegal-access>
         <surefire.jvm.args.add-opens></surefire.jvm.args.add-opens>
-        <surefire.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access}</surefire.jvm.args>
-        <failsafe.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access}</failsafe.jvm.args>
+        <!--
+          The arguments below are Shrinkwrap settings taken from
+          https://github.com/shrinkwrap/resolver/blob/788a3c1148af3a7ebdfdaf817393273f5f5ee17b/impl-maven/src/main/java/org/jboss/shrinkwrap/resolver/impl/maven/bootstrap/MavenSettingsBuilder.java#L80
+          - maven.repo.local: necessary for the Shrinkwrap artifact retrieval to work when using a non-default local repository
+         -->
+        <surefire.jvm.args.shrinkwrap>
+            -Dmaven.repo.local=${settings.localRepository}
+        </surefire.jvm.args.shrinkwrap>
+        <surefire.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access} ${surefire.jvm.args.shrinkwrap}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access} ${surefire.jvm.args.shrinkwrap}</failsafe.jvm.args>
 
         <arquillian.wildfly.jvm.args.add-opens></arquillian.wildfly.jvm.args.add-opens>
         <arquillian.wildfly.jvm.args.add-modules></arquillian.wildfly.jvm.args.add-modules>
