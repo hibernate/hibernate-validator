@@ -185,6 +185,7 @@
                 <configuration>
                     <reuseForks>false</reuseForks>
                     <systemPropertyVariables>
+                        <maven.settings.localRepository>${settings.localRepository}</maven.settings.localRepository>
                         <maven.mavencentral.repo.url>${mavencentral.repo.url}</maven.mavencentral.repo.url>
                     </systemPropertyVariables>
                 </configuration>
