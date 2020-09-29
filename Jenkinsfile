@@ -315,11 +315,11 @@ stage('Default build') {
 }
 
 stage('Non-default environments') {
-	Map<String, Closure> executions = [:]
+	Map<String, Object> parameters = [:]
 
 	// Test with multiple JDKs
 	environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
-		executions.put(buildEnv.tag, {
+		parameters.put(buildEnv.tag, {
 			runBuildOnNode {
 				helper.withMavenWorkspace(jdk: buildEnv.buildJdkTool) {
 					mavenNonDefaultBuild buildEnv, """ \
@@ -330,12 +330,13 @@ stage('Non-default environments') {
 		})
 	}
 
-	if (executions.isEmpty()) {
+	if (parameters.isEmpty()) {
 		echo 'Skipping builds in non-default environments'
 		helper.markStageSkipped()
 	}
 	else {
-		parallel(executions)
+		parameters.put('failFast', false)
+		parallel(parameters)
 	}
 }
 
