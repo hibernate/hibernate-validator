@@ -1,6 +1,19 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.21.Final (29-09-2020)
+-------------------------
+
+** Bug
+    * HV-1804 - translations - Fix Dutch translation for @Size constraint
+    * HV-1761 - engine       - Interpolation of primitive arrays causes a ClassCastException
+
+** New Feature
+    * HV-1657 - engine       - Make the “propertyPath” available via the “HibernateMessageInterpolatorContext”
+
+** Task
+    * HV-1795 - build        - Remove link to JavaMoney javadoc
+
 6.0.20.Final (06-05-2020)
 -------------------------
 
