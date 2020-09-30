@@ -40,6 +40,11 @@ public class LocalSecurityManagerTestingExecutionEvent extends LocalExecutionEve
 		}
 
 		@Override
+		public String getMethodName() {
+			return method.getName();
+		}
+
+		@Override
 		public Method getMethod() {
 			return method;
 		}
