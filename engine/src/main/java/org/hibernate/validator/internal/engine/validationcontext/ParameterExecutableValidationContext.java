@@ -91,7 +91,7 @@ public class ParameterExecutableValidationContext<T> extends AbstractValidationC
 			return false;
 		}
 
-		return !executableMetaData.get().getReturnValueMetaData().hasCascadables();
+		return !executableMetaData.get().getValidatableParametersMetaData().hasCascadables();
 	}
 
 	@Override
