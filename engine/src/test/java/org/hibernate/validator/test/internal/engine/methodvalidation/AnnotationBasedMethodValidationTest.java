@@ -46,7 +46,7 @@ public class AnnotationBasedMethodValidationTest extends AbstractMethodValidatio
 		List<Customer> customers = Arrays.asList( null, customer );
 
 		try {
-			customerRepository.iterableParameterWithCascadingTypeParameter( customers );
+			customerRepositoryValidatingProxy.iterableParameterWithCascadingTypeParameter( customers );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -62,7 +62,7 @@ public class AnnotationBasedMethodValidationTest extends AbstractMethodValidatio
 					"iterableParameterWithCascadingTypeParameter.customer[1].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getLeafBean(), customer );
 			assertEquals( constraintViolation.getInvalidValue(), null );
 			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customers } );
