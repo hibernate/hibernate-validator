@@ -142,6 +142,12 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '16', buildJdkTool: 'OpenJDK 16 Latest',
 							condition: TestCondition.AFTER_MERGE)
+			],
+			wildflyTck: [
+					new WildFlyTckBuildEnvironment(javaVersion: '8', buildJdkTool: 'OracleJDK8 Latest',
+							condition: TestCondition.AFTER_MERGE),
+					new WildFlyTckBuildEnvironment(javaVersion: '11', buildJdkTool: 'OpenJDK 11 Latest',
+							condition: TestCondition.AFTER_MERGE)
 			]
 	])
 
@@ -330,6 +336,21 @@ stage('Non-default environments') {
 		})
 	}
 
+	// Run the TCK with WildFly in multiple environments
+	environments.content.wildflyTck.enabled.each { WildFlyTckBuildEnvironment buildEnv ->
+		parameters.put(buildEnv.tag, {
+			runBuildOnNode {
+				helper.withMavenWorkspace(jdk: buildEnv.buildJdkTool) {
+					mavenNonDefaultBuild buildEnv, """ \
+							clean install \
+							-pl tck-runner \
+							-Dincontainer \
+					"""
+				}
+			}
+		})
+	}
+
 	if (parameters.isEmpty()) {
 		echo 'Skipping builds in non-default environments'
 		helper.markStageSkipped()
@@ -424,6 +445,15 @@ class JdkBuildEnvironment extends BuildEnvironment {
 	String getTag() { "jdk-$version" }
 	@Override
 	boolean requiresDefaultBuildArtifacts() { false }
+}
+
+class WildFlyTckBuildEnvironment extends BuildEnvironment {
+	String javaVersion
+	String buildJdkTool
+	@Override
+	String getTag() { "wildfly-tck-jdk$javaVersion" }
+	@Override
+	boolean requiresDefaultBuildArtifacts() { true }
 }
 
 void keepOnlyEnvironmentsMatchingFilter(String regex) {
