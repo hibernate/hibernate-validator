@@ -1397,5 +1397,32 @@
                 </repository>
             </repositories>
         </profile>
+        <profile>
+            <id>IDEA</id>
+            <activation>
+                <!-- This is a trick to have the profile automatically activated by IDEA -->
+                <property>
+                    <name>idea.maven.embedder.version</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>${version.compiler.plugin}</version>
+                            <configuration>
+                                <compilerArgs>
+                                    <compilerArg>-Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArg>
+                                    <!-- Make sure IDEA uses the -parameters for all code;
+                                         IDEA ignores the "testCompilerArguments" option... -->
+                                    <compilerArg>-parameters</compilerArg>
+                                </compilerArgs>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
     </profiles>
 </project>
