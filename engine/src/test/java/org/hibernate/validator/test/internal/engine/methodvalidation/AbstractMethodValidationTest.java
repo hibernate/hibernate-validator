@@ -52,7 +52,8 @@ import org.testng.annotations.Test;
  */
 @Test
 public abstract class AbstractMethodValidationTest {
-	protected CustomerRepository customerRepository;
+	protected CustomerRepository customerRepositoryOriginalBean;
+	protected CustomerRepository customerRepositoryValidatingProxy;
 	protected RepositoryBase<Customer> repositoryBase;
 	protected Validator validator;
 
@@ -61,16 +62,17 @@ public abstract class AbstractMethodValidationTest {
 	protected abstract String messagePrefix();
 
 	protected void createProxy(Class<?>... groups) {
-		customerRepository = getValidatingProxy(
-				new CustomerRepositoryImpl(), validator, groups
+		customerRepositoryOriginalBean = new CustomerRepositoryImpl();
+		customerRepositoryValidatingProxy = getValidatingProxy(
+				customerRepositoryOriginalBean, validator, groups
 		);
-		repositoryBase = customerRepository;
+		repositoryBase = customerRepositoryValidatingProxy;
 	}
 
 	@Test
 	public void methodValidationYieldsConstraintViolation() {
 		try {
-			customerRepository.findCustomerByName( null );
+			customerRepositoryValidatingProxy.findCustomerByName( null );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -92,13 +94,13 @@ public abstract class AbstractMethodValidationTest {
 			assertMethod( constraintViolation, "findCustomerByName", String.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
-			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
 					"findCustomerByName.name"
 			);
-			assertEquals( constraintViolation.getLeafBean(), customerRepository );
+			assertEquals( constraintViolation.getLeafBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getInvalidValue(), null );
 			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { null } );
 			assertEquals( constraintViolation.getExecutableReturnValue(), null );
@@ -108,7 +110,7 @@ public abstract class AbstractMethodValidationTest {
 	@Test
 	public void validationOfMethodWithMultipleParameters() {
 		try {
-			customerRepository.findCustomerByAgeAndName( 30, null );
+			customerRepositoryValidatingProxy.findCustomerByAgeAndName( 30, null );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -141,7 +143,7 @@ public abstract class AbstractMethodValidationTest {
 	@Test
 	public void constraintViolationsAtMultipleParameters() {
 		try {
-			customerRepository.findCustomerByAgeAndName( 1, null );
+			customerRepositoryValidatingProxy.findCustomerByAgeAndName( 1, null );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -170,7 +172,7 @@ public abstract class AbstractMethodValidationTest {
 	public void methodValidationWithCascadingParameter() {
 		Customer customer = new Customer( null, null );
 		try {
-			customerRepository.persistCustomer( customer );
+			customerRepositoryValidatingProxy.persistCustomer( customer );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -195,7 +197,7 @@ public abstract class AbstractMethodValidationTest {
 					constraintViolation.getPropertyPath().toString(), "persistCustomer.customer.name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getLeafBean(), customer );
 			assertEquals( constraintViolation.getInvalidValue(), null );
 			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customer } );
@@ -209,7 +211,7 @@ public abstract class AbstractMethodValidationTest {
 		Customer customer = new Customer( "Bob", address );
 
 		try {
-			customerRepository.persistCustomer( customer );
+			customerRepositoryValidatingProxy.persistCustomer( customer );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -236,7 +238,7 @@ public abstract class AbstractMethodValidationTest {
 					"persistCustomer.customer.address.city"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getLeafBean(), address );
 			assertEquals( constraintViolation.getInvalidValue(), null );
 			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customer } );
@@ -251,7 +253,7 @@ public abstract class AbstractMethodValidationTest {
 		customers.put( "Bob", bob );
 
 		try {
-			customerRepository.cascadingMapParameter( customers );
+			customerRepositoryValidatingProxy.cascadingMapParameter( customers );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -277,7 +279,7 @@ public abstract class AbstractMethodValidationTest {
 					"cascadingMapParameter.customer[Bob].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getLeafBean(), bob );
 			assertEquals( constraintViolation.getInvalidValue(), null );
 			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customers } );
@@ -291,7 +293,7 @@ public abstract class AbstractMethodValidationTest {
 		List<Customer> customers = Arrays.asList( null, customer );
 
 		try {
-			customerRepository.cascadingIterableParameter( customers );
+			customerRepositoryValidatingProxy.cascadingIterableParameter( customers );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -317,7 +319,7 @@ public abstract class AbstractMethodValidationTest {
 					"cascadingIterableParameter.customer[1].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getLeafBean(), customer );
 			assertEquals( constraintViolation.getInvalidValue(), null );
 			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customers } );
@@ -331,7 +333,7 @@ public abstract class AbstractMethodValidationTest {
 		Customer customer = new Customer( null );
 
 		try {
-			customerRepository.cascadingArrayParameter( null, customer );
+			customerRepositoryValidatingProxy.cascadingArrayParameter( null, customer );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -357,7 +359,7 @@ public abstract class AbstractMethodValidationTest {
 					"cascadingArrayParameter.customer[1].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getLeafBean(), customer );
 			assertEquals( constraintViolation.getInvalidValue(), null );
 			assertEquals(
@@ -371,7 +373,7 @@ public abstract class AbstractMethodValidationTest {
 	@Test
 	public void constraintsAtMethodFromBaseClassAreEvaluated() {
 		try {
-			customerRepository.findById( null );
+			customerRepositoryValidatingProxy.findById( null );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -398,7 +400,7 @@ public abstract class AbstractMethodValidationTest {
 	@Test
 	public void constraintsAtOverriddenMethodAreEvaluated() {
 		try {
-			customerRepository.foo( null );
+			customerRepositoryValidatingProxy.foo( null );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -425,7 +427,7 @@ public abstract class AbstractMethodValidationTest {
 	@Test
 	public void validFromOverriddenMethodIsEvaluated() {
 		try {
-			customerRepository.bar( new Customer( null, null ) );
+			customerRepositoryValidatingProxy.bar( new Customer( null, null ) );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -453,13 +455,13 @@ public abstract class AbstractMethodValidationTest {
 
 	@Test
 	public void parameterValidationOfParameterlessMethod() {
-		customerRepository.boz();
+		customerRepositoryValidatingProxy.boz();
 	}
 
 	@Test
 	public void returnValueValidationYieldsConstraintViolation() {
 		try {
-			customerRepository.baz();
+			customerRepositoryValidatingProxy.baz();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -478,10 +480,10 @@ public abstract class AbstractMethodValidationTest {
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must be greater than or equal to 10" );
 			assertMethod( constraintViolation, "baz" );
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
-			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getPropertyPath().toString(), "baz.<return value>" );
-			assertEquals( constraintViolation.getLeafBean(), customerRepository );
+			assertEquals( constraintViolation.getLeafBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getInvalidValue(), 9 );
 			assertEquals( constraintViolation.getExecutableParameters(), null );
 			assertEquals( constraintViolation.getExecutableReturnValue(), 9 );
@@ -491,7 +493,7 @@ public abstract class AbstractMethodValidationTest {
 	@Test
 	public void cascadingReturnValue() {
 		try {
-			customerRepository.cascadingReturnValue();
+			customerRepositoryValidatingProxy.cascadingReturnValue();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -510,7 +512,7 @@ public abstract class AbstractMethodValidationTest {
 			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
 			assertMethod( constraintViolation, "cascadingReturnValue" );
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
-			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
@@ -526,7 +528,7 @@ public abstract class AbstractMethodValidationTest {
 	@Test
 	public void cascadingReturnValueFromSuperType() {
 		try {
-			customerRepository.overriddenMethodWithCascadingReturnValue();
+			customerRepositoryValidatingProxy.overriddenMethodWithCascadingReturnValue();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -546,7 +548,7 @@ public abstract class AbstractMethodValidationTest {
 			assertMethod( constraintViolation, "overriddenMethodWithCascadingReturnValue" );
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 
-			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
@@ -562,7 +564,7 @@ public abstract class AbstractMethodValidationTest {
 	@Test
 	public void cascadingIterableReturnValue() {
 		try {
-			customerRepository.cascadingIterableReturnValue();
+			customerRepositoryValidatingProxy.cascadingIterableReturnValue();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -587,7 +589,7 @@ public abstract class AbstractMethodValidationTest {
 					"cascadingIterableReturnValue.<return value>[1].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getLeafBean(), new Customer( null ) );
 			assertEquals( constraintViolation.getInvalidValue(), null );
 			assertEquals( constraintViolation.getExecutableParameters(), null );
@@ -598,7 +600,7 @@ public abstract class AbstractMethodValidationTest {
 	@Test
 	public void cascadingMapReturnValue() {
 		try {
-			customerRepository.cascadingMapReturnValue();
+			customerRepositoryValidatingProxy.cascadingMapReturnValue();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -627,7 +629,7 @@ public abstract class AbstractMethodValidationTest {
 					"cascadingMapReturnValue.<return value>[Bob].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getLeafBean(), customer );
 			assertEquals( constraintViolation.getInvalidValue(), null );
 			assertEquals( constraintViolation.getExecutableParameters(), null );
@@ -638,7 +640,7 @@ public abstract class AbstractMethodValidationTest {
 	@Test
 	public void cascadingArrayReturnValue() {
 		try {
-			customerRepository.cascadingArrayReturnValue();
+			customerRepositoryValidatingProxy.cascadingArrayReturnValue();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -663,7 +665,7 @@ public abstract class AbstractMethodValidationTest {
 					"cascadingArrayReturnValue.<return value>[1].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getLeafBean(), new Customer( null ) );
 			assertEquals( constraintViolation.getInvalidValue(), null );
 			assertEquals( constraintViolation.getExecutableParameters(), null );
@@ -674,7 +676,7 @@ public abstract class AbstractMethodValidationTest {
 	@Test
 	public void overridingMethodStrengthensReturnValueConstraint() {
 		try {
-			customerRepository.overriddenMethodWithReturnValueConstraint();
+			customerRepositoryValidatingProxy.overriddenMethodWithReturnValueConstraint();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -729,13 +731,13 @@ public abstract class AbstractMethodValidationTest {
 
 	@Test
 	public void methodValidationSucceedsAsNoConstraintOfValidatedGroupAreViolated() {
-		customerRepository.parameterConstraintInGroup( null );
+		customerRepositoryValidatingProxy.parameterConstraintInGroup( null );
 	}
 
 	@Test(expectedExceptions = ConstraintViolationException.class)
 	public void methodValidationFailsAsConstraintOfValidatedGroupIsViolated() {
 		createProxy( CustomerRepository.ValidationGroup.class );
-		customerRepository.parameterConstraintInGroup( null );
+		customerRepositoryValidatingProxy.parameterConstraintInGroup( null );
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000132.*")
@@ -750,7 +752,7 @@ public abstract class AbstractMethodValidationTest {
 	@TestForIssue(jiraKey = "HV-601")
 	@Test(expectedExceptions = ConstraintViolationException.class)
 	public void shouldValidateGetterLikeNamedMethodWithParameter() {
-		customerRepository.getFoo( "" );
+		customerRepositoryValidatingProxy.getFoo( "" );
 	}
 
 	@Test
@@ -761,7 +763,7 @@ public abstract class AbstractMethodValidationTest {
 
 		try {
 			//when
-			customerRepository.methodWithCrossParameterConstraint( startDate, endDate );
+			customerRepositoryValidatingProxy.methodWithCrossParameterConstraint( startDate, endDate );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch (ConstraintViolationException e) {
@@ -778,8 +780,8 @@ public abstract class AbstractMethodValidationTest {
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getConstraintDescriptor().getAnnotation().annotationType(), ConsistentDateParameters.class );
 			assertEquals( constraintViolation.getInvalidValue(), new Object[] { startDate, endDate } );
-			assertEquals( constraintViolation.getLeafBean(), customerRepository );
-			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getLeafBean(), customerRepositoryOriginalBean );
+			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { startDate, endDate } );
 			assertEquals( constraintViolation.getExecutableReturnValue(), null );
@@ -795,7 +797,7 @@ public abstract class AbstractMethodValidationTest {
 
 	@Test
 	public void methodValidationSucceeds() {
-		customerRepository.findCustomerByName( "Bob" );
+		customerRepositoryValidatingProxy.findCustomerByName( "Bob" );
 	}
 
 	protected void assertMethod(ConstraintViolation<?> constraintViolation, String methodName, Class<?>... parameterTypes) {
