@@ -1,6 +1,25 @@
 Hibernate Validator Changelog
 =============================
 
+6.1.6.Final (30-09-2020)
+-------------------------
+
+** Bug
+    * HV-1804 - translations - Fix Dutch translation for @Size constraint
+    * HV-1797 - validators   - Validation on classes with a bidirectional relationship cause stack overflow on 6.1.x
+    * HV-1761 - engine       - Interpolation of primitive arrays causes a ClassCastException
+
+** Improvement
+    * HV-1782 - translations - Remove trailing dot from @Max constraint German translation
+
+** New Feature
+    * HV-1780 - validators   - Add @Normalized contraint that validates if text is normalized in a given form
+
+** Task
+    * HV-1803 - tests        - Move the tests to log4j2
+    * HV-1802 - tests        - Update ByteBuddy test dependency to 1.10.16
+    * HV-1795 - build        - Remove link to JavaMoney javadoc
+
 6.1.5.Final (06-05-2020)
 -------------------------
 
