@@ -145,9 +145,9 @@ stage('Configure') {
 			],
 			wildflyTck: [
 					new WildFlyTckBuildEnvironment(javaVersion: '8', buildJdkTool: 'OracleJDK8 Latest',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new WildFlyTckBuildEnvironment(javaVersion: '11', buildJdkTool: 'OpenJDK 11 Latest',
-							condition: TestCondition.AFTER_MERGE)
+							condition: TestCondition.ON_DEMAND)
 			]
 	])
 
