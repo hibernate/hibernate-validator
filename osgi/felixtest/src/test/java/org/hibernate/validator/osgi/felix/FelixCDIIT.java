@@ -14,6 +14,8 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
 import org.testng.annotations.Test;
 
 import com.example.cdi.MyBean;
@@ -27,11 +29,13 @@ public class FelixCDIIT extends Arquillian {
 
 	@Deployment
 	public static Archive<?> deployment() {
+		PomEquippedResolveStage pom = Maven.resolver().loadPomFromFile( "pom.xml" );
 		WebArchive war = create( WebArchive.class )
 				.addClasses(
 						MyBean.class,
 						ValidNumber.class,
-						ValidNumberValidator.class );
+						ValidNumberValidator.class )
+				.addAsLibraries( pom.resolve( "org.testng:testng" ).withTransitivity().asFile() );
 
 		return war;
 	}
