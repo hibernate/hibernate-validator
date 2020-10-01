@@ -175,7 +175,7 @@
         <apache.karaf.version>4.2.0</apache.karaf.version>
         <osgi-core.version>6.0.0</osgi-core.version>
         <payara.version>5.181</payara.version>
-        <payara-arquillian.version>1.0.Beta3</payara-arquillian.version>
+        <payara-arquillian.version>2.3.1</payara-arquillian.version>
 
         <puppycrawl.checkstyle.version>8.1</puppycrawl.checkstyle.version>
 
