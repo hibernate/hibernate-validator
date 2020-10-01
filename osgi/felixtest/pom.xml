@@ -75,7 +75,7 @@
         </dependency>
         <dependency>
             <groupId>fish.payara.arquillian</groupId>
-            <artifactId>arquillian-payara-server-4-managed</artifactId> 
+            <artifactId>arquillian-payara-server-managed</artifactId>
             <version>${version.fish.payara.arquillian}</version>
             <scope>test</scope>
         </dependency>
