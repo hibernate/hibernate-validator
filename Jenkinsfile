@@ -304,7 +304,7 @@ stage('Default build') {
 					mvn clean \
 					--fail-at-end \
 					${deploySnapshot ? "\
-							deploy \
+							deploy -DdeployAtEnd=true \
 					" : "\
 							install \
 					"} \
