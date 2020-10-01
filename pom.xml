@@ -215,6 +215,13 @@
             -Dmaven.repo.local=${settings.localRepository}
         </maven-surefire-plugin.shrinkwrap>
 
+        <!--
+            Should be set from the command line.
+            Used by CI jobs that execute tests in multiple environments.
+            Allows distinguishing between multiple executions of the same test in test reports.
+         -->
+        <surefire.environment>default</surefire.environment>
+
         <!-- add-opens options required for Arquillian and WildFly -->
         <arquillian.wildfly.jvm.args.add-opens></arquillian.wildfly.jvm.args.add-opens>
         <arquillian.wildfly.jvm.args.add-modules></arquillian.wildfly.jvm.args.add-modules>
@@ -682,6 +689,7 @@
                             <include>**/*Test.java</include>
                         </includes>
                         <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.shrinkwrap}</argLine>
+                        <reportNameSuffix>${surefire.environment}</reportNameSuffix>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -706,6 +714,7 @@
                     <version>${maven-surefire-plugin.version}</version>
                     <configuration>
                         <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.shrinkwrap} ${maven-surefire-plugin.argLine.add-opens}</argLine>
+                        <reportNameSuffix>${surefire.environment}</reportNameSuffix>
                     </configuration>
                 </plugin>
                 <plugin>
