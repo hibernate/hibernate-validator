@@ -80,11 +80,13 @@ grant codeBase "file:${localRepository}/org/hibernate/beanvalidation/tck/-" {
 
 // Ideally, this domain should have no permissions at all; Only specifically enabling some API calls done by the BV TCK
 // tests (which do not use privileged actions for these)
+// and by TestNG (which does not use privileged actions either).
 grant codeBase "file:${project.build.directory}/classes" {
     permission java.util.PropertyPermission "validation.provider", "read";
     permission java.io.FilePermission "${localRepository}/org/hibernate/beanvalidation/tck/beanvalidation-tck-tests/${version.org.hibernate.beanvalidation.tck}/beanvalidation-tck-tests-${version.org.hibernate.beanvalidation.tck}.jar", "read";
     permission java.util.PropertyPermission "user.language", "write";
     permission org.hibernate.validator.HibernateValidatorPermission "accessPrivateMembers";
+    permission "java.lang.reflect.ReflectPermission" "suppressAccessChecks";
 };
 
 grant codeBase "file:${project.build.directory}/test-classes" {
