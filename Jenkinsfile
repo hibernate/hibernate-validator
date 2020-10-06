@@ -309,6 +309,8 @@ stage('Default build') {
 							install \
 					"} \
 					-Pdist \
+					-Psigtest \
+					-Pjqassistant \
 					${enableDefaultBuildIT ? '' : '-DskipITs'} \
 					${toTestJdkArg(environments.content.jdk.default)} \
 			"""
