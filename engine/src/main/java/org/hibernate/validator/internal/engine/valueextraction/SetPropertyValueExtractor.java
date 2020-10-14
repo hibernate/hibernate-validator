@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.valueextraction;
 
+import java.util.Optional;
 import java.util.Set;
 
 import jakarta.validation.valueextraction.ExtractedValue;
@@ -29,7 +30,8 @@ import javafx.beans.value.ObservableValue;
 @IgnoreForbiddenApisErrors(reason = "Usage of JavaFX classes")
 class SetPropertyValueExtractor implements ValueExtractor<SetProperty<@ExtractedValue ?>> {
 
-	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new SetPropertyValueExtractor() );
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new SetPropertyValueExtractor(), SetProperty.class,
+			SetProperty.class.getTypeParameters()[0], false, Optional.empty() );
 
 	private SetPropertyValueExtractor() {
 	}
