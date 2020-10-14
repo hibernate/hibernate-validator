@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.valueextraction;
 
+import java.util.Optional;
 import java.util.OptionalLong;
 
 import javax.validation.valueextraction.ExtractedValue;
@@ -18,7 +19,8 @@ import javax.validation.valueextraction.ValueExtractor;
 @UnwrapByDefault
 class OptionalLongValueExtractor implements ValueExtractor<@ExtractedValue(type = Long.class) OptionalLong> {
 
-	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new OptionalLongValueExtractor() );
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new OptionalLongValueExtractor(), OptionalLong.class,
+			AnnotatedObject.INSTANCE, true, Optional.of( Long.class ) );
 
 	@Override
 	public void extractValues(OptionalLong originalValue, ValueReceiver receiver) {

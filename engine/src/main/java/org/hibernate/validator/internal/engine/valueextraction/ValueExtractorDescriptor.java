@@ -53,6 +53,19 @@ public class ValueExtractorDescriptor {
 		this.extractedType = getExtractedType( valueExtractorDefinition );
 	}
 
+	ValueExtractorDescriptor(ValueExtractor<?> valueExtractor,
+			Class<?> containerType,
+			TypeVariable<?> extractedTypeParameter,
+			boolean unwrapByDefault,
+			Optional<Class<?>> extractedType) {
+		this.key = new Key(
+				containerType,
+				extractedTypeParameter );
+		this.valueExtractor = valueExtractor;
+		this.unwrapByDefault = unwrapByDefault;
+		this.extractedType = extractedType;
+	}
+
 	@SuppressWarnings("rawtypes")
 	private static TypeVariable<?> getExtractedTypeParameter(AnnotatedParameterizedType valueExtractorDefinition,
 			Class<? extends ValueExtractor> extractorImplementationType) {

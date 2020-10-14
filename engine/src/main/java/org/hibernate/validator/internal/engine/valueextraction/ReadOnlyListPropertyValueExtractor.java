@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.engine.valueextraction;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
@@ -29,7 +30,8 @@ import javafx.beans.value.ObservableValue;
 @IgnoreForbiddenApisErrors(reason = "Usage of JavaFX classes")
 class ReadOnlyListPropertyValueExtractor implements ValueExtractor<ReadOnlyListProperty<@ExtractedValue ?>> {
 
-	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new ReadOnlyListPropertyValueExtractor() );
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new ReadOnlyListPropertyValueExtractor(), ReadOnlyListProperty.class,
+			ReadOnlyListProperty.class.getTypeParameters()[0], false, Optional.empty() );
 
 	private ReadOnlyListPropertyValueExtractor() {
 	}
