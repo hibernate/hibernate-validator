@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.engine.valueextraction;
 
 import java.util.Map;
+import java.util.Optional;
 
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
@@ -29,7 +30,8 @@ import javafx.beans.value.ObservableValue;
 @IgnoreForbiddenApisErrors(reason = "Usage of JavaFX classes")
 class ReadOnlyMapPropertyValueExtractor implements ValueExtractor<ReadOnlyMapProperty<?, @ExtractedValue ?>> {
 
-	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new ReadOnlyMapPropertyValueExtractor() );
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new ReadOnlyMapPropertyValueExtractor(), ReadOnlyMapProperty.class,
+			ReadOnlyMapProperty.class.getTypeParameters()[1], false, Optional.empty() );
 
 	private ReadOnlyMapPropertyValueExtractor() {
 	}

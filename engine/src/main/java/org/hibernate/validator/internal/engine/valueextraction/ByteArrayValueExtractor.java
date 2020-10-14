@@ -6,14 +6,17 @@
  */
 package org.hibernate.validator.internal.engine.valueextraction;
 
+import java.util.Optional;
+
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 
-class ByteArrayValueExtractor implements ValueExtractor<byte @ExtractedValue[]> {
+class ByteArrayValueExtractor implements ValueExtractor<byte @ExtractedValue []> {
 
-	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new ByteArrayValueExtractor() );
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new ByteArrayValueExtractor(), byte[].class,
+			new ArrayElement( byte[].class ), false, Optional.empty() );
 
 	private ByteArrayValueExtractor() {
 	}
