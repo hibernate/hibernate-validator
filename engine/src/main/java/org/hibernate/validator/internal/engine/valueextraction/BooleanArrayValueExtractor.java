@@ -6,14 +6,17 @@
  */
 package org.hibernate.validator.internal.engine.valueextraction;
 
-import jakarta.validation.valueextraction.ExtractedValue;
-import jakarta.validation.valueextraction.ValueExtractor;
+import java.util.Optional;
 
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 
+import jakarta.validation.valueextraction.ExtractedValue;
+import jakarta.validation.valueextraction.ValueExtractor;
+
 class BooleanArrayValueExtractor implements ValueExtractor<boolean @ExtractedValue[]> {
 
-	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new BooleanArrayValueExtractor() );
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new BooleanArrayValueExtractor(), boolean[].class,
+			new ArrayElement( boolean[].class ), false, Optional.empty() );
 
 	private BooleanArrayValueExtractor() {
 	}

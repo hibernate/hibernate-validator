@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.engine.valueextraction;
 
 import java.util.Map;
+import java.util.Optional;
 
 import jakarta.validation.valueextraction.ExtractedValue;
 import jakarta.validation.valueextraction.ValueExtractor;
@@ -15,7 +16,8 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 class MapValueExtractor implements ValueExtractor<Map<?, @ExtractedValue ?>> {
 
-	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new MapValueExtractor() );
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new MapValueExtractor(), Map.class, Map.class.getTypeParameters()[1],
+			false, Optional.empty() );
 
 	private MapValueExtractor() {
 	}

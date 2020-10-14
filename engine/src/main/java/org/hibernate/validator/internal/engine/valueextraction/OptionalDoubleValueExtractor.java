@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.valueextraction;
 
+import java.util.Optional;
 import java.util.OptionalDouble;
 
 import jakarta.validation.valueextraction.ExtractedValue;
@@ -18,7 +19,8 @@ import jakarta.validation.valueextraction.ValueExtractor;
 @UnwrapByDefault
 class OptionalDoubleValueExtractor implements ValueExtractor<@ExtractedValue(type = Double.class) OptionalDouble> {
 
-	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new OptionalDoubleValueExtractor() );
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new OptionalDoubleValueExtractor(), OptionalDouble.class,
+			AnnotatedObject.INSTANCE, true, Optional.of( Double.class ) );
 
 	@Override
 	public void extractValues(OptionalDouble originalValue, ValueReceiver receiver) {
