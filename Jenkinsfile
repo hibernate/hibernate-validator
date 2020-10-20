@@ -141,9 +141,8 @@ stage('Configure') {
 					// Disabled because of https://bugs.openjdk.java.net/browse/JDK-8253566
 					new JdkBuildEnvironment(version: '15', buildJdkTool: 'OpenJDK 15 Latest',
 							condition: TestCondition.ON_DEMAND),
-					// Disabled because of https://bugs.openjdk.java.net/browse/JDK-8253566
 					new JdkBuildEnvironment(version: '16', buildJdkTool: 'OpenJDK 16 Latest',
-							condition: TestCondition.ON_DEMAND)
+							condition: TestCondition.AFTER_MERGE)
 			],
 			wildflyTck: [
 					new WildFlyTckBuildEnvironment(javaVersion: '8', buildJdkTool: 'OracleJDK8 Latest',
