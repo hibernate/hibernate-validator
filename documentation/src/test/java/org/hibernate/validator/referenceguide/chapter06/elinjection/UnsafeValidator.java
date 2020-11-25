@@ -1,5 +1,6 @@
 package org.hibernate.validator.referenceguide.chapter06.elinjection;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.referenceguide.chapter06.constraintvalidatorpayload.ZipCode;
 
 import javax.validation.ConstraintValidator;
@@ -16,9 +17,15 @@ public class UnsafeValidator implements ConstraintValidator<ZipCode, String> {
 
 		context.disableDefaultConstraintViolation();
 
+		HibernateConstraintValidatorContext hibernateContext = context.unwrap(
+				HibernateConstraintValidatorContext.class );
+		hibernateContext.disableDefaultConstraintViolation();
+
 		if ( isInvalid( value ) ) {
-			context
+			hibernateContext
+					// THIS IS UNSAFE, DO NOT COPY THIS EXAMPLE
 					.buildConstraintViolationWithTemplate( value + " is not a valid ZIP code" )
+					.enableExpressionLanguage()
 					.addConstraintViolation();
 
 			return false;

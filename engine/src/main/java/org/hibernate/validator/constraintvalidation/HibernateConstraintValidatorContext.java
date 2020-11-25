@@ -21,6 +21,9 @@ import org.hibernate.validator.Incubating;
  */
 public interface HibernateConstraintValidatorContext extends ConstraintValidatorContext {
 
+	@Override
+	HibernateConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate);
+
 	/**
 	 * Allows to set an additional named parameter which can be interpolated in the constraint violation message. The
 	 * variable will be available for interpolation for all constraint violations generated for this constraint.

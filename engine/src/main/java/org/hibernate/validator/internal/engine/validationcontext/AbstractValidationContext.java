@@ -229,6 +229,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		String messageTemplate = constraintViolationCreationContext.getMessage();
 		String interpolatedMessage = interpolate(
 				messageTemplate,
+				constraintViolationCreationContext.isExpressionLanguageEnabled(),
 				valueContext.getCurrentValidatedValue(),
 				descriptor,
 				constraintViolationCreationContext.getPath(),
@@ -295,6 +296,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 	private String interpolate(
 			String messageTemplate,
+			boolean expressionLanguageEnabled,
 			Object validatedValue,
 			ConstraintDescriptor<?> descriptor,
 			Path path,
@@ -306,7 +308,8 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 				getRootBeanClass(),
 				path,
 				messageParameters,
-				expressionVariables
+				expressionVariables,
+				expressionLanguageEnabled
 		);
 
 		try {
