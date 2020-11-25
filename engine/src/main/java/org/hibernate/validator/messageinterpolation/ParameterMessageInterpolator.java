@@ -52,7 +52,7 @@ public class ParameterMessageInterpolator extends AbstractMessageInterpolator {
 	}
 
 	@Override
-	public String interpolate(Context context, Locale locale, String term) {
+	protected String interpolate(Context context, Locale locale, String term) {
 		if ( InterpolationTerm.isElExpression( term ) ) {
 			LOG.warnElIsUnsupported( term );
 			return term;

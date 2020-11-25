@@ -419,6 +419,55 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/dynamicpay
 ----
 ====
 
+[[el-features]]
+=== Enabling Expression Language features
+
+Hibernate Validator restricts the Expression Language features exposed by default.
+
+For this purpose, we define several feature levels in `ExpressionLanguageFeatureLevel`:
+
+* `NONE`: Expression Language interpolation is fully disabled.
+* `VARIABLES`: Allow interpolation of the variables injected via `addExpressionVariable()`, resources bundles and usage of the `formatter` object.
+* `BEAN_PROPERTIES`: Allow everything `VARIABLES` allows plus the interpolation of bean properties.
+* `BEAN_METHODS`: Also allow execution of bean methods. This can lead to serious security issues, including arbitrary code execution if not carefully handled.
+
+Depending on the context, the features we expose are different:
+
+* For constraints, the default level is `BEAN_PROPERTIES`.
+  For all the built-in constraint messages to be correctly interpolated, you need at least the `VARIABLES` level.
+* For custom violations, created via the `ConstraintValidatorContext`, Expression Language is disabled by default.
+  You can enable it for specific custom violations and, when enabled, it will default to `VARIABLES`.
+
+Hibernate Validator provides ways to override these defaults when boostrapping the `ValidatorFactory`.
+
+To change the Expression Language feature level for constraints, use the following:
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/el/ElFeaturesTest.java[tags=constraints]
+----
+
+To change the Expression Language feature level for custom violations, use the following:
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/el/ElFeaturesTest.java[tags=customViolations]
+----
+
+[CAUTION]
+====
+Doing this will automatically enable Expression Language for all the custom violations in your application.
+
+It should only be used for compatibility and to ease the migration from older Hibernate Validator versions.
+====
+
+These levels can also be defined using the following properties:
+
+* `hibernate.validator.constraint_expression_language_feature_level`
+* `hibernate.validator.custom_violation_expression_language_feature_level`
+
+Accepted values for these properties are: `none`, `variables`, `bean-properties` and `bean-methods`.
+
 [[non-el-message-interpolator]]
 === `ParameterMessageInterpolator`
 
@@ -552,7 +601,7 @@ You can, however, update the parameters between invocations of
 * set an arbitrary dynamic payload - see <<section-dynamic-payload>>
 
 By default, Expression Language interpolation is **disabled** for custom violations,
-this to avoid arbitrary code execution or sensitive data leak if user input is not properly escaped.
+this to avoid arbitrary code execution or sensitive data leak if message templates are built from improperly escaped user input.
 
 It is possible to enable Expression Language for a given custom violation by using `enableExpressionLanguage()` as shown in the example below:
 
@@ -563,9 +612,21 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/elinjectio
 
 In this case, the message template will be interpolated by the Expression Language engine.
 
+By default, only variables interpolation is enabled when enabling Expression Language.
+
+You can enable more features by using `HibernateConstraintViolationBuilder#enableExpressionLanguage(ExpressionLanguageFeatureLevel level)`.
+
+We define several levels of features for Expression Language interpolation:
+
+* `NONE`: Expression Language interpolation is fully disabled - this is the default for custom violations.
+* `VARIABLES`: Allow interpolation of the variables injected via `addExpressionVariable()`, resources bundles and usage of the `formatter` object.
+* `BEAN_PROPERTIES`: Allow everything `VARIABLES` allows plus the interpolation of bean properties.
+* `BEAN_METHODS`: Also allow execution of bean methods. This can lead to serious security issues, including arbitrary code execution if not carefully handled.
+
 [CAUTION]
 ====
-Using `addExpressionVariable()` is the only safe way to inject a variable into an expression.
+Using `addExpressionVariable()` is the only safe way to inject a variable into an expression
+and it's especially important if you use the `BEAN_PROPERTIES` or `BEAN_METHODS` feature levels.
 
 If you inject user input by simply concatenating the user input in the message,
 you will allow potential arbitrary code execution and sensitive data leak:
@@ -596,7 +657,7 @@ bundle. If you have any other use cases, let us know.
 ====
 [source, JAVA, indent=0]
 ----
-include::{engine-sourcedir}/org/hibernate/validator/messageinterpolation/HibernateMessageInterpolatorContext.java[lines=18..26]
+include::{engine-sourcedir}/org/hibernate/validator/messageinterpolation/HibernateMessageInterpolatorContext.java[lines=22..58]
 ----
 ====
 
