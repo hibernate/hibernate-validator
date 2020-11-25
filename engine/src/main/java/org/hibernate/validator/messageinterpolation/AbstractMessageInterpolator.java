@@ -416,7 +416,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			// HibernateMessageInterpolatorContext
 			// but it can be a spec Context in the Jakarta Bean Validation TCK.
 			if ( !( context instanceof HibernateMessageInterpolatorContext )
-					|| ( (HibernateMessageInterpolatorContext) context ).isExpressionLanguageEnabled() ) {
+					|| ( (HibernateMessageInterpolatorContext) context ).getExpressionLanguageFeatureLevel() != ExpressionLanguageFeatureLevel.NONE ) {
 				resolvedMessage = interpolateExpression(
 						new TokenIterator( getParameterTokens( resolvedMessage, tokenizedELMessages, InterpolationTermType.EL ) ),
 						context,
@@ -527,7 +527,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		return tokenIterator.getInterpolatedMessage();
 	}
 
-	public abstract String interpolate(Context context, Locale locale, String term);
+	protected abstract String interpolate(Context context, Locale locale, String term);
 
 	private String resolveParameter(String parameterName, ResourceBundle bundle, Locale locale, boolean recursive)
 			throws MessageDescriptorFormatException {

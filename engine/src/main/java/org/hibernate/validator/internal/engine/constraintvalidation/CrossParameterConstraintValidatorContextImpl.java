@@ -16,6 +16,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintViolation
 import org.hibernate.validator.constraintvalidation.HibernateCrossParameterConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 
 /**
  * @author Marko Bekhta
@@ -24,8 +25,15 @@ public class CrossParameterConstraintValidatorContextImpl extends ConstraintVali
 
 	private final List<String> methodParameterNames;
 
-	public CrossParameterConstraintValidatorContextImpl(List<String> methodParameterNames, ClockProvider clockProvider, PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor, Object constraintValidatorPayload) {
-		super( clockProvider, propertyPath, constraintDescriptor, constraintValidatorPayload );
+	public CrossParameterConstraintValidatorContextImpl(List<String> methodParameterNames,
+			ClockProvider clockProvider,
+			PathImpl propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor,
+			Object constraintValidatorPayload,
+			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
+			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel) {
+		super( clockProvider, propertyPath, constraintDescriptor, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
+				customViolationExpressionLanguageFeatureLevel );
 		Contracts.assertTrue( propertyPath.getLeafNode().getKind() == ElementKind.CROSS_PARAMETER, "Context can only be used for corss parameter validation" );
 		this.methodParameterNames = methodParameterNames;
 	}

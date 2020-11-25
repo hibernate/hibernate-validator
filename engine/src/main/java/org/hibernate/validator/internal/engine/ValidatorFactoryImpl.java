@@ -12,6 +12,8 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineBeanMetaDataClassNormalizer;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintMappings;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintValidatorPayload;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintExpressionLanguageFeatureLevel;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineCustomViolationExpressionLanguageFeatureLevel;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineExternalClassLoader;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFast;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineScriptEvaluatorFactory;
@@ -156,7 +158,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				determineScriptEvaluatorFactory( configurationState, properties, externalClassLoader ),
 				determineFailFast( hibernateSpecificConfig, properties ),
 				determineTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
-				determineConstraintValidatorPayload( hibernateSpecificConfig )
+				determineConstraintValidatorPayload( hibernateSpecificConfig ),
+				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
+				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties )
 		);
 
 		ConstraintValidatorManager constraintValidatorManager = new ConstraintValidatorManagerImpl(

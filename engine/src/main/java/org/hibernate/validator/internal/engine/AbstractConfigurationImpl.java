@@ -57,6 +57,7 @@ import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLo
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.hibernate.validator.internal.xml.config.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.config.ValidationXmlParser;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
@@ -129,6 +130,8 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private Locale defaultLocale = Locale.getDefault();
 	private LocaleResolver localeResolver;
 	private BeanMetaDataClassNormalizer beanMetaDataClassNormalizer;
+	private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
+	private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 
 	protected AbstractConfigurationImpl(BootstrapState state) {
 		this();
@@ -627,6 +630,35 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		return beanMetaDataClassNormalizer;
 	}
 
+	@Override
+	public T constraintExpressionLanguageFeatureLevel(ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel) {
+		if ( LOG.isDebugEnabled() ) {
+			if ( expressionLanguageFeatureLevel != null ) {
+				LOG.debug( "Setting ExpressionLanguageFeatureLevel for constraints to " + expressionLanguageFeatureLevel.name() );
+			}
+		}
+		this.constraintExpressionLanguageFeatureLevel = expressionLanguageFeatureLevel;
+		return thisAsT();
+	}
+
+	public ExpressionLanguageFeatureLevel getConstraintExpressionLanguageFeatureLevel() {
+		return constraintExpressionLanguageFeatureLevel;
+	}
+
+	@Override
+	public T customViolationExpressionLanguageFeatureLevel(ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel) {
+		if ( LOG.isDebugEnabled() ) {
+			if ( expressionLanguageFeatureLevel != null ) {
+				LOG.debug( "Setting ExpressionLanguageFeatureLevel for custom violations to " + expressionLanguageFeatureLevel.name() );
+			}
+		}
+		this.customViolationExpressionLanguageFeatureLevel = expressionLanguageFeatureLevel;
+		return thisAsT();
+	}
+
+	public ExpressionLanguageFeatureLevel getCustomViolationExpressionLanguageFeatureLevel() {
+		return customViolationExpressionLanguageFeatureLevel;
+	}
 
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {
 		return programmaticMappings;

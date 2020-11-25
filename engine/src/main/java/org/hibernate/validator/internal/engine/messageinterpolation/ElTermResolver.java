@@ -10,14 +10,19 @@ import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.el.ELContext;
 import javax.el.ELException;
 import javax.el.ExpressionFactory;
+import javax.el.MethodNotFoundException;
 import javax.el.PropertyNotFoundException;
 import javax.el.ValueExpression;
 import javax.validation.MessageInterpolator;
 
+import org.hibernate.validator.internal.engine.messageinterpolation.el.BeanMethodsELContext;
+import org.hibernate.validator.internal.engine.messageinterpolation.el.BeanPropertiesElContext;
+import org.hibernate.validator.internal.engine.messageinterpolation.el.DisabledFeatureELException;
 import org.hibernate.validator.internal.engine.messageinterpolation.el.RootResolver;
-import org.hibernate.validator.internal.engine.messageinterpolation.el.SimpleELContext;
+import org.hibernate.validator.internal.engine.messageinterpolation.el.VariablesELContext;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
@@ -27,6 +32,7 @@ import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolator
  *
  * @author Hardy Ferentschik
  * @author Adam Stawicki
+ * @author Guillaume Smet
  */
 public class ElTermResolver implements TermResolver {
 
@@ -61,13 +67,21 @@ public class ElTermResolver implements TermResolver {
 	@Override
 	public String interpolate(MessageInterpolator.Context context, String expression) {
 		String resolvedExpression = expression;
-		SimpleELContext elContext = new SimpleELContext( expressionFactory );
+
+		ELContext elContext = getElContext( context );
+
 		try {
 			ValueExpression valueExpression = bindContextValues( expression, context, elContext );
 			resolvedExpression = (String) valueExpression.getValue( elContext );
 		}
+		catch (DisabledFeatureELException dfee) {
+			LOG.disabledFeatureInExpressionLanguage( expression, dfee );
+		}
 		catch (PropertyNotFoundException pnfe) {
 			LOG.unknownPropertyInExpressionLanguage( expression, pnfe );
+		}
+		catch (MethodNotFoundException mnfe) {
+			LOG.unknownMethodInExpressionLanguage( expression, mnfe );
 		}
 		catch (ELException e) {
 			LOG.errorInExpressionLanguage( expression, e );
@@ -79,7 +93,26 @@ public class ElTermResolver implements TermResolver {
 		return resolvedExpression;
 	}
 
-	private ValueExpression bindContextValues(String messageTemplate, MessageInterpolator.Context messageInterpolatorContext, SimpleELContext elContext) {
+	private ELContext getElContext(MessageInterpolator.Context context) {
+		if ( !( context instanceof HibernateMessageInterpolatorContext ) ) {
+			return new VariablesELContext( expressionFactory );
+		}
+
+		switch ( ( (HibernateMessageInterpolatorContext) context ).getExpressionLanguageFeatureLevel() ) {
+			case NONE:
+				throw LOG.expressionsNotResolvedWhenExpressionLanguageFeaturesDisabled();
+			case VARIABLES:
+				return new VariablesELContext( expressionFactory );
+			case BEAN_PROPERTIES:
+				return new BeanPropertiesElContext( expressionFactory );
+			case BEAN_METHODS:
+				return new BeanMethodsELContext( expressionFactory );
+			default:
+				throw LOG.expressionsLanguageFeatureLevelNotSupported();
+		}
+	}
+
+	private ValueExpression bindContextValues(String messageTemplate, MessageInterpolator.Context messageInterpolatorContext, ELContext elContext) {
 		// bind the validated value
 		ValueExpression valueExpression = expressionFactory.createValueExpression(
 				messageInterpolatorContext.getValidatedValue(),
@@ -104,7 +137,7 @@ public class ElTermResolver implements TermResolver {
 		return expressionFactory.createValueExpression( elContext, messageTemplate, String.class );
 	}
 
-	private void addVariablesToElContext(SimpleELContext elContext, Map<String, Object> variables) {
+	private void addVariablesToElContext(ELContext elContext, Map<String, Object> variables) {
 		for ( Map.Entry<String, Object> entry : variables.entrySet() ) {
 			ValueExpression valueExpression = expressionFactory.createValueExpression( entry.getValue(), Object.class );
 			elContext.getVariableMapper().setVariable( entry.getKey(), valueExpression );

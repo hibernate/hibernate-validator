@@ -35,6 +35,7 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 
 /**
  * Context object keeping track of all required data for a validation call.
@@ -229,7 +230,8 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		String messageTemplate = constraintViolationCreationContext.getMessage();
 		String interpolatedMessage = interpolate(
 				messageTemplate,
-				constraintViolationCreationContext.isExpressionLanguageEnabled(),
+				constraintViolationCreationContext.getExpressionLanguageFeatureLevel(),
+				constraintViolationCreationContext.isCustomViolation(),
 				valueContext.getCurrentValidatedValue(),
 				descriptor,
 				constraintViolationCreationContext.getPath(),
@@ -287,7 +289,9 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 				validatorScopedContext.getClockProvider(),
 				path,
 				constraintDescriptor,
-				validatorScopedContext.getConstraintValidatorPayload()
+				validatorScopedContext.getConstraintValidatorPayload(),
+				validatorScopedContext.getConstraintExpressionLanguageFeatureLevel(),
+				validatorScopedContext.getCustomViolationExpressionLanguageFeatureLevel()
 		);
 	}
 
@@ -296,7 +300,8 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 	private String interpolate(
 			String messageTemplate,
-			boolean expressionLanguageEnabled,
+			ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel,
+			boolean customViolation,
 			Object validatedValue,
 			ConstraintDescriptor<?> descriptor,
 			Path path,
@@ -309,7 +314,8 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 				path,
 				messageParameters,
 				expressionVariables,
-				expressionLanguageEnabled
+				expressionLanguageFeatureLevel,
+				customViolation
 		);
 
 		try {

@@ -28,6 +28,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.DefaultClockProvider;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.testutil.DummyTraversableResolver;
 import org.hibernate.validator.testutil.ValidationInvocationHandler;
 
@@ -235,6 +236,7 @@ public final class ValidatorUtil {
 	}
 
 	public static HibernateConstraintValidatorContext getConstraintValidatorContext() {
-		return new ConstraintValidatorContextImpl( DefaultClockProvider.INSTANCE, null, null, null );
+		return new ConstraintValidatorContextImpl( DefaultClockProvider.INSTANCE, null, null, null, ExpressionLanguageFeatureLevel.BEAN_PROPERTIES,
+				ExpressionLanguageFeatureLevel.NONE );
 	}
 }

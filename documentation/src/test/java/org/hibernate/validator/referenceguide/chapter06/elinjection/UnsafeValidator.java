@@ -23,8 +23,8 @@ public class UnsafeValidator implements ConstraintValidator<ZipCode, String> {
 
 		if ( isInvalid( value ) ) {
 			hibernateContext
- 					// THIS IS UNSAFE, DO NOT COPY THIS EXAMPLE
- 					.buildConstraintViolationWithTemplate( value + " is not a valid ZIP code" )
+					// THIS IS UNSAFE, DO NOT COPY THIS EXAMPLE
+					.buildConstraintViolationWithTemplate( value + " is not a valid ZIP code" )
 					.enableExpressionLanguage()
 					.addConstraintViolation();
 

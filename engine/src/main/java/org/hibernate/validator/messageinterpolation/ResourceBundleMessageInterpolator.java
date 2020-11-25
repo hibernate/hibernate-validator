@@ -154,7 +154,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	}
 
 	@Override
-	public String interpolate(Context context, Locale locale, String term) {
+	protected String interpolate(Context context, Locale locale, String term) {
 		InterpolationTerm expression = new InterpolationTerm( term, locale, expressionFactory );
 		return expression.interpolate( context );
 	}

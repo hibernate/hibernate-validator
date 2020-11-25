@@ -50,9 +50,9 @@ public interface HibernateMessageInterpolatorContext extends MessageInterpolator
 	Path getPropertyPath();
 
 	/**
-	 * @return if Expression Language should be enabled if supported by the {@code MessageInterpolator}.
+	 * @return the level of features enabled for the Expression Language engine
 	 *
-	 * @return 6.1.7
+	 * @since 6.2
 	 */
-	boolean isExpressionLanguageEnabled();
+	ExpressionLanguageFeatureLevel getExpressionLanguageFeatureLevel();
 }

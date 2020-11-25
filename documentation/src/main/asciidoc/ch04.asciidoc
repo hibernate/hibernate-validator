@@ -91,6 +91,19 @@ context:
 `format(String format, Object... args)` which behaves like
 `java.util.Formatter.format(String format, Object... args)`.
 
+Expression Language is very flexible and Hibernate Validator offers several feature levels
+that you can use to enable Expression Language features through the `ExpressionLanguageFeatureLevel` enum:
+
+* `NONE`: Expression Language interpolation is fully disabled.
+* `VARIABLES`: Allow interpolation of the variables injected via `addExpressionVariable()`, resources bundles and usage of the `formatter` object.
+* `BEAN_PROPERTIES`: Allow everything `VARIABLES` allows plus the interpolation of bean properties.
+* `BEAN_METHODS`: Also allow execution of bean methods. Can be considered safe for hardcoded constraint messages but not for <<section-hibernateconstraintvalidatorcontext, custom violations>>
+  where extra care is required.
+
+The default feature level for constraint messages is `BEAN_PROPERTIES`.
+
+You can define the Expression Language feature level when <<el-features, bootstrapping the `ValidatorFactory`>>.
+
 The following section provides several examples for using EL expressions in error messages.
 
 ==== Examples
