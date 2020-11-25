@@ -510,6 +510,7 @@ custom extensions for both of these interfaces.
 [[section-custom-constraint-validator-context]]
 `HibernateConstraintValidatorContext` is a subtype of `ConstraintValidatorContext` which allows you to:
 
+* enable Expression Language interpolation for a particular custom violation - see below
 * set arbitrary parameters for interpolation via the Expression Language message interpolation
 facility using `HibernateConstraintValidatorContext#addExpressionVariable(String, Object)`
 or `HibernateConstraintValidatorContext#addMessageParameter(String, Object)`.
@@ -535,8 +536,8 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/context/My
 [NOTE]
 ====
 Apart from the syntax, the main difference between message parameters and expression variables is that message parameters
-are simply interpolated whereas expression variables are interpreted using the expression language engine.
-In practice, it should not change anything.
+are simply interpolated whereas expression variables are interpreted using the Expression Language engine.
+In practice, use message parameters if you do not need the advanced features of an Expression Language.
 ====
 +
 [NOTE]
@@ -549,6 +550,38 @@ You can, however, update the parameters between invocations of
 `ConstraintViolationBuilder#addConstraintViolation()`.
 ====
 * set an arbitrary dynamic payload - see <<section-dynamic-payload>>
+
+By default, Expression Language interpolation is **disabled** for custom violations,
+this to avoid arbitrary code execution or sensitive data leak if user input is not properly escaped.
+
+It is possible to enable Expression Language for a given custom violation by using `enableExpressionLanguage()` as shown in the example below:
+
+[source]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/elinjection/SafeValidator.java[tags=include]
+----
+
+In this case, the message template will be interpolated by the Expression Language engine.
+
+[CAUTION]
+====
+Using `addExpressionVariable()` is the only safe way to inject a variable into an expression.
+
+If you inject user input by simply concatenating the user input in the message,
+you will allow potential arbitrary code execution and sensitive data leak:
+if the user input contains valid expressions, they will be executed by the Expression Language engine.
+
+Here is an example of something you should **ABSOLUTELY NOT** do:
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/elinjection/UnsafeValidator.java[tags=include]
+----
+
+In the example above, if `value`, which might be user input, contains a valid expression,
+it will be interpolated by the Expression Language engine,
+potentially leading to unsafe behaviors.
+====
 
 ==== `HibernateMessageInterpolatorContext`
 

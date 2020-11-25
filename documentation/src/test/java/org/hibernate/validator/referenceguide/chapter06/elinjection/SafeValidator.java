@@ -23,6 +23,7 @@ public class SafeValidator implements ConstraintValidator<ZipCode, String> {
 			hibernateContext
 					.addExpressionVariable( "validatedValue", value )
 					.buildConstraintViolationWithTemplate( "${validatedValue} is not a valid ZIP code" )
+					.enableExpressionLanguage()
 					.addConstraintViolation();
 
 			return false;

@@ -45,6 +45,7 @@ public class HibernateConstraintValidatorContextTest {
 	private static final String QUESTION_2 = "What is 1+1 and what is the answer to life?";
 	private static final String QUESTION_3 = "This is a trick question";
 	private static final String QUESTION_4 = "What keywords are not allowed?";
+	private static final String QUESTION_5 = "What is 1+1 and what is the answer to life? But I won't get the right answer as Expression Language is disabled";
 
 	private static final List<String> INVALID_KEYWORDS = Lists.newArrayList( "foo", "bar", "baz" );
 
@@ -130,7 +131,7 @@ public class HibernateConstraintValidatorContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-701")
-	public void testCreatingMultipleConstraintViolationWithExpressionVariables() {
+	public void testCreatingMultipleConstraintViolationWithExpressionVariablesWithExpressionLanguageEnabled() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<ExpressionVariableFoo>> constraintViolations = validator.validate( new ExpressionVariableFoo( QUESTION_2 ) );
 
@@ -221,6 +222,18 @@ public class HibernateConstraintValidatorContextTest {
 		HibernateConstraintViolation<ExpressionVariableFoo> hibernateConstraintViolation = constraintViolation.unwrap( HibernateConstraintViolation.class );
 
 		Assert.assertNull( hibernateConstraintViolation.getDynamicPayload( Object.class ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1816")
+	public void testCreatingMultipleConstraintViolationWithExpressionVariables() {
+		Validator validator = getValidator();
+		Set<ConstraintViolation<ExpressionVariableFoo>> constraintViolations = validator.validate( new ExpressionVariableFoo( QUESTION_5 ) );
+
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( ExpressionVariableOracleConstraint.class ).withMessage( "answer 1: ${answer}" ),
+				violationOf( ExpressionVariableOracleConstraint.class ).withMessage( "answer 2: ${answer}" )
+		);
 	}
 
 	public class MessageParameterFoo {
@@ -323,13 +336,16 @@ public class HibernateConstraintValidatorContextTest {
 				createSingleConstraintViolation( hibernateContext );
 			}
 			else if ( question.equals( QUESTION_2 ) ) {
-				createMultipleConstraintViolationsUpdatingExpressionVariableValues( hibernateContext );
+				createMultipleConstraintViolationsUpdatingExpressionVariableValuesWithExpressionLanguageEnabled( hibernateContext );
 			}
 			else if ( question.equals( QUESTION_3 ) ) {
 				hibernateContext.addExpressionVariable( "answer", "${foo}" );
 			}
 			else if ( question.equals( QUESTION_4 ) ) {
 				hibernateContext.withDynamicPayload( INVALID_KEYWORDS );
+			}
+			else if ( question.equals( QUESTION_5 ) ) {
+				createMultipleConstraintViolationsUpdatingExpressionVariableValues( hibernateContext );
 			}
 			else {
 				tryingToIllegallyUseNullExpressionVariableName( hibernateContext );
@@ -341,6 +357,22 @@ public class HibernateConstraintValidatorContextTest {
 
 		private void tryingToIllegallyUseNullExpressionVariableName(HibernateConstraintValidatorContext hibernateContext) {
 			hibernateContext.addMessageParameter( null, "foo" );
+		}
+
+		private void createMultipleConstraintViolationsUpdatingExpressionVariableValuesWithExpressionLanguageEnabled(
+				HibernateConstraintValidatorContext hibernateContext) {
+			hibernateContext.disableDefaultConstraintViolation();
+
+			hibernateContext.addExpressionVariable( "answer", 2 );
+			hibernateContext.buildConstraintViolationWithTemplate( "answer 1: ${answer}" )
+					.enableExpressionLanguage()
+					.addConstraintViolation();
+
+			// resetting the expression variables
+			hibernateContext.addExpressionVariable( "answer", 42 );
+			hibernateContext.buildConstraintViolationWithTemplate( "answer 2: ${answer}" )
+					.enableExpressionLanguage()
+					.addConstraintViolation();
 		}
 
 		private void createMultipleConstraintViolationsUpdatingExpressionVariableValues(HibernateConstraintValidatorContext hibernateContext) {
