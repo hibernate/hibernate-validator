@@ -12,6 +12,7 @@ import jakarta.validation.ClockProvider;
 import jakarta.validation.ElementKind;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintViolationBuilder;
 import org.hibernate.validator.constraintvalidation.HibernateCrossParameterConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.Contracts;
@@ -30,7 +31,7 @@ public class CrossParameterConstraintValidatorContextImpl extends ConstraintVali
 	}
 
 	@Override
-	public final ConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
+	public final HibernateConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
 		return new CrossParameterConstraintViolationBuilderImpl(
 				methodParameterNames,
 				messageTemplate,
