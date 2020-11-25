@@ -102,7 +102,9 @@ public class ParameterExecutableValidationContext<T> extends AbstractValidationC
 					validatorScopedContext.getClockProvider(),
 					path,
 					constraintDescriptor,
-					validatorScopedContext.getConstraintValidatorPayload()
+					validatorScopedContext.getConstraintValidatorPayload(),
+					validatorScopedContext.getConstraintExpressionLanguageFeatureLevel(),
+					validatorScopedContext.getCustomViolationExpressionLanguageFeatureLevel()
 			);
 		}
 
@@ -110,7 +112,9 @@ public class ParameterExecutableValidationContext<T> extends AbstractValidationC
 				validatorScopedContext.getClockProvider(),
 				path,
 				constraintDescriptor,
-				validatorScopedContext.getConstraintValidatorPayload()
+				validatorScopedContext.getConstraintValidatorPayload(),
+				validatorScopedContext.getConstraintExpressionLanguageFeatureLevel(),
+				validatorScopedContext.getCustomViolationExpressionLanguageFeatureLevel()
 		);
 	}
 

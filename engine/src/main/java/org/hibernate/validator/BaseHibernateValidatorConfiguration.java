@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import jakarta.validation.Configuration;
+import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.TraversableResolver;
 import jakarta.validation.constraints.Future;
@@ -24,6 +25,7 @@ import jakarta.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
@@ -143,6 +145,28 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	String LOCALE_RESOLVER_CLASSNAME = "hibernate.validator.locale_resolver";
+
+	/**
+	 * Property for configuring the Expression Language feature level for constraints, allowing to define which
+	 * Expression Language features are available for message interpolation.
+	 * <p>
+	 * This property only affects the EL feature level of "static" constraint violation messages. In particular, it
+	 * doesn't affect the default EL feature level for custom violations. Refer to
+	 * {@link #CUSTOM_VIOLATION_EXPRESSION_LANGUAGE_FEATURE_LEVEL} to configure that.
+	 *
+	 * @since 6.2
+	 */
+	@Incubating
+	String CONSTRAINT_EXPRESSION_LANGUAGE_FEATURE_LEVEL = "hibernate.validator.constraint_expression_language_feature_level";
+
+	/**
+	 * Property for configuring the Expression Language feature level for custom violations, allowing to define which
+	 * Expression Language features are available for message interpolation.
+	 *
+	 * @since 6.2
+	 */
+	@Incubating
+	String CUSTOM_VIOLATION_EXPRESSION_LANGUAGE_FEATURE_LEVEL = "hibernate.validator.custom_violation_expression_language_feature_level";
 
 	/**
 	 * <p>
@@ -427,4 +451,33 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 
 	@Incubating
 	S beanMetaDataClassNormalizer(BeanMetaDataClassNormalizer beanMetaDataClassNormalizer);
+
+	/**
+	 * Allows setting the Expression Language feature level for message interpolation of constraint messages.
+	 * <p>
+	 * This is the feature level used for messages hardcoded inside the constraint declaration.
+	 * <p>
+	 * If you are creating custom constraint violations, Expression Language support needs to be explicitly enabled and
+	 * use the safest feature level by default if enabled.
+	 *
+	 * @param expressionLanguageFeatureLevel the {@link ExpressionLanguageFeatureLevel} to be used
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.2
+	 */
+	@Incubating
+	S constraintExpressionLanguageFeatureLevel(ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel);
+
+	/**
+	 * Allows setting the Expression Language feature level for message interpolation of custom violation messages.
+	 * <p>
+	 * This is the feature level used for messages of custom violations created by the {@link ConstraintValidatorContext}.
+	 *
+	 * @param expressionLanguageFeatureLevel the {@link ExpressionLanguageFeatureLevel} to be used
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 6.2
+	 */
+	@Incubating
+	S customViolationExpressionLanguageFeatureLevel(ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel);
 }

@@ -17,6 +17,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 public class ValidatorFactoryScopedContext {
@@ -68,6 +69,16 @@ public class ValidatorFactoryScopedContext {
 	private final Object constraintValidatorPayload;
 
 	/**
+	 * The Expression Language feature level for constraints.
+	 */
+	private final ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
+
+	/**
+	 * The Expression Language feature level for custom violations.
+	 */
+	private final ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
+
+	/**
 	 * The constraint validator initialization context.
 	 */
 	private final HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
@@ -80,9 +91,12 @@ public class ValidatorFactoryScopedContext {
 			ScriptEvaluatorFactory scriptEvaluatorFactory,
 			boolean failFast,
 			boolean traversableResolverResultCacheEnabled,
-			Object constraintValidatorPayload) {
+			Object constraintValidatorPayload,
+			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
+			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel) {
 		this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
-				traversableResolverResultCacheEnabled, constraintValidatorPayload,
+				traversableResolverResultCacheEnabled, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
+				customViolationExpressionLanguageFeatureLevel,
 				new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
 						temporalValidationTolerance ) );
 	}
@@ -96,6 +110,8 @@ public class ValidatorFactoryScopedContext {
 			boolean failFast,
 			boolean traversableResolverResultCacheEnabled,
 			Object constraintValidatorPayload,
+			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
+			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
 			HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext) {
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
@@ -106,6 +122,8 @@ public class ValidatorFactoryScopedContext {
 		this.failFast = failFast;
 		this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
 		this.constraintValidatorPayload = constraintValidatorPayload;
+		this.constraintExpressionLanguageFeatureLevel = constraintExpressionLanguageFeatureLevel;
+		this.customViolationExpressionLanguageFeatureLevel = customViolationExpressionLanguageFeatureLevel;
 		this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
 	}
 
@@ -149,6 +167,14 @@ public class ValidatorFactoryScopedContext {
 		return this.constraintValidatorInitializationContext;
 	}
 
+	public ExpressionLanguageFeatureLevel getConstraintExpressionLanguageFeatureLevel() {
+		return this.constraintExpressionLanguageFeatureLevel;
+	}
+
+	public ExpressionLanguageFeatureLevel getCustomViolationExpressionLanguageFeatureLevel() {
+		return this.customViolationExpressionLanguageFeatureLevel;
+	}
+
 	static class Builder {
 		private final ValidatorFactoryScopedContext defaultContext;
 
@@ -161,6 +187,8 @@ public class ValidatorFactoryScopedContext {
 		private boolean failFast;
 		private boolean traversableResolverResultCacheEnabled;
 		private Object constraintValidatorPayload;
+		private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
+		private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 		private HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
 
 		Builder(ValidatorFactoryScopedContext defaultContext) {
@@ -176,6 +204,8 @@ public class ValidatorFactoryScopedContext {
 			this.failFast = defaultContext.failFast;
 			this.traversableResolverResultCacheEnabled = defaultContext.traversableResolverResultCacheEnabled;
 			this.constraintValidatorPayload = defaultContext.constraintValidatorPayload;
+			this.constraintExpressionLanguageFeatureLevel = defaultContext.constraintExpressionLanguageFeatureLevel;
+			this.customViolationExpressionLanguageFeatureLevel = defaultContext.customViolationExpressionLanguageFeatureLevel;
 			this.constraintValidatorInitializationContext = defaultContext.constraintValidatorInitializationContext;
 		}
 
@@ -250,6 +280,18 @@ public class ValidatorFactoryScopedContext {
 			return this;
 		}
 
+		public ValidatorFactoryScopedContext.Builder setConstraintExpressionLanguageFeatureLevel(
+				ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel) {
+			this.constraintExpressionLanguageFeatureLevel = expressionLanguageFeatureLevel;
+			return this;
+		}
+
+		public ValidatorFactoryScopedContext.Builder setCustomViolationExpressionLanguageFeatureLevel(
+				ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel) {
+			this.customViolationExpressionLanguageFeatureLevel = expressionLanguageFeatureLevel;
+			return this;
+		}
+
 		public ValidatorFactoryScopedContext build() {
 			return new ValidatorFactoryScopedContext(
 					messageInterpolator,
@@ -261,6 +303,8 @@ public class ValidatorFactoryScopedContext {
 					failFast,
 					traversableResolverResultCacheEnabled,
 					constraintValidatorPayload,
+					constraintExpressionLanguageFeatureLevel,
+					customViolationExpressionLanguageFeatureLevel,
 					HibernateConstraintValidatorInitializationContextImpl.of(
 							constraintValidatorInitializationContext,
 							scriptEvaluatorFactory,

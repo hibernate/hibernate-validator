@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.engine.messageinterpolation.el;
 
 import jakarta.el.ArrayELResolver;
-import jakarta.el.BeanELResolver;
 import jakarta.el.CompositeELResolver;
 import jakarta.el.ELResolver;
 import jakarta.el.ExpressionFactory;
@@ -17,10 +16,9 @@ import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.StandardELContext;
 
 /**
- * @author Hardy Ferentschik
  * @author Guillaume Smet
  */
-public class SimpleELContext extends StandardELContext {
+public class BeanPropertiesElContext extends StandardELContext {
 	private static final ELResolver DEFAULT_RESOLVER = new CompositeELResolver() {
 		{
 			add( new RootResolver() );
@@ -28,14 +26,14 @@ public class SimpleELContext extends StandardELContext {
 			add( new ListELResolver( true ) );
 			add( new MapELResolver( true ) );
 			add( new ResourceBundleELResolver() );
-			add( new BeanELResolver( true ) );
+			add( new BeanPropertiesELResolver() );
 		}
 	};
 
-	public SimpleELContext(ExpressionFactory expressionFactory) {
+	public BeanPropertiesElContext(ExpressionFactory expressionFactory) {
 		super( expressionFactory );
 
-		// In jakarta.el.ELContext, the ExpressionFactory is extracted from the context map. If it is not found, it
+		// In javax.el.ELContext, the ExpressionFactory is extracted from the context map. If it is not found, it
 		// defaults to ELUtil.getExpressionFactory() which, if we provided the ExpressionFactory to the
 		// ResourceBundleMessageInterpolator, might not be the same. Thus, we inject the ExpressionFactory in the
 		// context.

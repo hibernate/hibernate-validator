@@ -38,6 +38,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
@@ -257,6 +258,50 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 
 		return null;
+	}
+
+	static ExpressionLanguageFeatureLevel determineConstraintExpressionLanguageFeatureLevel(AbstractConfigurationImpl<?> hibernateSpecificConfig,
+			Map<String, String> properties) {
+		if ( hibernateSpecificConfig.getConstraintExpressionLanguageFeatureLevel() != null ) {
+			LOG.logConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig.getConstraintExpressionLanguageFeatureLevel() );
+			return ExpressionLanguageFeatureLevel.interpretDefaultForConstraints( hibernateSpecificConfig.getConstraintExpressionLanguageFeatureLevel() );
+		}
+
+		String expressionLanguageFeatureLevelName = properties.get( HibernateValidatorConfiguration.CONSTRAINT_EXPRESSION_LANGUAGE_FEATURE_LEVEL );
+		if ( expressionLanguageFeatureLevelName != null ) {
+			try {
+				ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel = ExpressionLanguageFeatureLevel.of( expressionLanguageFeatureLevelName );
+				LOG.logConstraintExpressionLanguageFeatureLevel( expressionLanguageFeatureLevel );
+				return ExpressionLanguageFeatureLevel.interpretDefaultForConstraints( expressionLanguageFeatureLevel );
+			}
+			catch (IllegalArgumentException e) {
+				throw LOG.invalidExpressionLanguageFeatureLevelValue( expressionLanguageFeatureLevelName, e );
+			}
+		}
+
+		return ExpressionLanguageFeatureLevel.interpretDefaultForConstraints( ExpressionLanguageFeatureLevel.DEFAULT );
+	}
+
+	static ExpressionLanguageFeatureLevel determineCustomViolationExpressionLanguageFeatureLevel(AbstractConfigurationImpl<?> hibernateSpecificConfig,
+			Map<String, String> properties) {
+		if ( hibernateSpecificConfig.getCustomViolationExpressionLanguageFeatureLevel() != null ) {
+			LOG.logCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig.getCustomViolationExpressionLanguageFeatureLevel() );
+			return ExpressionLanguageFeatureLevel.interpretDefaultForCustomViolations( hibernateSpecificConfig.getCustomViolationExpressionLanguageFeatureLevel() );
+		}
+
+		String expressionLanguageFeatureLevelName = properties.get( HibernateValidatorConfiguration.CUSTOM_VIOLATION_EXPRESSION_LANGUAGE_FEATURE_LEVEL );
+		if ( expressionLanguageFeatureLevelName != null ) {
+			try {
+				ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel = ExpressionLanguageFeatureLevel.of( expressionLanguageFeatureLevelName );
+				LOG.logCustomViolationExpressionLanguageFeatureLevel( expressionLanguageFeatureLevel );
+				return ExpressionLanguageFeatureLevel.interpretDefaultForCustomViolations( expressionLanguageFeatureLevel );
+			}
+			catch (IllegalArgumentException e) {
+				throw LOG.invalidExpressionLanguageFeatureLevelValue( expressionLanguageFeatureLevelName, e );
+			}
+		}
+
+		return ExpressionLanguageFeatureLevel.NONE;
 	}
 
 	static GetterPropertySelectionStrategy determineGetterPropertySelectionStrategy(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
