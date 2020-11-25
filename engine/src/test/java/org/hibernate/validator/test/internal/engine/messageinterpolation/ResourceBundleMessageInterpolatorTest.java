@@ -29,6 +29,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -282,7 +283,8 @@ public class ResourceBundleMessageInterpolatorTest {
 				null,
 				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap(),
-				true );
+				ExpressionLanguageFeatureLevel.BEAN_METHODS,
+				false );
 	}
 
 	private void runInterpolation(boolean cachingEnabled) {

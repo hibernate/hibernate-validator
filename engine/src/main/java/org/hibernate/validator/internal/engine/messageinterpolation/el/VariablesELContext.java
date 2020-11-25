@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.engine.messageinterpolation.el;
 
 import javax.el.ArrayELResolver;
-import javax.el.BeanELResolver;
 import javax.el.CompositeELResolver;
 import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
@@ -17,22 +16,25 @@ import javax.el.ResourceBundleELResolver;
 import javax.el.StandardELContext;
 
 /**
- * @author Hardy Ferentschik
  * @author Guillaume Smet
  */
-public class SimpleELContext extends StandardELContext {
+public class VariablesELContext extends StandardELContext {
+
 	private static final ELResolver DEFAULT_RESOLVER = new CompositeELResolver() {
+
 		{
 			add( new RootResolver() );
 			add( new ArrayELResolver( true ) );
 			add( new ListELResolver( true ) );
 			add( new MapELResolver( true ) );
 			add( new ResourceBundleELResolver() );
-			add( new BeanELResolver( true ) );
+			// this one is required so that expressions containing method calls are returned as is
+			// if not there, the expression is replaced by an empty string
+			add( new NoOpElResolver() );
 		}
 	};
 
-	public SimpleELContext(ExpressionFactory expressionFactory) {
+	public VariablesELContext(ExpressionFactory expressionFactory) {
 		super( expressionFactory );
 
 		// In javax.el.ELContext, the ExpressionFactory is extracted from the context map. If it is not found, it

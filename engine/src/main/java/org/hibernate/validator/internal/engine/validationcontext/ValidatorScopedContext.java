@@ -14,6 +14,7 @@ import javax.validation.Validator;
 
 import org.hibernate.validator.internal.engine.ValidatorFactoryScopedContext;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
@@ -65,6 +66,16 @@ public class ValidatorScopedContext {
 	 */
 	private final Object constraintValidatorPayload;
 
+	/**
+	 * Hibernate Validator specific flag to define Expression Language feature levels for constraints.
+	 */
+	private final ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
+
+	/**
+	 * Hibernate Validator specific flag to define Expression Language feature levels for custom violations.
+	 */
+	private final ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
+
 	public ValidatorScopedContext(ValidatorFactoryScopedContext validatorFactoryScopedContext) {
 		this.messageInterpolator = validatorFactoryScopedContext.getMessageInterpolator();
 		this.parameterNameProvider = validatorFactoryScopedContext.getParameterNameProvider();
@@ -74,6 +85,8 @@ public class ValidatorScopedContext {
 		this.failFast = validatorFactoryScopedContext.isFailFast();
 		this.traversableResolverResultCacheEnabled = validatorFactoryScopedContext.isTraversableResolverResultCacheEnabled();
 		this.constraintValidatorPayload = validatorFactoryScopedContext.getConstraintValidatorPayload();
+		this.constraintExpressionLanguageFeatureLevel = validatorFactoryScopedContext.getConstraintExpressionLanguageFeatureLevel();
+		this.customViolationExpressionLanguageFeatureLevel = validatorFactoryScopedContext.getCustomViolationExpressionLanguageFeatureLevel();
 	}
 
 	public MessageInterpolator getMessageInterpolator() {
@@ -106,5 +119,13 @@ public class ValidatorScopedContext {
 
 	public Object getConstraintValidatorPayload() {
 		return this.constraintValidatorPayload;
+	}
+
+	public ExpressionLanguageFeatureLevel getConstraintExpressionLanguageFeatureLevel() {
+		return this.constraintExpressionLanguageFeatureLevel;
+	}
+
+	public ExpressionLanguageFeatureLevel getCustomViolationExpressionLanguageFeatureLevel() {
+		return customViolationExpressionLanguageFeatureLevel;
 	}
 }

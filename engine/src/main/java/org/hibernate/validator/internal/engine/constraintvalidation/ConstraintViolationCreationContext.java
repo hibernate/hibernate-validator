@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 
 /**
  * Container class for the information needed to create a constraint violation.
@@ -22,7 +23,8 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
 public class ConstraintViolationCreationContext {
 
 	private final String message;
-	private final boolean expressionLanguageEnabled;
+	private final ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel;
+	private final boolean customViolation;
 	private final PathImpl propertyPath;
 	@Immutable
 	private final Map<String, Object> messageParameters;
@@ -31,13 +33,15 @@ public class ConstraintViolationCreationContext {
 	private final Object dynamicPayload;
 
 	public ConstraintViolationCreationContext(String message,
-			boolean expressionLanguageEnabled,
+			ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel,
+			boolean customViolation,
 			PathImpl property,
 			Map<String, Object> messageParameters,
 			Map<String, Object> expressionVariables,
 			Object dynamicPayload) {
 		this.message = message;
-		this.expressionLanguageEnabled = expressionLanguageEnabled;
+		this.expressionLanguageFeatureLevel = expressionLanguageFeatureLevel;
+		this.customViolation = customViolation;
 		this.propertyPath = property;
 		this.messageParameters = toImmutableMap( messageParameters );
 		this.expressionVariables = toImmutableMap( expressionVariables );
@@ -48,8 +52,12 @@ public class ConstraintViolationCreationContext {
 		return message;
 	}
 
-	public boolean isExpressionLanguageEnabled() {
-		return expressionLanguageEnabled;
+	public ExpressionLanguageFeatureLevel getExpressionLanguageFeatureLevel() {
+		return expressionLanguageFeatureLevel;
+	}
+
+	public boolean isCustomViolation() {
+		return customViolation;
 	}
 
 	public final PathImpl getPath() {
@@ -72,7 +80,8 @@ public class ConstraintViolationCreationContext {
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "ConstraintViolationCreationContext{" );
 		sb.append( "message='" ).append( message ).append( '\'' );
-		sb.append( ", expressionLanguageEnabled=" ).append( expressionLanguageEnabled );
+		sb.append( ", expressionLanguageFeatureLevel=" ).append( expressionLanguageFeatureLevel );
+		sb.append( ", customViolation=" ).append( customViolation );
 		sb.append( ", propertyPath=" ).append( propertyPath );
 		sb.append( ", messageParameters=" ).append( messageParameters );
 		sb.append( ", expressionVariables=" ).append( expressionVariables );

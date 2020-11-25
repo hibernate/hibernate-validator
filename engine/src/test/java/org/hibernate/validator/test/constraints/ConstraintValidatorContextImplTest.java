@@ -21,6 +21,7 @@ import javax.validation.ValidationException;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.testutil.ConstraintViolationAssert.PathExpectation;
 import org.testng.annotations.Test;
 
@@ -226,7 +227,8 @@ public class ConstraintValidatorContextImplTest {
 		PathImpl path = PathImpl.createRootPath();
 		path.addBeanNode();
 
-		ConstraintValidatorContextImpl context = new ConstraintValidatorContextImpl( null, path, null, null );
+		ConstraintValidatorContextImpl context = new ConstraintValidatorContextImpl( null, path, null, null, ExpressionLanguageFeatureLevel.BEAN_PROPERTIES,
+				ExpressionLanguageFeatureLevel.NONE );
 		context.disableDefaultConstraintViolation();
 		return context;
 	}

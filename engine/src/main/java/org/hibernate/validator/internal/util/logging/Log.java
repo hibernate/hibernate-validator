@@ -63,6 +63,7 @@ import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatt
 import org.hibernate.validator.internal.util.logging.formatter.ObjectArrayFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
 import org.hibernate.validator.internal.xml.mapping.ContainerElementTypePath;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
@@ -912,4 +913,29 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = 257, value = "Expression variables have been defined for constraint %1$s while Expression Language is not enabled.")
 	void expressionVariablesDefinedWithExpressionLanguageNotEnabled(Class<? extends Annotation> constraintAnnotation);
+
+	@Message(id = 258, value = "Expressions should not be resolved when Expression Language features are disabled.")
+	IllegalStateException expressionsNotResolvedWhenExpressionLanguageFeaturesDisabled();
+
+	@Message(id = 259, value = "Provided Expression Language feature level is not supported.")
+	IllegalStateException expressionsLanguageFeatureLevelNotSupported();
+
+	@LogMessage(level = DEBUG)
+	@Message(id = 260, value = "Expression Language feature level for constraints set to %1$s.")
+	void logConstraintExpressionLanguageFeatureLevel(ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = 261, value = "Expression Language feature level for custom violations set to %1$s.")
+	void logCustomViolationExpressionLanguageFeatureLevel(ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel);
+
+	@Message(id = 262, value = "Unable to find an expression language feature level for value %s.")
+	ValidationException invalidExpressionLanguageFeatureLevelValue(String expressionLanguageFeatureLevelName, @Cause IllegalArgumentException e);
+
+	@LogMessage(level = WARN)
+	@Message(id = 263, value = "EL expression '%s' references an unknown method.")
+	void unknownMethodInExpressionLanguage(String expression, @Cause Exception e);
+
+	@LogMessage(level = ERROR)
+	@Message(id = 264, value = "Unable to interpolate EL expression '%s' as it uses a disabled feature.")
+	void disabledFeatureInExpressionLanguage(String expression, @Cause Exception e);
 }
