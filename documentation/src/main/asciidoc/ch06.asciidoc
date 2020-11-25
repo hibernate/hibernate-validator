@@ -173,35 +173,12 @@ It is important to add each configured constraint violation by calling `addConst
 Only after that the new constraint violation will be created.
 ====
 
-[[el-injection-caution]]
-[CAUTION]
-====
-**Be aware that the custom message template is passed directly to the Expression Language engine.**
+By default, Expression Language is not enabled for custom violations created in the `ConstraintValidatorContext`.
 
-Thus, you should be very careful when integrating user input in a custom message template as it will be interpreted
-by the Expression Language engine, which is usually not the behavior you want and **could allow malicious users to leak
-sensitive data or even execute arbitrary code**.
+However, for some advanced requirements, using Expression Language might be necessary.
 
-If you need to integrate user input in your message, you must <<section-hibernateconstraintvalidatorcontext,pass it as an expression variable>>
-by unwrapping the context to `HibernateConstraintValidatorContext`.
-
-The following validator is very unsafe as it includes user input in the violation message.
-If the validated `value` contains EL expressions, they will be executed by the EL engine.
-
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/elinjection/UnsafeValidator.java[tags=include]
-----
-
-The following pattern must be used instead:
-
-[source]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/elinjection/SafeValidator.java[tags=include]
-----
-
-By using expression variables, Hibernate Validator properly handles escaping and EL expressions won't be executed.
-====
+In this case, you need to unwrap the `HibernateConstraintValidatorContext` and enable Expression Language explicitly.
+See <<section-hibernateconstraintvalidatorcontext>> for more information.
 
 Refer to <<section-custom-property-paths>> to learn how to use the `ConstraintValidatorContext` API to
 control the property path of constraint violations for class-level constraints.

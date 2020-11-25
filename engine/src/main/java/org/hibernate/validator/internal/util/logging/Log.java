@@ -908,4 +908,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 256, value = "Unable to instantiate locale resolver class %s.")
 	ValidationException getUnableToInstantiateLocaleResolverClassException(String localeResolverClassName, @Cause Exception e);
+
+	@LogMessage(level = WARN)
+	@Message(id = 257, value = "Expression variables have been defined for constraint %1$s while Expression Language is not enabled.")
+	void expressionVariablesDefinedWithExpressionLanguageNotEnabled(Class<? extends Annotation> constraintAnnotation);
 }
