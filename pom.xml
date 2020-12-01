@@ -196,7 +196,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>8.18</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>8.38</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
@@ -213,7 +213,7 @@
         <version.assembly.plugin>3.1.0</version.assembly.plugin>
         <version.buildhelper.plugin>3.0.0</version.buildhelper.plugin>
         <version.bundle.plugin>3.5.0</version.bundle.plugin>
-        <version.checkstyle.plugin>3.0.0</version.checkstyle.plugin>
+        <version.checkstyle.plugin>3.1.1</version.checkstyle.plugin>
         <version.clean.plugin>3.0.0</version.clean.plugin>
         <version.compiler.plugin>3.8.1</version.compiler.plugin>
         <version.copy.plugin>0.0.6</version.copy.plugin>
