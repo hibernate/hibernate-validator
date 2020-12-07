@@ -1,6 +1,23 @@
 Hibernate Validator Changelog
 =============================
 
+6.2.0.CR1 (07-12-2020)
+-------------------------
+
+** Improvement
+    * HV-1812 - engine             - Avoid reflection-based metadata extraction for built-in value extractors
+
+** New Feature
+    * HV-1816 - engine             - Disable Expression Language by default for custom constraint violations
+
+** Remove Feature
+    * HV-1790 - engine, validators - Remove the SafeHtml constraint
+
+** Task
+    * HV-1820 - engine             - Upgrade JBoss Logging to 3.4.1.Final
+    * HV-1819 - engine             - Upgrade Classmate to 1.5.1
+    * HV-1817 - build              - Upgrade to checkstyle 8.38
+
 6.1.6.Final (30-09-2020)
 -------------------------
 
