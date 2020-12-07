@@ -1,6 +1,35 @@
 Hibernate Validator Changelog
 =============================
 
+7.0.0.CR1 (07-12-2020)
+-------------------------
+
+** Bug
+    * HV-1804 - translations - Fix Dutch translation for @Size constraint
+    * HV-1797 - validators   - Validation on classes with a bidirectional relationship cause stack overflow on 6.1.x
+
+** Improvement
+    * HV-1815 - translations - Fix DecimalMax and DecimalMin in zh_CN translation
+    * HV-1814 - tests        - Upgrade JUnit to 4.13.1
+    * HV-1812 - engine       - Avoid reflection-based metadata extraction for built-in value extractors
+
+** New Feature
+    * HV-1816 - engine       - Disable Expression Language by default for custom constraint violations
+
+** Task
+    * HV-1820 - engine       - Upgrade JBoss Logging to 3.4.1.Final
+    * HV-1819 - engine       - Upgrade Classmate to 1.5.1
+    * HV-1818 - build        - Upgrade Jakarta API dependencies
+    * HV-1817 - build        - Upgrade to checkstyle 8.38
+    * HV-1809 - tests        - Upgrade to TestNG 6.14.3
+    * HV-1808 - tests        - Upgrade to Arquillian 1.7.0.Alpha4
+    * HV-1807 - build        - Add Maven profile to improve contributor experience on Intellij IDEA
+    * HV-1806 - tests        - Use the local repository from the Maven build in OSGi/WildFly integration tests
+    * HV-1805 - build        - Add a Jenkinsfile to test multiple JDKs from a single job
+    * HV-1803 - tests        - Move the tests to log4j2
+    * HV-1802 - tests        - Update ByteBuddy test dependency to 1.10.16
+    * HV-1795 - build        - Remove link to JavaMoney javadoc
+
 7.0.0.Alpha6 (22-07-2020)
 -------------------------
 
