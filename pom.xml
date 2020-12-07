@@ -117,7 +117,7 @@
         <version.jakarta.validation.beanvalidation-tck>3.0.0</version.jakarta.validation.beanvalidation-tck>
 
         <version.com.thoughtworks.paranamer>2.8</version.com.thoughtworks.paranamer>
-        <version.jakarta.el-api>4.0.0-RC2</version.jakarta.el-api>
+        <version.jakarta.el-api>4.0.0</version.jakarta.el-api>
         <version.org.glassfish.jakarta.el>${version.jakarta.el-api}</version.org.glassfish.jakarta.el>
         <version.org.jboss.logging.jboss-logging>3.3.2.Final</version.org.jboss.logging.jboss-logging>
         <version.org.jboss.logging.jboss-logging-tools>2.1.0.Final</version.org.jboss.logging.jboss-logging-tools>
@@ -143,14 +143,14 @@
             They should be aligned with the ones from the Wildfly version we support
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
-        <version.jakarta.enterprise.cdi-api>3.0.0-M4</version.jakarta.enterprise.cdi-api>
-        <version.org.jboss.weld.weld>4.0.0.Alpha3</version.org.jboss.weld.weld>
+        <version.jakarta.enterprise.cdi-api>3.0.0</version.jakarta.enterprise.cdi-api>
+        <version.org.jboss.weld.weld>4.0.0.CR1</version.org.jboss.weld.weld>
         <version.org.wildfly.arquillian>2.2.0.Final</version.org.wildfly.arquillian>
-        <version.jakarta.ejb-api>4.0.0-RC2</version.jakarta.ejb-api>
-        <version.jakarta.interceptor-api>2.0.0-RC2</version.jakarta.interceptor-api>
+        <version.jakarta.ejb-api>4.0.0</version.jakarta.ejb-api>
+        <version.jakarta.interceptor-api>2.0.0</version.jakarta.interceptor-api>
         <version.jakarta.annotation-api>2.0.0-RC1</version.jakarta.annotation-api>
-        <version.jakarta.inject-api>2.0.0-RC4</version.jakarta.inject-api>
-        <version.jakarta.persistence-api>3.0.0-RC2</version.jakarta.persistence-api>
+        <version.jakarta.inject-api>2.0.0</version.jakarta.inject-api>
+        <version.jakarta.persistence-api>3.0.0</version.jakarta.persistence-api>
         <!-- do not update for now, this is used for the WildFly IT -->
         <version.jakarta.ws.rs-api>2.1.6</version.jakarta.ws.rs-api>
 
