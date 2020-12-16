@@ -202,9 +202,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		this.validationOrderGenerator = new ValidationOrderGenerator();
 
-		this.beanMetadataClassNormalizer = hibernateSpecificConfig.getBeanMetaDataClassNormalizer() != null ?
-				hibernateSpecificConfig.getBeanMetaDataClassNormalizer() :
-					new DefaultBeanMetaDataClassNormalizer();
+		this.beanMetadataClassNormalizer = ( hibernateSpecificConfig != null && hibernateSpecificConfig.getBeanMetaDataClassNormalizer() != null )
+				? hibernateSpecificConfig.getBeanMetaDataClassNormalizer()
+				: new DefaultBeanMetaDataClassNormalizer();
 
 		if ( LOG.isDebugEnabled() ) {
 			logValidatorFactoryScopedConfiguration( validatorFactoryScopedContext );
