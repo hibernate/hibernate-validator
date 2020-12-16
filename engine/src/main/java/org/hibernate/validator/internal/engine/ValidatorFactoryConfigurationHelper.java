@@ -262,7 +262,7 @@ final class ValidatorFactoryConfigurationHelper {
 
 	static ExpressionLanguageFeatureLevel determineConstraintExpressionLanguageFeatureLevel(AbstractConfigurationImpl<?> hibernateSpecificConfig,
 			Map<String, String> properties) {
-		if ( hibernateSpecificConfig.getConstraintExpressionLanguageFeatureLevel() != null ) {
+		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getConstraintExpressionLanguageFeatureLevel() != null ) {
 			LOG.logConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig.getConstraintExpressionLanguageFeatureLevel() );
 			return ExpressionLanguageFeatureLevel.interpretDefaultForConstraints( hibernateSpecificConfig.getConstraintExpressionLanguageFeatureLevel() );
 		}
@@ -284,7 +284,7 @@ final class ValidatorFactoryConfigurationHelper {
 
 	static ExpressionLanguageFeatureLevel determineCustomViolationExpressionLanguageFeatureLevel(AbstractConfigurationImpl<?> hibernateSpecificConfig,
 			Map<String, String> properties) {
-		if ( hibernateSpecificConfig.getCustomViolationExpressionLanguageFeatureLevel() != null ) {
+		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getCustomViolationExpressionLanguageFeatureLevel() != null ) {
 			LOG.logCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig.getCustomViolationExpressionLanguageFeatureLevel() );
 			return ExpressionLanguageFeatureLevel.interpretDefaultForCustomViolations( hibernateSpecificConfig.getCustomViolationExpressionLanguageFeatureLevel() );
 		}
@@ -306,7 +306,7 @@ final class ValidatorFactoryConfigurationHelper {
 
 	static GetterPropertySelectionStrategy determineGetterPropertySelectionStrategy(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
 			ClassLoader externalClassLoader) {
-		if ( hibernateSpecificConfig.getGetterPropertySelectionStrategy() != null ) {
+		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getGetterPropertySelectionStrategy() != null ) {
 			LOG.usingGetterPropertySelectionStrategy( hibernateSpecificConfig.getGetterPropertySelectionStrategy().getClass() );
 			return hibernateSpecificConfig.getGetterPropertySelectionStrategy();
 		}
@@ -332,7 +332,7 @@ final class ValidatorFactoryConfigurationHelper {
 	}
 
 	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(AbstractConfigurationImpl<?> hibernateSpecificConfig) {
-		if ( hibernateSpecificConfig.getBeanMetaDataClassNormalizer() != null ) {
+		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getBeanMetaDataClassNormalizer() != null ) {
 			return hibernateSpecificConfig.getBeanMetaDataClassNormalizer();
 		}
 
@@ -341,7 +341,7 @@ final class ValidatorFactoryConfigurationHelper {
 
 	static PropertyNodeNameProvider determinePropertyNodeNameProvider(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
 			ClassLoader externalClassLoader) {
-		if ( hibernateSpecificConfig.getPropertyNodeNameProvider() != null ) {
+		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getPropertyNodeNameProvider() != null ) {
 			LOG.usingPropertyNodeNameProvider( hibernateSpecificConfig.getPropertyNodeNameProvider().getClass() );
 
 			return hibernateSpecificConfig.getPropertyNodeNameProvider();
@@ -367,7 +367,7 @@ final class ValidatorFactoryConfigurationHelper {
 
 	static LocaleResolver determineLocaleResolver(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
 			ClassLoader externalClassLoader) {
-		if ( hibernateSpecificConfig.getLocaleResolver() != null ) {
+		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getLocaleResolver() != null ) {
 			LOG.usingLocaleResolver( hibernateSpecificConfig.getLocaleResolver().getClass() );
 
 			return hibernateSpecificConfig.getLocaleResolver();
