@@ -1,6 +1,12 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.22.Final (16-12-2020)
+-------------------------
+
+** Bug
+    * HV-1821 - engine - HV-1755 introduces NPE in org.hibernate.validator.internal.engine.ValidatorFactoryImpl constructor
+
 6.0.21.Final (29-09-2020)
 -------------------------
 
