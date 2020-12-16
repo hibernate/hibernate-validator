@@ -1,6 +1,24 @@
 Hibernate Validator Changelog
 =============================
 
+6.1.7.Final (16-12-2020)
+-------------------------
+
+** Bug
+    * HV-1821 - engine       - HV-1755 introduces NPE in org.hibernate.validator.internal.engine.ValidatorFactoryImpl constructor
+
+** Improvement
+    * HV-1815 - translations - Fix DecimalMax and DecimalMin in zh_CN translation
+    * HV-1814 - tests        - Upgrade JUnit to 4.13.1
+
+** Task
+    * HV-1811 - build, tests - Upgrade to BeanValidation TCK version 2.0.6
+    * HV-1810 - tests        - Upgrade to Arquillian 1.6
+    * HV-1809 - tests        - Upgrade to TestNG 6.14.3
+    * HV-1807 - build        - Add Maven profile to improve contributor experience on Intellij IDEA
+    * HV-1806 - tests        - Use the local repository from the Maven build in OSGi/WildFly integration tests
+    * HV-1805 - build        - Add a Jenkinsfile to test multiple JDKs from a single job
+
 6.1.6.Final (30-09-2020)
 -------------------------
 
