@@ -27,6 +27,7 @@ import org.hibernate.validator.cfg.defs.br.TituloEleitoralDef;
 import org.hibernate.validator.cfg.defs.pl.NIPDef;
 import org.hibernate.validator.cfg.defs.pl.PESELDef;
 import org.hibernate.validator.cfg.defs.pl.REGONDef;
+import org.hibernate.validator.cfg.defs.ru.INNDef;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
@@ -34,6 +35,7 @@ import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
+import org.hibernate.validator.constraints.ru.INN;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 import org.testng.annotations.Test;
 
@@ -60,6 +62,8 @@ public class ProgrammaticConstraintDefinitionsTest {
 		doProgrammaticTest( PESEL.class, new PESELDef(), "12252918020", "44051401358", "invalid Polish National Identification Number (PESEL)" );
 		doProgrammaticTest( NIP.class, new NIPDef(), "1786052059", "2596048505", "invalid VAT Identification Number (NIP)" );
 
+		doProgrammaticTest( INN.class, new INNDef().type( INN.Type.INDIVIDUAL ), "127530851622", "127530851623", "invalid Russian taxpayer identification number (INN)" );
+		doProgrammaticTest( INN.class, new INNDef().type( INN.Type.JURIDICAL ), "8606995694", "8606995695", "invalid Russian taxpayer identification number (INN)" );
 	}
 
 	@Test
