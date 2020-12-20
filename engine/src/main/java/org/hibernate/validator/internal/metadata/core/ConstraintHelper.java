@@ -50,6 +50,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_PESEL;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_REGON;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RANGE;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RU_INN;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SCRIPT_ASSERT;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MAX;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MIN;
@@ -99,6 +100,7 @@ import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
+import org.hibernate.validator.constraints.ru.INN;
 import org.hibernate.validator.constraints.time.DurationMax;
 import org.hibernate.validator.constraints.time.DurationMin;
 import org.hibernate.validator.internal.constraintvalidators.bv.AssertFalseValidator;
@@ -314,6 +316,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.pl.NIPValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.pl.PESELValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.pl.REGONValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.ru.INNValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMaxValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMinValidator;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
@@ -796,6 +799,9 @@ public class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_REGON ) ) {
 			putBuiltinConstraint( tmpConstraints, REGON.class, REGONValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RU_INN ) ) {
+			putBuiltinConstraint( tmpConstraints, INN.class, INNValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SCRIPT_ASSERT ) ) {
 			putBuiltinConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );

@@ -43,6 +43,7 @@ import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
+import org.hibernate.validator.constraints.ru.INN;
 import org.hibernate.validator.constraints.time.DurationMax;
 import org.hibernate.validator.constraints.time.DurationMin;
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
@@ -170,6 +171,7 @@ public class MessagePropertiesTest {
 							violationOf( REGON.class ),
 							violationOf( NIP.class ),
 							violationOf( PESEL.class ),
+							violationOf( INN.class ),
 							violationOf( DurationMax.class ),
 							violationOf( DurationMin.class ),
 							violationOf( ScriptAssert.class )
@@ -344,6 +346,9 @@ public class MessagePropertiesTest {
 
 		@PESEL
 		private String pesel = "invalid";
+
+		@INN
+		private String inn = "invalid";
 
 		@DurationMax(days = 4, hours = 4, minutes = 4, millis = 4, nanos = 4)
 		private Duration durationMax = Duration.ofDays( 8 );
