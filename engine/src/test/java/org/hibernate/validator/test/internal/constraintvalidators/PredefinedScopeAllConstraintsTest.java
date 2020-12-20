@@ -67,6 +67,7 @@ import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
+import org.hibernate.validator.constraints.ru.INN;
 import org.hibernate.validator.constraints.time.DurationMax;
 import org.hibernate.validator.constraints.time.DurationMin;
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
@@ -128,6 +129,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( REGON.class, new REGONBean() );
 		testConstraint( NIP.class, new NIPBean() );
 		testConstraint( PESEL.class, new PESELBean() );
+		testConstraint( INN.class, new INNBean() );
 		testConstraint( DurationMax.class, new DurationMaxBean() );
 		testConstraint( DurationMin.class, new DurationMinBean() );
 		testConstraint( ScriptAssert.class, new ScriptAssertBean() );
@@ -427,6 +429,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@PESEL
 		private String pesel = "invalid";
+	}
+
+	private static class INNBean {
+
+		@INN
+		private String inn = "invalid";
 	}
 
 	private static class DurationMaxBean {
