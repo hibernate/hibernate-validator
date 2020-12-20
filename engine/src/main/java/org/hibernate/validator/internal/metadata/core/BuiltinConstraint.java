@@ -86,6 +86,7 @@ enum BuiltinConstraint {
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_NIP("org.hibernate.validator.constraints.pl.NIP"),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_PESEL("org.hibernate.validator.constraints.pl.PESEL"),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_REGON("org.hibernate.validator.constraints.pl.REGON"),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RU_INN("org.hibernate.validator.constraints.ru.INN"),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MAX("org.hibernate.validator.constraints.time.DurationMax"),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MIN("org.hibernate.validator.constraints.time.DurationMin");
 
