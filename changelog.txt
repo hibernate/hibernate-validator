@@ -1,6 +1,15 @@
 Hibernate Validator Changelog
 =============================
 
+6.2.0.Final (23-12-2020)
+-------------------------
+
+** Bug
+    * HV-1821 - engine     - HV-1755 introduces NPE in org.hibernate.validator.internal.engine.ValidatorFactoryImpl constructor
+
+** New Feature
+    * HV-1822 - validators - Add Russian specific validator for russian taxpayer identification number
+
 6.2.0.CR1 (07-12-2020)
 -------------------------
 
