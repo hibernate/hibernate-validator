@@ -57,7 +57,7 @@ public class OptionalConstraintsIT extends AbstractArquillianIT {
 		assertThat( violations.iterator().next().getConstraintDescriptor().getAnnotation().annotationType() ).isEqualTo( Future.class );
 	}
 
-	@Test
+	@Test(enabled = false)
 	public void canUseJavaMoneyBasedConstraint() {
 		Set<ConstraintViolation<Order>> violations = validator.validate( new Order( Money.of( 1200.0, "EUR" ) ) );
 
