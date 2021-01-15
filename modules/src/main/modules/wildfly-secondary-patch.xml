@@ -13,7 +13,7 @@
         <description>This patch upgrades Hibernate Validator to ${project.version} within a WildFly ${version.wildfly.secondary} installation</description>
         <specified-content>
             <modules>
-                <updated name="javax.validation.api" />
+                <updated name="jakarta.validation.api" />
                 <updated name="org.hibernate.validator" />
                 <updated name="org.hibernate.validator.cdi" />
             </modules>

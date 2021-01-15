@@ -21,16 +21,14 @@
     <description>Hibernate Validator WildFly integration tests.</description>
 
     <properties>
-        <wildfly.target-dir>${project.build.directory}/wildfly-${version.wildfly}</wildfly.target-dir>
+        <wildfly.target-dir>${project.build.directory}/wildfly-preview-${version.wildfly}</wildfly.target-dir>
         <wildfly.modules-dir>${wildfly.target-dir}/modules/system/layers/base</wildfly.modules-dir>
-
+        <!--
         <wildfly-secondary.target-dir>${project.build.directory}/wildfly-${version.wildfly.secondary}</wildfly-secondary.target-dir>
         <wildfly-secondary.modules-dir>${wildfly-secondary.target-dir}/modules/system/layers/base</wildfly-secondary.modules-dir>
+        -->
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
-
-        <!-- Temporary, should be removed as soon as we have a Jakarta EE 9 WildFly -->
-        <skipTests>true</skipTests>
     </properties>
 
     <dependencies>
@@ -158,7 +156,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-validator-modules</artifactId>
-            <classifier>wildfly-${version.wildfly}-patch</classifier>
+            <classifier>wildfly-preview-${version.wildfly}-patch</classifier>
             <type>zip</type>
             <scope>test</scope>
         </dependency>
@@ -220,7 +218,7 @@
                                 <!-- WildFly current -->
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
-                                    <artifactId>wildfly-dist</artifactId>
+                                    <artifactId>wildfly-preview-dist</artifactId>
                                     <version>${version.wildfly}</version>
                                     <type>tar.gz</type>
                                     <overWrite>false</overWrite>
@@ -242,7 +240,7 @@
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>hibernate-validator-modules</artifactId>
                                     <version>${project.version}</version>
-                                    <classifier>wildfly-${version.wildfly}-patch</classifier>
+                                    <classifier>wildfly-preview-${version.wildfly}-patch</classifier>
                                     <type>zip</type>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
@@ -310,10 +308,10 @@
                         </goals>
                         <configuration>
                             <offline>true</offline>
-                            <jbossHome>${project.build.directory}/wildfly-${version.wildfly}/</jbossHome>
+                            <jbossHome>${project.build.directory}/wildfly-preview-${version.wildfly}/</jbossHome>
                             <fail-on-error>false</fail-on-error>
                             <commands>
-                                <command>patch apply ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${version.wildfly}-patch.zip</command>
+                                <command>patch apply ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-preview-${version.wildfly}-patch.zip</command>
                             </commands>
                         </configuration>
                     </execution>
@@ -333,6 +331,7 @@
             </properties>
         </profile>
         <!-- WildFly 13 does not support JDK 11 so running the tests with WildFly 13 for JDK 10 - -->
+        <!--
         <profile>
             <id>jdk10-</id>
             <activation>
@@ -344,7 +343,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <executions>
-                            <!-- WildFly secondary version -->
                             <execution>
                                 <id>wildfly-secondary-integration-test</id>
                                 <goals>
@@ -371,7 +369,6 @@
                                 </goals>
                                 <configuration>
                                     <artifactItems>
-                                        <!-- WildFly secondary version -->
                                         <artifactItem>
                                             <groupId>org.wildfly</groupId>
                                             <artifactId>wildfly-dist</artifactId>
@@ -391,7 +388,6 @@
                                 </goals>
                                 <configuration>
                                     <artifactItems>
-                                        <!-- WildFly secondary version -->
                                         <artifactItem>
                                             <groupId>${project.groupId}</groupId>
                                             <artifactId>hibernate-validator-modules</artifactId>
@@ -411,7 +407,6 @@
                                 </goals>
                                 <configuration>
                                     <artifactItems>
-                                        <!-- WildFly secondary version -->
                                         <artifactItem>
                                             <groupId>javax.money</groupId>
                                             <artifactId>money-api</artifactId>
@@ -432,7 +427,6 @@
                     <plugin>
                         <artifactId>maven-resources-plugin</artifactId>
                         <executions>
-                            <!-- WildFly secondary version -->
                             <execution>
                                 <id>copy-wildfly-secondary-resources</id>
                                 <phase>pre-integration-test</phase>
@@ -455,7 +449,6 @@
                         <groupId>org.wildfly.plugins</groupId>
                         <artifactId>wildfly-maven-plugin</artifactId>
                         <executions>
-                            <!-- WildFly secondary version -->
                             <execution>
                                 <id>apply-wildfly-secondary-patch-file</id>
                                 <phase>pre-integration-test</phase>
@@ -476,5 +469,6 @@
                 </plugins>
             </build>
         </profile>
+        -->
     </profiles>
 </project>
