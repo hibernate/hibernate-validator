@@ -22,14 +22,14 @@ def removeDependency(File file, String dependencyToRemove) {
 }
 
 // Jakarta Bean Validation API
-bvModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/javax/validation/api/main/module.xml' )
+bvModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/jakarta/validation/api/main/module.xml' )
 def bvArtifactName = 'jakarta.validation-api-' + project.properties['version.jakarta.validation-api'] + '.jar';
 println "[INFO] Using Jakarta Bean Validation version " + bvArtifactName;
 processFileInplace( bvModuleXml ) { text ->
     text.replaceAll( /<resource-root path=".*validation-api.*jar/, '<resource-root path="' + bvArtifactName )
 }
 
-deleteFiles( new FileNameFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/javax/validation/api/main', '*.jar' ) )
+deleteFiles( new FileNameFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/jakarta/validation/api/main', '*.jar' ) )
 
 // HV
 hvModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/org/hibernate/validator/main/module.xml' )
