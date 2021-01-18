@@ -17,12 +17,14 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.Properties;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -303,21 +305,35 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	private static class AggregateResourceBundle extends ResourceBundle {
 
 		protected static final Control CONTROL = new AggregateResourceBundleControl();
-		private final Properties properties;
+		private final Set<PropertyResourceBundle> properties;
 
-		protected AggregateResourceBundle(Properties properties) {
+		protected AggregateResourceBundle(Set<PropertyResourceBundle> properties) {
 			this.properties = properties;
 		}
 
+		/**
+		 * Search object key in each properties until founded. If duplicated key, first value is returned
+		 */
 		@Override
 		protected Object handleGetObject(String key) {
-			return properties.get( key );
+			for ( PropertyResourceBundle property : properties ) {
+				Object object = property.handleGetObject( key );
+				if ( object != null ) {
+					return object;
+				}
+			}
+			return null;
 		}
 
 		@Override
 		public Enumeration<String> getKeys() {
 			Set<String> keySet = newHashSet();
-			keySet.addAll( properties.stringPropertyNames() );
+			List<String> keys = properties.stream()
+					.map( PropertyResourceBundle::getKeys )
+					.map( Collections::list )
+					.flatMap( List::stream )
+					.collect( Collectors.toList() );
+			keySet.addAll( keys );
 			if ( parent != null ) {
 				keySet.addAll( Collections.list( parent.getKeys() ) );
 			}
@@ -340,18 +356,17 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 			}
 
 			String resourceName = toBundleName( baseName, locale ) + ".properties";
-			Properties properties = load( resourceName, loader );
-			return properties.size() == 0 ? null : new AggregateResourceBundle( properties );
+			Set<PropertyResourceBundle> properties = load( resourceName, loader );
+			return properties.isEmpty() ? null : new AggregateResourceBundle( properties );
 		}
 
-		private Properties load(String resourceName, ClassLoader loader) throws IOException {
-			Properties aggregatedProperties = new Properties();
+		private static Set<PropertyResourceBundle> load(String resourceName, ClassLoader loader) throws IOException {
+			Set<PropertyResourceBundle> aggregatedProperties = newHashSet();
 			Enumeration<URL> urls = run( GetResources.action( loader, resourceName ) );
 			while ( urls.hasMoreElements() ) {
 				URL url = urls.nextElement();
-				Properties properties = new Properties();
-				properties.load( url.openStream() );
-				aggregatedProperties.putAll( properties );
+				PropertyResourceBundle propertyResourceBundle = new PropertyResourceBundle( url.openStream() );
+				aggregatedProperties.add( propertyResourceBundle );
 			}
 			return aggregatedProperties;
 		}
