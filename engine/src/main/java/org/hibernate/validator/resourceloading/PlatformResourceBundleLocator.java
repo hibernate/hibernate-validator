@@ -337,7 +337,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 			if ( parent != null ) {
 				keySet.addAll( Collections.list( parent.getKeys() ) );
 			}
-			return Collections.enumeration( keys );
+			return Collections.enumeration( keySet );
 		}
 	}
 
