@@ -36,4 +36,6 @@ public @interface ConstraintComposition {
 	 * @return the {@code CompositionType} value
 	 */
 	CompositionType value() default AND;
+
+	String message() default "";
 }
