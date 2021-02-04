@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.resourceloading;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.io.IOException;
@@ -16,9 +15,10 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -229,7 +229,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 						bundleName,
 						locale,
 						classLoader,
-						AggregateResourceBundle.CONTROL
+						AggregateResourceBundleControl.CONTROL
 				);
 			}
 			else {
@@ -273,7 +273,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 */
 	private static boolean determineAvailabilityOfResourceBundleControl() {
 		try {
-			ResourceBundle.Control dummyControl = AggregateResourceBundle.CONTROL;
+			ResourceBundle.Control dummyControl = AggregateResourceBundleControl.CONTROL;
 
 			if ( dummyControl == null ) {
 				return false;
@@ -298,44 +298,10 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 		}
 	}
 
-	/**
-	 * Inspired by <a href="http://stackoverflow.com/questions/4614465/is-it-possible-to-include-resource-bundle-files-within-a-resource-bundle">this</a>
-	 * Stack Overflow question.
-	 */
-	private static class AggregateResourceBundle extends ResourceBundle {
-
-		protected static final Control CONTROL = new AggregateResourceBundleControl();
-
-		@Immutable
-		private final Map<String, Object> properties;
-
-		protected AggregateResourceBundle(Map<String, Object> properties) {
-			this.properties = CollectionHelper.toImmutableMap( properties );
-		}
-
-		@Override
-		protected Object handleGetObject(String key) {
-			return properties.get( key );
-		}
-
-		@Override
-		protected Set<String> handleKeySet() {
-			return properties.keySet();
-		}
-
-		@Override
-		public Enumeration<String> getKeys() {
-			Set<String> keySet = newHashSet( properties.keySet() );
-
-			if ( parent != null ) {
-				keySet.addAll( Collections.list( parent.getKeys() ) );
-			}
-
-			return Collections.enumeration( keySet );
-		}
-	}
-
 	private static class AggregateResourceBundleControl extends ResourceBundle.Control {
+
+		private static final ResourceBundle.Control CONTROL = new AggregateResourceBundleControl();
+
 		@Override
 		public ResourceBundle newBundle(
 				String baseName,
@@ -350,27 +316,22 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 			}
 
 			String resourceName = toBundleName( baseName, locale ) + ".properties";
-			Map<String, Object> properties = load( resourceName, loader );
-			return properties.isEmpty() ? null : new AggregateResourceBundle( properties );
+			List<ResourceBundle> resourceBundles = load( resourceName, loader );
+			return resourceBundles.isEmpty() ? null : new AggregateResourceBundle( resourceBundles );
 		}
 
-		private static Map<String, Object> load(String resourceName, ClassLoader loader) throws IOException {
-			Map<String, Object> aggregatedProperties = new HashMap<>();
+		private static List<ResourceBundle> load(String resourceName, ClassLoader loader) throws IOException {
+			List<ResourceBundle> resourceBundles = new ArrayList<>();
 
 			Enumeration<URL> urls = run( GetResources.action( loader, resourceName ) );
 			while ( urls.hasMoreElements() ) {
 				URL url = urls.nextElement();
 				try ( InputStream propertyStream = url.openStream() ) {
-					PropertyResourceBundle propertyResourceBundle = new PropertyResourceBundle( propertyStream );
-					Enumeration<String> keys = propertyResourceBundle.getKeys();
-					while ( keys.hasMoreElements() ) {
-						String key = keys.nextElement();
-						aggregatedProperties.put( key, propertyResourceBundle.getObject( key ) );
-					}
+					resourceBundles.add( new PropertyResourceBundle( propertyStream ) );
 				}
 			}
 
-			return aggregatedProperties;
+			return resourceBundles;
 		}
 	}
 }
