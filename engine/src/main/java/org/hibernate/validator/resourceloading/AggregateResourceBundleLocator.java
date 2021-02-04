@@ -8,12 +8,8 @@ package org.hibernate.validator.resourceloading;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -175,89 +171,20 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 			sourceBundles.add( bundleFromDelegate );
 		}
 
-		return sourceBundles.isEmpty() ? null : new AggregateBundle( sourceBundles );
+		return sourceBundles.isEmpty() ? null : new AggregateResourceBundle( sourceBundles );
 	}
 
 	/**
 	 * A {@link ResourceBundle} whose content is aggregated from multiple source bundles.
-	 * <p>
-	 * This class is package-private for the sake of testability.
-	 * </p>
 	 *
 	 * @author Gunnar Morling
+	 * @deprecated This class should not have been part of the public API and will be removed at a later stage.
 	 */
-	public static class AggregateBundle extends ResourceBundle {
-		private final Map<String, Object> contents = new HashMap<String, Object>();
+	@Deprecated
+	public static class AggregateBundle extends AggregateResourceBundle {
 
-		/**
-		 * Creates a new AggregateBundle.
-		 *
-		 * @param bundles A list of source bundles, which shall be merged into one
-		 * aggregated bundle. The newly created bundle will contain
-		 * all keys from all source bundles. In case a key occurs in
-		 * multiple source bundles, the value will be taken from the
-		 * first bundle containing the key.
-		 */
 		public AggregateBundle(List<ResourceBundle> bundles) {
-			if ( bundles != null ) {
-
-				for ( ResourceBundle bundle : bundles ) {
-					Enumeration<String> keys = bundle.getKeys();
-					while ( keys.hasMoreElements() ) {
-						String oneKey = keys.nextElement();
-						if ( !contents.containsKey( oneKey ) ) {
-							contents.put( oneKey, bundle.getObject( oneKey ) );
-						}
-					}
-				}
-			}
-		}
-
-		@Override
-		public Enumeration<String> getKeys() {
-			return new IteratorEnumeration<String>( contents.keySet().iterator() );
-		}
-
-		@Override
-		protected Object handleGetObject(String key) {
-			return contents.get( key );
-		}
-	}
-
-	/**
-	 * An {@link Enumeration} implementation, that wraps an {@link Iterator}. Can
-	 * be used to integrate older APIs working with enumerations with iterators.
-	 *
-	 * @param <T> The enumerated type.
-	 *
-	 * @author Gunnar Morling
-	 */
-	private static class IteratorEnumeration<T> implements Enumeration<T> {
-
-		private final Iterator<T> source;
-
-		/**
-		 * Creates a new IterationEnumeration.
-		 *
-		 * @param source The source iterator. Must not be null.
-		 */
-		public IteratorEnumeration(Iterator<T> source) {
-
-			if ( source == null ) {
-				throw new IllegalArgumentException( "Source must not be null" );
-			}
-
-			this.source = source;
-		}
-
-		@Override
-		public boolean hasMoreElements() {
-			return source.hasNext();
-		}
-
-		@Override
-		public T nextElement() {
-			return source.next();
+			super( bundles );
 		}
 	}
 }
