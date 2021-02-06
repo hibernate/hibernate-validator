@@ -32,18 +32,5 @@
             -->
         </configuration>
     </container>
-    <!--
-    <container qualifier="wildfly-secondary">
-        <protocol type="jmx-wildfly">
-            <property name="executionType">REMOTE</property>
-        </protocol>
-        <configuration>
-            <property name="jbossHome">${basedir}/target/wildfly-${version.wildfly.secondary}</property>
-            <property name="javaVmArguments">
-                ${arquillian.wildfly.jvm.args}
-            </property>
-        </configuration>
-    </container>
-    -->
 
 </arquillian>
