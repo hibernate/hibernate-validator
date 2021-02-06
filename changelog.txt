@@ -1,6 +1,12 @@
 Hibernate Validator Changelog
 =============================
 
+7.0.1.Final (06-02-2021)
+-------------------------
+
+** Task
+    * HV-1826 - tck-runner - Reintroduce TCK Runner in container tests for Jakarta EE 9 using WildFly Preview
+
 7.0.0.Final (23-12-2020)
 -------------------------
 
