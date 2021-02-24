@@ -101,10 +101,10 @@ public class ValidatorFactoryScopedContext {
 			boolean failFast,
 			boolean failFastOnPropertyViolation,
 			boolean traversableResolverResultCacheEnabled,
+			boolean showValidatedValuesInTraceLogs,
 			Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
-			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
-			boolean showValidatedValuesInTraceLogs) {
+			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel) {
 		this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
 				failFastOnPropertyViolation, traversableResolverResultCacheEnabled, showValidatedValuesInTraceLogs, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
 				customViolationExpressionLanguageFeatureLevel,
@@ -112,7 +112,7 @@ public class ValidatorFactoryScopedContext {
 						temporalValidationTolerance ) );
 	}
 
-	private ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
+	ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ClockProvider clockProvider,
@@ -121,7 +121,8 @@ public class ValidatorFactoryScopedContext {
 			boolean failFast,
 			boolean failFastOnPropertyViolation,
 			boolean traversableResolverResultCacheEnabled,
-			boolean showValidatedValuesInTraceLogs, Object constraintValidatorPayload,
+			boolean showValidatedValuesInTraceLogs,
+			Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
 			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
 			HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext) {
@@ -212,7 +213,6 @@ public class ValidatorFactoryScopedContext {
 		private Object constraintValidatorPayload;
 		private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
 		private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
-
 		private boolean showValidatedValuesInTraceLogs;
 		private HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
 
