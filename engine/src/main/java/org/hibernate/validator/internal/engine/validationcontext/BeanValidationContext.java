@@ -16,6 +16,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
+import org.hibernate.validator.internal.engine.tracking.ProcessedBeansTrackingStrategy;
 import org.hibernate.validator.internal.engine.valuecontext.ValueContext;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 
@@ -37,12 +38,14 @@ class BeanValidationContext<T> extends AbstractValidationContext<T> {
 			BeanMetaData<T> rootBeanMetaData
 	) {
 		super( constraintValidatorManager, constraintValidatorFactory, validatorScopedContext, traversableResolver, constraintValidatorInitializationContext,
-				rootBean, rootBeanClass, rootBeanMetaData, buildDisableAlreadyValidatedBeanTracking( rootBeanMetaData )
+				rootBean, rootBeanClass, rootBeanMetaData, buildProcessedBeansTrackingEnabled( validatorScopedContext.getProcessedBeansTrackingStrategy(),
+						rootBeanClass, rootBeanMetaData )
 		);
 	}
 
-	private static boolean buildDisableAlreadyValidatedBeanTracking(BeanMetaData<?> rootBeanMetaData) {
-		return !rootBeanMetaData.hasCascadables();
+	private static boolean buildProcessedBeansTrackingEnabled(ProcessedBeansTrackingStrategy processedBeansTrackingStrategy, Class<?> rootBeanClass,
+			BeanMetaData<?> rootBeanMetaData) {
+		return processedBeansTrackingStrategy.isEnabledForBean( rootBeanClass, rootBeanMetaData.hasCascadables() );
 	}
 
 	@Override

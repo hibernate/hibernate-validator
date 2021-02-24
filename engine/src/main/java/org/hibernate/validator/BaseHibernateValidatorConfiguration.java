@@ -25,6 +25,7 @@ import jakarta.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.internal.engine.tracking.ProcessedBeansTrackingStrategy;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
@@ -501,4 +502,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	S showValidatedValuesInTraceLogs(boolean enabled);
+
+	@Incubating
+	S processedBeansTrackingStrategy(ProcessedBeansTrackingStrategy processedBeanTrackingStrategy);
 }

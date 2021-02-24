@@ -15,6 +15,7 @@ import jakarta.validation.TraversableResolver;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
+import org.hibernate.validator.internal.engine.tracking.ProcessedBeansTrackingStrategy;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
@@ -79,6 +80,11 @@ public class ValidatorFactoryScopedContext {
 	private final ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 
 	/**
+	 * Strategy used to enable or not processed beans tracking.
+	 */
+	private final ProcessedBeansTrackingStrategy processedBeansTrackingStrategy;
+
+	/**
 	 * The constraint validator initialization context.
 	 */
 	private final HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
@@ -99,15 +105,16 @@ public class ValidatorFactoryScopedContext {
 			Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
 			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
+			ProcessedBeansTrackingStrategy processedBeansTrackingStrategy,
 			boolean showValidatedValuesInTraceLogs) {
 		this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
 				traversableResolverResultCacheEnabled, showValidatedValuesInTraceLogs, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
-				customViolationExpressionLanguageFeatureLevel,
+				customViolationExpressionLanguageFeatureLevel, processedBeansTrackingStrategy,
 				new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
 						temporalValidationTolerance ) );
 	}
 
-	private ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
+	ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ClockProvider clockProvider,
@@ -118,6 +125,7 @@ public class ValidatorFactoryScopedContext {
 			boolean showValidatedValuesInTraceLogs, Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
 			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
+			ProcessedBeansTrackingStrategy processedBeanTrackingStrategy,
 			HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext) {
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
@@ -131,6 +139,7 @@ public class ValidatorFactoryScopedContext {
 		this.constraintExpressionLanguageFeatureLevel = constraintExpressionLanguageFeatureLevel;
 		this.customViolationExpressionLanguageFeatureLevel = customViolationExpressionLanguageFeatureLevel;
 		this.showValidatedValuesInTraceLogs = showValidatedValuesInTraceLogs;
+		this.processedBeansTrackingStrategy = processedBeanTrackingStrategy;
 		this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
 	}
 
@@ -186,6 +195,10 @@ public class ValidatorFactoryScopedContext {
 		return showValidatedValuesInTraceLogs;
 	}
 
+	public ProcessedBeansTrackingStrategy getProcessedBeansTrackingStrategy() {
+		return processedBeansTrackingStrategy;
+	}
+
 	static class Builder {
 		private final ValidatorFactoryScopedContext defaultContext;
 
@@ -200,6 +213,7 @@ public class ValidatorFactoryScopedContext {
 		private Object constraintValidatorPayload;
 		private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
 		private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
+		private ProcessedBeansTrackingStrategy processedBeansTrackingStrategy;
 
 		private boolean showValidatedValuesInTraceLogs;
 		private HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
@@ -220,6 +234,7 @@ public class ValidatorFactoryScopedContext {
 			this.constraintExpressionLanguageFeatureLevel = defaultContext.constraintExpressionLanguageFeatureLevel;
 			this.customViolationExpressionLanguageFeatureLevel = defaultContext.customViolationExpressionLanguageFeatureLevel;
 			this.showValidatedValuesInTraceLogs = defaultContext.showValidatedValuesInTraceLogs;
+			this.processedBeansTrackingStrategy = defaultContext.processedBeansTrackingStrategy;
 			this.constraintValidatorInitializationContext = defaultContext.constraintValidatorInitializationContext;
 		}
 
@@ -312,6 +327,12 @@ public class ValidatorFactoryScopedContext {
 			return this;
 		}
 
+		public ValidatorFactoryScopedContext.Builder setProcessedBeansTrackingStrategy(
+				ProcessedBeansTrackingStrategy processedBeansTrackingStrategy) {
+			this.processedBeansTrackingStrategy = processedBeansTrackingStrategy;
+			return this;
+		}
+
 		public ValidatorFactoryScopedContext build() {
 			return new ValidatorFactoryScopedContext(
 					messageInterpolator,
@@ -325,6 +346,7 @@ public class ValidatorFactoryScopedContext {
 					showValidatedValuesInTraceLogs, constraintValidatorPayload,
 					constraintExpressionLanguageFeatureLevel,
 					customViolationExpressionLanguageFeatureLevel,
+					processedBeansTrackingStrategy,
 					HibernateConstraintValidatorInitializationContextImpl.of(
 							constraintValidatorInitializationContext,
 							scriptEvaluatorFactory,
