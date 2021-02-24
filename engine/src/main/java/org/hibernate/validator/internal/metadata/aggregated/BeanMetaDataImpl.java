@@ -29,6 +29,7 @@ import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
+import org.hibernate.validator.internal.engine.tracking.ProcessedBeansTrackingStrategy;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -43,6 +44,8 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.spi.tracking.ProcessedBeansTrackingVoter;
+import org.hibernate.validator.spi.tracking.ProcessedBeansTrackingVoter.Vote;
 
 /**
  * This class encapsulates all meta data needed for validation. Implementations of {@code Validator} interface can
@@ -184,6 +187,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private volatile BeanDescriptor beanDescriptor;
 
 	/**
+	 * Whether tracking of processed beans should be enabled for objects of this type.
+	 */
+	private final boolean trackingEnabled;
+
+	/**
 	 * Creates a new {@link BeanMetaDataImpl}
 	 *
 	 * @param beanClass The Java type represented by this meta data object.
@@ -195,7 +203,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			List<Class<?>> defaultGroupSequence,
 			DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider,
 			Set<ConstraintMetaData> constraintMetaDataSet,
-			ValidationOrderGenerator validationOrderGenerator) {
+			ValidationOrderGenerator validationOrderGenerator,
+			ProcessedBeansTrackingVoter processedBeansTrackingVoter) {
 
 		this.validationOrderGenerator = validationOrderGenerator;
 		this.beanClass = beanClass;
@@ -270,6 +279,60 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		// We initialize those elements eagerly so that any eventual error is thrown when bootstrapping the bean metadata
 		this.defaultGroupSequenceRedefined = this.defaultGroupSequence.size() > 1 || hasDefaultGroupSequenceProvider();
 		this.resolvedDefaultGroupSequence = getDefaultGroupSequence( null );
+
+		Vote processedBeansTrackingVote = processedBeansTrackingVoter.isEnabledForBean( beanClass, hasCascadables() );
+		switch ( processedBeansTrackingVote ) {
+			case NON_TRACKING:
+				this.trackingEnabled = false;
+				break;
+			case TRACKING:
+				this.trackingEnabled = true;
+				break;
+			default:
+				this.trackingEnabled = hasCascadables();
+				break;
+		}
+	}
+
+	public BeanMetaDataImpl(BeanMetaDataImpl<T> originalBeanMetaData, ProcessedBeansTrackingStrategy processedBeansTrackingStrategy,
+			ProcessedBeansTrackingVoter processedBeansTrackingVoter) {
+		this.validationOrderGenerator = originalBeanMetaData.validationOrderGenerator;
+		this.beanClass = originalBeanMetaData.beanClass;
+		this.propertyMetaDataMap = originalBeanMetaData.propertyMetaDataMap;
+		this.hasConstraints = originalBeanMetaData.hasConstraints;
+		this.cascadedProperties = originalBeanMetaData.cascadedProperties;
+		this.allMetaConstraints = originalBeanMetaData.allMetaConstraints;
+		this.allDirectMetaConstraints = originalBeanMetaData.allDirectMetaConstraints;
+		this.classMetaConstraints = originalBeanMetaData.classMetaConstraints;
+		this.propertyMetaConstraints = originalBeanMetaData.propertyMetaConstraints;
+		this.directClassMetaConstraints = originalBeanMetaData.directClassMetaConstraints;
+		this.directPropertyMetaConstraints = originalBeanMetaData.directPropertyMetaConstraints;
+		this.classHierarchyWithoutInterfaces = originalBeanMetaData.classHierarchyWithoutInterfaces;
+		this.defaultGroupSequenceProvider = originalBeanMetaData.defaultGroupSequenceProvider;
+		this.defaultGroupSequence = originalBeanMetaData.defaultGroupSequence;
+		this.validationOrder = originalBeanMetaData.validationOrder;
+		Map<Signature, ExecutableMetaData> tempExecutableMetaDataMap = newHashMap();
+		for ( Entry<Signature, ExecutableMetaData> executableMetaDataEntry : originalBeanMetaData.executableMetaDataMap.entrySet() ) {
+			tempExecutableMetaDataMap.put( executableMetaDataEntry.getKey(),
+					new ExecutableMetaData( executableMetaDataEntry.getValue(), processedBeansTrackingStrategy, processedBeansTrackingVoter ) );
+		}
+		this.executableMetaDataMap = CollectionHelper.toImmutableMap( tempExecutableMetaDataMap );
+		this.unconstrainedExecutables = originalBeanMetaData.unconstrainedExecutables;
+		this.defaultGroupSequenceRedefined = originalBeanMetaData.defaultGroupSequenceRedefined;
+		this.resolvedDefaultGroupSequence = originalBeanMetaData.resolvedDefaultGroupSequence;
+
+		Vote processedBeansTrackingVote = processedBeansTrackingVoter.isEnabledForBean( beanClass, hasCascadables() );
+		switch ( processedBeansTrackingVote ) {
+			case NON_TRACKING:
+				this.trackingEnabled = false;
+				break;
+			case TRACKING:
+				this.trackingEnabled = true;
+				break;
+			default:
+				this.trackingEnabled = processedBeansTrackingStrategy.isEnabledForBean( this.beanClass, hasCascadables() );
+				break;
+		}
 	}
 
 	@Override
@@ -407,6 +470,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@Override
 	public List<Class<? super T>> getClassHierarchy() {
 		return classHierarchyWithoutInterfaces;
+	}
+
+	@Override
+	public boolean isTrackingEnabled() {
+		return trackingEnabled;
 	}
 
 	private static BeanDescriptor createBeanDescriptor(Class<?> beanClass, Set<MetaConstraint<?>> classMetaConstraints,

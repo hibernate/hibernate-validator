@@ -33,6 +33,7 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
+import org.hibernate.validator.spi.tracking.ProcessedBeansTrackingVoter;
 
 /**
  * This manager is in charge of providing all constraint related meta data
@@ -95,6 +96,8 @@ public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 
 	private final ValidationOrderGenerator validationOrderGenerator;
 
+	private final ProcessedBeansTrackingVoter processedBeansTrackingVoter;
+
 	/**
 	 * the three properties in this field affect the invocation of rules associated to section 4.5.5
 	 * of the specification.  By default they are all false, if true they allow
@@ -109,14 +112,15 @@ public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 			BeanMetaDataClassNormalizer beanMetaDataClassNormalizer,
 			ValidationOrderGenerator validationOrderGenerator,
 			List<MetaDataProvider> optionalMetaDataProviders,
-			MethodValidationConfiguration methodValidationConfiguration) {
+			MethodValidationConfiguration methodValidationConfiguration,
+			ProcessedBeansTrackingVoter processedBeansTrackingVoter) {
 		this.constraintCreationContext = constraintCreationContext;
 		this.executableHelper = executableHelper;
 		this.parameterNameProvider = parameterNameProvider;
 		this.beanMetaDataClassNormalizer = beanMetaDataClassNormalizer;
 		this.validationOrderGenerator = validationOrderGenerator;
-
 		this.methodValidationConfiguration = methodValidationConfiguration;
+		this.processedBeansTrackingVoter = processedBeansTrackingVoter;
 
 		this.beanMetaDataCache = new ConcurrentReferenceHashMap<>(
 				DEFAULT_INITIAL_CAPACITY,
@@ -193,7 +197,8 @@ public class BeanMetaDataManagerImpl implements BeanMetaDataManager {
 	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
 		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance(
 				constraintCreationContext, executableHelper, parameterNameProvider,
-				validationOrderGenerator, clazz, methodValidationConfiguration );
+				validationOrderGenerator, clazz, methodValidationConfiguration,
+				processedBeansTrackingVoter );
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
 			for ( BeanConfiguration<? super T> beanConfiguration : getBeanConfigurationForHierarchy( provider, clazz ) ) {

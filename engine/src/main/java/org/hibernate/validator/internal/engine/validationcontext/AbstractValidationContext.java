@@ -95,7 +95,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	/**
 	 * Indicates if the tracking of already validated bean should be disabled.
 	 */
-	private final boolean disableAlreadyValidatedBeanTracking;
+	private final boolean processedBeanTrackingEnabled;
 
 	/**
 	 * The set of already processed meta constraints per bean - path ({@link BeanPathMetaConstraintProcessedUnit}).
@@ -130,7 +130,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			T rootBean,
 			Class<T> rootBeanClass,
 			BeanMetaData<T> rootBeanMetaData,
-			boolean disableAlreadyValidatedBeanTracking
+			boolean processedBeanTrackingEnabled
 	) {
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.validatorScopedContext = validatorScopedContext;
@@ -142,7 +142,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		this.rootBeanClass = rootBeanClass;
 		this.rootBeanMetaData = rootBeanMetaData;
 
-		this.disableAlreadyValidatedBeanTracking = disableAlreadyValidatedBeanTracking;
+		this.processedBeanTrackingEnabled = processedBeanTrackingEnabled;
 	}
 
 	@Override
@@ -197,7 +197,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 	@Override
 	public boolean isBeanAlreadyValidated(Object value, Class<?> group, ModifiablePath path) {
-		if ( disableAlreadyValidatedBeanTracking ) {
+		if ( !processedBeanTrackingEnabled ) {
 			return false;
 		}
 
@@ -212,7 +212,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 	@Override
 	public void markCurrentBeanAsProcessed(ValueContext<?, ?> valueContext) {
-		if ( disableAlreadyValidatedBeanTracking ) {
+		if ( !processedBeanTrackingEnabled ) {
 			return;
 		}
 

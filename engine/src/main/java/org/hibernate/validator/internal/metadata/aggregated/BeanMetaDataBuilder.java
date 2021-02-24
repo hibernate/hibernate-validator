@@ -23,6 +23,7 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.spi.tracking.ProcessedBeansTrackingVoter;
 
 /**
  * @author Hardy Ferentschik
@@ -41,6 +42,7 @@ public class BeanMetaDataBuilder<T> {
 	private final ExecutableHelper executableHelper;
 	private final ExecutableParameterNameProvider parameterNameProvider;
 	private final MethodValidationConfiguration methodValidationConfiguration;
+	private ProcessedBeansTrackingVoter processedBeansTrackingVoter;
 
 	private ConfigurationSource sequenceSource;
 	private ConfigurationSource providerSource;
@@ -54,13 +56,15 @@ public class BeanMetaDataBuilder<T> {
 			ExecutableParameterNameProvider parameterNameProvider,
 			ValidationOrderGenerator validationOrderGenerator,
 			Class<T> beanClass,
-			MethodValidationConfiguration methodValidationConfiguration) {
+			MethodValidationConfiguration methodValidationConfiguration,
+			ProcessedBeansTrackingVoter processedBeansTrackingVoter) {
 		this.beanClass = beanClass;
 		this.constraintCreationContext = constraintCreationContext;
 		this.validationOrderGenerator = validationOrderGenerator;
 		this.executableHelper = executableHelper;
 		this.parameterNameProvider = parameterNameProvider;
 		this.methodValidationConfiguration = methodValidationConfiguration;
+		this.processedBeansTrackingVoter = processedBeansTrackingVoter;
 	}
 
 	public static <T> BeanMetaDataBuilder<T> getInstance(
@@ -69,14 +73,16 @@ public class BeanMetaDataBuilder<T> {
 			ExecutableParameterNameProvider parameterNameProvider,
 			ValidationOrderGenerator validationOrderGenerator,
 			Class<T> beanClass,
-			MethodValidationConfiguration methodValidationConfiguration) {
+			MethodValidationConfiguration methodValidationConfiguration,
+			ProcessedBeansTrackingVoter processedBeansTrackingVoter) {
 		return new BeanMetaDataBuilder<>(
 				constraintCreationContext,
 				executableHelper,
 				parameterNameProvider,
 				validationOrderGenerator,
 				beanClass,
-				methodValidationConfiguration );
+				methodValidationConfiguration,
+				processedBeansTrackingVoter );
 	}
 
 	public void add(BeanConfiguration<? super T> configuration) {
@@ -117,7 +123,8 @@ public class BeanMetaDataBuilder<T> {
 						constraintCreationContext,
 						executableHelper,
 						parameterNameProvider,
-						methodValidationConfiguration
+						methodValidationConfiguration,
+						processedBeansTrackingVoter
 				)
 		);
 	}
@@ -134,7 +141,8 @@ public class BeanMetaDataBuilder<T> {
 				defaultGroupSequence,
 				defaultGroupSequenceProvider,
 				aggregatedElements,
-				validationOrderGenerator
+				validationOrderGenerator,
+				processedBeansTrackingVoter
 		);
 	}
 
@@ -147,6 +155,7 @@ public class BeanMetaDataBuilder<T> {
 		private MetaDataBuilder metaDataBuilder;
 		private ExecutableMetaData.Builder methodBuilder;
 		private final MethodValidationConfiguration methodValidationConfiguration;
+		private final ProcessedBeansTrackingVoter processedBeansTrackingVoter;
 		private final int hashCode;
 
 		public BuilderDelegate(
@@ -155,7 +164,8 @@ public class BeanMetaDataBuilder<T> {
 				ConstraintCreationContext constraintCreationContext,
 				ExecutableHelper executableHelper,
 				ExecutableParameterNameProvider parameterNameProvider,
-				MethodValidationConfiguration methodValidationConfiguration
+				MethodValidationConfiguration methodValidationConfiguration,
+				ProcessedBeansTrackingVoter processedBeansTrackingVoter
 		) {
 			this.beanClass = beanClass;
 			this.constrainedElement = constrainedElement;
@@ -163,6 +173,7 @@ public class BeanMetaDataBuilder<T> {
 			this.executableHelper = executableHelper;
 			this.parameterNameProvider = parameterNameProvider;
 			this.methodValidationConfiguration = methodValidationConfiguration;
+			this.processedBeansTrackingVoter = processedBeansTrackingVoter;
 
 			switch ( constrainedElement.getKind() ) {
 				case FIELD:
@@ -188,7 +199,8 @@ public class BeanMetaDataBuilder<T> {
 								constraintCreationContext,
 								executableHelper,
 								parameterNameProvider,
-								methodValidationConfiguration
+								methodValidationConfiguration,
+								processedBeansTrackingVoter
 						);
 					}
 
@@ -235,7 +247,8 @@ public class BeanMetaDataBuilder<T> {
 							constraintCreationContext,
 							executableHelper,
 							parameterNameProvider,
-							methodValidationConfiguration
+							methodValidationConfiguration,
+							processedBeansTrackingVoter
 					);
 				}
 

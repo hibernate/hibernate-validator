@@ -35,12 +35,8 @@ class BeanValidationContext<T> extends AbstractValidationContext<T> {
 			BeanMetaData<T> rootBeanMetaData
 	) {
 		super( constraintValidatorManager, constraintValidatorFactory, validatorScopedContext, traversableResolver, constraintValidatorInitializationContext,
-				rootBean, rootBeanClass, rootBeanMetaData, buildDisableAlreadyValidatedBeanTracking( rootBeanMetaData )
+				rootBean, rootBeanClass, rootBeanMetaData, rootBeanMetaData.isTrackingEnabled()
 		);
-	}
-
-	private static boolean buildDisableAlreadyValidatedBeanTracking(BeanMetaData<?> rootBeanMetaData) {
-		return !rootBeanMetaData.hasCascadables();
 	}
 
 	@Override

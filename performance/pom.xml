@@ -32,6 +32,7 @@
         -->
         <sources.to.add.main>${project.basedir}/src/main/java</sources.to.add.main>
         <sources.to.add.additional>${project.basedir}/src/main/java</sources.to.add.additional>
+        <sources.to.add.additional.predefined>${project.basedir}/src/main/java</sources.to.add.additional.predefined>
 
         <!--
         Need to specify something, since the plugin cannot handle empty options. Using something which does not have
@@ -89,6 +90,7 @@
                                 <sources>
                                     <source>${sources.to.add.main}</source>
                                     <source>${sources.to.add.additional}</source>
+                                    <source>${sources.to.add.additional.predefined}</source>
                                 </sources>
                             </configuration>
                         </execution>
@@ -164,6 +166,7 @@
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>${project.version}</beanvalidation-impl.version>
                 <sources.to.add.main>${project.basedir}/src/main/jakarta</sources.to.add.main>
+                <sources.to.add.additional.predefined>${project.basedir}/src/main/jakarta-predefined-scope</sources.to.add.additional.predefined>
             </properties>
             <dependencies>
                 <dependency>
@@ -196,8 +199,9 @@
             <properties>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <validation-api.version>3.1.1.Final</validation-api.version>
-                <beanvalidation-impl.version>9.0.0.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>9.0.1.Final</beanvalidation-impl.version>
                 <sources.to.add.main>${project.basedir}/src/main/jakarta</sources.to.add.main>
+                <sources.to.add.additional.predefined>${project.basedir}/src/main/jakarta-predefined-scope</sources.to.add.additional.predefined>
             </properties>
             <dependencies>
                 <dependency>
@@ -232,6 +236,7 @@
                 <validation-api.version>3.0.0.Final</validation-api.version>
                 <beanvalidation-impl.version>8.0.3.Final</beanvalidation-impl.version>
                 <sources.to.add.main>${project.basedir}/src/main/jakarta</sources.to.add.main>
+                <sources.to.add.additional.predefined>${project.basedir}/src/main/jakarta-predefined-scope</sources.to.add.additional.predefined>
             </properties>
             <dependencies>
                 <dependency>
@@ -262,16 +267,17 @@
                 </property>
             </activation>
             <properties>
-                <validation-api.version>2.0.1.Final</validation-api.version>
+                <validation-api.version>2.0.2.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>6.2.5.Final</beanvalidation-impl.version>
                 <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
                 <sources.to.add.additional>${project.basedir}/src/main/javax-bv2</sources.to.add.additional>
+                <sources.to.add.additional.predefined>${project.basedir}/src/main/javax-predefined-scope</sources.to.add.additional.predefined>
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>javax.validation</groupId>
-                    <artifactId>validation-api</artifactId>
+                    <groupId>jakarta.validation</groupId>
+                    <artifactId>jakarta.validation-api</artifactId>
                     <version>${validation-api.version}</version>
                 </dependency>
                 <dependency>
@@ -281,8 +287,8 @@
                 </dependency>
                 <dependency>
                     <groupId>org.glassfish</groupId>
-                    <artifactId>javax.el</artifactId>
-                    <version>3.0.1-b12</version>
+                    <artifactId>jakarta.el</artifactId>
+                    <version>3.0.3</version>
                 </dependency>
                 <dependency>
                     <groupId>org.apache.logging.log4j</groupId>
@@ -301,7 +307,7 @@
             <properties>
                 <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>6.1.2.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>6.1.7.Final</beanvalidation-impl.version>
                 <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
                 <sources.to.add.additional>${project.basedir}/src/main/javax-bv2</sources.to.add.additional>
             </properties>
@@ -338,7 +344,7 @@
             <properties>
                 <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>6.0.19.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>6.0.22.Final</beanvalidation-impl.version>
                 <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
                 <sources.to.add.additional>${project.basedir}/src/main/javax-bv2</sources.to.add.additional>
             </properties>
