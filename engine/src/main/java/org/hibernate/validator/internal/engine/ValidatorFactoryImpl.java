@@ -48,6 +48,7 @@ import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
+import org.hibernate.validator.internal.engine.tracking.DefaultProcessedBeansTrackingVoter;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManagerImpl;
@@ -68,6 +69,7 @@ import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.spi.tracking.ProcessedBeansTrackingVoter;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is the Hibernate Validator default
@@ -133,6 +135,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private final ValidationOrderGenerator validationOrderGenerator;
 
+	private final ProcessedBeansTrackingVoter processedBeansTrackingVoter;
+
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		ClassLoader externalClassLoader = determineExternalClassLoader( configurationState );
 
@@ -162,10 +166,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				determineFailFast( hibernateSpecificConfig, properties ),
 				determineFailFastOnPropertyViolation( hibernateSpecificConfig, properties ),
 				determineTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
+				determineShowValidatedValuesInTraceLogs( hibernateSpecificConfig, properties ),
 				determineConstraintValidatorPayload( hibernateSpecificConfig ),
 				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
-				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
-				determineShowValidatedValuesInTraceLogs( hibernateSpecificConfig, properties )
+				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties )
 		);
 
 		ConstraintValidatorManager constraintValidatorManager = new ConstraintValidatorManagerImpl(
@@ -225,6 +229,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		else {
 			this.xmlMetaDataProvider = null;
 		}
+
+		this.processedBeansTrackingVoter = ( hibernateSpecificConfig != null && hibernateSpecificConfig.getProcessedBeansTrackingVoter() != null )
+				? hibernateSpecificConfig.getProcessedBeansTrackingVoter()
+				: new DefaultProcessedBeansTrackingVoter();
 
 		if ( LOG.isDebugEnabled() ) {
 			logValidatorFactoryScopedConfiguration( validatorFactoryScopedContext );
@@ -349,7 +357,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						beanMetadataClassNormalizer,
 						validationOrderGenerator,
 						buildMetaDataProviders(),
-						methodValidationConfiguration
+						methodValidationConfiguration,
+						processedBeansTrackingVoter
 				)
 		);
 
