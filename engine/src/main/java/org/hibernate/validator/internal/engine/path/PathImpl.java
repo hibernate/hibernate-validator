@@ -204,7 +204,7 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public NodeImpl makeLeafNodeIterable() {
-		requiresWriteableNodeList();
+		copyNodeList();
 
 		currentLeafNode = NodeImpl.makeIterable( currentLeafNode );
 
@@ -214,7 +214,7 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public NodeImpl makeLeafNodeIterableAndSetIndex(Integer index) {
-		requiresWriteableNodeList();
+		copyNodeList();
 
 		currentLeafNode = NodeImpl.makeIterableAndSetIndex( currentLeafNode, index );
 
@@ -224,7 +224,7 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public NodeImpl makeLeafNodeIterableAndSetMapKey(Object key) {
-		requiresWriteableNodeList();
+		copyNodeList();
 
 		currentLeafNode = NodeImpl.makeIterableAndSetMapKey( currentLeafNode, key );
 
@@ -309,6 +309,10 @@ public final class PathImpl implements Path, Serializable {
 			return;
 		}
 
+		copyNodeList();
+	}
+
+	private void copyNodeList() {
 		// Usually, the write operation is about adding one more node, so let's make the list one element larger.
 		List<Node> newNodeList = new ArrayList<>( nodeList.size() + 1 );
 		newNodeList.addAll( nodeList );
