@@ -11,6 +11,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Executable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -117,6 +118,10 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 			beanMetaData = (BeanMetaData<T>) beanMetaDataMap.computeIfAbsent( normalizedBeanClass, UninitializedBeanMetaData::new );
 		}
 		return beanMetaData;
+	}
+
+	public Collection<BeanMetaData<?>> getBeanMetaData() {
+		return beanMetaDataMap.values();
 	}
 
 	@Override

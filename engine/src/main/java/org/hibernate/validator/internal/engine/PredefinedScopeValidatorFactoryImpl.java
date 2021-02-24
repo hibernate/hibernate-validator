@@ -9,11 +9,11 @@ package org.hibernate.validator.internal.engine;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowMultipleCascadedValidationOnReturnValues;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowOverridingMethodAlterParameterConstraint;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowParallelMethodsDefineParameterConstraints;
-import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintExpressionLanguageFeatureLevel;
-import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineCustomViolationExpressionLanguageFeatureLevel;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineBeanMetaDataClassNormalizer;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintExpressionLanguageFeatureLevel;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintMappings;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintValidatorPayload;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineCustomViolationExpressionLanguageFeatureLevel;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineExternalClassLoader;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFast;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineScriptEvaluatorFactory;
@@ -44,8 +44,10 @@ import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.PredefinedScopeHibernateValidatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
+import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.PredefinedScopeConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
+import org.hibernate.validator.internal.engine.tracking.PredefinedScopeProcessedBeansTrackingStrategy;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.PredefinedScopeBeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -112,23 +114,16 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 						determineAllowParallelMethodsDefineParameterConstraints( hibernateSpecificConfig, properties )
 				).build();
 
-		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
-				configurationState.getMessageInterpolator(),
-				configurationState.getTraversableResolver(),
-				new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() ),
-				configurationState.getClockProvider(),
-				determineTemporalValidationTolerance( configurationState, properties ),
-				determineScriptEvaluatorFactory( configurationState, properties, externalClassLoader ),
-				determineFailFast( hibernateSpecificConfig, properties ),
-				determineTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
-				determineConstraintValidatorPayload( hibernateSpecificConfig ),
-				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
-				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties )
-		);
+		ExecutableParameterNameProvider parameterNameProvider = new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() );
+		ScriptEvaluatorFactory scriptEvaluatorFactory = determineScriptEvaluatorFactory( configurationState, properties, externalClassLoader );
+		Duration temporalValidationTolerance = determineTemporalValidationTolerance( configurationState, properties );
+
+		HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl(
+				scriptEvaluatorFactory, configurationState.getClockProvider(), temporalValidationTolerance );
 
 		this.constraintValidatorManager = new PredefinedScopeConstraintValidatorManagerImpl(
 				configurationState.getConstraintValidatorFactory(),
-				this.validatorFactoryScopedContext.getConstraintValidatorInitializationContext()
+				constraintValidatorInitializationContext
 		);
 
 		this.validationOrderGenerator = new ValidationOrderGenerator();
@@ -171,7 +166,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		this.beanMetaDataManager = new PredefinedScopeBeanMetaDataManager(
 				constraintCreationContext,
 				executableHelper,
-				validatorFactoryScopedContext.getParameterNameProvider(),
+				parameterNameProvider,
 				javaBeanHelper,
 				validationOrderGenerator,
 				buildMetaDataProviders( constraintCreationContext, xmlMetaDataProvider, constraintMappings ),
@@ -179,6 +174,23 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				determineBeanMetaDataClassNormalizer( hibernateSpecificConfig ),
 				hibernateSpecificConfig.getBeanClassesToInitialize()
 		);
+
+		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
+				configurationState.getMessageInterpolator(),
+				configurationState.getTraversableResolver(),
+				parameterNameProvider,
+				configurationState.getClockProvider(),
+				temporalValidationTolerance,
+				scriptEvaluatorFactory,
+				determineFailFast( hibernateSpecificConfig, properties ),
+				determineTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
+				determineConstraintValidatorPayload( hibernateSpecificConfig ),
+				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
+				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
+				( hibernateSpecificConfig != null && hibernateSpecificConfig.getProcessedBeansTrackingStrategy() != null )
+						? hibernateSpecificConfig.getProcessedBeansTrackingStrategy()
+						: new PredefinedScopeProcessedBeansTrackingStrategy( beanMetaDataManager ),
+				constraintValidatorInitializationContext );
 
 		if ( LOG.isDebugEnabled() ) {
 			logValidatorFactoryScopedConfiguration( validatorFactoryScopedContext );

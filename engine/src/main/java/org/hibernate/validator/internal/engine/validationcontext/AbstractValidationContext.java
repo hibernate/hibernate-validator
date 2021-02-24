@@ -7,9 +7,10 @@
 package org.hibernate.validator.internal.engine.validationcontext;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -96,25 +97,25 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	/**
 	 * Indicates if the tracking of already validated bean should be disabled.
 	 */
-	private final boolean disableAlreadyValidatedBeanTracking;
+	private final boolean processedBeanTrackingEnabled;
 
 	/**
 	 * The set of already processed meta constraints per bean - path ({@link BeanPathMetaConstraintProcessedUnit}).
 	 */
 	@Lazy
-	private Set<BeanPathMetaConstraintProcessedUnit> processedPathUnits;
+	private HashSet<BeanPathMetaConstraintProcessedUnit> processedPathUnits;
 
 	/**
 	 * The set of already processed groups per bean ({@link BeanGroupProcessedUnit}).
 	 */
 	@Lazy
-	private Set<BeanGroupProcessedUnit> processedGroupUnits;
+	private HashSet<BeanGroupProcessedUnit> processedGroupUnits;
 
 	/**
 	 * Maps an object to a list of paths in which it has been validated. The objects are the bean instances.
 	 */
 	@Lazy
-	private Map<Object, Set<PathImpl>> processedPathsPerBean;
+	private HashMap<ProcessedBean, ArrayList<PathImpl>> processedPathsPerBean;
 
 	/**
 	 * Contains all failing constraints so far.
@@ -131,7 +132,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			T rootBean,
 			Class<T> rootBeanClass,
 			BeanMetaData<T> rootBeanMetaData,
-			boolean disableAlreadyValidatedBeanTracking
+			boolean processedBeanTrackingEnabled
 	) {
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.validatorScopedContext = validatorScopedContext;
@@ -143,7 +144,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		this.rootBeanClass = rootBeanClass;
 		this.rootBeanMetaData = rootBeanMetaData;
 
-		this.disableAlreadyValidatedBeanTracking = disableAlreadyValidatedBeanTracking;
+		this.processedBeanTrackingEnabled = processedBeanTrackingEnabled;
 	}
 
 	@Override
@@ -188,7 +189,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 	@Override
 	public boolean isBeanAlreadyValidated(Object value, Class<?> group, PathImpl path) {
-		if ( disableAlreadyValidatedBeanTracking ) {
+		if ( !processedBeanTrackingEnabled ) {
 			return false;
 		}
 
@@ -204,7 +205,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 	@Override
 	public void markCurrentBeanAsProcessed(ValueContext<?, ?> valueContext) {
-		if ( disableAlreadyValidatedBeanTracking ) {
+		if ( !processedBeanTrackingEnabled ) {
 			return;
 		}
 
@@ -333,7 +334,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	}
 
 	private boolean isAlreadyValidatedForPath(Object value, PathImpl path) {
-		Set<PathImpl> pathSet = getInitializedProcessedPathsPerBean().get( value );
+		ArrayList<PathImpl> pathSet = getInitializedProcessedPathsPerBean().get( new ProcessedBean( value ) );
 		if ( pathSet == null ) {
 			return false;
 		}
@@ -369,12 +370,13 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 	private void markCurrentBeanAsProcessedForCurrentPath(Object bean, PathImpl path) {
 		// HV-1031 The path object is mutated as we traverse the object tree, hence copy it before saving it
-		Map<Object, Set<PathImpl>> processedPathsPerBean = getInitializedProcessedPathsPerBean();
+		HashMap<ProcessedBean, ArrayList<PathImpl>> processedPathsPerBean = getInitializedProcessedPathsPerBean();
 
-		Set<PathImpl> processedPaths = processedPathsPerBean.get( bean );
+		ProcessedBean processedBean = new ProcessedBean( bean );
+		ArrayList<PathImpl> processedPaths = processedPathsPerBean.get( processedBean );
 		if ( processedPaths == null ) {
-			processedPaths = new HashSet<>();
-			processedPathsPerBean.put( bean, processedPaths );
+			processedPaths = new ArrayList<>();
+			processedPathsPerBean.put( processedBean, processedPaths );
 		}
 
 		processedPaths.add( PathImpl.createCopy( path ) );
@@ -391,16 +393,16 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		return processedPathUnits;
 	}
 
-	private Set<BeanGroupProcessedUnit> getInitializedProcessedGroupUnits() {
+	private HashSet<BeanGroupProcessedUnit> getInitializedProcessedGroupUnits() {
 		if ( processedGroupUnits == null ) {
 			processedGroupUnits = new HashSet<>();
 		}
 		return processedGroupUnits;
 	}
 
-	private Map<Object, Set<PathImpl>> getInitializedProcessedPathsPerBean() {
+	private HashMap<ProcessedBean, ArrayList<PathImpl>> getInitializedProcessedPathsPerBean() {
 		if ( processedPathsPerBean == null ) {
-			processedPathsPerBean = new IdentityHashMap<>();
+			processedPathsPerBean = new HashMap<>();
 		}
 		return processedPathsPerBean;
 	}
@@ -503,6 +505,33 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			int result = System.identityHashCode( bean );
 			result = 31 * result + group.hashCode();
 			return result;
+		}
+	}
+
+	private static final class ProcessedBean {
+
+		private Object bean;
+		private int hashCode = -1;
+
+		ProcessedBean(Object bean) {
+			this.bean = bean;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			return this.bean == ((ProcessedBean) o).bean;
+		}
+
+		@Override
+		public int hashCode() {
+			if ( hashCode == -1 ) {
+				hashCode = createHashCode();
+			}
+			return hashCode;
+		}
+
+		private int createHashCode() {
+			return System.identityHashCode( bean );
 		}
 	}
 }

@@ -42,6 +42,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
+import org.hibernate.validator.internal.engine.tracking.ProcessedBeansTrackingStrategy;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
@@ -132,6 +133,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private BeanMetaDataClassNormalizer beanMetaDataClassNormalizer;
 	private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
 	private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
+	private ProcessedBeansTrackingStrategy processedBeansTrackingStrategy;
 
 	protected AbstractConfigurationImpl(BootstrapState state) {
 		this();
@@ -658,6 +660,22 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	public ExpressionLanguageFeatureLevel getCustomViolationExpressionLanguageFeatureLevel() {
 		return customViolationExpressionLanguageFeatureLevel;
+	}
+
+	@Override
+	public T processedBeansTrackingStrategy(ProcessedBeansTrackingStrategy processedBeansTrackingStrategy) {
+		if ( LOG.isDebugEnabled() ) {
+			if ( processedBeansTrackingStrategy != null ) {
+				LOG.debug( "Setting custom ProcessedBeansTrackingStrategy of type " + processedBeansTrackingStrategy.getClass()
+						.getName() );
+			}
+		}
+		this.processedBeansTrackingStrategy = processedBeansTrackingStrategy;
+		return thisAsT();
+	}
+
+	public ProcessedBeansTrackingStrategy getProcessedBeansTrackingStrategy() {
+		return processedBeansTrackingStrategy;
 	}
 
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {

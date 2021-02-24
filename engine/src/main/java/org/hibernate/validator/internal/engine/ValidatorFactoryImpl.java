@@ -47,6 +47,7 @@ import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
+import org.hibernate.validator.internal.engine.tracking.HasCascadablesProcessedBeansTrackingStrategy;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManagerImpl;
@@ -160,8 +161,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				determineTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
 				determineConstraintValidatorPayload( hibernateSpecificConfig ),
 				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
-				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties )
-		);
+				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
+				( hibernateSpecificConfig != null && hibernateSpecificConfig.getProcessedBeansTrackingStrategy() != null )
+						? hibernateSpecificConfig.getProcessedBeansTrackingStrategy()
+						: new HasCascadablesProcessedBeansTrackingStrategy() );
 
 		ConstraintValidatorManager constraintValidatorManager = new ConstraintValidatorManagerImpl(
 				configurationState.getConstraintValidatorFactory(),
