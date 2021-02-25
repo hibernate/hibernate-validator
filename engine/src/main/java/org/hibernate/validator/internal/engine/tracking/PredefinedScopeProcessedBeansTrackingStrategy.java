@@ -23,6 +23,11 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 
 	public PredefinedScopeProcessedBeansTrackingStrategy(PredefinedScopeBeanMetaDataManager beanMetaDataManager) {
 		// TODO: build the maps from the information inside the beanMetaDataManager
+		// There is a good chance we will need a structure with the whole hierarchy of constraint classes.
+		// That's something we could add to PredefinedScopeBeanMetaDataManager, as we are already doing similar things
+		// there (see the ClassHierarchyHelper.getHierarchy call).
+		// In the predefined scope case, we will have the whole hierarchy of constrained classes passed to
+		// PredefinedScopeBeanMetaDataManager.
 
 		this.trackingEnabledForBeans = CollectionHelper.toImmutableMap( new HashMap<>() );
 		this.trackingEnabledForReturnValues = CollectionHelper.toImmutableMap( new HashMap<>() );
