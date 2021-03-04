@@ -80,11 +80,6 @@ public final class DomainNameUtil {
 			return false;
 		}
 
-		Matcher matcher = pattern.matcher( domain );
-		if ( !matcher.matches() ) {
-			return false;
-		}
-
 		String asciiString;
 		try {
 			asciiString = IDN.toASCII( domain );
@@ -94,6 +89,11 @@ public final class DomainNameUtil {
 		}
 
 		if ( asciiString.length() > MAX_DOMAIN_PART_LENGTH ) {
+			return false;
+		}
+
+		Matcher matcher = pattern.matcher( domain );
+		if ( !matcher.matches() ) {
 			return false;
 		}
 
