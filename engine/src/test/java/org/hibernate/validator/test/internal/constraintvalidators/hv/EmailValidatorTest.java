@@ -25,10 +25,10 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.EmailDef;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
+import org.hibernate.validator.internal.util.DomainNameUtil;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -220,6 +220,12 @@ public class EmailValidatorTest {
 	public void testEmailWith256CharacterDomainPartIsInvalid() {
 		// Domain part should allow up to 255
 		isInvalidEmail( "foo@" + domainOfLength( 252 ) + ".com" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1833")
+	public void testLongEmail() {
+		assertEquals( false, DomainNameUtil.isValidEmailDomainAddress( stringOfLength( 5000 ) + ".com" ) );
 	}
 
 	private String stringOfLength(int length) {
