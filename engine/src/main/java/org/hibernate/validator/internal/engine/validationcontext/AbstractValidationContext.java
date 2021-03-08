@@ -7,10 +7,9 @@
 package org.hibernate.validator.internal.engine.validationcontext;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -103,19 +102,19 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	 * The set of already processed meta constraints per bean - path ({@link BeanPathMetaConstraintProcessedUnit}).
 	 */
 	@Lazy
-	private HashSet<BeanPathMetaConstraintProcessedUnit> processedPathUnits;
+	private Set<BeanPathMetaConstraintProcessedUnit> processedPathUnits;
 
 	/**
 	 * The set of already processed groups per bean ({@link BeanGroupProcessedUnit}).
 	 */
 	@Lazy
-	private HashSet<BeanGroupProcessedUnit> processedGroupUnits;
+	private Set<BeanGroupProcessedUnit> processedGroupUnits;
 
 	/**
 	 * Maps an object to a list of paths in which it has been validated. The objects are the bean instances.
 	 */
 	@Lazy
-	private HashMap<ProcessedBean, ArrayList<PathImpl>> processedPathsPerBean;
+	private Map<Object, Set<PathImpl>> processedPathsPerBean;
 
 	/**
 	 * Contains all failing constraints so far.
@@ -334,7 +333,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	}
 
 	private boolean isAlreadyValidatedForPath(Object value, PathImpl path) {
-		ArrayList<PathImpl> pathSet = getInitializedProcessedPathsPerBean().get( new ProcessedBean( value ) );
+		Set<PathImpl> pathSet = getInitializedProcessedPathsPerBean().get( value );
 		if ( pathSet == null ) {
 			return false;
 		}
@@ -370,13 +369,12 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 	private void markCurrentBeanAsProcessedForCurrentPath(Object bean, PathImpl path) {
 		// HV-1031 The path object is mutated as we traverse the object tree, hence copy it before saving it
-		HashMap<ProcessedBean, ArrayList<PathImpl>> processedPathsPerBean = getInitializedProcessedPathsPerBean();
+		Map<Object, Set<PathImpl>> processedPathsPerBean = getInitializedProcessedPathsPerBean();
 
-		ProcessedBean processedBean = new ProcessedBean( bean );
-		ArrayList<PathImpl> processedPaths = processedPathsPerBean.get( processedBean );
+		Set<PathImpl> processedPaths = processedPathsPerBean.get( bean );
 		if ( processedPaths == null ) {
-			processedPaths = new ArrayList<>();
-			processedPathsPerBean.put( processedBean, processedPaths );
+			processedPaths = new HashSet<>();
+			processedPathsPerBean.put( bean, processedPaths );
 		}
 
 		processedPaths.add( PathImpl.createCopy( path ) );
@@ -393,16 +391,16 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		return processedPathUnits;
 	}
 
-	private HashSet<BeanGroupProcessedUnit> getInitializedProcessedGroupUnits() {
+	private Set<BeanGroupProcessedUnit> getInitializedProcessedGroupUnits() {
 		if ( processedGroupUnits == null ) {
 			processedGroupUnits = new HashSet<>();
 		}
 		return processedGroupUnits;
 	}
 
-	private HashMap<ProcessedBean, ArrayList<PathImpl>> getInitializedProcessedPathsPerBean() {
+	private Map<Object, Set<PathImpl>> getInitializedProcessedPathsPerBean() {
 		if ( processedPathsPerBean == null ) {
-			processedPathsPerBean = new HashMap<>();
+			processedPathsPerBean = new IdentityHashMap<>();
 		}
 		return processedPathsPerBean;
 	}
@@ -505,33 +503,6 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			int result = System.identityHashCode( bean );
 			result = 31 * result + group.hashCode();
 			return result;
-		}
-	}
-
-	private static final class ProcessedBean {
-
-		private Object bean;
-		private int hashCode = -1;
-
-		ProcessedBean(Object bean) {
-			this.bean = bean;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			return this.bean == ((ProcessedBean) o).bean;
-		}
-
-		@Override
-		public int hashCode() {
-			if ( hashCode == -1 ) {
-				hashCode = createHashCode();
-			}
-			return hashCode;
-		}
-
-		private int createHashCode() {
-			return System.identityHashCode( bean );
 		}
 	}
 }
