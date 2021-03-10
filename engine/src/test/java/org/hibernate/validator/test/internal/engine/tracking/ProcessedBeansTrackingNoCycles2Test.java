@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.tracking;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -26,7 +27,14 @@ public class ProcessedBeansTrackingNoCycles2Test {
 	public void testSerializeHibernateEmail() throws Exception {
 		Validator validator = ValidatorUtil.getValidator();
 
-		validator.validate( new Parent() );
+		final Parent parent = new Parent();
+		parent.property = "parent property";
+		final Child child = new Child();
+		child.property = "child property";
+		parent.children = new ArrayList<>();
+		parent.children.add( child );
+		parent.children.add( child );
+		validator.validate( parent );
 	}
 
 	private static class Parent {
