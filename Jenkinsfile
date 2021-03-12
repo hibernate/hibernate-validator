@@ -142,6 +142,8 @@ stage('Configure') {
 					new JdkBuildEnvironment(version: '15', buildJdkTool: 'OpenJDK 15 Latest',
 							condition: TestCondition.ON_DEMAND),
 					new JdkBuildEnvironment(version: '16', buildJdkTool: 'OpenJDK 16 Latest',
+							condition: TestCondition.AFTER_MERGE),
+					new JdkBuildEnvironment(version: '17', buildJdkTool: 'OpenJDK 17 Latest',
 							condition: TestCondition.AFTER_MERGE)
 			],
 			wildflyTck: [
