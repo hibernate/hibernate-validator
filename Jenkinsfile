@@ -138,9 +138,8 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '14', buildJdkTool: 'OpenJDK 14 Latest',
 							condition: TestCondition.AFTER_MERGE),
-					// Disabled because of https://bugs.openjdk.java.net/browse/JDK-8253566
 					new JdkBuildEnvironment(version: '15', buildJdkTool: 'OpenJDK 15 Latest',
-							condition: TestCondition.ON_DEMAND),
+							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '16', buildJdkTool: 'OpenJDK 16 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '17', buildJdkTool: 'OpenJDK 17 Latest',
