@@ -35,9 +35,9 @@ import static org.hibernate.validator.constraints.CompositionType.AND;
 @Retention(RUNTIME)
 @ValidSSN
 @Constraint(validatedBy = { })
-@Blacklist
+@ExcludedSSNList
 public @interface AllowedSSN {
-	String message() default "Invalid or blacklisted social security number";
+	String message() default "Invalid or excluded social security number";
 
 	Class<?>[] groups() default { };
 

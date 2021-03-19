@@ -43,10 +43,10 @@ Just fork this repository, build your test case and attach it as an archive to a
 
 Create a "topic" branch on which you will work.  The convention is to name the branch
 using the JIRA issue key.  If there is not already a JIRA issue covering the work you
-want to do, create one.  Assuming you will be working from the master branch and working
+want to do, create one.  Assuming you will be working from the main branch and working
 on the JIRA HV-123 :
 
-     git checkout -b HV-123 master
+     git checkout -b HV-123 main
 
 
 ## Code
@@ -85,9 +85,9 @@ Add the original Hibernate Validator repository as a remote repository called up
 git remote add upstream https://github.com/hibernate/hibernate-validator.git
 ```
 
-If you want to rebase your branch on top of the master branch, you can use the following git command:
+If you want to rebase your branch on top of the main branch, you can use the following git command:
 ```shell
-git pull --rebase upstream master
+git pull --rebase upstream main
 ```
 
 ## Submit
