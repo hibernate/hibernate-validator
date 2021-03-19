@@ -233,7 +233,7 @@ to the fields of a Car instance:
 ====
 You can find the complete source code of all examples used in this reference guide in the Hibernate
 Validator
-https://github.com/hibernate/hibernate-validator/tree/master/documentation/src/test[source repository]
+https://github.com/hibernate/hibernate-validator/tree/main/documentation/src/test[source repository]
 on GitHub.
 ====
 
