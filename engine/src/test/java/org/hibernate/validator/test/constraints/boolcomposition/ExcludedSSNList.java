@@ -23,7 +23,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 
 /**
- * Blacklisted SSN numbers
+ * Excluded SSN numbers
  *
  * @author Federico Mancini
  * @author Dag Hovland
@@ -39,8 +39,8 @@ import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 		@Pattern(regexp = "55555555555"),
 		@Pattern(regexp = "123456")
 })
-public @interface Blacklist {
-	String message() default "Blacklisted SSN";
+public @interface ExcludedSSNList {
+	String message() default "Excluded SSN";
 
 	Class<?>[] groups() default { };
 

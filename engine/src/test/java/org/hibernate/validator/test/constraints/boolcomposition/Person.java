@@ -24,7 +24,7 @@ public class Person {
 	private String ssn = "";
 
 
-	@Blacklist
+	@ExcludedSSNList
 	@IsBlank
 	private String anotherSsn = "";
 
