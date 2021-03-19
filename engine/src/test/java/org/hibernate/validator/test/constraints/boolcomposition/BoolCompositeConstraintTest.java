@@ -105,7 +105,7 @@ public class BoolCompositeConstraintTest {
 		);
 
 		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( Blacklist.class ).withProperty( "anotherSsn" ),
+				violationOf( ExcludedSSNList.class ).withProperty( "anotherSsn" ),
 				violationOf( IsBlank.class ).withProperty( "anotherSsn" )
 		);
 
@@ -115,7 +115,7 @@ public class BoolCompositeConstraintTest {
 		);
 
 		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( Blacklist.class ).withProperty( "ssn" )
+				violationOf( ExcludedSSNList.class ).withProperty( "ssn" )
 		);
 
 		// Checks that all parts of an "or" ar reported

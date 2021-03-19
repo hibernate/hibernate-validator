@@ -38,7 +38,7 @@ schema generation.
 ==== Hibernate ORM event-based validation
 
 Hibernate Validator has a built-in Hibernate event listener -
-https://github.com/hibernate/hibernate-orm/blob/master/hibernate-core/src/main/java/org/hibernate/cfg/beanvalidation/BeanValidationEventListener.java[`org.hibernate.cfg.beanvalidation.BeanValidationEventListener`] -
+https://github.com/hibernate/hibernate-orm/blob/main/hibernate-core/src/main/java/org/hibernate/cfg/beanvalidation/BeanValidationEventListener.java[`org.hibernate.cfg.beanvalidation.BeanValidationEventListener`] -
 which is part of Hibernate ORM. Whenever a `PreInsertEvent`,
 `PreUpdateEvent` or `PreDeleteEvent` occurs, the listener will verify all constraints of the entity
 instance and throw an exception if any constraint is violated. Per default, objects will be checked

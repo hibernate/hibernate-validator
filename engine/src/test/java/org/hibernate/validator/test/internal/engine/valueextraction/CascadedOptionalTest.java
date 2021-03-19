@@ -43,63 +43,63 @@ public class CascadedOptionalTest {
 	@Test
 	public void cascadedValueIsRetrievedFromField() {
 		PondWithCascadedField pond = new PondWithCascadedField();
-		pond.masterFish = new MasterFish();
+		pond.cascadedBean = new CascadedBean();
 
 		Set<ConstraintViolation<PondWithCascadedField>> constraintViolations = validator.validate( pond );
 
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
-								.property( "masterFish" )
+								.property( "cascadedBean" )
 								.property( "name" )
 						)
 		);
-		assertFalse( pond.getMasterFishInvoked );
+		assertFalse( pond.getCascadedBeanInvoked );
 	}
 
 	@Test
 	public void cascadedValueIsRetrievedFromGetterApplyingUnwrapper() {
 		PondWithCascadedGetter pond = new PondWithCascadedGetter();
-		pond.masterFish = new MasterFish();
+		pond.cascadedBean = new CascadedBean();
 
 		Set<ConstraintViolation<PondWithCascadedGetter>> constraintViolations = validator.validate( pond );
 
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
-								.property( "masterFish" )
+								.property( "cascadedBean" )
 								.property( "name", false, null, null, Optional.class, 0 )
 						)
 		);
-		assertTrue( pond.getMasterFishInvoked );
+		assertTrue( pond.getCascadedBeanInvoked );
 	}
 
 	private class PondWithCascadedField {
 
 		@Valid
-		private MasterFish masterFish;
-		private boolean getMasterFishInvoked = false;
+		private CascadedBean cascadedBean;
+		private boolean getCascadedBeanInvoked = false;
 
 		@SuppressWarnings("unused")
-		public Optional<MasterFish> getMasterFish() {
-			getMasterFishInvoked = true;
-			return Optional.ofNullable( masterFish );
+		public Optional<CascadedBean> getCascadedBean() {
+			getCascadedBeanInvoked = true;
+			return Optional.ofNullable( cascadedBean );
 		}
 	}
 
 	private class PondWithCascadedGetter {
 
-		private MasterFish masterFish;
-		private boolean getMasterFishInvoked = false;
+		private CascadedBean cascadedBean;
+		private boolean getCascadedBeanInvoked = false;
 
 		@Valid
-		public Optional<MasterFish> getMasterFish() {
-			getMasterFishInvoked = true;
-			return Optional.ofNullable( masterFish );
+		public Optional<CascadedBean> getCascadedBean() {
+			getCascadedBeanInvoked = true;
+			return Optional.ofNullable( cascadedBean );
 		}
 	}
 
-	private class MasterFish {
+	private class CascadedBean {
 
 		@NotNull
 		private String name;
