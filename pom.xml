@@ -174,7 +174,7 @@
         <version.org.easymock>3.4</version.org.easymock>
         <version.io.rest-assured>4.1.2</version.io.rest-assured>
         <version.org.codehaus.groovy>2.4.12</version.org.codehaus.groovy>
-        <version.com.google.guava>27.1-jre</version.com.google.guava>
+        <version.com.google.guava>29.0-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>4.3.10.RELEASE</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>3.0.0.Alpha1</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.10.3</version.com.fasterxml.jackson.core.jackson-databind>
