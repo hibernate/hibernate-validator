@@ -95,7 +95,7 @@ public class ParameterExecutableValidationContext<T> extends AbstractValidationC
 			return false;
 		}
 
-		return processedBeansTrackingStrategy.isEnabledForReturnValue( executable,
+		return processedBeansTrackingStrategy.isEnabledForParameters( executable,
 				executableMetaData.get().getValidatableParametersMetaData().hasCascadables() );
 	}
 
