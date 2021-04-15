@@ -7,20 +7,15 @@
 package org.hibernate.validator.test.internal.engine.tracking;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
-import org.hibernate.validator.test.predefinedscope.LocaleResolverTest;
-import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertTrue;
@@ -75,7 +70,7 @@ public class ProcessedBeansTrackingCycles1Test {
 		return Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
 				.builtinConstraints( new HashSet<>( Arrays.asList( NotNull.class.getName() ) ) )
-				.initializeBeanMetaData( new HashSet<>( Arrays.asList( Parent.class, Child.class, Other.class) ) )
+				.initializeBeanMetaData( new HashSet<>( Arrays.asList( Parent.class, Child.class, Other.class ) ) )
 				.buildValidatorFactory()
 				.getValidator();
 	}

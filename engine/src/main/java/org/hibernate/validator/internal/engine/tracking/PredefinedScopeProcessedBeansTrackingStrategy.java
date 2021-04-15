@@ -53,7 +53,7 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 
 		public Map<Class<?>, Boolean> build() {
 			final Set<Class<?>> beanClassesInPath = new HashSet<>();
-			for (BeanMetaData<?> beanMetadata : beanMetaDataManager.getBeanMetaData() ) {
+			for ( BeanMetaData<?> beanMetadata : beanMetaDataManager.getBeanMetaData() ) {
 				determineTrackingRequired( beanMetadata.getBeanClass(), beanClassesInPath );
 				if ( !beanClassesInPath.isEmpty() ) {
 					throw new IllegalStateException( "beanClassesInPath not empty" );
