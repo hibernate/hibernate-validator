@@ -7,6 +7,8 @@
 package org.hibernate.validator.internal.engine.tracking;
 
 import java.lang.reflect.Executable;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +18,7 @@ import java.util.Set;
 import org.hibernate.validator.internal.metadata.PredefinedScopeBeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ContainerCascadingMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.CollectionHelper;
 
@@ -163,7 +166,21 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 				for ( Cascadable cascadable : beanMetaData.getCascadables() ) {
 					final CascadingMetaData cascadingMetaData = cascadable.getCascadingMetaData();
 					if ( cascadingMetaData.isContainer() ) {
-						throw new UnsupportedOperationException( "Containers are not supported yet." );
+						final ContainerCascadingMetaData containerCascadingMetaData = (ContainerCascadingMetaData) cascadingMetaData;
+						if ( containerCascadingMetaData.getEnclosingType() instanceof ParameterizedType ) {
+							ParameterizedType parameterizedType = (ParameterizedType) containerCascadingMetaData.getEnclosingType();
+							for ( Type typeArgument :  parameterizedType.getActualTypeArguments() ) {
+								if ( typeArgument instanceof Class ) {
+									directCascadedBeanClasses.add( (Class<?>) typeArgument );
+								}
+								else {
+									throw new UnsupportedOperationException( "Only ParameterizedType values of type Class are supported" );
+								}
+							}
+						}
+						else {
+							throw new UnsupportedOperationException( "Non-parameterized containers are not supported yet." );
+						}
 					}
 					else {
 						// TODO: For now, assume non-container Cascadables are always beans. Truee???
