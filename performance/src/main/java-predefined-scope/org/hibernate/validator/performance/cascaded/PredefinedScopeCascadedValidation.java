@@ -8,17 +8,19 @@ package org.hibernate.validator.performance.cascaded;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Valid;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -33,16 +35,22 @@ import org.openjdk.jmh.infra.Blackhole;
 
 /**
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
-public class CascadedValidation {
+public class PredefinedScopeCascadedValidation {
 
 	@State(Scope.Benchmark)
-	public static class CascadedValidationState {
+	public static class PredefinedScopeCascadedValidationState {
+
 		public volatile Validator validator;
 		public volatile Person person;
 
-		public CascadedValidationState() {
-			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		public PredefinedScopeCascadedValidationState() {
+			ValidatorFactory factory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
+					.configure()
+					.builtinConstraints( Collections.singleton( NotNull.class.getName() ) )
+					.initializeBeanMetaData( Collections.singleton( Person.class ) )
+					.buildValidatorFactory();
 			validator = factory.getValidator();
 
 			// TODO graphs needs to be generated and deeper
@@ -65,7 +73,7 @@ public class CascadedValidation {
 	@Threads(50)
 	@Warmup(iterations = 10)
 	@Measurement(iterations = 20)
-	public void testCascadedValidation(CascadedValidationState state, Blackhole bh) {
+	public void testPredefinedScopeCascadedValidation(PredefinedScopeCascadedValidationState state, Blackhole bh) {
 		Set<ConstraintViolation<Person>> violations = state.validator.validate( state.person );
 		assertThat( violations ).hasSize( 0 );
 
@@ -73,6 +81,7 @@ public class CascadedValidation {
 	}
 
 	public static class Person {
+
 		@NotNull
 		String name;
 
