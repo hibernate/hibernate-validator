@@ -9,6 +9,9 @@ package org.hibernate.validator.performance.cascaded;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -19,6 +22,8 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.performance.BenchmarkRunner;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -46,7 +51,10 @@ public class CascadedWithLotsOfItemsValidation {
 		public volatile Shop shop;
 
 		public CascadedWithLotsOfItemsValidationState() {
-			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+			ValidatorFactory factory = BenchmarkRunner.buildValidatorFactory(
+					Collections.singleton( NotNull.class.getName() ),
+					new HashSet<>( Arrays.asList( Shop.class, Article.class ) )
+			);
 			validator = factory.getValidator();
 
 			shop = createShop();

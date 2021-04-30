@@ -6,9 +6,21 @@
  */
 package org.hibernate.validator.performance;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotNull;
+import javax.validation.spi.ValidationProvider;
+
+import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.performance.cascaded.CascadedValidation;
 import org.hibernate.validator.performance.cascaded.CascadedWithLotsOfItemsValidation;
 import org.hibernate.validator.performance.simple.SimpleValidation;
@@ -22,6 +34,7 @@ import org.openjdk.jmh.runner.options.CommandLineOptionException;
 import org.openjdk.jmh.runner.options.CommandLineOptions;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.util.Optional;
 
 /**
  * Class containing main method to run all performance tests.
@@ -30,6 +43,10 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
  * @author Guillaume Smet
  */
 public final class BenchmarkRunner {
+
+	private static String PREDEFINED_PARAMETER = "predefined";
+	private static boolean IS_PREDEFINED = false;
+	private static ValidationProvider<?> validationProvider;
 
 	private static final Stream<? extends Class<?>> DEFAULT_TEST_CLASSES = Stream.of(
 			SimpleValidation.class.getName(),
@@ -58,8 +75,33 @@ public final class BenchmarkRunner {
 			DEFAULT_TEST_CLASSES.forEach( testClass -> builder.include( testClass.getName() ) );
 		}
 
+		IS_PREDEFINED = isPredefined( commandLineOptions );
+
 		Options opt = builder.build();
 		new Runner( opt ).run();
+	}
+
+	public static ValidatorFactory buildValidatorFactory(Set<String> constraintNames, Set<Class<?>> beanClasses) {
+		return IS_PREDEFINED
+				? Validation.byProvider( PredefinedScopeHibernateValidator.class )
+						.configure()
+						.builtinConstraints( constraintNames )
+						.initializeBeanMetaData( beanClasses )
+						.buildValidatorFactory()
+				: Validation.buildDefaultValidatorFactory();
+	}
+
+	private static boolean isPredefined(Options commandLineOptions) throws CommandLineOptionException {
+		Optional<Collection<String>> isPredefinedValues = commandLineOptions.getParameter( PREDEFINED_PARAMETER );
+		if ( isPredefinedValues.hasValue() ) {
+			if ( isPredefinedValues.get().size() == 1 ) {
+				return Boolean.parseBoolean( isPredefinedValues.get().iterator().next() );
+			}
+			else {
+				throw new CommandLineOptionException( "More than one value provided for parameter: " + PREDEFINED_PARAMETER );
+			}
+		}
+		return false;
 	}
 
 	private static Class<?> classForName(String qualifiedName) {

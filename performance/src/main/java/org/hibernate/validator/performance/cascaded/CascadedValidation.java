@@ -8,6 +8,7 @@ package org.hibernate.validator.performance.cascaded;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -18,6 +19,8 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.performance.BenchmarkRunner;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -42,7 +45,10 @@ public class CascadedValidation {
 		public volatile Person person;
 
 		public CascadedValidationState() {
-			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+			ValidatorFactory factory = BenchmarkRunner.buildValidatorFactory(
+					Collections.singleton( NotNull.class.getName() ),
+					Collections.singleton( Person.class )
+			);
 			validator = factory.getValidator();
 
 			// TODO graphs needs to be generated and deeper
