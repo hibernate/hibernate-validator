@@ -186,12 +186,27 @@
                     <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
-            <!-- adding sources for BV 2.0 tests -->
+            <!-- adding sources for BV 2.0 and Predefined Scope tests -->
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${project.basedir}/src/main/java-bv2</source>
+                                        <source>${project.basedir}/src/main/java-predefined-scope</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -230,12 +245,27 @@
                     <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
-            <!-- adding sources for BV 2.0 tests -->
+            <!-- adding sources for BV 2.0 Predefined Scope tests -->
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${project.basedir}/src/main/java-bv2</source>
+                                        <source>${project.basedir}/src/main/java-predefined-scope</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -250,7 +280,7 @@
             </activation>
             <properties>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>6.1.2.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>6.1.7.Final</beanvalidation-impl.version>
             </properties>
             <dependencies>
                 <dependency>
@@ -271,12 +301,27 @@
                     <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
-            <!-- adding sources for BV 2.0 tests -->
+            <!-- adding sources for BV 2.0 and Predefined Scope tests -->
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${project.basedir}/src/main/java-bv2</source>
+                                        <source>${project.basedir}/src/main/java-predefined-scope</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -292,7 +337,7 @@
             <properties>
                 <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>6.0.19.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>6.0.22.Final</beanvalidation-impl.version>
             </properties>
             <dependencies>
                 <dependency>
@@ -321,6 +366,20 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${project.basedir}/src/main/java-bv2</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
