@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.test.internal.engine.tracking;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
@@ -39,25 +39,22 @@ import static org.testng.Assert.assertTrue;
  *
  * A, B, C, D, E, F, and G are beans that get validated.
  *
- * An arrow, ->, indicates a cascading constraint.
+ * An arrow, ->, indicates a cascading constraint.ProcessedBeansTrackingCyclesNoCyclesMapTest
  *
- * The following are the properties with cascading List constraints:
- * A.bValues
- *  .eValues
- * B.cValues
- * C.dValues
- *  .fValues
- * D.bValues
- * E.fValues
- *  .gValues
- *  .gAnotherValues
- * F.gValues
+ * The following are the properties with cascading Map constraints:
+ * A.bToEs
+ * B.cToCs
+ * C.dToFs
+ * D.bToBs
+ * E.fToGs
+ *  .gToGs
+ * F.gToGs
  *
  * @author Gail Badner
  *
  */
 
-public class ProcessedBeansTrackingCyclesNoCyclesListTest {
+public class ProcessedBeansTrackingCyclesNoCyclesMapTest {
 
 	@Test
 	public void testTrackingEnabled() {
@@ -105,15 +102,12 @@ public class ProcessedBeansTrackingCyclesNoCyclesListTest {
 		final F f = new F();
 		final G g = new G();
 
-		a.bValues.add( b );
-		a.eValues.add( e );
-		b.cValues.add( c );
-		c.dValues.add( d );
-		d.bValues.add( b );
-		e.fValues.add( f );
-		e.gValues.add( g );
-		e.gAnotherValues.add( g );
-		f.gValues.add( g );
+		a.bToEs.put( b, e );
+		b.cToCs.put( c, c );
+		c.dToFs.put( d, f );
+		d.bToBs.put( b, b );
+		e.fToGs.put( f, g );
+		e.gToGs.put( g, g );
 
 		final Validator validator = getValidator();
 		final Set<ConstraintViolation<A>> violationsA = validator.validate( a );
@@ -147,50 +141,45 @@ public class ProcessedBeansTrackingCyclesNoCyclesListTest {
 
 		private String description;
 
-		private List<@Valid B> bValues = new ArrayList<>();
+		private Map<@Valid B, @Valid E> bToEs = new HashMap<>();
 
-		private List<@Valid E> eValues = new ArrayList<>();
 	}
 
 	private static class B {
 		@Valid
 		private String description;
 
-		private List<@Valid C> cValues = new ArrayList<>();
+		private Map<@Valid C, @Valid C> cToCs = new HashMap<>();
 	}
 
 	private static class C {
 
 		private String description;
 
-		private List<@Valid D> dValues = new ArrayList<>();
-
-		private List<@Valid F> fValues = new ArrayList<>();
+		private Map<@Valid D, @Valid F> dToFs = new HashMap<>();
 	}
 
 	private static class D {
 
 		private String description;
 
-		private List<@Valid B> bValues = new ArrayList<>();
+		private Map<@Valid B, @Valid B> bToBs = new HashMap<>();
 	}
 
 	private static class E {
 
 		private String description;
 
-		private List<@Valid F> fValues = new ArrayList<>();
+		private Map<@Valid F, G> fToGs = new HashMap<>();
 
-		private List<@Valid G> gValues = new ArrayList<>();
-
-		private List<@Valid G> gAnotherValues = new ArrayList<>();
+		private Map<@Valid G, @Valid G> gToGs = new HashMap<>();
 	}
 
 	private static class F {
 
 		private String description;
 
-		private List<@Valid G> gValues = new ArrayList<>();
+		private Map<@Valid G, @Valid G> gToGs = new HashMap<>();
 	}
 
 	private static class G {
