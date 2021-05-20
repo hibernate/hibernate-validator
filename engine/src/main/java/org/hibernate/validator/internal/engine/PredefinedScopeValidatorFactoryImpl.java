@@ -163,6 +163,20 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
 
+		// collect all metadata, I don't think we need this work to be in BeanMetaDataManager contract, it can be a specific class (or private method if simple enough)
+		// it's basically the content of PredefinedScopeBeanMetaDataManager constructor
+		// the metadata wouldn't be complete because we want to inject the tracking information
+
+		// then you build the tracking information from these incomplete metadata
+
+		// finally you create a PredefinedScopeBeanMetaDataManager with the augmented metadata pushed to it
+		// you will need to augment both BeanMetaData and ExecutableMetaData
+		// I would prototype BeanMetaData first then discuss it before going further
+
+		// Note: we want classes to be immutable
+		// Might be a good idea to push a default method to BeanMetaData as enabling tracking is the default behavior we want
+		// Maybe first try composition and benchmark it and if good enough, we keep it
+
 		this.beanMetaDataManager = new PredefinedScopeBeanMetaDataManager(
 				constraintCreationContext,
 				executableHelper,
