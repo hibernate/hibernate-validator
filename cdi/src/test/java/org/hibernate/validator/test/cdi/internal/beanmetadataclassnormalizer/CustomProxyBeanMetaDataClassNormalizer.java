@@ -41,7 +41,7 @@ public class CustomProxyBeanMetaDataClassNormalizer
 		return Collections.emptySet();
 	}
 
-	@Override
+	// TODO to be removed once using CDI API 4.x
 	public boolean isNullable() {
 		return false;
 	}

@@ -16,6 +16,7 @@ import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.spi.AnnotatedType;
 import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.enterprise.inject.spi.InjectionTarget;
+import jakarta.enterprise.inject.spi.InjectionTargetFactory;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.constraints.Min;
@@ -32,6 +33,7 @@ public class InjectingConstraintValidatorFactoryTest {
 	private BeanManager beanManagerMock;
 	private AnnotatedType<MyValidator> annotatedTypeMock;
 	private InjectionTarget<MyValidator> injectionTargetMock;
+	private InjectionTargetFactory<MyValidator> injectionTargetFactoryMock;
 	private CreationalContext<MyValidator> creationalContextMock;
 
 	@BeforeClass
@@ -41,6 +43,7 @@ public class InjectingConstraintValidatorFactoryTest {
 		constraintValidatorFactory = new InjectingConstraintValidatorFactory( beanManagerMock );
 		annotatedTypeMock = createMock( AnnotatedType.class );
 		injectionTargetMock = createMock( InjectionTarget.class );
+		injectionTargetFactoryMock = createMock( InjectionTargetFactory.class );
 		creationalContextMock = createMock( CreationalContext.class );
 	}
 
@@ -60,7 +63,8 @@ public class InjectingConstraintValidatorFactoryTest {
 		// setup the mocks
 
 		expect( beanManagerMock.createAnnotatedType( MyValidator.class ) ).andReturn( annotatedTypeMock );
-		expect( beanManagerMock.createInjectionTarget( annotatedTypeMock ) ).andReturn( injectionTargetMock );
+		expect( beanManagerMock.getInjectionTargetFactory( annotatedTypeMock ) ).andReturn( injectionTargetFactoryMock );
+		expect( injectionTargetFactoryMock.createInjectionTarget( null ) ).andReturn( injectionTargetMock );
 		expect( (CreationalContext) beanManagerMock.createCreationalContext( null ) ).andReturn(
 				creationalContextMock
 		);
@@ -74,7 +78,7 @@ public class InjectingConstraintValidatorFactoryTest {
 		injectionTargetMock.dispose( validator );
 
 		// get the mocks into replay mode
-		replay( beanManagerMock, annotatedTypeMock, injectionTargetMock );
+		replay( beanManagerMock, annotatedTypeMock, injectionTargetFactoryMock, injectionTargetMock );
 
 		// run the tests
 		MyValidator validatorInstance = constraintValidatorFactory.getInstance( MyValidator.class );
