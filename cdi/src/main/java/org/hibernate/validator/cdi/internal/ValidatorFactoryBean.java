@@ -116,7 +116,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		return false;
 	}
 
-	@Override
+	// TODO to be removed once using CDI API 4.x
 	public boolean isNullable() {
 		return false;
 	}

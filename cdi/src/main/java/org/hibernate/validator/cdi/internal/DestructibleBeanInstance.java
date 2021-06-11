@@ -41,7 +41,7 @@ public class DestructibleBeanInstance<T> {
 
 	private InjectionTarget<T> createInjectionTarget(BeanManager beanManager, Class<T> type) {
 		AnnotatedType<T> annotatedType = beanManager.createAnnotatedType( type );
-		return beanManager.createInjectionTarget( annotatedType );
+		return beanManager.getInjectionTargetFactory( annotatedType ).createInjectionTarget( null );
 	}
 
 	private static <T> T createAndInjectBeans(BeanManager beanManager, InjectionTarget<T> injectionTarget) {
