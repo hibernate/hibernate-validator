@@ -44,7 +44,7 @@ Logging will delegate any log requests to that provider.
         <dependency>
            <groupId>org.glassfish</groupId>
            <artifactId>jakarta.el</artifactId>
-           <version>4.0.0-RC2</version>
+           <version>4.0.1</version>
         </dependency>
 
 * Jakarta Bean Validation defines integration points with [CDI](http://jcp.org/en/jsr/detail?id=346). If your application runs
