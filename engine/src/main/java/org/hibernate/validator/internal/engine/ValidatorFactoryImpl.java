@@ -63,6 +63,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -257,6 +258,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	@Override
 	public GetterPropertySelectionStrategy getGetterPropertySelectionStrategy() {
 		return javaBeanHelper.getGetterPropertySelectionStrategy();
+	}
+
+	@Override
+	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
+		return javaBeanHelper.getPropertyNodeNameProvider();
 	}
 
 	public boolean isFailFast() {
