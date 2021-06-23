@@ -182,8 +182,52 @@
                     <artifactId>jakarta.el</artifactId>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
+                </dependency>
+            </dependencies>
+            <!-- adding sources for BV 2.0 tests -->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>hv-6.2</id>
+            <activation>
+                <property>
+                    <name>validator</name>
+                    <value>hv-6.2</value>
+                </property>
+            </activation>
+            <properties>
+                <validation-api.version>2.0.1.Final</validation-api.version>
+                <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
+                <beanvalidation-impl.version>6.2.0.Final</beanvalidation-impl.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${beanvalidation-impl.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.el</artifactId>
+                    <version>3.0.1-b11</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
             <!-- adding sources for BV 2.0 tests -->
@@ -223,8 +267,8 @@
                     <artifactId>jakarta.el</artifactId>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
             <!-- adding sources for BV 2.0 tests -->
@@ -267,8 +311,8 @@
                     <version>3.0.1-b11</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
             <!-- adding sources for BV 2.0 tests -->
@@ -311,8 +355,8 @@
                     <version>3.0.1-b11</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -352,8 +396,8 @@
                     <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -393,8 +437,8 @@
                     <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -434,8 +478,8 @@
                     <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -475,8 +519,8 @@
                     <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -505,8 +549,8 @@
                     <version>${beanvalidation-impl.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
