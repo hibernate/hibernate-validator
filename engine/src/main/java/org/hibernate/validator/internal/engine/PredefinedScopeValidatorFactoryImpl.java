@@ -59,6 +59,7 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -91,6 +92,8 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 	private final ValueExtractorManager valueExtractorManager;
 
 	private final GetterPropertySelectionStrategy getterPropertySelectionStrategy;
+
+	private final PropertyNodeNameProvider propertyNodeNameProvider;
 
 	private final ValidationOrderGenerator validationOrderGenerator;
 
@@ -134,6 +137,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		this.validationOrderGenerator = new ValidationOrderGenerator();
 
 		this.getterPropertySelectionStrategy = ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader );
+		this.propertyNodeNameProvider = ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, externalClassLoader );
 
 		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
 		ConstraintHelper constraintHelper = ConstraintHelper.forBuiltinConstraints( hibernateSpecificConfig.getBuiltinConstraints() );
@@ -143,8 +147,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				constraintValidatorManager, typeResolutionHelper, valueExtractorManager );
 
 		ExecutableHelper executableHelper = new ExecutableHelper( typeResolutionHelper );
-		JavaBeanHelper javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ),
-				ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, externalClassLoader ) );
+		JavaBeanHelper javaBeanHelper = new JavaBeanHelper( getterPropertySelectionStrategy, propertyNodeNameProvider );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		XmlMetaDataProvider xmlMetaDataProvider;
@@ -232,6 +235,11 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 	@Override
 	public GetterPropertySelectionStrategy getGetterPropertySelectionStrategy() {
 		return getterPropertySelectionStrategy;
+	}
+
+	@Override
+	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
+		return propertyNodeNameProvider;
 	}
 
 	public boolean isFailFast() {

@@ -47,6 +47,10 @@ public class JavaBeanHelper {
 		return getterPropertySelectionStrategy;
 	}
 
+	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
+		return propertyNodeNameProvider;
+	}
+
 	public Optional<JavaBeanField> findDeclaredField(Class<?> declaringClass, String property) {
 		Contracts.assertNotNull( declaringClass, MESSAGES.classCannotBeNull() );
 
