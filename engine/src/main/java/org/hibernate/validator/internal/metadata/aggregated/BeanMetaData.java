@@ -113,4 +113,12 @@ public interface BeanMetaData<T> extends Validatable {
 	 *         element itself and goes up the hierarchy chain. Interfaces are not included.
 	 */
 	List<Class<? super T>> getClassHierarchy();
+
+	/**
+	 * @return {@code true} if the bean class is required to be tracked; {@code false} otherwise.
+	 */
+	default boolean isTrackingRequired() {
+		// TODO: is this the correct return value for UninitializedBeanMetaData???
+		return true;
+	}
 }

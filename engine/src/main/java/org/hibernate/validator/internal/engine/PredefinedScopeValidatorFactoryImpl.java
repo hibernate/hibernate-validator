@@ -47,7 +47,6 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.PredefinedScopeConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
-import org.hibernate.validator.internal.engine.tracking.PredefinedScopeProcessedBeansTrackingStrategy;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.PredefinedScopeBeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -186,7 +185,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				buildMetaDataProviders( constraintCreationContext, xmlMetaDataProvider, constraintMappings ),
 				methodValidationConfiguration,
 				determineBeanMetaDataClassNormalizer( hibernateSpecificConfig ),
-				hibernateSpecificConfig.getBeanClassesToInitialize()
+				hibernateSpecificConfig
 		);
 
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
@@ -201,9 +200,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				determineConstraintValidatorPayload( hibernateSpecificConfig ),
 				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
 				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
-				( hibernateSpecificConfig != null && hibernateSpecificConfig.getProcessedBeansTrackingStrategy() != null )
-						? hibernateSpecificConfig.getProcessedBeansTrackingStrategy()
-						: new PredefinedScopeProcessedBeansTrackingStrategy( beanMetaDataManager ),
+				beanMetaDataManager.getProcessedBeansTrackingStrategy(),
 				constraintValidatorInitializationContext );
 
 		if ( LOG.isDebugEnabled() ) {

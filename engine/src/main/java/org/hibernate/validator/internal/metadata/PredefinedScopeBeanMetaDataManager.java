@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,12 +32,16 @@ import javax.validation.metadata.Scope;
 
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
+import org.hibernate.validator.internal.engine.PredefinedScopeConfigurationImpl;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
+import org.hibernate.validator.internal.engine.tracking.PredefinedScopeProcessedBeansTrackingStrategy;
+import org.hibernate.validator.internal.engine.tracking.ProcessedBeansTrackingStrategy;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.NonTrackedBeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
@@ -61,15 +66,17 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 	 */
 	private final ConcurrentMap<Class<?>, BeanMetaData<?>> beanMetaDataMap = new ConcurrentHashMap<>();
 
+	private final ProcessedBeansTrackingStrategy processedBeansTrackingStrategy;
+
 	public PredefinedScopeBeanMetaDataManager(ConstraintCreationContext constraintCreationContext,
-			ExecutableHelper executableHelper,
-			ExecutableParameterNameProvider parameterNameProvider,
-			JavaBeanHelper javaBeanHelper,
-			ValidationOrderGenerator validationOrderGenerator,
-			List<MetaDataProvider> optionalMetaDataProviders,
-			MethodValidationConfiguration methodValidationConfiguration,
-			BeanMetaDataClassNormalizer beanMetaDataClassNormalizer,
-			Set<Class<?>> beanClassesToInitialize) {
+											  ExecutableHelper executableHelper,
+											  ExecutableParameterNameProvider parameterNameProvider,
+											  JavaBeanHelper javaBeanHelper,
+											  ValidationOrderGenerator validationOrderGenerator,
+											  List<MetaDataProvider> optionalMetaDataProviders,
+											  MethodValidationConfiguration methodValidationConfiguration,
+											  BeanMetaDataClassNormalizer beanMetaDataClassNormalizer,
+											  PredefinedScopeConfigurationImpl hibernateSpecificConfig) {
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders( optionalMetaDataProviders );
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
 				constraintCreationContext,
@@ -85,7 +92,7 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 		metaDataProviders.add( defaultProvider );
 		metaDataProviders.addAll( optionalMetaDataProviders );
 
-		for ( Class<?> validatedClass : beanClassesToInitialize ) {
+		for ( Class<?> validatedClass : hibernateSpecificConfig.getBeanClassesToInitialize() ) {
 			Class<?> normalizedValidatedClass = beanMetaDataClassNormalizer.normalize( validatedClass );
 
 			@SuppressWarnings("unchecked")
@@ -105,6 +112,23 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 		}
 
 		this.beanMetaDataClassNormalizer = beanMetaDataClassNormalizer;
+
+		if ( hibernateSpecificConfig.getProcessedBeansTrackingStrategy() != null ) {
+			this.processedBeansTrackingStrategy = hibernateSpecificConfig.getProcessedBeansTrackingStrategy();
+		}
+		else {
+			this.processedBeansTrackingStrategy = new PredefinedScopeProcessedBeansTrackingStrategy(
+					this
+			);
+		}
+		// Wrap the BeanMetaData objects with NonTrackedBeanMetaDataImpl if tracking is not required.
+		for ( Map.Entry<Class<?>, BeanMetaData<?>> entry : beanMetaDataMap.entrySet()  ) {
+			final Class<?> beanClass = entry.getKey();
+			final BeanMetaData<?> beanMetaData = entry.getValue();
+			if ( ! processedBeansTrackingStrategy.isEnabledForBean( beanClass, beanMetaData.hasCascadables() ) ) {
+				beanMetaDataMap.put( beanClass, new NonTrackedBeanMetaDataImpl<>( beanMetaData ) );
+			}
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -122,6 +146,10 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 
 	public Collection<BeanMetaData<?>> getBeanMetaData() {
 		return beanMetaDataMap.values();
+	}
+
+	public ProcessedBeansTrackingStrategy getProcessedBeansTrackingStrategy() {
+		return processedBeansTrackingStrategy;
 	}
 
 	@Override
