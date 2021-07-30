@@ -6,15 +6,15 @@
  */
 package org.hibernate.validator.internal.engine.tracking;
 
-import java.lang.reflect.Executable;
+import org.hibernate.validator.internal.properties.Signature;
 
 public interface ProcessedBeansTrackingStrategy {
 
 	boolean isEnabledForBean(Class<?> beanClass, boolean hasCascadables);
 
-	boolean isEnabledForReturnValue(Executable executable, boolean hasCascadables);
+	boolean isEnabledForReturnValue(Signature signature, boolean hasCascadables);
 
-	boolean isEnabledForParameters(Executable executable, boolean hasCascadables);
+	boolean isEnabledForParameters(Signature signature, boolean hasCascadables);
 
 	void clear();
 }

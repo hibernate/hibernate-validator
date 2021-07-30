@@ -23,6 +23,7 @@ import javax.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
+import org.hibernate.validator.internal.engine.tracking.ProcessedBeansTrackingStrategy;
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
@@ -78,6 +79,9 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	private final ReturnValueMetaData returnValueMetaData;
 	private final ElementKind kind;
 
+	private final boolean trackingEnabledForParameters;
+	private final boolean trackingEnabledForReturnValue;
+
 	private ExecutableMetaData(
 			String name,
 			Type returnType,
@@ -113,6 +117,35 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		);
 		this.isGetter = isGetter;
 		this.kind = kind;
+		this.trackingEnabledForParameters = validatableParametersMetaData.hasCascadables();
+		this.trackingEnabledForReturnValue = returnValueMetaData.hasCascadables();
+	}
+
+	public ExecutableMetaData(ExecutableMetaData originalExecutableMetaData, ProcessedBeansTrackingStrategy processedBeansTrackingStrategy) {
+		super( originalExecutableMetaData );
+
+		this.parameterTypes = originalExecutableMetaData.parameterTypes;
+		this.parameterMetaDataList = originalExecutableMetaData.parameterMetaDataList;
+		this.validatableParametersMetaData = originalExecutableMetaData.validatableParametersMetaData;
+		this.crossParameterConstraints = originalExecutableMetaData.crossParameterConstraints;
+		this.signatures = originalExecutableMetaData.signatures;
+		this.returnValueMetaData = originalExecutableMetaData.returnValueMetaData;
+		this.isGetter = originalExecutableMetaData.isGetter;
+		this.kind = originalExecutableMetaData.kind;
+
+		boolean trackingEnabledForParameters = false;
+		for ( Signature signature : originalExecutableMetaData.getSignatures() ) {
+			trackingEnabledForParameters = trackingEnabledForParameters || processedBeansTrackingStrategy.isEnabledForParameters( signature,
+					originalExecutableMetaData.getValidatableParametersMetaData().hasCascadables() );
+		}
+		this.trackingEnabledForParameters = trackingEnabledForParameters;
+
+		boolean trackingEnabledForReturnValue = false;
+		for ( Signature signature : originalExecutableMetaData.getSignatures() ) {
+			trackingEnabledForReturnValue = trackingEnabledForReturnValue || processedBeansTrackingStrategy.isEnabledForReturnValue( signature,
+					originalExecutableMetaData.getReturnValueMetaData().hasCascadables() );
+		}
+		this.trackingEnabledForReturnValue = trackingEnabledForReturnValue;
 	}
 
 	/**
@@ -197,6 +230,15 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	@Override
 	public ElementKind getKind() {
 		return kind;
+	}
+
+
+	public boolean isTrackingEnabledForParameters() {
+		return trackingEnabledForParameters;
+	}
+
+	public boolean isTrackingEnabledForReturnValue() {
+		return trackingEnabledForReturnValue;
 	}
 
 	@Override

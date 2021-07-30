@@ -200,7 +200,6 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				determineConstraintValidatorPayload( hibernateSpecificConfig ),
 				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
 				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
-				beanMetaDataManager.getProcessedBeansTrackingStrategy(),
 				constraintValidatorInitializationContext );
 
 		if ( LOG.isDebugEnabled() ) {
@@ -263,6 +262,10 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 
 	public boolean isTraversableResolverResultCacheEnabled() {
 		return validatorFactoryScopedContext.isTraversableResolverResultCacheEnabled();
+	}
+
+	public PredefinedScopeBeanMetaDataManager getBeanMetaDataManager() {
+		return beanMetaDataManager;
 	}
 
 	@Override

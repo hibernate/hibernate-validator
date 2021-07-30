@@ -10,9 +10,9 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowOverridingMethodAlterParameterConstraint;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowParallelMethodsDefineParameterConstraints;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineBeanMetaDataClassNormalizer;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintExpressionLanguageFeatureLevel;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintMappings;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintValidatorPayload;
-import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintExpressionLanguageFeatureLevel;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineCustomViolationExpressionLanguageFeatureLevel;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineExternalClassLoader;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFast;
@@ -47,7 +47,6 @@ import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
-import org.hibernate.validator.internal.engine.tracking.HasCascadablesProcessedBeansTrackingStrategy;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManagerImpl;
@@ -161,10 +160,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				determineTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
 				determineConstraintValidatorPayload( hibernateSpecificConfig ),
 				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
-				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
-				( hibernateSpecificConfig != null && hibernateSpecificConfig.getProcessedBeansTrackingStrategy() != null )
-						? hibernateSpecificConfig.getProcessedBeansTrackingStrategy()
-						: new HasCascadablesProcessedBeansTrackingStrategy() );
+				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ) );
 
 		ConstraintValidatorManager constraintValidatorManager = new ConstraintValidatorManagerImpl(
 				configurationState.getConstraintValidatorFactory(),

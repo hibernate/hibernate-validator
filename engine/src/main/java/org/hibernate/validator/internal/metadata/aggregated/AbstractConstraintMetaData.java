@@ -70,6 +70,16 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 		this.isConstrained = isConstrained;
 	}
 
+	protected AbstractConstraintMetaData(AbstractConstraintMetaData originalAbstractConstraintMetaData) {
+		this.name = originalAbstractConstraintMetaData.name;
+		this.type = originalAbstractConstraintMetaData.type;
+		this.directConstraints = originalAbstractConstraintMetaData.directConstraints;
+		this.containerElementsConstraints = originalAbstractConstraintMetaData.containerElementsConstraints;
+		this.allConstraints = originalAbstractConstraintMetaData.allConstraints;
+		this.isCascading = originalAbstractConstraintMetaData.isCascading;
+		this.isConstrained = originalAbstractConstraintMetaData.isConstrained;
+	}
+
 	@Override
 	public String getName() {
 		return name;
