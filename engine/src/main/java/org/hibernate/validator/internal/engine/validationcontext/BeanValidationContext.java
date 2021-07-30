@@ -37,7 +37,7 @@ class BeanValidationContext<T> extends AbstractValidationContext<T> {
 			BeanMetaData<T> rootBeanMetaData
 	) {
 		super( constraintValidatorManager, constraintValidatorFactory, validatorScopedContext, traversableResolver, constraintValidatorInitializationContext,
-				rootBean, rootBeanClass, rootBeanMetaData, rootBeanMetaData.isTrackingRequired()
+				rootBean, rootBeanClass, rootBeanMetaData, rootBeanMetaData.isTrackingEnabled()
 		);
 	}
 

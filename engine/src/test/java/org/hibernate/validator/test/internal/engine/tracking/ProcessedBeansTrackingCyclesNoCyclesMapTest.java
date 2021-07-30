@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.tracking;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,13 +23,8 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.PredefinedScopeHibernateValidatorFactory;
 import org.hibernate.validator.internal.engine.PredefinedScopeValidatorFactoryImpl;
-import org.hibernate.validator.internal.engine.ValidatorFactoryScopedContext;
 import org.hibernate.validator.internal.engine.tracking.ProcessedBeansTrackingStrategy;
-
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 /**
  * An example of beans with cascading constraints, some cycle and others do not.
@@ -58,10 +56,8 @@ public class ProcessedBeansTrackingCyclesNoCyclesMapTest {
 
 	@Test
 	public void testTrackingEnabled() {
+		final ProcessedBeansTrackingStrategy processedBeansTrackingStrategy = getProcessedBeansTrackingStrategy();
 
-		final ValidatorFactoryScopedContext validatorFactoryScopedContext = getValidatorFactoryScopedContext();
-		final ProcessedBeansTrackingStrategy processedBeansTrackingStrategy =
-				validatorFactoryScopedContext.getProcessedBeansTrackingStrategy();
 		assertTrue( processedBeansTrackingStrategy.isEnabledForBean(
 				A.class,
 				true
@@ -133,8 +129,8 @@ public class ProcessedBeansTrackingCyclesNoCyclesMapTest {
 				.buildValidatorFactory().unwrap( PredefinedScopeHibernateValidatorFactory.class );
 	}
 
-	private ValidatorFactoryScopedContext getValidatorFactoryScopedContext() {
-		return ( (PredefinedScopeValidatorFactoryImpl) getValidatorFactory() ).getValidatorFactoryScopedContext();
+	private ProcessedBeansTrackingStrategy getProcessedBeansTrackingStrategy() {
+		return ( (PredefinedScopeValidatorFactoryImpl) getValidatorFactory() ).getBeanMetaDataManager().getProcessedBeansTrackingStrategy();
 	}
 
 	private static class A {

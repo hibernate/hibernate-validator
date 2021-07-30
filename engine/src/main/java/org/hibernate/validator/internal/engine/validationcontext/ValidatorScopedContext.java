@@ -13,7 +13,6 @@ import jakarta.validation.MessageInterpolator;
 import jakarta.validation.Validator;
 
 import org.hibernate.validator.internal.engine.ValidatorFactoryScopedContext;
-import org.hibernate.validator.internal.engine.tracking.ProcessedBeansTrackingStrategy;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -79,11 +78,6 @@ public class ValidatorScopedContext {
 
 	private final boolean showValidatedValuesInTraceLogs;
 
-	/**
-	 * Strategy used to enable or not processed beans tracking.
-	 */
-	private final ProcessedBeansTrackingStrategy processedBeansTrackingStrategy;
-
 	public ValidatorScopedContext(ValidatorFactoryScopedContext validatorFactoryScopedContext) {
 		this.messageInterpolator = validatorFactoryScopedContext.getMessageInterpolator();
 		this.parameterNameProvider = validatorFactoryScopedContext.getParameterNameProvider();
@@ -95,7 +89,6 @@ public class ValidatorScopedContext {
 		this.constraintValidatorPayload = validatorFactoryScopedContext.getConstraintValidatorPayload();
 		this.constraintExpressionLanguageFeatureLevel = validatorFactoryScopedContext.getConstraintExpressionLanguageFeatureLevel();
 		this.customViolationExpressionLanguageFeatureLevel = validatorFactoryScopedContext.getCustomViolationExpressionLanguageFeatureLevel();
-		this.processedBeansTrackingStrategy = validatorFactoryScopedContext.getProcessedBeansTrackingStrategy();
 		this.showValidatedValuesInTraceLogs = validatorFactoryScopedContext.isShowValidatedValuesInTraceLogs();
 	}
 
@@ -141,9 +134,5 @@ public class ValidatorScopedContext {
 
 	public boolean isShowValidatedValuesInTraceLogs() {
 		return showValidatedValuesInTraceLogs;
-	}
-
-	public ProcessedBeansTrackingStrategy getProcessedBeansTrackingStrategy() {
-		return processedBeansTrackingStrategy;
 	}
 }

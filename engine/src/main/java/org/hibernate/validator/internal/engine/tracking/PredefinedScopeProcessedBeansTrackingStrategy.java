@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.engine.tracking;
 
-import java.lang.reflect.Executable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -15,22 +14,22 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.PredefinedScopeBeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ContainerCascadingMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
+import org.hibernate.validator.internal.properties.Signature;
 import org.hibernate.validator.internal.util.CollectionHelper;
 
 public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedBeansTrackingStrategy {
 
 	private final Map<Class<?>, Boolean> trackingEnabledForBeans;
 
-	private final Map<Executable, Boolean> trackingEnabledForReturnValues;
+	private final Map<Signature, Boolean> trackingEnabledForReturnValues;
 
-	private final Map<Executable, Boolean> trackingEnabledForParameters;
+	private final Map<Signature, Boolean> trackingEnabledForParameters;
 
-	public PredefinedScopeProcessedBeansTrackingStrategy(PredefinedScopeBeanMetaDataManager beanMetaDataManager) {
+	public PredefinedScopeProcessedBeansTrackingStrategy(Map<Class<?>, BeanMetaData<?>> rawBeanMetaDataMap) {
 		// TODO: build the maps from the information inside the beanMetaDataManager
 		// There is a good chance we will need a structure with the whole hierarchy of constraint classes.
 		// That's something we could add to PredefinedScopeBeanMetaDataManager, as we are already doing similar things
@@ -39,24 +38,24 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 		// PredefinedScopeBeanMetaDataManager.
 
 		this.trackingEnabledForBeans = CollectionHelper.toImmutableMap(
-				new TrackingEnabledStrategyBuilder( beanMetaDataManager ).build()
+				new TrackingEnabledStrategyBuilder( rawBeanMetaDataMap ).build()
 		);
 		this.trackingEnabledForReturnValues = CollectionHelper.toImmutableMap( new HashMap<>() );
 		this.trackingEnabledForParameters = CollectionHelper.toImmutableMap( new HashMap<>() );
 	}
 
 	private static class TrackingEnabledStrategyBuilder {
-		private final PredefinedScopeBeanMetaDataManager beanMetaDataManager;
+		private final Map<Class<?>, BeanMetaData<?>> rawBeanMetaDataMap;
 		private final Map<Class<?>, Boolean> classToBeanTrackingEnabled;
 
-		TrackingEnabledStrategyBuilder(PredefinedScopeBeanMetaDataManager beanMetaDataManager) {
-			this.beanMetaDataManager = beanMetaDataManager;
-			this.classToBeanTrackingEnabled = new HashMap<>( beanMetaDataManager.getBeanMetaData().size() );
+		TrackingEnabledStrategyBuilder(Map<Class<?>, BeanMetaData<?>> rawBeanMetaDataMap) {
+			this.rawBeanMetaDataMap = rawBeanMetaDataMap;
+			this.classToBeanTrackingEnabled = CollectionHelper.newHashMap( rawBeanMetaDataMap.size() );
 		}
 
 		public Map<Class<?>, Boolean> build() {
 			final Set<Class<?>> beanClassesInPath = new HashSet<>();
-			for ( BeanMetaData<?> beanMetadata : beanMetaDataManager.getBeanMetaData() ) {
+			for ( BeanMetaData<?> beanMetadata : rawBeanMetaDataMap.values() ) {
 				determineTrackingRequired( beanMetadata.getBeanClass(), beanClassesInPath );
 				if ( !beanClassesInPath.isEmpty() ) {
 					throw new IllegalStateException( "beanClassesInPath not empty" );
@@ -160,38 +159,38 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 
 		// TODO: is there a more concise way to do this?
 		private <T> Set<Class<?>> getDirectCascadedBeanClasses(Class<T> beanClass ) {
-			final BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( beanClass );
-			if ( beanMetaData.hasCascadables() ) {
-				final Set<Class<?>> directCascadedBeanClasses = new HashSet<>();
-				for ( Cascadable cascadable : beanMetaData.getCascadables() ) {
-					final CascadingMetaData cascadingMetaData = cascadable.getCascadingMetaData();
-					if ( cascadingMetaData.isContainer() ) {
-						final ContainerCascadingMetaData containerCascadingMetaData = (ContainerCascadingMetaData) cascadingMetaData;
-						if ( containerCascadingMetaData.getEnclosingType() instanceof ParameterizedType ) {
-							ParameterizedType parameterizedType = (ParameterizedType) containerCascadingMetaData.getEnclosingType();
-							for ( Type typeArgument :  parameterizedType.getActualTypeArguments() ) {
-								if ( typeArgument instanceof Class ) {
-									directCascadedBeanClasses.add( (Class<?>) typeArgument );
-								}
-								else {
-									throw new UnsupportedOperationException( "Only ParameterizedType values of type Class are supported" );
-								}
+			final BeanMetaData<?> beanMetaData = rawBeanMetaDataMap.get( beanClass );
+
+			if ( beanMetaData == null || !beanMetaData.hasCascadables() ) {
+				return Collections.emptySet();
+			}
+
+			final Set<Class<?>> directCascadedBeanClasses = new HashSet<>();
+			for ( Cascadable cascadable : beanMetaData.getCascadables() ) {
+				final CascadingMetaData cascadingMetaData = cascadable.getCascadingMetaData();
+				if ( cascadingMetaData.isContainer() ) {
+					final ContainerCascadingMetaData containerCascadingMetaData = (ContainerCascadingMetaData) cascadingMetaData;
+					if ( containerCascadingMetaData.getEnclosingType() instanceof ParameterizedType ) {
+						ParameterizedType parameterizedType = (ParameterizedType) containerCascadingMetaData.getEnclosingType();
+						for ( Type typeArgument :  parameterizedType.getActualTypeArguments() ) {
+							if ( typeArgument instanceof Class ) {
+								directCascadedBeanClasses.add( (Class<?>) typeArgument );
 							}
-						}
-						else {
-							throw new UnsupportedOperationException( "Non-parameterized containers are not supported yet." );
+							else {
+								throw new UnsupportedOperationException( "Only ParameterizedType values of type Class are supported" );
+							}
 						}
 					}
 					else {
-						// TODO: For now, assume non-container Cascadables are always beans. Truee???
-						directCascadedBeanClasses.add( (Class<?>) cascadable.getCascadableType() );
+						throw new UnsupportedOperationException( "Non-parameterized containers are not supported yet." );
 					}
 				}
-				return directCascadedBeanClasses;
+				else {
+					// TODO: For now, assume non-container Cascadables are always beans. Truee???
+					directCascadedBeanClasses.add( (Class<?>) cascadable.getCascadableType() );
+				}
 			}
-			else {
-				return Collections.emptySet();
-			}
+			return directCascadedBeanClasses;
 		}
 
 		private boolean register(Class<?> beanClass, boolean isBeanTrackingEnabled) {
@@ -212,21 +211,21 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 	}
 
 	@Override
-	public boolean isEnabledForReturnValue(Executable executable, boolean hasCascadables) {
+	public boolean isEnabledForReturnValue(Signature signature, boolean hasCascadables) {
 		if ( !hasCascadables ) {
 			return false;
 		}
 
-		return trackingEnabledForReturnValues.getOrDefault( executable, true );
+		return trackingEnabledForReturnValues.getOrDefault( signature, true );
 	}
 
 	@Override
-	public boolean isEnabledForParameters(Executable executable, boolean hasCascadables) {
+	public boolean isEnabledForParameters(Signature signature, boolean hasCascadables) {
 		if ( !hasCascadables ) {
 			return false;
 		}
 
-		return trackingEnabledForParameters.getOrDefault( executable, true );
+		return trackingEnabledForParameters.getOrDefault( signature, true );
 	}
 
 	@Override

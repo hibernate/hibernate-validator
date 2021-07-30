@@ -117,8 +117,5 @@ public interface BeanMetaData<T> extends Validatable {
 	/**
 	 * @return {@code true} if the bean class is required to be tracked; {@code false} otherwise.
 	 */
-	default boolean isTrackingRequired() {
-		// TODO: is this the correct return value for UninitializedBeanMetaData???
-		return true;
-	}
+	boolean isTrackingEnabled();
 }
