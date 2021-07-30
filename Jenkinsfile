@@ -365,31 +365,35 @@ stage('Deploy') {
 		echo "Performing full release for version ${releaseVersion.toString()}"
 		runBuildOnNode {
 			helper.withMavenWorkspace(mavenSettingsConfig: params.RELEASE_DRY_RUN ? null : helper.configuration.file.deployment.maven.settingsId) {
-				sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
-				sh "bash -xe hibernate-noorm-release-scripts/prepare-release.sh validator ${releaseVersion.toString()}"
+				configFileProvider([configFile(fileId: 'release.config.ssh', targetLocation: env.HOME + '/.ssh/config')]) {
+					sshagent(['hibernate.filemgmt.jboss.org', 'hibernate-ci.frs.sourceforge.net']) {
+						sh 'cat $HOME/.ssh/config'
+						sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
+						sh "bash -xe hibernate-noorm-release-scripts/prepare-release.sh validator ${releaseVersion.toString()}"
 
-				String deployCommand = "bash -xe hibernate-noorm-release-scripts/deploy.sh validator"
-				if (!params.RELEASE_DRY_RUN) {
-					sh deployCommand
-				} else {
-					echo "WARNING: Not deploying. Would have executed:"
-					echo deployCommand
-				}
+						String deployCommand = "bash -xe hibernate-noorm-release-scripts/deploy.sh validator"
+						if (!params.RELEASE_DRY_RUN) {
+							sh deployCommand
+						} else {
+							echo "WARNING: Not deploying. Would have executed:"
+							echo deployCommand
+						}
 
-				String uploadDistributionCommand = "bash -xe hibernate-noorm-release-scripts/upload-distribution.sh validator ${releaseVersion.toString()}"
-				String uploadDocumentationCommand = "bash -xe hibernate-noorm-release-scripts/upload-documentation.sh validator ${releaseVersion.toString()} ${releaseVersion.family}"
-				if (!params.RELEASE_DRY_RUN) {
-					sh uploadDistributionCommand
-					sh uploadDocumentationCommand
-				}
-				else {
-					echo "WARNING: Not uploading anything. Would have executed:"
-					echo uploadDistributionCommand
-					echo uploadDocumentationCommand
-				}
+						String uploadDistributionCommand = "bash -xe hibernate-noorm-release-scripts/upload-distribution.sh validator ${releaseVersion.toString()}"
+						String uploadDocumentationCommand = "bash -xe hibernate-noorm-release-scripts/upload-documentation.sh validator ${releaseVersion.toString()} ${releaseVersion.family}"
+						if (!params.RELEASE_DRY_RUN) {
+							sh uploadDistributionCommand
+							sh uploadDocumentationCommand
+						} else {
+							echo "WARNING: Not uploading anything. Would have executed:"
+							echo uploadDistributionCommand
+							echo uploadDocumentationCommand
+						}
 
-				sh "bash -xe hibernate-noorm-release-scripts/update-version.sh validator ${afterReleaseDevelopmentVersion.toString()}"
-				sh "bash -xe hibernate-noorm-release-scripts/push-upstream.sh validator ${releaseVersion.toString()} ${helper.scmSource.branch.name} ${!params.RELEASE_DRY_RUN}"
+						sh "bash -xe hibernate-noorm-release-scripts/update-version.sh validator ${afterReleaseDevelopmentVersion.toString()}"
+						sh "bash -xe hibernate-noorm-release-scripts/push-upstream.sh validator ${releaseVersion.toString()} ${helper.scmSource.branch.name} ${!params.RELEASE_DRY_RUN}"
+					}
+				}
 			}
 		}
 	}
