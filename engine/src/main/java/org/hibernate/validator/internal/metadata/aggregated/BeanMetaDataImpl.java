@@ -275,7 +275,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.defaultGroupSequence = originalBeanMetaData.defaultGroupSequence;
 		this.validationOrder = originalBeanMetaData.validationOrder;
 		this.directMetaConstraints = originalBeanMetaData.directMetaConstraints;
-		this.executableMetaDataMap = originalBeanMetaData.executableMetaDataMap;
+		Map<Signature, ExecutableMetaData> tempExecutableMetaDataMap = newHashMap();
+		for ( Entry<Signature, ExecutableMetaData> executableMetaDataEntry : originalBeanMetaData.executableMetaDataMap.entrySet() ) {
+			tempExecutableMetaDataMap.put( executableMetaDataEntry.getKey(),
+					new ExecutableMetaData( executableMetaDataEntry.getValue(), processedBeansTrackingStrategy, processedBeansTrackingVoter ) );
+		}
+		this.executableMetaDataMap = CollectionHelper.toImmutableMap( tempExecutableMetaDataMap );
 		this.unconstrainedExecutables = originalBeanMetaData.unconstrainedExecutables;
 		this.defaultGroupSequenceRedefined = originalBeanMetaData.defaultGroupSequenceRedefined;
 		this.resolvedDefaultGroupSequence = originalBeanMetaData.resolvedDefaultGroupSequence;
