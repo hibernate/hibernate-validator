@@ -47,6 +47,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.PredefinedScopeConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
+import org.hibernate.validator.internal.engine.tracking.DefaultProcessedBeansTrackingVoter;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.PredefinedScopeBeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -185,6 +186,9 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				buildMetaDataProviders( constraintCreationContext, xmlMetaDataProvider, constraintMappings ),
 				methodValidationConfiguration,
 				determineBeanMetaDataClassNormalizer( hibernateSpecificConfig ),
+				( hibernateSpecificConfig != null && hibernateSpecificConfig.getProcessedBeansTrackingVoter() != null )
+						? hibernateSpecificConfig.getProcessedBeansTrackingVoter()
+						: new DefaultProcessedBeansTrackingVoter(),
 				hibernateSpecificConfig
 		);
 
