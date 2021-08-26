@@ -43,7 +43,6 @@ import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
-import org.hibernate.validator.internal.engine.tracking.ProcessedBeansTrackingStrategy;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
@@ -68,6 +67,7 @@ import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.spi.tracking.ProcessedBeansTrackingVoter;
 
 /**
  * Hibernate specific {@code Configuration} implementation.
@@ -134,7 +134,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private BeanMetaDataClassNormalizer beanMetaDataClassNormalizer;
 	private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
 	private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
-	private ProcessedBeansTrackingStrategy processedBeansTrackingStrategy;
+	private ProcessedBeansTrackingVoter processedBeansTrackingVoter;
 	private boolean showValidatedValuesInTraceLogs;
 
 	protected AbstractConfigurationImpl(BootstrapState state) {
@@ -675,19 +675,19 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	}
 
 	@Override
-	public T processedBeansTrackingStrategy(ProcessedBeansTrackingStrategy processedBeansTrackingStrategy) {
+	public T processedBeansTrackingVoter(ProcessedBeansTrackingVoter processedBeansTrackingVoter) {
 		if ( LOG.isDebugEnabled() ) {
-			if ( processedBeansTrackingStrategy != null ) {
-				LOG.debug( "Setting custom ProcessedBeansTrackingStrategy of type " + processedBeansTrackingStrategy.getClass()
+			if ( processedBeansTrackingVoter != null ) {
+				LOG.debug( "Setting custom ProcessedBeansTrackingVoter of type " + processedBeansTrackingVoter.getClass()
 						.getName() );
 			}
 		}
-		this.processedBeansTrackingStrategy = processedBeansTrackingStrategy;
+		this.processedBeansTrackingVoter = processedBeansTrackingVoter;
 		return thisAsT();
 	}
 
-	public ProcessedBeansTrackingStrategy getProcessedBeansTrackingStrategy() {
-		return processedBeansTrackingStrategy;
+	public ProcessedBeansTrackingVoter getProcessedBeansTrackingVoter() {
+		return processedBeansTrackingVoter;
 	}
 
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {

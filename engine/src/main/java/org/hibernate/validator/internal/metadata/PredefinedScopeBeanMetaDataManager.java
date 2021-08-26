@@ -56,6 +56,7 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
+import org.hibernate.validator.spi.tracking.ProcessedBeansTrackingVoter;
 
 public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 
@@ -76,6 +77,7 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 											  List<MetaDataProvider> optionalMetaDataProviders,
 											  MethodValidationConfiguration methodValidationConfiguration,
 											  BeanMetaDataClassNormalizer beanMetaDataClassNormalizer,
+											  ProcessedBeansTrackingVoter processedBeansTrackingVoter,
 											  PredefinedScopeConfigurationImpl hibernateSpecificConfig) {
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders( optionalMetaDataProviders );
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
@@ -108,24 +110,19 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 				rawBeanMetaDataMap.put( hierarchyElement,
 						createBeanMetaData( constraintCreationContext, executableHelper, parameterNameProvider,
 								javaBeanHelper, validationOrderGenerator, optionalMetaDataProviders, methodValidationConfiguration,
-								metaDataProviders, hierarchyElement ) );
+								processedBeansTrackingVoter, metaDataProviders, hierarchyElement ) );
 			}
 		}
 
 		this.beanMetaDataClassNormalizer = beanMetaDataClassNormalizer;
-
-		if ( hibernateSpecificConfig.getProcessedBeansTrackingStrategy() != null ) {
-			this.processedBeansTrackingStrategy = hibernateSpecificConfig.getProcessedBeansTrackingStrategy();
-		}
-		else {
-			this.processedBeansTrackingStrategy = new PredefinedScopeProcessedBeansTrackingStrategy(
-					rawBeanMetaDataMap
-			);
-		}
+		this.processedBeansTrackingStrategy = new PredefinedScopeProcessedBeansTrackingStrategy(
+				rawBeanMetaDataMap
+		);
 
 		// Inject the processed beans tracking information into the BeanMetaData objects
-		for ( Map.Entry<Class<?>, BeanMetaData<?>> rawBeanMetaDataEntry : rawBeanMetaDataMap.entrySet()  ) {
-			beanMetaDataMap.put( rawBeanMetaDataEntry.getKey(), injectTrackingInformation( rawBeanMetaDataEntry.getValue(), processedBeansTrackingStrategy ) );
+		for ( Map.Entry<Class<?>, BeanMetaData<?>> rawBeanMetaDataEntry : rawBeanMetaDataMap.entrySet() ) {
+			beanMetaDataMap.put( rawBeanMetaDataEntry.getKey(),
+					injectTrackingInformation( rawBeanMetaDataEntry.getValue(), processedBeansTrackingStrategy, processedBeansTrackingVoter ) );
 		}
 	}
 
@@ -171,11 +168,13 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 			ValidationOrderGenerator validationOrderGenerator,
 			List<MetaDataProvider> optionalMetaDataProviders,
 			MethodValidationConfiguration methodValidationConfiguration,
+			ProcessedBeansTrackingVoter processedBeansTrackingVoter,
 			List<MetaDataProvider> metaDataProviders,
 			Class<T> clazz) {
 		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance(
 				constraintCreationContext, executableHelper, parameterNameProvider,
-				validationOrderGenerator, clazz, methodValidationConfiguration );
+				validationOrderGenerator, clazz, methodValidationConfiguration,
+				processedBeansTrackingVoter );
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
 			for ( BeanConfiguration<? super T> beanConfiguration : getBeanConfigurationForHierarchy( provider, clazz ) ) {
@@ -221,8 +220,9 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 	}
 
 	private static <T> BeanMetaData<T> injectTrackingInformation(BeanMetaData<T> rawBeanMetaData,
-			ProcessedBeansTrackingStrategy processedBeansTrackingStrategy) {
-		return new BeanMetaDataImpl<T>( (BeanMetaDataImpl<T>) rawBeanMetaData, processedBeansTrackingStrategy );
+			ProcessedBeansTrackingStrategy processedBeansTrackingStrategy,
+			ProcessedBeansTrackingVoter processedBeansTrackingVoter) {
+		return new BeanMetaDataImpl<T>( (BeanMetaDataImpl<T>) rawBeanMetaData, processedBeansTrackingStrategy, processedBeansTrackingVoter );
 	}
 
 	private static class UninitializedBeanMetaData<T> implements BeanMetaData<T> {
