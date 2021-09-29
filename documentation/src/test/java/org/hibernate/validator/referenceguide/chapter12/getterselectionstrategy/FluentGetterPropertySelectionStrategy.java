@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.validator.spi.properties.ConstrainableExecutable;
@@ -36,9 +37,9 @@ public class FluentGetterPropertySelectionStrategy implements GetterPropertySele
 	}
 
 	@Override
-	public Set<String> getGetterMethodNameCandidates(String propertyName) {
+	public List<String> getGetterMethodNameCandidates(String propertyName) {
 		// As method name == property name, there always is just one possible name for a method
-		return Collections.singleton( propertyName );
+		return Collections.singletonList( propertyName );
 	}
 }
 //end::include[]

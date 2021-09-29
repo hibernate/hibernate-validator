@@ -24,6 +24,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.executable.ExecutableType;
@@ -428,6 +429,21 @@ public class XmlMappingTest {
 						pathWith()
 							.property( "parentListAttribute" )
 							.containerElement( "<list element>", true, null, 0, List.class, 0 ) )
+		);
+	}
+
+	@Test
+	public void test_right_getter_used_when_there_are_multiple_getter_candidates() {
+		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
+		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "hv-1853-mapping.xml" ) );
+
+		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
+		final Validator validator = validatorFactory.getValidator();
+
+		Set<ConstraintViolation<MultipleGetterCandidates>> violations = validator.validate( new MultipleGetterCandidates() );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Min.class ).withProperty( "property1" ),
+				violationOf( Min.class ).withProperty( "property2" )
 		);
 	}
 
