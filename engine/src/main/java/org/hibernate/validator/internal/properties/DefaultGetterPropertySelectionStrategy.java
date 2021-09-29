@@ -7,8 +7,8 @@
 package org.hibernate.validator.internal.properties;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
@@ -54,10 +54,10 @@ public class DefaultGetterPropertySelectionStrategy implements GetterPropertySel
 	}
 
 	@Override
-	public Set<String> getGetterMethodNameCandidates(String propertyName) {
+	public List<String> getGetterMethodNameCandidates(String propertyName) {
 		Contracts.assertNotEmpty( propertyName, "Name of a property must not be empty" );
 
-		Set<String> nameCandidates = CollectionHelper.newHashSet( GETTER_PREFIXES.length );
+		List<String> nameCandidates = CollectionHelper.newArrayList( GETTER_PREFIXES.length );
 		for ( String prefix : GETTER_PREFIXES ) {
 			nameCandidates.add( prefix + Character.toUpperCase( propertyName.charAt( 0 ) ) + propertyName.substring( 1 ) );
 		}

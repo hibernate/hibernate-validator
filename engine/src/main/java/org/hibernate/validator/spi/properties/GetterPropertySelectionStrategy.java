@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.spi.properties;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -42,6 +43,6 @@ public interface GetterPropertySelectionStrategy {
 	 *
 	 * @return the {@link Set} of possible getter names
 	 */
-	Set<String> getGetterMethodNameCandidates(String propertyName);
+	List<String> getGetterMethodNameCandidates(String propertyName);
 
 }

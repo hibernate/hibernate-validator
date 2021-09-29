@@ -232,8 +232,8 @@ public class GetterPropertySelectionStrategyTest {
 		}
 
 		@Override
-		public Set<String> getGetterMethodNameCandidates(String propertyName) {
-			return Collections.singleton( propertyName );
+		public List<String> getGetterMethodNameCandidates(String propertyName) {
+			return Collections.singletonList( propertyName );
 		}
 	}
 
@@ -252,8 +252,8 @@ public class GetterPropertySelectionStrategyTest {
 		}
 
 		@Override
-		public Set<String> getGetterMethodNameCandidates(String propertyName) {
-			return Collections.singleton( "foo" + Character.toUpperCase( propertyName.charAt( 0 ) ) + propertyName.substring( 1 ) );
+		public List<String> getGetterMethodNameCandidates(String propertyName) {
+			return Collections.singletonList( "foo" + Character.toUpperCase( propertyName.charAt( 0 ) ) + propertyName.substring( 1 ) );
 		}
 	}
 
