@@ -12,6 +12,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.annotations.Test;
 
@@ -58,7 +59,6 @@ public class PESELValidatorTest extends AbstractConstrainedTest {
 		assertNoViolations( validator.validate( new Person( "12241301417" ) ) );
 		assertNoViolations( validator.validate( new Person( "12252918020" ) ) );
 		assertNoViolations( validator.validate( new Person( "12262911406" ) ) );
-
 	}
 
 	@Test
@@ -96,6 +96,31 @@ public class PESELValidatorTest extends AbstractConstrainedTest {
 						violationOf( PESEL.class ).withProperty( "pesel" )
 				);
 		assertThat( validator.validate( new Person( "12262911402" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HV-1854")
+	public void testMeaningfulPESELNumber() {
+		assertThat( validator.validate( new Person( "00000000000" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+		assertThat( validator.validate( new Person( "00130000006" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+		assertThat( validator.validate( new Person( "00013300009" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+		assertThat( validator.validate( new Person( "21022900008" ) ) )
+				.containsOnlyViolations(
+						violationOf( PESEL.class ).withProperty( "pesel" )
+				);
+		assertThat( validator.validate( new Person( "21034000004" ) ) )
 				.containsOnlyViolations(
 						violationOf( PESEL.class ).withProperty( "pesel" )
 				);
