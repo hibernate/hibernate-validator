@@ -246,10 +246,11 @@
 
         <!-- Repository Deployment URLs -->
 
-        <jboss.releases.repo.id>jboss-releases-repository</jboss.releases.repo.id>
-        <jboss.releases.repo.url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</jboss.releases.repo.url>
-        <jboss.snapshots.repo.id>jboss-snapshots-repository</jboss.snapshots.repo.id>
-        <jboss.snapshots.repo.url>https://repository.jboss.org/nexus/content/repositories/snapshots/</jboss.snapshots.repo.url>
+        <ossrh.releases.repo.id>ossrh</ossrh.releases.repo.id>
+        <ossrh.releases.repo.url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</ossrh.releases.repo.url>
+        <ossrh.releases.repo.baseUrl>https://oss.sonatype.org/</ossrh.releases.repo.baseUrl>
+        <ossrh.snapshots.repo.id>ossrh</ossrh.snapshots.repo.id>
+        <ossrh.snapshots.repo.url>https://oss.sonatype.org/content/repositories/snapshots</ossrh.snapshots.repo.url>
 
         <!-- Maven Central repository -->
 
@@ -1183,14 +1184,14 @@
 
     <distributionManagement>
         <repository>
-            <id>${jboss.releases.repo.id}</id>
-            <name>JBoss Releases Repository</name>
-            <url>${jboss.releases.repo.url}</url>
+            <id>${ossrh.releases.repo.id}</id>
+            <name>OSSRH Releases Repository</name>
+            <url>${ossrh.releases.repo.url}</url>
         </repository>
         <snapshotRepository>
-            <id>${jboss.snapshots.repo.id}</id>
-            <name>JBoss Snapshots Repository</name>
-            <url>${jboss.snapshots.repo.url}</url>
+            <id>${ossrh.snapshots.repo.id}</id>
+            <name>OSSRH Snapshots Repository</name>
+            <url>${ossrh.snapshots.repo.url}</url>
         </snapshotRepository>
     </distributionManagement>
 
