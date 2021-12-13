@@ -1264,7 +1264,6 @@
                         <configuration>
                             <nexusUrl>${ossrh.releases.repo.baseUrl}</nexusUrl>
                             <serverId>${ossrh.releases.repo.id}</serverId>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
                 </plugins>
