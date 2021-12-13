@@ -97,7 +97,7 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
 
 // Default node pattern, to be used for resource-intensive stages.
 // Should not include the controller node.
-@Field final String NODE_PATTERN_BASE = 'Worker'
+@Field final String NODE_PATTERN_BASE = 'Worker&&Containers'
 // Quick-use node pattern, to be used for very light, quick, and environment-independent stages,
 // such as sending a notification. May include the controller node in particular.
 @Field final String QUICK_USE_NODE_PATTERN = 'Controller||Worker'
