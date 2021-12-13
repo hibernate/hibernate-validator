@@ -240,6 +240,7 @@
         <version.org.wildfly.core>14.0.0.Final</version.org.wildfly.core>
         <version.wildfly-patch-gen.plugin>2.1.0.Final</version.wildfly-patch-gen.plugin>
         <version.wildfly-patch-gen.plugin.woodstox>5.0.3</version.wildfly-patch-gen.plugin.woodstox>
+        <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
@@ -945,6 +946,10 @@
                 <plugin>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>${version.deploy.plugin}</version>
+                    <configuration>
+                        <!-- we use the nexus-staging plugin -->
+                        <skip>true</skip>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
@@ -1250,6 +1255,17 @@
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>${version.nexus-staging-maven-plugin}</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <nexusUrl>${ossrh.releases.repo.baseUrl}</nexusUrl>
+                            <serverId>${ossrh.releases.repo.id}</serverId>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
