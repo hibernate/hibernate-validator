@@ -1,6 +1,28 @@
 Hibernate Validator Changelog
 =============================
 
+6.2.1.Final (2021-12-14)
+-------------------------
+
+** Bug
+    * HV-1854 PESELValidator does not valid correct
+    * HV-1833 DomainNameUtil issues java.lang.StackOverflowError on very large error (@Email validation)
+
+** Task
+    * HV-1862 Update Log4j 2 test dependency to 2.16.0
+    * HV-1861 Switch to the nexus-staging-maven-plugin
+    * HV-1860 Add GitHub SSH keys to SSH agent during Jenkinsfile release
+    * HV-1859 Update Log4j 2 test dependency to 2.15.0
+    * HV-1858 Switch to OSSRH for deployment to Maven Central
+    * HV-1848 Set up SSH config as part of the Jenkinsfile
+    * HV-1843 Upgrade Jackson test dependency to 2.12.3
+    * HV-1842 Upgrade Guava test dependency to 30.1.1-jre
+    * HV-1841 Expose a getter for the configured PropertyNodeNameProvider
+    * HV-1838 Skip forbiddenapis on JDK17+
+    * HV-1837 Language rework initiative
+    * HV-1836 Restore CI for JDK 15
+    * HV-1835 Test Hibernate Validator against JDK17
+
 6.2.0.Final (23-12-2020)
 -------------------------
 
