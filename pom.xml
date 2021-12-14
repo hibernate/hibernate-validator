@@ -1264,6 +1264,7 @@
                         <configuration>
                             <nexusUrl>${ossrh.releases.repo.baseUrl}</nexusUrl>
                             <serverId>${ossrh.releases.repo.id}</serverId>
+                            <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
                         </configuration>
                     </plugin>
                 </plugins>
