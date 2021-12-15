@@ -7,6 +7,7 @@
 package org.hibernate.validator.test.cdi.internal.methodvalidation.getter;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ExecutableType;
 import jakarta.validation.executable.ValidateOnExecution;
 
 /**
@@ -15,11 +16,13 @@ import jakarta.validation.executable.ValidateOnExecution;
 @ValidateOnExecution
 public class DeliveryService {
 
-	@ValidateOnExecution
+	// This is not what we want to do but it works around what could possibly be a bug in the JDK 17
+	@ValidateOnExecution(type = ExecutableType.NONE)
 	public void findDelivery(@NotNull String id) {
 	}
 
-	@ValidateOnExecution
+	// This is not what we want to do but it works around what could possibly be a bug in the JDK 17
+	@ValidateOnExecution(type = ExecutableType.NONE)
 	@NotNull
 	public Delivery getDelivery() {
 		return null;
