@@ -329,11 +329,11 @@
                 <surefire.jvm.args.add-opens>--add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED</surefire.jvm.args.add-opens>
             </properties>
         </profile>
-        <!-- WildFly 13 does not support JDK 11 so running the tests with WildFly 13 for JDK 10 - -->
+        <!-- We keep this instance separate as we sometimes have to condition it on JDK version - -->
         <profile>
-            <id>jdk10-</id>
+            <id>wildfly-secondary-version</id>
             <activation>
-                <jdk>(,11)</jdk>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <build>
                 <plugins>
