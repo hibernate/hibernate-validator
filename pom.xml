@@ -218,7 +218,7 @@
         <version.depends.plugin>1.4.0</version.depends.plugin>
         <version.deploy.plugin>2.8.2</version.deploy.plugin>
         <version.enforcer.plugin>3.0.0-M1</version.enforcer.plugin>
-        <version.forbiddenapis.plugin>2.5</version.forbiddenapis.plugin>
+        <version.forbiddenapis.plugin>3.2</version.forbiddenapis.plugin>
         <version.gmavenplus.plugin>1.6</version.gmavenplus.plugin>
         <version.install.plugin>2.5.2</version.install.plugin>
         <version.japicmp.plugin>0.11.0</version.japicmp.plugin>
@@ -1341,16 +1341,6 @@
                     </plugins>
                 </pluginManagement>
             </build>
-        </profile>
-        <profile>
-            <id>jdk17+</id>
-            <activation>
-                <jdk>[17,)</jdk>
-            </activation>
-            <properties>
-                <!-- ForbiddenAPIs doesn't work with JDK17: https://github.com/policeman-tools/forbidden-apis/issues/177 -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
-            </properties>
         </profile>
         <profile>
             <id>jqassistant</id>
