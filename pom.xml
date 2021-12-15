@@ -89,6 +89,9 @@
         <module>tck-runner</module>
         <module>annotation-processor</module>
         <module>performance</module>
+        <module>cdi</module>
+        <module>modules</module>
+        <module>integration</module>
     </modules>
 
     <properties>
@@ -1182,8 +1185,6 @@
                     <name>disableDocumentationBuild</name>
                     <value>!true</value>
                 </property>
-                <!-- Don't build docs on JDK 12 as we don't have the CDI artifact -->
-                <jdk>(,12)</jdk>
             </activation>
             <modules>
                 <module>documentation</module>
@@ -1196,8 +1197,6 @@
                     <name>disableDistributionBuild</name>
                     <value>!true</value>
                 </property>
-                <!-- Don't build distribution on JDK 12 as we don't have the CDI artifact -->
-                <jdk>(,12)</jdk>
             </activation>
             <modules>
                 <module>distribution</module>
@@ -1303,19 +1302,6 @@
             </activation>
             <modules>
                 <module>osgi</module>
-            </modules>
-        </profile>
-        <!-- Only run the CDI and WildFly modules/integration tests for JDK < 12 -->
-        <profile>
-            <id>jdk11-</id>
-            <activation>
-                <jdk>(,12)</jdk>
-            </activation>
-            <modules>
-                <!-- see https://github.com/jbossas/jboss-classfilewriter/issues/18 -->
-                <module>cdi</module>
-                <module>modules</module>
-                <module>integration</module>
             </modules>
         </profile>
         <profile>
