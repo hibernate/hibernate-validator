@@ -1328,6 +1328,8 @@
                 <jdk>[9,)</jdk>
             </activation>
             <properties>
+                <maven.compiler.release>8</maven.compiler.release>
+                <maven.compiler.testRelease>8</maven.compiler.testRelease>
                 <!--
                 All these add-opens are probably not necessary for our WildFly usage but add the ones defined in
                 https://github.com/ctomc/wildfly/commit/d8c4f55a1f900d931c224049c8a118ba4a5bcb45 to be on the safe side.
