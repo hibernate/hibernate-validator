@@ -1223,6 +1223,9 @@
                                 <configuration>
                                     <rules>
                                         <requireReleaseDeps />
+                                        <requireJavaVersion>
+                                            <version>[17,18)</version>
+                                        </requireJavaVersion> 
                                     </rules>
                                     <fail>true</fail>
                                 </configuration>
