@@ -20,4 +20,4 @@ public class PersonSerializationTest {
 		assertEquals( "{\"first_name\":\"Clark\",\"last_name\":\"Kent\"}", serializedPerson );
 	}
 }
-//tag::include[]
+//end::include[]
