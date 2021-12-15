@@ -1,6 +1,8 @@
 //tag::include[]
 package org.hibernate.validator.referenceguide.chapter02.containerelement.set;
 
+//end::include[]
+
 import java.util.HashSet;
 import java.util.Set;
 

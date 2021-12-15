@@ -1,6 +1,8 @@
 //tag::include[]
 package org.hibernate.validator.referenceguide.chapter02.containerelement.map;
 
+//end::include[]
+
 import java.util.HashMap;
 import java.util.Map;
 
