@@ -727,6 +727,10 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
+`@UUID(allowEmpty=, allowNil=, version=, variant=, letterCase=)`:: Checks that the annotated character sequence is a valid universally unique identifier according to RFC 4122. `null` is always valid. The option `allowEmpty` allows empty character sequences. `allowNil` includes nil UUIDs (`00000000-0000-0000-0000-000000000000`). The `version` and `variant` parameters control which UUID versions and variants are allowed. `letterCase` ensures lower case or upper case, but can also be configured as case insensitive.
+        Supported data types::: `CharSequence`
+        Hibernate metadata impact::: None
+
 ===== Country specific constraints
 
 Hibernate Validator offers also some country specific constraints, e.g. for the validation of social

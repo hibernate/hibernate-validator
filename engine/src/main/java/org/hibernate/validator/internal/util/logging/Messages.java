@@ -31,6 +31,12 @@ public interface Messages {
 	@Message(value = "The parameter \"%s\" must not be empty.")
 	String parameterMustNotBeEmpty(String parameterName);
 
+	@Message(value = "The parameter \"%s\" should be greater than or equal to %d.")
+	String parameterShouldBeGreaterThanOrEqualTo(String parameterName, int val);
+
+	@Message(value = "The parameter \"%s\" should be less than or equal to %d.")
+	String parameterShouldBeLessThanOrEqualTo(String parameterName, int val);
+
 	@Message(value = "The bean type cannot be null.", format = Message.Format.NO_FORMAT)
 	String beanTypeCannotBeNull();
 

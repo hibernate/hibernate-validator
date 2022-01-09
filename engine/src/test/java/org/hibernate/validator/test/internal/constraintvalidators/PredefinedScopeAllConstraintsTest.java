@@ -35,6 +35,7 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
+import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
@@ -134,6 +135,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( DurationMax.class, new DurationMaxBean() );
 		testConstraint( DurationMin.class, new DurationMinBean() );
 		testConstraint( ScriptAssert.class, new ScriptAssertBean() );
+		testConstraint( UUID.class, new UUIDBean() );
 
 		Set<ConstraintViolation<ParameterScriptAssertBean>> parameterScriptAssertBeanViolations = getValidator( ParameterScriptAssert.class,
 				ParameterScriptAssertBean.class ).forExecutables().validateParameters(
@@ -464,4 +466,12 @@ public class PredefinedScopeAllConstraintsTest {
 			return test;
 		}
 	}
+
+	private static class UUIDBean {
+
+		@UUID
+		private String uuid = "invalid";
+
+	}
+
 }
