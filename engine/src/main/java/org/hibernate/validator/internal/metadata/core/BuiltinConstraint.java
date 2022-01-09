@@ -88,7 +88,8 @@ enum BuiltinConstraint {
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_REGON("org.hibernate.validator.constraints.pl.REGON"),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RU_INN("org.hibernate.validator.constraints.ru.INN"),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MAX("org.hibernate.validator.constraints.time.DurationMax"),
-	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MIN("org.hibernate.validator.constraints.time.DurationMin");
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MIN("org.hibernate.validator.constraints.time.DurationMin"),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UUID("org.hibernate.validator.constraints.UUID");
 
 	private static final Map<String, Set<BuiltinConstraint>> CONSTRAINT_MAPPING;
 

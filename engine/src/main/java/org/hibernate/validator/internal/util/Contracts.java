@@ -90,4 +90,59 @@ public final class Contracts {
 			throw LOG.getIllegalArgumentException( StringHelper.format( message, messageParameters ) );
 		}
 	}
+
+	public static void assertNotEmpty(Object[] array, String message) {
+		if ( array.length == 0 ) {
+			throw LOG.getIllegalArgumentException( message );
+		}
+	}
+
+	public static void assertNotEmpty(byte[] array, String message) {
+		if ( array.length == 0 ) {
+			throw LOG.getIllegalArgumentException( message );
+		}
+	}
+
+	public static void assertNotEmpty(short[] array, String message) {
+		if ( array.length == 0 ) {
+			throw LOG.getIllegalArgumentException( message );
+		}
+	}
+
+	public static void assertNotEmpty(int[] array, String message) {
+		if ( array.length == 0 ) {
+			throw LOG.getIllegalArgumentException( message );
+		}
+	}
+
+	public static void assertNotEmpty(long[] array, String message) {
+		if ( array.length == 0 ) {
+			throw LOG.getIllegalArgumentException( message );
+		}
+	}
+
+	public static void assertNotEmpty(float[] array, String message) {
+		if ( array.length == 0 ) {
+			throw LOG.getIllegalArgumentException( message );
+		}
+	}
+
+	public static void assertNotEmpty(double[] array, String message) {
+		if ( array.length == 0 ) {
+			throw LOG.getIllegalArgumentException( message );
+		}
+	}
+
+	public static void assertNotEmpty(boolean[] array, String message) {
+		if ( array.length == 0 ) {
+			throw LOG.getIllegalArgumentException( message );
+		}
+	}
+
+	public static void assertNotEmpty(char[] array, String message) {
+		if ( array.length == 0 ) {
+			throw LOG.getIllegalArgumentException( message );
+		}
+	}
+
 }

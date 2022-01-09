@@ -36,6 +36,7 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
+import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
@@ -174,7 +175,8 @@ public class MessagePropertiesTest {
 							violationOf( INN.class ),
 							violationOf( DurationMax.class ),
 							violationOf( DurationMin.class ),
-							violationOf( ScriptAssert.class )
+							violationOf( ScriptAssert.class ),
+							violationOf( UUID.class )
 					);
 
 			collectInvalidMessages( locale, invalidMessages, violations );
@@ -355,6 +357,9 @@ public class MessagePropertiesTest {
 
 		@DurationMin(days = 4, hours = 4, minutes = 4, millis = 4, nanos = 4)
 		private Duration durationMin = Duration.ofDays( 2 );
+
+		@UUID
+		private String uuid = "invalid";
 
 		@SuppressWarnings("unused")
 		private boolean scriptAssert = false;

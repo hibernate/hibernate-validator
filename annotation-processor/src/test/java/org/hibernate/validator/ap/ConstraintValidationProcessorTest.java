@@ -27,6 +27,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithJava8DateTime;
 import org.hibernate.validator.ap.testmodel.ModelWithJavaMoneyTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithNormalizedConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithUUIDConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithUniqueElementsConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithoutConstraints;
 import org.hibernate.validator.ap.testmodel.MultipleConstraintsOfSameType;
@@ -740,6 +741,27 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 17 ),
 				new DiagnosticExpectation( Kind.ERROR, 20 ),
 				new DiagnosticExpectation( Kind.ERROR, 23 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1867")
+	public void uuidConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithUUIDConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 27 ),
+				new DiagnosticExpectation( Kind.ERROR, 30 ),
+				new DiagnosticExpectation( Kind.ERROR, 33 ),
+				new DiagnosticExpectation( Kind.ERROR, 36 ),
+				new DiagnosticExpectation( Kind.ERROR, 39 )
 		);
 	}
 

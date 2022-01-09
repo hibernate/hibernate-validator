@@ -56,6 +56,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MIN;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UNIQUE_ELEMENTS;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_URL;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UUID;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.Annotation;
@@ -93,6 +94,7 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
+import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
@@ -311,6 +313,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.NormalizedValida
 import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.UUIDValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.UniqueElementsValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
@@ -815,6 +818,9 @@ public class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_URL ) ) {
 			putBuiltinConstraint( tmpConstraints, URL.class, URLValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UUID ) ) {
+			putBuiltinConstraint( tmpConstraints, UUID.class, UUIDValidator.class );
 		}
 
 		this.enabledBuiltinConstraints = Collections.unmodifiableMap( tmpConstraints );
