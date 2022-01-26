@@ -22,6 +22,7 @@
     <properties>
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
+        <gpg.skip>true</gpg.skip>
         <maven.javadoc.skip>false</maven.javadoc.skip>
         <javadoc.additional.param></javadoc.additional.param>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
