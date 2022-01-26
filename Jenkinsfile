@@ -368,33 +368,15 @@ stage('Deploy') {
 		runBuildOnNode {
 			helper.withMavenWorkspace(mavenSettingsConfig: params.RELEASE_DRY_RUN ? null : helper.configuration.file.deployment.maven.settingsId) {
 				configFileProvider([configFile(fileId: 'release.config.ssh', targetLocation: env.HOME + '/.ssh/config')]) {
-					sshagent(['ed25519.Hibernate-CI.github.com', 'hibernate.filemgmt.jboss.org', 'hibernate-ci.frs.sourceforge.net']) {
-						sh 'cat $HOME/.ssh/config'
-						sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
-						sh "bash -xe hibernate-noorm-release-scripts/prepare-release.sh validator ${releaseVersion.toString()}"
-
-						String deployCommand = "bash -xe hibernate-noorm-release-scripts/deploy.sh validator"
-						if (!params.RELEASE_DRY_RUN) {
-							sh deployCommand
-						} else {
-							echo "WARNING: Not deploying. Would have executed:"
-							echo deployCommand
-						}
-
-						String uploadDistributionCommand = "bash -xe hibernate-noorm-release-scripts/upload-distribution.sh validator ${releaseVersion.toString()}"
-						String uploadDocumentationCommand = "bash -xe hibernate-noorm-release-scripts/upload-documentation.sh validator ${releaseVersion.toString()} ${releaseVersion.family}"
-						if (!params.RELEASE_DRY_RUN) {
-							sh uploadDistributionCommand
-							sh uploadDocumentationCommand
-						} else {
-							echo "WARNING: Not uploading anything. Would have executed:"
-							echo uploadDistributionCommand
-							echo uploadDocumentationCommand
-						}
-
-						sh "bash -xe hibernate-noorm-release-scripts/update-version.sh validator ${afterReleaseDevelopmentVersion.toString()}"
-						sh "bash -xe hibernate-noorm-release-scripts/push-upstream.sh validator ${releaseVersion.toString()} ${helper.scmSource.branch.name} ${!params.RELEASE_DRY_RUN}"
-					}
+				withCredentials([file(credentialsId: 'release.gpg.private-key', variable: 'RELEASE_GPG_PRIVATE_KEY_PATH'),
+						string(credentialsId: 'release.gpg.passphrase', variable: 'RELEASE_GPG_PASSPHRASE')]) {
+				sshagent(['ed25519.Hibernate-CI.github.com', 'hibernate.filemgmt.jboss.org', 'hibernate-ci.frs.sourceforge.net']) {
+					sh 'cat $HOME/.ssh/config'
+					sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
+					env.RELEASE_GPG_HOMEDIR = env.WORKSPACE_TMP + '/.gpg'
+					sh "bash -xe hibernate-noorm-release-scripts/release.sh ${params.RELEASE_DRY_RUN ? '-d' : ''} validator ${releaseVersion.toString()} ${afterReleaseDevelopmentVersion.toString()}"
+				}
+				}
 				}
 			}
 		}
