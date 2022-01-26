@@ -40,6 +40,7 @@
 
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
+        <gpg.skip>true</gpg.skip>
         <surefire.jvm.args.additional>-Duser.language=en</surefire.jvm.args.additional>
 
         <forbiddenapis-junit.path>forbidden-allow-junit.txt</forbiddenapis-junit.path>
