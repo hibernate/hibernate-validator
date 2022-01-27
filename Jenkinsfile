@@ -56,20 +56,11 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
  *
  * This job includes two deployment modes:
  *
- * - A deployment of snapshot artifacts for every non-PR build on "primary" branches (master and maintenance branches).
+ * - A deployment of snapshot artifacts for every non-PR build on "primary" branches (main and maintenance branches).
  * - A full release when starting the job with specific parameters.
  *
  * In the first case, the name of a Maven settings file must be provided in the job configuration file
  * (see below).
- *
- * #### Gitter (optional)
- *
- * You need to enable the Jenkins integration in your Gitter room first:
- * see https://gitlab.com/gitlab-org/gitter/webapp/blob/master/docs/integrations.md
- *
- * Then you will also need to configure *global* secret text credentials containing the Gitter webhook URL,
- * and list the ID of these credentials in the job configuration file
- * (see https://github.com/hibernate/hibernate-jenkins-pipeline-helpers#job-configuration-file).
  *
  * ### Job configuration
  *
@@ -105,11 +96,11 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
 @Field final String MAVEN_TOOL = 'Apache Maven 3.6'
 
 // Default node pattern, to be used for resource-intensive stages.
-// Should not include the master node.
-@Field final String NODE_PATTERN_BASE = 'Slave'
+// Should not include the controller node.
+@Field final String NODE_PATTERN_BASE = 'Worker&&Containers'
 // Quick-use node pattern, to be used for very light, quick, and environment-independent stages,
-// such as sending a notification. May include the master node in particular.
-@Field final String QUICK_USE_NODE_PATTERN = 'Master||Slave'
+// such as sending a notification. May include the controller node in particular.
+@Field final String QUICK_USE_NODE_PATTERN = 'Controller||Worker'
 
 @Field AlternativeMultiMap<BuildEnvironment> environments
 @Field JobHelper helper
@@ -419,12 +410,12 @@ stage('Deploy') {
 
 enum TestCondition {
 	// For environments that are expected to work correctly
-	// before merging into master or maintenance branches.
-	// Tested on master and maintenance branches, on feature branches, and for PRs.
+	// before merging into main or maintenance branches.
+	// Tested on main and maintenance branches, on feature branches, and for PRs.
 	BEFORE_MERGE,
 	// For environments that are expected to work correctly,
 	// but are considered too resource-intensive to test them on pull requests.
-	// Tested on master and maintenance branches only.
+	// Tested on main and maintenance branches only.
 	// Not tested on feature branches or PRs.
 	AFTER_MERGE,
 	// For environments that may not work correctly.
