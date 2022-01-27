@@ -3,7 +3,7 @@ GEM
   specs:
     asciidoctor (1.5.2)
     coderay (1.1.0)
-    ffi (1.9.10)
+    ffi (1.15.5)
     formatador (0.2.5)
     guard (2.12.8)
       formatador (>= 0.2.4)
