@@ -113,17 +113,17 @@
 
         <!-- Dependencies versions -->
 
-        <version.jakarta.validation-api>3.0.0</version.jakarta.validation-api>
+        <version.jakarta.validation-api>3.0.1</version.jakarta.validation-api>
         <version.jakarta.validation.beanvalidation-tck>3.0.0</version.jakarta.validation.beanvalidation-tck>
 
         <version.com.thoughtworks.paranamer>2.8</version.com.thoughtworks.paranamer>
-        <version.jakarta.el-api>4.0.0</version.jakarta.el-api>
-        <version.org.glassfish.jakarta.el>4.0.1</version.org.glassfish.jakarta.el>
+        <version.jakarta.el-api>5.0.0-RC1</version.jakarta.el-api>
+        <version.org.glassfish.jakarta.el>5.0.0-M1</version.org.glassfish.jakarta.el>
         <version.org.jboss.logging.jboss-logging>3.4.1.Final</version.org.jboss.logging.jboss-logging>
         <version.org.jboss.logging.jboss-logging-tools>2.2.1.Final</version.org.jboss.logging.jboss-logging-tools>
 
         <!-- Currently supported version of WildFly -->
-        <version.wildfly>22.0.0.Final</version.wildfly>
+        <version.wildfly>26.0.1.Final</version.wildfly>
         <!-- Used to create a patch file for the second version of WildFly we support -->
         <!--<version.wildfly.secondary>18.0.1.Final</version.wildfly.secondary>-->
         <!-- Version used to run the TCK in incontainer mode -->
@@ -147,9 +147,9 @@
         <version.org.jboss.weld.weld>4.0.0.CR1</version.org.jboss.weld.weld>
         <version.org.wildfly.arquillian>2.2.0.Final</version.org.wildfly.arquillian>
         <version.jakarta.ejb-api>4.0.0</version.jakarta.ejb-api>
-        <version.jakarta.interceptor-api>2.0.0</version.jakarta.interceptor-api>
-        <version.jakarta.annotation-api>2.0.0</version.jakarta.annotation-api>
-        <version.jakarta.inject-api>2.0.0</version.jakarta.inject-api>
+        <version.jakarta.interceptor-api>2.1.0-RC3</version.jakarta.interceptor-api>
+        <version.jakarta.annotation-api>2.1.0</version.jakarta.annotation-api>
+        <version.jakarta.inject-api>2.0.1</version.jakarta.inject-api>
         <version.jakarta.persistence-api>3.0.0</version.jakarta.persistence-api>
         <!-- do not update for now, this is used for the WildFly IT -->
         <version.jakarta.ws.rs-api>2.1.6</version.jakarta.ws.rs-api>
@@ -221,7 +221,7 @@
         <version.depends.plugin>1.4.0</version.depends.plugin>
         <version.deploy.plugin>2.8.2</version.deploy.plugin>
         <version.enforcer.plugin>3.0.0-M1</version.enforcer.plugin>
-        <version.forbiddenapis.plugin>2.5</version.forbiddenapis.plugin>
+        <version.forbiddenapis.plugin>2.6</version.forbiddenapis.plugin>
         <version.gmavenplus.plugin>1.6</version.gmavenplus.plugin>
         <version.gpg.plugin>3.0.1</version.gpg.plugin>
         <version.install.plugin>2.5.2</version.install.plugin>
@@ -281,7 +281,7 @@
         <maven.compiler.argument.testTarget>${maven.compiler.testTarget}</maven.compiler.argument.testTarget>
         <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
 
-        <forbiddenapis.jdk.target>10</forbiddenapis.jdk.target>
+        <forbiddenapis.jdk.target>11</forbiddenapis.jdk.target>
 
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
         <surefire.jvm.args.additional></surefire.jvm.args.additional>
