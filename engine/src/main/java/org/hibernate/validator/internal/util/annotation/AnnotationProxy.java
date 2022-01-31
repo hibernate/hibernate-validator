@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttributes;
 
 /**
@@ -136,6 +137,7 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 						: Arrays.equals( (Object[]) o1, (Object[]) o2 );
 	}
 
+	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
 	private Map<String, Object> getAnnotationAttributes(Annotation annotation) {
 		// We only enable this optimization if the security manager is not enabled. Otherwise,
 		// we would have to add every package containing constraints to the security policy.
@@ -155,6 +157,7 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
 	 * privileged actions within HV's protection domain.
 	 */
+	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
 	private <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
