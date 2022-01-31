@@ -18,6 +18,7 @@ import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.cfg.AnnotationDef;
 import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
@@ -113,6 +114,7 @@ class ConfiguredConstraint<A extends Annotation> {
 	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
 	 * privileged actions within HV's protection domain.
 	 */
+	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
 	private static <V> V run(PrivilegedAction<V> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}

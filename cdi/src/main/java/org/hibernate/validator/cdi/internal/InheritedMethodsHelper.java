@@ -14,6 +14,7 @@ import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
@@ -59,6 +60,7 @@ public class InheritedMethodsHelper {
 	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
 	 * privileged actions within HV's protection domain.
 	 */
+	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
 	private static <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}

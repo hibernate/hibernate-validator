@@ -27,6 +27,7 @@ import javax.xml.stream.events.XMLEvent;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -161,10 +162,12 @@ public class XmlParserHelper {
 	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
 	 * privileged actions within HV's protection domain.
 	 */
+	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
 	private <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
+	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
 	private <T> T run(PrivilegedExceptionAction<T> action) throws Exception {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}

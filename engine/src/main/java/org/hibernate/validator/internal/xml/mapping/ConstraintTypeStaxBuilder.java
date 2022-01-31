@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -463,6 +464,7 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 		 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
 		 * privileged actions within HV's protection domain.
 		 */
+		@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
 		private static <T> T run(PrivilegedAction<T> action) {
 			return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 		}

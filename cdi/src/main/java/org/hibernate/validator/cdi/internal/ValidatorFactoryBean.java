@@ -41,6 +41,7 @@ import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cdi.spi.BeanNames;
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
@@ -324,6 +325,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
 	 * privileged actions within HV's protection domain.
 	 */
+	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
 	private <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}

@@ -14,6 +14,7 @@ import java.security.PrivilegedAction;
 
 import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.engine.HibernateValidatorEnhancedBean;
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Getter;
 import org.hibernate.validator.internal.properties.PropertyAccessor;
@@ -149,6 +150,7 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 	/**
 	 * Returns an accessible copy of the given method.
 	 */
+	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
 	private static Method getAccessible(Method original) {
 		SecurityManager sm = System.getSecurityManager();
 		if ( sm != null ) {
@@ -167,6 +169,7 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
 	 * privileged actions within HV's protection domain.
 	 */
+	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
 	private static <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
