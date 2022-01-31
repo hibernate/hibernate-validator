@@ -281,8 +281,6 @@
         <maven.compiler.argument.testTarget>${maven.compiler.testTarget}</maven.compiler.argument.testTarget>
         <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
 
-        <forbiddenapis.jdk.target>10</forbiddenapis.jdk.target>
-
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
         <surefire.jvm.args.additional></surefire.jvm.args.additional>
         <surefire.jvm.args.illegal-access></surefire.jvm.args.illegal-access>
@@ -721,9 +719,9 @@
                     <artifactId>forbiddenapis</artifactId>
                     <version>${version.forbiddenapis.plugin}</version>
                     <configuration>
-                        <targetVersion>${forbiddenapis.jdk.target}</targetVersion>
                         <!-- if the Java version used is too new, don't fail, just do nothing -->
                         <failOnUnsupportedJava>false</failOnUnsupportedJava>
+                        <ignoreSignaturesOfMissingClasses>true</ignoreSignaturesOfMissingClasses>
                         <suppressAnnotations>
                             <annotation>**.IgnoreForbiddenApisErrors</annotation>
                         </suppressAnnotations>
@@ -753,11 +751,43 @@
                             <phase>verify</phase>
                             <configuration>
                                 <bundledSignatures>
-                                    <bundledSignature>jdk-unsafe</bundledSignature>
-                                    <bundledSignature>jdk-deprecated</bundledSignature>
+                                    <!-- These signatures on the top are not specific to any JDK version -->
                                     <bundledSignature>jdk-system-out</bundledSignature>
                                     <bundledSignature>jdk-non-portable</bundledSignature>
-                                    <bundledSignature>jdk-internal</bundledSignature>
+
+                                    <!-- All following signatures should be replicated for each target JDK version we intend to support -->
+                                    <bundledSignature>jdk-unsafe-1.8</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-9</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-10</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-11</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-12</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-13</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-14</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-15</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-16</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-17</bundledSignature>
+
+                                    <bundledSignature>jdk-deprecated-1.8</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-9</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-10</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-11</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-12</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-13</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-14</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-15</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-16</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-17</bundledSignature>
+
+                                    <bundledSignature>jdk-internal-1.8</bundledSignature>
+                                    <bundledSignature>jdk-internal-9</bundledSignature>
+                                    <bundledSignature>jdk-internal-10</bundledSignature>
+                                    <bundledSignature>jdk-internal-11</bundledSignature>
+                                    <bundledSignature>jdk-internal-12</bundledSignature>
+                                    <bundledSignature>jdk-internal-13</bundledSignature>
+                                    <bundledSignature>jdk-internal-14</bundledSignature>
+                                    <bundledSignature>jdk-internal-15</bundledSignature>
+                                    <bundledSignature>jdk-internal-16</bundledSignature>
+                                    <bundledSignature>jdk-internal-17</bundledSignature>
                                 </bundledSignatures>
                             </configuration>
                         </execution>
