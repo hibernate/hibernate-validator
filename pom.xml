@@ -285,6 +285,7 @@
         <surefire.jvm.args.additional></surefire.jvm.args.additional>
         <surefire.jvm.args.illegal-access></surefire.jvm.args.illegal-access>
         <surefire.jvm.args.add-opens></surefire.jvm.args.add-opens>
+        <surefire.jvm.args.java-version></surefire.jvm.args.java-version>
         <!--
           The arguments below are Shrinkwrap settings taken from
           https://github.com/shrinkwrap/resolver/blob/788a3c1148af3a7ebdfdaf817393273f5f5ee17b/impl-maven/src/main/java/org/jboss/shrinkwrap/resolver/impl/maven/bootstrap/MavenSettingsBuilder.java#L80
@@ -293,8 +294,8 @@
         <surefire.jvm.args.shrinkwrap>
             -Dmaven.repo.local=${settings.localRepository}
         </surefire.jvm.args.shrinkwrap>
-        <surefire.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access} ${surefire.jvm.args.shrinkwrap}</surefire.jvm.args>
-        <failsafe.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access} ${surefire.jvm.args.shrinkwrap}</failsafe.jvm.args>
+        <surefire.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access} ${surefire.jvm.args.shrinkwrap} ${surefire.jvm.args.java-version}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access} ${surefire.jvm.args.shrinkwrap} ${surefire.jvm.args.java-version}</failsafe.jvm.args>
 
         <!--
             Should be set from the command line.
@@ -1440,8 +1441,18 @@
                 <jdk>[18,)</jdk>
             </activation>
             <properties>
-                <!-- ForbiddenAPIs doesn't work with JDK18 yet -->
+                <!-- ForbiddenAPIs doesn't work with JDK18+ yet -->
                 <forbiddenapis.skip>true</forbiddenapis.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>jdk19+</id>
+            <activation>
+                <jdk>[19,)</jdk>
+            </activation>
+            <properties>
+                <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK19+ -->
+                <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
             </properties>
         </profile>
         <profile>
