@@ -305,18 +305,6 @@ stage('Non-default environments') {
 	}
 }
 
-stage('Deploy') {
-	if (deploySnapshot) {
-		// TODO delay the deployment of snapshots to this stage? This would require to use staging repositories for snapshots, not sure it's possible.
-		echo "Already deployed snapshot as part of the 'Default build' stage."
-	}
-	else {
-		echo "Skipping deployment"
-		helper.markStageSkipped()
-		return
-	}
-}
-
 } // End of helper.runWithNotification
 
 // Job-specific helpers
