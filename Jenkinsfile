@@ -13,7 +13,6 @@ import groovy.transform.Field
 @Library('hibernate-jenkins-pipeline-helpers@1.4')
 import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
 import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
-import org.hibernate.jenkins.pipeline.helpers.version.Version
 
 /*
  * WARNING: DO NOT IMPORT LOCAL LIBRARIES HERE.
@@ -54,13 +53,12 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
  *
  * #### Nexus deployment
  *
- * This job includes two deployment modes:
- *
- * - A deployment of snapshot artifacts for every non-PR build on "primary" branches (main and maintenance branches).
- * - A full release when starting the job with specific parameters.
- *
- * In the first case, the name of a Maven settings file must be provided in the job configuration file
+ * This job is only able to deploy snapshot artifacts,
+ * for every non-PR build on "primary" branches (main and maintenance branches),
+ * but the name of a Maven settings file must be provided in the job configuration file
  * (see below).
+ *
+ * For actual releases, see jenkins/release.groovy.
  *
  * ### Job configuration
  *
@@ -88,8 +86,7 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
  *     deployment:
  *       maven:
  *         # String containing the ID of a Maven settings file registered using the config-file-provider Jenkins plugin.
- *         # The settings must provide credentials to the servers with ID
- *         # 'jboss-releases-repository' and 'jboss-snapshots-repository'.
+ *         # The settings must provide credentials to the server with ID 'ossrh'.
  *         settingsId: ...
  */
 
@@ -109,11 +106,7 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
 @Field boolean enableDefaultBuildIT = false
 @Field boolean enableDefaultBuildJQAssistant = false
 @Field boolean enableDefaultBuildSigtest = false
-@Field boolean performRelease = false
 @Field boolean deploySnapshot = false
-
-@Field Version releaseVersion
-@Field Version afterReleaseDevelopmentVersion
 
 this.helper = new JobHelper(this)
 
@@ -185,7 +178,7 @@ DEFAULT
 SUPPORTED
 ALL""",
 							description: """A set of environments that must be checked.
-'AUTOMATIC' picks a different set of environments based on the branch name and whether a release is being performed.
+'AUTOMATIC' picks a different set of environments based on the branch name.
 'DEFAULT' means a single build with the default environment expected by the Maven configuration,
 while other options will trigger multiple Maven executions in different environments."""
 					),
@@ -197,30 +190,11 @@ while other options will trigger multiple Maven executions in different environm
 If this parameter is non-empty, ENVIRONMENT_SET will be ignored and environments whose tag matches the given regex will be checked.
 Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse'.
 """
-					),
-					string(
-							name: 'RELEASE_VERSION',
-							defaultValue: '',
-							description: 'The version to be released, e.g. 5.10.0.Final. Setting this triggers a release.',
-							trim: true
-					),
-					string(
-							name: 'RELEASE_DEVELOPMENT_VERSION',
-							defaultValue: '',
-							description: 'The next version to be used after the release, e.g. 5.10.0-SNAPSHOT.',
-							trim: true
-					),
-					booleanParam(
-							name: 'RELEASE_DRY_RUN',
-							defaultValue: false,
-							description: 'If true, just simulate the release, without pushing any commits or tags, and without uploading any artifacts or documentation.'
 					)
 			])
 	])
 
-	performRelease = (params.RELEASE_VERSION ? true : false)
-
-	if (!performRelease && helper.scmSource.branch.primary && !helper.scmSource.pullRequest) {
+	if (helper.scmSource.branch.primary && !helper.scmSource.pullRequest) {
 		if (helper.configuration.file?.deployment?.maven?.settingsId) {
 			deploySnapshot = true
 		}
@@ -264,32 +238,8 @@ Resulting execution plan:
     enableDefaultBuild=$enableDefaultBuild
     enableDefaultBuildIT=$enableDefaultBuildIT
     environments=${environments.enabledAsString}
-    performRelease=$performRelease
     deploySnapshot=$deploySnapshot
 """
-
-	if (performRelease) {
-		releaseVersion = Version.parseReleaseVersion(params.RELEASE_VERSION)
-		echo "Inferred version family for the release to '$releaseVersion.family'"
-
-		// Check that all the necessary parameters are set
-		if (!params.RELEASE_DEVELOPMENT_VERSION) {
-			throw new IllegalArgumentException(
-					"Missing value for parameter RELEASE_DEVELOPMENT_VERSION." +
-							" This parameter must be set when RELEASE_VERSION is set."
-			)
-		}
-		if (!params.RELEASE_DRY_RUN && !helper.configuration.file?.deployment?.maven?.settingsId) {
-			throw new IllegalArgumentException(
-					"Missing deployment configuration in job configuration file." +
-							" Cannot deploy artifacts during the release."
-			)
-		}
-	}
-
-	if (params.RELEASE_DEVELOPMENT_VERSION) {
-		afterReleaseDevelopmentVersion = Version.parseDevelopmentVersion(params.RELEASE_DEVELOPMENT_VERSION)
-	}
 }
 
 stage('Default build') {
@@ -367,26 +317,8 @@ stage('Non-default environments') {
 
 stage('Deploy') {
 	if (deploySnapshot) {
-		// TODO delay the release to this stage? This would require to use staging repositories for snapshots, not sure it's possible.
+		// TODO delay the deployment of snapshots to this stage? This would require to use staging repositories for snapshots, not sure it's possible.
 		echo "Already deployed snapshot as part of the 'Default build' stage."
-	}
-	else if (performRelease) {
-		echo "Performing full release for version ${releaseVersion.toString()}"
-		runBuildOnNode {
-			helper.withMavenWorkspace(mavenSettingsConfig: params.RELEASE_DRY_RUN ? null : helper.configuration.file.deployment.maven.settingsId) {
-				configFileProvider([configFile(fileId: 'release.config.ssh', targetLocation: env.HOME + '/.ssh/config')]) {
-				withCredentials([file(credentialsId: 'release.gpg.private-key', variable: 'RELEASE_GPG_PRIVATE_KEY_PATH'),
-						string(credentialsId: 'release.gpg.passphrase', variable: 'RELEASE_GPG_PASSPHRASE')]) {
-				sshagent(['ed25519.Hibernate-CI.github.com', 'hibernate.filemgmt.jboss.org', 'hibernate-ci.frs.sourceforge.net']) {
-					sh 'cat $HOME/.ssh/config'
-					sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
-					env.RELEASE_GPG_HOMEDIR = env.WORKSPACE_TMP + '/.gpg'
-					sh "bash -xe hibernate-noorm-release-scripts/release.sh ${params.RELEASE_DRY_RUN ? '-d' : ''} validator ${releaseVersion.toString()} ${afterReleaseDevelopmentVersion.toString()}"
-				}
-				}
-				}
-			}
-		}
 	}
 	else {
 		echo "Skipping deployment"
@@ -481,9 +413,7 @@ void keepOnlyEnvironmentsFromSet(String environmentSetName) {
 			enableOptional = true
 			break
 		case 'AUTOMATIC':
-			if (params.RELEASE_VERSION) {
-				echo "Releasing version '$params.RELEASE_VERSION'."
-			} else if (helper.scmSource.pullRequest) {
+			if (helper.scmSource.pullRequest) {
 				echo "Building pull request '$helper.scmSource.pullRequest.id'"
 				enableDefaultEnv = true
 				enableBeforeMergeEnvs = true
