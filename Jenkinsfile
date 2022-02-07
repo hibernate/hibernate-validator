@@ -160,7 +160,7 @@ stage('Configure') {
 
 	properties([
 			buildDiscarder(
-					logRotator(daysToKeepStr: '90')
+					logRotator(daysToKeepStr: '30', numToKeepStr: '10')
 			),
 			disableConcurrentBuilds(abortPrevious: true),
 			pipelineTriggers(
