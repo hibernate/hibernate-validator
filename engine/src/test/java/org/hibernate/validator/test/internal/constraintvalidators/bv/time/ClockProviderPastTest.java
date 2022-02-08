@@ -10,14 +10,8 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
-import java.time.Clock;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-
-import jakarta.validation.ClockProvider;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-import jakarta.validation.constraints.Past;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.joda.time.DateTime;
@@ -26,6 +20,10 @@ import org.joda.time.ReadablePartial;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.constraints.Past;
 
 /**
  * Test for using the {@code ClockProvider} contract in {@code @Past} validators not covered by the TCK.
@@ -86,21 +84,6 @@ public class ClockProviderPastTest {
 
 		@Past
 		private ReadablePartial orderDateAsReadablePartial;
-
-	}
-
-	private static class FixedClockProvider implements ClockProvider {
-
-		private Clock clock;
-
-		public FixedClockProvider(ZonedDateTime dateTime) {
-			clock = Clock.fixed( dateTime.toInstant(), dateTime.getZone() );
-		}
-
-		@Override
-		public Clock getClock() {
-			return clock;
-		}
 
 	}
 }
