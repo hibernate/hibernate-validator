@@ -89,6 +89,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <!-- We exclude this dependency from the classpath when running tests with OracleJDK 8,
+                 because OracleJDK 8 already bundles JavaFX. -->
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -364,20 +370,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>jdk11+</id>
-            <activation>
-                <jdk>[11,)</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>javafx-base</artifactId>
-                    <version>${version.org.openjfx}</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
         </profile>
     </profiles>
 </project>

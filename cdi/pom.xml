@@ -230,9 +230,12 @@
     </build>
     <profiles>
         <profile>
-            <id>jdk9</id>
+            <id>testWithJdk11+</id>
             <activation>
-                <jdk>[9,)</jdk>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>!8</value>
+                </property>
             </activation>
             <properties>
                 <!-- required by Weld -->

@@ -32,13 +32,16 @@
     
     <profiles>
         <profile>
-            <id>pre-jdk9</id>
+            <id>testWithJdk8</id>
             <activation>
-                <jdk>1.8</jdk>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>8</value>
+                </property>
             </activation>
             <modules>
                 <!--
-                Only enable this test on JDK 8 as it is failing on JDK 9.
+                Only enable this test on JDK 8 as it is failing on JDK 9+.
                 See https://hibernate.atlassian.net/browse/HV-1478 for more information about the failure.
                 -->
                 <module>felixtest</module>

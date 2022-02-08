@@ -20,6 +20,7 @@
     <container qualifier="paraya" default="true">
         <configuration>
             <property name="glassFishHome">${basedir}/target/payara5</property>
+            <!-- Java home is defined through an environment variable (see maven-failsafe-plugin config) -->
             <!--
             Uncomment to enable debug mode (debug port is 9009, suspend is disabled):
             <property name="debug">true</property>
