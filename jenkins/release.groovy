@@ -15,7 +15,7 @@ pipeline {
 	}
 	tools {
 		maven 'Apache Maven 3.8'
-		jdk 'OpenJDK 11 Latest'
+		jdk 'OracleJDK8 Latest'
 	}
 	options {
 		buildDiscarder logRotator(daysToKeepStr: '30', numToKeepStr: '10')
