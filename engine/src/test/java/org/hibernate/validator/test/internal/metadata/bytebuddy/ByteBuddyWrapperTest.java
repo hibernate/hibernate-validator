@@ -71,7 +71,7 @@ public class ByteBuddyWrapperTest {
 				.load( classLoader, ClassLoadingStrategy.Default.INJECTION )
 				.getLoaded();
 
-		Object object = aClass.newInstance();
+		Object object = aClass.getConstructor().newInstance();
 
 		Method getFieldValue = aClass.getMethod( HibernateValidatorEnhancedBean.GET_FIELD_VALUE_METHOD_NAME, String.class );
 
