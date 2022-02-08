@@ -20,7 +20,8 @@ public class FutureOrPresentValidatorForDate extends AbstractFutureOrPresentInst
 
 	@Override
 	protected Instant getInstant(Date value) {
-		return value.toInstant();
+		// we don't use Date.toInstant() as it's not supported by java.sql.Date
+		return Instant.ofEpochMilli( value.getTime() );
 	}
 
 }
