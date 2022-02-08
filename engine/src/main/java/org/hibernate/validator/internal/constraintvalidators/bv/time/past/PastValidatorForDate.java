@@ -20,7 +20,8 @@ public class PastValidatorForDate extends AbstractPastInstantBasedValidator<Date
 
 	@Override
 	protected Instant getInstant(Date value) {
-		return value.toInstant();
+		// we don't use Date.toInstant() as it's not supported by java.sql.Date
+		return Instant.ofEpochMilli( value.getTime() );
 	}
 
 }
