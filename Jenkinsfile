@@ -90,6 +90,7 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *         settingsId: ...
  */
 
+@Field final String DEFAULT_JDK_TOOL = 'OpenJDK 17 Latest'
 @Field final String MAVEN_TOOL = 'Apache Maven 3.6'
 
 // Default node pattern, to be used for resource-intensive stages.
@@ -116,19 +117,19 @@ stage('Configure') {
 			jdk: [
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
-					new JdkBuildEnvironment(version: '17', buildJdkTool: 'OpenJDK 17 Latest',
+					new JdkBuildEnvironment(testJavaVersion: '17', testCompilerTool: 'OpenJDK 17 Latest',
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
-					new JdkBuildEnvironment(version: '8', buildJdkTool: 'OracleJDK8 Latest',
+					new JdkBuildEnvironment(testJavaVersion: '8', testLauncherTool: 'OracleJDK8 Latest',
 							enableSigtest: true,
 							condition: TestCondition.BEFORE_MERGE),
-					new JdkBuildEnvironment(version: '11', buildJdkTool: 'OpenJDK 11 Latest',
+					new JdkBuildEnvironment(testJavaVersion: '11', testCompilerTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.BEFORE_MERGE)
 			],
 			wildflyTck: [
-					new WildFlyTckBuildEnvironment(javaVersion: '8', buildJdkTool: 'OracleJDK8 Latest',
+					new WildFlyTckBuildEnvironment(testJavaVersion: '8', testLauncherTool: 'OracleJDK8 Latest',
 							condition: TestCondition.AFTER_MERGE),
-					new WildFlyTckBuildEnvironment(javaVersion: '11', buildJdkTool: 'OpenJDK 11 Latest',
+					new WildFlyTckBuildEnvironment(testJavaVersion: '11', testCompilerTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.AFTER_MERGE)
 			]
 	])
@@ -137,7 +138,7 @@ stage('Configure') {
 		configurationNodePattern QUICK_USE_NODE_PATTERN
 		file 'job-configuration.yaml'
 		jdk {
-			defaultTool environments.content.jdk.default.buildJdkTool
+			defaultTool DEFAULT_JDK_TOOL
 		}
 		maven {
 			defaultTool MAVEN_TOOL
@@ -269,7 +270,7 @@ stage('Non-default environments') {
 	environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
 		parameters.put(buildEnv.tag, {
 			runBuildOnNode {
-				helper.withMavenWorkspace(jdk: buildEnv.buildJdkTool) {
+				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
 							${buildEnv.enableSigtest ? '-Psigtest' : ''} \
@@ -283,7 +284,7 @@ stage('Non-default environments') {
 	environments.content.wildflyTck.enabled.each { WildFlyTckBuildEnvironment buildEnv ->
 		parameters.put(buildEnv.tag, {
 			runBuildOnNode {
-				helper.withMavenWorkspace(jdk: buildEnv.buildJdkTool) {
+				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
 							-pl tck-runner \
@@ -330,6 +331,9 @@ enum TestCondition {
 abstract class BuildEnvironment {
 	boolean isDefault = false
 	TestCondition condition
+	String testJavaVersion
+	String testCompilerTool
+	String testLauncherTool
 	String toString() { getTag() }
 	abstract String getTag()
 	boolean isDefault() { isDefault }
@@ -337,21 +341,16 @@ abstract class BuildEnvironment {
 }
 
 class JdkBuildEnvironment extends BuildEnvironment {
-	String version
-	String buildJdkTool
-	String testJdkTool
 	boolean enableSigtest
 	@Override
-	String getTag() { "jdk-$version" }
+	String getTag() { "jdk-$testJavaVersion" }
 	@Override
 	boolean requiresDefaultBuildArtifacts() { false }
 }
 
 class WildFlyTckBuildEnvironment extends BuildEnvironment {
-	String javaVersion
-	String buildJdkTool
 	@Override
-	String getTag() { "wildfly-tck-jdk$javaVersion" }
+	String getTag() { "wildfly-tck-jdk$testJavaVersion" }
 	@Override
 	boolean requiresDefaultBuildArtifacts() { true }
 }
@@ -457,14 +456,21 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, String project
 String toTestJdkArg(BuildEnvironment buildEnv) {
 	String args = ''
 
-	if ( ! (buildEnv instanceof JdkBuildEnvironment) ) {
-		return args;
+	String testCompilerTool = buildEnv.testCompilerTool
+	if ( testCompilerTool && DEFAULT_JDK_TOOL != testCompilerTool ) {
+		def testCompilerToolPath = tool(name: testCompilerTool, type: 'jdk')
+		args += " -Djava-version.test.compiler.java_home=$testCompilerToolPath"
 	}
-
-	String testJdkTool = buildEnv.testJdkTool
-	if ( testJdkTool ) {
-		def testJdkToolPath = tool(name: testJdkTool, type: 'jdk')
-		args += " -Dsurefire.jvm.java_executable=$testJdkToolPath/bin/java"
+	// Note: the POM uses the java_home of the test compiler for the test launcher by default.
+	String testLauncherTool = buildEnv.testLauncherTool
+	if ( testLauncherTool && DEFAULT_JDK_TOOL != testLauncherTool ) {
+		def testLauncherToolPath = tool(name: testLauncherTool, type: 'jdk')
+		args += " -Djava-version.test.launcher.java_home=$testLauncherToolPath"
+	}
+	String defaultVersion = environments.content.jdk.default.testJavaVersion
+	String version = buildEnv.testJavaVersion
+	if ( defaultVersion != version ) {
+		args += " -Djava-version.test.release=$version"
 	}
 
 	return args
