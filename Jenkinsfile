@@ -104,7 +104,6 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
 
 @Field boolean enableDefaultBuild = false
 @Field boolean enableDefaultBuildIT = false
-@Field boolean enableDefaultBuildJQAssistant = false
 @Field boolean enableDefaultBuildSigtest = false
 @Field boolean deploySnapshot = false
 
@@ -121,7 +120,7 @@ stage('Configure') {
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
 					new JdkBuildEnvironment(version: '8', buildJdkTool: 'OracleJDK8 Latest',
-							enableSigtest: true, enableJQAssistant: true,
+							enableSigtest: true,
 							condition: TestCondition.BEFORE_MERGE),
 					new JdkBuildEnvironment(version: '11', buildJdkTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.BEFORE_MERGE),
@@ -260,8 +259,8 @@ stage('Default build') {
 							install \
 					"} \
 					-Pdist \
+					-Pjqassistant \
 					${enableDefaultBuildSigtest ? '-Psigtest' : ''} \
-					${enableDefaultBuildJQAssistant ? '-Pjqassistant' : ''} \
 					${enableDefaultBuildIT ? '' : '-DskipITs'} \
 					${toTestJdkArg(environments.content.jdk.default)} \
 			"""
@@ -284,7 +283,6 @@ stage('Non-default environments') {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
 							${buildEnv.enableSigtest ? '-Psigtest' : ''} \
-							${buildEnv.enableJQAssistant ? '-Pjqassistant' : ''} \
 					"""
 				}
 			}
@@ -353,7 +351,6 @@ class JdkBuildEnvironment extends BuildEnvironment {
 	String buildJdkTool
 	String testJdkTool
 	boolean enableSigtest
-	boolean enableJQAssistant
 	@Override
 	String getTag() { "jdk-$version" }
 	@Override
