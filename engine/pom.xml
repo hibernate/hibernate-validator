@@ -99,6 +99,18 @@
             <artifactId>money-api</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <!-- We exclude this dependency from the classpath when running tests with OracleJDK 8,
+                 because OracleJDK 8 already bundles JavaFX. -->
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <!-- The JavaFX dependency is optional (not pulled transitively by our consumers) for two reasons:
+                 1. HV should work fine without it, as long as you don't use JavaFX.
+                 2. We don't want to force the dependency on our users who are still on OracleJDK 8,
+                    since OracleJDK 8 already bundles JavaFX.
+              -->
+            <optional>true</optional>
+        </dependency>
 
         <!--
         Test dependencies
@@ -304,27 +316,16 @@
     </build>
     <profiles>
         <profile>
-            <id>jdk9+</id>
+            <id>testWithJdk11+</id>
             <activation>
-                <jdk>[9,)</jdk>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>!8</value>
+                </property>
             </activation>
             <properties>
                 <surefire.jvm.args.illegal-access>--illegal-access=deny</surefire.jvm.args.illegal-access>
             </properties>
-        </profile>
-        <profile>
-            <id>jdk11+</id>
-            <activation>
-                <jdk>[11,)</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>javafx-base</artifactId>
-                    <version>${version.org.openjfx}</version>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
         </profile>
     </profiles>
 </project>

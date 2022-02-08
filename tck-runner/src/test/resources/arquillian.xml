@@ -26,6 +26,7 @@
         <!-- Takes no effect - ARQ-579 -->
         <configuration>
             <property name="jbossHome">${wildfly.target-dir}</property>
+            <property name="javaHome">${arquillian.wildfly.jvm.java_home}</property>
             <property name="javaVmArguments">${arquillian.wildfly.jvm.args}
                 -Xmx1024m -XX:MaxPermSize=512m ${remote.debug}
                 -Dvalidation.provider=${validation.provider}

@@ -39,6 +39,12 @@
             <artifactId>hibernate-validator</artifactId>
         </dependency>
         <dependency>
+            <!-- We exclude this dependency from the classpath when running tests with OracleJDK 8,
+                 because OracleJDK 8 already bundles JavaFX. -->
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.el</artifactId>
         </dependency>
@@ -395,59 +401,16 @@
             </build>
         </profile>
         <profile>
-            <id>jdk9+</id>
+            <id>testWithJdk11+</id>
             <activation>
-                <jdk>[9,)</jdk>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>!8</value>
+                </property>
             </activation>
             <properties>
                 <surefire.jvm.args.add-opens>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED</surefire.jvm.args.add-opens>
             </properties>
-        </profile>
-        <profile>
-            <id>jdk10-</id>
-            <activation>
-                <jdk>(,11)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <!-- Copy additional modules -->
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-resources</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${wildfly.target-dir}/modules/system/layers/base/</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>src/test/modules/jdk8</directory>
-                                            <filtering>true</filtering>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>jdk11+</id>
-            <activation>
-                <jdk>[11,)</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>javafx-base</artifactId>
-                    <version>${version.org.openjfx}</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
             <build>
                 <plugins>
                     <!-- Copy additional modules -->
