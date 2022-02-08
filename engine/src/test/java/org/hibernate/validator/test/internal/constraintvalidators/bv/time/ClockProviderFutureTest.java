@@ -10,11 +10,9 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
-import java.time.Clock;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import javax.validation.ClockProvider;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Future;
@@ -87,21 +85,6 @@ public class ClockProviderFutureTest {
 
 		@Future
 		private ReadablePartial shipmentDateAsReadablePartial;
-
-	}
-
-	private static class FixedClockProvider implements ClockProvider {
-
-		private Clock clock;
-
-		public FixedClockProvider(ZonedDateTime dateTime) {
-			clock = Clock.fixed( dateTime.toInstant(), dateTime.getZone() );
-		}
-
-		@Override
-		public Clock getClock() {
-			return clock;
-		}
 
 	}
 }
