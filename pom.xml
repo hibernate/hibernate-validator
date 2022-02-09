@@ -287,9 +287,7 @@
         <!-- No need to build the javadocs per module. Aggregated javadocs are build in the distribution module. See also HV-894 -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
-        <maven.compiler.release>${java-version.main.release}</maven.compiler.release>
-        <maven.compiler.testRelease>${java-version.test.release}</maven.compiler.testRelease>
-
+        <!-- maven.compiler.release and maven.compiler.testRelease are set in a profile; see below -->
         <!-- Also set source/target, because several other plugins rely on this and don't understand release -->
         <maven.compiler.source>${java-version.main.release}</maven.compiler.source>
         <maven.compiler.target>${java-version.main.release}</maven.compiler.target>
@@ -1384,6 +1382,31 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <!-- Running the build with JDK 8 is not recommended and will require disabling the enforcer plugin,
+                 but it's the only way to run the signature test. -->
+            <id>runningMavenWithJdk8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <properties>
+                <!-- With JDK 8, java.home is the JRE -->
+                <java-version.main.compiler.java_home>${java.home}/../</java-version.main.compiler.java_home>
+                <java-version.test.compiler.java_home>${java.home}/../</java-version.test.compiler.java_home>
+                <!-- Cannot use -release on JDK 8; we'll default to -source/-target -->
+                <!-- That's why we don't define maven.compiler.release nor maven.compiler.testRelease here -->
+            </properties>
+        </profile>
+        <profile>
+            <id>runningMavenWithJdk9+</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <properties>
+                <maven.compiler.release>${java-version.main.release}</maven.compiler.release>
+                <maven.compiler.testRelease>${java-version.test.release}</maven.compiler.testRelease>
+            </properties>
         </profile>
         <profile>
             <id>testWithJdk8</id>
