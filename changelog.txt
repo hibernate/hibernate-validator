@@ -1,6 +1,20 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.23.Final (2022-02-09)
+-------------------------
+
+** Bug
+    * HV-1878 java.sql.Date is not supported anymore
+    * HV-1833 DomainNameUtil issues java.lang.StackOverflowError on very large error (@Email validation)
+
+** Task
+    * HV-1881 Switch to Log4j 2 for 6.0 testing
+    * HV-1879 Backport Jenkinsfiles to 6.0
+    * HV-1877 Move the release job to a separate Jenkinsfile
+    * HV-1871 Sign published artifacts
+    * HV-1858 Switch to OSSRH for deployment to Maven Central
+
 6.0.22.Final (16-12-2020)
 -------------------------
 
