@@ -105,7 +105,6 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
 
 @Field boolean enableDefaultBuild = false
 @Field boolean enableDefaultBuildIT = false
-@Field boolean enableDefaultBuildSigtest = false
 @Field boolean deploySnapshot = false
 
 this.helper = new JobHelper(this)
@@ -121,7 +120,6 @@ stage('Configure') {
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
 					new JdkBuildEnvironment(testJavaVersion: '8', testLauncherTool: 'OracleJDK8 Latest',
-							enableSigtest: true,
 							condition: TestCondition.BEFORE_MERGE),
 					new JdkBuildEnvironment(testJavaVersion: '11', testCompilerTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.BEFORE_MERGE)
@@ -131,6 +129,10 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE),
 					new WildFlyTckBuildEnvironment(testJavaVersion: '11', testCompilerTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.AFTER_MERGE)
+			],
+			sigtest: [
+					new SigTestBuildEnvironment(testJavaVersion: '8', jdkTool: 'OracleJDK8 Latest',
+							condition: TestCondition.BEFORE_MERGE)
 			]
 	])
 
@@ -251,7 +253,6 @@ stage('Default build') {
 					"} \
 					-Pdist \
 					-Pjqassistant \
-					${enableDefaultBuildSigtest ? '-Psigtest' : ''} \
 					${enableDefaultBuildIT ? '' : '-DskipITs'} \
 					${toTestJdkArg(environments.content.jdk.default)} \
 			"""
@@ -273,7 +274,6 @@ stage('Non-default environments') {
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
-							${buildEnv.enableSigtest ? '-Psigtest' : ''} \
 					"""
 				}
 			}
@@ -289,6 +289,28 @@ stage('Non-default environments') {
 							clean install \
 							-pl tck-runner \
 							-Dincontainer \
+					"""
+				}
+			}
+		})
+	}
+
+	// Run the TCK signature test
+	environments.content.sigtest.enabled.each { SigTestBuildEnvironment buildEnv ->
+		parameters.put(buildEnv.tag, {
+			runBuildOnNode {
+				helper.withMavenWorkspace(jdk: buildEnv.jdkTool) {
+					if ( buildEnv.testJavaVersion == '8' ) {
+						// JVM options such as --add-opens won't work on JDK 8
+						sh 'rm .mvn/jvm.config'
+					}
+					mavenNonDefaultBuild buildEnv, """ \
+							clean install \
+							-pl tck-runner \
+							-Psigtest \
+							-Denforcer.skip=true \
+							-DskipTests=true -Dcheckstyle.skip=true \
+							-DdisableDistributionBuild=true -DdisableDocumentationBuild=true \
 					"""
 				}
 			}
@@ -341,7 +363,6 @@ abstract class BuildEnvironment {
 }
 
 class JdkBuildEnvironment extends BuildEnvironment {
-	boolean enableSigtest
 	@Override
 	String getTag() { "jdk-$testJavaVersion" }
 	@Override
@@ -351,6 +372,14 @@ class JdkBuildEnvironment extends BuildEnvironment {
 class WildFlyTckBuildEnvironment extends BuildEnvironment {
 	@Override
 	String getTag() { "wildfly-tck-jdk$testJavaVersion" }
+	@Override
+	boolean requiresDefaultBuildArtifacts() { true }
+}
+
+class SigTestBuildEnvironment extends BuildEnvironment {
+	String jdkTool
+	@Override
+	String getTag() { "sigtest-jdk$testJavaVersion" }
 	@Override
 	boolean requiresDefaultBuildArtifacts() { true }
 }
