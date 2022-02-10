@@ -1,6 +1,19 @@
 Hibernate Validator Changelog
 =============================
 
+6.2.2.Final (2022-02-10)
+-------------------------
+
+** Bug
+    * HV-1878 java.sql.Date is not supported anymore
+
+** Task
+    * HV-1880 Clean up Gemfile.lock that shouldn't be there
+    * HV-1877 Move the release job to a separate Jenkinsfile
+    * HV-1874 Bump Log4j test dependency to 2.17.1
+    * HV-1871 Sign published artifacts
+    * HV-1864 Make sure we can release with JDK 17
+
 6.2.1.Final (2021-12-14)
 -------------------------
 
