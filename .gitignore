@@ -53,5 +53,5 @@ maven-eclipse.xml
 .DS_Store
 
 # Maven wrapper files
-.mvn
+.mvn/wrapper
 mvnw*
