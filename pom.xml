@@ -203,12 +203,12 @@
 
         <!-- Asciidoctor -->
 
-        <version.asciidoctor.plugin>1.5.6</version.asciidoctor.plugin>
+        <version.asciidoctor.plugin>2.2.2</version.asciidoctor.plugin>
         <version.org.hibernate.infra.hibernate-asciidoctor-theme>1.0.3.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
-        <version.org.hibernate.infra.hibernate-asciidoctor-extensions>1.0.3.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
-        <version.org.jruby>9.1.15.0</version.org.jruby>
-        <version.org.asciidoctor.asciidoctorj>1.6.0-alpha.5</version.org.asciidoctor.asciidoctorj>
-        <version.org.asciidoctor.asciidoctorj-pdf>1.5.0-alpha.16</version.org.asciidoctor.asciidoctorj-pdf>
+        <version.org.hibernate.infra.hibernate-asciidoctor-extensions>2.0.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
+        <version.org.jruby>9.3.2.0</version.org.jruby>
+        <version.org.asciidoctor.asciidoctorj>2.5.3</version.org.asciidoctor.asciidoctorj>
+        <version.org.asciidoctor.asciidoctorj-pdf>1.5.0-alpha.18</version.org.asciidoctor.asciidoctorj-pdf>
 
         <!-- Maven plugins versions -->
 
@@ -1172,7 +1172,7 @@
                                             asciidoctor-maven-plugin
                                         </artifactId>
                                         <versionRange>
-                                            [0.1.4,)
+                                            [2.2.2,)
                                         </versionRange>
                                         <goals>
                                             <goal>

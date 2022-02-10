@@ -260,11 +260,12 @@
                         <configuration>
                             <backend>html5</backend>
                             <outputDirectory>${asciidoctor.base-output-dir}/html_single</outputDirectory>
-                            <sourceHighlighter>prettify</sourceHighlighter>
                             <attributes>
+                                <imagesdir>${asciidoctor.aggregated-resources-dir}/images/</imagesdir>
                                 <stylesdir>css</stylesdir>
                                 <iconfont-remote>false</iconfont-remote>
                                 <iconfont-name>font-awesome/css/font-awesome.min</iconfont-name>
+                                <source-highlighter>prettify</source-highlighter>
                             </attributes>
                         </configuration>
                     </execution>
@@ -324,15 +325,15 @@
                                 <configuration>
                                     <backend>pdf</backend>
                                     <outputDirectory>${asciidoctor.base-output-dir}/pdf</outputDirectory>
-                                    <sourceHighlighter>coderay</sourceHighlighter>
                                     <attributes>
-                                        <imagesDir>${asciidoctor.aggregated-resources-dir}/images/</imagesDir>
+                                        <imagesdir>${asciidoctor.aggregated-resources-dir}/images/</imagesdir>
                                         <pdf-stylesdir>${asciidoctor.aggregated-resources-dir}/theme</pdf-stylesdir>
                                         <pdf-style>hibernate</pdf-style>
                                         <pdf-fontsdir>${asciidoctor.aggregated-resources-dir}/theme/fonts</pdf-fontsdir>
                                         <pagenums/>
                                         <idprefix/>
                                         <idseparator>-</idseparator>
+                                        <source-highlighter>coderay</source-highlighter>
                                     </attributes>
                                 </configuration>
                             </execution>
