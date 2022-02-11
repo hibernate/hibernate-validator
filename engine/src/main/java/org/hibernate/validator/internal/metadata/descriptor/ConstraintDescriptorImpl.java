@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.metadata.descriptor;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -614,7 +615,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private Set<ConstraintDescriptorImpl<?>> parseComposingConstraints(ConstraintHelper constraintHelper, Constrainable constrainable,
 			ConstraintType constraintType) {
-		Set<ConstraintDescriptorImpl<?>> composingConstraintsSet = newHashSet();
+		Set<ConstraintDescriptorImpl<?>> composingConstraintsSet = newLinkedHashSet();
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = parseOverrideParameters();
 		Map<Class<? extends Annotation>, ComposingConstraintAnnotationLocation> composingConstraintLocations = new HashMap<>();
 
