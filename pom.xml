@@ -1466,6 +1466,27 @@
             </repositories>
         </profile>
         <profile>
+            <id>jakarta-snapshot</id>
+            <activation>
+                <property>
+                    <name>jakarta-snapshot</name>
+                </property>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>jakarta-snapshot</id>
+                    <name>Jakarta Staging Repository</name>
+                    <url>https://jakarta.oss.sonatype.org/content/repositories/snapshots/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+        <profile>
             <id>IDEA</id>
             <activation>
                 <!-- This is a trick to have the profile automatically activated by IDEA -->
