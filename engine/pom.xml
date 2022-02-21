@@ -53,8 +53,8 @@
         Provided dependencies
         -->
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
+            <groupId>org.glassfish.expressly</groupId>
+            <artifactId>expressly</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
