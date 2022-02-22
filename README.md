@@ -42,9 +42,9 @@ Logging will delegate any log requests to that provider.
   In a Jakarta EE environment, they are often already provided.
 
         <dependency>
-           <groupId>org.glassfish</groupId>
-           <artifactId>jakarta.el</artifactId>
-           <version>4.0.1</version>
+           <groupId>org.glassfish.expressly</groupId>
+           <artifactId>expressly</artifactId>
+           <version>5.0.0-M1</version>
         </dependency>
 
 * Jakarta Bean Validation defines integration points with [CDI](http://jcp.org/en/jsr/detail?id=346). If your application runs
