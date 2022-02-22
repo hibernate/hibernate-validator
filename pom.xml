@@ -1163,16 +1163,11 @@
                     <version>${version.sigtest.plugin}</version>
                     <executions>
                         <execution>
-                            <goals>check</goals>
-                            <configuration>
-                            </configuration>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
                         </execution>
                     </executions>
-                    <configuration>
-                        <classes>
-
-                        </classes>
-                    </configuration>
                 </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>
