@@ -30,9 +30,11 @@
         <wildfly-main.patch-file>${project.build.directory}/wildfly-current-hv-patch.zip</wildfly-main.patch-file>
 
         <!-- WildFly secondary version -->
+        <!--
         <wildfly-secondary.original.target-dir>${project.build.directory}/wildfly-original/wildfly-${version.wildfly.secondary}</wildfly-secondary.original.target-dir>
         <wildfly-secondary.patched.target-dir>${project.build.directory}/wildfly-patched/wildfly-${version.wildfly.secondary}</wildfly-secondary.patched.target-dir>
         <wildfly-secondary.patch-file>${project.build.directory}/wildfly-secondary-hv-patch.zip</wildfly-secondary.patch-file>
+        -->
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
@@ -103,11 +105,13 @@
                                     <classifier>wildfly-${version.wildfly}-patch</classifier>
                                 </artifact>
                                 <!-- WildFly secondary version -->
+                                <!--
                                 <artifact>
                                     <file>${wildfly-secondary.patch-file}</file>
                                     <type>zip</type>
                                     <classifier>wildfly-${version.wildfly.secondary}-patch</classifier>
                                 </artifact>
+                                -->
                             </artifacts>
                         </configuration>
                     </execution>
@@ -135,6 +139,7 @@
                         </configuration>
                     </execution>
                     <!-- WildFly secondary version -->
+                    <!--
                     <execution>
                         <id>update-wildfly-secondary-modules</id>
                         <phase>prepare-package</phase>
@@ -150,6 +155,7 @@
                             </properties>
                         </configuration>
                     </execution>
+                    -->
                 </executions>
             </plugin>
             <plugin>
@@ -182,6 +188,7 @@
                                     <outputDirectory>${project.build.directory}/wildfly-patched</outputDirectory>
                                 </artifactItem>
                                 <!-- WildFly secondary version -->
+                                <!--
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
                                     <artifactId>wildfly-dist</artifactId>
@@ -198,6 +205,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/wildfly-patched</outputDirectory>
                                 </artifactItem>
+                                -->
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -237,13 +245,13 @@
                                     <destFileName>hibernate-validator-cdi-${project.version}.jar</destFileName>
                                 </artifactItem>
                                 <!-- WildFly secondary version -->
+                                <!--
                                 <artifactItem>
                                     <groupId>jakarta.validation</groupId>
                                     <artifactId>jakarta.validation-api</artifactId>
                                     <version>${version.jakarta.validation-api}</version>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${wildfly-secondary.patched.target-dir}/modules/system/layers/base/javax/validation/api/main</outputDirectory>
-                                    <!-- Specifying name to avoid timestamp in version on CI -->
                                     <destFileName>jakarta.validation-api-${version.jakarta.validation-api}.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
@@ -262,6 +270,7 @@
                                     <outputDirectory>${wildfly-secondary.patched.target-dir}/modules/system/layers/base/org/hibernate/validator/cdi/main</outputDirectory>
                                     <destFileName>hibernate-validator-cdi-${project.version}.jar</destFileName>
                                 </artifactItem>
+                                -->
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -271,6 +280,13 @@
             <plugin>
                 <groupId>org.jboss.as</groupId>
                 <artifactId>patch-gen-maven-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jboss.modules</groupId>
+                        <artifactId>jboss-modules</artifactId>
+                        <version>1.9.0.Final</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>create-wildfly-current-patch-file</id>
@@ -285,6 +301,7 @@
                             <outputFile>${wildfly-main.patch-file}</outputFile>
                         </configuration>
                     </execution>
+                    <!--
                     <execution>
                         <id>create-wildfly-secondary-patch-file</id>
                         <phase>prepare-package</phase>
@@ -298,6 +315,7 @@
                             <outputFile>${wildfly-secondary.patch-file}</outputFile>
                         </configuration>
                     </execution>
+                    -->
                 </executions>
             </plugin>
         </plugins>

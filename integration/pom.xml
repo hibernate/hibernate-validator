@@ -23,9 +23,10 @@
     <properties>
         <wildfly.target-dir>${project.build.directory}/wildfly-${version.wildfly}</wildfly.target-dir>
         <wildfly.modules-dir>${wildfly.target-dir}/modules/system/layers/base</wildfly.modules-dir>
-
+        <!--
         <wildfly-secondary.target-dir>${project.build.directory}/wildfly-${version.wildfly.secondary}</wildfly-secondary.target-dir>
         <wildfly-secondary.modules-dir>${wildfly-secondary.target-dir}/modules/system/layers/base</wildfly-secondary.modules-dir>
+        -->
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
@@ -336,6 +337,7 @@
             </properties>
         </profile>
         <!-- We keep this instance separate as we sometimes have to condition it on JDK version - -->
+        <!--
         <profile>
             <id>wildfly-secondary-version</id>
             <activation>
@@ -347,7 +349,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <executions>
-                            <!-- WildFly secondary version -->
                             <execution>
                                 <id>wildfly-secondary-integration-test</id>
                                 <goals>
@@ -374,7 +375,6 @@
                                 </goals>
                                 <configuration>
                                     <artifactItems>
-                                        <!-- WildFly secondary version -->
                                         <artifactItem>
                                             <groupId>org.wildfly</groupId>
                                             <artifactId>wildfly-dist</artifactId>
@@ -394,7 +394,6 @@
                                 </goals>
                                 <configuration>
                                     <artifactItems>
-                                        <!-- WildFly secondary version -->
                                         <artifactItem>
                                             <groupId>${project.groupId}</groupId>
                                             <artifactId>hibernate-validator-modules</artifactId>
@@ -414,7 +413,6 @@
                                 </goals>
                                 <configuration>
                                     <artifactItems>
-                                        <!-- WildFly secondary version -->
                                         <artifactItem>
                                             <groupId>javax.money</groupId>
                                             <artifactId>money-api</artifactId>
@@ -435,7 +433,6 @@
                     <plugin>
                         <artifactId>maven-resources-plugin</artifactId>
                         <executions>
-                            <!-- WildFly secondary version -->
                             <execution>
                                 <id>copy-wildfly-secondary-resources</id>
                                 <phase>pre-integration-test</phase>
@@ -458,7 +455,6 @@
                         <groupId>org.wildfly.plugins</groupId>
                         <artifactId>wildfly-maven-plugin</artifactId>
                         <executions>
-                            <!-- WildFly secondary version -->
                             <execution>
                                 <id>apply-wildfly-secondary-patch-file</id>
                                 <phase>pre-integration-test</phase>
@@ -479,5 +475,6 @@
                 </plugins>
             </build>
         </profile>
+        -->
     </profiles>
 </project>
