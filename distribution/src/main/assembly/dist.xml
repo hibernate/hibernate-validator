@@ -36,7 +36,7 @@
                 <include>jakarta.validation:jakarta.validation-api</include>
                 <include>org.jboss.logging:jboss-logging</include>
                 <include>com.fasterxml:classmate</include>
-                <include>org.glassfish:jakarta.el</include>
+                <include>org.glassfish.expressly:expressly</include>
             </includes>
         </dependencySet>
         <dependencySet>
