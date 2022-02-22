@@ -236,7 +236,7 @@
         <version.release.plugin>2.5.3</version.release.plugin>
         <version.resources.plugin>3.0.2</version.resources.plugin>
         <version.shade.plugin>3.1.0</version.shade.plugin>
-        <version.sigtest.plugin>1.2</version.sigtest.plugin>
+        <version.sigtest.plugin>1.4</version.sigtest.plugin>
         <version.source.plugin>3.0.1</version.source.plugin>
         <version.surefire.plugin>2.21.0</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.2</version.surefire.plugin.java-version.asm>
@@ -1161,6 +1161,18 @@
                     <groupId>org.netbeans.tools</groupId>
                     <artifactId>sigtest-maven-plugin</artifactId>
                     <version>${version.sigtest.plugin}</version>
+                    <executions>
+                        <execution>
+                            <goals>check</goals>
+                            <configuration>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <classes>
+
+                        </classes>
+                    </configuration>
                 </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>
