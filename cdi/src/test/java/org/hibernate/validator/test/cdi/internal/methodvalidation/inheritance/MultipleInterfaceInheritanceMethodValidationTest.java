@@ -6,19 +6,17 @@
  */
 package org.hibernate.validator.test.cdi.internal.methodvalidation.inheritance;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.fail;
-
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotNull;
-
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.testng.annotations.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -32,7 +30,7 @@ public class MultipleInterfaceInheritanceMethodValidationTest extends Arquillian
 				.addClass( ShipmentServiceSecondInHierarchy.class )
 				.addClass( Shipment.class )
 				.addClass( ShipmentServiceImpl.class )
-				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsManifestResource( "beans.xml" );
 	}
 
 	@Inject

@@ -6,16 +6,14 @@
  */
 package org.hibernate.validator.test.cdi.internal.methodvalidation.getter;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import jakarta.inject.Inject;
-
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.testng.annotations.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Hardy Ferentschik
@@ -26,7 +24,7 @@ public class ImplicitValidateOnExecutionDoesNotTriggerGetterValidationTest exten
 		return ShrinkWrap.create( JavaArchive.class )
 				.addClass( Delivery.class )
 				.addClass( DeliveryService.class )
-				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsManifestResource( "beans.xml" );
 	}
 
 	@Inject
