@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.test.cdi.internal.injection;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Produces;
@@ -16,15 +14,15 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import jakarta.validation.constraints.NotNull;
-
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.testng.annotations.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the case where {@code @Default}-scoped beans for validator and validator factory have already been registered
@@ -38,7 +36,7 @@ public class InjectionWithExternallyProvidedDefaultBeansTest extends Arquillian 
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
-				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsManifestResource( "beans.xml" );
 	}
 
 	@HibernateValidator
