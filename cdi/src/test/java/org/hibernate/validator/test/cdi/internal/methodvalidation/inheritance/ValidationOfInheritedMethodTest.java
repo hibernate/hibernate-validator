@@ -6,18 +6,16 @@
  */
 package org.hibernate.validator.test.cdi.internal.methodvalidation.inheritance;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.fail;
-
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
-
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.testng.annotations.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -32,7 +30,7 @@ public class ValidationOfInheritedMethodTest extends Arquillian {
 				.addClass( AbstractGreeter.class )
 				.addClass( Encryptor.class )
 				.addClass( RefusingEncryptor.class )
-				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsManifestResource( "beans.xml" );
 	}
 
 	@Inject

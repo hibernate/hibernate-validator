@@ -146,14 +146,14 @@
             They should be aligned with the ones from the Wildfly version we support
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
-        <version.jakarta.enterprise.cdi-api>3.0.0</version.jakarta.enterprise.cdi-api>
-        <version.org.jboss.weld.weld>4.0.2.Final</version.org.jboss.weld.weld>
+        <version.jakarta.enterprise.cdi-api>4.0.0-RC5</version.jakarta.enterprise.cdi-api>
+        <version.org.jboss.weld.weld>5.0.0.Beta1</version.org.jboss.weld.weld>
         <version.org.wildfly.arquillian>2.2.0.Final</version.org.wildfly.arquillian>
         <version.jakarta.ejb-api>4.0.0</version.jakarta.ejb-api>
         <version.jakarta.interceptor-api>2.1.0-RC3</version.jakarta.interceptor-api>
         <version.jakarta.annotation-api>2.1.0-B1</version.jakarta.annotation-api>
         <version.jakarta.inject-api>2.0.1</version.jakarta.inject-api>
-        <version.jakarta.persistence-api>3.0.0</version.jakarta.persistence-api>
+        <version.jakarta.persistence-api>3.1.0-RC2</version.jakarta.persistence-api>
         <!-- do not update for now, this is used for the WildFly IT -->
         <version.jakarta.ws.rs-api>2.1.6</version.jakarta.ws.rs-api>
 
@@ -169,7 +169,7 @@
         <version.org.openjfx>11.0.2</version.org.openjfx>
 
         <!-- Test dependencies -->
-        <version.org.jboss.arquillian>1.7.0.Alpha4</version.org.jboss.arquillian>
+        <version.org.jboss.arquillian>1.7.0.Alpha10</version.org.jboss.arquillian>
         <version.org.testng>6.14.3</version.org.testng>
         <!-- it must be the exact same version than the one used in the Bean Validation TCK -->
         <version.org.assertj.assertj-core>3.8.0</version.org.assertj.assertj-core>
@@ -179,7 +179,7 @@
         <version.org.codehaus.groovy>2.4.12</version.org.codehaus.groovy>
         <version.com.google.guava>30.1.1-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>4.3.10.RELEASE</version.org.springframework.spring-expression>
-        <version.org.jboss.arquillian.container.arquillian-weld-embedded>3.0.0.Alpha1</version.org.jboss.arquillian.container.arquillian-weld-embedded>
+        <version.org.jboss.arquillian.container.arquillian-weld-embedded>3.0.2.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.12.3</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.12.3</version.com.fasterxml.jackson.core.jackson-annotations>
         <version.net.bytebuddy.byte-buddy>1.11.6</version.net.bytebuddy.byte-buddy>
