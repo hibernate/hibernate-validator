@@ -317,12 +317,9 @@
          -->
         <surefire.environment>default</surefire.environment>
 
-        <arquillian.wildfly.jvm.java_home>${java-version.test.launcher.java_home}</arquillian.wildfly.jvm.java_home>
         <arquillian.wildfly.jvm.args.add-opens></arquillian.wildfly.jvm.args.add-opens>
         <arquillian.wildfly.jvm.args.add-modules></arquillian.wildfly.jvm.args.add-modules>
         <arquillian.wildfly.jvm.args>${arquillian.wildfly.jvm.args.add-opens} ${arquillian.wildfly.jvm.args.add-modules}</arquillian.wildfly.jvm.args>
-
-        <arquillian.payara.jvm.java_home>${java-version.test.launcher.java_home}</arquillian.payara.jvm.java_home>
 
         <!-- JDK version required for the build -->
         <jdk.min.version>17</jdk.min.version>
@@ -890,6 +887,11 @@
                         <jvm>${java-version.test.launcher}</jvm>
                         <argLine>${surefire.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}</reportNameSuffix>
+                        <environmentVariables>
+                            <!-- Ensure Java programs launched in tests (Payara, WildFly)
+                                 use the test Java home, not the Maven Java home -->
+                            <JAVA_HOME>${java-version.test.launcher.java_home}</JAVA_HOME>
+                        </environmentVariables>
                     </configuration>
                     <dependencies>
                         <!--
@@ -929,6 +931,11 @@
                         <jvm>${java-version.test.launcher}</jvm>
                         <argLine>${failsafe.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}</reportNameSuffix>
+                        <environmentVariables>
+                            <!-- Ensure Java programs launched in tests (Payara, WildFly)
+                                 use the test Java home, not the Maven Java home -->
+                            <JAVA_HOME>${java-version.test.launcher.java_home}</JAVA_HOME>
+                        </environmentVariables>
                     </configuration>
                     <dependencies>
                         <!--

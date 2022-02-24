@@ -23,7 +23,7 @@
         </protocol>
         <configuration>
             <property name="jbossHome">${wildfly.target-dir}</property>
-            <property name="javaHome">${arquillian.wildfly.jvm.java_home}</property>
+            <!-- Java home is defined through an environment variable (see maven-failsafe-plugin config) -->
             <property name="javaVmArguments">
                 ${arquillian.wildfly.jvm.args}
             </property>
