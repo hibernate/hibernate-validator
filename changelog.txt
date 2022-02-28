@@ -1,6 +1,19 @@
 Hibernate Validator Changelog
 =============================
 
+8.0.0.Alpha1 (2022-02-28)
+-------------------------
+
+** Bug
+    * HV-1857 Hibernate Validator version for EE 10/EL 5?
+
+** New Feature
+    * HV-1867 Add UUID validation
+
+** Task
+    * HV-1886 Fix incontainer build for main
+    * HV-1882 Use a different JDK for running Maven than for compiling/launching tests in JDK CI jobs
+
 7.0.2.Final (2021-12-14)
 -------------------------
 
