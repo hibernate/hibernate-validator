@@ -376,61 +376,76 @@
         </profile>
         <profile>
             <id>sigtest</id>
+            <properties>
+                <sigtest.java-version>${java-version.main.release}</sigtest.java-version>
+                <sigtest.signature-file>${project.build.directory}/validation-api-java${sigtest.java-version}.sig</sigtest.signature-file>
+            </properties>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>jakarta.validation</groupId>
+                                            <artifactId>jakarta.validation-api</artifactId>
+                                            <version>${version.jakarta.validation-api}</version>
+                                            <type>jar</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.build.directory}/validation-api</outputDirectory>
+                                            <includes>**/*.class,**/*.xml</includes>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.netbeans.tools</groupId>
                         <artifactId>sigtest-maven-plugin</artifactId>
                         <executions>
                             <execution>
+                                <id>sigtest-generate</id>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                                <configuration>
+                                    <classes>${project.build.directory}/validation-api</classes>
+                                    <attach>false</attach>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>sigtest-check</id>
                                 <goals>
                                     <goal>check</goal>
                                 </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <action>strictcheck</action>
-                            <packages>jakarta.validation,jakarta.validation.bootstrap,jakarta.validation.constraints,
-                                jakarta.validation.constraintvalidation,jakarta.validation.executable,jakarta.validation.groups,
-                                jakarta.validation.metadata,jakarta.validation.spi,jakarta.validation.valueextraction
-                            </packages>
-                            <sigfile>${project.build.directory}/api-signature/validation-api-java8.sig</sigfile>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>testWithJdk8</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>8</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <!-- Copy additional modules -->
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-resources</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
                                 <configuration>
-                                    <outputDirectory>${wildfly.target-dir}/modules/system/layers/base/</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>src/test/modules/jdk8</directory>
-                                            <filtering>true</filtering>
-                                        </resource>
-                                    </resources>
+                                    <action>strictcheck</action>
                                 </configuration>
                             </execution>
                         </executions>
+                        <configuration>
+                            <packages>
+                                jakarta.validation,
+                                jakarta.validation.bootstrap,
+                                jakarta.validation.constraints,
+                                jakarta.validation.constraintvalidation,
+                                jakarta.validation.executable,
+                                jakarta.validation.groups,
+                                jakarta.validation.metadata,
+                                jakarta.validation.spi,
+                                jakarta.validation.valueextraction
+                            </packages>
+                            <sigfile>${sigtest.signature-file}</sigfile>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
