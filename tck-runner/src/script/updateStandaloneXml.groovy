@@ -15,10 +15,10 @@ String getPropertyValue(String name) {
 
 // Add javafx.api module to the global modules
 standaloneXml = new File( getPropertyValue('wildfly.target-dir'), 'standalone/configuration/standalone.xml' )
-println "[INFO] Add javafx.api as global module"
+println "[INFO] Add javafx.api as global module in " + standaloneXml
 
 processFileInplace( standaloneXml ) { text ->
-    text.replaceAll( /<subsystem xmlns="urn:jboss:domain:ee:5\.0">/, '<subsystem xmlns="urn:jboss:domain:ee:5.0">\n            <global-modules>\n                <module name="javafx.api" slot="main" />\n            </global-modules>' )
+    text.replaceAll( /<subsystem xmlns="urn:jboss:domain:ee:([^"]+)">/, '<subsystem xmlns="urn:jboss:domain:ee:$1">\n            <global-modules>\n                <module name="javafx.api" slot="main" />\n            </global-modules>' )
 }
 
 println "[INFO] ------------------------------------------------------------------------";
