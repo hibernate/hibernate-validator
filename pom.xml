@@ -102,11 +102,11 @@
         <!-- URLs used in javadoc and documentation generation -->
 
         <bv.spec.url>http://beanvalidation.org/2.0/spec/</bv.spec.url>
-        <java.api-docs.base-url>http://docs.oracle.com/javase/8/docs/api</java.api-docs.base-url>
+        <java.api-docs.base-url>https://docs.oracle.com/en/java/javase/11/docs/api</java.api-docs.base-url>
         <java.technotes.base-url>http://docs.oracle.com/javase/8/docs/technotes</java.technotes.base-url>
-        <javaee.api-docs.base-url>http://docs.oracle.com/javaee/7/api</javaee.api-docs.base-url>
-        <javafx.docs.url>http://docs.oracle.com/javase/8/javase-clienttechnologies.htm</javafx.docs.url>
-        <bv.api-docs.base-url>http://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api</bv.api-docs.base-url>
+        <javaee.api-docs.base-url>https://jakarta.ee/specifications/platform/9/apidocs</javaee.api-docs.base-url>
+        <javafx.docs.url>https://openjfx.io/openjfx-docs/</javafx.docs.url>
+        <bv.api-docs.base-url>https://jakarta.ee/specifications/bean-validation/3.0/apidocs</bv.api-docs.base-url>
         <javamoney.api-docs.base-url>http://javamoney.github.io/apidocs</javamoney.api-docs.base-url>
 
         <!-- Module names used for Java 9 modules and OSGi bundles -->
@@ -236,7 +236,7 @@
         <version.release.plugin>2.5.3</version.release.plugin>
         <version.resources.plugin>3.0.2</version.resources.plugin>
         <version.shade.plugin>3.1.0</version.shade.plugin>
-        <version.sigtest.plugin>1.4</version.sigtest.plugin>
+        <version.sigtest.plugin>1.6</version.sigtest.plugin>
         <version.source.plugin>3.0.1</version.source.plugin>
         <version.surefire.plugin>2.21.0</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.2</version.surefire.plugin.java-version.asm>
@@ -271,7 +271,7 @@
 
         <!-- The lowest supported version of Java for applications using Hibernate Validator -->
         <!-- Set statically, independently of the current JDK: we want our code to comply with this version -->
-        <java-version.main.release>8</java-version.main.release>
+        <java-version.main.release>11</java-version.main.release>
         <java-version.main.compiler.java_home>${java.home}</java-version.main.compiler.java_home>
         <java-version.main.compiler>${java-version.main.compiler.java_home}/bin/javac</java-version.main.compiler>
         <!-- The version of test bytecode, useful for testing compatibility with newer JDKs -->
@@ -287,12 +287,13 @@
         <!-- No need to build the javadocs per module. Aggregated javadocs are build in the distribution module. See also HV-894 -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
-        <!-- maven.compiler.release and maven.compiler.testRelease are set in a profile; see below -->
         <!-- Also set source/target, because several other plugins rely on this and don't understand release -->
         <maven.compiler.source>${java-version.main.release}</maven.compiler.source>
         <maven.compiler.target>${java-version.main.release}</maven.compiler.target>
         <maven.compiler.testSource>${java-version.test.release}</maven.compiler.testSource>
         <maven.compiler.testTarget>${java-version.test.release}</maven.compiler.testTarget>
+        <maven.compiler.release>${java-version.main.release}</maven.compiler.release>
+        <maven.compiler.testRelease>${java-version.test.release}</maven.compiler.testRelease>
 
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
         <surefire.jvm.args.additional></surefire.jvm.args.additional>
@@ -1161,13 +1162,6 @@
                     <groupId>org.netbeans.tools</groupId>
                     <artifactId>sigtest-maven-plugin</artifactId>
                     <version>${version.sigtest.plugin}</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>
@@ -1398,70 +1392,6 @@
             </build>
         </profile>
         <profile>
-            <!-- Running the build with JDK 8 is not recommended and will require disabling the enforcer plugin,
-                 but it's the only way to run the signature test. -->
-            <id>runningMavenWithJdk8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <!-- With JDK 8, java.home is the JRE -->
-                <java-version.main.compiler.java_home>${java.home}/../</java-version.main.compiler.java_home>
-                <java-version.test.compiler.java_home>${java.home}/../</java-version.test.compiler.java_home>
-                <!-- Cannot use -release on JDK 8; we'll default to -source/-target -->
-                <!-- That's why we don't define maven.compiler.release nor maven.compiler.testRelease here -->
-            </properties>
-        </profile>
-        <profile>
-            <id>runningMavenWithJdk9+</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <properties>
-                <maven.compiler.release>${java-version.main.release}</maven.compiler.release>
-                <maven.compiler.testRelease>${java-version.test.release}</maven.compiler.testRelease>
-            </properties>
-        </profile>
-        <profile>
-            <id>testWithJdk8</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>8</value>
-                </property>
-            </activation>
-            <modules>
-                <!-- Only run the OSGi tests for JDK 8 -->
-                <module>osgi</module>
-            </modules>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <configuration>
-                                <classpathDependencyExcludes>
-                                    <!-- JavaFX is already provided by OracleJDK8 -->
-                                    <classpathDependencyExclude>org.openjfx:javafx-base</classpathDependencyExclude>
-                                </classpathDependencyExcludes>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-failsafe-plugin</artifactId>
-                            <configuration>
-                                <classpathDependencyExcludes>
-                                    <!-- JavaFX is already provided by OracleJDK8 -->
-                                    <classpathDependencyExclude>org.openjfx:javafx-base</classpathDependencyExclude>
-                                </classpathDependencyExcludes>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-        <profile>
             <id>testWithJdk11+</id>
             <activation>
                 <property>
@@ -1579,27 +1509,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>jakarta-staging</id>
-            <activation>
-                <property>
-                    <name>jakarta-staging</name>
-                </property>
-            </activation>
-            <repositories>
-                <repository>
-                    <id>jakarta-staging</id>
-                    <name>Jakarta Staging Repository</name>
-                    <url>https://jakarta.oss.sonatype.org/content/repositories/staging/</url>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                </repository>
-            </repositories>
         </profile>
         <profile>
             <id>IDEA</id>
