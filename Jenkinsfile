@@ -119,8 +119,6 @@ stage('Configure') {
 					new JdkBuildEnvironment(testJavaVersion: '17', testCompilerTool: 'OpenJDK 17 Latest',
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
-					new JdkBuildEnvironment(testJavaVersion: '8', testLauncherTool: 'OracleJDK8 Latest',
-							condition: TestCondition.BEFORE_MERGE),
 					new JdkBuildEnvironment(testJavaVersion: '11', testCompilerTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.BEFORE_MERGE),
 					new JdkBuildEnvironment(testJavaVersion: '18', testCompilerTool: 'OpenJDK 18 Latest',
@@ -129,13 +127,11 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE)
 			],
 			wildflyTck: [
-					new WildFlyTckBuildEnvironment(testJavaVersion: '8', testLauncherTool: 'OracleJDK8 Latest',
-							condition: TestCondition.ON_DEMAND),
 					new WildFlyTckBuildEnvironment(testJavaVersion: '11', testCompilerTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.ON_DEMAND)
 			],
 			sigtest: [
-					new SigTestBuildEnvironment(testJavaVersion: '8', jdkTool: 'OracleJDK8 Latest',
+					new SigTestBuildEnvironment(testJavaVersion: '17', jdkTool: 'OpenJDK 17 Latest',
 							condition: TestCondition.BEFORE_MERGE)
 			]
 	])
@@ -304,10 +300,6 @@ stage('Non-default environments') {
 		parameters.put(buildEnv.tag, {
 			runBuildOnNode {
 				helper.withMavenWorkspace(jdk: buildEnv.jdkTool) {
-					if ( buildEnv.testJavaVersion == '8' ) {
-						// JVM options such as --add-opens won't work on JDK 8
-						sh 'rm .mvn/jvm.config'
-					}
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
 							-pl tck-runner \
