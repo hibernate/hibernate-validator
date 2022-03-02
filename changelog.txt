@@ -1,6 +1,28 @@
 Hibernate Validator Changelog
 =============================
 
+7.0.3.Final (2022-03-02)
+-------------------------
+
+** Bug
+    * HV-1884 Composing constraints order is unpredictable
+    * HV-1878 java.sql.Date is not supported anymore
+
+** Task
+    * HV-1888 Rename jakarta.annotation.processing.Processor to javax.annotation.processing.Processor
+    * HV-1886 Fix incontainer build for main
+    * HV-1883 Upgrade to asciidoctor-maven-plugin 2.2.2
+    * HV-1882 Use a different JDK for running Maven than for compiling/launching tests in JDK CI jobs
+    * HV-1880 Clean up Gemfile.lock that shouldn't be there
+    * HV-1877 Move the release job to a separate Jenkinsfile
+    * HV-1876 Upgrade WildFly test dependency to 26.0.1.Final
+    * HV-1875 Upgrade Weld test dependency to 4.0.2.Final
+    * HV-1874 Bump Log4j test dependency to 2.17.1
+    * HV-1873 Upgrade to forbiddenapis 3.2
+    * HV-1872 Test Hibernate Validator against OpenJDK 19
+    * HV-1871 Sign published artifacts
+    * HV-1864 Make sure we can release with JDK 17
+
 7.0.2.Final (2021-12-14)
 -------------------------
 
