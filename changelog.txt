@@ -1,6 +1,15 @@
 Hibernate Validator Changelog
 =============================
 
+6.2.3.Final (2022-03-03)
+-------------------------
+
+** Bug
+    * HV-1884 Composing constraints order is unpredictable
+
+** Task
+    * HV-1882 Use a different JDK for running Maven than for compiling/launching tests in JDK CI jobs
+
 6.2.2.Final (2022-02-10)
 -------------------------
 
