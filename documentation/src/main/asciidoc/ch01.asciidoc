@@ -46,9 +46,9 @@ implementation]:
 [subs="verbatim,attributes"]
 ----
 <dependency>
-    <groupId>org.glassfish</groupId>
-    <artifactId>jakarta.el</artifactId>
-    <version>{jakartaElVersion}</version>
+    <groupId>org.glassfish.expressly</groupId>
+    <artifactId>expressly</artifactId>
+    <version>{expresslyVersion}</version>
 </dependency>
 ----
 ====
