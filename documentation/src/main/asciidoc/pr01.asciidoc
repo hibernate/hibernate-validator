@@ -11,7 +11,7 @@ code which is really metadata about the class itself.
 
 image::application-layers.png[]
 
-Jakarta Bean Validation 2.0 - defines a metadata model and API for entity and method validation.
+Jakarta Bean Validation 3.0 defines a metadata model and API for entity and method validation.
 The default metadata source are annotations, with the ability to override and extend the meta-data
 through the use of XML. The API is not tied to a specific application tier nor programming model. It
 is specifically not tied to either web or persistence tier, and is available for both server-side
@@ -23,4 +23,4 @@ Hibernate Validator is the reference implementation of Jakarta Bean Validation. 
 well as the Jakarta Bean Validation API and TCK are all provided and distributed under the
 http://www.apache.org/licenses/LICENSE-2.0[Apache Software License 2.0].
 
-Hibernate Validator 6 and Jakarta Bean Validation 2.0 require Java 8 or later.
+Hibernate Validator 8 and Jakarta Bean Validation 3.0 require Java 11 or later.
