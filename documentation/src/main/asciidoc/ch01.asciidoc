@@ -34,8 +34,8 @@ This transitively pulls in the dependency to the Jakarta Bean Validation API
 
 Hibernate Validator requires an implementation of https://projects.eclipse.org/projects/ee4j.el[Jakarta Expression Language]
 for evaluating dynamic expressions in constraint
-violation messages (see <<section-message-interpolation>>). When your application runs in a Java EE
-container such as JBoss AS, an EL implementation is already provided by the container. In a Java SE
+violation messages (see <<section-message-interpolation>>). When your application runs in a Jakarta EE
+container such as WildFly/JBoss EAP, an EL implementation is already provided by the container. In a Java SE
 environment, however, you have to add an implementation as dependency to your POM file. For instance
 you can add the following dependency to use the Jakarta EL https://github.com/eclipse-ee4j/el-ri[reference
 implementation]:
@@ -82,7 +82,7 @@ Validator CDI portable extension by adding the following Maven dependency to you
 ----
 ====
 
-Note that adding this dependency is usually not required for applications running on a Java EE
+Note that adding this dependency is usually not required for applications running on a Jakarta EE
 application server. You can learn more about the integration of Jakarta Bean Validation and CDI in
 <<section-integration-with-cdi>>.
 

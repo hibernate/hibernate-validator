@@ -101,7 +101,7 @@
 
         <!-- URLs used in javadoc and documentation generation -->
 
-        <bv.spec.url>http://beanvalidation.org/2.0/spec/</bv.spec.url>
+        <bv.spec.url>https://jakarta.ee/specifications/bean-validation/3.0/jakarta-bean-validation-spec-3.0.html</bv.spec.url>
         <java.api-docs.base-url>https://docs.oracle.com/en/java/javase/11/docs/api</java.api-docs.base-url>
         <java.technotes.base-url>http://docs.oracle.com/javase/8/docs/technotes</java.technotes.base-url>
         <javaee.api-docs.base-url>https://jakarta.ee/specifications/platform/9/apidocs</javaee.api-docs.base-url>
