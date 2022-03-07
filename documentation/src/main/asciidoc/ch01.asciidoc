@@ -192,14 +192,14 @@ $JBOSS_HOME/bin/jboss-cli.sh patch rollback --reset-configuration=true
 You can learn more about the WildFly patching infrastructure in general https://developer.jboss.org/wiki/SingleInstallationPatching/[here] and http://www.mastertheboss.com/jboss-server/jboss-configuration/managing-wildfly-and-eap-patches[here].
 
 [[validator-gettingstarted-java9]]
-==== Running on Java 9
+==== Running on Java 11+
 
-As of Hibernate Validator {hvVersion}, support for Java 9 and the Java Platform Module System (JPMS) is experimental.
-There are no JPMS module descriptors provided yet, but Hibernate Validator is usable as automatic modules.
+Support for Java 11 and the Java Platform Module System (JPMS) is present in a preliminary form.
+There are no JPMS module descriptors provided, but Hibernate Validator is usable as automatic modules.
 
 These are the module names as declared using the `Automatic-Module-Name` header:
 
-* Jakarta Bean Validation API: `java.validation`
+* Jakarta Bean Validation API: `jakarta.validation`
 * Hibernate Validator core: `org.hibernate.validator`
 * Hibernate Validator CDI extension: `org.hibernate.validator.cdi`
 * Hibernate Validator test utilities: `org.hibernate.validator.testutils`
