@@ -171,7 +171,7 @@ extractors.
 Furthermore, parameter and return value constraints on the methods and constructors of CDI managed
 beans will automatically be validated upon invocation.
 
-When your application runs on a Java EE container, this integration is enabled by default. When
+When your application runs on a Jakarta EE container, this integration is enabled by default. When
 working with CDI in a Servlet container or in a pure Java SE environment, you can use the CDI
 portable extension provided by Hibernate Validator. To do so, add the portable extension to your
 class path as described in <<section-getting-started-cdi>>.
@@ -250,7 +250,7 @@ constructors.
 ====
 The interceptor `org.hibernate.validator.cdi.internal.interceptor.ValidationInterceptor` is
 registered by `org.hibernate.validator.cdi.internal.ValidationExtension`. This happens implicitly
-within a Java EE runtime environment or explicitly by adding the _hibernate-validator-cdi_
+within a Jakarta EE runtime environment or explicitly by adding the _hibernate-validator-cdi_
 artifact - see <<section-getting-started-cdi>>
 ====
 
@@ -353,9 +353,9 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/cdi/method
 ====
 
 
-=== Java EE
+=== Jakarta EE
 
-When your application runs on a Java EE application server such as http://wildfly.org/[WildFly],
+When your application runs on a Jakarta EE application server such as http://wildfly.org/[WildFly],
 you also can obtain `Validator` and `ValidatorFactory` instances via `@Resource` injection in
 managed objects such as EJBs etc., as shown in <<example-validator-resource-injection>>.
 
