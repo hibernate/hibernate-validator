@@ -155,7 +155,7 @@
         <version.jakarta.inject-api>2.0.1</version.jakarta.inject-api>
         <version.jakarta.persistence-api>3.1.0-RC2</version.jakarta.persistence-api>
         <!-- do not update for now, this is used for the WildFly IT -->
-        <version.jakarta.ws.rs-api>2.1.6</version.jakarta.ws.rs-api>
+        <version.jakarta.ws.rs-api>3.0.0</version.jakarta.ws.rs-api>
 
         <!-- JavaMoney dependencies -->
         <version.javax.money>1.0.1</version.javax.money>
