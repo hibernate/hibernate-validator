@@ -1,6 +1,16 @@
 Hibernate Validator Changelog
 =============================
 
+7.0.4.Final (2022-03-10)
+-------------------------
+
+** Bug
+    * HV-1889 Fix imagesdir for documentation
+
+** Task
+    * HV-1892 Update Java 9 section in documentation
+    * HV-1890 Fix Jakarta Bean Validation versions in documentation
+
 7.0.3.Final (2022-03-02)
 -------------------------
 
