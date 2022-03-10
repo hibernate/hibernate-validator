@@ -1,6 +1,19 @@
 Hibernate Validator Changelog
 =============================
 
+8.0.0.Alpha2 (2022-03-10)
+-------------------------
+
+** Bug
+    * HV-1889 Fix imagesdir for documentation
+
+** Task
+    * HV-1892 Update Java 9 section in documentation
+    * HV-1891 Update EL dependency to Expressly in documentation
+    * HV-1890 Fix Jakarta Bean Validation versions in documentation
+    * HV-1888 Rename jakarta.annotation.processing.Processor to javax.annotation.processing.Processor
+    * HV-1887 Make Java 11 the base version for Hibernate Validator 8
+
 8.0.0.Alpha1 (2022-02-28)
 -------------------------
 
