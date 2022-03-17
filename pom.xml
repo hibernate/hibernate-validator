@@ -320,7 +320,7 @@
 
         <arquillian.wildfly.jvm.args.add-opens></arquillian.wildfly.jvm.args.add-opens>
         <arquillian.wildfly.jvm.args.add-modules></arquillian.wildfly.jvm.args.add-modules>
-        <arquillian.wildfly.jvm.args>${arquillian.wildfly.jvm.args.add-opens} ${arquillian.wildfly.jvm.args.add-modules}</arquillian.wildfly.jvm.args>
+        <arquillian.wildfly.jvm.args>-Duser.language=en ${arquillian.wildfly.jvm.args.add-opens} ${arquillian.wildfly.jvm.args.add-modules}</arquillian.wildfly.jvm.args>
 
         <!-- JDK version required for the build -->
         <jdk.min.version>17</jdk.min.version>
