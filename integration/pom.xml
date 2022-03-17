@@ -27,6 +27,7 @@
         <wildfly-secondary.target-dir>${project.build.directory}/wildfly-${version.wildfly.secondary}</wildfly-secondary.target-dir>
         <wildfly-secondary.modules-dir>${wildfly-secondary.target-dir}/modules/system/layers/base</wildfly-secondary.modules-dir>
         -->
+        <surefire.jvm.args.additional>-Duser.language=en</surefire.jvm.args.additional>
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
