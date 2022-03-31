@@ -147,7 +147,7 @@
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
         <version.jakarta.enterprise.cdi-api>4.0.0-RC5</version.jakarta.enterprise.cdi-api>
-        <version.org.jboss.weld.weld>5.0.0.Beta1</version.org.jboss.weld.weld>
+        <version.org.jboss.weld.weld>5.0.0.CR2</version.org.jboss.weld.weld>
         <version.org.wildfly.arquillian>2.2.0.Final</version.org.wildfly.arquillian>
         <version.jakarta.ejb-api>4.0.0</version.jakarta.ejb-api>
         <version.jakarta.interceptor-api>2.1.0-RC3</version.jakarta.interceptor-api>
@@ -215,7 +215,7 @@
         <version.antrun.plugin>1.8</version.antrun.plugin>
         <version.assembly.plugin>3.1.0</version.assembly.plugin>
         <version.buildhelper.plugin>3.0.0</version.buildhelper.plugin>
-        <version.bundle.plugin>3.5.0</version.bundle.plugin>
+        <version.bundle.plugin>5.1.4</version.bundle.plugin>
         <version.checkstyle.plugin>3.1.1</version.checkstyle.plugin>
         <version.clean.plugin>3.0.0</version.clean.plugin>
         <version.compiler.plugin>3.8.1</version.compiler.plugin>
