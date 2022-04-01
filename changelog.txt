@@ -1,6 +1,15 @@
 Hibernate Validator Changelog
 =============================
 
+8.0.0.Alpha3 (2022-04-01)
+-------------------------
+
+** Bug
+    * HV-1895 Bundle plugin 3.5.0 produces unusable osgi values in manifest
+
+** Task
+    * HV-1893 Make test suite locale independent
+
 8.0.0.Alpha2 (2022-03-10)
 -------------------------
 
