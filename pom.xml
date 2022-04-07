@@ -153,7 +153,7 @@
         <version.jakarta.interceptor-api>2.1.0-RC3</version.jakarta.interceptor-api>
         <version.jakarta.annotation-api>2.1.0-B1</version.jakarta.annotation-api>
         <version.jakarta.inject-api>2.0.1</version.jakarta.inject-api>
-        <version.jakarta.persistence-api>3.1.0-RC2</version.jakarta.persistence-api>
+        <version.jakarta.persistence-api>3.1.0</version.jakarta.persistence-api>
         <!-- do not update for now, this is used for the WildFly IT -->
         <version.jakarta.ws.rs-api>2.1.6</version.jakarta.ws.rs-api>
 
