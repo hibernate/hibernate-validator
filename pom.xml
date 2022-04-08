@@ -150,7 +150,7 @@
         <version.org.jboss.weld.weld>5.0.0.CR2</version.org.jboss.weld.weld>
         <version.org.wildfly.arquillian>2.2.0.Final</version.org.wildfly.arquillian>
         <version.jakarta.ejb-api>4.0.0</version.jakarta.ejb-api>
-        <version.jakarta.interceptor-api>2.1.0-RC3</version.jakarta.interceptor-api>
+        <version.jakarta.interceptor-api>2.1.0</version.jakarta.interceptor-api>
         <version.jakarta.annotation-api>2.1.0</version.jakarta.annotation-api>
         <version.jakarta.inject-api>2.0.1</version.jakarta.inject-api>
         <version.jakarta.persistence-api>3.1.0</version.jakarta.persistence-api>
