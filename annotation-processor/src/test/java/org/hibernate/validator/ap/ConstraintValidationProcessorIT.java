@@ -92,7 +92,7 @@ import org.testng.annotations.Test;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-public class ConstraintValidationProcessorTest extends ConstraintValidationProcessorTestBase {
+public class ConstraintValidationProcessorIT extends ConstraintValidationProcessorITBase {
 
 	@Test
 	public void fieldLevelValidationUsingBuiltInConstraints() {
