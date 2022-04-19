@@ -41,8 +41,11 @@ public class RecordConstraintValidationProcessorTest extends ConstraintValidatio
 
 		assertFalse( compilationResult );
 
+		// given the nature of the records, a second error is thrown at line -1:
+		// "The annotation @FutureOrPresent is disallowed for the return type of this method."
 		assertThatDiagnosticsMatch(
 				diagnostics,
+				new DiagnosticExpectation( Diagnostic.Kind.ERROR, -1 ),
 				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 15 )
 		);
 	}
@@ -85,7 +88,7 @@ public class RecordConstraintValidationProcessorTest extends ConstraintValidatio
 
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 19 )
+				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 18 )
 		);
 	}
 }
