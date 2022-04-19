@@ -25,7 +25,7 @@ import org.testng.annotations.Test;
  *
  * @author Marko Bekhta
  */
-public class GroupSequenceValidationTest extends ConstraintValidationProcessorTestBase {
+public class GroupSequenceValidationIT extends ConstraintValidationProcessorITBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-451")

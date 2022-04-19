@@ -17,7 +17,7 @@ import org.testng.annotations.Test;
  *
  * @author Marko Bekhta
  */
-public class CircularNestedTypesTest extends ConstraintValidationProcessorTestBase {
+public class CircularNestedTypesIT extends ConstraintValidationProcessorITBase {
 
 	@Test
 	public void testNoInfiniteLoop() {
