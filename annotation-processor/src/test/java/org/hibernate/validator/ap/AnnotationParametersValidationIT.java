@@ -38,7 +38,7 @@ import org.testng.annotations.Test;
  *
  * @author Marko Bekhta
  */
-public class AnnotationParametersValidationTest extends ConstraintValidationProcessorTestBase {
+public class AnnotationParametersValidationIT extends ConstraintValidationProcessorITBase {
 
 	@Test
 	public void testValidSizeParameters() {
