@@ -121,14 +121,56 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-test-source-java17</id>
+                        <phase>${java-version.test.java17.add-test-source-phase}</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/java17</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
     <profiles>
         <profile>
-            <id>java14-mr-build</id>
+            <id>java17-mr-build</id>
             <activation>
-                <jdk>[14,)</jdk>
+                <jdk>[17,)</jdk>
             </activation>
             <build>
                 <plugins>
@@ -137,48 +179,17 @@
                         <artifactId>maven-compiler-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>compile-java14</id>
+                                <id>compile-java17</id>
                                 <phase>compile</phase>
                                 <goals>
                                     <goal>compile</goal>
                                 </goals>
                                 <configuration>
-                                    <release>14</release>
+                                    <release>17</release>
                                     <compileSourceRoots>
-                                        <compileSourceRoot>${project.basedir}/src/main/java14</compileSourceRoot>
+                                        <compileSourceRoot>${project.basedir}/src/main/java17</compileSourceRoot>
                                     </compileSourceRoots>
                                     <multiReleaseOutput>true</multiReleaseOutput>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>testWithJdk17</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>17</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>add-test-source</id>
-                                <phase>generate-test-sources</phase>
-                                <goals>
-                                    <goal>add-test-source</goal>
-                                </goals>
-                                <configuration>
-                                    <sources>
-                                        <source>src/test/java17</source>
-                                    </sources>
                                 </configuration>
                             </execution>
                         </executions>
