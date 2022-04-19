@@ -21,7 +21,7 @@ import org.testng.annotations.BeforeMethod;
  *
  * @author Gunnar Morling
  */
-public abstract class ConstraintValidationProcessorTestBase {
+public abstract class ConstraintValidationProcessorITBase {
 
 	protected static CompilerTestHelper compilerHelper;
 

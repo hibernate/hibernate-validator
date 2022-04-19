@@ -47,7 +47,7 @@ import org.testng.annotations.Test;
  *
  * @author Gunnar Morling
  */
-public class AnnotationTypeValidationTest extends ConstraintValidationProcessorTestBase {
+public class AnnotationTypeValidationIT extends ConstraintValidationProcessorITBase {
 
 	@Test
 	public void testThatSpecifyingConstraintAnnotationAtNonConstraintAnnotationTypeCausesCompilationError() {

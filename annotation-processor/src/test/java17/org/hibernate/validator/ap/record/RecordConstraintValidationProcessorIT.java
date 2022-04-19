@@ -12,7 +12,7 @@ import java.util.EnumSet;
 import javax.tools.Diagnostic;
 
 import org.hibernate.validator.ap.ConstraintValidationProcessor;
-import org.hibernate.validator.ap.ConstraintValidationProcessorTestBase;
+import org.hibernate.validator.ap.ConstraintValidationProcessorITBase;
 import org.hibernate.validator.ap.testutil.CompilerTestHelper;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 
@@ -24,7 +24,7 @@ import static org.testng.Assert.assertFalse;
 /**
  * @author Jan Schatteman
  */
-public class RecordConstraintValidationProcessorTest extends ConstraintValidationProcessorTestBase {
+public class RecordConstraintValidationProcessorIT extends ConstraintValidationProcessorITBase {
 
 	@Test
 	public void testRecordWithInvalidConstraints() {
