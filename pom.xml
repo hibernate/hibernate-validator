@@ -277,6 +277,7 @@
         <!-- IMPORTANT: For Java 8, this must be the path to the JDK, not to the JRE -->
         <java-version.test.launcher.java_home>${java-version.test.compiler.java_home}</java-version.test.launcher.java_home>
         <java-version.test.launcher>${java-version.test.launcher.java_home}/bin/java</java-version.test.launcher>
+        <java-version.test.java17.add-test-source-phase>generate-test-sources</java-version.test.java17.add-test-source-phase>
 
         <!-- No need to build the javadocs per module. Aggregated javadocs are build in the distribution module. See also HV-894 -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
@@ -1368,6 +1369,10 @@
                     <value>8</value>
                 </property>
             </activation>
+            <properties>
+                <!-- Tests specific to Java 17+ won't work with JDK 8, so we disable them. -->
+                <java-version.test.java17.add-test-source-phase>none</java-version.test.java17.add-test-source-phase>
+            </properties>
             <modules>
                 <!-- Only run the OSGi tests for JDK 8 -->
                 <module>osgi</module>
@@ -1398,6 +1403,19 @@
                     </plugins>
                 </pluginManagement>
             </build>
+        </profile>
+        <profile>
+            <id>testWithJdk11</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>11</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- Tests specific to Java 17+ won't work with JDK 11, so we disable them. -->
+                <java-version.test.java17.add-test-source-phase>none</java-version.test.java17.add-test-source-phase>
+            </properties>
         </profile>
         <profile>
             <id>testWithJdk11+</id>
