@@ -72,6 +72,7 @@ public class ConstraintCheckFactory {
 		parameterChecks.put(
 				AnnotationType.CONSTRAINT_ANNOTATION,
 				new SingleValuedChecks(
+						new TypeCheck( constraintHelper, typeUtils, annotationApiHelper ),
 						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
 						new AnnotationParametersPatternCheck( annotationApiHelper ),
 						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
@@ -84,6 +85,7 @@ public class ConstraintCheckFactory {
 				AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION,
 				new MultiValuedChecks(
 						constraintHelper,
+						new TypeCheck( constraintHelper, typeUtils, annotationApiHelper ),
 						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
 						new AnnotationParametersPatternCheck( annotationApiHelper ),
 						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
