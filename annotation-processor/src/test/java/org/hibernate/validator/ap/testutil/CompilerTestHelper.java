@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.annotation.processing.Processor;
@@ -253,7 +254,7 @@ public class CompilerTestHelper {
 		Set<DiagnosticExpectation> theValue = CollectionHelper.newTreeSet();
 
 		for ( Diagnostic<? extends JavaFileObject> diagnostic : diagnosticsList ) {
-			theValue.add( new DiagnosticExpectation( diagnostic.getKind(), diagnostic.getLineNumber() ) );
+			theValue.add( new DiagnosticExpectation( diagnostic.getKind(), diagnostic.getLineNumber(), diagnostic.getMessage( Locale.ROOT ) ) );
 		}
 
 		return theValue;
