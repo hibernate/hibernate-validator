@@ -19,9 +19,18 @@ public class DiagnosticExpectation implements Comparable<DiagnosticExpectation> 
 
 	private final long lineNumber;
 
+	private final String message;
+
 	public DiagnosticExpectation(Kind kind, long lineNumber) {
 		this.kind = kind;
 		this.lineNumber = lineNumber;
+		this.message = null;
+	}
+
+	public DiagnosticExpectation(Kind kind, long lineNumber, String message) {
+		this.kind = kind;
+		this.lineNumber = lineNumber;
+		this.message = message;
 	}
 
 	public Kind getKind() {
@@ -34,7 +43,7 @@ public class DiagnosticExpectation implements Comparable<DiagnosticExpectation> 
 
 	@Override
 	public String toString() {
-		return "DiagnosticExpectation [kind=" + kind + ", lineNumber=" + lineNumber + "]";
+		return "DiagnosticExpectation [kind=" + kind + ", lineNumber=" + lineNumber + ", message=" + message + "]";
 	}
 
 	@Override
