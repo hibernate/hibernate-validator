@@ -288,7 +288,7 @@ stage('Non-default environments') {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
 							-pl tck-runner \
-							-Dincontainer \
+							-Dincontainer -Dincontainer-prepared \
 					"""
 				}
 			}
