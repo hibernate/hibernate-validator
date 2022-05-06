@@ -133,6 +133,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private BeanMetaDataClassNormalizer beanMetaDataClassNormalizer;
 	private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
 	private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
+	private boolean hideValidationValueFromTraceLogging;
 
 	protected AbstractConfigurationImpl(BootstrapState state) {
 		this();
@@ -659,6 +660,16 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	public ExpressionLanguageFeatureLevel getCustomViolationExpressionLanguageFeatureLevel() {
 		return customViolationExpressionLanguageFeatureLevel;
+	}
+
+	@Override
+	public T hideValidationValuesFromTraceLogging(boolean enabled) {
+		this.hideValidationValueFromTraceLogging = enabled;
+		return thisAsT();
+	}
+
+	public final boolean getHideValidationValueFromTraceLogging() {
+		return this.hideValidationValueFromTraceLogging;
 	}
 
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {

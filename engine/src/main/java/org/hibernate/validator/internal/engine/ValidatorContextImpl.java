@@ -143,6 +143,12 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
+	public HibernateValidatorContext hideValidationValueFromTraceLogging(boolean enabled) {
+		validatorFactoryScopedContextBuilder.setHideValidationValueFromTraceLogging( enabled );
+		return this;
+	}
+
+	@Override
 	public Validator getValidator() {
 		return validatorFactory.createValidator(
 				constraintValidatorFactory,

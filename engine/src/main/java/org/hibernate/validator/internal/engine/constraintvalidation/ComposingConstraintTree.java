@@ -77,11 +77,15 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 		if ( mainConstraintNeedsEvaluation( validationContext, violatedConstraintValidatorContexts ) ) {
 
 			if ( LOG.isTraceEnabled() ) {
-				LOG.tracef(
-						"Validating value %s against constraint defined by %s.",
-						valueContext.getCurrentValidatedValue(),
-						descriptor
-				);
+				if ( validationContext.isHideValidationValueFromTraceLogging() ) {
+					LOG.tracef(
+							"Validating value %s against constraint defined by %s.",
+							valueContext.getCurrentValidatedValue(),
+							descriptor );
+				}
+				else {
+					LOG.tracef( "Validating against constraint defined by %s.", descriptor );
+				}
 			}
 
 			// find the right constraint validator
