@@ -169,6 +169,13 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	String CUSTOM_VIOLATION_EXPRESSION_LANGUAGE_FEATURE_LEVEL = "hibernate.validator.custom_violation_expression_language_feature_level";
 
 	/**
+	 * Property to hide values from trace level logging when validating constraints
+	 * @since 6.2
+	 */
+	@Incubating
+	String HIDE_VALIDATION_VALUE_FROM_TRACE_LOGGING = "hibernate.validator.hide_validation_value_from_trace_logging";
+
+	/**
 	 * <p>
 	 * Returns the {@link ResourceBundleLocator} used by the
 	 * {@link Configuration#getDefaultMessageInterpolator() default message
@@ -480,4 +487,10 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	S customViolationExpressionLanguageFeatureLevel(ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel);
+
+	/*
+	 * Hide sensitive values
+	 */
+	@Incubating
+	S hideValidationValuesFromTraceLogging(boolean enabled);
 }

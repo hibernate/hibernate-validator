@@ -417,6 +417,23 @@ final class ValidatorFactoryConfigurationHelper {
 		);
 	}
 
+	static boolean determineHideValidationValueFromTraceLogging(AbstractConfigurationImpl<?> configuration, Map<String, String> properties) {
+		// check whether hiding the validation values from trace logging is programmatically enabled
+		boolean tmpHideValidationValueFromTraceLogging = configuration != null ? configuration.getHideValidationValueFromTraceLogging() : false;
+
+		String propertyStringValue = properties.get( HibernateValidatorConfiguration.HIDE_VALIDATION_VALUE_FROM_TRACE_LOGGING );
+		if ( propertyStringValue != null ) {
+			boolean configurationValue = Boolean.valueOf( propertyStringValue );
+			// throw an exception if the programmatic value is true and it overrides a false configured value
+			if ( tmpHideValidationValueFromTraceLogging && !configurationValue ) {
+				throw LOG.getInconsistentHideValidationValueFromTraceLoggingViolationConfigurationException();
+			}
+			tmpHideValidationValueFromTraceLogging = configurationValue;
+		}
+
+		return tmpHideValidationValueFromTraceLogging;
+	}
+
 	static void logValidatorFactoryScopedConfiguration(ValidatorFactoryScopedContext context) {
 		LOG.logValidatorFactoryScopedConfiguration( context.getMessageInterpolator().getClass(), "message interpolator" );
 		LOG.logValidatorFactoryScopedConfiguration( context.getTraversableResolver().getClass(), "traversable resolver" );

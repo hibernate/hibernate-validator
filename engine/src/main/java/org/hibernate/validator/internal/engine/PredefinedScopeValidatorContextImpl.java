@@ -103,6 +103,12 @@ public class PredefinedScopeValidatorContextImpl implements HibernateValidatorCo
 	}
 
 	@Override
+	public HibernateValidatorContext hideValidationValueFromTraceLogging(boolean enabled) {
+		validatorFactoryScopedContextBuilder.setHideValidationValueFromTraceLogging( enabled );
+		return this;
+	}
+
+	@Override
 	public Validator getValidator() {
 		return validatorFactory.createValidator( validatorFactoryScopedContextBuilder.build() );
 	}
