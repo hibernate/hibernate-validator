@@ -76,6 +76,8 @@ public class ValidatorScopedContext {
 	 */
 	private final ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 
+	private final boolean hideValidationValueFromTraceLogging;
+
 	public ValidatorScopedContext(ValidatorFactoryScopedContext validatorFactoryScopedContext) {
 		this.messageInterpolator = validatorFactoryScopedContext.getMessageInterpolator();
 		this.parameterNameProvider = validatorFactoryScopedContext.getParameterNameProvider();
@@ -87,6 +89,7 @@ public class ValidatorScopedContext {
 		this.constraintValidatorPayload = validatorFactoryScopedContext.getConstraintValidatorPayload();
 		this.constraintExpressionLanguageFeatureLevel = validatorFactoryScopedContext.getConstraintExpressionLanguageFeatureLevel();
 		this.customViolationExpressionLanguageFeatureLevel = validatorFactoryScopedContext.getCustomViolationExpressionLanguageFeatureLevel();
+		this.hideValidationValueFromTraceLogging = validatorFactoryScopedContext.isHideValidationValueFromTraceLogging();
 	}
 
 	public MessageInterpolator getMessageInterpolator() {
@@ -127,5 +130,9 @@ public class ValidatorScopedContext {
 
 	public ExpressionLanguageFeatureLevel getCustomViolationExpressionLanguageFeatureLevel() {
 		return customViolationExpressionLanguageFeatureLevel;
+	}
+
+	public boolean isHideValidationValueFromTraceLogging() {
+		return hideValidationValueFromTraceLogging;
 	}
 }

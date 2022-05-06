@@ -40,6 +40,8 @@ public interface ValidationContext<T> {
 
 	boolean isFailFastModeEnabled();
 
+	boolean isHideValidationValueFromTraceLogging();
+
 	ConstraintValidatorManager getConstraintValidatorManager();
 
 	HibernateConstraintValidatorInitializationContext getConstraintValidatorInitializationContext();
