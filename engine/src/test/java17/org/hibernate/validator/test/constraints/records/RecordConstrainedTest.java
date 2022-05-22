@@ -6,15 +6,27 @@
  */
 package org.hibernate.validator.test.constraints.records;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.OverridesAttribute;
+import jakarta.validation.Payload;
+import jakarta.validation.Valid;
 import jakarta.validation.Validator;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutils.ValidatorUtil;
@@ -22,8 +34,11 @@ import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 /**
@@ -61,6 +76,36 @@ public class RecordConstrainedTest extends AbstractConstrainedTest {
 		violations = validator.validate( r );
 		assertThat( violations ).containsOnlyViolations( violationOf( Positive.class ).withProperty( "age" ) );
 		assertThat( violations ).containsOnlyViolations( violationOf( Positive.class ).withMessage( "Age has to be a strictly positive integer" ) );
+	}
+
+	@Test
+	public void testRecordWithComposedConstraint() {
+		Set<ConstraintViolation<NameRecord>> violations = validator.validate( new NameRecord( "a", "b" ) );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withProperty( "first" ),
+				violationOf( Size.class ).withProperty( "last" )
+		);
+	}
+
+	@Test
+	public void testRecordWithCascading() {
+		Set<ConstraintViolation<UserRecord>> violations = validator.validate(
+				new UserRecord( new NameRecord( "a", "bbbb" ), "not_an_email" )
+		);
+
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Email.class ).withProperty( "email" ),
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.property( "name" )
+						.property( "first" )
+				)
+		);
+	}
+
+	@Test
+	public void testRecordWithComposingConstraintAndIncorrectTarget() {
+		Set<ConstraintViolation<BadNameRecord>> violations = validator.validate( new BadNameRecord( "a", "b" ) );
+		assertThat( violations ).isEmpty();
 	}
 
 	@Test
@@ -152,6 +197,15 @@ public class RecordConstrainedTest extends AbstractConstrainedTest {
 	private record PersonRecord(@NotBlank(message = "Name cannot be null or empty") String name, @Positive(message = "Age has to be a strictly positive integer") int age) {
 	}
 
+	private record BadNameRecord(@AtLeastNCharactersWrongTarget(min = 2) String first, @AtLeastNCharactersWrongTarget(min = 2) String last) {
+	}
+
+	private record NameRecord(@AtLeastNCharacters(min = 2) String first, @AtLeastNCharacters(min = 2) String last) {
+	}
+
+	private record UserRecord(@Valid NameRecord name, @Email String email) {
+	}
+
 	private record ConstructorValidationRecord(String name, int age) implements ConstructorValidator {
 		private ConstructorValidationRecord(@NotBlank(message = "Name cannot be null or empty") String name, @Positive(message = "Age has to be a strictly positive integer") int age) {
 			validate( name, age );
@@ -203,5 +257,41 @@ public class RecordConstrainedTest extends AbstractConstrainedTest {
 				throw new ConstraintViolationException( message, violations );
 			}
 		}
+	}
+
+	@Size
+	@NotNull
+	@Documented
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({FIELD})
+	@Constraint(validatedBy = {})
+	@interface AtLeastNCharacters {
+
+		@OverridesAttribute(constraint = Size.class, name = "min")
+		int min() default 0;
+
+		String message() default "message";
+
+		Class<?>[] groups() default {};
+
+		Class<? extends Payload>[] payload() default {};
+	}
+
+	@Size
+	@NotNull
+	@Documented
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({METHOD})
+	@Constraint(validatedBy = {})
+	@interface AtLeastNCharactersWrongTarget {
+
+		@OverridesAttribute(constraint = Size.class, name = "min")
+		int min() default 0;
+
+		String message() default "message";
+
+		Class<?>[] groups() default {};
+
+		Class<? extends Payload>[] payload() default {};
 	}
 }
