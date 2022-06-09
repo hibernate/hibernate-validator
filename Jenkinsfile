@@ -123,7 +123,11 @@ stage('Configure') {
 							condition: TestCondition.BEFORE_MERGE),
 					new JdkBuildEnvironment(testJavaVersion: '18', testCompilerTool: 'OpenJDK 18 Latest',
 							condition: TestCondition.AFTER_MERGE),
+					// We want to enable preview features when testing early-access builds of OpenJDK:
+					// even if we don't use these features, just enabling them can cause side effects
+					// and it's useful to test that.
 					new JdkBuildEnvironment(testJavaVersion: '19', testCompilerTool: 'OpenJDK 19 Latest',
+							testLauncherArgs: '--enable-preview',
 							condition: TestCondition.AFTER_MERGE)
 			],
 			wildflyTck: [
@@ -352,6 +356,7 @@ abstract class BuildEnvironment {
 	String testJavaVersion
 	String testCompilerTool
 	String testLauncherTool
+	String testLauncherArgs
 	String toString() { getTag() }
 	abstract String getTag()
 	boolean isDefault() { isDefault }
@@ -496,6 +501,10 @@ String toTestJdkArg(BuildEnvironment buildEnv) {
 	String version = buildEnv.testJavaVersion
 	if ( defaultVersion != version ) {
 		args += " -Djava-version.test.release=$version"
+	}
+
+	if ( buildEnv.testLauncherArgs ) {
+		args += " -Dsurefire.jvm.args.commandline=${buildEnv.testLauncherArgs}"
 	}
 
 	return args
