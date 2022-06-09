@@ -939,6 +939,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 264, value = "Unable to interpolate EL expression '%s' as it uses a disabled feature.")
 	void disabledFeatureInExpressionLanguage(String expression, @Cause Exception e);
 
-	@Message(id = 265, value = "Inconsistent hide validation value from trace logging configuration. It is enabled via programmatic API, but explicitly disabled via properties.")
-	ValidationException getInconsistentHideValidationValueFromTraceLoggingViolationConfigurationException();
+	@Message(id = 265, value = "Inconsistent show validation value in trace logs configuration. It is enabled via programmatic API, but explicitly disabled via properties.")
+	ValidationException getInconsistentShowValidatedValuesInTraceLogsViolationConfigurationException();
 }

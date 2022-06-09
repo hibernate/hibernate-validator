@@ -84,10 +84,9 @@ public class ValidatorFactoryScopedContext {
 	private final HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
 
 	/**
-	 * Hibernate Validator specific flag to not log values being validated at TRACE logging level
-	 * to hide sensitive information
+	 * Hibernate Validator specific flag to log values being validated at TRACE logging level.
 	 */
-	private final boolean hideValidationValueFromTraceLogging;
+	private final boolean showValidatedValuesInTraceLogs;
 
 	ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
@@ -100,10 +99,10 @@ public class ValidatorFactoryScopedContext {
 			Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
 			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
-			boolean hideValidationValueFromTraceLogging) {
+			boolean showValidatedValuesInTraceLogs) {
 		this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
-				traversableResolverResultCacheEnabled, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
-				customViolationExpressionLanguageFeatureLevel, hideValidationValueFromTraceLogging,
+				traversableResolverResultCacheEnabled, showValidatedValuesInTraceLogs, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
+				customViolationExpressionLanguageFeatureLevel,
 				new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
 						temporalValidationTolerance ) );
 	}
@@ -116,10 +115,9 @@ public class ValidatorFactoryScopedContext {
 			ScriptEvaluatorFactory scriptEvaluatorFactory,
 			boolean failFast,
 			boolean traversableResolverResultCacheEnabled,
-			Object constraintValidatorPayload,
+			boolean showValidatedValuesInTraceLogs, Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
 			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
-			boolean hideValidationValueFromTraceLogging,
 			HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext) {
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
@@ -132,7 +130,7 @@ public class ValidatorFactoryScopedContext {
 		this.constraintValidatorPayload = constraintValidatorPayload;
 		this.constraintExpressionLanguageFeatureLevel = constraintExpressionLanguageFeatureLevel;
 		this.customViolationExpressionLanguageFeatureLevel = customViolationExpressionLanguageFeatureLevel;
-		this.hideValidationValueFromTraceLogging = hideValidationValueFromTraceLogging;
+		this.showValidatedValuesInTraceLogs = showValidatedValuesInTraceLogs;
 		this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
 	}
 
@@ -184,8 +182,8 @@ public class ValidatorFactoryScopedContext {
 		return this.customViolationExpressionLanguageFeatureLevel;
 	}
 
-	public boolean isHideValidationValueFromTraceLogging() {
-		return hideValidationValueFromTraceLogging;
+	public boolean isShowValidatedValuesInTraceLogs() {
+		return showValidatedValuesInTraceLogs;
 	}
 
 	static class Builder {
@@ -203,7 +201,7 @@ public class ValidatorFactoryScopedContext {
 		private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
 		private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 
-		private boolean hideValidationValueFromTraceLogging;
+		private boolean showValidatedValuesInTraceLogs;
 		private HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
 
 		Builder(ValidatorFactoryScopedContext defaultContext) {
@@ -221,7 +219,7 @@ public class ValidatorFactoryScopedContext {
 			this.constraintValidatorPayload = defaultContext.constraintValidatorPayload;
 			this.constraintExpressionLanguageFeatureLevel = defaultContext.constraintExpressionLanguageFeatureLevel;
 			this.customViolationExpressionLanguageFeatureLevel = defaultContext.customViolationExpressionLanguageFeatureLevel;
-			this.hideValidationValueFromTraceLogging = defaultContext.hideValidationValueFromTraceLogging;
+			this.showValidatedValuesInTraceLogs = defaultContext.showValidatedValuesInTraceLogs;
 			this.constraintValidatorInitializationContext = defaultContext.constraintValidatorInitializationContext;
 		}
 
@@ -308,9 +306,9 @@ public class ValidatorFactoryScopedContext {
 			return this;
 		}
 
-		public ValidatorFactoryScopedContext.Builder setHideValidationValueFromTraceLogging(
-				boolean hideValidationValueFromTraceLogging) {
-			this.hideValidationValueFromTraceLogging = hideValidationValueFromTraceLogging;
+		public ValidatorFactoryScopedContext.Builder setShowValidatedValuesInTraceLogs(
+				boolean showValidatedValuesInTraceLogs) {
+			this.showValidatedValuesInTraceLogs = showValidatedValuesInTraceLogs;
 			return this;
 		}
 
@@ -324,10 +322,9 @@ public class ValidatorFactoryScopedContext {
 					scriptEvaluatorFactory,
 					failFast,
 					traversableResolverResultCacheEnabled,
-					constraintValidatorPayload,
+					showValidatedValuesInTraceLogs, constraintValidatorPayload,
 					constraintExpressionLanguageFeatureLevel,
 					customViolationExpressionLanguageFeatureLevel,
-					hideValidationValueFromTraceLogging,
 					HibernateConstraintValidatorInitializationContextImpl.of(
 							constraintValidatorInitializationContext,
 							scriptEvaluatorFactory,

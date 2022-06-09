@@ -170,12 +170,12 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	/**
 	 * Define whether values that are currently being validated should be part of the logging at trace level, or not.
 	 *
-	 * @param enabled {@code true} to hide the values at trace level, {@code false} otherwise.
+	 * @param enabled {@code true} to show the values at trace level, {@code false} otherwise.
 	 *
 	 * @return {@code this} following the chaining method pattern
 	 *
-	 * @since 8.0.0
+	 * @since 8.0
 	 */
 	@Incubating
-	HibernateValidatorContext hideValidationValueFromTraceLogging(boolean enabled);
+	HibernateValidatorContext showValidatedValuesInTraceLogs(boolean enabled);
 }
