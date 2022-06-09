@@ -40,7 +40,7 @@ public interface ValidationContext<T> {
 
 	boolean isFailFastModeEnabled();
 
-	boolean isHideValidationValueFromTraceLogging();
+	boolean isShowValidatedValuesInTraceLogs();
 
 	ConstraintValidatorManager getConstraintValidatorManager();
 

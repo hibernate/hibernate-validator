@@ -172,8 +172,8 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	}
 
 	@Override
-	public boolean isHideValidationValueFromTraceLogging() {
-		return validatorScopedContext.isHideValidationValueFromTraceLogging();
+	public boolean isShowValidatedValuesInTraceLogs() {
+		return validatorScopedContext.isShowValidatedValuesInTraceLogs();
 	}
 
 	@Override

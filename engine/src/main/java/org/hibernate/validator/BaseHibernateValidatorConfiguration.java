@@ -169,11 +169,12 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	String CUSTOM_VIOLATION_EXPRESSION_LANGUAGE_FEATURE_LEVEL = "hibernate.validator.custom_violation_expression_language_feature_level";
 
 	/**
-	 * Property to hide values from trace level logging when validating constraints
-	 * @since 6.2
+	 * Property for trace level logs to include values under validation when constraint checks are executed.
+	 *
+	 * @since 8.0
 	 */
 	@Incubating
-	String HIDE_VALIDATION_VALUE_FROM_TRACE_LOGGING = "hibernate.validator.hide_validation_value_from_trace_logging";
+	String SHOW_VALIDATED_VALUE_IN_TRACE_LOGS = "hibernate.validator.show_validated_value_in_trace_logs";
 
 	/**
 	 * <p>
@@ -488,9 +489,16 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	@Incubating
 	S customViolationExpressionLanguageFeatureLevel(ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel);
 
-	/*
-	 * Hide sensitive values
+	/**
+	 * Allows setting the logging configuration that would include validated values in trace level logs.
+	 * <p>
+	 * By default, values will not be printed to the logs as they might contain sensitive data.
+	 *
+	 * @param enabled flag determining whether validated values will be printed out into trace level logs or not.
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 8.0
 	 */
 	@Incubating
-	S hideValidationValuesFromTraceLogging(boolean enabled);
+	S showValidatedValuesInTraceLogs(boolean enabled);
 }

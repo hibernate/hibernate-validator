@@ -43,7 +43,7 @@ class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts) {
 
 		if ( LOG.isTraceEnabled() ) {
-			if ( validationContext.isHideValidationValueFromTraceLogging() ) {
+			if ( validationContext.isShowValidatedValuesInTraceLogs() ) {
 					LOG.tracef(
 							"Validating value %s against constraint defined by %s.",
 							valueContext.getCurrentValidatedValue(),
