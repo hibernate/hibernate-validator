@@ -297,6 +297,8 @@
         <maven.compiler.testRelease>${java-version.test.release}</maven.compiler.testRelease>
 
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
+        <!-- Argument passed from the command line -->
+        <surefire.jvm.args.commandline></surefire.jvm.args.commandline>
         <surefire.jvm.args.additional></surefire.jvm.args.additional>
         <surefire.jvm.args.illegal-access></surefire.jvm.args.illegal-access>
         <surefire.jvm.args.add-opens></surefire.jvm.args.add-opens>
@@ -309,8 +311,8 @@
         <surefire.jvm.args.shrinkwrap>
             -Dmaven.repo.local=${settings.localRepository}
         </surefire.jvm.args.shrinkwrap>
-        <surefire.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access} ${surefire.jvm.args.shrinkwrap} ${surefire.jvm.args.java-version}</surefire.jvm.args>
-        <failsafe.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access} ${surefire.jvm.args.shrinkwrap} ${surefire.jvm.args.java-version}</failsafe.jvm.args>
+        <surefire.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access} ${surefire.jvm.args.shrinkwrap} ${surefire.jvm.args.java-version} ${surefire.jvm.args.commandline}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access} ${surefire.jvm.args.shrinkwrap} ${surefire.jvm.args.java-version} ${surefire.jvm.args.commandline}</failsafe.jvm.args>
 
         <!--
             Should be set from the command line.
