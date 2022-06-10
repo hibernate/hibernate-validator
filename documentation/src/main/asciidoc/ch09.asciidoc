@@ -545,6 +545,44 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CustomScri
 ----
 ====
 
+==== Logging of values under validation
+
+In some cases it might be useful to inspect logs produced by Hibernate Validator.
+When the log level is set to `TRACE` validator will produce, among others,
+log entries containing the descriptor of constraints that are evaluated. By default, values under validation are not going
+to be visible in these messages to prevent sensitive data from getting exposed. If required, Hibernate Validator
+can be configured to print these values as well. As usual, there are a few ways to do it:
+
+.Programmatic configuration
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/LoggingConfigurationTest.java[tags=programmatic]
+----
+====
+
+.Programmatic configuration via property
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/LoggingConfigurationTest.java[tags=programmaticProperty]
+----
+====
+
+.XML configuration via property
+====
+[source, XML, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/validation-ShowValidatedValueInLogs.xml[]
+----
+====
+
+[NOTE]
+====
+Hibernate Validator versions, prior to 8.0, logged both value and constraint descriptor
+if logging level was set to `TRACE`.
+====
+
 [[section-configuring-validator]]
 === Configuring a Validator
 
