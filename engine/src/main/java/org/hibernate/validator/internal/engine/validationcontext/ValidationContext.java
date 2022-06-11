@@ -40,6 +40,8 @@ public interface ValidationContext<T> {
 
 	boolean isFailFastModeEnabled();
 
+	boolean isFailFastOnPropertyViolationModeEnabled();
+
 	ConstraintValidatorManager getConstraintValidatorManager();
 
 	HibernateConstraintValidatorInitializationContext getConstraintValidatorInitializationContext();
