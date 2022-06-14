@@ -44,7 +44,7 @@ Logging will delegate any log requests to that provider.
         <dependency>
            <groupId>org.glassfish.expressly</groupId>
            <artifactId>expressly</artifactId>
-           <version>5.0.0-M1</version>
+           <version>5.0.0-M2</version>
         </dependency>
 
 * Jakarta Bean Validation defines integration points with [CDI](http://jcp.org/en/jsr/detail?id=346). If your application runs
