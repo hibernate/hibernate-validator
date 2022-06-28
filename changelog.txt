@@ -1,6 +1,27 @@
 Hibernate Validator Changelog
 =============================
 
+8.0.0.CR1 (2022-06-28)
+-------------------------
+
+** Bug
+    * HV-1853 Inconsistency of getter method detection in GetterPropertySelectionStrategy
+
+** Improvement
+    * HV-1901 Provide an easy way to run the TCK with a provided WildFly
+
+** Task
+    * HV-1911 Upgrade jakarta.el-api to 5.0.1
+    * HV-1910 Update jakarta.annotation-api to 2.1.1
+    * HV-1909 Update Weld to 5.0.1.Final
+    * HV-1908 Update CDI API to 4.0.1 and Weld to 5.0.0.SP2
+    * HV-1907 Update Jakarta EL API to 5.0.0 and Expressly to 5.0.0-M2
+    * HV-1906 Update Bean Validation API to 3.0.2 and TCK to 3.0.1
+    * HV-1904 Update Jakarta EE 10 dependencies to stable versions
+    * HV-1898 Bump jakarta.persistence-api to 3.1.0
+    * HV-1897 Bump jakarta.annotation-api to 2.1.0
+    * HV-1896 Upgrade Jackson Databind test dependency to 2.13.2.2
+
 8.0.0.Alpha3 (2022-04-01)
 -------------------------
 
