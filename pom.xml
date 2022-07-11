@@ -1482,7 +1482,7 @@
             </properties>
         </profile>
         <profile>
-            <id>jdk19+</id>
+            <id>testWithJdk19</id>
             <activation>
                 <property>
                     <name>java-version.test.release</name>
@@ -1493,6 +1493,21 @@
                 <!-- ForbiddenAPIs doesn't work with JDK19+ yet -->
                 <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK19+ -->
+                <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
+            </properties>
+        </profile>
+        <profile>
+            <id>testWithJdk20</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>20</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- ForbiddenAPIs doesn't work with JDK20+ yet -->
+                <forbiddenapis.skip>true</forbiddenapis.skip>
+                <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK20+ -->
                 <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
             </properties>
         </profile>

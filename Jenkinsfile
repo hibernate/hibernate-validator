@@ -128,6 +128,9 @@ stage('Configure') {
 					// and it's useful to test that.
 					new JdkBuildEnvironment(testJavaVersion: '19', testCompilerTool: 'OpenJDK 19 Latest',
 							testLauncherArgs: '--enable-preview',
+							condition: TestCondition.AFTER_MERGE),
+					new JdkBuildEnvironment(testJavaVersion: '20', testCompilerTool: 'OpenJDK 20 Latest',
+							testLauncherArgs: '--enable-preview',
 							condition: TestCondition.AFTER_MERGE)
 			],
 			wildflyTck: [
