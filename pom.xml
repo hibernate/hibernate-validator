@@ -213,7 +213,7 @@
         <!-- Maven plugins versions -->
 
         <version.antrun.plugin>1.8</version.antrun.plugin>
-        <version.assembly.plugin>3.1.0</version.assembly.plugin>
+        <version.assembly.plugin>3.4.2</version.assembly.plugin>
         <version.buildhelper.plugin>3.0.0</version.buildhelper.plugin>
         <version.bundle.plugin>5.1.4</version.bundle.plugin>
         <version.checkstyle.plugin>3.1.1</version.checkstyle.plugin>
@@ -966,22 +966,6 @@
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>${version.assembly.plugin}</version>
-                    <dependencies>
-                        <!--
-                        We need to use a more recent version of the plexus-archiver to support JDK 9
-                        due to https://github.com/codehaus-plexus/plexus-archiver/pull/12
-                        -->
-                        <dependency>
-                            <groupId>org.codehaus.plexus</groupId>
-                            <artifactId>plexus-archiver</artifactId>
-                            <version>3.4</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.codehaus.plexus</groupId>
-                            <artifactId>plexus-io</artifactId>
-                            <version>2.7.1</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
                 <plugin>
                     <artifactId>maven-release-plugin</artifactId>
