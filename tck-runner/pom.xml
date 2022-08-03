@@ -75,7 +75,7 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.protocol</groupId>
-            <artifactId>arquillian-protocol-servlet</artifactId>
+            <artifactId>arquillian-protocol-servlet-jakarta</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -255,7 +255,7 @@
             </activation>
             <properties>
                 <surefire.jvm.args.additional>-DincludeJavaFXTests=true -Xmx1024m -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Duser.language=en</surefire.jvm.args.additional>
-                <arquillian.protocol>Servlet 3.0</arquillian.protocol>
+                <arquillian.protocol>Servlet 5.0</arquillian.protocol>
             </properties>
             <dependencies>
                 <dependency>
@@ -383,7 +383,7 @@
             </activation>
             <properties>
                 <surefire.jvm.args.additional>-Xmx1024m -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Duser.language=en</surefire.jvm.args.additional>
-                <arquillian.protocol>Servlet 3.0</arquillian.protocol>
+                <arquillian.protocol>Servlet 5.0</arquillian.protocol>
             </properties>
             <dependencies>
                 <dependency>
