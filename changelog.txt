@@ -1,6 +1,21 @@
 Hibernate Validator Changelog
 =============================
 
+7.0.5.Final (2022-08-03)
+-------------------------
+
+** Bug
+    * HV-1863 hibernate-validator-annotation-processor 6.2.0.Final (Spring Boot managed) isn't Java 17 compatible
+
+** Improvement
+    * HV-1900 Add annotation TypeCheck to parameter checks in AnnotationProcessor
+
+** Task
+    * HV-1920 Upgrade Spring Expression test dependency to 5.3.22
+    * HV-1919 Upgrade Maven Assembly Plugin to 3.4.2
+    * HV-1896 Upgrade Jackson Databind test dependency to 2.13.2.2
+    * HV-1893 Make test suite locale independent
+
 7.0.4.Final (2022-03-10)
 -------------------------
 
