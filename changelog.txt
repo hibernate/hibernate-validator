@@ -1,6 +1,17 @@
 Hibernate Validator Changelog
 =============================
 
+8.0.0.CR2 (2022-08-04)
+-------------------------
+
+** Bug
+    * HV-1922 Switch to use arquillian-protocol-servlet-jakarta artifact instead of arquillian-protocol-servlet for testing with WildFly 27
+
+** Task
+    * HV-1920 Upgrade Spring Expression test dependency to 5.3.22
+    * HV-1919 Upgrade Maven Assembly Plugin to 3.4.2
+    * HV-1914 Test against JDK 20 (early access)
+
 8.0.0.CR1 (2022-06-28)
 -------------------------
 
