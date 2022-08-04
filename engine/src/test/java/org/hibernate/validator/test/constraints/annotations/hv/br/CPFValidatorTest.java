@@ -138,6 +138,7 @@ public class CPFValidatorTest extends AbstractConstrainedTest {
 		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "134241313-00" ) );
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( CPF.class ).withProperty( "cpf" )
+		);
 	}
 
 	public static class Person {
