@@ -93,14 +93,7 @@ public class CPFValidatorTest extends AbstractConstrainedTest {
 		violations = validator.validate( new Person( "33181429643" ) );
 		assertNoViolations( violations );
 	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-979")
-	public void correct_cpf_with_dash_only_separator_validates() {
-		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "134241313-00" ) );
-		assertNoViolations( violations );
-	}
-
+	
 	@Test
 	@TestForIssue(jiraKey = "HV-808")
 	public void invalid_cpf_with_separator_creates_constraint_violation() {
@@ -137,6 +130,14 @@ public class CPFValidatorTest extends AbstractConstrainedTest {
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( CPF.class ).withProperty( "cpf" )
 		);
+	}
+	
+	@Test
+	@TestForIssue(jiraKey = "HV-1923")
+	public void correct_cpf_with_dash_only_separator_creates_constraint_violation() {
+		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "134241313-00" ) );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CPF.class ).withProperty( "cpf" )
 	}
 
 	public static class Person {
