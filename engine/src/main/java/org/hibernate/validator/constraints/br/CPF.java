@@ -31,9 +31,10 @@ import org.hibernate.validator.constraints.br.CPF.List;
  *
  * @author George Gastaldi
  * @author Victor Rezende dos Santos
+ * @author Thomas Augusto Gouveia Chaves
  */
 @Pattern.List({
-		@Pattern(regexp = "([0-9]{3}[.]?[0-9]{3}[.]?[0-9]{3}-[0-9]{2})|([0-9]{11})"),
+		@Pattern(regexp = "([0-9]{3}.[0-9]{3}.[0-9]{3}-[0-9]{2})|([0-9]{11})"),
 		// XXX.XXX.XXX-XX where X is always the same digit are not a valid CPFs, but all of them passes the mod check. Needs to be singled out each one via regexp
 		@Pattern(regexp = "^(?:(?!000\\.?000\\.?000-?00).)*$"),
 		@Pattern(regexp = "^(?:(?!111\\.?111\\.?111-?11).)*$"),
