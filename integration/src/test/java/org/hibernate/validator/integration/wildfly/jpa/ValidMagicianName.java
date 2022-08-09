@@ -11,7 +11,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

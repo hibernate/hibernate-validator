@@ -33,7 +33,7 @@ public class BeanPropertiesElContext extends StandardELContext {
 	public BeanPropertiesElContext(ExpressionFactory expressionFactory) {
 		super( expressionFactory );
 
-		// In javax.el.ELContext, the ExpressionFactory is extracted from the context map. If it is not found, it
+		// In jakarta.el.ELContext, the ExpressionFactory is extracted from the context map. If it is not found, it
 		// defaults to ELUtil.getExpressionFactory() which, if we provided the ExpressionFactory to the
 		// ResourceBundleMessageInterpolator, might not be the same. Thus, we inject the ExpressionFactory in the
 		// context.

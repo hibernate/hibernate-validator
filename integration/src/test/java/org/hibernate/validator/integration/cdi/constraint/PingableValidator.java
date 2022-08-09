@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.integration.cdi.constraint;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

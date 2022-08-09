@@ -115,6 +115,6 @@ public class ValidatorBean implements Bean<Validator>, PassivationCapable {
 
 	@Override
 	public String toString() {
-		return "ValidatorBean [id=" + getId() + "]";
+		return "ValidatorBean [id=" + getId() + ", qualifiers=" + getQualifiers() + "]";
 	}
 }

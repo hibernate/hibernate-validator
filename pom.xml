@@ -126,7 +126,7 @@
         <version.org.jboss.logging.jboss-logging-tools>2.2.1.Final</version.org.jboss.logging.jboss-logging-tools>
 
         <!-- Currently supported version of WildFly -->
-        <version.wildfly>26.0.1.Final</version.wildfly>
+        <version.wildfly>27.0.0.Alpha4</version.wildfly>
         <!-- Used to create a patch file for the second version of WildFly we support -->
         <!--<version.wildfly.secondary>18.0.1.Final</version.wildfly.secondary>-->
         <!-- Version used to run the TCK in incontainer mode -->
@@ -154,8 +154,7 @@
         <version.jakarta.annotation-api>2.1.1</version.jakarta.annotation-api>
         <version.jakarta.inject-api>2.0.1</version.jakarta.inject-api>
         <version.jakarta.persistence-api>3.1.0</version.jakarta.persistence-api>
-        <!-- do not update for now, this is used for the WildFly IT -->
-        <version.jakarta.ws.rs-api>2.1.6</version.jakarta.ws.rs-api>
+        <version.jakarta.ws.rs-api>3.1.0</version.jakarta.ws.rs-api>
 
         <!-- JavaMoney dependencies -->
         <version.javax.money>1.0.1</version.javax.money>
@@ -356,7 +355,7 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-validator-modules</artifactId>
                 <version>${project.version}</version>
-                <classifier>wildfly-preview-${version.wildfly}-patch</classifier>
+                <classifier>wildfly-${version.wildfly}-patch</classifier>
                 <type>zip</type>
             </dependency>
             <!--

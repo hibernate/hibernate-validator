@@ -10,7 +10,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import jakarta.validation.ParameterNameProvider;
 
 import org.hibernate.validator.integration.cdi.service.PingService;

@@ -8,14 +8,13 @@ package org.hibernate.validator.integration.wildfly;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.inject.Inject;
-import jakarta.validation.constraints.NotNull;
-
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.testng.annotations.Test;
+
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Asserts that the validation interceptor picks up a {@code Validator} provided by the application and uses it for
@@ -38,7 +37,7 @@ public class MethodValidationWithCustomValidatorIT extends AbstractArquillianIT 
 	public static Archive<?> createTestArchive() {
 		return buildTestArchive( WAR_FILE_NAME )
 				.addClasses( MyValidator.class )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsWebInfResource( BEANS_XML, "beans.xml" );
 	}
 
 	@Inject

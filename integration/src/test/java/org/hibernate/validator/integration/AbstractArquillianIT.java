@@ -8,6 +8,7 @@ package org.hibernate.validator.integration;
 
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
@@ -18,6 +19,11 @@ import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
  * @author Guillaume Smet
  */
 public abstract class AbstractArquillianIT extends Arquillian {
+
+	protected static StringAsset BEANS_XML = new StringAsset( "<beans xmlns=\"https://jakarta.ee/xml/ns/jakartaee\" " +
+			"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+			"xsi:schemaLocation=\"https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/beans_3_0.xsd\"\n" +
+			"bean-discovery-mode=\"all\"></beans>" );
 
 	public static WebArchive buildTestArchive(String warFileName) {
 		PomEquippedResolveStage pom = Maven.resolver().loadPomFromFile( "pom.xml" );

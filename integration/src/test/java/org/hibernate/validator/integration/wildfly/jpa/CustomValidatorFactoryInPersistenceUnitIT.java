@@ -9,18 +9,16 @@ package org.hibernate.validator.integration.wildfly.jpa;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.fail;
 
-import javax.inject.Inject;
-
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.asset.Asset;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.testng.annotations.Test;
 
+import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
 
 /**
@@ -40,7 +38,7 @@ public class CustomValidatorFactoryInPersistenceUnitIT extends AbstractArquillia
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsResource( "validation.xml", "META-INF/validation.xml" )
 				.addAsResource( "constraints-magician.xml", "META-INF/validation/constraints-magician.xml" )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsWebInfResource( BEANS_XML, "beans.xml" );
 	}
 
 	private static Asset persistenceXml() {

@@ -10,11 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 
-import javax.inject.Inject;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
-import jakarta.validation.constraints.NotNull;
-
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -22,13 +17,17 @@ import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.asset.Asset;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.validationConfiguration11.ValidationConfigurationDescriptor;
 import org.jboss.shrinkwrap.descriptor.api.validationMapping11.ValidationMappingDescriptor;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.testng.annotations.Test;
+
+import jakarta.inject.Inject;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Test for https://hibernate.atlassian.net/browse/HV-1280. To reproduce the issue, the deployment must be done twice
@@ -54,7 +53,7 @@ public class JaxpContainedInDeploymentIT extends AbstractArquillianIT {
 				.addAsResource( validationXml(), "META-INF/validation.xml" )
 				.addAsResource( mappingXml(), "META-INF/my-mapping.xml" )
 				.addAsLibrary( Maven.resolver().resolve( "xerces:xercesImpl:2.9.1" ).withoutTransitivity().asSingleFile() )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsWebInfResource( BEANS_XML, "beans.xml" );
 	}
 
 	private static Asset validationXml() {
