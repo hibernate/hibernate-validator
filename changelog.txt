@@ -1,6 +1,13 @@
 Hibernate Validator Changelog
 =============================
 
+8.0.0.CR3 (2022-08-09)
+-------------------------
+
+** Task
+    * HV-1925 Switch to WildFly 27 for testing and remove the remaining javax stuff
+    * HV-1924 Bump expressly from 5.0.0-M2 to 5.0.0
+
 8.0.0.CR2 (2022-08-04)
 -------------------------
 
