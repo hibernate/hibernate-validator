@@ -8,17 +8,15 @@ package org.hibernate.validator.integration.wildfly;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.inject.Inject;
-
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
 import org.hibernate.validator.integration.util.MyValidator;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.testng.annotations.Test;
 
+import jakarta.inject.Inject;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
@@ -37,10 +35,10 @@ public class CustomValidationProviderInDeploymentUnitIT extends AbstractArquilli
 		return buildTestArchive( WAR_FILE_NAME )
 				.addAsLibrary( IntegrationTestUtil.createCustomBeanValidationProviderJar()
 								.as( JavaArchive.class )
-								.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" ) )
+								.addAsManifestResource( BEANS_XML, "beans.xml" ) )
 				.addAsResource( "log4j.properties" )
 				.addAsResource( "validation-custom-provider.xml", "META-INF/validation.xml" )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsWebInfResource( BEANS_XML, "beans.xml" );
 	}
 
 	@Inject

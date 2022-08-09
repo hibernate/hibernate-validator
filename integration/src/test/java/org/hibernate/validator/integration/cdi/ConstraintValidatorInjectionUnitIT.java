@@ -8,10 +8,6 @@ package org.hibernate.validator.integration.cdi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.inject.Inject;
-import jakarta.validation.ConstraintValidatorFactory;
-import jakarta.validation.ValidatorFactory;
-
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.integration.cdi.constraint.Pingable;
@@ -19,9 +15,12 @@ import org.hibernate.validator.integration.cdi.constraint.PingableValidator;
 import org.hibernate.validator.integration.cdi.service.PingService;
 import org.hibernate.validator.integration.cdi.service.PingServiceImpl;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.annotations.Test;
+
+import jakarta.inject.Inject;
+import jakarta.validation.ConstraintValidatorFactory;
+import jakarta.validation.ValidatorFactory;
 
 /**
  * @author Hardy Ferentschik
@@ -42,7 +41,7 @@ public class ConstraintValidatorInjectionUnitIT extends AbstractArquillianIT {
 						PingServiceImpl.class,
 						PingableValidator.class
 				)
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsWebInfResource( BEANS_XML, "beans.xml" );
 	}
 
 	@Test

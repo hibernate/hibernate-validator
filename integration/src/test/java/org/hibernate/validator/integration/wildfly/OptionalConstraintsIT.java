@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.money.MonetaryAmount;
 
 import org.hibernate.validator.constraints.Currency;
@@ -18,10 +17,10 @@ import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.javamoney.moneta.Money;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.joda.time.DateTime;
 import org.testng.annotations.Test;
 
+import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.DecimalMax;
@@ -42,7 +41,7 @@ public class OptionalConstraintsIT extends AbstractArquillianIT {
 	public static Archive<?> createTestArchive() {
 		return buildTestArchive( WAR_FILE_NAME )
 				.addAsWebInfResource( "jboss-deployment-structure-optional-constraints.xml", "jboss-deployment-structure.xml" )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsWebInfResource( BEANS_XML, "beans.xml" );
 	}
 
 	@Inject

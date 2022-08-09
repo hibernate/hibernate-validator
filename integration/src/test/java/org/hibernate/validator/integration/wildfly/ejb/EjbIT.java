@@ -11,17 +11,15 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 import org.hibernate.validator.integration.AbstractArquillianIT;
-
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
+import org.testng.annotations.Test;
 
 import io.restassured.filter.log.ErrorLoggingFilter;
 import io.restassured.http.ContentType;
-import org.testng.annotations.Test;
 
 /**
  * This is a reproducer for WFL-11566, but fixing the problem requires changes in WildFly.
@@ -37,7 +35,7 @@ public class EjbIT extends AbstractArquillianIT {
 		return buildTestArchive( WAR_FILE_NAME )
 				.addClass( EjbJaxRsResource.class )
 				.addClass( JaxRsApplication.class )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
+				.addAsWebInfResource( BEANS_XML, "beans.xml" )
 				.addAsWebInfResource(
 						new StringAsset(
 								Descriptors.create( org.jboss.shrinkwrap.descriptor.api.webapp31.WebAppDescriptor.class )

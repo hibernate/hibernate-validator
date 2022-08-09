@@ -8,15 +8,14 @@ package org.hibernate.validator.integration.cdi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import jakarta.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
-import jakarta.validation.ValidatorFactory;
-
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.testng.annotations.Test;
+
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.inject.Inject;
+import jakarta.validation.ValidatorFactory;
 
 /**
  * @author Hardy Ferentschik
@@ -33,7 +32,7 @@ public class DefaultInjectionUnitIT extends AbstractArquillianIT {
 	@Deployment
 	public static WebArchive createTestArchive() throws Exception {
 		return buildTestArchive( WAR_FILE_NAME )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsWebInfResource( BEANS_XML, "beans.xml" );
 	}
 
 	@Test

@@ -11,18 +11,17 @@ import static org.testng.Assert.fail;
 
 import java.util.Set;
 
-import javax.inject.Inject;
+import org.hibernate.validator.integration.AbstractArquillianIT;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.testng.annotations.Test;
+
+import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-
-import org.hibernate.validator.integration.AbstractArquillianIT;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.testng.annotations.Test;
 
 @TestForIssue(jiraKey = "HV-978")
 public class GenericParameterTypeValidationUnitIT extends AbstractArquillianIT {
@@ -31,7 +30,7 @@ public class GenericParameterTypeValidationUnitIT extends AbstractArquillianIT {
 	@Deployment
 	public static WebArchive deployment() {
 		return buildTestArchive( WAR_FILE_NAME )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
+				.addAsWebInfResource( BEANS_XML, "beans.xml" )
 				.addPackage( GenericParameterTypeValidationUnitIT.class.getPackage() );
 	}
 

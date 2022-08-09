@@ -22,7 +22,7 @@
 
     <properties>
         <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-tests-suite.xml</tck.suite.file>
-        <wildfly.target-dir>${project.build.directory}/wildfly-preview-${version.wildfly.tck}</wildfly.target-dir>
+        <wildfly.target-dir>${project.build.directory}/wildfly-${version.wildfly.tck}</wildfly.target-dir>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug />
 
@@ -267,7 +267,7 @@
                     <groupId>${project.groupId}</groupId>
                     <artifactId>hibernate-validator-modules</artifactId>
                     <version>${project.version}</version>
-                    <classifier>wildfly-preview-${version.wildfly.tck}-patch</classifier>
+                    <classifier>wildfly-${version.wildfly.tck}-patch</classifier>
                     <type>zip</type>
                 </dependency>
             </dependencies>
@@ -286,7 +286,7 @@
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>org.wildfly</groupId>
-                                            <artifactId>wildfly-preview-dist</artifactId>
+                                            <artifactId>wildfly-dist</artifactId>
                                             <version>${version.wildfly.tck}</version>
                                             <type>tar.gz</type>
                                             <overWrite>false</overWrite>
@@ -307,7 +307,7 @@
                                             <groupId>${project.groupId}</groupId>
                                             <artifactId>hibernate-validator-modules</artifactId>
                                             <version>${project.version}</version>
-                                            <classifier>wildfly-preview-${version.wildfly.tck}-patch</classifier>
+                                            <classifier>wildfly-${version.wildfly.tck}-patch</classifier>
                                             <type>zip</type>
                                             <outputDirectory>${project.build.directory}</outputDirectory>
                                         </artifactItem>
@@ -330,7 +330,7 @@
                                     <offline>true</offline>
                                     <fail-on-error>false</fail-on-error>
                                     <commands>
-                                        <command>patch apply ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-preview-${version.wildfly.tck}-patch.zip</command>
+                                        <command>patch apply ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${version.wildfly.tck}-patch.zip</command>
                                     </commands>
                                 </configuration>
                             </execution>

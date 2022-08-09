@@ -7,7 +7,7 @@
 package org.hibernate.validator.integration.cdi.configuration;
 
 import java.util.Locale;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import jakarta.validation.MessageInterpolator;
 
 import org.hibernate.validator.integration.cdi.service.PingService;

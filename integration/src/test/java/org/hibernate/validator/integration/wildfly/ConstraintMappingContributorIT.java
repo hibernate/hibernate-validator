@@ -10,16 +10,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 
-import javax.inject.Inject;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
-import jakarta.validation.constraints.NotNull;
-
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.testng.annotations.Test;
+
+import jakarta.inject.Inject;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Asserts constraints mappings contributed via {@code validation.xml} are applied.
@@ -36,7 +35,7 @@ public class ConstraintMappingContributorIT extends AbstractArquillianIT {
 		return buildTestArchive( WAR_FILE_NAME )
 				.addClasses( Broomstick.class, MyConstraintMappingContributor.class )
 				.addAsResource( "constraint-mapping-contributor-validation.xml", "META-INF/validation.xml" )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsWebInfResource( BEANS_XML, "beans.xml" );
 	}
 
 	@Inject

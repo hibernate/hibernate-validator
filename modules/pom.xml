@@ -25,9 +25,9 @@
         <module.xml.targetdir>${project.build.directory}/modules</module.xml.targetdir>
 
         <!-- WildFly current -->
-        <wildfly-main.original.target-dir>${project.build.directory}/wildfly-original/wildfly-preview-${version.wildfly}</wildfly-main.original.target-dir>
-        <wildfly-main.patched.target-dir>${project.build.directory}/wildfly-patched/wildfly-preview-${version.wildfly}</wildfly-main.patched.target-dir>
-        <wildfly-main.patch-file>${project.build.directory}/wildfly-preview-current-hv-patch.zip</wildfly-main.patch-file>
+        <wildfly-main.original.target-dir>${project.build.directory}/wildfly-original/wildfly-${version.wildfly}</wildfly-main.original.target-dir>
+        <wildfly-main.patched.target-dir>${project.build.directory}/wildfly-patched/wildfly-${version.wildfly}</wildfly-main.patched.target-dir>
+        <wildfly-main.patch-file>${project.build.directory}/wildfly-current-hv-patch.zip</wildfly-main.patch-file>
 
         <!-- WildFly secondary version -->
         <!--
@@ -102,7 +102,7 @@
                                 <artifact>
                                     <file>${wildfly-main.patch-file}</file>
                                     <type>zip</type>
-                                    <classifier>wildfly-preview-${version.wildfly}-patch</classifier>
+                                    <classifier>wildfly-${version.wildfly}-patch</classifier>
                                 </artifact>
                                 <!-- WildFly secondary version -->
                                 <!--
@@ -173,7 +173,7 @@
                                 <!-- WildFly current -->
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
-                                    <artifactId>wildfly-preview-dist</artifactId>
+                                    <artifactId>wildfly-dist</artifactId>
                                     <version>${version.wildfly}</version>
                                     <type>tar.gz</type>
                                     <overWrite>false</overWrite>
@@ -181,7 +181,7 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
-                                    <artifactId>wildfly-preview-dist</artifactId>
+                                    <artifactId>wildfly-dist</artifactId>
                                     <version>${version.wildfly}</version>
                                     <type>tar.gz</type>
                                     <overWrite>false</overWrite>
