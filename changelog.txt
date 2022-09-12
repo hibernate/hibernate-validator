@@ -1,6 +1,12 @@
 Hibernate Validator Changelog
 =============================
 
+6.2.5.Final (2022-09-12)
+-------------------------
+
+** Improvement
+    * HV-1927 Use Executable#getAnnotatedParameterTypes() instead of Executable#getGenericParameterTypes()
+
 6.2.4.Final (2022-08-04)
 -------------------------
 
