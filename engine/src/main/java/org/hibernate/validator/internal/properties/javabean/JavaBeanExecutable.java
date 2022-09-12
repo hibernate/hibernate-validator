@@ -7,14 +7,12 @@
 package org.hibernate.validator.internal.properties.javabean;
 
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,17 +23,12 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.TypeHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * @author Marko Bekhta
  * @author Guillaume Smet
  */
 public abstract class JavaBeanExecutable<T extends Executable> implements Callable, JavaBeanAnnotatedConstrainable {
-
-	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected final T executable;
 	private final Type typeForValidatorResolution;
@@ -194,72 +187,12 @@ public abstract class JavaBeanExecutable<T extends Executable> implements Callab
 
 		Parameter[] parameterArray = executable.getParameters();
 		Class<?>[] parameterTypes = executable.getParameterTypes();
-		// getGenericParameterTypes() does not include either the synthetic or the implicit parameters so we need to be
-		// extra careful
-		Type[] genericParameterTypes = executable.getGenericParameterTypes();
+		AnnotatedType[] annotatedTypes = executable.getAnnotatedParameterTypes();
 
-		if ( parameterTypes.length == genericParameterTypes.length ) {
-			// this is the simple case where both arrays are consistent
-			// we could do without it but at some point, the behavior of getGenericParameterTypes() might be changed in
-			// Java and we'd better be ready.
-			for ( int i = 0; i < parameterArray.length; i++ ) {
-				parameters.add( new JavaBeanParameter( i, parameterArray[i], parameterTypes[i], getErasedTypeIfTypeVariable( genericParameterTypes[i] ) ) );
-			}
-		}
-		else {
-			// in this case, we have synthetic or implicit parameters
-
-			// do we have the information about which parameter is synthetic/implicit?
-			// (this metadata is only included when classes are compiled with the '-parameters' flag)
-			boolean hasParameterModifierInfo = isAnyParameterCarryingMetadata( parameterArray );
-
-			if ( ! hasParameterModifierInfo ) {
-				LOG.missingParameterMetadataWithSyntheticOrImplicitParameters( executable );
-			}
-
-			int explicitlyDeclaredParameterIndex = 0;
-
-			for ( int i = 0; i < parameterArray.length; i++ ) {
-				if ( explicitlyDeclaredParameterIndex < genericParameterTypes.length // we might already be out of the bounds of generic params array
-						&& isExplicit( parameterArray[i] )
-						&& parameterTypesMatch( parameterTypes[i], genericParameterTypes[explicitlyDeclaredParameterIndex] ) ) {
-					// in this case we have a parameter that is present and matches ("most likely") to the one in the generic parameter types list
-					parameters.add( new JavaBeanParameter( i, parameterArray[i], parameterTypes[i],
-							getErasedTypeIfTypeVariable( genericParameterTypes[explicitlyDeclaredParameterIndex] ) ) );
-					explicitlyDeclaredParameterIndex++;
-				}
-				else {
-					// in this case, the parameter is not present in genericParameterTypes, or the types doesn't match
-					parameters.add( new JavaBeanParameter( i, parameterArray[i], parameterTypes[i], parameterTypes[i] ) );
-				}
-			}
+		for ( int i = 0; i < parameterArray.length; i++ ) {
+			parameters.add( new JavaBeanParameter( i, parameterArray[i], parameterTypes[i], annotatedTypes[i] ) );
 		}
 
 		return CollectionHelper.toImmutableList( parameters );
-	}
-
-	private static boolean isAnyParameterCarryingMetadata(Parameter[] parameterArray) {
-		for ( Parameter parameter : parameterArray ) {
-			if ( parameter.isSynthetic() || parameter.isImplicit() ) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static boolean parameterTypesMatch(Class<?> paramType, Type genericParamType) {
-		return TypeHelper.getErasedType( genericParamType ).equals( paramType );
-	}
-
-	private static boolean isExplicit(Parameter parameter) {
-		return !parameter.isSynthetic() && !parameter.isImplicit();
-	}
-
-	private static Type getErasedTypeIfTypeVariable(Type genericType) {
-		if ( genericType instanceof TypeVariable ) {
-			return TypeHelper.getErasedType( genericType );
-		}
-
-		return genericType;
 	}
 }
