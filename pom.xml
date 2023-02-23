@@ -1532,6 +1532,13 @@
                     <name>idea.maven.embedder.version</name>
                 </property>
             </activation>
+            <properties>
+                <!-- Intellij IDEA only understands the main -release argument,
+                     so we need to do this in order for tests to compile.
+                     Here's the issue in the IDEA bug tracker: https://youtrack.jetbrains.com/issue/IDEA-85478
+                     It's supposedly fixed in 2022.1 EAP 6, but I couldn't get that to work. -->
+                <java-version.main.release>${java-version.test.release}</java-version.main.release>
+            </properties>
             <build>
                 <pluginManagement>
                     <plugins>
