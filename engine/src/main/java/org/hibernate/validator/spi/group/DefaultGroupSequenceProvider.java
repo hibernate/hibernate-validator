@@ -47,7 +47,7 @@ public interface DefaultGroupSequenceProvider<T> {
 	 *         apply as for lists defined via {@code GroupSequence}. In particular the list has to contain the type T.
 	 */
 	default List<Class<?>> getValidationGroups(Class<?> clazz, T object) {
-    	return getValidationGroups( object );
+		return getValidationGroups( object );
 	}
 
 	/**
