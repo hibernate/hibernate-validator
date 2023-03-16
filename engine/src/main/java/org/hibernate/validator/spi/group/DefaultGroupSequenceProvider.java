@@ -39,6 +39,22 @@ public interface DefaultGroupSequenceProvider<T> {
 	 * The object parameter allows to dynamically compose the default group sequence in function of the validated value state.
 	 * </p>
 	 *
+     * @param clazz the instance class being validated.
+	 * @param object the instance being validated. This value can be {@code null} in case this method was called as part of
+	 * {@linkplain jakarta.validation.Validator#validateValue(Class, String, Object, Class[]) Validator#validateValue}.
+	 *
+	 * @return a list of classes specifying the default group sequence. The same constraints to the redefined group list
+	 *         apply as for lists defined via {@code GroupSequence}. In particular the list has to contain the type T.
+	 */
+	default List<Class<?>> getValidationGroups(Class<?> clazz, T object){
+        return getValidationGroups(object);
+    }
+	/**
+	 * This method returns the default group sequence for the given instance.
+	 * <p>
+	 * The object parameter allows to dynamically compose the default group sequence in function of the validated value state.
+	 * </p>
+	 *
 	 * @param object the instance being validated. This value can be {@code null} in case this method was called as part of
 	 * {@linkplain jakarta.validation.Validator#validateValue(Class, String, Object, Class[]) Validator#validateValue}.
 	 *
