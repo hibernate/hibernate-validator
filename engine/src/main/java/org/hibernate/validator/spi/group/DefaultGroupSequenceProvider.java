@@ -46,9 +46,10 @@ public interface DefaultGroupSequenceProvider<T> {
 	 * @return a list of classes specifying the default group sequence. The same constraints to the redefined group list
 	 *         apply as for lists defined via {@code GroupSequence}. In particular the list has to contain the type T.
 	 */
-	default List<Class<?>> getValidationGroups(Class<?> clazz, T object){
-        return getValidationGroups(object);
-    }
+	default List<Class<?>> getValidationGroups(Class<?> clazz, T object) {
+    	return getValidationGroups( object );
+	}
+
 	/**
 	 * This method returns the default group sequence for the given instance.
 	 * <p>
