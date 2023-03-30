@@ -122,7 +122,7 @@
         <version.com.thoughtworks.paranamer>2.8</version.com.thoughtworks.paranamer>
         <version.jakarta.el-api>5.0.1</version.jakarta.el-api>
         <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
-        <version.org.jboss.logging.jboss-logging>3.4.1.Final</version.org.jboss.logging.jboss-logging>
+        <version.org.jboss.logging.jboss-logging>3.4.3.Final</version.org.jboss.logging.jboss-logging>
         <version.org.jboss.logging.jboss-logging-tools>2.2.1.Final</version.org.jboss.logging.jboss-logging-tools>
 
         <!-- Currently supported version of WildFly -->
@@ -176,7 +176,7 @@
         <version.org.easymock>3.4</version.org.easymock>
         <version.io.rest-assured>4.1.2</version.io.rest-assured>
         <version.org.codehaus.groovy>2.4.12</version.org.codehaus.groovy>
-        <version.com.google.guava>30.1.1-jre</version.com.google.guava>
+        <version.com.google.guava>31.1-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>5.3.22</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>3.0.2.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.13.2.2</version.com.fasterxml.jackson.core.jackson-databind>
@@ -222,7 +222,7 @@
         <version.dependency.plugin>3.0.2</version.dependency.plugin>
         <version.depends.plugin>1.4.0</version.depends.plugin>
         <version.deploy.plugin>2.8.2</version.deploy.plugin>
-        <version.enforcer.plugin>3.0.0-M1</version.enforcer.plugin>
+        <version.enforcer.plugin>3.0.0</version.enforcer.plugin>
         <version.forbiddenapis.plugin>3.2</version.forbiddenapis.plugin>
         <version.gmavenplus.plugin>1.6</version.gmavenplus.plugin>
         <version.gpg.plugin>3.0.1</version.gpg.plugin>
