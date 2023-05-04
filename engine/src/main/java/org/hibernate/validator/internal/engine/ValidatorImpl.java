@@ -749,9 +749,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					cascadedValueContext.setTypeParameter( cascadingMetaData.getDeclaredContainerClass(), cascadingMetaData.getDeclaredTypeParameterIndex() );
 				}
 
-				if ( nodeName != null ) {
-					cascadedTypeArgumentValueContext.appendTypeParameterNode( nodeName );
-				}
+				cascadedTypeArgumentValueContext.appendTypeParameterNode( nodeName );
 
 				validateCascadedContainerElementsInContext( value, validationContext, cascadedTypeArgumentValueContext, cascadingMetaData, validationOrder );
 			}

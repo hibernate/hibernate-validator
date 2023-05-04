@@ -134,6 +134,17 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
+	public boolean needToAddContainerElementNode(String nodeName) {
+		// If the node name is not null that would mean that we need to add it,
+		//   but otherwise -- we may want to have an empty node
+		//   if a current node is some iterable/multivalued element (E.g. array/list/map etc.).
+		// If we don't add it -- the path would be broken and would lead to a situation
+		//   where container elements would be pointing to a container element node itself
+		//   resulting in various node methods like `Node#getIndex()` producing incorrect results.
+		// As an additional side effect of not adding a node it might lead to the path not being correctly copied.
+		return nodeName != null || currentLeafNode.isIterable();
+	}
+
 	public NodeImpl addParameterNode(String nodeName, int index) {
 		requiresWriteableNodeList();
 

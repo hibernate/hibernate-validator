@@ -102,9 +102,11 @@ public class ValueContext<T, V> {
 	}
 
 	public final void appendTypeParameterNode(String nodeName) {
-		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		newPath.addContainerElementNode( nodeName );
-		propertyPath = newPath;
+		if ( propertyPath.needToAddContainerElementNode( nodeName ) ) {
+			PathImpl newPath = PathImpl.createCopy( propertyPath );
+			newPath.addContainerElementNode( nodeName );
+			propertyPath = newPath;
+		}
 	}
 
 	public final void markCurrentPropertyAsIterable() {
