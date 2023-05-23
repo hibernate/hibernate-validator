@@ -6,17 +6,14 @@
  */
 package org.hibernate.validator.internal.metadata.provider;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.xml.mapping.MappingXmlParser;
@@ -36,15 +33,7 @@ public class XmlMetaDataProvider implements MetaDataProvider {
 
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
-	public XmlMetaDataProvider(ConstraintCreationContext constraintCreationContext,
-			JavaBeanHelper javaBeanHelper,
-			Set<InputStream> mappingStreams,
-			ClassLoader externalClassLoader) {
-
-		MappingXmlParser mappingParser = new MappingXmlParser( constraintCreationContext,
-				javaBeanHelper, externalClassLoader );
-		mappingParser.parse( mappingStreams );
-
+	public XmlMetaDataProvider(MappingXmlParser mappingParser) {
 		configuredBeans = CollectionHelper.toImmutableMap( createBeanConfigurations( mappingParser ) );
 		annotationProcessingOptions = mappingParser.getAnnotationProcessingOptions();
 	}

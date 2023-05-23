@@ -87,8 +87,16 @@ class ConstraintMappingsStaxBuilder extends AbstractStaxBuilder {
 		return new ConstraintDefinitionStaxBuilder( classLoadingHelper, constraintCreationContext.getConstraintHelper(), defaultPackageStaxBuilder );
 	}
 
-	public void build(Set<Class<?>> processedClasses, Map<Class<?>, Set<ConstrainedElement>> constrainedElementsByType, Set<String> alreadyProcessedConstraintDefinitions) {
+	public void buildConstraintDefinitions(Set<String> alreadyProcessedConstraintDefinitions) {
 		constraintDefinitionStaxBuilders.forEach( builder -> builder.build( alreadyProcessedConstraintDefinitions ) );
+	}
+
+	public void buildConstrainedElements(Set<Class<?>> processedClasses, Map<Class<?>, Set<ConstrainedElement>> constrainedElementsByType) {
 		beanStaxBuilders.forEach( builder -> builder.build( javaBeanHelper, processedClasses, constrainedElementsByType ) );
 	}
+
+	public boolean hasBeanBuilders() {
+		return !beanStaxBuilders.isEmpty();
+	}
+
 }

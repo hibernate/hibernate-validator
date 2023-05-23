@@ -56,6 +56,7 @@ public class MappingXmlParser {
 	private final JavaBeanHelper javaBeanHelper;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 	private final Map<Class<?>, Set<ConstrainedElement>> constrainedElements;
+	private final Set<ConstraintMappingsStaxBuilder> mappingBuilders;
 
 	private final XmlParserHelper xmlParserHelper;
 
@@ -80,6 +81,7 @@ public class MappingXmlParser {
 		this.javaBeanHelper = javaBeanHelper;
 		this.defaultSequences = newHashMap();
 		this.constrainedElements = newHashMap();
+		this.mappingBuilders = newHashSet();
 		this.xmlParserHelper = new XmlParserHelper();
 		this.classLoadingHelper = new ClassLoadingHelper( externalClassLoader, run( GetClassLoader.fromContext() ) );
 	}
@@ -130,7 +132,16 @@ public class MappingXmlParser {
 				while ( xmlEventReader.hasNext() ) {
 					constraintMappingsStaxBuilder.process( xmlEventReader, xmlEventReader.nextEvent() );
 				}
-				constraintMappingsStaxBuilder.build( processedClasses, constrainedElements, alreadyProcessedConstraintDefinitions );
+				// at this point we only build the constraint definitions.
+				// we want to fully populate the constraint helper and get the final rules for which
+				// validators will be applied before we build any constrained elements that contribute to
+				// final bean metadata.
+				constraintMappingsStaxBuilder.buildConstraintDefinitions( alreadyProcessedConstraintDefinitions );
+				// we only add the builder to process it later if it has anything related to bean's constraints,
+				// otherwise it was only about constraint definition, and we've processed it already.
+				if ( constraintMappingsStaxBuilder.hasBeanBuilders() ) {
+					mappingBuilders.add( constraintMappingsStaxBuilder );
+				}
 				xmlEventReader.close();
 				in.reset();
 			}
@@ -143,6 +154,16 @@ public class MappingXmlParser {
 		}
 	}
 
+	public final boolean createConstrainedElements() {
+		for ( ConstraintMappingsStaxBuilder builder : mappingBuilders ) {
+			builder.buildConstrainedElements( processedClasses, constrainedElements );
+		}
+
+		// If there are no mappings means that we've only got some constraint definitions passed to us through XML.
+		// so we don't need to create an XML metadata provider since it won't contribute anything anyway.
+		return !mappingBuilders.isEmpty();
+	}
+
 	public final Set<Class<?>> getXmlConfiguredClasses() {
 		return processedClasses;
 	}
@@ -152,12 +173,7 @@ public class MappingXmlParser {
 	}
 
 	public final Set<ConstrainedElement> getConstrainedElementsForClass(Class<?> beanClass) {
-		if ( constrainedElements.containsKey( beanClass ) ) {
-			return constrainedElements.get( beanClass );
-		}
-		else {
-			return Collections.emptySet();
-		}
+		return constrainedElements.getOrDefault( beanClass, Collections.emptySet() );
 	}
 
 	public final List<Class<?>> getDefaultSequenceForClass(Class<?> beanClass) {
