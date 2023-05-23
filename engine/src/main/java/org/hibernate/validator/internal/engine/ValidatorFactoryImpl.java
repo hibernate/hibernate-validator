@@ -63,6 +63,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
+import org.hibernate.validator.internal.xml.mapping.MappingXmlParser;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
@@ -184,12 +185,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, externalClassLoader ) );
 		this.beanMetadataClassNormalizer = determineBeanMetaDataClassNormalizer( hibernateSpecificConfig );
 
-		// HV-302; don't load XmlMappingParser if not necessary
-		if ( configurationState.getMappingStreams().isEmpty() ) {
-			this.xmlMetaDataProvider = null;
-		}
-		else {
-			this.xmlMetaDataProvider = new XmlMetaDataProvider( constraintCreationContext, javaBeanHelper, configurationState.getMappingStreams(), externalClassLoader );
+		MappingXmlParser mappingParser = null;
+		if ( !configurationState.getMappingStreams().isEmpty() ) {
+			mappingParser = new MappingXmlParser( constraintCreationContext,
+					javaBeanHelper, externalClassLoader );
+			mappingParser.parse( configurationState.getMappingStreams() );
 		}
 
 		this.constraintMappings = Collections.unmodifiableSet(
@@ -202,6 +202,14 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		);
 
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
+
+		// HV-302; don't load XmlMappingParser if not necessary
+		if ( mappingParser != null && mappingParser.createConstrainedElements() ) {
+			this.xmlMetaDataProvider = new XmlMetaDataProvider( mappingParser );
+		}
+		else {
+			this.xmlMetaDataProvider = null;
+		}
 
 		if ( LOG.isDebugEnabled() ) {
 			logValidatorFactoryScopedConfiguration( validatorFactoryScopedContext );

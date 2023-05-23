@@ -60,6 +60,7 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.xml.mapping.MappingXmlParser;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -152,14 +153,11 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		JavaBeanHelper javaBeanHelper = new JavaBeanHelper( getterPropertySelectionStrategy, propertyNodeNameProvider );
 
 		// HV-302; don't load XmlMappingParser if not necessary
-		XmlMetaDataProvider xmlMetaDataProvider;
-		if ( configurationState.getMappingStreams().isEmpty() ) {
-			xmlMetaDataProvider = null;
-		}
-		else {
-			xmlMetaDataProvider = new XmlMetaDataProvider(
-					constraintCreationContext, javaBeanHelper, configurationState.getMappingStreams(), externalClassLoader
-			);
+		MappingXmlParser mappingParser = null;
+		if ( !configurationState.getMappingStreams().isEmpty() ) {
+			mappingParser = new MappingXmlParser( constraintCreationContext,
+					javaBeanHelper, externalClassLoader );
+			mappingParser.parse( configurationState.getMappingStreams() );
 		}
 
 		Set<DefaultConstraintMapping> constraintMappings = Collections.unmodifiableSet(
@@ -172,6 +170,14 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		);
 
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
+
+		XmlMetaDataProvider xmlMetaDataProvider;
+		if ( mappingParser != null && mappingParser.createConstrainedElements() ) {
+			xmlMetaDataProvider = new XmlMetaDataProvider( mappingParser );
+		}
+		else {
+			xmlMetaDataProvider = null;
+		}
 
 		this.beanMetaDataManager = new PredefinedScopeBeanMetaDataManager(
 				constraintCreationContext,
