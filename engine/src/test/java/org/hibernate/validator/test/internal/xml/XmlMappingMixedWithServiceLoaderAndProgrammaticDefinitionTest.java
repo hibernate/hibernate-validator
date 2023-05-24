@@ -123,6 +123,25 @@ public class XmlMappingMixedWithServiceLoaderAndProgrammaticDefinitionTest {
 		);
 	}
 
+	@Test
+	public void constraintValidatorLoadedByServiceLoaderOverriddenByProgrammaticDefinition() {
+		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
+		configuration.externalClassLoader( new ServiceLoaderTestingClassLoader() );
+
+		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
+		configuration.addMapping( constraintMapping );
+
+		constraintMapping.constraintDefinition( MyOtherConstraint.class )
+				.includeExistingValidators( false )
+				.validatedBy( MyOtherConstraint.MyOtherOtherConstraintValidator.class );
+
+		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
+		final Validator validator = validatorFactory.getValidator();
+
+		assertNoViolations( validator.validate( new Foo() ) );
+		assertNoViolations( validator.validate( new Bar() ) );
+	}
+
 	public static class Foo {
 		public String string;
 	}
