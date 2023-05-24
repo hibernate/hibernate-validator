@@ -72,13 +72,6 @@ final class ValidatorFactoryConfigurationHelper {
 			 * these programmatically defined mappings into account when checking for constraint definition uniqueness
 			 */
 			constraintMappings.addAll( hibernateConfiguration.getProgrammaticMappings() );
-
-			// service loader based config
-			ConstraintMappingContributor serviceLoaderBasedContributor = new ServiceLoaderBasedConstraintMappingContributor(
-					typeResolutionHelper,
-					externalClassLoader != null ? externalClassLoader : run( GetClassLoader.fromContext() ) );
-			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( javaBeanHelper, constraintMappings );
-			serviceLoaderBasedContributor.createConstraintMappings( builder );
 		}
 
 		// XML-defined constraint mapping contributors
@@ -90,6 +83,22 @@ final class ValidatorFactoryConfigurationHelper {
 			contributor.createConstraintMappings( builder );
 		}
 
+		return constraintMappings;
+	}
+
+	static Set<DefaultConstraintMapping> determineServiceLoadedConstraintMappings(
+			TypeResolutionHelper typeResolutionHelper,
+			JavaBeanHelper javaBeanHelper, ClassLoader externalClassLoader) {
+		Set<DefaultConstraintMapping> constraintMappings = newHashSet();
+
+		// service loader based config
+		ConstraintMappingContributor serviceLoaderBasedContributor = new ServiceLoaderBasedConstraintMappingContributor(
+				typeResolutionHelper,
+				externalClassLoader != null ? externalClassLoader : run( GetClassLoader.fromContext() )
+		);
+		DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder(
+				javaBeanHelper, constraintMappings );
+		serviceLoaderBasedContributor.createConstraintMappings( builder );
 		return constraintMappings;
 	}
 

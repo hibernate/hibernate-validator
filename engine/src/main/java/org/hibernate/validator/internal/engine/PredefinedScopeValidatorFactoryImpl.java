@@ -17,6 +17,7 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineExternalClassLoader;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFast;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineScriptEvaluatorFactory;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineServiceLoadedConstraintMappings;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTemporalValidationTolerance;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTraversableResolverResultCacheEnabled;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.logValidatorFactoryScopedConfiguration;
@@ -152,6 +153,18 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		ExecutableHelper executableHelper = new ExecutableHelper( typeResolutionHelper );
 		JavaBeanHelper javaBeanHelper = new JavaBeanHelper( getterPropertySelectionStrategy, propertyNodeNameProvider );
 
+		// first we want to register any validators coming from a service loader. Since they are just loaded and there's
+		// no control over them (include/exclude the ones that already exists from any other sources etc.)
+		registerCustomConstraintValidators(
+				determineServiceLoadedConstraintMappings(
+						typeResolutionHelper,
+						javaBeanHelper,
+						externalClassLoader
+				),
+				constraintHelper );
+
+		// we parse all XML mappings but only register constraint validators and delay constraint mappings building till
+		// we collect all the constraint validators.
 		// HV-302; don't load XmlMappingParser if not necessary
 		MappingXmlParser mappingParser = null;
 		if ( !configurationState.getMappingStreams().isEmpty() ) {
@@ -169,6 +182,8 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				)
 		);
 
+		// now the final step of registering any constraint validators that can come either from ConstraintMappingContributors
+		// or from programmatic mappings
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
 
 		XmlMetaDataProvider xmlMetaDataProvider;
