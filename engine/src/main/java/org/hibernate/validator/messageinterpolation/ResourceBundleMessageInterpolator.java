@@ -38,6 +38,7 @@ import jakarta.el.ExpressionFactory;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Adam Stawicki
  * @author Guillaume Smet
+ * @author Yanming Zhou
  */
 public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolator {
 
@@ -200,11 +201,16 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 
 			// Finally we try the CL of the EL implementation itself. This is necessary for OSGi now that the
 			// implementation is separated from the API.
-			run( SetContextClassLoader.action( ExpressionFactoryImpl.class.getClassLoader() ) );
-			if ( canLoadExpressionFactory() ) {
-				ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
-				LOG.debug( "Loaded expression factory via com.sun.el classloader" );
-				return expressionFactory;
+			try {
+				run( SetContextClassLoader.action( ExpressionFactoryImpl.class.getClassLoader() ) );
+				if ( canLoadExpressionFactory() ) {
+					ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
+					LOG.debug( "Loaded expression factory via com.sun.el classloader" );
+					return expressionFactory;
+				}
+			}
+			catch (NoClassDefFoundError err) {
+				// ignore
 			}
 		}
 		catch (Throwable e) {
