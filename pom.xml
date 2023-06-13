@@ -1452,32 +1452,6 @@
             </build>
         </profile>
         <profile>
-            <id>testWithJdk18</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>18</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- ForbiddenAPIs doesn't work with JDK18+ yet -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>testWithJdk19</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>19</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- ForbiddenAPIs doesn't work with JDK19+ yet -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
-            </properties>
-        </profile>
-        <profile>
             <id>testWithJdk20</id>
             <activation>
                 <property>
