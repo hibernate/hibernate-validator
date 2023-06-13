@@ -147,7 +147,7 @@
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
         <version.jakarta.enterprise.cdi-api>4.0.1</version.jakarta.enterprise.cdi-api>
-        <version.org.jboss.weld.weld>5.0.1.Final</version.org.jboss.weld.weld>
+        <version.org.jboss.weld.weld>5.1.1.Final</version.org.jboss.weld.weld>
         <version.org.wildfly.arquillian>5.0.0.Alpha3</version.org.wildfly.arquillian>
         <version.jakarta.ejb-api>4.0.1</version.jakarta.ejb-api>
         <version.jakarta.interceptor-api>2.1.0</version.jakarta.interceptor-api>
