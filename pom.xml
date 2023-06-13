@@ -1475,8 +1475,6 @@
             <properties>
                 <!-- ForbiddenAPIs doesn't work with JDK19+ yet -->
                 <forbiddenapis.skip>true</forbiddenapis.skip>
-                <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK19+ -->
-                <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
             </properties>
         </profile>
         <profile>
@@ -1490,7 +1488,35 @@
             <properties>
                 <!-- ForbiddenAPIs doesn't work with JDK20+ yet -->
                 <forbiddenapis.skip>true</forbiddenapis.skip>
-                <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK20+ -->
+            </properties>
+        </profile>
+        <profile>
+            <id>testWithJdk21</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>21</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- ForbiddenAPIs doesn't work with JDK20+ yet -->
+                <forbiddenapis.skip>true</forbiddenapis.skip>
+                <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK21+ -->
+                <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
+            </properties>
+        </profile>
+        <profile>
+            <id>testWithJdk22</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>22</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- ForbiddenAPIs doesn't work with JDK20+ yet -->
+                <forbiddenapis.skip>true</forbiddenapis.skip>
+                <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK21+ -->
                 <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
             </properties>
         </profile>
