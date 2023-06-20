@@ -1,6 +1,26 @@
 Hibernate Validator Changelog
 =============================
 
+8.0.1.Final (2023-06-20)
+-------------------------
+
+** Bug
+    * HV-1949 Nondeterministic behavior of HibernateValidator (in springboot?) when both annotation and xml-based definition are used
+    * HV-1932 Incomplete @Positive annotation's default message in fr
+
+** Improvement
+    * HV-1943 Some french validation messages are not quite accurate
+    * HV-1941 Add support for European Portuguese for ValidationMessages
+    * HV-1927 Use Executable#getAnnotatedParameterTypes() instead of Executable#getGenericParameterTypes()
+
+** Task
+    * HV-1956 Update Weld test dependency to 5.1.1.Final
+    * HV-1954 Test Hibernate Validator against JDK 22
+    * HV-1944 Upgraded JBoss Logging, Maven Enforcer plugin and Guava to latest version
+    * HV-1938 Update ByteBuddy test dependency to 1.13.0
+    * HV-1935 Test Hibernate Validator against JDK 21
+    * HV-1934 Upgrade to hibernate-asciidoctor-theme 1.0.6
+
 8.0.0.Final (2022-09-09)
 -------------------------
 
