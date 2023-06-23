@@ -48,7 +48,7 @@ public class DefaultGroupSequenceProviderTest {
 		@Override
 		public List<Class<?>> getValidationGroups (Object object) {
 			List<Class<?>> groups = new ArrayList<> ();
-			if (Objects.nonNull (object)) {
+			if ( Objects.nonNull (object) ) {
 				groups.add (object.getClass ());
 			}
 			return groups;
@@ -61,7 +61,7 @@ public class DefaultGroupSequenceProviderTest {
 		@Override
 		public List<Class<?>> getValidationGroups (Class<?> clazz, Object object) {
 			List<Class<?>> groups = new ArrayList<> ();
-			if (Objects.nonNull (clazz)) {
+			if ( Objects.nonNull (clazz) ) {
 				groups.add (clazz);
 			}
 			return groups;
