@@ -7,6 +7,7 @@ Hibernate Validator Changelog
 ** Bug
     * HV-1949 Nondeterministic behavior of HibernateValidator (in springboot?) when both annotation and xml-based definition are used
     * HV-1932 Incomplete @Positive annotation's default message in fr
+    * HV-1939 Annotations on constructors of named classes declared in method get ignored
 
 ** Improvement
     * HV-1943 Some french validation messages are not quite accurate
