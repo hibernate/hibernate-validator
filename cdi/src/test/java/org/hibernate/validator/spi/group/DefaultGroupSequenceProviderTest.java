@@ -28,18 +28,18 @@ public class DefaultGroupSequenceProviderTest {
 
 	@Test
 	public void withoutClassParam() {
-		Assert.assertThrows (() -> {
-			final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory ();
-			final Validator validator = validatorFactory.getValidator ();
-			validator.validate (new A1 ());
+		Assert.assertThrows(() -> {
+			final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+			final Validator validator = validatorFactory.getValidator();
+			validator.validate(new A1());
 		});
 	}
 
 	@Test
 	public void withClassParam() {
-		final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory ();
-		final Validator validator = validatorFactory.getValidator ();
-		validator.validate (new A2 ());
+		final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+		final Validator validator = validatorFactory.getValidator();
+		validator.validate(new A2());
 	}
 
 
@@ -47,9 +47,9 @@ public class DefaultGroupSequenceProviderTest {
 
 		@Override
 		public List<Class<?>> getValidationGroups(Object object) {
-			List<Class<?>> groups = new ArrayList<> ();
-			if ( Objects.nonNull (object) ) {
-				groups.add (object.getClass ());
+			List<Class<?>> groups = new ArrayList<>();
+			if ( Objects.nonNull(object) ) {
+				groups.add(object.getClass());
 			}
 			return groups;
 		}
@@ -60,16 +60,16 @@ public class DefaultGroupSequenceProviderTest {
 
 		@Override
 		public List<Class<?>> getValidationGroups(Class<?> clazz, Object object) {
-			List<Class<?>> groups = new ArrayList<> ();
-			if ( Objects.nonNull (clazz) ) {
-				groups.add (clazz);
+			List<Class<?>> groups = new ArrayList<>();
+			if ( Objects.nonNull(clazz) ) {
+				groups.add(clazz);
 			}
 			return groups;
 		}
 
 		@Override
 		public List<Class<?>> getValidationGroups(Object object) {
-			throw new IllegalArgumentException ("");
+			throw new IllegalArgumentException("");
 		}
 	}
 
