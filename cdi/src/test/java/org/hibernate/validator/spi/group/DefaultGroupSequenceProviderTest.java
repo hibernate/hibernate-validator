@@ -27,29 +27,29 @@ import java.util.Objects;
 public class DefaultGroupSequenceProviderTest {
 
     @Test
-    public void withoutClassParam() {
-        Assert.assertThrows(() -> {
-            final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-            final Validator validator = validatorFactory.getValidator();
-            validator.validate(new A1());
+    public void withoutClassParam () {
+        Assert.assertThrows (() -> {
+            final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory ();
+            final Validator validator = validatorFactory.getValidator ();
+            validator.validate (new A1 ());
         });
     }
 
     @Test
-    public void withClassParam() {
-        final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-        final Validator validator = validatorFactory.getValidator();
-        validator.validate(new A2());
+    public void withClassParam () {
+        final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory ();
+        final Validator validator = validatorFactory.getValidator ();
+        validator.validate (new A2 ());
     }
 
 
     public static class DefaultGroupSequenceProvider1 implements DefaultGroupSequenceProvider<Object> {
 
         @Override
-        public List<Class<?>> getValidationGroups(Object object) {
-            List<Class<?>> groups = new ArrayList<>();
-            if (Objects.nonNull(object)) {
-                groups.add(object.getClass());
+        public List<Class<?>> getValidationGroups (Object object) {
+            List<Class<?>> groups = new ArrayList<> ();
+            if (Objects.nonNull (object)) {
+                groups.add (object.getClass ());
             }
             return groups;
         }
@@ -59,17 +59,17 @@ public class DefaultGroupSequenceProviderTest {
     public static class DefaultGroupSequenceProvider2 implements DefaultGroupSequenceProvider<Object> {
 
         @Override
-        public List<Class<?>> getValidationGroups(Class<?> clazz, Object object) {
-            List<Class<?>> groups = new ArrayList<>();
-            if (Objects.nonNull(clazz)) {
-                groups.add(clazz);
+        public List<Class<?>> getValidationGroups (Class<?> clazz, Object object) {
+            List<Class<?>> groups = new ArrayList<> ();
+            if (Objects.nonNull (clazz)) {
+                groups.add (clazz);
             }
             return groups;
         }
 
         @Override
-        public List<Class<?>> getValidationGroups(Object object) {
-            throw new IllegalArgumentException("");
+        public List<Class<?>> getValidationGroups (Object object) {
+            throw new IllegalArgumentException ("");
         }
     }
 
@@ -79,11 +79,11 @@ public class DefaultGroupSequenceProviderTest {
         @NotNull
         private String name;
 
-        public String getName() {
+        public String getName () {
             return name;
         }
 
-        public void setName(String name) {
+        public void setName (String name) {
             this.name = name;
         }
     }
@@ -93,11 +93,11 @@ public class DefaultGroupSequenceProviderTest {
         @NotNull
         private String name;
 
-        public String getName() {
+        public String getName () {
             return name;
         }
 
-        public void setName(String name) {
+        public void setName (String name) {
             this.name = name;
         }
     }
@@ -107,11 +107,11 @@ public class DefaultGroupSequenceProviderTest {
         @NotNull
         private String name;
 
-        public String getName() {
+        public String getName () {
             return name;
         }
 
-        public void setName(String name) {
+        public void setName (String name) {
             this.name = name;
         }
     }
@@ -121,11 +121,11 @@ public class DefaultGroupSequenceProviderTest {
         @NotNull
         private String name;
 
-        public String getName() {
+        public String getName () {
             return name;
         }
 
-        public void setName(String name) {
+        public void setName (String name) {
             this.name = name;
         }
     }
