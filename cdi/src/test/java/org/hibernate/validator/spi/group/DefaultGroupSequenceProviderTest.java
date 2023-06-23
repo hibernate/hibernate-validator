@@ -28,7 +28,7 @@ public class DefaultGroupSequenceProviderTest {
 
 	@Test
 	public void withoutClassParam() {
-		Assert.assertThrows(() -> {
+		Assert.assertThrows(()->{
 			final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
 			final Validator validator = validatorFactory.getValidator();
 			validator.validate(new A1());
