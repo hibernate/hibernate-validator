@@ -9,6 +9,7 @@ package org.hibernate.validator.test.internal.engine.messageinterpolation;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
+import java.time.Duration;
 import java.util.Locale;
 import java.util.Set;
 
@@ -20,6 +21,8 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Email;
 
 import org.hibernate.validator.constraints.Range;
+import org.hibernate.validator.constraints.time.DurationMax;
+import org.hibernate.validator.constraints.time.DurationMin;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
@@ -132,6 +135,40 @@ public class MessageInterpolationWithDefaultBundleTest {
 		);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1943")
+	public void testConditionalDecimalMinMaxMessagesForFrenchLocale() {
+		Configuration<?> config = ValidatorUtil.getConfiguration( Locale.FRENCH );
+		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+
+		Set<ConstraintViolation<DoubleHolder>> constraintViolations = validator.validate( new DoubleHolder() );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( DecimalMin.class ).withMessage( "doit être supérieur ou égal à 1.0" ),
+				violationOf( DecimalMin.class ).withMessage( "doit être supérieur à 1.0" ),
+				violationOf( DecimalMax.class ).withMessage( "doit être inférieur ou égal à 1.0" ),
+				violationOf( DecimalMax.class ).withMessage( "doit être inférieur à 1.0" )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1943")
+	public void testConditionalDurationMinMaxMessagesForFrenchLocale() {
+		Configuration<?> config = ValidatorUtil.getConfiguration( Locale.FRENCH );
+		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+
+		Set<ConstraintViolation<DurationHolder>> constraintViolations = validator.validate( new DurationHolder() );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( DurationMin.class ).withMessage( "doit être plus long ou égal à 2 jours" ),
+				violationOf( DurationMin.class ).withMessage( "doit être plus long que 2 jours" ),
+				violationOf( DurationMax.class ).withMessage( "doit être plus court ou égal à 2 jours" ),
+				violationOf( DurationMax.class ).withMessage( "doit être plus court que 2 jours" )
+		);
+	}
+
 	private static class DoubleHolder {
 		@DecimalMax(value = "1.0")
 		private final double inclusiveMaxDouble;
@@ -149,6 +186,26 @@ public class MessageInterpolationWithDefaultBundleTest {
 
 			this.inclusiveMinDouble = 0.9;
 			this.exclusiveMinDouble = 1.0;
+		}
+	}
+
+	private static class DurationHolder {
+		@DurationMax(days = 2L)
+		private final Duration inclusiveMaxDuration;
+		@DurationMax(days = 2L, inclusive = false)
+		private final Duration exclusiveMaxDuration;
+
+		@DurationMin(days = 2L)
+		private final Duration inclusiveMinDuration;
+		@DurationMin(days = 2L, inclusive = false)
+		private final Duration exclusiveMinDuration;
+
+		private DurationHolder() {
+			this.inclusiveMaxDuration = Duration.ofDays( 3 );
+			this.exclusiveMaxDuration = Duration.ofDays( 2 );
+
+			this.inclusiveMinDuration = Duration.ofDays( 1 );
+			this.exclusiveMinDuration = Duration.ofDays( 2 );
 		}
 	}
 
