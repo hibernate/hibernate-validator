@@ -326,8 +326,8 @@
                                     <outputDirectory>${asciidoctor.base-output-dir}/pdf</outputDirectory>
                                     <attributes>
                                         <imagesdir>${asciidoctor.aggregated-resources-dir}/images/</imagesdir>
-                                        <pdf-stylesdir>${asciidoctor.aggregated-resources-dir}/theme</pdf-stylesdir>
-                                        <pdf-style>hibernate</pdf-style>
+                                        <pdf-themesdir>${asciidoctor.aggregated-resources-dir}/theme</pdf-themesdir>
+                                        <pdf-theme>hibernate</pdf-theme>
                                         <pdf-fontsdir>${asciidoctor.aggregated-resources-dir}/theme/fonts</pdf-fontsdir>
                                         <pagenums/>
                                         <idprefix/>
