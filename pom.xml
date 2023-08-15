@@ -202,12 +202,12 @@
 
         <!-- Asciidoctor -->
 
-        <version.asciidoctor.plugin>2.2.2</version.asciidoctor.plugin>
-        <version.org.hibernate.infra.hibernate-asciidoctor-theme>1.0.6.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
+        <version.asciidoctor.plugin>2.2.4</version.asciidoctor.plugin>
+        <version.org.hibernate.infra.hibernate-asciidoctor-theme>2.0.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
         <version.org.hibernate.infra.hibernate-asciidoctor-extensions>2.0.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
         <version.org.jruby>9.3.2.0</version.org.jruby>
-        <version.org.asciidoctor.asciidoctorj>2.5.3</version.org.asciidoctor.asciidoctorj>
-        <version.org.asciidoctor.asciidoctorj-pdf>1.5.0-alpha.18</version.org.asciidoctor.asciidoctorj-pdf>
+        <version.org.asciidoctor.asciidoctorj>2.5.10</version.org.asciidoctor.asciidoctorj>
+        <version.org.asciidoctor.asciidoctorj-pdf>2.3.9</version.org.asciidoctor.asciidoctorj-pdf>
 
         <!-- Maven plugins versions -->
 
@@ -984,11 +984,6 @@
                     <artifactId>asciidoctor-maven-plugin</artifactId>
                     <version>${version.asciidoctor.plugin}</version>
                     <dependencies>
-                        <dependency>
-                            <groupId>org.jruby</groupId>
-                            <artifactId>jruby-complete</artifactId>
-                            <version>${version.org.jruby}</version>
-                        </dependency>
                          <dependency>
                             <groupId>org.asciidoctor</groupId>
                             <artifactId>asciidoctorj</artifactId>
