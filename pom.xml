@@ -237,8 +237,7 @@
         <version.shade.plugin>3.1.0</version.shade.plugin>
         <version.sigtest.plugin>1.6</version.sigtest.plugin>
         <version.source.plugin>3.0.1</version.source.plugin>
-        <version.surefire.plugin>2.21.0</version.surefire.plugin>
-        <version.surefire.plugin.java-version.asm>9.2</version.surefire.plugin.java-version.asm>
+        <version.surefire.plugin>3.1.2</version.surefire.plugin>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.wildfly.plugin>1.2.1.Final</version.wildfly.plugin>
         <version.org.wildfly.core>14.0.0.Final</version.org.wildfly.core>
@@ -882,11 +881,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${version.surefire.plugin}</version>
                     <configuration>
-                        <forkMode>once</forkMode>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                        <includes>
-                            <include>**/*Test.java</include>
-                        </includes>
                         <jvm>${java-version.test.launcher}</jvm>
                         <argLine>${surefire.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}</reportNameSuffix>
@@ -896,19 +891,6 @@
                             <JAVA_HOME>${java-version.test.launcher.java_home}</JAVA_HOME>
                         </environmentVariables>
                     </configuration>
-                    <dependencies>
-                        <!--
-                             maven-surefire-plugin and maven-failsafe-plugin use an older version of ASM
-                             that cannot handle Java 15+ bytecode.
-                             Let's upgrade that dependency and hope for the best;
-                             if it doesn't work, the build is very likely to fail and we'll know about it.
-                         -->
-                        <dependency>
-                            <groupId>org.ow2.asm</groupId>
-                            <artifactId>asm</artifactId>
-                            <version>${version.surefire.plugin.java-version.asm}</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-report-plugin</artifactId>
@@ -923,7 +905,6 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <outputDirectory>${project.build.directory}/surefire-reports</outputDirectory>
                         <outputName>test-report</outputName>
                     </configuration>
                 </plugin>
@@ -940,19 +921,6 @@
                             <JAVA_HOME>${java-version.test.launcher.java_home}</JAVA_HOME>
                         </environmentVariables>
                     </configuration>
-                    <dependencies>
-                        <!--
-                             maven-surefire-plugin and maven-failsafe-plugin use an older version of ASM
-                             that cannot handle Java 15+ bytecode.
-                             Let's upgrade that dependency and hope for the best;
-                             if it doesn't work, the build is very likely to fail and we'll know about it.
-                         -->
-                        <dependency>
-                            <groupId>org.ow2.asm</groupId>
-                            <artifactId>asm</artifactId>
-                            <version>${version.surefire.plugin.java-version.asm}</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
@@ -984,21 +952,6 @@
                     <artifactId>asciidoctor-maven-plugin</artifactId>
                     <version>${version.asciidoctor.plugin}</version>
                     <dependencies>
-                        <dependency>
-                            <groupId>org.jruby</groupId>
-                            <artifactId>jruby-complete</artifactId>
-                            <version>${version.org.jruby}</version>
-                        </dependency>
-                         <dependency>
-                            <groupId>org.asciidoctor</groupId>
-                            <artifactId>asciidoctorj</artifactId>
-                            <version>${version.org.asciidoctor.asciidoctorj}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.asciidoctor</groupId>
-                            <artifactId>asciidoctorj-pdf</artifactId>
-                            <version>${version.org.asciidoctor.asciidoctorj-pdf}</version>
-                        </dependency>
                         <dependency>
                             <groupId>org.hibernate.infra</groupId>
                             <artifactId>hibernate-asciidoctor-extensions</artifactId>
