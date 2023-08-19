@@ -162,12 +162,9 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>${tck.suite.file}</suiteXmlFile>
                     </suiteXmlFiles>
-                    <systemProperties>
-                        <property>
-                            <name>validation.provider</name>
-                            <value>${validation.provider}</value>
-                        </property>
-                    </systemProperties>
+                    <systemPropertyVariables>
+                        <validation.provider>${validation.provider}</validation.provider>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -183,7 +180,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <outputDirectory>${project.build.directory}/surefire-reports</outputDirectory>
                     <outputName>test-report</outputName>
                 </configuration>
             </plugin>
@@ -220,16 +216,10 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <systemProperties>
-                                <property>
-                                    <name>validation.provider</name>
-                                    <value>${validation.provider}</value>
-                                </property>
-                                <property>
-                                    <name>excludeIntegrationTests</name>
-                                    <value>true</value>
-                                </property>
-                            </systemProperties>
+                            <systemPropertyVariables>
+                                <validation.provider>${validation.provider}</validation.provider>
+                                <excludeIntegrationTests>true</excludeIntegrationTests>
+                            </systemPropertyVariables>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -365,7 +355,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <forkMode>once</forkMode>
                             <systemPropertyVariables>
                                 <arquillian.launch>incontainer</arquillian.launch>
                             </systemPropertyVariables>
@@ -398,7 +387,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <forkMode>once</forkMode>
                             <systemPropertyVariables>
                                 <arquillian.launch>incontainer</arquillian.launch>
                             </systemPropertyVariables>
