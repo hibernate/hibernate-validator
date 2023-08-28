@@ -34,7 +34,7 @@ public class CrossParameterConstraintValidatorContextImpl extends ConstraintVali
 			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel) {
 		super( clockProvider, propertyPath, constraintDescriptor, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
 				customViolationExpressionLanguageFeatureLevel );
-		Contracts.assertTrue( propertyPath.getLeafNode().getKind() == ElementKind.CROSS_PARAMETER, "Context can only be used for corss parameter validation" );
+		Contracts.assertTrue( propertyPath.getLeafNode().getKind() == ElementKind.CROSS_PARAMETER, "Context can only be used for cross parameter validation" );
 		this.methodParameterNames = methodParameterNames;
 	}
 
