@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,6 +47,7 @@ import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLev
  * @author Gunnar Morling
  * @author Guillaume Smet
  * @author Marko Bekhta
+ * @author Thomas Strauß
  */
 abstract class AbstractValidationContext<T> implements BaseBeanValidationContext<T> {
 
@@ -343,29 +343,20 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			return false;
 		}
 
+		if ( path.isRootPath() ) {
+			return true;
+		}
+
+		// Since this isAlreadyValidatedForPath(..) is only applicable for an object that is about to be cascaded into,
+		// it means that the new path we are testing cannot be a root path; also since we are cascading into inner
+		// objects, i.e. going further from the object tree root, it means that the new path cannot be shorter than
+		// the ones we've already encountered.
 		for ( PathImpl p : pathSet ) {
-			if ( path.isRootPath() || p.isRootPath() || isSubPathOf( path, p ) || isSubPathOf( p, path ) ) {
+			if ( p.isSubPathOrContains( path ) ) {
 				return true;
 			}
 		}
-
 		return false;
-	}
-
-	private boolean isSubPathOf(Path p1, Path p2) {
-		Iterator<Path.Node> p1Iter = p1.iterator();
-		Iterator<Path.Node> p2Iter = p2.iterator();
-		while ( p1Iter.hasNext() ) {
-			Path.Node p1Node = p1Iter.next();
-			if ( !p2Iter.hasNext() ) {
-				return false;
-			}
-			Path.Node p2Node = p2Iter.next();
-			if ( !p1Node.equals( p2Node ) ) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	private boolean isAlreadyValidatedForCurrentGroup(Object value, Class<?> group) {
@@ -434,6 +425,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 		@Override
 		public boolean equals(Object o) {
+			// null check intentionally left out
 			if ( this == o ) {
 				return true;
 			}
@@ -482,6 +474,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 		@Override
 		public boolean equals(Object o) {
+			// null check intentionally left out
 			if ( this == o ) {
 				return true;
 			}
