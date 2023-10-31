@@ -48,6 +48,7 @@ import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLev
  * @author Gunnar Morling
  * @author Guillaume Smet
  * @author Marko Bekhta
+ * @author Thomas Strauß
  */
 abstract class AbstractValidationContext<T> implements BaseBeanValidationContext<T> {
 
@@ -344,7 +345,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		}
 
 		for ( PathImpl p : pathSet ) {
-			if ( path.isRootPath() || p.isRootPath() || isSubPathOf( path, p ) || isSubPathOf( p, path ) ) {
+			if ( pathsSharePrefix( p, path ) ) {
 				return true;
 			}
 		}
@@ -352,19 +353,34 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		return false;
 	}
 
-	private boolean isSubPathOf(Path p1, Path p2) {
+	/**
+	 * this method compares two PathImpl to decide if either one is a prefix of the other.
+	 *
+	 * @param p1 first Path
+	 * @param p2 second Path
+	 * @return true if p1 ⊃ p2 or p2 ⊃ p1
+	 */
+	private boolean pathsSharePrefix(PathImpl p1, PathImpl p2) {
+		// root path is a common prefix of any path != null
+		if ( p1.isRootPath() || p2.isRootPath() ) {
+			return true;
+		}
+
+		// at this point, p1 and p2 will have at least one element in the iterator
 		Iterator<Path.Node> p1Iter = p1.iterator();
 		Iterator<Path.Node> p2Iter = p2.iterator();
 		while ( p1Iter.hasNext() ) {
 			Path.Node p1Node = p1Iter.next();
 			if ( !p2Iter.hasNext() ) {
-				return false;
+				// p1 ⊃ p2
+				return true;
 			}
 			Path.Node p2Node = p2Iter.next();
 			if ( !p1Node.equals( p2Node ) ) {
 				return false;
 			}
 		}
+		// p2 ⊃ p1
 		return true;
 	}
 
@@ -434,6 +450,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 		@Override
 		public boolean equals(Object o) {
+			// null check intentionally left out
 			if ( this == o ) {
 				return true;
 			}
@@ -482,6 +499,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 		@Override
 		public boolean equals(Object o) {
+			// null check intentionally left out
 			if ( this == o ) {
 				return true;
 			}
