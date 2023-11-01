@@ -78,6 +78,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.validation.Valid;
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.CreditCardNumber;
@@ -324,6 +325,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.ru.INNValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMaxValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMinValidator;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
+import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -381,6 +383,7 @@ public class ConstraintHelper {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
 	private static final String JAVA_MONEY_CLASS_NAME = "javax.money.MonetaryAmount";
+	private static final String BUILTIN_TYPE_NAMES = "(boolean|byte|char|int|short|double|long)";
 
 	@Immutable
 	private final Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> enabledBuiltinConstraints;
@@ -1170,6 +1173,30 @@ public class ConstraintHelper {
 	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
 	private static <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
+
+	/**
+	 * this method inspects the type of the <code>@Valid</code> annotation and decides, if the annotation is useful.
+	 * <p>
+	 *     This method returns false, if the {@link jakarta.validation.Valid} annotation is applied to:
+	 *     <ul>
+	 *         <li>a native type (int, boolean, etc</li>
+	 *         <li>a type in a java.* or javax.* package</li>
+	 *     </ul>
+	 * </p>
+	 * @param annotation the Valid annotation
+	 * @param constrainable the constraint element
+	 * @return true, if the Valid annotation should not be applied
+	 * @param <A> type of annotation
+	 */
+	public <A extends Annotation> boolean isNonApplicableValidAnnotation(A annotation, Constrainable constrainable) {
+		if ( !( annotation instanceof Valid ) ) {
+			return false;
+		}
+
+		return constrainable.getType().getTypeName().startsWith( "java." )
+				|| constrainable.getType().getTypeName().startsWith( "javax." )
+				|| constrainable.getType().getTypeName().matches( BUILTIN_TYPE_NAMES );
 	}
 
 	/**

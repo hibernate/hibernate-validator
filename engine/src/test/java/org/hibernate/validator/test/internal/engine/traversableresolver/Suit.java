@@ -20,9 +20,13 @@ public class Suit {
 
 	@Max(value = 50, groups = { Default.class, Cloth.class })
 	@Min(1)
+	@Valid // this should be ignored
 	private Integer size;
 	@Valid private Trousers trousers;
 	private Jacket jacket;
+
+	@Valid
+	private boolean awesomeDesign;
 
 	public Trousers getTrousers() {
 		return trousers;
@@ -47,5 +51,13 @@ public class Suit {
 
 	public void setSize(Integer size) {
 		this.size = size;
+	}
+
+	public boolean isAwesomeDesign() {
+		return awesomeDesign;
+	}
+
+	public void setAwesomeDesign(boolean awesomeDesign) {
+		this.awesomeDesign = awesomeDesign;
 	}
 }
