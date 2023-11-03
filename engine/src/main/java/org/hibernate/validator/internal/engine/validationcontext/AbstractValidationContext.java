@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -344,44 +343,20 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			return false;
 		}
 
-		for ( PathImpl p : pathSet ) {
-			if ( pathsSharePrefix( p, path ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * this method compares two PathImpl to decide if either one is a prefix of the other.
-	 *
-	 * @param p1 first Path
-	 * @param p2 second Path
-	 * @return true if p1 ⊃ p2 or p2 ⊃ p1
-	 */
-	private boolean pathsSharePrefix(PathImpl p1, PathImpl p2) {
-		// root path is a common prefix of any path != null
-		if ( p1.isRootPath() || p2.isRootPath() ) {
+		if ( path.isRootPath() ) {
 			return true;
 		}
 
-		// at this point, p1 and p2 will have at least one element in the iterator
-		Iterator<Path.Node> p1Iter = p1.iterator();
-		Iterator<Path.Node> p2Iter = p2.iterator();
-		while ( p1Iter.hasNext() ) {
-			Path.Node p1Node = p1Iter.next();
-			if ( !p2Iter.hasNext() ) {
-				// p1 ⊃ p2
+		// Since this isAlreadyValidatedForPath(..) is only applicable for an object that is about to be cascaded into,
+		// it means that the new path we are testing cannot be a root path; also since we are cascading into inner
+		// objects, i.e. going further from the object tree root, it means that the new path cannot be shorter than
+		// the ones we've already encountered.
+		for ( PathImpl p : pathSet ) {
+			if ( p.isSubPathOrContains( path ) ) {
 				return true;
 			}
-			Path.Node p2Node = p2Iter.next();
-			if ( !p1Node.equals( p2Node ) ) {
-				return false;
-			}
 		}
-		// p2 ⊃ p1
-		return true;
+		return false;
 	}
 
 	private boolean isAlreadyValidatedForCurrentGroup(Object value, Class<?> group) {

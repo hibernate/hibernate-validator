@@ -453,4 +453,21 @@ public final class PathImpl implements Path, Serializable {
 		}
 		return true;
 	}
+
+	public boolean isSubPathOrContains(PathImpl other) {
+
+		// prefetch contant return values
+		int oSize = other.nodeList.size();
+		// calling Math.min will reduce speed significantly
+		int mySize = nodeList.size() < oSize
+				? nodeList.size()
+				: oSize;
+
+		for ( int i = 0; i < mySize; i++ ) {
+			if ( !nodeList.get( i ).equals( other.nodeList.get( i ) ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
