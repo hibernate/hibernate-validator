@@ -383,7 +383,14 @@ public class ConstraintHelper {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
 	private static final String JAVA_MONEY_CLASS_NAME = "javax.money.MonetaryAmount";
-	private static final String BUILTIN_TYPE_NAMES = "(boolean|byte|char|int|short|double|long)";
+	private static final java.util.regex.Pattern BUILTIN_TYPE_NAMES = java.util.regex.Pattern.compile( "" +
+			// primitives
+			"(boolean|byte|char|int|short|double|long" +
+			// boxed primitives
+			"|java.lang.Boolean|java.lang.Byte|java.lang.Character|java.lang.Integer|java.lang.Short|java.lang.Double|java.lang.Long" +
+			// selected final types from java.* hierarchy
+			"|java.lang.String" +
+			")" );
 
 	@Immutable
 	private final Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> enabledBuiltinConstraints;
@@ -1178,25 +1185,25 @@ public class ConstraintHelper {
 	/**
 	 * this method inspects the type of the <code>@Valid</code> annotation and decides, if the annotation is useful.
 	 * <p>
-	 *     This method returns false, if the {@link jakarta.validation.Valid} annotation is applied to:
+	 *     This method returns false, if the {@link jakarta.validation.Valid} annotation is applied to
+     *     types matching {@link #BUILTIN_TYPE_NAMES}:
 	 *     <ul>
 	 *         <li>a native type (int, boolean, etc</li>
-	 *         <li>a type in a java.* or javax.* package</li>
+	 *         <li>a boxed native type (Integer, Boolean, etc</li>
+	 *         <li>some types in java.lang.* package, eg String</li>
 	 *     </ul>
 	 * </p>
 	 * @param annotation the Valid annotation
 	 * @param constrainable the constraint element
-	 * @return true, if the Valid annotation should not be applied
+	 * @return true, if the Valid annotation is not applicable
 	 * @param <A> type of annotation
 	 */
 	public <A extends Annotation> boolean isNonApplicableValidAnnotation(A annotation, Constrainable constrainable) {
 		if ( !( annotation instanceof Valid ) ) {
 			return false;
 		}
-
-		return constrainable.getType().getTypeName().startsWith( "java." )
-				|| constrainable.getType().getTypeName().startsWith( "javax." )
-				|| constrainable.getType().getTypeName().matches( BUILTIN_TYPE_NAMES );
+		String typeName = constrainable.getType().getTypeName();
+		return BUILTIN_TYPE_NAMES.matcher( typeName ).matches();
 	}
 
 	/**
