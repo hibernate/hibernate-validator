@@ -62,6 +62,8 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -385,9 +387,9 @@ public class ConstraintHelper {
 	private static final String JAVA_MONEY_CLASS_NAME = "javax.money.MonetaryAmount";
 	private static final java.util.regex.Pattern BUILTIN_TYPE_NAMES = java.util.regex.Pattern.compile( "" +
 			// primitives
-			"(boolean|byte|char|int|short|double|long" +
+			"(boolean|byte|char|int|short|float|double|long" +
 			// boxed primitives
-			"|java.lang.Boolean|java.lang.Byte|java.lang.Character|java.lang.Integer|java.lang.Short|java.lang.Double|java.lang.Long" +
+			"|java.lang.Boolean|java.lang.Byte|java.lang.Character|java.lang.Integer|java.lang.Short|java.lang.Float|java.lang.Double|java.lang.Long" +
 			// selected final types from java.* hierarchy
 			"|java.lang.String" +
 			")" );
@@ -767,7 +769,8 @@ public class ConstraintHelper {
 			putBuiltinConstraint( tmpConstraints, EAN.class, EANValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EMAIL ) ) {
-			putBuiltinConstraint( tmpConstraints, org.hibernate.validator.constraints.Email.class, org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator.class );
+			putBuiltinConstraint( tmpConstraints, org.hibernate.validator.constraints.Email.class,
+					org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ISBN ) ) {
 			putBuiltinConstraint( tmpConstraints, ISBN.class, ISBNValidator.class );
@@ -797,7 +800,8 @@ public class ConstraintHelper {
 			putBuiltinConstraint( tmpConstraints, NIP.class, NIPValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NOT_BLANK ) ) {
-			putBuiltinConstraint( tmpConstraints, org.hibernate.validator.constraints.NotBlank.class, org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator.class );
+			putBuiltinConstraint( tmpConstraints, org.hibernate.validator.constraints.NotBlank.class,
+					org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NOT_EMPTY ) ) {
 			putBuiltinConstraint( tmpConstraints, org.hibernate.validator.constraints.NotEmpty.class );
@@ -866,9 +870,7 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Returns the constraint validator classes for the given constraint
-	 * annotation type, as retrieved from
-	 *
+	 * Returns the constraint validator classes for the given constraint annotation type, as retrieved from
 	 * <ul>
 	 * <li>{@link Constraint#validatedBy()},
 	 * <li>internally registered validators for built-in constraints</li>
@@ -876,12 +878,10 @@ public class ConstraintHelper {
 	 * <li>programmatically registered validators (see
 	 * {@link org.hibernate.validator.cfg.ConstraintMapping#constraintDefinition(Class)}).</li>
 	 * </ul>
-	 *
 	 * The result is cached internally.
 	 *
 	 * @param annotationType The constraint annotation type.
-	 * @param <A> the type of the annotation
-	 *
+	 * @param <A>            the type of the annotation
 	 * @return The validator classes for the given type.
 	 */
 	public <A extends Annotation> List<ConstraintValidatorDescriptor<A>> getAllValidatorDescriptors(Class<A> annotationType) {
@@ -890,19 +890,17 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Returns those validator descriptors for the given constraint annotation
-	 * matching the given target.
+	 * Returns those validator descriptors for the given constraint annotation matching the given target.
 	 *
-	 * @param annotationType The annotation of interest.
+	 * @param annotationType   The annotation of interest.
 	 * @param validationTarget The target, either annotated element or parameters.
-	 * @param <A> the type of the annotation
-	 *
+	 * @param <A>              the type of the annotation
 	 * @return A list with matching validator descriptors.
 	 */
 	public <A extends Annotation> List<ConstraintValidatorDescriptor<A>> findValidatorDescriptors(Class<A> annotationType, ValidationTarget validationTarget) {
 		return getAllValidatorDescriptors( annotationType ).stream()
-			.filter( d -> supportsValidationTarget( d, validationTarget ) )
-			.collect( Collectors.toList() );
+				.filter( d -> supportsValidationTarget( d, validationTarget ) )
+				.collect( Collectors.toList() );
 	}
 
 	private boolean supportsValidationTarget(ConstraintValidatorDescriptor<?> validatorDescriptor, ValidationTarget target) {
@@ -910,17 +908,16 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Registers the given validator descriptors with the given constraint
-	 * annotation type.
+	 * Registers the given validator descriptors with the given constraint annotation type.
 	 *
-	 * @param annotationType The constraint annotation type
+	 * @param annotationType       The constraint annotation type
 	 * @param validatorDescriptors The validator descriptors to register
-	 * @param keepExistingClasses Whether already-registered validators should be kept or not
-	 * @param <A> the type of the annotation
+	 * @param keepExistingClasses  Whether already-registered validators should be kept or not
+	 * @param <A>                  the type of the annotation
 	 */
 	public <A extends Annotation> void putValidatorDescriptors(Class<A> annotationType,
-														   List<ConstraintValidatorDescriptor<A>> validatorDescriptors,
-														   boolean keepExistingClasses) {
+			List<ConstraintValidatorDescriptor<A>> validatorDescriptors,
+			boolean keepExistingClasses) {
 
 		List<ConstraintValidatorDescriptor<A>> validatorDescriptorsToAdd = new ArrayList<>();
 
@@ -940,9 +937,7 @@ public class ConstraintHelper {
 	 * Checks whether a given annotation is a multi value constraint or not.
 	 *
 	 * @param annotationType the annotation type to check.
-	 *
-	 * @return {@code true} if the specified annotation is a multi value constraints, {@code false}
-	 *         otherwise.
+	 * @return {@code true} if the specified annotation is a multi value constraints, {@code false} otherwise.
 	 */
 	public boolean isMultiValueConstraint(Class<? extends Annotation> annotationType) {
 		if ( isJdkAnnotation( annotationType ) ) {
@@ -972,12 +967,10 @@ public class ConstraintHelper {
 	/**
 	 * Returns the constraints which are part of the given multi-value constraint.
 	 * <p>
-	 * Invoke {@link #isMultiValueConstraint(Class)} prior to calling this method to check whether a given constraint
-	 * actually is a multi-value constraint.
+	 * Invoke {@link #isMultiValueConstraint(Class)} prior to calling this method to check whether a given constraint actually is a multi-value constraint.
 	 *
 	 * @param multiValueConstraint the multi-value constraint annotation from which to retrieve the contained constraints
-	 * @param <A> the type of the annotation
-	 *
+	 * @param <A>                  the type of the annotation
 	 * @return A list of constraint annotations, may be empty but never {@code null}.
 	 */
 	public <A extends Annotation> List<Annotation> getConstraintsFromMultiValueConstraint(A multiValueConstraint) {
@@ -992,8 +985,7 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks whether the specified annotation is a valid constraint annotation. A constraint annotation has to
-	 * fulfill the following conditions:
+	 * Checks whether the specified annotation is a valid constraint annotation. A constraint annotation has to fulfill the following conditions:
 	 * <ul>
 	 * <li>Must be annotated with {@link Constraint}
 	 * <li>Define a message parameter</li>
@@ -1002,7 +994,6 @@ public class ConstraintHelper {
 	 * </ul>
 	 *
 	 * @param annotationType The annotation type to test.
-	 *
 	 * @return {@code true} if the annotation fulfills the above conditions, {@code false} otherwise.
 	 */
 	public boolean isConstraintAnnotation(Class<? extends Annotation> annotationType) {
@@ -1143,10 +1134,7 @@ public class ConstraintHelper {
 	 * Returns the default validators for the given constraint type.
 	 *
 	 * @param annotationType The constraint annotation type.
-	 *
-	 * @return A list with the default validators as retrieved from
-	 *         {@link Constraint#validatedBy()} or the list of validators for
-	 *         built-in constraints.
+	 * @return A list with the default validators as retrieved from {@link Constraint#validatedBy()} or the list of validators for built-in constraints.
 	 */
 	@SuppressWarnings("unchecked")
 	private <A extends Annotation> List<ConstraintValidatorDescriptor<A>> getDefaultValidatorDescriptors(Class<A> annotationType) {
@@ -1185,31 +1173,37 @@ public class ConstraintHelper {
 	/**
 	 * this method inspects the type of the <code>@Valid</code> annotation and decides, if the annotation is useful.
 	 * <p>
-	 *     This method returns false, if the {@link jakarta.validation.Valid} annotation is applied to
-     *     types matching {@link #BUILTIN_TYPE_NAMES}:
+	 * This method returns false, if the {@link jakarta.validation.Valid} annotation is applied to types matching {@link #BUILTIN_TYPE_NAMES}:
 	 *     <ul>
 	 *         <li>a native type (int, boolean, etc</li>
 	 *         <li>a boxed native type (Integer, Boolean, etc</li>
 	 *         <li>some types in java.lang.* package, eg String</li>
 	 *     </ul>
 	 * </p>
-	 * @param annotation the Valid annotation
+	 *
+	 * @param annotation    the Valid annotation
 	 * @param constrainable the constraint element
+	 * @param <A>           type of annotation
 	 * @return true, if the Valid annotation is not applicable
-	 * @param <A> type of annotation
 	 */
 	public <A extends Annotation> boolean isNonApplicableValidAnnotation(A annotation, Constrainable constrainable) {
 		if ( !( annotation instanceof Valid ) ) {
 			return false;
 		}
 		String typeName = constrainable.getType().getTypeName();
-		return BUILTIN_TYPE_NAMES.matcher( typeName ).matches();
+		Type typeForResolution = constrainable.getTypeForValidatorResolution();
+		if ( typeForResolution instanceof ParameterizedType ) {
+			return Arrays.stream( ( (ParameterizedType) typeForResolution ).getActualTypeArguments() )
+					.allMatch( pType -> BUILTIN_TYPE_NAMES.matcher( pType.getTypeName() ).matches() );
+		}
+		else {
+			return BUILTIN_TYPE_NAMES.matcher( typeName ).matches();
+		}
 	}
 
 	/**
-	 * A type-safe wrapper around a concurrent map from constraint types to
-	 * associated validator classes. The casts are safe as data is added trough
-	 * the typed API only.
+	 * A type-safe wrapper around a concurrent map from constraint types to associated validator classes. The casts are safe as data is added trough the typed
+	 * API only.
 	 *
 	 * @author Gunnar Morling
 	 */

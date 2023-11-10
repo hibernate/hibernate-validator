@@ -12,21 +12,29 @@ import jakarta.validation.Valid;
 import jakarta.validation.GroupSequence;
 import jakarta.validation.groups.Default;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author Emmanuel Bernard
  */
-@GroupSequence( {Suit.class, Cloth.class })
+@GroupSequence({ Suit.class, Cloth.class })
 public class Suit {
 
 	@Max(value = 50, groups = { Default.class, Cloth.class })
 	@Min(1)
 	@Valid // this should be ignored
 	private Integer size;
-	@Valid private Trousers trousers;
+	@Valid
+	private Trousers trousers;
 	private Jacket jacket;
 
 	@Valid
 	private boolean awesomeDesign;
+
+	@Valid Set<Integer> someSet = new HashSet<>( Arrays.asList( 1, 2, 3, 4, 5, 6 ) );
+	Set<@Valid Integer> someOtherSet = new HashSet<>( Arrays.asList( 1, 2, 3, 4, 5, 6 ) );
 
 	public Trousers getTrousers() {
 		return trousers;
