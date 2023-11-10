@@ -529,6 +529,11 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			return Collections.emptyList();
 		}
 
+		// address HV-1831: do not create an Annotation object for unwanted Valid annotations
+		if ( constraintCreationContext.getConstraintHelper().isNonApplicableValidAnnotation( annotation, constrainable ) ) {
+			return Collections.emptyList();
+		}
+
 		List<Annotation> constraints = newArrayList();
 		Class<? extends Annotation> annotationType = annotation.annotationType();
 		if ( constraintCreationContext.getConstraintHelper().isConstraintAnnotation( annotationType ) ) {

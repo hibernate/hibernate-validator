@@ -10,6 +10,8 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.hibernate.validator.performance.cascaded.CascadedValidation;
+import org.hibernate.validator.performance.cascaded.CascadedValidationWithManyPrimitiveValids;
+import org.hibernate.validator.performance.cascaded.CascadedValidationWithoutPrimitiveValids;
 import org.hibernate.validator.performance.cascaded.CascadedWithLotsOfItemsValidation;
 import org.hibernate.validator.performance.simple.SimpleValidation;
 import org.hibernate.validator.performance.statistical.StatisticalValidation;
@@ -32,13 +34,15 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 public final class BenchmarkRunner {
 
 	private static final Stream<? extends Class<?>> DEFAULT_TEST_CLASSES = Stream.of(
-			SimpleValidation.class.getName(),
-			CascadedValidation.class.getName(),
-			CascadedWithLotsOfItemsValidation.class.getName(),
-			StatisticalValidation.class.getName(),
+			CascadedValidationWithManyPrimitiveValids.class.getName(),
+			CascadedValidationWithoutPrimitiveValids.class.getName()
+//			SimpleValidation.class.getName(),
+//			CascadedValidation.class.getName(),
+//			CascadedWithLotsOfItemsValidation.class.getName(),
+//			StatisticalValidation.class.getName()//,
 			// Benchmarks specific to Bean Validation 2.0
 			// Tests are located in a separate source folder only added for implementations compatible with BV 2.0
-			"org.hibernate.validator.performance.multilevel.MultiLevelContainerValidation"
+			//"org.hibernate.validator.performance.multilevel.MultiLevelContainerValidation"
 	).map( BenchmarkRunner::classForName ).filter( Objects::nonNull );
 
 	private BenchmarkRunner() {
