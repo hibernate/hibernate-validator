@@ -1477,6 +1477,21 @@
             </properties>
         </profile>
         <profile>
+            <id>testWithJdk23</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>23</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- ForbiddenAPIs doesn't work with JDK23+ yet -->
+                <forbiddenapis.skip>true</forbiddenapis.skip>
+                <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK23+ -->
+                <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
+            </properties>
+        </profile>
+        <profile>
             <id>jqassistant</id>
             <!--
             To run the analysis on the engine module and launch a Neo4j server accessible at http://localhost:7474/, run:
