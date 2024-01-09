@@ -1447,19 +1447,6 @@
             </build>
         </profile>
         <profile>
-            <id>testWithJdk20</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>20</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- ForbiddenAPIs doesn't work with JDK20+ yet -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
-            </properties>
-        </profile>
-        <profile>
             <id>testWithJdk21</id>
             <activation>
                 <property>
