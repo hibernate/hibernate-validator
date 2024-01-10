@@ -50,6 +50,7 @@ import org.testng.annotations.Test;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
+ * @author Thomas Strauß
  */
 public class PathImplTest {
 
@@ -164,6 +165,28 @@ public class PathImplTest {
 	public void testEmptyString() {
 		Path path = PathImpl.createPathFromString( "" );
 		assertTrue( path.iterator().hasNext() );
+	}
+
+	@Test
+	public void testIsSubPathOrContains() {
+		PathImpl rootPath = PathImpl.createPathFromString( "" );
+		PathImpl subPath = PathImpl.createPathFromString( "annotation" );
+		PathImpl middlePath = PathImpl.createPathFromString( "annotation.property" );
+		PathImpl middlePath2 = PathImpl.createPathFromString( "annotation.property[2]" );
+		PathImpl middlePath3 = PathImpl.createPathFromString( "annotation.property[3]" );
+		PathImpl fullPath3 = PathImpl.createPathFromString( "annotation.property[3].element" );
+		PathImpl fullPath4 = PathImpl.createPathFromString( "annotation.property[4].element" );
+
+		assertTrue( rootPath.isSubPathOrContains( middlePath ), "root path is in every path" );
+		assertTrue( middlePath.isSubPathOrContains( rootPath ), "every path contains the root path" );
+		assertTrue( subPath.isSubPathOrContains( middlePath ), "bean is subpath of its properties" );
+		assertTrue( middlePath.isSubPathOrContains( subPath ), "a property is an extension of its bean" );
+		assertTrue( subPath.isSubPathOrContains( fullPath3 ), "bean is subpath of its tree" );
+		assertTrue( subPath.isSubPathOrContains( fullPath4 ), "bean is subpath of its tree, for every array index" );
+		assertFalse( middlePath.isSubPathOrContains( fullPath3 ), "property is not a subpath of an array" );
+		assertFalse( middlePath3.isSubPathOrContains( fullPath3 ), "array property is not a subpath of a property of a bean in an array" );
+		assertFalse( middlePath2.isSubPathOrContains( fullPath3 ), "array element is not a subpath of another element's children" );
+		assertFalse( fullPath3.isSubPathOrContains( fullPath4 ), "different array elements are not subpaths of the other" );
 	}
 
 	@Test
