@@ -13,7 +13,6 @@ import org.hibernate.validator.performance.cascaded.CascadedValidation;
 import org.hibernate.validator.performance.cascaded.CascadedWithLotsOfItemsValidation;
 import org.hibernate.validator.performance.simple.SimpleValidation;
 import org.hibernate.validator.performance.statistical.StatisticalValidation;
-
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;

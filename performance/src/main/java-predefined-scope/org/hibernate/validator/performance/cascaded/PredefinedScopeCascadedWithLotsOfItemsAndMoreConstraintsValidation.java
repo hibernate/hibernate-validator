@@ -9,18 +9,21 @@ package org.hibernate.validator.performance.cascaded;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Valid;
-import jakarta.validation.Validator;
-import jakarta.validation.Validation;
-import jakarta.validation.ValidatorFactory;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
+import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -36,18 +39,23 @@ import org.openjdk.jmh.infra.Blackhole;
 /**
  * @author Guillaume Smet
  */
-public class CascadedWithLotsOfItemsAndMoreConstraintsValidation {
+public class PredefinedScopeCascadedWithLotsOfItemsAndMoreConstraintsValidation {
 
 	private static final int NUMBER_OF_ARTICLES_PER_SHOP = 2000;
 
 	@State(Scope.Benchmark)
-	public static class CascadedWithLotsOfItemsValidationState {
+	public static class PredefinedScopeCascadedWithLotsOfItemsValidationState {
+
 		public volatile Validator validator;
 
 		public volatile Shop shop;
 
-		public CascadedWithLotsOfItemsValidationState() {
-			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		public PredefinedScopeCascadedWithLotsOfItemsValidationState() {
+			ValidatorFactory factory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
+					.configure()
+					.builtinConstraints( new HashSet<>( Arrays.asList( NotNull.class.getName(), Size.class.getName() ) ) )
+					.initializeBeanMetaData( new HashSet<>( Arrays.asList( Shop.class, Article.class ) ) )
+					.buildValidatorFactory();
 			validator = factory.getValidator();
 
 			shop = createShop();
@@ -71,7 +79,7 @@ public class CascadedWithLotsOfItemsAndMoreConstraintsValidation {
 	@Threads(20)
 	@Warmup(iterations = 10)
 	@Measurement(iterations = 20)
-	public void testCascadedValidationWithLotsOfItems(CascadedWithLotsOfItemsValidationState state, Blackhole bh) {
+	public void testPredefinedScopeCascadedValidationWithLotsOfItems(PredefinedScopeCascadedWithLotsOfItemsValidationState state, Blackhole bh) {
 		Set<ConstraintViolation<Shop>> violations = state.validator.validate( state.shop );
 		assertThat( violations ).hasSize( 0 );
 
@@ -79,6 +87,7 @@ public class CascadedWithLotsOfItemsAndMoreConstraintsValidation {
 	}
 
 	public static class Shop {
+
 		@NotNull
 		private Integer id;
 
@@ -100,6 +109,7 @@ public class CascadedWithLotsOfItemsAndMoreConstraintsValidation {
 	}
 
 	public static class Article {
+
 		@NotNull
 		private Integer id;
 

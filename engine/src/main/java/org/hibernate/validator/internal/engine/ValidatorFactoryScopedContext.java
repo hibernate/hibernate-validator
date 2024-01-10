@@ -107,7 +107,7 @@ public class ValidatorFactoryScopedContext {
 						temporalValidationTolerance ) );
 	}
 
-	private ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
+	ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ClockProvider clockProvider,
@@ -200,7 +200,6 @@ public class ValidatorFactoryScopedContext {
 		private Object constraintValidatorPayload;
 		private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
 		private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
-
 		private boolean showValidatedValuesInTraceLogs;
 		private HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
 
