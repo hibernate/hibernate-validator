@@ -83,6 +83,7 @@ enum BuiltinConstraint {
 			Arrays.asList( JAKARTA_VALIDATION_CONSTRAINTS_PATTERN )),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_TITULO_ELEITORAL("org.hibernate.validator.constraints.br.TituloEleitoral",
 			Arrays.asList( JAKARTA_VALIDATION_CONSTRAINTS_PATTERN, ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD11_CHECK ) ),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_KOR_KORRRN("org.hibernate.validator.constraints.kor.KorRRN"),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_NIP("org.hibernate.validator.constraints.pl.NIP"),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_PESEL("org.hibernate.validator.constraints.pl.PESEL"),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_REGON("org.hibernate.validator.constraints.pl.REGON"),

@@ -24,6 +24,7 @@ import org.hibernate.validator.cfg.defs.ParameterScriptAssertDef;
 import org.hibernate.validator.cfg.defs.br.CNPJDef;
 import org.hibernate.validator.cfg.defs.br.CPFDef;
 import org.hibernate.validator.cfg.defs.br.TituloEleitoralDef;
+import org.hibernate.validator.cfg.defs.kor.KorRRNDef;
 import org.hibernate.validator.cfg.defs.pl.NIPDef;
 import org.hibernate.validator.cfg.defs.pl.PESELDef;
 import org.hibernate.validator.cfg.defs.pl.REGONDef;
@@ -32,6 +33,7 @@ import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
+import org.hibernate.validator.constraints.kor.KorRRN;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
@@ -64,6 +66,10 @@ public class ProgrammaticConstraintDefinitionsTest {
 
 		doProgrammaticTest( INN.class, new INNDef().type( INN.Type.INDIVIDUAL ), "127530851622", "127530851623", "invalid Russian taxpayer identification number (INN)" );
 		doProgrammaticTest( INN.class, new INNDef().type( INN.Type.JURIDICAL ), "8606995694", "8606995695", "invalid Russian taxpayer identification number (INN)" );
+
+		doProgrammaticTest( KorRRN.class, new KorRRNDef().validateCheckDigit( KorRRN.ValidateCheckDigit.NEVER ), "030205-1000004", "010199-1063015", "invalid Korean resident registration number (KorRRN)" );
+		doProgrammaticTest( KorRRN.class, new KorRRNDef().validateCheckDigit( KorRRN.ValidateCheckDigit.ALWAYS ), "030205-2567485", "030299-5000000", "invalid Korean resident registration number (KorRRN)" );
+		doProgrammaticTest( KorRRN.class, new KorRRNDef(),"030205-1000004", "010199-1063015", "invalid Korean resident registration number (KorRRN)" );
 	}
 
 	@Test
