@@ -1,0 +1,38 @@
+package org.hibernate.validator.constraints.kor;
+
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE_USE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import org.hibernate.validator.constraints.ru.INN.Type;
+
+/**
+ * Checks that the annotated character sequence is a valid Korean resident registration number.
+ *
+ * @author Taewoo Kim
+ * @see <a href="https://ko.wikipedia.org/wiki/주민등록번호">Korean resident registration number</a>
+ */
+
+@Documented
+@Constraint(validatedBy = {})
+@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
+@Retention(RUNTIME)
+public @interface KorRRN {
+
+    String message() default "{org.hibernate.validator.constraints.kor.KorRRN.message}";
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
+
+    Type type() default Type.ANY;
+}
