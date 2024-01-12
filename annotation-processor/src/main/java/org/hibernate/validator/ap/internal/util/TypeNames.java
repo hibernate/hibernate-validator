@@ -79,6 +79,7 @@ public class TypeNames {
 		public static final String NIP_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.NIP";
 		public static final String PESEL_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.PESEL";
 		public static final String INN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ru.INN";
+		public static final String KOR_RRN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + "kor.KorRRN";
 		public static final String NORMALIZED = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Normalized";
 		public static final String UUID = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".UUID";
 		public static final String NOT_BLANK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotBlank";
