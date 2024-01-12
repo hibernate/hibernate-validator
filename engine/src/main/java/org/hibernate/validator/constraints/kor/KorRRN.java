@@ -1,3 +1,9 @@
+/*
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.constraints.kor;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -10,9 +16,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
 import org.hibernate.validator.constraints.ru.INN.Type;
 
 /**
@@ -24,15 +32,15 @@ import org.hibernate.validator.constraints.ru.INN.Type;
 
 @Documented
 @Constraint(validatedBy = {})
-@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
+@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 public @interface KorRRN {
 
-    String message() default "{org.hibernate.validator.constraints.kor.KorRRN.message}";
+	String message() default "{org.hibernate.validator.constraints.kor.KorRRN.message}";
 
-    Class<?>[] groups() default {};
+	Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default {};
 
-    Type type() default Type.ANY;
+	Type type() default Type.ANY;
 }

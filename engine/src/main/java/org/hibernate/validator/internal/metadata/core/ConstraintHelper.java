@@ -1180,7 +1180,7 @@ public class ConstraintHelper {
 
 	/**
 	 * A type-safe wrapper around a concurrent map from constraint types to
-	 * associated validator classes. The casts are safe as data is added trough
+	 * associated validator classes. The casts are safe as data is added through
 	 * the typed API only.
 	 *
 	 * @author Gunnar Morling
