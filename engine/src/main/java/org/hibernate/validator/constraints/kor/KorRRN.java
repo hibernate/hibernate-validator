@@ -21,8 +21,6 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.hibernate.validator.constraints.ru.INN.Type;
-
 /**
  * Checks that the annotated character sequence is a valid Korean resident registration number.
  *
@@ -41,6 +39,4 @@ public @interface KorRRN {
 	Class<?>[] groups() default {};
 
 	Class<? extends Payload>[] payload() default {};
-
-	Type type() default Type.ANY;
 }
