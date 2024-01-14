@@ -57,10 +57,9 @@ public class CNPJValidator implements ConstraintValidator<CNPJ, CharSequence> {
 		}
 
 		// Check for repeated digits
-		boolean allDigitsSame = value.toString().chars()
+		if ( value.toString().chars()
 				.filter( Character::isDigit )
-				.distinct().count() == 1;
-		if ( allDigitsSame ) {
+				.distinct().count() == 1 ) {
 			return false;
 		}
 
