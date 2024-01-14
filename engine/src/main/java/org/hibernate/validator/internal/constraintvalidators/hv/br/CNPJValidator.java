@@ -16,6 +16,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValida
 
 /**
  * @author Hardy Ferentschik
+ * @author Eduardo Resende Batista Soares
  */
 public class CNPJValidator implements ConstraintValidator<CNPJ, CharSequence> {
 	private static final Pattern DIGITS_ONLY = Pattern.compile( "\\d+" );
@@ -53,6 +54,14 @@ public class CNPJValidator implements ConstraintValidator<CNPJ, CharSequence> {
 	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
 		if ( value == null ) {
 			return true;
+		}
+
+		// Check for repeated digits
+		boolean allDigitsSame = value.toString().chars()
+				.filter( Character::isDigit )
+				.distinct().count() == 1;
+		if ( allDigitsSame ) {
+			return false;
 		}
 
 		if ( DIGITS_ONLY.matcher( value ).matches() ) {
