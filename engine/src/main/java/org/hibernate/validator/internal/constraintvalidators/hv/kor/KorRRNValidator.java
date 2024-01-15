@@ -7,12 +7,16 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv.kor;
 
+import java.util.regex.Pattern;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.kor.KorRRN;
 
 public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence> {
+
+	private static final Pattern REGEX = Pattern.compile( "\\d{6}-\\d{7}" );
 
 	private static final int CHECK_DIGIT_INDEX = 13;
 	private static final int[] CHECK_DIGIT_ARRAY = { 2, 3, 4, 5, 6, 7, -1, 8, 9, 2, 3, 4, 5 };
@@ -22,14 +26,24 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 		if ( rrnValue == null ) {
 			return true;
 		}
+		String rrn = rrnValue.toString();
 
-		int month = Integer.parseInt( rrnValue.toString().substring( 2, 4 ) );
-		int day = Integer.parseInt( rrnValue.toString().substring( 4, 6 ) );
-
-		if ( day > 31 || ( day > 30 && ( month == 4 || month == 6 || month == 9 || month == 11 ) ) || ( day > 28 && month == 2 ) ) {
+		if ( !isValidFormat( rrn ) ) {
 			return false;
 		}
-		return validateCheckSum( rrnValue.toString().toCharArray(), rrnValue.charAt( CHECK_DIGIT_INDEX ) );
+
+		int month = Integer.parseInt( rrn.substring( 2, 4 ) );
+		int day = Integer.parseInt( rrn.substring( 4, 6 ) );
+
+		if ( day > 31 || ( day > 30 && ( month == 4 || month == 6 || month == 9 || month == 11 ) ) || ( day > 28 && month == 2 ) || rrn.length() != 14 ) {
+			return false;
+		}
+
+		return validateCheckSum( rrn.toCharArray(), rrnValue.charAt( CHECK_DIGIT_INDEX ) );
+	}
+
+	private static boolean isValidFormat(String rrn) {
+		return REGEX.matcher( rrn ).matches();
 	}
 
 	private boolean validateCheckSum(char[] rrnArray, char code) {
@@ -40,10 +54,7 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 			}
 			sum += CHECK_DIGIT_ARRAY[i] * Character.getNumericValue( rrnArray[i] );
 		}
-		int su = 11 - sum % 11;
-		if ( su >= 10 ) {
-			su %= 10;
-		}
-		return su == Character.getNumericValue( code );
+
+		return ( 11 - sum % 11 ) % 10 == Character.getNumericValue( code );
 	}
 }

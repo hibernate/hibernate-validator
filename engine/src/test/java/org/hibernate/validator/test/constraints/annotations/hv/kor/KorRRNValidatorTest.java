@@ -23,7 +23,7 @@ public class KorRRNValidatorTest extends AbstractConstrainedTest {
 
 	@Test
 	void testKorRRN() {
-		final KorRegistrationCard korRegistrationCard = new KorRegistrationCard( "030205-1000004" );
+		final KorRegistrationCard korRegistrationCard = new KorRegistrationCard( "030205-3069010" );
 		final Set<ConstraintViolation<KorRegistrationCard>> violations = validator.validate( korRegistrationCard );
 		assertNoViolations( violations );
 	}
