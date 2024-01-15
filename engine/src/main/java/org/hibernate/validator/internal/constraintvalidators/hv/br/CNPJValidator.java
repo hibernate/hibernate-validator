@@ -16,6 +16,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValida
 
 /**
  * @author Hardy Ferentschik
+ * @author Eduardo Resende Batista Soares
  */
 public class CNPJValidator implements ConstraintValidator<CNPJ, CharSequence> {
 	private static final Pattern DIGITS_ONLY = Pattern.compile( "\\d+" );
@@ -53,6 +54,22 @@ public class CNPJValidator implements ConstraintValidator<CNPJ, CharSequence> {
 	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
 		if ( value == null ) {
 			return true;
+		}
+
+		if ( value.length() < 2 ) {
+			return false;
+		}
+
+		char firstDigit = value.charAt( 0 );
+		char otherDigit = value.charAt( 1 );
+		for ( int i = 2; i < value.length(); i++ ) {
+			char c = value.charAt( i );
+			if ( Character.isDigit( c ) && firstDigit != c ) {
+				otherDigit = c;
+			}
+		}
+		if ( firstDigit == otherDigit ) {
+			return false;
 		}
 
 		if ( DIGITS_ONLY.matcher( value ).matches() ) {
