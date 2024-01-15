@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  * Checks that the annotated character sequence is a valid Korean resident registration number.
  *
  * @author Taewoo Kim
- * @see <a href="[https://ko.wikipedia.org/wiki/주민등록번호](https://ko.wikipedia.org/wiki/%EC%A3%BC%EB%AF%BC%EB%93%B1%EB%A1%9D%EB%B2%88%ED%98%B8)">Korean resident registration number</a>
+ * @see <a href="https://ko.wikipedia.org/wiki/%EC%A3%BC%EB%AF%BC%EB%93%B1%EB%A1%9D%EB%B2%88%ED%98%B8">Korean resident registration number</a>
  */
 
 @Documented
