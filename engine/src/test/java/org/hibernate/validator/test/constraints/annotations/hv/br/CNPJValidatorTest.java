@@ -37,6 +37,18 @@ public class CNPJValidatorTest extends AbstractConstrainedTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1971")
+	public void any_length_less_then_14_is_invalid() {
+		String[] invalidLengthCNPJs = {"1", "123", "0000000000019"};
+		for ( String cnpj : invalidLengthCNPJs ) {
+			Set<ConstraintViolation<Company>> violations = validator.validate( new Company( cnpj ) );
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( CNPJ.class ).withProperty( "cnpj" )
+			);
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1971")
 	public void any_same_digit_cnpj_with_separator_is_invalid() {
 		for ( String cnpj : invalidCNPJs ) {
 			Set<ConstraintViolation<Company>> violations = validator.validate( new Company( cnpj ) );
