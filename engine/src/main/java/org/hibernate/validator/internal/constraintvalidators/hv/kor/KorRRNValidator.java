@@ -19,6 +19,12 @@ import org.hibernate.validator.constraints.kor.KorRRN;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ModUtil;
 
+/**
+ * Checks that a given character sequence is a valid RRN.
+ *
+ * @author Taewoo Kim
+ * @see <a href="https://www.law.go.kr/LSW/lsInfoP.do?lsId=008230&ancYnChk=0#0000">Korean Resident Registration Act Implementation Rules</a>
+ */
 public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence> {
 
 	private static final Function<Supplier<String>, String> REPLACE_HYPEN =
@@ -54,10 +60,17 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 		// Returns an implementation of the algorithm based on the value of ValidateCheckDigit
 		static RRNValidationAlgorithm from(KorRRN.ValidateCheckDigit validateCheckDigit) {
 			Contracts.assertNotNull( validateCheckDigit );
-			if ( validateCheckDigit == KorRRN.ValidateCheckDigit.BEFORE_OCTOBER_2020_ONLY ) {
-				return RRNValidationAlgorithmImpl.BEFORE_OCTOBER_2020_ONLY;
+			switch ( validateCheckDigit ){
+				case BEFORE_OCTOBER_2020_ONLY -> {
+					return RRNValidationAlgorithmImpl.BEFORE_OCTOBER_2020_ONLY;
+				}
+				case NEVER -> {
+					return RRNValidationAlgorithmImpl.NEVER;
+				}
+				default -> {
+					return RRNValidationAlgorithmImpl.NEVER;
+				}
 			}
-			return RRNValidationAlgorithmImpl.NEVER;
 		}
 
 		// Check the check-digit of the RRN using ModUtil

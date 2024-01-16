@@ -43,11 +43,21 @@ public @interface KorRRN {
 
 	ValidateCheckDigit validateCheckDigit() default NEVER;
 
-	/**
-	 * Korean resident registration number was changed by October 2020
-	 */
 	enum ValidateCheckDigit {
+		/**
+		 * Inspect the following lines
+		 * 1. Length of RRN
+		 * 2. Validity of Gender-Digit in RRN
+		 * 3. Validity of date in RRN
+		 */
 		NEVER,
+		/**
+		 * Inspect the following lines
+		 * 1. Length of RRN
+		 * 2. Validity of Gender-Digit in RRN
+		 * 3. Validity of date in RRN
+		 * 4. Validity of Check-digitin RRN
+		 */
 		BEFORE_OCTOBER_2020_ONLY
 	}
 }
