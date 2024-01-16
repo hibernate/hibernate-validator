@@ -60,17 +60,10 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 		// Returns an implementation of the algorithm based on the value of ValidateCheckDigit
 		static RRNValidationAlgorithm from(KorRRN.ValidateCheckDigit validateCheckDigit) {
 			Contracts.assertNotNull( validateCheckDigit );
-			switch ( validateCheckDigit ){
-				case BEFORE_OCTOBER_2020_ONLY -> {
-					return RRNValidationAlgorithmImpl.BEFORE_OCTOBER_2020_ONLY;
-				}
-				case NEVER -> {
-					return RRNValidationAlgorithmImpl.NEVER;
-				}
-				default -> {
-					return RRNValidationAlgorithmImpl.NEVER;
-				}
+			if ( validateCheckDigit == KorRRN.ValidateCheckDigit.BEFORE_OCTOBER_2020_ONLY ) {
+				return RRNValidationAlgorithmImpl.BEFORE_OCTOBER_2020_ONLY;
 			}
+			return RRNValidationAlgorithmImpl.NEVER;
 		}
 
 		// Check the check-digit of the RRN using ModUtil
