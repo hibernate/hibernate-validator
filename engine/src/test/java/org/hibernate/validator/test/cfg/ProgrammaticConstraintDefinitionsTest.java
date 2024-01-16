@@ -67,8 +67,8 @@ public class ProgrammaticConstraintDefinitionsTest {
 		doProgrammaticTest( INN.class, new INNDef().type( INN.Type.INDIVIDUAL ), "127530851622", "127530851623", "invalid Russian taxpayer identification number (INN)" );
 		doProgrammaticTest( INN.class, new INNDef().type( INN.Type.JURIDICAL ), "8606995694", "8606995695", "invalid Russian taxpayer identification number (INN)" );
 
-		doProgrammaticTest( KorRRN.class, new KorRRNDef(), "030205-1000004", "010101-1063015", "invalid Korean resident registration number (KorRRN)" );
-		doProgrammaticTest( KorRRN.class, new KorRRNDef(), "030205-2567485", "030299-5000000", "invalid Korean resident registration number (KorRRN)" );
+		doProgrammaticTest( KorRRN.class, new KorRRNDef().validateCheckDigit( KorRRN.ValidateCheckDigit.NEVER ), "030205-1000004", "010199-1063015", "invalid Korean resident registration number (KorRRN)" );
+		doProgrammaticTest( KorRRN.class, new KorRRNDef().validateCheckDigit( KorRRN.ValidateCheckDigit.BEFORE_OCTOBER_2020_ONLY  ), "030205-2567485", "030299-5000000", "invalid Korean resident registration number (KorRRN)" );
 	}
 
 	@Test

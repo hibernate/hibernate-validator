@@ -7,54 +7,138 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv.kor;
 
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.kor.KorRRN;
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ModUtil;
 
 public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence> {
 
-	private static final Pattern REGEX = Pattern.compile( "\\d{6}-\\d{7}" );
+	private static final Function<Supplier<String>, String> REPLACE_HYPEN =
+			rrn -> rrn.get().replace( "-", "" );
+	private static final List<Integer> GENDER_DIGIT = List.of( 1, 2, 3, 4 );
+	// Check sum weight for ModUtil
+	private static final int[] CHECK_SUM_WEIGHT = new int[] { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+	// index of the digit representing the gender
+	private static final int GENDER_DIGIT_INDEX = 6;
 
-	private static final int CHECK_DIGIT_INDEX = 13;
-	private static final int[] CHECK_DIGIT_ARRAY = { 2, 3, 4, 5, 6, 7, -1, 8, 9, 2, 3, 4, 5 };
+	private RRNValidationAlgorithm rrnValidationAlgorithm;
+
+	@Override
+	public void initialize(KorRRN constraintAnnotation) {
+		this.rrnValidationAlgorithm = RRNValidationAlgorithm.from( constraintAnnotation.validateCheckDigit() );
+	}
 
 	@Override
 	public boolean isValid(CharSequence rrnValue, ConstraintValidatorContext context) {
 		if ( rrnValue == null ) {
 			return true;
 		}
-		String rrn = rrnValue.toString();
-
-		if ( !isValidFormat( rrn ) ) {
-			return false;
-		}
-
-		int month = Integer.parseInt( rrn.substring( 2, 4 ) );
-		int day = Integer.parseInt( rrn.substring( 4, 6 ) );
-
-		if ( day > 31 || ( day > 30 && ( month == 4 || month == 6 || month == 9 || month == 11 ) ) || ( day > 28 && month == 2 ) || rrn.length() != 14 ) {
-			return false;
-		}
-
-		return validateCheckSum( rrn.toCharArray(), rrnValue.charAt( CHECK_DIGIT_INDEX ) );
+		return rrnValidationAlgorithm.isValid( REPLACE_HYPEN.apply( rrnValue::toString ) );
 	}
 
-	private static boolean isValidFormat(String rrn) {
-		return REGEX.matcher( rrn ).matches();
-	}
+	private interface RRNValidationAlgorithm {
+		int VALID_LENGTH = 13;
+		int THRESHOLD = 9;
+		int MODULDO = 11;
 
-	private boolean validateCheckSum(char[] rrnArray, char code) {
-		int sum = 0;
-		for ( int i = 0; i < CHECK_DIGIT_ARRAY.length; i++ ) {
-			if ( i == 6 ) {
-				continue;
+		boolean isValid(String rrn);
+
+		// Returns an implementation of the algorithm based on the value of ValidateCheckDigit
+		static RRNValidationAlgorithm from(KorRRN.ValidateCheckDigit validateCheckDigit) {
+			Contracts.assertNotNull( validateCheckDigit );
+			if ( validateCheckDigit == KorRRN.ValidateCheckDigit.BEFORE_OCTOBER_2020_ONLY ) {
+				return RRNValidationAlgorithmImpl.BEFORE_OCTOBER_2020_ONLY;
 			}
-			sum += CHECK_DIGIT_ARRAY[i] * Character.getNumericValue( rrnArray[i] );
+			return RRNValidationAlgorithmImpl.NEVER;
 		}
 
-		return ( 11 - sum % 11 ) % 10 == Character.getNumericValue( code );
+		// Check the check-digit of the RRN using ModUtil
+		default boolean isValidChecksum(final String rrn) {
+			int checksum = ModUtil.calculateModXCheckWithWeights(
+					toChecksumDigits( rrn ),
+					MODULDO,
+					THRESHOLD,
+					CHECK_SUM_WEIGHT
+			);
+			checksum = checksum >= 10 ? checksum - 10 : checksum;
+			return checksum == getChectDigit( rrn );
+		}
+
+		default boolean isValidDate(final String rrn) {
+			final int month = extractMonth( rrn );
+			final int day = extractDay( rrn );
+			if ( month > 12 || day < 0 || day > 31 ) {
+				return false;
+			}
+			return day <= 31 && ( day <= 30 || ( month != 4 && month != 6 && month != 9 && month != 11 ) ) && ( day <= 29 || month != 2 );
+		}
+
+		default boolean isValidLength(String rrn) {
+			return rrn.length() == VALID_LENGTH;
+		}
+
+		default boolean isValidGenderDigit(String rrn) {
+			return GENDER_DIGIT.contains( extractGenderDigit( rrn ) );
+		}
+
+		private int extractGenderDigit(String rrn) {
+			return Character.getNumericValue( rrn.charAt( GENDER_DIGIT_INDEX ) );
+		}
+
+		private List<Integer> toChecksumDigits(String rrn) {
+			List<Integer> collect = new ArrayList<>();
+			for ( int i = 0; i < rrn.length() - 1; i++ ) {
+				collect.add( Character.getNumericValue( rrn.charAt( i ) ) );
+			}
+			return collect;
+		}
+
+		private int getChectDigit(String rrn) {
+			return Character.getNumericValue( rrn.charAt( rrn.length() - 1 ) );
+		}
+
+		private int extractDay(String rrn) {
+			return Integer.parseInt( rrn.substring( 4, 6 ) );
+		}
+
+		private int extractMonth(String rrn) {
+			return Integer.parseInt( rrn.substring( 2, 4 ) );
+		}
+	}
+
+	private enum RRNValidationAlgorithmImpl implements RRNValidationAlgorithm {
+		/**
+		 * Inspect the following lines
+		 * 1. Length of RRN
+		 * 2. Validity of Gender-Digit in RRN
+		 * 3. Validity of date in RRN
+		 */
+		NEVER {
+			@Override
+			public boolean isValid(String rrn) {
+				return isValidLength( rrn ) && isValidDate( rrn ) && isValidGenderDigit( rrn );
+			}
+		},
+		/**
+		 * Inspect the following lines
+		 * 1. Length of RRN
+		 * 2. Validity of Gender-Digit in RRN
+		 * 3. Validity of date in RRN
+		 * 4. Validity of Check-digitin RRN
+		 */
+		BEFORE_OCTOBER_2020_ONLY {
+			@Override
+			public boolean isValid(String rrn) {
+				return isValidLength( rrn ) && isValidDate( rrn ) && isValidGenderDigit( rrn ) && isValidChecksum( rrn );
+			}
+		}
 	}
 }

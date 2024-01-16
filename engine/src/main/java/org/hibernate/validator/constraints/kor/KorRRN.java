@@ -13,6 +13,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.constraints.kor.KorRRN.ValidateCheckDigit.NEVER;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -39,4 +40,14 @@ public @interface KorRRN {
 	Class<?>[] groups() default {};
 
 	Class<? extends Payload>[] payload() default {};
+
+	ValidateCheckDigit validateCheckDigit() default NEVER;
+
+	/**
+	 * Korean resident registration number was changed by October 2020
+	 */
+	enum ValidateCheckDigit {
+		NEVER,
+		BEFORE_OCTOBER_2020_ONLY
+	}
 }

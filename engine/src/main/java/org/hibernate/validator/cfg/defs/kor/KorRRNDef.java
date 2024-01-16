@@ -14,4 +14,9 @@ public class KorRRNDef extends ConstraintDef<KorRRNDef, KorRRN> {
 	public KorRRNDef() {
 		super( KorRRN.class );
 	}
+
+	public KorRRNDef validateCheckDigit(KorRRN.ValidateCheckDigit validateCheckDigit) {
+		addParameter( "validateCheckDigit", validateCheckDigit );
+		return this;
+	}
 }
