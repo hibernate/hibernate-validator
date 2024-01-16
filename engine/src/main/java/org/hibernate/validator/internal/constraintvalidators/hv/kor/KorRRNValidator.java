@@ -89,11 +89,11 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 			return GENDER_DIGIT.contains( extractGenderDigit( rrn ) );
 		}
 
-		private int extractGenderDigit(String rrn) {
+		default int extractGenderDigit(String rrn) {
 			return Character.getNumericValue( rrn.charAt( GENDER_DIGIT_INDEX ) );
 		}
 
-		private List<Integer> toChecksumDigits(String rrn) {
+		default List<Integer> toChecksumDigits(String rrn) {
 			List<Integer> collect = new ArrayList<>();
 			for ( int i = 0; i < rrn.length() - 1; i++ ) {
 				collect.add( Character.getNumericValue( rrn.charAt( i ) ) );
@@ -101,15 +101,15 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 			return collect;
 		}
 
-		private int getChectDigit(String rrn) {
+		default int getChectDigit(String rrn) {
 			return Character.getNumericValue( rrn.charAt( rrn.length() - 1 ) );
 		}
 
-		private int extractDay(String rrn) {
+		default int extractDay(String rrn) {
 			return Integer.parseInt( rrn.substring( 4, 6 ) );
 		}
 
-		private int extractMonth(String rrn) {
+		default int extractMonth(String rrn) {
 			return Integer.parseInt( rrn.substring( 2, 4 ) );
 		}
 	}
