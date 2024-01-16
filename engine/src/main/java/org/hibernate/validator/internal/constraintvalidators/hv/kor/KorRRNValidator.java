@@ -60,8 +60,8 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 		// Returns an implementation of the algorithm based on the value of ValidateCheckDigit
 		static RRNValidationAlgorithm from(KorRRN.ValidateCheckDigit validateCheckDigit) {
 			Contracts.assertNotNull( validateCheckDigit );
-			if ( validateCheckDigit == KorRRN.ValidateCheckDigit.BEFORE_OCTOBER_2020_ONLY ) {
-				return RRNValidationAlgorithmImpl.BEFORE_OCTOBER_2020_ONLY;
+			if ( validateCheckDigit == KorRRN.ValidateCheckDigit.ALWAYS ) {
+				return RRNValidationAlgorithmImpl.ALWAYS;
 			}
 			return RRNValidationAlgorithmImpl.NEVER;
 		}
@@ -140,7 +140,7 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 		 * 3. Validity of date in RRN
 		 * 4. Validity of Check-digitin RRN
 		 */
-		BEFORE_OCTOBER_2020_ONLY {
+		ALWAYS {
 			@Override
 			public boolean isValid(String rrn) {
 				return isValidLength( rrn ) && isValidDate( rrn ) && isValidGenderDigit( rrn ) && isValidChecksum( rrn );

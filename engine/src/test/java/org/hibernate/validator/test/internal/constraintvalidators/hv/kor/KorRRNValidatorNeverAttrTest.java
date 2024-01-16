@@ -91,6 +91,14 @@ public class KorRRNValidatorNeverAttrTest extends KorRRNValidatorTestHelper {
 		assertInvalidRRN( "zzzzzzzzzzzzzzzzz" );
 	}
 
+	// Invalid RRN Sequence
+	@Test
+	void invalidGen() {
+		assertInvalidRRN( "861224-9567484" );
+		assertInvalidRRN( "960223-9499378" );
+		assertInvalidRRN( "790707-9133360" );
+	}
+
 	private void assertValidRRN(String rrn) {
 		assertTrue( validator.isValid( rrn, null ), rrn + " should be a valid RRN" );
 

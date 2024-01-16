@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.kor.KorRRNValida
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.hibernate.validator.constraints.kor.KorRRN.ValidateCheckDigit.BEFORE_OCTOBER_2020_ONLY;
+import static org.hibernate.validator.constraints.kor.KorRRN.ValidateCheckDigit.ALWAYS;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -23,14 +23,14 @@ import static org.testng.Assert.assertTrue;
  *
  * @author Taewoo Kim
  */
-public class KorRRNValidatorBeforeOctober2020OnlyAttrTest extends KorRRNValidatorTestHelper {
+public class KorRRNValidatorAlwaysAttrTest extends KorRRNValidatorTestHelper {
 
 	private KorRRNValidator validator;
 
 	@BeforeMethod
 	void setUp() {
 		validator = new KorRRNValidator();
-		validator.initialize( initAnootation( BEFORE_OCTOBER_2020_ONLY ) );
+		validator.initialize( initAnootation( ALWAYS ) );
 	}
 
 	// valid RRN
@@ -88,6 +88,14 @@ public class KorRRNValidatorBeforeOctober2020OnlyAttrTest extends KorRRNValidato
 		assertInvalidRRN( "abcdefg-hijklmnop" );
 		assertInvalidRRN( "hello-world" );
 		assertInvalidRRN( "zzzzzzzzzzzzzzzzz" );
+	}
+
+	// Invalid RRN Sequence
+	@Test
+	void invalidGen() {
+		assertInvalidRRN( "861224-9567484" );
+		assertInvalidRRN( "960223-9499378" );
+		assertInvalidRRN( "790707-9133360" );
 	}
 
 	private void assertValidRRN(String rrn) {

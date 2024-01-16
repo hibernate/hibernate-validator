@@ -56,8 +56,8 @@ public @interface KorRRN {
 		 * 1. Length of RRN
 		 * 2. Validity of Gender-Digit in RRN
 		 * 3. Validity of date in RRN
-		 * 4. Validity of Check-digitin RRN
+		 * 4. Validity of Check-digitin in RRN
 		 */
-		BEFORE_OCTOBER_2020_ONLY
+		ALWAYS
 	}
 }
