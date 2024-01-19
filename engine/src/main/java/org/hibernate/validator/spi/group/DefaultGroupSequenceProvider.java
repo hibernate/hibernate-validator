@@ -39,7 +39,7 @@ public interface DefaultGroupSequenceProvider<T> {
 	 * The object parameter allows to dynamically compose the default group sequence in function of the validated value state.
 	 * </p>
 	 *
-     * @param clazz the instance class being validated.
+     	 * @param clazz the instance class being validated.
 	 * @param object the instance being validated. This value can be {@code null} in case this method was called as part of
 	 * {@linkplain jakarta.validation.Validator#validateValue(Class, String, Object, Class[]) Validator#validateValue}.
 	 *
