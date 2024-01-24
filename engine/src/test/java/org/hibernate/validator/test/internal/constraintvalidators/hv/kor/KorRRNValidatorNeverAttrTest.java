@@ -30,7 +30,7 @@ public class KorRRNValidatorNeverAttrTest extends KorRRNValidatorTestHelper {
 	@BeforeMethod
 	void setUp() {
 		validator = new KorRRNValidator();
-		validator.initialize( initAnootation( NEVER ) );
+		validator.initialize( initAnnotation( NEVER ) );
 	}
 
 	/**

@@ -30,7 +30,7 @@ public class KorRRNValidatorAlwaysAttrTest extends KorRRNValidatorTestHelper {
 	@BeforeMethod
 	void setUp() {
 		validator = new KorRRNValidator();
-		validator.initialize( initAnootation( ALWAYS ) );
+		validator.initialize( initAnnotation( ALWAYS ) );
 	}
 
 	// valid RRN
