@@ -69,6 +69,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 
 		doProgrammaticTest( KorRRN.class, new KorRRNDef().validateCheckDigit( KorRRN.ValidateCheckDigit.NEVER ), "030205-1000004", "010199-1063015", "invalid Korean resident registration number (KorRRN)" );
 		doProgrammaticTest( KorRRN.class, new KorRRNDef().validateCheckDigit( KorRRN.ValidateCheckDigit.ALWAYS ), "030205-2567485", "030299-5000000", "invalid Korean resident registration number (KorRRN)" );
+		doProgrammaticTest( KorRRN.class, new KorRRNDef(),"030205-2567485", "030205-1000004", "invalid Korean resident registration number (KorRRN)" );
 	}
 
 	@Test
