@@ -777,6 +777,11 @@ Hibernate Validator!
 	Hibernate metadata impact::: None
 	Country::: Russia
 
+`@KorRRN`:: Checks that the annotated character sequence represents a Korean resident registration number (https://ko.wikipedia.org/wiki/%EC%A3%BC%EB%AF%BC%EB%93%B1%EB%A1%9D%EB%B2%88%ED%98%B8[KorRRN])
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+	Country::: South Korea
+
 [TIP]
 ====
 In some cases neither the Jakarta Bean Validation constraints nor the custom constraints provided by
