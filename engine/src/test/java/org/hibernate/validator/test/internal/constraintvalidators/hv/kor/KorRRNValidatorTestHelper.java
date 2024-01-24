@@ -17,9 +17,8 @@ import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDesc
  * @author Taewoo Kim
  */
 public abstract class KorRRNValidatorTestHelper {
-	protected KorRRN initAnootation(ValidateCheckDigit validateCheckDigit) {
-		ConstraintAnnotationDescriptor.Builder<KorRRN> constraintAnnotationDescriptor = new ConstraintAnnotationDescriptor.Builder<>(
-				KorRRN.class );
+	protected KorRRN initAnnotation(ValidateCheckDigit validateCheckDigit) {
+		ConstraintAnnotationDescriptor.Builder<KorRRN> constraintAnnotationDescriptor = new ConstraintAnnotationDescriptor.Builder<>( KorRRN.class );
 		constraintAnnotationDescriptor.setAttribute( "validateCheckDigit", validateCheckDigit );
 		return constraintAnnotationDescriptor.build().getAnnotation();
 	}
