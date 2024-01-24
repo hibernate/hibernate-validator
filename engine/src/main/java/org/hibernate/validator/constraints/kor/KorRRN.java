@@ -17,8 +17,10 @@ import static org.hibernate.validator.constraints.kor.KorRRN.ValidateCheckDigit.
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
+import jakarta.validation.ReportAsSingleViolation;
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -33,6 +35,8 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = {})
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
+@Repeatable(KorRRN.List.class)
+@ReportAsSingleViolation
 public @interface KorRRN {
 
 	String message() default "{org.hibernate.validator.constraints.kor.KorRRN.message}";
@@ -43,21 +47,40 @@ public @interface KorRRN {
 
 	ValidateCheckDigit validateCheckDigit() default NEVER;
 
+	/**
+	 * Defines the validation rules this constraint applies to the Korean resident registration number.
+	 * <p>
+	 * Each type specifies which particular checks will be applied.
+	 */
 	enum ValidateCheckDigit {
 		/**
-		 * Inspect the following lines
-		 * 1. Length of RRN
-		 * 2. Validity of Gender-Digit in RRN
-		 * 3. Validity of date in RRN
+		 * Perform the checks on:
+		 * <ul>
+		 *     <li>The length of an RRN</li>
+		 *     <li>The validity of the Gender-Digit in an RRN</li>
+		 *     <li>The validity of the date in an RRN</li>
+		 * </ul>
 		 */
 		NEVER,
 		/**
-		 * Inspect the following lines
-		 * 1. Length of RRN
-		 * 2. Validity of Gender-Digit in RRN
-		 * 3. Validity of date in RRN
-		 * 4. Validity of Check-digitin in RRN
+		 * Perform the checks on:
+		 * <ul>
+		 *     <li>The length of an RRN</li>
+		 *     <li>The validity of the Gender-Digit in an RRN</li>
+		 *     <li>The validity of the date in an RRN</li>
+		 *     <li>The Validity of check-digit in RRN</li>
+		 * </ul>
 		 */
 		ALWAYS
+	}
+
+	/**
+	 * Defines several {@code @KorRRN} annotations on the same element.
+	 */
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
+	@Retention(RUNTIME)
+	@Documented
+	@interface List {
+		KorRRN[] value();
 	}
 }
