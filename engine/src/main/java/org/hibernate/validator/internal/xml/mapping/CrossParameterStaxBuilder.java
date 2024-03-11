@@ -87,12 +87,7 @@ class CrossParameterStaxBuilder extends AbstractStaxBuilder {
 				.collect( Collectors.toSet() );
 
 		// ignore annotations
-		if ( ignoreAnnotations.isPresent() ) {
-			annotationProcessingOptions.ignoreConstraintAnnotationsForCrossParameterConstraint(
-					callable,
-					ignoreAnnotations.get()
-			);
-		}
+		ignoreAnnotations.ifPresent( b -> annotationProcessingOptions.ignoreConstraintAnnotationsForCrossParameterConstraint( callable, b ) );
 
 		return crossParameterConstraints;
 	}

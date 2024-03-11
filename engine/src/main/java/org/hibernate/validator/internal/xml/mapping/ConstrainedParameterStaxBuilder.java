@@ -77,13 +77,7 @@ class ConstrainedParameterStaxBuilder extends AbstractConstrainedElementStaxBuil
 		ContainerElementTypeConfiguration containerElementTypeConfiguration = getContainerElementTypeConfiguration( type, constraintLocation );
 
 		// ignore annotations
-		if ( ignoreAnnotations.isPresent() ) {
-			annotationProcessingOptions.ignoreConstraintAnnotationsOnParameter(
-					callable,
-					index,
-					ignoreAnnotations.get()
-			);
-		}
+		ignoreAnnotations.ifPresent( b -> annotationProcessingOptions.ignoreConstraintAnnotationsOnParameter( callable, index, b ) );
 
 		ConstrainedParameter constrainedParameter = new ConstrainedParameter(
 				ConfigurationSource.XML,

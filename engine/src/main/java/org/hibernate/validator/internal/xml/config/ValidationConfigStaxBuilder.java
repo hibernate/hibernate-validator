@@ -274,9 +274,7 @@ class ValidationConfigStaxBuilder extends AbstractStaxBuilder {
 		@Override
 		protected void add(XMLEventReader xmlEventReader, XMLEvent xmlEvent) throws XMLStreamException {
 			Optional<String> enabledAttribute = readAttribute( xmlEvent.asStartElement(), ENABLED_QNAME );
-			if ( enabledAttribute.isPresent() ) {
-				enabled = Boolean.parseBoolean( enabledAttribute.get() );
-			}
+			enabledAttribute.ifPresent( s -> enabled = Boolean.parseBoolean( s ) );
 
 			while ( !( xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().getLocalPart().equals( EXECUTABLE_VALIDATION_QNAME_LOCAL_PART ) ) ) {
 				XMLEvent currentEvent = xmlEventReader.nextEvent();

@@ -102,12 +102,7 @@ class ClassConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 				.collect( Collectors.toSet() );
 
 		// ignore annotation
-		if ( ignoreAnnotations.isPresent() ) {
-			annotationProcessingOptions.ignoreClassLevelConstraintAnnotations(
-					beanClass,
-					ignoreAnnotations.get()
-			);
-		}
+		ignoreAnnotations.ifPresent( b -> annotationProcessingOptions.ignoreClassLevelConstraintAnnotations( beanClass, b ) );
 
 		return new ConstrainedType(
 				ConfigurationSource.XML,

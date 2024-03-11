@@ -122,9 +122,7 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 
 		// set common things to all constraints:
 		Optional<String> message = messageStaxBuilder.build();
-		if ( message.isPresent() ) {
-			annotationDescriptorBuilder.setMessage( message.get() );
-		}
+		message.ifPresent( annotationDescriptorBuilder::setMessage );
 		annotationDescriptorBuilder.setGroups( groupsStaxBuilder.build() )
 				.setPayload( payloadStaxBuilder.build() );
 

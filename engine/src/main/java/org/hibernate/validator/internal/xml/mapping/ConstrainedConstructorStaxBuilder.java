@@ -76,12 +76,7 @@ class ConstrainedConstructorStaxBuilder extends AbstractConstrainedExecutableEle
 		}
 
 		// ignore annotations
-		if ( ignoreAnnotations.isPresent() ) {
-			annotationProcessingOptions.ignoreConstraintAnnotationsOnMember(
-					javaBeanConstructor,
-					ignoreAnnotations.get()
-			);
-		}
+		ignoreAnnotations.ifPresent( b -> annotationProcessingOptions.ignoreConstraintAnnotationsOnMember( javaBeanConstructor, b ) );
 
 		List<ConstrainedParameter> constrainedParameters = CollectionHelper.newArrayList( constrainedParameterStaxBuilders.size() );
 		for ( int index = 0; index < constrainedParameterStaxBuilders.size(); index++ ) {

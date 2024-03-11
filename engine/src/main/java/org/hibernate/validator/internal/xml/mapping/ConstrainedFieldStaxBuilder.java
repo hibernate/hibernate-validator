@@ -82,12 +82,7 @@ class ConstrainedFieldStaxBuilder extends AbstractConstrainedElementStaxBuilder 
 		);
 
 		// ignore annotations
-		if ( ignoreAnnotations.isPresent() ) {
-			annotationProcessingOptions.ignoreConstraintAnnotationsOnMember(
-					javaBeanField,
-					ignoreAnnotations.get()
-			);
-		}
+		ignoreAnnotations.ifPresent( b -> annotationProcessingOptions.ignoreConstraintAnnotationsOnMember( javaBeanField, b ) );
 
 		return constrainedField;
 	}
