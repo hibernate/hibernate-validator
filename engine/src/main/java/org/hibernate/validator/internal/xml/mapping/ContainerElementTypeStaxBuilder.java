@@ -79,9 +79,7 @@ class ContainerElementTypeStaxBuilder extends AbstractStaxBuilder {
 	@Override
 	protected void add(XMLEventReader xmlEventReader, XMLEvent xmlEvent) throws XMLStreamException {
 		Optional<String> typeArgumentIndex = readAttribute( xmlEvent.asStartElement(), TYPE_ARGUMENT_INDEX_QNAME );
-		if ( typeArgumentIndex.isPresent() ) {
-			this.typeArgumentIndex = Integer.parseInt( typeArgumentIndex.get() );
-		}
+		typeArgumentIndex.ifPresent( s -> this.typeArgumentIndex = Integer.parseInt( s ) );
 		ConstraintTypeStaxBuilder constraintTypeStaxBuilder = getNewConstraintTypeStaxBuilder();
 		ContainerElementTypeStaxBuilder containerElementTypeConfigurationStaxBuilder = getNewContainerElementTypeConfigurationStaxBuilder();
 		while ( !( xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().getLocalPart().equals( getAcceptableQName() ) ) ) {

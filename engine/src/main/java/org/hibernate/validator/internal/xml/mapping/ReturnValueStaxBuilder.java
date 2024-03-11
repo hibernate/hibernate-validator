@@ -62,12 +62,7 @@ class ReturnValueStaxBuilder extends AbstractConstrainedElementStaxBuilder {
 		returnValueTypeArgumentConstraints.addAll( containerElementTypeConfiguration.getMetaConstraints() );
 
 		// ignore annotations
-		if ( ignoreAnnotations.isPresent() ) {
-			annotationProcessingOptions.ignoreConstraintAnnotationsForReturnValue(
-					callable,
-					ignoreAnnotations.get()
-			);
-		}
+		ignoreAnnotations.ifPresent( b -> annotationProcessingOptions.ignoreConstraintAnnotationsForReturnValue( callable, b ) );
 
 		return getCascadingMetaData( containerElementTypeConfiguration.getTypeParametersCascadingMetaData(), callable.getType() );
 	}

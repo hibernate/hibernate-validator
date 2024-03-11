@@ -105,7 +105,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 
 			// We re-evaluate the boolean composition by taking into consideration also the violations
 			// from the local constraintValidator
-			if ( !violatedLocalConstraintValidatorContext.isPresent() ) {
+			if ( violatedLocalConstraintValidatorContext.isEmpty() ) {
 				compositionResult.setAtLeastOneTrue( true );
 			}
 			else {
@@ -168,7 +168,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 			// violations or not (or if there is no local ConstraintValidator at all).
 			// If not we create a violation
 			// using the error message in the annotation declaration at top level.
-			if ( !localConstraintValidatorContext.isPresent() ) {
+			if ( localConstraintValidatorContext.isEmpty() ) {
 				violatedConstraintValidatorContexts.add(
 						validationContext.createConstraintValidatorContextFor(
 								descriptor, valueContext.getPropertyPath()
@@ -185,9 +185,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 		// as checked in test CustomErrorMessage.java
 		// If no violations have been reported from the local ConstraintValidator, or no such validator exists,
 		// then we just add an empty list.
-		if ( localConstraintValidatorContext.isPresent() ) {
-			violatedConstraintValidatorContexts.add( localConstraintValidatorContext.get() );
-		}
+		localConstraintValidatorContext.ifPresent( violatedConstraintValidatorContexts::add );
 	}
 
 	/**
