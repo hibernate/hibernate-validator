@@ -30,8 +30,6 @@
         <asciidoctor.engine-source-dir>${basedir}/../engine/src/main/java</asciidoctor.engine-source-dir>
         <asciidoctor.osgi-integrationtest-source-dir>${basedir}/../osgi/integrationtest/src/test/java</asciidoctor.osgi-integrationtest-source-dir>
 
-        <html.meta.description>Hibernate Validator, Annotation based constraints for your domain model - Reference Documentation</html.meta.description>
-        <html.meta.keywords>hibernate, validator, hibernate validator, validation, jakarta bean validation, bean validation</html.meta.keywords>
         <html.meta.project-key>validator</html.meta.project-key>
         <html.google-analytics.id>G-282CVRCQHZ</html.google-analytics.id>
         <html.outdated-content.project-key>${html.meta.project-key}</html.outdated-content.project-key>

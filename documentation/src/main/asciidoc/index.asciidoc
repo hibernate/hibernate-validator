@@ -11,6 +11,9 @@ Hardy Ferentschik; Gunnar Morling; Guillaume Smet
 :docinfodir: {docinfodir}
 :docinfo: shared,private
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
+:html-meta-description: Hibernate Validator, Annotation based constraints for your domain model - Reference Documentation
+:html-meta-keywords: hibernate, validator, hibernate validator, validation, jakarta bean validation, bean validation
+:html-meta-canonical-link: https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/
 
 include::pr01.asciidoc[]
 
