@@ -203,8 +203,8 @@
         <!-- Asciidoctor -->
 
         <version.asciidoctor.plugin>3.0.0</version.asciidoctor.plugin>
-        <version.org.hibernate.infra.hibernate-asciidoctor-theme>2.0.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
-        <version.org.hibernate.infra.hibernate-asciidoctor-extensions>2.0.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
+        <version.org.hibernate.infra.hibernate-asciidoctor-theme>4.0.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
+        <version.org.hibernate.infra.hibernate-asciidoctor-extensions>2.0.1.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
         <version.org.jruby>9.3.2.0</version.org.jruby>
         <version.org.asciidoctor.asciidoctorj>2.5.13</version.org.asciidoctor.asciidoctorj>
         <version.org.asciidoctor.asciidoctorj-pdf>2.3.17</version.org.asciidoctor.asciidoctorj-pdf>
