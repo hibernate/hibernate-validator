@@ -34,9 +34,7 @@ public class BitcoinAddressValidator implements ConstraintValidator<BitcoinAddre
 
 	@Override
 	public void initialize(BitcoinAddress bitcoinAddress) {
-		BitcoinAddressType[] types = bitcoinAddress.anyOf().length > 0
-				? bitcoinAddress.anyOf()
-				: new BitcoinAddressType[] { bitcoinAddress.value() };
+		BitcoinAddressType[] types = bitcoinAddress.value();
 
 		this.singleType = ( types.length == 1 );
 
@@ -52,7 +50,7 @@ public class BitcoinAddressValidator implements ConstraintValidator<BitcoinAddre
 		Collections.addAll( this.addressType, types );
 		this.typesDescription = this.addressType.stream()
 								.map( BitcoinAddressType::getDescription )
-								.collect( Collectors.joining( ", " ) );
+								.collect( Collectors.joining( "; " ) );
 	}
 
 	/**
@@ -71,7 +69,6 @@ public class BitcoinAddressValidator implements ConstraintValidator<BitcoinAddre
 
 		for ( BitcoinAddressType type : this.addressType ) {
 			Pattern pattern = Pattern.compile( type.getRegex() );
-
 			Matcher matcher = pattern.matcher( charSequence );
 
 			if ( matcher.matches() ) {

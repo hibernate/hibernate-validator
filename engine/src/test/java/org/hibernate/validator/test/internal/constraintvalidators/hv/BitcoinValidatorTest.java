@@ -44,7 +44,7 @@ public class BitcoinValidatorTest {
 
 	@Test(dataProvider = "validAddressesSingleType")
 	public void valid_btc_address_single_type_pass_validation( BitcoinAddressType type, String address ) {
-		descriptorBuilder.setAttribute( "value", type );
+		descriptorBuilder.setAttribute( "value", new BitcoinAddressType[] { type } );
 		bitcoinAddressValidator.initialize( descriptorBuilder.build().getAnnotation() );
 
 		assertTrue( bitcoinAddressValidator.isValid( address, null ),
@@ -53,7 +53,7 @@ public class BitcoinValidatorTest {
 
 	@Test(dataProvider = "validAddressesMultipleTypes")
 	public void valid_btc_address_simultiple_types_pass_validation(BitcoinAddressType[] types, String address ) {
-		descriptorBuilder.setAttribute( "anyOf", types );
+		descriptorBuilder.setAttribute( "value", types );
 		bitcoinAddressValidator.initialize( descriptorBuilder.build().getAnnotation() );
 
 		String descriptions = Arrays.stream( types )

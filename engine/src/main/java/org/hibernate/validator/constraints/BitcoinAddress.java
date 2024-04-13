@@ -45,11 +45,5 @@ public @interface BitcoinAddress {
 
 	Class<? extends Payload>[] payload() default { };
 
-	BitcoinAddressType value() default BitcoinAddressType.ANY ;
-
-	/**
-	 * Configure a set of {@code BitcoinAddressType} to be tested. If it's filled, the <i>value</i> attribute will be ignored.
-	 * @return a {@code BitcoinAddressType} array. If any of them matches, the validated value will be valid.
-	 */
-	BitcoinAddressType[] anyOf() default { };
+	BitcoinAddressType[] value() default BitcoinAddressType.ANY ;
 }
