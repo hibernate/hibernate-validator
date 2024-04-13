@@ -10,6 +10,7 @@ import org.hibernate.validator.constraints.BitcoinAddress;
 import org.hibernate.validator.constraints.BitcoinAddressType;
 import org.hibernate.validator.internal.constraintvalidators.bv.BitcoinAddressValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -24,6 +25,7 @@ import static org.hibernate.validator.constraints.BitcoinAddressType.P2SH;
 import static org.hibernate.validator.constraints.BitcoinAddressType.P2TR;
 import static org.hibernate.validator.constraints.BitcoinAddressType.P2WPKH;
 import static org.hibernate.validator.constraints.BitcoinAddressType.P2WSH;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -64,6 +66,27 @@ public class BitcoinValidatorTest {
 				String.format( "should be a valid %s address. Tested value: %s", descriptions, address ) );
 	}
 
+	@Test(dataProvider = "invalidAddressesSingleType")
+	public void valid_btc_address_single_type_fail_validation( BitcoinAddressType type, String address ) {
+		descriptorBuilder.setAttribute( "value", new BitcoinAddressType[] { type } );
+		bitcoinAddressValidator.initialize( descriptorBuilder.build().getAnnotation() );
+
+		assertFalse( bitcoinAddressValidator.isValid( address, ValidatorUtil.getConstraintValidatorContext() ),
+				String.format( "should NOT be a valid %s address. Tested value: %s", type.getDescription(), address ) );
+	}
+
+	@Test(dataProvider = "invalidAddressesMultipleTypes")
+	public void valid_btc_address_simultiple_types_fail_validation(BitcoinAddressType[] types, String address ) {
+		descriptorBuilder.setAttribute( "value", types );
+		bitcoinAddressValidator.initialize( descriptorBuilder.build().getAnnotation() );
+
+		String descriptions = Arrays.stream( types )
+				.map( BitcoinAddressType::getDescription )
+				.collect( Collectors.joining( "," ) );
+
+		assertFalse( bitcoinAddressValidator.isValid( address, ValidatorUtil.getConstraintValidatorContext() ),
+				String.format( "should NOT be a valid %s address. Tested value: %s", descriptions, address ) );
+	}
 
 	@DataProvider(name = "validAddressesSingleType")
 	private static Object[][] validAddressesSingleType() {
@@ -80,6 +103,24 @@ public class BitcoinValidatorTest {
 				{ P2WSH, "bc1qeklep85ntjz4605drds6aww9u0qr46qzrv5xswd35uhjuj8ahfcqgf6hak" },
 				{ P2WPKH, "bc1q34aq5drpuwy3wgl9lhup9892qp6svr8ldzyy7c" },
 				{ P2TR, "bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297" }
+		};
+	}
+
+	@DataProvider(name = "invalidAddressesSingleType")
+	private static Object[][] invalidAddressesSingleType() {
+		return new Object[][] {
+				{ ANY, "x1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN" },
+				{ ANY, "x342ftSRCvFHfCeFFBuz4xwbeqnDw6BGUe" },
+				{ ANY, "xbc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5md" },
+				{ ANY, "xbc1qeklep85ntjz4605drds6aww9u0qr46qzrv5xswd35uhjuj8ahfcqgf6ha" },
+				{ ANY, "xbc1q34aq5drpuwy3wgl9lhup9892qp6svr8ldzyy7" },
+				{ ANY, "xbc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg329" },
+				{ P2PKH, "x1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN" },
+				{ P2SH, "x342ftSRCvFHfCeFFBuz4xwbeqnDw6BGUe" },
+				{ BECH32, "xbc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5md" },
+				{ P2WSH, "xbc1qeklep85ntjz4605drds6aww9u0qr46qzrv5xswd35uhjuj8ahfcqgf6ha" },
+				{ P2WPKH, "xbc1q34aq5drpuwy3wgl9lhup9892qp6svr8ldzyy7" },
+				{ P2TR, "xbc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg329" }
 		};
 	}
 
@@ -341,6 +382,42 @@ public class BitcoinValidatorTest {
 				{ new BitcoinAddressType[] {P2TR, P2WPKH, P2WSH}, "bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297" },
 				{ new BitcoinAddressType[] {P2TR, P2WPKH, P2WSH}, "bc1q34aq5drpuwy3wgl9lhup9892qp6svr8ldzyy7c" },
 				{ new BitcoinAddressType[] {P2TR, P2WPKH, P2WSH}, "bc1qeklep85ntjz4605drds6aww9u0qr46qzrv5xswd35uhjuj8ahfcqgf6hak" }
+		};
+	}
+
+	@DataProvider(name = "invalidAddressesMultipleTypes")
+	private static Object[][] invalidAddressesMultipleTypes() {
+		return new Object[][]{
+				{new BitcoinAddressType[]{P2PKH, P2SH}, "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"},
+				{new BitcoinAddressType[]{P2PKH, BECH32}, "342ftSRCvFHfCeFFBuz4xwbeqnDw6BGUey"},
+				{new BitcoinAddressType[]{P2PKH, P2WSH}, "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"},
+				{new BitcoinAddressType[]{P2PKH, P2WPKH}, "342ftSRCvFHfCeFFBuz4xwbeqnDw6BGUey"},
+				{new BitcoinAddressType[]{P2PKH, P2TR}, "342ftSRCvFHfCeFFBuz4xwbeqnDw6BGUey"},
+				{new BitcoinAddressType[]{P2SH, P2PKH}, "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"},
+				{new BitcoinAddressType[]{P2SH, BECH32}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{P2SH, P2WSH}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{P2SH, P2WPKH}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{P2SH, P2TR}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{BECH32, P2PKH}, "342ftSRCvFHfCeFFBuz4xwbeqnDw6BGUey"},
+				{new BitcoinAddressType[]{BECH32, P2SH}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{BECH32, P2WSH}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{BECH32, P2WPKH}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{BECH32, P2TR}, "342ftSRCvFHfCeFFBuz4xwbeqnDw6BGUey"},
+				{new BitcoinAddressType[]{P2WSH, P2PKH}, "342ftSRCvFHfCeFFBuz4xwbeqnDw6BGUey"},
+				{new BitcoinAddressType[]{P2WSH, P2SH}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{P2WSH, BECH32}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{P2WSH, P2WPKH}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{P2WSH, P2TR}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{P2WPKH, P2PKH}, "342ftSRCvFHfCeFFBuz4xwbeqnDw6BGUey"},
+				{new BitcoinAddressType[]{P2WPKH, P2SH}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{P2WPKH, BECH32}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{P2WPKH, P2WSH}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{P2WPKH, P2TR}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{P2TR, P2PKH}, "342ftSRCvFHfCeFFBuz4xwbeqnDw6BGUey"},
+				{new BitcoinAddressType[]{P2TR, P2SH}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{P2TR, BECH32}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{P2TR, P2WSH}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"},
+				{new BitcoinAddressType[]{P2TR, P2WPKH}, "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"}
 		};
 	}
 
