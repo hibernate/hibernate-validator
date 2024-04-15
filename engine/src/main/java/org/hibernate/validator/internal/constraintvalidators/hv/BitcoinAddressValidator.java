@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class BitcoinAddressValidator implements ConstraintValidator<BitcoinAddress, CharSequence> {
 
 	static final String HIBERNATE_VALIDATION_MESSAGES = "org.hibernate.validator.ValidationMessages";
-	static final String ADDRESS_TYPE_VALIDATION_MESSAGE_PREFIX = "org.hibernate.validator.constraints.Bitcoin.address.type.";
+	static final String ADDRESS_TYPE_VALIDATION_MESSAGE_PREFIX = "org.hibernate.validator.constraints.BitcoinAddress.type.";
 	private final List<BitcoinAddressType> addressTypes = new ArrayList<>();
 
 	@Override

@@ -38,7 +38,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface BitcoinAddress {
 
-	String message() default "{org.hibernate.validator.constraints.Bitcoin.message}";
+	String message() default "{org.hibernate.validator.constraints.BitcoinAddress.message}";
 
 	Class<?>[] groups() default { };
 

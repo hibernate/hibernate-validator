@@ -70,37 +70,37 @@ public class BitcoinAddressValidatorTest {
 	@Test
 	public void testGetTypesDescription_multipleValues() {
 		assertEquals( validator4.getTypesDescription(),
-						resourceBundle.getString( "org.hibernate.validator.constraints.Bitcoin.address.type.p2sh" ) + "; "
-						+ resourceBundle.getString( "org.hibernate.validator.constraints.Bitcoin.address.type.p2tr" ) );
+						resourceBundle.getString( "org.hibernate.validator.constraints.BitcoinAddress.type.p2sh" ) + "; "
+						+ resourceBundle.getString( "org.hibernate.validator.constraints.BitcoinAddress.type.p2tr" ) );
 
 		assertEquals( validator5.getTypesDescription(),
-						resourceBundle.getString( "org.hibernate.validator.constraints.Bitcoin.address.type.bech32" ) + "; "
-						+ resourceBundle.getString( "org.hibernate.validator.constraints.Bitcoin.address.type.p2sh" ) + "; "
-						+ resourceBundle.getString( "org.hibernate.validator.constraints.Bitcoin.address.type.p2tr" ) );
+						resourceBundle.getString( "org.hibernate.validator.constraints.BitcoinAddress.type.bech32" ) + "; "
+						+ resourceBundle.getString( "org.hibernate.validator.constraints.BitcoinAddress.type.p2sh" ) + "; "
+						+ resourceBundle.getString( "org.hibernate.validator.constraints.BitcoinAddress.type.p2tr" ) );
 	}
 
 	@Test
 	public void testGetAddressTypeName() {
 		assertEquals( validator1.getAddressTypeName( BitcoinAddressType.ANY ),
-						resourceBundle.getString( "org.hibernate.validator.constraints.Bitcoin.address.type.any" ) );
+						resourceBundle.getString( "org.hibernate.validator.constraints.BitcoinAddress.type.any" ) );
 
 		assertEquals( validator1.getAddressTypeName( BitcoinAddressType.P2PKH ),
-						resourceBundle.getString( "org.hibernate.validator.constraints.Bitcoin.address.type.p2pkh" ) );
+						resourceBundle.getString( "org.hibernate.validator.constraints.BitcoinAddress.type.p2pkh" ) );
 
 		assertEquals( validator1.getAddressTypeName( BitcoinAddressType.P2SH ),
-						resourceBundle.getString( "org.hibernate.validator.constraints.Bitcoin.address.type.p2sh" ) );
+						resourceBundle.getString( "org.hibernate.validator.constraints.BitcoinAddress.type.p2sh" ) );
 
 		assertEquals( validator1.getAddressTypeName( BitcoinAddressType.BECH32 ),
-						resourceBundle.getString( "org.hibernate.validator.constraints.Bitcoin.address.type.bech32" ) );
+						resourceBundle.getString( "org.hibernate.validator.constraints.BitcoinAddress.type.bech32" ) );
 
 		assertEquals( validator1.getAddressTypeName( BitcoinAddressType.P2WSH ),
-						resourceBundle.getString( "org.hibernate.validator.constraints.Bitcoin.address.type.p2wsh" ) );
+						resourceBundle.getString( "org.hibernate.validator.constraints.BitcoinAddress.type.p2wsh" ) );
 
 		assertEquals( validator1.getAddressTypeName( BitcoinAddressType.P2WPKH ),
-						resourceBundle.getString( "org.hibernate.validator.constraints.Bitcoin.address.type.p2wpkh" ) );
+						resourceBundle.getString( "org.hibernate.validator.constraints.BitcoinAddress.type.p2wpkh" ) );
 
 		assertEquals( validator1.getAddressTypeName( BitcoinAddressType.P2TR ),
-						resourceBundle.getString( "org.hibernate.validator.constraints.Bitcoin.address.type.p2tr" ) );
+						resourceBundle.getString( "org.hibernate.validator.constraints.BitcoinAddress.type.p2tr" ) );
 	}
 
 	private BitcoinAddress getBitcoinAddress(String fieldName) {
