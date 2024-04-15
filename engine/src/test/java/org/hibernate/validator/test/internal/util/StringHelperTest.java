@@ -93,7 +93,7 @@ public class StringHelperTest {
 	@TestForIssue(jiraKey = "HV-1140")
 	public void decapitalizeShouldReturnDecapizalizedWordOnTurkishLocale() {
 		Locale defaultLocale = Locale.getDefault();
-		Locale.setDefault( new Locale( "tr" , "TR" ) );
+		Locale.setDefault( Locale.forLanguageTag( "tr-TR" ) );
 		assertEquals( StringHelper.decapitalize( "IsIsolationLevelGuaranteed" ), "isIsolationLevelGuaranteed" );
 		Locale.setDefault( defaultLocale );
 	}
