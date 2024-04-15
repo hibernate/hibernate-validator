@@ -8,7 +8,7 @@ package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
 import org.hibernate.validator.constraints.BitcoinAddress;
 import org.hibernate.validator.constraints.BitcoinAddressType;
-import org.hibernate.validator.internal.constraintvalidators.bv.BitcoinAddressValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.BitcoinAddressValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeMethod;
@@ -49,8 +49,8 @@ public class BitcoinValidatorTest {
 		descriptorBuilder.setAttribute( "value", new BitcoinAddressType[] { type } );
 		bitcoinAddressValidator.initialize( descriptorBuilder.build().getAnnotation() );
 
-		assertTrue( bitcoinAddressValidator.isValid( address, null ),
-				String.format( "should be a valid %s address. Tested value: %s", type.getDescription(), address ) );
+		assertTrue( bitcoinAddressValidator.isValid( address, ValidatorUtil.getConstraintValidatorContext() ),
+				String.format( "should be a valid %s address. Tested value: %s", type.name(), address ) );
 	}
 
 	@Test(dataProvider = "validAddressesMultipleTypes")
@@ -59,10 +59,10 @@ public class BitcoinValidatorTest {
 		bitcoinAddressValidator.initialize( descriptorBuilder.build().getAnnotation() );
 
 		String descriptions = Arrays.stream( types )
-				.map( BitcoinAddressType::getDescription )
+				.map( Enum::name )
 				.collect( Collectors.joining( "," ) );
 
-		assertTrue( bitcoinAddressValidator.isValid( address, null ),
+		assertTrue( bitcoinAddressValidator.isValid( address, ValidatorUtil.getConstraintValidatorContext() ),
 				String.format( "should be a valid %s address. Tested value: %s", descriptions, address ) );
 	}
 
@@ -72,7 +72,7 @@ public class BitcoinValidatorTest {
 		bitcoinAddressValidator.initialize( descriptorBuilder.build().getAnnotation() );
 
 		assertFalse( bitcoinAddressValidator.isValid( address, ValidatorUtil.getConstraintValidatorContext() ),
-				String.format( "should NOT be a valid %s address. Tested value: %s", type.getDescription(), address ) );
+				String.format( "should NOT be a valid %s address. Tested value: %s", type.name(), address ) );
 	}
 
 	@Test(dataProvider = "invalidAddressesMultipleTypes")
@@ -81,7 +81,7 @@ public class BitcoinValidatorTest {
 		bitcoinAddressValidator.initialize( descriptorBuilder.build().getAnnotation() );
 
 		String descriptions = Arrays.stream( types )
-				.map( BitcoinAddressType::getDescription )
+				.map( Enum::name )
 				.collect( Collectors.joining( "," ) );
 
 		assertFalse( bitcoinAddressValidator.isValid( address, ValidatorUtil.getConstraintValidatorContext() ),
