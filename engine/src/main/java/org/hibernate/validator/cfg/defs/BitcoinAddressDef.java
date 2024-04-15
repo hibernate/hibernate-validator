@@ -9,7 +9,6 @@ package org.hibernate.validator.cfg.defs;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.BitcoinAddress;
 import org.hibernate.validator.constraints.BitcoinAddressType;
-import org.hibernate.validator.constraints.ISBN;
 
 /**
  * @author José Yoshiriro

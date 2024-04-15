@@ -33,7 +33,9 @@ import static org.hibernate.validator.constraints.BitcoinAddressType.P2SH;
 import static org.hibernate.validator.constraints.BitcoinAddressType.P2TR;
 import static org.hibernate.validator.constraints.BitcoinAddressType.P2WPKH;
 import static org.hibernate.validator.constraints.BitcoinAddressType.P2WSH;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.*;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
