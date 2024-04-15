@@ -96,6 +96,6 @@ public class BitcoinAddressValidator implements ConstraintValidator<BitcoinAddre
 	String getAddressTypeName(BitcoinAddressType bitcoinAddressType) {
 		ResourceBundle resourceBundle = ResourceBundle.getBundle( HIBERNATE_VALIDATION_MESSAGES, Locale.getDefault() );
 		return resourceBundle.getString(
-				ADDRESS_TYPE_VALIDATION_MESSAGE_PREFIX + bitcoinAddressType.name().toLowerCase(Locale.getDefault()) );
+				ADDRESS_TYPE_VALIDATION_MESSAGE_PREFIX + bitcoinAddressType.name().toLowerCase( Locale.getDefault() ) );
 	}
 }
