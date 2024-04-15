@@ -8,7 +8,6 @@ package org.hibernate.validator.constraints;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import org.hibernate.validator.internal.constraintvalidators.bv.BitcoinAddressValidator;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -24,17 +23,17 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 
 /**
- * The string has to be a well-formed BTC (Bitcoin) address. Accepts {@code CharSequence}.
+ * The string has to be a well-formed BTC (Bitcoin) Mainnet address. Accepts {@code CharSequence}.
  * P2PK, P2MS and Nested SegWit (P2SH-P2WPKH and P2SH-P2WSH) addresses are not valid.
  * <p>
  * {@code null} elements are considered valid.
  *
  * @author José Yoshiriro
  *
- * @since 2.0
+ * @since 8.0.2
  */
 @Documented
-@Constraint(validatedBy = { BitcoinAddressValidator.class })
+@Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 public @interface BitcoinAddress {
