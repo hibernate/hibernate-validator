@@ -18,20 +18,7 @@ import java.util.Locale;
 import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
 
-import org.hibernate.validator.ap.testmodel.FieldLevelValidationUsingBuiltInConstraints;
-import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInConstraints;
-import org.hibernate.validator.ap.testmodel.ModelWithCodePointLengthConstraints;
-import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
-import org.hibernate.validator.ap.testmodel.ModelWithISBNConstraints;
-import org.hibernate.validator.ap.testmodel.ModelWithJava8DateTime;
-import org.hibernate.validator.ap.testmodel.ModelWithJavaMoneyTypes;
-import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
-import org.hibernate.validator.ap.testmodel.ModelWithNormalizedConstraints;
-import org.hibernate.validator.ap.testmodel.ModelWithUUIDConstraints;
-import org.hibernate.validator.ap.testmodel.ModelWithUniqueElementsConstraints;
-import org.hibernate.validator.ap.testmodel.ModelWithoutConstraints;
-import org.hibernate.validator.ap.testmodel.MultipleConstraintsOfSameType;
-import org.hibernate.validator.ap.testmodel.ValidationUsingAtValidAnnotation;
+import org.hibernate.validator.ap.testmodel.*;
 import org.hibernate.validator.ap.testmodel.boxing.ValidLong;
 import org.hibernate.validator.ap.testmodel.boxing.ValidLongValidator;
 import org.hibernate.validator.ap.testmodel.boxing.ValidationUsingBoxing;
@@ -778,6 +765,23 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertThatDiagnosticsMatch(
 				diagnostics,
 				new DiagnosticExpectation( Kind.ERROR, 22 )
+		);
+	}
+
+	@Test
+	public void bitcoinAddressConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithBitcoinAddressConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 20 ),
+				new DiagnosticExpectation( Kind.ERROR, 23 )
 		);
 	}
 }
