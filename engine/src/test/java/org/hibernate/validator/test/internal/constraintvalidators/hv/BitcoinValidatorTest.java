@@ -6,6 +6,12 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.BitcoinAddressDef;
 import org.hibernate.validator.constraints.BitcoinAddress;
 import org.hibernate.validator.constraints.BitcoinAddressType;
 import org.hibernate.validator.internal.constraintvalidators.hv.BitcoinAddressValidator;
@@ -15,7 +21,9 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.lang.annotation.ElementType;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hibernate.validator.constraints.BitcoinAddressType.ANY;
@@ -25,6 +33,7 @@ import static org.hibernate.validator.constraints.BitcoinAddressType.P2SH;
 import static org.hibernate.validator.constraints.BitcoinAddressType.P2TR;
 import static org.hibernate.validator.constraints.BitcoinAddressType.P2WPKH;
 import static org.hibernate.validator.constraints.BitcoinAddressType.P2WSH;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.*;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -421,4 +430,33 @@ public class BitcoinValidatorTest {
 		};
 	}
 
+
+	@Test
+	public void testProgrammaticDefinition() {
+		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Wallet.class )
+				.property( "address", ElementType.FIELD )
+				.constraint( new BitcoinAddressDef().value( BitcoinAddressType.ANY ) );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Set<ConstraintViolation<Wallet>> constraintViolations =
+				validator.validate( new Wallet( "342ftSRCvFHfCeFFBuz4xwbeqnDw6BGUey" ) );
+		assertNoViolations( constraintViolations );
+
+		constraintViolations = validator.validate( new Wallet( "www342ftSRCvFHfCeFFBuz4xwbeqnDw6BGUey" ) );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( BitcoinAddress.class )
+		);
+	}
+
+	private static class Wallet {
+
+		private final String address;
+
+		public Wallet(String address) {
+			this.address = address;
+		}
+	}
 }
