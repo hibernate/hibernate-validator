@@ -30,7 +30,7 @@ public class LocaleResolverTest {
 
 	@Test
 	public void testLanguageRangeSupport() throws NoSuchMethodException, SecurityException {
-		ValidatorFactory validatorFactory = getValidatorFactoryWithInitializedLocales( Locale.FRANCE, new Locale( "es", "ES" ) );
+		ValidatorFactory validatorFactory = getValidatorFactoryWithInitializedLocales( Locale.FRANCE, Locale.forLanguageTag( "es-ES" ) );
 		MessageInterpolator messageInterpolator = validatorFactory.getMessageInterpolator();
 
 		StaticFieldLocaleResolver.acceptLanguage = "fr-FR,fr;q=0.9";
@@ -53,7 +53,7 @@ public class LocaleResolverTest {
 	@Test
 	public void testFallbackToDefault() throws NoSuchMethodException, SecurityException {
 		// Defaults to en when we don't define a default as we launch Surefire with the en locale
-		ValidatorFactory validatorFactory = getValidatorFactoryWithInitializedLocales( new Locale( "es", "ES" ) );
+		ValidatorFactory validatorFactory = getValidatorFactoryWithInitializedLocales( Locale.forLanguageTag( "es-ES" ) );
 		MessageInterpolator messageInterpolator = validatorFactory.getMessageInterpolator();
 
 		StaticFieldLocaleResolver.acceptLanguage = "hr-HR,hr;q=0.9";

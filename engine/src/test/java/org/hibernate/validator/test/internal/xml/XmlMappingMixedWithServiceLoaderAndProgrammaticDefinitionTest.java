@@ -30,6 +30,7 @@ import java.util.Enumeration;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
 import jakarta.validation.Constraint;
@@ -191,6 +192,7 @@ public class XmlMappingMixedWithServiceLoaderAndProgrammaticDefinitionTest {
 	 * A classloader that allows to use a `META-INF/services/jakarta.validation.ConstraintValidator`
 	 * defined in the tests rather than reading it from an actual file.
 	 */
+	@IgnoreForbiddenApisErrors(reason = "Need a Java 20 API to create URLs with a custom handler.")
 	private static class ServiceLoaderTestingClassLoader extends SecureClassLoader {
 
 		private static final String SERVICE_FILE = "META-INF/services/" + ConstraintValidator.class.getName();

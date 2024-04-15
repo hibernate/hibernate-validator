@@ -200,7 +200,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		String actual = interpolator.interpolate(
 				notNullDescriptor.getAnnotation().message(),
 				messageInterpolatorContext,
-				new Locale( "es", "ES" )
+				Locale.forLanguageTag( "es-ES" )
 		);
 		assertEquals( actual, expected, "Wrong substitution" );
 	}

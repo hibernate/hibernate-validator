@@ -162,7 +162,7 @@ public class PredefinedScopeValidatorFactoryTest {
 		Locale defaultLocale = Locale.getDefault();
 
 		try {
-			Locale georgianLocale = new Locale( "ka", "GE" );
+			Locale georgianLocale = Locale.forLanguageTag( "ka-GE" );
 
 			Locale.setDefault( georgianLocale );
 
