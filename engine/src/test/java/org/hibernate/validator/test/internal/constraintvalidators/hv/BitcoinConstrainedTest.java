@@ -7,11 +7,18 @@
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
 import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.BitcoinAddressDef;
 import org.hibernate.validator.constraints.BitcoinAddress;
 import org.hibernate.validator.constraints.BitcoinAddressType;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
+import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
 
+import java.lang.annotation.ElementType;
 import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
@@ -92,5 +99,34 @@ public class BitcoinConstrainedTest extends AbstractConstrainedTest {
 				violationOf( BitcoinAddress.class ).withMessage( validationMessage ),
 				violationOf( BitcoinAddress.class ).withMessage( validationMessage )
 		);
+	}
+
+	@Test
+	public void testProgrammaticDefinition() throws Exception {
+		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Wallet.class )
+				.property( "address", ElementType.FIELD )
+				.constraint( new BitcoinAddressDef().value( BitcoinAddressType.ANY ) );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Set<ConstraintViolation<Wallet>> constraintViolations =
+				validator.validate( new Wallet( "342ftSRCvFHfCeFFBuz4xwbeqnDw6BGUey" ) );
+		assertNoViolations( constraintViolations );
+
+		constraintViolations = validator.validate( new Wallet( "www342ftSRCvFHfCeFFBuz4xwbeqnDw6BGUey" ) );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( BitcoinAddress.class )
+		);
+	}
+
+	private static class Wallet {
+
+		private final String address;
+
+		public Wallet(String address) {
+			this.address = address;
+		}
 	}
 }
