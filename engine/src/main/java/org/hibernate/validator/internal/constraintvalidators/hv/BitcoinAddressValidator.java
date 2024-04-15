@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.constraintvalidators.bv;
+package org.hibernate.validator.internal.constraintvalidators.hv;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -27,30 +29,23 @@ import java.util.stream.Collectors;
  */
 public class BitcoinAddressValidator implements ConstraintValidator<BitcoinAddress, CharSequence> {
 
-	private final List<BitcoinAddressType> addressType = new ArrayList<>();
-
-	private boolean singleType;
-	private String typesDescription;
+	static final String HIBERNATE_VALIDATION_MESSAGES = "org.hibernate.validator.ValidationMessages";
+	static final String ADDRESS_TYPE_VALIDATION_MESSAGE_PREFIX = "org.hibernate.validator.constraints.Bitcoin.address.type.";
+	private final List<BitcoinAddressType> addressTypes = new ArrayList<>();
 
 	@Override
 	public void initialize(BitcoinAddress bitcoinAddress) {
 		BitcoinAddressType[] types = bitcoinAddress.value();
 
-		this.singleType = ( types.length == 1 );
-
 		if ( Arrays.stream( types ).anyMatch( type -> type == BitcoinAddressType.ANY ) ) {
-			this.typesDescription = BitcoinAddressType.ANY.getDescription();
-			this.addressType.addAll(
-				Arrays.stream( BitcoinAddressType.values() )
-						.filter( type -> type != BitcoinAddressType.ANY )
-						.collect( Collectors.toList() ) );
+			this.addressTypes.addAll(
+					Arrays.stream( BitcoinAddressType.values() )
+							.filter( type -> type != BitcoinAddressType.ANY )
+							.collect( Collectors.toList() ) );
 			return;
 		}
 
-		Collections.addAll( this.addressType, types );
-		this.typesDescription = this.addressType.stream()
-								.map( BitcoinAddressType::getDescription )
-								.collect( Collectors.joining( "; " ) );
+		Collections.addAll( this.addressTypes, types );
 	}
 
 	/**
@@ -67,8 +62,8 @@ public class BitcoinAddressValidator implements ConstraintValidator<BitcoinAddre
 			return true;
 		}
 
-		for ( BitcoinAddressType type : this.addressType ) {
-			Pattern pattern = Pattern.compile( type.getRegex() );
+		for ( BitcoinAddressType type : this.addressTypes ) {
+			Pattern pattern = type.getPattern();
 			Matcher matcher = pattern.matcher( charSequence );
 
 			if ( matcher.matches() ) {
@@ -76,9 +71,30 @@ public class BitcoinAddressValidator implements ConstraintValidator<BitcoinAddre
 			}
 		}
 
+
 		context.unwrap( HibernateConstraintValidatorContext.class )
-				.addExpressionVariable( "singleType", singleType )
-				.addExpressionVariable( "typesDescription", typesDescription );
+				.addExpressionVariable( "singleType", isSingleType() )
+				.addExpressionVariable( "typesDescription", getTypesDescription() );
+
 		return false;
+	}
+
+	boolean isSingleType() {
+		return addressTypes.size() == 1
+				|| addressTypes.containsAll( Arrays.stream( BitcoinAddressType.values() )
+				.filter( type -> type != BitcoinAddressType.ANY ).collect( Collectors.toList() ) );
+	}
+
+	String getTypesDescription() {
+		if ( isSingleType() ) {
+			return getAddressTypeName( BitcoinAddressType.ANY );
+		}
+
+		return this.addressTypes.stream().map( this::getAddressTypeName ).collect( Collectors.joining( "; " ) );
+	}
+
+	String getAddressTypeName(BitcoinAddressType bitcoinAddressType) {
+		ResourceBundle resourceBundle = ResourceBundle.getBundle( HIBERNATE_VALIDATION_MESSAGES, Locale.getDefault() );
+		return resourceBundle.getString( ADDRESS_TYPE_VALIDATION_MESSAGE_PREFIX + bitcoinAddressType.name().toLowerCase() );
 	}
 }
