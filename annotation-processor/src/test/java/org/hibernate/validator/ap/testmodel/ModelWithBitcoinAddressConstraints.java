@@ -7,7 +7,6 @@
 package org.hibernate.validator.ap.testmodel;
 
 import org.hibernate.validator.constraints.BitcoinAddress;
-import org.hibernate.validator.constraints.ISBN;
 
 /**
  * @author José Yoshiriro
@@ -17,10 +16,10 @@ public class ModelWithBitcoinAddressConstraints {
 	@BitcoinAddress
 	private String string;
 
-	@ISBN
+	@BitcoinAddress
 	private Integer integer;
 
-	@ISBN
+	@BitcoinAddress
 	private Boolean aBoolean;
 
 }
