@@ -129,3 +129,13 @@ grant codeBase "file:${localRepository}/org/apache/maven/surefire/-" {
     permission java.security.AllPermission;
 };
 
+/* ========= */
+/* SLF4j     */
+/* ========= */
+
+grant codeBase "file:${localRepository}/org/slf4j/-" {
+	permission java.util.PropertyPermission "slf4j.internal.report.stream", "read";
+	permission java.util.PropertyPermission "slf4j.internal.verbosity", "read";
+	permission java.util.PropertyPermission "slf4j.provider", "read";
+};
+
