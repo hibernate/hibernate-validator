@@ -8,8 +8,66 @@ updates:
   - package-ecosystem: "maven"
     directory: "/" # Location of package manifests
     schedule:
-      interval: "daily"
-    allow:
-      - dependency-name: jakarta.*:*
-      - dependency-name: org.glassfish.expressly:expressly
-      - dependency-name: org.jboss.weld:*
+      interval: "weekly"
+      day: "tuesday"
+    assignees: [ "marko-bekhta" ]
+    open-pull-requests-limit: 20
+    groups:
+      # This group combines all build-only dependencies. Published artifacts do not depend on them.
+      # Grouping such dependencies will make Dependabot create PRs with a branch name
+      # following the pattern (`dependabot/maven/build-dependencies-.*`)
+      # and with a title like `Bump the build-dependencies group with 8 updates` that we can easily
+      # use for Hibernate Bot rules.
+      build-dependencies:
+        patterns:
+          # Maven plugins:
+          - "*maven*plugin*"
+          - "org.apache.maven*:*"
+          - "*surefire*"
+          - "*forbiddenapis*"
+          - "com.puppycrawl.tools:*"
+          # Other test/build dependencies
+          - "org.apache.groovy:groovy-jsr223"
+          - "org.openjdk.jmh:*" # performance testing dependency
+          - "com.google.guava:guava" # Guava is used in our test utils
+          - "org.asciidoctor:*" # Asciidoctor is used for rendering the documentation
+          - "org.apache.logging.log4j:*"
+          - "org.slf4j:*"
+          - "org.ow2.asm:*" # for Surefire/Failsafe plugins to support builds on latest JDKs
+          - "junit:*"
+          - "org.testng:*"
+          - "org.easymock:*"
+          - "org.jboss.arquillian:*"
+          - "org.jboss.arquillian.container:*"
+          - "org.jboss.modules:*"
+          - "com.fasterxml.woodstox:*"
+          - "io.rest-assured:*"
+          - "net.bytebuddy:*"
+          - "com.fasterxml.jackson.core:*"
+          - "org.springframework:*"
+          # only used for perf tests based on javax:
+          - "org.glassfish:javax.el"
+    ignore:
+      - dependency-name: "javax.validation:*"
+      - dependency-name: "org.apache.bval:*"
+      # dependencies that we align on Wildfly version that is used:
+      - dependency-name: "org.jboss.weld:*"
+      - dependency-name: "org.wildfly.arquillian:*"
+      - dependency-name: "jakarta.enterprise:jakarta.enterprise.cdi-api"
+      - dependency-name: "jakarta.ejb:jakarta.ejb-api"
+      - dependency-name: "jakarta.interceptor:jakarta.interceptor-api"
+      - dependency-name: "jakarta.annotation:jakarta.annotation-api"
+      - dependency-name: "jakarta.inject:jakarta.inject-api"
+      - dependency-name: "jakarta.persistence:jakarta.persistence-api"
+      - dependency-name: "jakarta.ws.rs:jakarta.ws.rs-api"
+        # cannot upgrade wildfly dist and core to latest as patching modules is failing on them
+        # see https://github.com/jbossas/patch-gen/issues/34 the issue causing the problem.
+      - dependency-name: "org.wildfly:wildfly-dist"
+      - dependency-name: "org.wildfly.core:*"
+        # Bean Validation TCK requires a particular version of AssertJ and using others leads to errors:
+      - dependency-name: "org.assertj:*"
+        # We have a fixed major version of OpenJFX to work with the min JDK we require
+      - dependency-name: "org.openjfx:*"
+        update-types:
+          - version-update:semver-major
+          - version-update:semver-minor
