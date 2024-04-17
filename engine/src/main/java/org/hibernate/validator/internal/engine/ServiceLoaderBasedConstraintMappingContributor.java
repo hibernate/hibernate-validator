@@ -9,8 +9,6 @@ package org.hibernate.validator.internal.engine;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 import java.lang.annotation.Annotation;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +18,8 @@ import jakarta.validation.ConstraintValidator;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.internal.util.privilegedactions.GetInstancesFromServiceLoader;
+import org.hibernate.validator.internal.util.actions.GetInstancesFromServiceLoader;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 
 import com.fasterxml.classmate.ResolvedType;
@@ -57,8 +54,7 @@ public class ServiceLoaderBasedConstraintMappingContributor implements Constrain
 		Map<Class<?>, List<Class<?>>> customValidators = newHashMap();
 
 		// find additional constraint validators via the Java ServiceLoader mechanism
-		List<ConstraintValidator> discoveredConstraintValidators = run( GetInstancesFromServiceLoader.action( primaryClassLoader,
-				ConstraintValidator.class ) );
+		List<ConstraintValidator> discoveredConstraintValidators = GetInstancesFromServiceLoader.action( primaryClassLoader, ConstraintValidator.class );
 
 		for ( ConstraintValidator constraintValidator : discoveredConstraintValidators ) {
 			Class<? extends ConstraintValidator> constraintValidatorClass = constraintValidator.getClass();
@@ -99,14 +95,4 @@ public class ServiceLoaderBasedConstraintMappingContributor implements Constrain
 		return resolvedType.typeParametersFor( ConstraintValidator.class ).get( 0 ).getErasedType();
 	}
 
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
 }

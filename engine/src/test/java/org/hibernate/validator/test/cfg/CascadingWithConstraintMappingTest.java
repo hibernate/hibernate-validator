@@ -23,7 +23,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NotNullDef;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
+import org.hibernate.validator.internal.util.actions.GetMethod;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.annotations.BeforeMethod;
@@ -101,7 +101,7 @@ public class CascadingWithConstraintMappingTest {
 
 		B b = new B();
 		b.c = new C();
-		Method method = GetMethod.action( B.class, "getC" ).run();
+		Method method = GetMethod.action( B.class, "getC" );
 
 		Set<ConstraintViolation<B>> violations = validator.forExecutables().validateReturnValue(
 				b, method, b.getC()

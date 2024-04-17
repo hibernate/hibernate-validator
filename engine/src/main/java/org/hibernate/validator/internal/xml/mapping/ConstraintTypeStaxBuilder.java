@@ -10,8 +10,6 @@ import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +27,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -41,7 +38,7 @@ import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
+import org.hibernate.validator.internal.util.actions.GetMethod;
 import org.hibernate.validator.internal.xml.AbstractStaxBuilder;
 
 /**
@@ -373,7 +370,7 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 		}
 
 		private static <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
-			Method m = run( GetMethod.action( annotationClass, name ) );
+			Method m = GetMethod.action( annotationClass, name );
 			if ( m == null ) {
 				throw LOG.getAnnotationDoesNotContainAParameterException( annotationClass, name );
 			}
@@ -458,16 +455,6 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 			return returnValue;
 		}
 
-		/**
-		 * Runs the given privileged action, using a privileged block if required.
-		 *
-		 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-		 * privileged actions within HV's protection domain.
-		 */
-		@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-		private static <T> T run(PrivilegedAction<T> action) {
-			return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-		}
 	}
 
 	private static class GroupsStaxBuilder extends AbstractMultiValuedElementStaxBuilder {

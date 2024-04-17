@@ -11,8 +11,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +21,6 @@ import jakarta.validation.spi.ConfigurationState;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
@@ -36,9 +33,9 @@ import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
-import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.internal.util.actions.GetClassLoader;
+import org.hibernate.validator.internal.util.actions.LoadClass;
+import org.hibernate.validator.internal.util.actions.NewInstance;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
@@ -94,7 +91,7 @@ final class ValidatorFactoryConfigurationHelper {
 		// service loader based config
 		ConstraintMappingContributor serviceLoaderBasedContributor = new ServiceLoaderBasedConstraintMappingContributor(
 				typeResolutionHelper,
-				externalClassLoader != null ? externalClassLoader : run( GetClassLoader.fromContext() )
+				externalClassLoader != null ? externalClassLoader : GetClassLoader.fromContext()
 		);
 		DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder(
 				javaBeanHelper, constraintMappings );
@@ -148,9 +145,9 @@ final class ValidatorFactoryConfigurationHelper {
 
 		for ( String contributorName : contributorNames ) {
 			@SuppressWarnings("unchecked")
-			Class<? extends ConstraintMappingContributor> contributorType = (Class<? extends ConstraintMappingContributor>) run(
-					LoadClass.action( contributorName, externalClassLoader ) );
-			contributors.add( run( NewInstance.action( contributorType, "constraint mapping contributor class" ) ) );
+			Class<? extends ConstraintMappingContributor> contributorType = (Class<? extends ConstraintMappingContributor>)
+					LoadClass.action( contributorName, externalClassLoader );
+			contributors.add( NewInstance.action( contributorType, "constraint mapping contributor class" ) );
 		}
 
 		return contributors;
@@ -219,10 +216,9 @@ final class ValidatorFactoryConfigurationHelper {
 		if ( scriptEvaluatorFactoryFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends ScriptEvaluatorFactory> clazz = (Class<? extends ScriptEvaluatorFactory>) run(
-						LoadClass.action( scriptEvaluatorFactoryFqcn, externalClassLoader )
-				);
-				ScriptEvaluatorFactory scriptEvaluatorFactory = run( NewInstance.action( clazz, "script evaluator factory class" ) );
+				Class<? extends ScriptEvaluatorFactory> clazz = (Class<? extends ScriptEvaluatorFactory>)
+						LoadClass.action( scriptEvaluatorFactoryFqcn, externalClassLoader );
+				ScriptEvaluatorFactory scriptEvaluatorFactory = NewInstance.action( clazz, "script evaluator factory class" );
 				LOG.usingScriptEvaluatorFactory( clazz );
 
 				return scriptEvaluatorFactory;
@@ -325,10 +321,9 @@ final class ValidatorFactoryConfigurationHelper {
 		if ( getterPropertySelectionStrategyFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends GetterPropertySelectionStrategy> clazz = (Class<? extends GetterPropertySelectionStrategy>) run(
-						LoadClass.action( getterPropertySelectionStrategyFqcn, externalClassLoader )
-				);
-				GetterPropertySelectionStrategy getterPropertySelectionStrategy = run( NewInstance.action( clazz, "getter property selection strategy class" ) );
+				Class<? extends GetterPropertySelectionStrategy> clazz = (Class<? extends GetterPropertySelectionStrategy>)
+						LoadClass.action( getterPropertySelectionStrategyFqcn, externalClassLoader );
+				GetterPropertySelectionStrategy getterPropertySelectionStrategy = NewInstance.action( clazz, "getter property selection strategy class" );
 				LOG.usingGetterPropertySelectionStrategy( clazz );
 
 				return getterPropertySelectionStrategy;
@@ -361,8 +356,8 @@ final class ValidatorFactoryConfigurationHelper {
 		if ( propertyNodeNameProviderFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends PropertyNodeNameProvider> clazz = (Class<? extends PropertyNodeNameProvider>) run( LoadClass.action( propertyNodeNameProviderFqcn, externalClassLoader ) );
-				PropertyNodeNameProvider propertyNodeNameProvider = run( NewInstance.action( clazz, "property node name provider class" ) );
+				Class<? extends PropertyNodeNameProvider> clazz = (Class<? extends PropertyNodeNameProvider>) LoadClass.action( propertyNodeNameProviderFqcn, externalClassLoader );
+				PropertyNodeNameProvider propertyNodeNameProvider = NewInstance.action( clazz, "property node name provider class" );
 				LOG.usingPropertyNodeNameProvider( clazz );
 
 				return propertyNodeNameProvider;
@@ -387,8 +382,8 @@ final class ValidatorFactoryConfigurationHelper {
 		if ( localeResolverFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends LocaleResolver> clazz = (Class<? extends LocaleResolver>) run( LoadClass.action( localeResolverFqcn, externalClassLoader ) );
-				LocaleResolver localeResolver = run( NewInstance.action( clazz, "locale resolver class" ) );
+				Class<? extends LocaleResolver> clazz = (Class<? extends LocaleResolver>) LoadClass.action( localeResolverFqcn, externalClassLoader );
+				LocaleResolver localeResolver = NewInstance.action( clazz, "locale resolver class" );
 				LOG.usingLocaleResolver( clazz );
 
 				return localeResolver;
@@ -449,17 +444,6 @@ final class ValidatorFactoryConfigurationHelper {
 		LOG.logValidatorFactoryScopedConfiguration( context.getParameterNameProvider().getClass(), "parameter name provider" );
 		LOG.logValidatorFactoryScopedConfiguration( context.getClockProvider().getClass(), "clock provider" );
 		LOG.logValidatorFactoryScopedConfiguration( context.getScriptEvaluatorFactory().getClass(), "script evaluator factory" );
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	/**

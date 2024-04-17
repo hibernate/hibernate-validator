@@ -10,8 +10,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -41,13 +39,12 @@ import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cdi.spi.BeanNames;
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.GetInstancesFromServiceLoader;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.internal.util.actions.GetClassLoader;
+import org.hibernate.validator.internal.util.actions.GetInstancesFromServiceLoader;
+import org.hibernate.validator.internal.util.actions.LoadClass;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 
 /**
@@ -185,12 +182,11 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<? extends MessageInterpolator> messageInterpolatorClass = (Class<? extends MessageInterpolator>) run(
+		Class<? extends MessageInterpolator> messageInterpolatorClass = (Class<? extends MessageInterpolator>)
 				LoadClass.action(
 						messageInterpolatorFqcn,
 						null
-				)
-		);
+				);
 
 		return createInstance( messageInterpolatorClass );
 	}
@@ -204,12 +200,11 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<? extends TraversableResolver> traversableResolverClass = (Class<? extends TraversableResolver>) run(
+		Class<? extends TraversableResolver> traversableResolverClass = (Class<? extends TraversableResolver>)
 				LoadClass.action(
 						traversableResolverFqcn,
 						null
-				)
-		);
+				);
 
 		return createInstance( traversableResolverClass );
 	}
@@ -223,12 +218,11 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<? extends ParameterNameProvider> parameterNameProviderClass = (Class<? extends ParameterNameProvider>) run(
+		Class<? extends ParameterNameProvider> parameterNameProviderClass = (Class<? extends ParameterNameProvider>)
 				LoadClass.action(
 						parameterNameProviderFqcn,
 						null
-				)
-		);
+				);
 
 		return createInstance( parameterNameProviderClass );
 	}
@@ -242,12 +236,11 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<? extends ClockProvider> clockProviderClass = (Class<? extends ClockProvider>) run(
+		Class<? extends ClockProvider> clockProviderClass = (Class<? extends ClockProvider>)
 				LoadClass.action(
 						clockProviderFqcn,
 						null
-				)
-		);
+				);
 
 		return createInstance( clockProviderClass );
 	}
@@ -262,12 +255,11 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<? extends ConstraintValidatorFactory> constraintValidatorFactoryClass = (Class<? extends ConstraintValidatorFactory>) run(
+		Class<? extends ConstraintValidatorFactory> constraintValidatorFactoryClass = (Class<? extends ConstraintValidatorFactory>)
 				LoadClass.action(
 						constraintValidatorFactoryFqcn,
 						null
-				)
-		);
+				);
 
 		return createInstance( constraintValidatorFactoryClass );
 	}
@@ -278,8 +270,8 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 		@SuppressWarnings("unchecked")
 		Set<ValueExtractorDescriptor> valueExtractorDescriptors = valueExtractorFqcns.stream()
-				.map( fqcn -> createInstance( (Class<? extends ValueExtractor<?>>) run( LoadClass.action( fqcn, null ) ) ) )
-				.map( ve -> new ValueExtractorDescriptor( ve ) )
+				.map( fqcn -> createInstance( (Class<? extends ValueExtractor<?>>)  LoadClass.action( fqcn, null ) ) )
+				.map( ValueExtractorDescriptor::new )
 				.collect( Collectors.toSet() );
 
 		return valueExtractorDescriptors;
@@ -289,10 +281,10 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 	private Set<ValueExtractorDescriptor> createServiceLoaderValueExtractors() {
 		Set<ValueExtractorDescriptor> valueExtractorDescriptors = new HashSet<>();
 
-		List<ValueExtractor> valueExtractors = run( GetInstancesFromServiceLoader.action(
-				run( GetClassLoader.fromContext() ),
+		List<ValueExtractor> valueExtractors = GetInstancesFromServiceLoader.action(
+				GetClassLoader.fromContext(),
 				ValueExtractor.class
-		) );
+		);
 
 		for ( ValueExtractor<?> valueExtractor : valueExtractors ) {
 			valueExtractorDescriptors.add( new ValueExtractorDescriptor( injectInstance( valueExtractor ) ) );
@@ -317,17 +309,6 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		return validationProviderHelper.isDefaultProvider() ?
 				Validation.byDefaultProvider().configure() :
 				Validation.byProvider( org.hibernate.validator.HibernateValidator.class ).configure();
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	@Override

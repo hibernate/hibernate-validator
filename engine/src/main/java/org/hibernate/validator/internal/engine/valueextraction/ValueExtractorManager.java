@@ -8,8 +8,6 @@ package org.hibernate.validator.internal.engine.valueextraction;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,8 +21,7 @@ import jakarta.validation.ConstraintDeclarationException;
 import jakarta.validation.ValidationException;
 import jakarta.validation.valueextraction.ValueExtractor;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.internal.util.actions.LoadClass;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -194,12 +191,7 @@ public class ValueExtractorManager {
 	}
 
 	private static boolean isJavaFxForcefullyDisabled() {
-		return run( new PrivilegedAction<Boolean>() {
-			@Override
-			public Boolean run() {
-				 return Boolean.valueOf( Boolean.getBoolean( HIBERNATE_VALIDATOR_FORCE_DISABLE_JAVAFX_INTEGRATION ) );
-			}
-		} );
+		return Boolean.getBoolean( HIBERNATE_VALIDATOR_FORCE_DISABLE_JAVAFX_INTEGRATION );
 	}
 
 	private static boolean isJavaFxInClasspath() {
@@ -208,7 +200,7 @@ public class ValueExtractorManager {
 
 	private static boolean isClassPresent(String className, boolean fallbackOnTCCL) {
 		try {
-			run( LoadClass.action( className, ValueExtractorManager.class.getClassLoader(), fallbackOnTCCL ) );
+			LoadClass.action( className, ValueExtractorManager.class.getClassLoader(), fallbackOnTCCL );
 			return true;
 		}
 		catch (ValidationException e) {
@@ -220,14 +212,4 @@ public class ValueExtractorManager {
 		valueExtractorResolver.clear();
 	}
 
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
 }

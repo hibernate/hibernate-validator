@@ -4,9 +4,8 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.util.privilegedactions;
+package org.hibernate.validator.internal.util.actions;
 
-import java.security.PrivilegedAction;
 import java.lang.reflect.Method;
 
 /**
@@ -14,19 +13,12 @@ import java.lang.reflect.Method;
  *
  * @author Emmanuel Bernard
  */
-public final class GetMethods implements PrivilegedAction<Method[]> {
-	private final Class<?> clazz;
+public final class GetMethods {
 
-	public static GetMethods action(Class<?> clazz) {
-		return new GetMethods( clazz );
+	private GetMethods() {
 	}
 
-	private GetMethods(Class<?> clazz) {
-		this.clazz = clazz;
-	}
-
-	@Override
-	public Method[] run() {
+	public static Method[] action(Class<?> clazz) {
 		return clazz.getMethods();
 	}
 }

@@ -6,11 +6,10 @@
  */
 
 
-package org.hibernate.validator.internal.util.privilegedactions;
+package org.hibernate.validator.internal.util.actions;
 
 import java.io.IOException;
 import java.net.URL;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Enumeration;
 
@@ -19,22 +18,12 @@ import java.util.Enumeration;
  *
  * @author Hardy Ferentschik
  */
-public final class GetResources implements PrivilegedAction<Enumeration<URL>> {
+public final class GetResources {
 
-	private final String resourceName;
-	private final ClassLoader classLoader;
-
-	public static GetResources action(ClassLoader classLoader, String resourceName) {
-		return new GetResources( classLoader, resourceName );
+	private GetResources() {
 	}
 
-	private GetResources(ClassLoader classLoader, String resourceName) {
-		this.classLoader = classLoader;
-		this.resourceName = resourceName;
-	}
-
-	@Override
-	public Enumeration<URL> run() {
+	public static Enumeration<URL> action(ClassLoader classLoader, String resourceName) {
 		try {
 			return classLoader.getResources( resourceName );
 		}

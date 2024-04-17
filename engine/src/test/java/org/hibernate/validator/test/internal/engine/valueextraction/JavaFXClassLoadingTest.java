@@ -8,13 +8,9 @@ package org.hibernate.validator.test.internal.engine.valueextraction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import jakarta.validation.ValidationException;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.internal.util.actions.LoadClass;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.classloader.ShrinkWrapClassLoader;
@@ -48,22 +44,11 @@ public class JavaFXClassLoadingTest {
 
 	private static boolean isClassPresent(String className, ClassLoader classLoader, boolean fallbackOnTCCL) {
 		try {
-			run( LoadClass.action( className, classLoader, fallbackOnTCCL ) );
+			LoadClass.action( className, classLoader, fallbackOnTCCL );
 			return true;
 		}
 		catch (ValidationException e) {
 			return false;
 		}
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

@@ -13,8 +13,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,7 +37,6 @@ import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.BaseHibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
@@ -52,9 +49,9 @@ import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.GetInstancesFromServiceLoader;
-import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
+import org.hibernate.validator.internal.util.actions.GetClassLoader;
+import org.hibernate.validator.internal.util.actions.GetInstancesFromServiceLoader;
+import org.hibernate.validator.internal.util.actions.SetContextClassLoader;
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.hibernate.validator.internal.xml.config.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.config.ValidationXmlParser;
@@ -713,10 +710,10 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	@SuppressWarnings("rawtypes")
 	private void loadValueExtractorsFromServiceLoader() {
-		List<ValueExtractor> valueExtractors = run( GetInstancesFromServiceLoader.action(
-				externalClassLoader != null ? externalClassLoader : run( GetClassLoader.fromContext() ),
+		List<ValueExtractor> valueExtractors = GetInstancesFromServiceLoader.action(
+				externalClassLoader != null ? externalClassLoader : GetClassLoader.fromContext(),
 				ValueExtractor.class
-		) );
+		);
 
 		for ( ValueExtractor<?> valueExtractor : valueExtractors ) {
 			validationBootstrapParameters.addValueExtractorDescriptor( new ValueExtractorDescriptor( valueExtractor ) );
@@ -813,10 +810,10 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 			// Within RBMI, the expression factory implementation is loaded from the TCCL; thus we set the TCCL to the
 			// given external class loader for this call
-			final ClassLoader originalContextClassLoader = run( GetClassLoader.fromContext() );
+			final ClassLoader originalContextClassLoader = GetClassLoader.fromContext();
 
 			try {
-				run( SetContextClassLoader.action( externalClassLoader ) );
+				SetContextClassLoader.action( externalClassLoader );
 				return new ResourceBundleMessageInterpolator(
 						userResourceBundleLocator,
 						contributorResourceBundleLocator,
@@ -827,7 +824,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 				);
 			}
 			finally {
-				run( SetContextClassLoader.action( originalContextClassLoader ) );
+				SetContextClassLoader.action( originalContextClassLoader );
 			}
 		}
 		else {
@@ -856,14 +853,4 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		return (T) this;
 	}
 
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
 }

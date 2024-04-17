@@ -13,8 +13,6 @@ import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -27,14 +25,13 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.hibernate.validator.Incubating;
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
-import org.hibernate.validator.internal.util.privilegedactions.GetResources;
+import org.hibernate.validator.internal.util.actions.GetClassLoader;
+import org.hibernate.validator.internal.util.actions.GetMethod;
+import org.hibernate.validator.internal.util.actions.GetResources;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
@@ -197,7 +194,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 		}
 
 		if ( rb == null ) {
-			ClassLoader classLoader = run( GetClassLoader.fromContext() );
+			ClassLoader classLoader = GetClassLoader.fromContext();
 			if ( classLoader != null ) {
 				rb = loadBundle(
 						classLoader, locale, bundleName
@@ -207,7 +204,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 		}
 
 		if ( rb == null ) {
-			ClassLoader classLoader = run( GetClassLoader.fromClass( PlatformResourceBundleLocator.class ) );
+			ClassLoader classLoader = GetClassLoader.fromClass( PlatformResourceBundleLocator.class );
 			rb = loadBundle(
 					classLoader, locale, bundleName
 							+ " not found by validator classloader"
@@ -248,17 +245,6 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	}
 
 	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
-
-	/**
 	 * Check whether ResourceBundle.Control is available, which is needed for bundle aggregation. If not, we'll skip
 	 * resource aggregation.
 	 * <p>
@@ -281,7 +267,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 				return false;
 			}
 
-			Method getModule = run( GetMethod.action( Class.class, "getModule" ) );
+			Method getModule = GetMethod.action( Class.class, "getModule" );
 			// not on Java 9
 			if ( getModule == null ) {
 				return true;
@@ -289,7 +275,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 
 			// on Java 9, check whether HV is a named module
 			Object module = getModule.invoke( PlatformResourceBundleLocator.class );
-			Method isNamedMethod = run( GetMethod.action( module.getClass(), "isNamed" ) );
+			Method isNamedMethod = GetMethod.action( module.getClass(), "isNamed" );
 			boolean isNamed = (Boolean) isNamedMethod.invoke( module );
 
 			return !isNamed;
@@ -325,7 +311,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 		private static List<ResourceBundle> load(String resourceName, ClassLoader loader) throws IOException {
 			List<ResourceBundle> resourceBundles = new ArrayList<>();
 
-			Enumeration<URL> urls = run( GetResources.action( loader, resourceName ) );
+			Enumeration<URL> urls = GetResources.action( loader, resourceName );
 			while ( urls.hasMoreElements() ) {
 				URL url = urls.nextElement();
 				try ( InputStream propertyStream = url.openStream() ) {

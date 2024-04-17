@@ -30,3 +30,9 @@ org.jboss.logging.processor.util.Objects
 ################################################################################################################
 # JAXB shouldn't be used anymore as it is targeted to be removed from the JDK
 javax.xml.bind.**
+
+################################################################################################################
+# Security manager and related security classes that should not be used in the Validator:
+
+java.security.PrivilegedAction
+java.security.PrivilegedExceptionAction

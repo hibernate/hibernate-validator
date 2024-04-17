@@ -7,20 +7,17 @@
 package org.hibernate.validator.messageinterpolation;
 
 import java.lang.invoke.MethodHandles;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
 import org.hibernate.validator.Incubating;
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
+import org.hibernate.validator.internal.util.actions.GetClassLoader;
+import org.hibernate.validator.internal.util.actions.SetContextClassLoader;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
@@ -176,12 +173,12 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 			return expressionFactory;
 		}
 
-		final ClassLoader originalContextClassLoader = run( GetClassLoader.fromContext() );
+		final ClassLoader originalContextClassLoader = GetClassLoader.fromContext();
 
 		try {
 			// Then we try the Hibernate Validator class loader. In a fully-functional modular environment such as
 			// WildFly or Jigsaw, it is the way to go.
-			run( SetContextClassLoader.action( ResourceBundleMessageInterpolator.class.getClassLoader() ) );
+			SetContextClassLoader.action( ResourceBundleMessageInterpolator.class.getClassLoader() );
 
 			if ( canLoadExpressionFactory() ) {
 				ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
@@ -191,7 +188,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 
 			// We try the CL of the EL module itself; the EL RI uses the TCCL to load the implementation from
 			// its own module, so this should work.
-			run( SetContextClassLoader.action( ELManager.class.getClassLoader() ) );
+			SetContextClassLoader.action( ELManager.class.getClassLoader() );
 			if ( canLoadExpressionFactory() ) {
 				ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
 				LOG.debug( "Loaded expression factory via EL classloader" );
@@ -200,7 +197,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 
 			// Finally we try the CL of the EL implementation itself. This is necessary for OSGi now that the
 			// implementation is separated from the API.
-			run( SetContextClassLoader.action( ExpressionFactoryImpl.class.getClassLoader() ) );
+			SetContextClassLoader.action( ExpressionFactoryImpl.class.getClassLoader() );
 			if ( canLoadExpressionFactory() ) {
 				ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
 				LOG.debug( "Loaded expression factory via com.sun.el classloader" );
@@ -211,7 +208,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 			throw LOG.getUnableToInitializeELExpressionFactoryException( e );
 		}
 		finally {
-			run( SetContextClassLoader.action( originalContextClassLoader ) );
+			SetContextClassLoader.action( originalContextClassLoader );
 		}
 
 		// HV-793 - We fail eagerly in case we have no EL dependencies on the classpath
@@ -229,20 +226,8 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 			return true;
 		}
 		catch (Throwable e) {
-			LOG.debugv( e, "Failed to load expression factory via classloader {0}",
-					run( GetClassLoader.fromContext() ) );
+			LOG.debugv( e, "Failed to load expression factory via classloader {0}", GetClassLoader.fromContext() );
 			return false;
 		}
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

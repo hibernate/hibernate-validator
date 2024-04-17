@@ -8,8 +8,6 @@ package org.hibernate.validator.internal.xml.config;
 
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,14 +23,13 @@ import jakarta.validation.ValidationException;
 import jakarta.validation.spi.ValidationProvider;
 import jakarta.validation.valueextraction.ValueExtractor;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor.Key;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
-import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.internal.util.actions.LoadClass;
+import org.hibernate.validator.internal.util.actions.NewInstance;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
 /**
@@ -165,9 +162,7 @@ public class ValidationBootstrapParameters {
 	private void setProviderClass(String providerFqcn, ClassLoader externalClassLoader) {
 		if ( providerFqcn != null ) {
 			try {
-				providerClass = (Class<? extends ValidationProvider<?>>) run(
-						LoadClass.action( providerFqcn, externalClassLoader )
-				);
+				providerClass = (Class<? extends ValidationProvider<?>>) LoadClass.action( providerFqcn, externalClassLoader );
 				LOG.usingValidationProvider( providerClass );
 			}
 			catch (Exception e) {
@@ -180,10 +175,9 @@ public class ValidationBootstrapParameters {
 		if ( messageInterpolatorFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends MessageInterpolator> messageInterpolatorClass = (Class<? extends MessageInterpolator>) run(
-						LoadClass.action( messageInterpolatorFqcn, externalClassLoader )
-				);
-				messageInterpolator = run( NewInstance.action( messageInterpolatorClass, "message interpolator" ) );
+				Class<? extends MessageInterpolator> messageInterpolatorClass = (Class<? extends MessageInterpolator>)
+						LoadClass.action( messageInterpolatorFqcn, externalClassLoader );
+				messageInterpolator = NewInstance.action( messageInterpolatorClass, "message interpolator" );
 				LOG.usingMessageInterpolator( messageInterpolatorClass );
 			}
 			catch (ValidationException e) {
@@ -196,10 +190,9 @@ public class ValidationBootstrapParameters {
 		if ( traversableResolverFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends TraversableResolver> clazz = (Class<? extends TraversableResolver>) run(
-						LoadClass.action( traversableResolverFqcn, externalClassLoader )
-				);
-				traversableResolver = run( NewInstance.action( clazz, "traversable resolver" ) );
+				Class<? extends TraversableResolver> clazz = (Class<? extends TraversableResolver>)
+						LoadClass.action( traversableResolverFqcn, externalClassLoader );
+				traversableResolver = NewInstance.action( clazz, "traversable resolver" );
 				LOG.usingTraversableResolver( clazz );
 			}
 			catch (ValidationException e) {
@@ -212,10 +205,9 @@ public class ValidationBootstrapParameters {
 		if ( constraintValidatorFactoryFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends ConstraintValidatorFactory> clazz = (Class<? extends ConstraintValidatorFactory>) run(
-						LoadClass.action( constraintValidatorFactoryFqcn, externalClassLoader )
-				);
-				constraintValidatorFactory = run( NewInstance.action( clazz, "constraint validator factory class" ) );
+				Class<? extends ConstraintValidatorFactory> clazz = (Class<? extends ConstraintValidatorFactory>)
+						LoadClass.action( constraintValidatorFactoryFqcn, externalClassLoader );
+				constraintValidatorFactory = NewInstance.action( clazz, "constraint validator factory class" );
 				LOG.usingConstraintValidatorFactory( clazz );
 			}
 			catch (ValidationException e) {
@@ -228,10 +220,9 @@ public class ValidationBootstrapParameters {
 		if ( parameterNameProviderFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends ParameterNameProvider> clazz = (Class<? extends ParameterNameProvider>) run(
-						LoadClass.action( parameterNameProviderFqcn, externalClassLoader )
-				);
-				parameterNameProvider = run( NewInstance.action( clazz, "parameter name provider class" ) );
+				Class<? extends ParameterNameProvider> clazz = (Class<? extends ParameterNameProvider>)
+						LoadClass.action( parameterNameProviderFqcn, externalClassLoader );
+				parameterNameProvider = NewInstance.action( clazz, "parameter name provider class" );
 				LOG.usingParameterNameProvider( clazz );
 			}
 			catch (ValidationException e) {
@@ -244,10 +235,9 @@ public class ValidationBootstrapParameters {
 		if ( clockProviderFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends ClockProvider> clazz = (Class<? extends ClockProvider>) run(
-						LoadClass.action( clockProviderFqcn, externalClassLoader )
-				);
-				clockProvider = run( NewInstance.action( clazz, "clock provider class" ) );
+				Class<? extends ClockProvider> clazz = (Class<? extends ClockProvider>)
+						LoadClass.action( clockProviderFqcn, externalClassLoader );
+				clockProvider = NewInstance.action( clazz, "clock provider class" );
 				LOG.usingClockProvider( clazz );
 			}
 			catch (ValidationException e) {
@@ -262,10 +252,9 @@ public class ValidationBootstrapParameters {
 			ValueExtractor<?> valueExtractor;
 
 			try {
-				Class<? extends ValueExtractor<?>> clazz = (Class<? extends ValueExtractor<?>>) run(
-						LoadClass.action( valueExtractorFqcn, externalClassLoader )
-				);
-				valueExtractor = run( NewInstance.action( clazz, "value extractor class" ) );
+				Class<? extends ValueExtractor<?>> clazz = (Class<? extends ValueExtractor<?>>)
+						LoadClass.action( valueExtractorFqcn, externalClassLoader );
+				valueExtractor = NewInstance.action( clazz, "value extractor class" );
 			}
 			catch (ValidationException e) {
 				throw LOG.getUnableToInstantiateValueExtractorClassException( valueExtractorFqcn, e );
@@ -301,14 +290,4 @@ public class ValidationBootstrapParameters {
 		}
 	}
 
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
 }

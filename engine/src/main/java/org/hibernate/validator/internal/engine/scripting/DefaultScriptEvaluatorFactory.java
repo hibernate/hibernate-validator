@@ -7,16 +7,13 @@
 package org.hibernate.validator.internal.engine.scripting;
 
 import java.lang.invoke.MethodHandles;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.internal.util.actions.GetClassLoader;
 import org.hibernate.validator.spi.scripting.AbstractCachingScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEngineScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluationException;
@@ -85,21 +82,11 @@ public class DefaultScriptEvaluatorFactory extends AbstractCachingScriptEvaluato
 		if ( threadContextClassLoaderScriptEngineManager == null ) {
 			synchronized ( this ) {
 				if ( threadContextClassLoaderScriptEngineManager == null ) {
-					threadContextClassLoaderScriptEngineManager = new ScriptEngineManager( run( GetClassLoader.fromContext() ) );
+					threadContextClassLoaderScriptEngineManager = new ScriptEngineManager( GetClassLoader.fromContext() );
 				}
 			}
 		}
 		return threadContextClassLoaderScriptEngineManager;
 	}
 
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
 }
