@@ -316,7 +316,7 @@
                         <configuration>
                             <offline>true</offline>
                             <jbossHome>${project.build.directory}/wildfly-${version.wildfly}/</jbossHome>
-                            <fail-on-error>false</fail-on-error>
+                            <fail-on-error>true</fail-on-error>
                             <commands>
                                 <command>patch apply ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${version.wildfly}-patch.zip</command>
                             </commands>
