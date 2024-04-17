@@ -4,10 +4,9 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.util.privilegedactions;
+package org.hibernate.validator.internal.util.actions;
 
 import java.lang.invoke.MethodHandles;
-import java.security.PrivilegedAction;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -28,57 +27,41 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  * @author Guillaume Smet
  */
-public final class LoadClass implements PrivilegedAction<Class<?>> {
+public final class LoadClass {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String HIBERNATE_VALIDATOR_CLASS_NAME = "org.hibernate.validator";
 
-	private final String className;
+	private LoadClass() {
+	}
 
-	private final ClassLoader classLoader;
-
-	private final ClassLoader initialThreadContextClassLoader;
-
-	/**
-	 * when true, it will check the Thread Context ClassLoader when the class is not found in the provided one
-	 */
-	private final boolean fallbackOnTCCL;
-
-	public static LoadClass action(String className, ClassLoader classLoader) {
+	public static Class<?> action(String className, ClassLoader classLoader) {
 		return action( className, classLoader, true );
 	}
 
-	public static LoadClass action(String className, ClassLoader classLoader, boolean fallbackOnTCCL) {
-		return new LoadClass( className, classLoader, null, fallbackOnTCCL );
+	public static Class<?> action(String className, ClassLoader classLoader, boolean fallbackOnTCCL) {
+		return action( className, classLoader, null, fallbackOnTCCL );
 	}
 
 	/**
 	 * in some cases, the TCCL has been overridden so we need to pass it explicitly.
 	 */
-	public static LoadClass action(String className, ClassLoader classLoader, ClassLoader initialThreadContextClassLoader) {
-		return new LoadClass( className, classLoader, initialThreadContextClassLoader, true );
+	public static Class<?> action(String className, ClassLoader classLoader, ClassLoader initialThreadContextClassLoader) {
+		return action( className, classLoader, initialThreadContextClassLoader, true );
 	}
 
-	private LoadClass(String className, ClassLoader classLoader, ClassLoader initialThreadContextClassLoader, boolean fallbackOnTCCL) {
-		this.className = className;
-		this.classLoader = classLoader;
-		this.initialThreadContextClassLoader = initialThreadContextClassLoader;
-		this.fallbackOnTCCL = fallbackOnTCCL;
-	}
-
-	@Override
-	public Class<?> run() {
+	private static Class<?> action(String className, ClassLoader classLoader, ClassLoader initialThreadContextClassLoader, boolean fallbackOnTCCL) {
 		if ( className.startsWith( HIBERNATE_VALIDATOR_CLASS_NAME ) ) {
-			return loadClassInValidatorNameSpace();
+			return loadClassInValidatorNameSpace( className, classLoader, initialThreadContextClassLoader, fallbackOnTCCL );
 		}
 		else {
-			return loadNonValidatorClass();
+			return loadNonValidatorClass( className, classLoader, initialThreadContextClassLoader, fallbackOnTCCL );
 		}
 	}
 
 	// HV-363 - library internal classes are loaded via Class.forName first
-	private Class<?> loadClassInValidatorNameSpace() {
+	private static Class<?> loadClassInValidatorNameSpace(String className, ClassLoader classLoader, ClassLoader initialThreadContextClassLoader, boolean fallbackOnTCCL) {
 		final ClassLoader loader = HibernateValidator.class.getClassLoader();
 		Exception exception;
 		try {
@@ -111,7 +94,7 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 		}
 	}
 
-	private Class<?> loadNonValidatorClass() {
+	private static Class<?> loadNonValidatorClass(String className, ClassLoader classLoader, ClassLoader initialThreadContextClassLoader, boolean fallbackOnTCCL) {
 		Exception exception = null;
 		if ( classLoader != null ) {
 			try {

@@ -12,8 +12,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +24,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
@@ -34,8 +31,8 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
+import org.hibernate.validator.internal.util.actions.GetClassLoader;
+import org.hibernate.validator.internal.util.actions.SetContextClassLoader;
 import org.hibernate.validator.internal.xml.CloseIgnoringInputStream;
 import org.hibernate.validator.internal.xml.XmlParserHelper;
 import org.xml.sax.SAXException;
@@ -83,7 +80,7 @@ public class MappingXmlParser {
 		this.constrainedElements = newHashMap();
 		this.mappingBuilders = newHashSet();
 		this.xmlParserHelper = new XmlParserHelper();
-		this.classLoadingHelper = new ClassLoadingHelper( externalClassLoader, run( GetClassLoader.fromContext() ) );
+		this.classLoadingHelper = new ClassLoadingHelper( externalClassLoader, GetClassLoader.fromContext() );
 	}
 
 	/**
@@ -93,10 +90,10 @@ public class MappingXmlParser {
 	 * @param mappingStreams The streams to parse. Must support the mark/reset contract.
 	 */
 	public final void parse(Set<InputStream> mappingStreams) {
-		ClassLoader previousTccl = run( GetClassLoader.fromContext() );
+		ClassLoader previousTccl = GetClassLoader.fromContext();
 
 		try {
-			run( SetContextClassLoader.action( MappingXmlParser.class.getClassLoader() ) );
+			SetContextClassLoader.action( MappingXmlParser.class.getClassLoader() );
 
 			Set<String> alreadyProcessedConstraintDefinitions = newHashSet();
 			for ( InputStream in : mappingStreams ) {
@@ -150,7 +147,7 @@ public class MappingXmlParser {
 			throw LOG.getErrorParsingMappingFileException( e );
 		}
 		finally {
-			run( SetContextClassLoader.action( previousTccl ) );
+			SetContextClassLoader.action( previousTccl );
 		}
 	}
 
@@ -190,14 +187,4 @@ public class MappingXmlParser {
 		return schemaResource;
 	}
 
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
 }

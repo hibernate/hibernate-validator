@@ -199,10 +199,7 @@
             <properties>
                 <!-- Use Local for testing without security manager -->
                 <arquillian.protocol>LocalSecurityManagerTesting</arquillian.protocol>
-                <!-- Remove for testing without security manager -->
-                <surefire.jvm.args.additional>-DincludeJavaFXTests=true -Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/test.policy -Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
-                <!-- Uncomment the following line to obtain the access log of the security manager -->
-                <!--<surefire.jvm.args.additional>-DincludeJavaFXTests=true -Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/test.policy -Djava.security.debug=access -Duser.language=en -Duser.country=US</surefire.jvm.args.additional>-->
+                <surefire.jvm.args.additional>-DincludeJavaFXTests=true -Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
             </properties>
             <dependencies>
                 <dependency>

@@ -11,14 +11,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttributes;
+import org.hibernate.validator.internal.util.actions.GetAnnotationAttributes;
 
 /**
  * A concrete implementation of {@code Annotation} that pretends it is a
@@ -137,28 +134,15 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 						: Arrays.equals( (Object[]) o1, (Object[]) o2 );
 	}
 
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
 	private Map<String, Object> getAnnotationAttributes(Annotation annotation) {
-		// We only enable this optimization if the security manager is not enabled. Otherwise,
-		// we would have to add every package containing constraints to the security policy.
-		if ( Proxy.isProxyClass( annotation.getClass() ) && System.getSecurityManager() == null ) {
+		if ( Proxy.isProxyClass( annotation.getClass() ) ) {
 			InvocationHandler invocationHandler = Proxy.getInvocationHandler( annotation );
 			if ( invocationHandler instanceof AnnotationProxy ) {
 				return ( (AnnotationProxy) invocationHandler ).descriptor.getAttributes();
 			}
 		}
 
-		return run( GetAnnotationAttributes.action( annotation ) );
+		return GetAnnotationAttributes.action( annotation );
 	}
 
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
 }

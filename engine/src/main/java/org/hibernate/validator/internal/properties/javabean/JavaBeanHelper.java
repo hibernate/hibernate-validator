@@ -12,17 +12,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Optional;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromGetterNameCandidates;
+import org.hibernate.validator.internal.util.actions.GetDeclaredConstructor;
+import org.hibernate.validator.internal.util.actions.GetDeclaredField;
+import org.hibernate.validator.internal.util.actions.GetDeclaredMethod;
+import org.hibernate.validator.internal.util.actions.GetMethodFromGetterNameCandidates;
 import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.ConstrainableExecutable;
@@ -55,8 +52,7 @@ public class JavaBeanHelper {
 	public Optional<JavaBeanField> findDeclaredField(Class<?> declaringClass, String property) {
 		Contracts.assertNotNull( declaringClass, MESSAGES.classCannotBeNull() );
 
-		Field field = run( GetDeclaredField.action( declaringClass, property ) );
-
+		Field field = GetDeclaredField.action( declaringClass, property );
 		return Optional.ofNullable( field ).map( this::field );
 	}
 
@@ -73,12 +69,10 @@ public class JavaBeanHelper {
 	}
 
 	private Optional<JavaBeanGetter> findGetter(Class<?> declaringClass, String property, boolean lookForMethodsOnSuperClass) {
-		Method getter = run(
-				GetMethodFromGetterNameCandidates.action(
-						declaringClass,
-						getterPropertySelectionStrategy.getGetterMethodNameCandidates( property ),
-						lookForMethodsOnSuperClass
-				)
+		Method getter = GetMethodFromGetterNameCandidates.action(
+				declaringClass,
+				getterPropertySelectionStrategy.getGetterMethodNameCandidates( property ),
+				lookForMethodsOnSuperClass
 		);
 		if ( getter == null ) {
 			return Optional.empty();
@@ -90,7 +84,7 @@ public class JavaBeanHelper {
 	}
 
 	public Optional<JavaBeanMethod> findDeclaredMethod(Class<?> declaringClass, String methodName, Class<?>... parameterTypes) {
-		Method method = run( GetDeclaredMethod.action( declaringClass, methodName, parameterTypes ) );
+		Method method = GetDeclaredMethod.action( declaringClass, methodName, parameterTypes );
 		if ( method == null ) {
 			return Optional.empty();
 		}
@@ -100,7 +94,7 @@ public class JavaBeanHelper {
 	}
 
 	public <T> Optional<JavaBeanConstructor> findDeclaredConstructor(Class<T> declaringClass, Class<?>... parameterTypes) {
-		Constructor<T> constructor = run( GetDeclaredConstructor.action( declaringClass, parameterTypes ) );
+		Constructor<T> constructor = GetDeclaredConstructor.action( declaringClass, parameterTypes );
 		if ( constructor == null ) {
 			return Optional.empty();
 		}
@@ -135,17 +129,6 @@ public class JavaBeanHelper {
 
 	public JavaBeanField field(Field field) {
 		return new JavaBeanField( field, propertyNodeNameProvider.getName( new JavaBeanPropertyImpl( field.getDeclaringClass(), field.getName() ) ) );
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 *
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	private static class JavaBeanConstrainableExecutable implements ConstrainableExecutable {

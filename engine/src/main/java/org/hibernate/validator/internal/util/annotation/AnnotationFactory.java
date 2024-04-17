@@ -7,12 +7,9 @@
 package org.hibernate.validator.internal.util.annotation;
 
 import java.lang.annotation.Annotation;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.NewProxyInstance;
+import org.hibernate.validator.internal.util.actions.GetClassLoader;
+import org.hibernate.validator.internal.util.actions.NewProxyInstance;
 
 /**
  * Creates live annotations (actually {@link AnnotationProxy} instances) from {@code AnnotationDescriptor}s.
@@ -28,21 +25,10 @@ public class AnnotationFactory {
 	}
 
 	public static <T extends Annotation> T create(AnnotationDescriptor<T> descriptor) {
-		return run( NewProxyInstance.action(
-				run( GetClassLoader.fromClass( descriptor.getType() ) ),
+		return NewProxyInstance.action(
+				GetClassLoader.fromClass( descriptor.getType() ),
 				descriptor.getType(),
 				new AnnotationProxy( descriptor )
-		) );
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+		);
 	}
 }

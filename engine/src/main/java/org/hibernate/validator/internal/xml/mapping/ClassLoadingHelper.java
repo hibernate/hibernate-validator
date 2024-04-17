@@ -8,13 +8,10 @@ package org.hibernate.validator.internal.xml.mapping;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Map;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.internal.util.actions.LoadClass;
 
 /**
  * A helper for loading classes by names, as given in XML constraint mappings. Given names can be the names of primitive
@@ -85,7 +82,7 @@ class ClassLoadingHelper {
 	}
 
 	private Class<?> loadClass(String className) {
-		return run( LoadClass.action( className, externalClassLoader, threadContextClassLoader ) );
+		return LoadClass.action( className, externalClassLoader, threadContextClassLoader );
 	}
 
 	private static boolean isArrayClassName(String className) {
@@ -100,14 +97,4 @@ class ClassLoadingHelper {
 		return clazz.contains( PACKAGE_SEPARATOR );
 	}
 
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
 }

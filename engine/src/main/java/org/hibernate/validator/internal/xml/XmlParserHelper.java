@@ -11,9 +11,6 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedExceptionAction;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -27,13 +24,12 @@ import javax.xml.stream.events.XMLEvent;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.GetResource;
-import org.hibernate.validator.internal.util.privilegedactions.NewSchema;
+import org.hibernate.validator.internal.util.actions.GetClassLoader;
+import org.hibernate.validator.internal.util.actions.GetResource;
+import org.hibernate.validator.internal.util.actions.NewSchema;
 
 /**
  * Provides common functionality used within the different XML descriptor
@@ -142,13 +138,13 @@ public class XmlParserHelper {
 	}
 
 	private Schema loadSchema(String schemaResource) {
-		ClassLoader loader = run( GetClassLoader.fromClass( XmlParserHelper.class ) );
+		ClassLoader loader = GetClassLoader.fromClass( XmlParserHelper.class );
 
-		URL schemaUrl = run( GetResource.action( loader, schemaResource ) );
+		URL schemaUrl = GetResource.action( loader, schemaResource );
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		Schema schema = null;
 		try {
-			schema = run( NewSchema.action( sf, schemaUrl ) );
+			schema = NewSchema.action( sf, schemaUrl );
 		}
 		catch (Exception e) {
 			LOG.unableToCreateSchema( schemaResource, e.getMessage() );
@@ -156,19 +152,4 @@ public class XmlParserHelper {
 		return schema;
 	}
 
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
-
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private <T> T run(PrivilegedExceptionAction<T> action) throws Exception {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
 }

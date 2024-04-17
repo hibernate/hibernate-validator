@@ -10,12 +10,14 @@ import jakarta.validation.ValidationException;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.internal.util.actions.LoadClass;
 
 import static java.lang.Thread.currentThread;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 import static org.testng.Assert.assertTrue;
+
+import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
@@ -23,26 +25,24 @@ import static org.testng.Assert.assertTrue;
 public class LoadClassTest {
 	@Test
 	public void test_loading_dummy_class_throws_exception_without_fallback_to_tcl() {
-		final LoadClass action = LoadClass.action( "org.hibernate.validator.Dummy", null, false );
-		runLoadClass( action );
+		runLoadClass( () -> LoadClass.action( "org.hibernate.validator.Dummy", null, false ) );
 	}
 
 	@Test
 	public void test_loading_dummy_class_throws_exception_with_fallback_to_tcl() {
-		final LoadClass action = LoadClass.action( "org.hibernate.validator.Dummy", null, true );
 		final ClassLoader current = currentThread().getContextClassLoader();
 		try {
 			currentThread().setContextClassLoader( null );
-			runLoadClass( action );
+			runLoadClass( () -> LoadClass.action( "org.hibernate.validator.Dummy", null, true ) );
 		}
 		finally {
 			currentThread().setContextClassLoader( current );
 		}
 	}
 
-	private void runLoadClass(LoadClass action) {
+	private void runLoadClass(Supplier<?> action) {
 		try {
-			action.run();
+			action.get();
 			fail( "Should have thrown jakarta.validation.ValidationException" );
 		}
 		catch (ValidationException e) {

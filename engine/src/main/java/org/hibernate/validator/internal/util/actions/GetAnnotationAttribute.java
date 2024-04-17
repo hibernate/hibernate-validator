@@ -4,13 +4,12 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.util.privilegedactions;
+package org.hibernate.validator.internal.util.actions;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.security.PrivilegedAction;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -19,27 +18,15 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public final class GetAnnotationAttribute<T> implements PrivilegedAction<T> {
+public final class GetAnnotationAttribute {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
-	private final Annotation annotation;
-	private final String attributeName;
-	private final Class<T> type;
-
-	public static <T> GetAnnotationAttribute<T> action(Annotation annotation, String attributeName, Class<T> type) {
-		return new GetAnnotationAttribute<T>( annotation, attributeName, type );
+	private GetAnnotationAttribute() {
 	}
 
-	private GetAnnotationAttribute(Annotation annotation, String attributeName, Class<T> type) {
-		this.annotation = annotation;
-		this.attributeName = attributeName;
-		this.type = type;
-	}
-
-	@Override
 	@SuppressWarnings("unchecked")
-	public T run() {
+	public static <T> T action(Annotation annotation, String attributeName, Class<T> type) {
 		try {
 			Method m = annotation.getClass().getMethod( attributeName );
 			m.setAccessible( true );

@@ -23,8 +23,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,7 +37,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.groups.ConvertGroup;
 
 import org.hibernate.validator.group.GroupSequenceProvider;
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
@@ -72,11 +69,11 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructors;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredFields;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
-import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.internal.util.actions.GetDeclaredConstructors;
+import org.hibernate.validator.internal.util.actions.GetDeclaredFields;
+import org.hibernate.validator.internal.util.actions.GetDeclaredMethods;
+import org.hibernate.validator.internal.util.actions.GetMethods;
+import org.hibernate.validator.internal.util.actions.NewInstance;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 /**
@@ -171,14 +168,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<T> beanClass,
 			Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass) {
-		Method[] providerMethods = run( GetMethods.action( providerClass ) );
+		Method[] providerMethods = GetMethods.action( providerClass );
 		for ( Method method : providerMethods ) {
 			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
 					&& method.getParameterCount() == 1 && method.getParameterTypes()[0].isAssignableFrom( beanClass ) ) {
 
-				return run(
-						NewInstance.action( providerClass, "the default group sequence provider" )
-				);
+				return NewInstance.action( providerClass, "the default group sequence provider" );
 			}
 		}
 
@@ -214,7 +209,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private Set<ConstrainedElement> getFieldMetaData(Class<?> beanClass) {
 		Set<ConstrainedElement> propertyMetaData = newHashSet();
 
-		for ( Field field : run( GetDeclaredFields.action( beanClass ) ) ) {
+		for ( Field field : GetDeclaredFields.action( beanClass ) ) {
 			// HV-172
 			if ( Modifier.isStatic( field.getModifiers() ) || field.isSynthetic() ) {
 				continue;
@@ -268,13 +263,13 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private Set<ConstrainedExecutable> getConstructorMetaData(Class<?> clazz) {
-		Executable[] declaredConstructors = run( GetDeclaredConstructors.action( clazz ) );
+		Executable[] declaredConstructors = GetDeclaredConstructors.action( clazz );
 
 		return getMetaData( declaredConstructors );
 	}
 
 	private Set<ConstrainedExecutable> getMethodMetaData(Class<?> clazz) {
-		Executable[] declaredMethods = run( GetDeclaredMethods.action( clazz ) );
+		Executable[] declaredMethods = GetDeclaredMethods.action( clazz );
 
 		return getMetaData( declaredMethods );
 	}
@@ -589,17 +584,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				new ConstraintAnnotationDescriptor<>( annotation ),
 				type
 		);
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	/**

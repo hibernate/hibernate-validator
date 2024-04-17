@@ -11,8 +11,6 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +21,6 @@ import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
@@ -40,7 +37,7 @@ import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.internal.util.actions.NewInstance;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 /**
@@ -265,11 +262,10 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	}
 
 	private DefaultGroupSequenceProvider<? super C> getDefaultGroupSequenceProvider() {
-		return defaultGroupSequenceProviderClass != null ? run(
-				NewInstance.action(
-						defaultGroupSequenceProviderClass,
-						"default group sequence provider"
-				)
+		return defaultGroupSequenceProviderClass != null
+				? NewInstance.action(
+				defaultGroupSequenceProviderClass,
+				"default group sequence provider"
 		) : null;
 	}
 
@@ -282,14 +278,4 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		return ConstraintType.GENERIC;
 	}
 
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
 }

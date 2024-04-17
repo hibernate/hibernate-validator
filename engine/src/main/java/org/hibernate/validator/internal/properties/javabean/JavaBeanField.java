@@ -13,15 +13,11 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
-import org.hibernate.validator.HibernateValidatorPermission;
 import org.hibernate.validator.engine.HibernateValidatorEnhancedBean;
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.properties.PropertyAccessor;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
+import org.hibernate.validator.internal.util.actions.GetDeclaredField;
 
 /**
  * @author Marko Bekhta
@@ -170,26 +166,9 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 	/**
 	 * Returns an accessible copy of the given member.
 	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
 	private static Field getAccessible(Field original) {
-		SecurityManager sm = System.getSecurityManager();
-		if ( sm != null ) {
-			sm.checkPermission( HibernateValidatorPermission.ACCESS_PRIVATE_MEMBERS );
-		}
-
 		Class<?> clazz = original.getDeclaringClass();
 
-		return run( GetDeclaredField.andMakeAccessible( clazz, original.getName() ) );
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+		return GetDeclaredField.andMakeAccessible( clazz, original.getName() );
 	}
 }

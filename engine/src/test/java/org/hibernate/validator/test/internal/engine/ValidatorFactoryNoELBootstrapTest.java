@@ -16,8 +16,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Set;
 
 import jakarta.el.ExpressionFactory;
@@ -28,8 +26,8 @@ import jakarta.validation.Validator;
 import jakarta.validation.constraints.Min;
 
 import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
+import org.hibernate.validator.internal.util.actions.GetClassLoader;
+import org.hibernate.validator.internal.util.actions.SetContextClassLoader;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -227,31 +225,20 @@ public class ValidatorFactoryNoELBootstrapTest {
 	 */
 	private void runWithoutElLibs(Class<?> delegateType, String packageMissing) throws Throwable {
 		try {
-			ClassLoader originClassLoader = run( GetClassLoader.fromContext() );
+			ClassLoader originClassLoader = GetClassLoader.fromContext();
 			try {
 				ClassLoader classLoader = new ELIgnoringClassLoader( packageMissing );
-				run( SetContextClassLoader.action( classLoader ) );
+				SetContextClassLoader.action( classLoader );
 
 				Object test = classLoader.loadClass( delegateType.getName() ).getConstructor().newInstance();
 				test.getClass().getMethod( "run" ).invoke( test );
 			}
 			finally {
-				run( SetContextClassLoader.action( originClassLoader ) );
+				SetContextClassLoader.action( originClassLoader );
 			}
 		}
 		catch (InvocationTargetException ite) {
 			throw ite.getCause();
 		}
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

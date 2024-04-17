@@ -12,16 +12,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Signature;
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetResolvedMemberMethods;
+import org.hibernate.validator.internal.util.actions.GetResolvedMemberMethods;
 
 import com.fasterxml.classmate.Filter;
 import com.fasterxml.classmate.MemberResolver;
@@ -245,7 +242,7 @@ public final class ExecutableHelper {
 		// ClassMate itself doesn't require any special permissions, but it invokes reflection APIs which do.
 		// Wrapping the call into a privileged action to avoid that all calling code bases need to have the required
 		// permission
-		ResolvedMethod[] resolvedMethods = run( GetResolvedMemberMethods.action( typeWithMembers ) );
+		ResolvedMethod[] resolvedMethods = GetResolvedMemberMethods.action( typeWithMembers );
 
 		// The ClassMate doc says that overridden methods are flattened to one
 		// resolved method. But that is the case only for methods without any
@@ -276,17 +273,6 @@ public final class ExecutableHelper {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	/**

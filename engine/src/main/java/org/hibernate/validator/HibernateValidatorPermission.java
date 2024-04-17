@@ -13,8 +13,10 @@ import java.security.BasicPermission;
  * <p>
  * {@code HibernateValidatorPermission} is thread-safe and immutable.
  *
+ * @deprecated This permission will be removed in the future versions of Hibernate Validator as it does not rely on the {@code SecurityManager} anymore.
  * @author Guillaume Smet
  */
+@Deprecated(forRemoval = true)
 public class HibernateValidatorPermission extends BasicPermission {
 
 	public static final HibernateValidatorPermission ACCESS_PRIVATE_MEMBERS = new HibernateValidatorPermission( "accessPrivateMembers" );

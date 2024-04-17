@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.util.privilegedactions;
+package org.hibernate.validator.internal.util.actions;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
@@ -12,7 +12,6 @@ import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.security.PrivilegedAction;
 import java.util.Map;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -22,22 +21,14 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public final class GetAnnotationAttributes implements PrivilegedAction<Map<String, Object>> {
+public final class GetAnnotationAttributes {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
-	private final Annotation annotation;
-
-	public static GetAnnotationAttributes action(Annotation annotation) {
-		return new GetAnnotationAttributes( annotation );
+	private GetAnnotationAttributes() {
 	}
 
-	private GetAnnotationAttributes(Annotation annotation) {
-		this.annotation = annotation;
-	}
-
-	@Override
-	public Map<String, Object> run() {
+	public static Map<String, Object> action(Annotation annotation) {
 		final Method[] declaredMethods = annotation.annotationType().getDeclaredMethods();
 		Map<String, Object> attributes = newHashMap( declaredMethods.length );
 

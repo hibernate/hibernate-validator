@@ -12,8 +12,6 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,13 +20,12 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttributes;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
+import org.hibernate.validator.internal.util.actions.GetAnnotationAttributes;
+import org.hibernate.validator.internal.util.actions.GetDeclaredMethods;
 
 /**
  * Encapsulates the data you need to create an annotation. In
@@ -59,7 +56,7 @@ public class AnnotationDescriptor<A extends Annotation> implements Serializable 
 	@SuppressWarnings("unchecked")
 	public AnnotationDescriptor(A annotation) {
 		this.type = (Class<A>) annotation.annotationType();
-		this.attributes = run( GetAnnotationAttributes.action( annotation ) );
+		this.attributes = GetAnnotationAttributes.action( annotation );
 		this.annotation = annotation;
 		this.hashCode = buildHashCode();
 	}
@@ -248,7 +245,7 @@ public class AnnotationDescriptor<A extends Annotation> implements Serializable 
 		@SuppressWarnings("unchecked")
 		public Builder(S annotation) {
 			this.type = (Class<S>) annotation.annotationType();
-			this.attributes = new HashMap<String, Object>( run( GetAnnotationAttributes.action( annotation ) ) );
+			this.attributes = new HashMap<String, Object>( GetAnnotationAttributes.action( annotation ) );
 		}
 
 		public void setAttribute(String attributeName, Object value) {
@@ -270,7 +267,7 @@ public class AnnotationDescriptor<A extends Annotation> implements Serializable 
 		private Map<String, Object> getAnnotationAttributes() {
 			Map<String, Object> result = newHashMap( attributes.size() );
 			int processedValuesFromDescriptor = 0;
-			final Method[] declaredMethods = run( GetDeclaredMethods.action( type ) );
+			final Method[] declaredMethods = GetDeclaredMethods.action( type );
 			for ( Method m : declaredMethods ) {
 				Object elementValue = attributes.get( m.getName() );
 				if ( elementValue != null ) {
@@ -321,15 +318,5 @@ public class AnnotationDescriptor<A extends Annotation> implements Serializable 
 		private SortedSet<String> getRegisteredAttributesInAlphabeticalOrder() {
 			return new TreeSet<String>( attributes.keySet() );
 		}
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private static <V> V run(PrivilegedAction<V> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

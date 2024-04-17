@@ -62,8 +62,6 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -105,7 +103,6 @@ import org.hibernate.validator.constraints.pl.REGON;
 import org.hibernate.validator.constraints.ru.INN;
 import org.hibernate.validator.constraints.time.DurationMax;
 import org.hibernate.validator.constraints.time.DurationMin;
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.constraintvalidators.bv.AssertFalseValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.AssertTrueValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForCharSequence;
@@ -328,10 +325,10 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttribute;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
-import org.hibernate.validator.internal.util.privilegedactions.IsClassPresent;
+import org.hibernate.validator.internal.util.actions.GetAnnotationAttribute;
+import org.hibernate.validator.internal.util.actions.GetDeclaredMethods;
+import org.hibernate.validator.internal.util.actions.GetMethod;
+import org.hibernate.validator.internal.util.actions.IsClassPresent;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 import jakarta.validation.Constraint;
@@ -941,7 +938,7 @@ public class ConstraintHelper {
 
 		return multiValueConstraints.computeIfAbsent( annotationType, a -> {
 			boolean isMultiValueConstraint = false;
-			final Method method = run( GetMethod.action( a, "value" ) );
+			final Method method = GetMethod.action( a, "value" );
 			if ( method != null ) {
 				Class<?> returnType = method.getReturnType();
 				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
@@ -971,12 +968,10 @@ public class ConstraintHelper {
 	 * @return A list of constraint annotations, may be empty but never {@code null}.
 	 */
 	public <A extends Annotation> List<Annotation> getConstraintsFromMultiValueConstraint(A multiValueConstraint) {
-		Annotation[] annotations = run(
-				GetAnnotationAttribute.action(
-						multiValueConstraint,
-						"value",
-						Annotation[].class
-				)
+		Annotation[] annotations = GetAnnotationAttribute.action(
+				multiValueConstraint,
+				"value",
+				Annotation[].class
 		);
 		return Arrays.asList( annotations );
 	}
@@ -1018,7 +1013,7 @@ public class ConstraintHelper {
 	}
 
 	private void assertNoParameterStartsWithValid(Class<? extends Annotation> annotationType) {
-		final Method[] methods = run( GetDeclaredMethods.action( annotationType ) );
+		final Method[] methods = GetDeclaredMethods.action( annotationType );
 		for ( Method m : methods ) {
 			if ( m.getName().startsWith( "valid" ) && !SUPPORTED_VALID_METHODS.contains( m.getName() ) ) {
 				throw LOG.getConstraintParametersCannotStartWithValidException();
@@ -1028,7 +1023,7 @@ public class ConstraintHelper {
 
 	private void assertPayloadParameterExists(Class<? extends Annotation> annotationType) {
 		try {
-			final Method method = run( GetMethod.action( annotationType, PAYLOAD ) );
+			final Method method = GetMethod.action( annotationType, PAYLOAD );
 			if ( method == null ) {
 				throw LOG.getConstraintWithoutMandatoryParameterException( PAYLOAD, annotationType.getName() );
 			}
@@ -1044,7 +1039,7 @@ public class ConstraintHelper {
 
 	private void assertGroupsParameterExists(Class<? extends Annotation> annotationType) {
 		try {
-			final Method method = run( GetMethod.action( annotationType, GROUPS ) );
+			final Method method = GetMethod.action( annotationType, GROUPS );
 			if ( method == null ) {
 				throw LOG.getConstraintWithoutMandatoryParameterException( GROUPS, annotationType.getName() );
 			}
@@ -1059,7 +1054,7 @@ public class ConstraintHelper {
 	}
 
 	private void assertMessageParameterExists(Class<? extends Annotation> annotationType) {
-		final Method method = run( GetMethod.action( annotationType, MESSAGE ) );
+		final Method method = GetMethod.action( annotationType, MESSAGE );
 		if ( method == null ) {
 			throw LOG.getConstraintWithoutMandatoryParameterException( MESSAGE, annotationType.getName() );
 		}
@@ -1077,7 +1072,7 @@ public class ConstraintHelper {
 				annotationType,
 				ValidationTarget.PARAMETERS
 		).isEmpty();
-		final Method method = run( GetMethod.action( annotationType, VALIDATION_APPLIES_TO ) );
+		final Method method = GetMethod.action( annotationType, VALIDATION_APPLIES_TO );
 
 		if ( hasGenericValidators && hasCrossParameterValidator ) {
 			if ( method == null ) {
@@ -1158,18 +1153,7 @@ public class ConstraintHelper {
 	}
 
 	private static boolean isClassPresent(String className) {
-		return run( IsClassPresent.action( className, ConstraintHelper.class.getClassLoader() ) ).booleanValue();
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+		return IsClassPresent.action( className, ConstraintHelper.class.getClassLoader() );
 	}
 
 	/**

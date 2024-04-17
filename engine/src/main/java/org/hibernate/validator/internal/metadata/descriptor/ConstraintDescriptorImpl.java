@@ -18,8 +18,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +40,6 @@ import jakarta.validation.valueextraction.Unwrapping;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
@@ -55,9 +52,9 @@ import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationAttributes;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
+import org.hibernate.validator.internal.util.actions.GetAnnotationAttributes;
+import org.hibernate.validator.internal.util.actions.GetDeclaredMethods;
+import org.hibernate.validator.internal.util.actions.GetMethod;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -563,7 +560,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = newHashMap();
-		final Method[] methods = run( GetDeclaredMethods.action( annotationDescriptor.getType() ) );
+		final Method[] methods = GetDeclaredMethods.action( annotationDescriptor.getType() );
 		for ( Method m : methods ) {
 			if ( m.getAnnotation( OverridesAttribute.class ) != null ) {
 				addOverrideAttributes(
@@ -601,7 +598,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private void ensureAttributeIsOverridable(Method m, OverridesAttribute overridesAttribute, String overridesAttributeName) {
-		final Method method = run( GetMethod.action( overridesAttribute.constraint(), overridesAttributeName ) );
+		final Method method = GetMethod.action( overridesAttribute.constraint(), overridesAttributeName );
 		if ( method == null ) {
 			throw LOG.getOverriddenConstraintAttributeNotFoundException( overridesAttributeName );
 		}
@@ -704,7 +701,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 		// use a annotation proxy
 		ConstraintAnnotationDescriptor.Builder<U> annotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>(
-				annotationType, run( GetAnnotationAttributes.action( constraintAnnotation ) )
+				annotationType, GetAnnotationAttributes.action( constraintAnnotation )
 		);
 
 		// get the right override parameters
@@ -741,17 +738,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return new ConstraintDescriptorImpl<>(
 				constraintHelper, constrainable, annotationDescriptorBuilder.build(), constraintLocationKind, null, definedOn, constraintType
 		);
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	@IgnoreForbiddenApisErrors(reason = "SecurityManager is deprecated in JDK17")
-	private static <P> P run(PrivilegedAction<P> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	/**
