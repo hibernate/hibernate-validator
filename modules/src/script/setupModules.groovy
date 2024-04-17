@@ -29,7 +29,7 @@ processFileInplace( bvModuleXml ) { text ->
     text.replaceAll( /<resource-root path=".*validation-api.*jar/, '<resource-root path="' + bvArtifactName )
 }
 
-deleteFiles( new FileNameFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/jakarta/validation/api/main', '*.jar' ) )
+deleteFiles( new FileNameByRegexFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/jakarta/validation/api/main', '.*\\.jar' ) )
 
 // HV
 hvModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/org/hibernate/validator/main/module.xml' )
@@ -46,7 +46,7 @@ appendDependency( hvModuleXml, "javax.api", false )
 appendDependency( hvModuleXml, "javax.money.api", true )
 appendDependency( hvModuleXml, "javafx.api", true )
 
-deleteFiles( new FileNameFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/org/hibernate/validator/main', 'hibernate-validator-*.jar' ) )
+deleteFiles( new FileNameByRegexFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/org/hibernate/validator/main', 'hibernate-validator-.*\\.jar' ) )
 
 // HV CDI
 hvCdiModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/org/hibernate/validator/cdi/main/module.xml' )
@@ -56,6 +56,6 @@ processFileInplace( hvCdiModuleXml ) { text ->
     text.replaceAll( /hibernate-validator-cdi.*jar/, hvCdiArtifactName )
 }
 
-deleteFiles( new FileNameFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/org/hibernate/validator/cdi/main', 'hibernate-validator-cdi-*.jar' ) )
+deleteFiles( new FileNameByRegexFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/org/hibernate/validator/cdi/main', 'hibernate-validator-cdi-.*\\.jar' ) )
 
 println "[INFO] ------------------------------------------------------------------------";
