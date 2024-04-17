@@ -54,7 +54,7 @@ public interface Cascadable {
 	 */
 	CascadingMetaData getCascadingMetaData();
 
-	public interface Builder {
+	interface Builder {
 
 		void mergeCascadingMetaData(CascadingMetaDataBuilder cascadingMetaDataBuilder);
 

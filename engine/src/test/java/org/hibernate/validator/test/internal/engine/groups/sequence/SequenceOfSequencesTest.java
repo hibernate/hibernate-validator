@@ -135,22 +135,22 @@ public class SequenceOfSequencesTest {
 	public interface AllConstraints {
 
 		@GroupSequence({ OverlyBasicConstraints.class, SomewhatBasicConstraints.class })
-		public interface BasicConstraints {
+		interface BasicConstraints {
 
-			public interface OverlyBasicConstraints {
+			interface OverlyBasicConstraints {
 			}
 
-			public interface SomewhatBasicConstraints {
+			interface SomewhatBasicConstraints {
 			}
 		}
 
 		@GroupSequence({ SomewhatComplexConstraints.class, ImmenselyComplexConstraints.class })
-		public interface ComplexConstraints {
+		interface ComplexConstraints {
 
-			public interface SomewhatComplexConstraints {
+			interface SomewhatComplexConstraints {
 			}
 
-			public interface ImmenselyComplexConstraints {
+			interface ImmenselyComplexConstraints {
 			}
 		}
 	}

@@ -20,6 +20,6 @@ public interface Person {
 	@NotEmpty
 	String getLastName();
 
-	public interface PersonValidation {
+	interface PersonValidation {
 	}
 }

@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 //tag::include[]
 public interface Vehicle {
 
-	public interface Basic {
+	interface Basic {
 	}
 
 	@NotNull(groups = Vehicle.Basic.class)

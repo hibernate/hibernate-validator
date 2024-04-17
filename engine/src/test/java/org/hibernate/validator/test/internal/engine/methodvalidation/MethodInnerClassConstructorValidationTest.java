@@ -21,7 +21,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
-import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
