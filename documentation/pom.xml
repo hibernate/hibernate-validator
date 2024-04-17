@@ -168,7 +168,6 @@
                             <resources>
                                 <resource>
                                     <directory>${asciidoctor.theme-dir}</directory>
-                                    <filtering>true</filtering>
                                 </resource>
                             </resources>
                             <outputDirectory>${asciidoctor.aggregated-resources-dir}</outputDirectory>
