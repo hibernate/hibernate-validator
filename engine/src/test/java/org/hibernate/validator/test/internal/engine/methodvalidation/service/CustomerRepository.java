@@ -78,6 +78,6 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 	@ConsistentDateParameters
 	void methodWithCrossParameterConstraint(@NotNull LocalDate start, @NotNull LocalDate end);
 
-	public interface ValidationGroup {
+	interface ValidationGroup {
 	}
 }
