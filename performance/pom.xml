@@ -30,7 +30,7 @@
         -->
         <profilingOptions>-showversion</profilingOptions>
         <history.directory>${project.basedir}/history</history.directory>
-        <jmh.version>1.20</jmh.version>
+        <jmh.version>1.37</jmh.version>
 
         <!-- default values, overridden per profile -->
         <beanvalidation-impl.name>none</beanvalidation-impl.name>
@@ -229,7 +229,7 @@
                 <dependency>
                     <groupId>org.glassfish</groupId>
                     <artifactId>javax.el</artifactId>
-                    <version>3.0.1-b11</version>
+                    <version>3.0.1-b12</version>
                 </dependency>
                 <dependency>
                     <groupId>log4j</groupId>
@@ -273,7 +273,7 @@
                 <dependency>
                     <groupId>org.glassfish</groupId>
                     <artifactId>javax.el</artifactId>
-                    <version>3.0.1-b11</version>
+                    <version>3.0.1-b12</version>
                 </dependency>
                 <dependency>
                     <groupId>log4j</groupId>
@@ -317,7 +317,7 @@
                 <dependency>
                     <groupId>org.glassfish</groupId>
                     <artifactId>javax.el</artifactId>
-                    <version>3.0.1-b11</version>
+                    <version>3.0.1-b12</version>
                 </dependency>
                 <dependency>
                     <groupId>log4j</groupId>
@@ -546,7 +546,7 @@
                 <dependency>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
-                    <version>1.6.1</version>
+                    <version>1.7.33</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -577,7 +577,7 @@
                 <dependency>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
-                    <version>1.5.6</version>
+                    <version>1.7.33</version>
                 </dependency>
             </dependencies>
         </profile>
