@@ -213,7 +213,7 @@
                 </property>
             </activation>
             <properties>
-                <javadoc.additional.options>-html5 -source 8</javadoc.additional.options>
+                <javadoc.additional.options>-html5</javadoc.additional.options>
             </properties>
         </profile>
     </profiles>
