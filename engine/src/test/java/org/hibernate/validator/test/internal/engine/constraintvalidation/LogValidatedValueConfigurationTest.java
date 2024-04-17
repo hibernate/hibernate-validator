@@ -19,15 +19,16 @@ import java.lang.annotation.Target;
 import java.util.Set;
 
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.ListAppender;
 
 import jakarta.validation.Constraint;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Payload;
-import jakarta.validation.ReportAsSingleViolation;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.test.appender.ListAppender;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -41,17 +42,15 @@ public class LogValidatedValueConfigurationTest {
 	@BeforeTest
 	public void setUp() {
 		LoggerContext context = LoggerContext.getContext( false );
-		simpleAppender = (ListAppender) context.getLogger(
-						"org.hibernate.validator.internal.engine.constraintvalidation.SimpleConstraintTree" )
-				.getAppenders().get( "List" );
+		simpleAppender = new ListAppender( "simple" );
+		context.getLogger( "org.hibernate.validator.internal.engine.constraintvalidation.SimpleConstraintTree" )
+				.addAppender( simpleAppender );
 		simpleAppender.clear();
 
-		composingAppender = (ListAppender) context.getLogger(
-						"org.hibernate.validator.internal.engine.constraintvalidation.ComposingConstraintTree" )
-				.getAppenders().get( "List" );
+		composingAppender = new ListAppender( "composing" );
+		context.getLogger( "org.hibernate.validator.internal.engine.constraintvalidation.ComposingConstraintTree" )
+				.addAppender( composingAppender );
 		composingAppender.clear();
-
-
 	}
 
 	@AfterTest
@@ -71,7 +70,8 @@ public class LogValidatedValueConfigurationTest {
 
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( Size.class ).withProperty( "value" ),
-				violationOf( ComposingConstraint.class ).withProperty( "value" )
+				violationOf( Size.class ).withProperty( "value2" ),
+				violationOf( ComposingConstraint.class ).withProperty( "value2" )
 		);
 
 		assertTrue(
@@ -96,7 +96,8 @@ public class LogValidatedValueConfigurationTest {
 
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( Size.class ).withProperty( "value" ),
-				violationOf( ComposingConstraint.class ).withProperty( "value" )
+				violationOf( Size.class ).withProperty( "value2" ),
+				violationOf( ComposingConstraint.class ).withProperty( "value2" )
 		);
 
 		assertTrue(
@@ -123,7 +124,8 @@ public class LogValidatedValueConfigurationTest {
 
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( Size.class ).withProperty( "value" ),
-				violationOf( ComposingConstraint.class ).withProperty( "value" )
+				violationOf( Size.class ).withProperty( "value2" ),
+				violationOf( ComposingConstraint.class ).withProperty( "value2" )
 		);
 
 		assertTrue(
@@ -140,16 +142,17 @@ public class LogValidatedValueConfigurationTest {
 
 	public static class Foo {
 		@Size(max = 2)
-		@ComposingConstraint
 		private String value = "123";
+
+		@ComposingConstraint
+		private String value2 = "123";
 	}
 
 	@NotNull
 	@Size(max = 2)
-	@ReportAsSingleViolation
 	@Target({ FIELD })
 	@Retention(RUNTIME)
-	@Constraint(validatedBy = {})
+	@Constraint(validatedBy = ComposingConstraint.Validator.class)
 	@Documented
 	public @interface ComposingConstraint {
 		String message() default "";
@@ -157,5 +160,14 @@ public class LogValidatedValueConfigurationTest {
 		Class<?>[] groups() default {};
 
 		Class<? extends Payload>[] payload() default {};
+
+		class Validator implements ConstraintValidator<ComposingConstraint, Object> {
+
+			@Override
+			public boolean isValid(Object value, ConstraintValidatorContext context) {
+				return false;
+			}
+		}
 	}
+
 }

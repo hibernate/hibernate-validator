@@ -30,13 +30,13 @@ import jakarta.validation.ValidatorFactory;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.test.appender.ListAppender;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
+import org.hibernate.validator.testutils.ListAppender;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
@@ -63,7 +63,8 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 	public void setUp() {
 		LoggerContext context = LoggerContext.getContext( false );
 		Logger logger = context.getLogger( ConstraintValidatorContextImpl.class.getName() );
-		constraintValidatorContextImplLoglistAppender = (ListAppender) logger.getAppenders().get( "List" );
+		constraintValidatorContextImplLoglistAppender = new ListAppender( "list" );
+		logger.addAppender( constraintValidatorContextImplLoglistAppender );
 		constraintValidatorContextImplLoglistAppender.clear();
 	}
 

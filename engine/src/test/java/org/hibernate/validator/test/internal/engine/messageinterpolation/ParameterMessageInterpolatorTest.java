@@ -16,9 +16,10 @@ import java.util.Set;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.test.appender.ListAppender;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.ListAppender;
+
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -43,7 +44,8 @@ public class ParameterMessageInterpolatorTest {
 	public void setUp() {
 		LoggerContext context = LoggerContext.getContext( false );
 		Logger logger = context.getLogger( ParameterMessageInterpolator.class.getName() );
-		listAppender = (ListAppender) logger.getAppenders().get( "List" );
+		listAppender = new ListAppender( "list" );
+		logger.addAppender( listAppender );
 		listAppender.clear();
 
 		validator = getConfiguration()
