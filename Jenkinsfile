@@ -91,7 +91,7 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  */
 
 @Field final String DEFAULT_JDK_TOOL = 'OpenJDK 17 Latest'
-@Field final String MAVEN_TOOL = 'Apache Maven 3.6'
+@Field final String MAVEN_TOOL = 'Apache Maven 3.9'
 
 // Default node pattern, to be used for resource-intensive stages.
 // Should not include the controller node.
