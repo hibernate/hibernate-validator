@@ -845,7 +845,25 @@
                     <artifactId>license-maven-plugin</artifactId>
                     <version>${version.license.plugin}</version>
                     <configuration>
-                        <header>${hibernate-validator-parent.path}/build-config/src/main/resources/license.header</header>
+                        <licenseSets>
+                            <licenseSet>
+                                <header>${hibernate-validator-parent.path}/build-config/src/main/resources/license.header</header>
+                                <excludes>
+                                    <!-- Next two classes are copied from other project and have different headers -->
+                                    <exclude>**/org/hibernate/validator/internal/util/TypeHelper.java</exclude>
+                                    <exclude>**/org/hibernate/validator/test/internal/util/TypeHelperTest.java</exclude>
+                                    <exclude>**/settings-example.xml</exclude>
+                                    <exclude>**/src/test/resources/org/hibernate/validator/referenceguide/**/*.*</exclude>
+                                    <exclude>**/org/hibernate/validator/referenceguide/**/*.*</exclude>
+                                    <exclude>**/src/test/resources/org/hibernate/validator/test/internal/xml/**/*.xml</exclude>
+                                    <exclude>.mvn/**</exclude>
+                                </excludes>
+                                <includes>
+                                    <include>**/*.java</include>
+                                    <include>**/*.xml</include>
+                                </includes>
+                            </licenseSet>
+                        </licenseSets>
                         <strictCheck>true</strictCheck>
                         <headerDefinitions>
                             <headerDefinition>${hibernate-validator-parent.path}/build-config/src/main/resources/java-header-style.xml</headerDefinition>
@@ -855,20 +873,6 @@
                             <java>JAVA_CLASS_STYLE</java>
                             <xml>XML_FILE_STYLE</xml>
                         </mapping>
-                        <excludes>
-                            <!-- Next two classes are copied from other project and have different headers -->
-                            <exclude>**/org/hibernate/validator/internal/util/TypeHelper.java</exclude>
-                            <exclude>**/org/hibernate/validator/test/internal/util/TypeHelperTest.java</exclude>
-                            <exclude>**/settings-example.xml</exclude>
-                            <exclude>**/src/test/resources/org/hibernate/validator/referenceguide/**/*.*</exclude>
-                            <exclude>**/org/hibernate/validator/referenceguide/**/*.*</exclude>
-                            <exclude>**/src/test/resources/org/hibernate/validator/test/internal/xml/**/*.xml</exclude>
-                            <exclude>.mvn/**</exclude>
-                        </excludes>
-                        <includes>
-                            <include>**/*.java</include>
-                            <include>**/*.xml</include>
-                        </includes>
                     </configuration>
                     <executions>
                         <execution>
@@ -883,7 +887,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${version.surefire.plugin}</version>
                     <configuration>
-                        <forkMode>once</forkMode>
+                        <forkCount>1</forkCount>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <includes>
                             <include>**/*Test.java</include>
@@ -1058,6 +1062,12 @@
                         <dependency>
                             <groupId>org.apache.groovy</groupId>
                             <artifactId>groovy</artifactId>
+                            <version>${version.org.apache.groovy}</version>
+                            <scope>runtime</scope>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.apache.groovy</groupId>
+                            <artifactId>groovy-ant</artifactId>
                             <version>${version.org.apache.groovy}</version>
                             <scope>runtime</scope>
                         </dependency>
