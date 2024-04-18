@@ -1540,7 +1540,10 @@
                                     <goal>analyze</goal>
                                 </goals>
                                 <configuration>
-                                    <failOnViolations>true</failOnViolations>
+                                    <configurationLocations>
+                                        <!-- Any JQAssistant configurations go in this yml file:  -->
+                                        <configurationLocation>jqassistant/.jqassistant.yml</configurationLocation>
+                                    </configurationLocations>
                                 </configuration>
                             </execution>
                         </executions>

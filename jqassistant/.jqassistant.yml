@@ -1,0 +1,20 @@
+jqassistant:
+  maven:
+    # Force the module where 'mvn' is being executed to be used as root module. The database will be created in this module and contain all information of the reactor. Rules will be read from the rules folder of this module.
+    #
+    # jqassistant.maven.use-execution-root-as-project-root: true|false
+    use-execution-root-as-project-root: true
+    # Re-use store instances across all modules of the Maven reactor. Can be set to false for mitigating problems in specific setups,
+    # the jQAssistant Maven plugin will display an according hint when this is necessary.
+    #
+    # jqassistant.maven.reuse-store: true|false
+    reuse-store: true
+  analyze:
+    rule:
+      # Note: we cannot put the rules at the same level as our .jqassistant.yml itself,
+      # since JQAssistant will try reading it as a rule file and will fail.
+      directory: jqassistant/rules
+    report:
+      warn-on-severity: INFO
+      fail-on-severity: MAJOR
+      continue-on-failure: false
