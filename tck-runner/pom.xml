@@ -173,12 +173,9 @@
                    <execution>
                        <id>local</id>
                        <configuration>
-                           <systemProperties>
-                               <property>
-                                   <name>validation.provider</name>
-                                   <value>${validation.provider}</value>
-                               </property>
-                           </systemProperties>
+                           <systemPropertyVariables>
+                               <validation.provider>${validation.provider}</validation.provider>
+                           </systemPropertyVariables>
                        </configuration>
                    </execution>
                </executions>
@@ -372,7 +369,8 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <forkMode>once</forkMode>
+                            <forkCount>1</forkCount>
+                            <reuseForks>true</reuseForks>
                             <systemPropertyVariables>
                                 <arquillian.launch>incontainer</arquillian.launch>
                             </systemPropertyVariables>
@@ -405,7 +403,8 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <forkMode>once</forkMode>
+                            <forkCount>1</forkCount>
+                            <reuseForks>true</reuseForks>
                             <systemPropertyVariables>
                                 <arquillian.launch>incontainer</arquillian.launch>
                             </systemPropertyVariables>

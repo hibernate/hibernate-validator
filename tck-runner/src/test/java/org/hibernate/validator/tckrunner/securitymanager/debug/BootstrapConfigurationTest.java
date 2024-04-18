@@ -44,7 +44,7 @@ public class BootstrapConfigurationTest extends AbstractTCKTest {
 		};
 		for ( URL lib : libs ) {
 			System.err.println( lib );
-			File file = new File( lib.getFile() );
+			File file = new File( lib.getPath() );
 			System.err.println( "file.exists() = " + file.exists() );
 			System.err.println( "file.isFile() = " + file.isFile() );
 			System.err.println( "file.listFiles() = " + Arrays.toString( file.listFiles() ) );

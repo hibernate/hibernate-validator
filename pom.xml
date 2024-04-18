@@ -237,8 +237,8 @@
         <version.shade.plugin>3.1.0</version.shade.plugin>
         <version.sigtest.plugin>1.6</version.sigtest.plugin>
         <version.source.plugin>3.0.1</version.source.plugin>
-        <version.surefire.plugin>2.21.0</version.surefire.plugin>
-        <version.surefire.plugin.java-version.asm>9.2</version.surefire.plugin.java-version.asm>
+        <version.surefire.plugin>3.2.5</version.surefire.plugin>
+        <version.surefire.plugin.java-version.asm>9.7</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.wildfly.plugin>1.2.1.Final</version.wildfly.plugin>
         <version.org.wildfly.core>14.0.0.Final</version.org.wildfly.core>
@@ -883,7 +883,8 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${version.surefire.plugin}</version>
                     <configuration>
-                        <forkMode>once</forkMode>
+                        <forkCount>1</forkCount>
+                        <reuseForks>true</reuseForks>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <includes>
                             <include>**/*Test.java</include>
