@@ -326,7 +326,8 @@
 
         <!-- JDK version required for the build -->
         <jdk.min.version>17</jdk.min.version>
-        <maven.min.version>3.3.1</maven.min.version>
+        <!-- Maven version required for the build -->
+        <maven.min.version>3.9.6</maven.min.version>
     </properties>
 
     <dependencyManagement>
