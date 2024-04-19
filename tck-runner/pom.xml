@@ -158,17 +158,30 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <suiteXmlFiles>
-                        <suiteXmlFile>${tck.suite.file}</suiteXmlFile>
-                    </suiteXmlFiles>
-                    <systemProperties>
-                        <property>
-                            <name>validation.provider</name>
-                            <value>${validation.provider}</value>
-                        </property>
-                    </systemProperties>
-                </configuration>
+               <executions>
+<!--                   <execution>-->
+<!--                       <id>tck</id>-->
+<!--                       <configuration>-->
+<!--                           <suiteXmlFiles>-->
+<!--                               <suiteXmlFile>${tck.suite.file}</suiteXmlFile>-->
+<!--                           </suiteXmlFiles>-->
+<!--                           <systemPropertyVariables>-->
+<!--                               <validation.provider>${validation.provider}</validation.provider>-->
+<!--                           </systemPropertyVariables>-->
+<!--                       </configuration>-->
+<!--                   </execution>-->
+                   <execution>
+                       <id>local</id>
+                       <configuration>
+                           <systemProperties>
+                               <property>
+                                   <name>validation.provider</name>
+                                   <value>${validation.provider}</value>
+                               </property>
+                           </systemProperties>
+                       </configuration>
+                   </execution>
+               </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -201,9 +214,9 @@
             </activation>
             <properties>
                 <!-- Use Local for testing without security manager -->
-                <arquillian.protocol>LocalSecurityManagerTesting</arquillian.protocol>
+                <arquillian.protocol>Local</arquillian.protocol>
                 <!-- Remove for testing without security manager -->
-                <surefire.jvm.args.additional>-DincludeJavaFXTests=true -Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/test.policy -Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
+<!--                <surefire.jvm.args.additional>-DincludeJavaFXTests=true -Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/test.policy -Duser.language=en -Duser.country=US</surefire.jvm.args.additional>-->
                 <!-- Uncomment the following line to obtain the access log of the security manager -->
                 <!--<surefire.jvm.args.additional>-DincludeJavaFXTests=true -Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/test.policy -Djava.security.debug=access -Duser.language=en -Duser.country=US</surefire.jvm.args.additional>-->
             </properties>
@@ -220,16 +233,10 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <systemProperties>
-                                <property>
-                                    <name>validation.provider</name>
-                                    <value>${validation.provider}</value>
-                                </property>
-                                <property>
-                                    <name>excludeIntegrationTests</name>
-                                    <value>true</value>
-                                </property>
-                            </systemProperties>
+                            <systemPropertyVariables>
+                                <validation.provider>${validation.provider}</validation.provider>
+                                <excludeIntegrationTests>true</excludeIntegrationTests>
+                            </systemPropertyVariables>
                         </configuration>
                     </plugin>
                 </plugins>

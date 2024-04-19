@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Jakarta Bean Validation TCK
+
+    License: Apache License, Version 2.0
+    See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+
+-->
+<validation-config
+        xmlns="https://jakarta.ee/xml/ns/validation/configuration"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://jakarta.ee/xml/ns/validation/configuration validation-configuration-3.0.xsd"
+        version="3.0">
+        
+            <default-provider>com.acme.ValidationProvider</default-provider>
+            <message-interpolator>com.acme.MessageInterpolator</message-interpolator>
+            <traversable-resolver>com.acme.TraversableResolver</traversable-resolver>
+            <constraint-validator-factory>com.acme.ConstraintValidatorFactory</constraint-validator-factory>
+            <parameter-name-provider>com.acme.ParameterNameProvider</parameter-name-provider>
+            <constraint-mapping>mapping1</constraint-mapping>
+            <constraint-mapping>mapping2</constraint-mapping>
+            <property name="com.acme.Foo">Bar</property>
+            <property name="com.acme.Baz">Qux</property>
+</validation-config>
