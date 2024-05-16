@@ -1312,7 +1312,7 @@
                                 </goals>
                                 <configuration>
                                     <homedir>${env.RELEASE_GPG_HOMEDIR}</homedir>
-                                    <passphrase>${env.RELEASE_GPG_PASSPHRASE}</passphrase>
+                                    <bestPractices>true</bestPractices>
                                 </configuration>
                             </execution>
                         </executions>
