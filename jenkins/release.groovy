@@ -68,8 +68,9 @@ pipeline {
 							mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository') {
 						configFileProvider([configFile(fileId: 'release.config.ssh', targetLocation: env.HOME + '/.ssh/config'),
 											configFile(fileId: 'release.config.ssh.knownhosts', targetLocation: env.HOME + '/.ssh/known_hosts')]) {
+							// using MAVEN_GPG_PASSPHRASE (the default env variable name for passphrase in maven gpg plugin)
 							withCredentials([file(credentialsId: 'release.gpg.private-key', variable: 'RELEASE_GPG_PRIVATE_KEY_PATH'),
-											 string(credentialsId: 'release.gpg.passphrase', variable: 'RELEASE_GPG_PASSPHRASE')]) {
+											 string(credentialsId: 'release.gpg.passphrase', variable: 'MAVEN_GPG_PASSPHRASE')]) {
 								sshagent(['ed25519.Hibernate-CI.github.com', 'hibernate.filemgmt.jboss.org', 'hibernate-ci.frs.sourceforge.net']) {
 									sh 'cat $HOME/.ssh/config'
 									sh 'git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git'
