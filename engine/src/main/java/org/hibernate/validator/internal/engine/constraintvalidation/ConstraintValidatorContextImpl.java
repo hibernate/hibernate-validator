@@ -189,11 +189,16 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private abstract class NodeBuilderBase {
 
 		protected final String messageTemplate;
-		protected ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel = defaultCustomViolationExpressionLanguageFeatureLevel;
+		protected ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel;
 		protected PathImpl propertyPath;
 
 		protected NodeBuilderBase(String template, PathImpl path) {
+			this( template, defaultCustomViolationExpressionLanguageFeatureLevel, path );
+		}
+
+		protected NodeBuilderBase(String template, ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel, PathImpl path) {
 			this.messageTemplate = template;
+			this.expressionLanguageFeatureLevel = expressionLanguageFeatureLevel;
 			this.propertyPath = path;
 		}
 
@@ -238,7 +243,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 			dropLeafNodeIfRequired();
 			propertyPath.addPropertyNode( name );
 
-			return new NodeBuilder( messageTemplate, propertyPath );
+			return new NodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath );
 		}
 
 		@Override
@@ -279,8 +284,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	protected class NodeBuilder extends NodeBuilderBase
 			implements NodeBuilderDefinedContext, LeafNodeBuilderDefinedContext, ContainerElementNodeBuilderDefinedContext {
 
-		protected NodeBuilder(String template, PathImpl path) {
-			super( template, path );
+		protected NodeBuilder(String template, ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel, PathImpl path) {
+			super( template, expressionLanguageFeatureLevel, path );
 		}
 
 		@Override
@@ -322,8 +327,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 				PathImpl path,
 				String nodeName,
 				ElementKind leafNodeKind) {
-			super( template, path );
-			this.expressionLanguageFeatureLevel = expressionLanguageFeatureLevel;
+			super( template, expressionLanguageFeatureLevel, path );
 			this.leafNodeName = nodeName;
 			this.leafNodeKind = leafNodeKind;
 			this.leafNodeContainerType = null;
@@ -336,8 +340,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 				String nodeName,
 				Class<?> leafNodeContainerType,
 				Integer leafNodeTypeArgumentIndex) {
-			super( template, path );
-			this.expressionLanguageFeatureLevel = expressionLanguageFeatureLevel;
+			super( template, expressionLanguageFeatureLevel, path );
 			this.leafNodeName = nodeName;
 			this.leafNodeKind = ElementKind.CONTAINER_ELEMENT;
 			this.leafNodeContainerType = leafNodeContainerType;
@@ -360,14 +363,14 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		public NodeBuilder atKey(Object key) {
 			propertyPath.makeLeafNodeIterableAndSetMapKey( key );
 			addLeafNode();
-			return new NodeBuilder( messageTemplate, propertyPath );
+			return new NodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath );
 		}
 
 		@Override
 		public NodeBuilder atIndex(Integer index) {
 			propertyPath.makeLeafNodeIterableAndSetIndex( index );
 			addLeafNode();
-			return new NodeBuilder( messageTemplate, propertyPath );
+			return new NodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath );
 		}
 
 		@Override
