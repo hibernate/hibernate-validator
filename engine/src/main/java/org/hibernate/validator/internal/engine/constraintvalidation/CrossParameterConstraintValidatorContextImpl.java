@@ -75,7 +75,7 @@ public class CrossParameterConstraintValidatorContextImpl extends ConstraintVali
 			dropLeafNode();
 			propertyPath.addParameterNode( methodParameterNames.get( index ), index );
 
-			return new NodeBuilder( messageTemplate, propertyPath );
+			return new NodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath );
 		}
 
 		private void dropLeafNode() {
