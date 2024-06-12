@@ -21,7 +21,7 @@
     <description>Aggregates dependencies and runs the Jakarta Bean Validation TCK</description>
 
     <properties>
-        <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-tests-suite.xml</tck.suite.file>
+        <tck.suite.file>${project.build.directory}/dependency/validation-tck-tests-suite.xml</tck.suite.file>
         <wildfly.target-dir>${project.build.directory}/wildfly-${version.wildfly.tck}</wildfly.target-dir>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug />
@@ -59,8 +59,8 @@
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>
-            <artifactId>beanvalidation-tck-tests</artifactId>
-            <version>${version.jakarta.validation.beanvalidation-tck}</version>
+            <artifactId>validation-tck-tests</artifactId>
+            <version>${version.jakarta.validation.validation-tck}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.test-audit</groupId>
@@ -123,8 +123,8 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>jakarta.validation</groupId>
-                                    <artifactId>beanvalidation-tck-tests</artifactId>
-                                    <version>${version.jakarta.validation.beanvalidation-tck}</version>
+                                    <artifactId>validation-tck-tests</artifactId>
+                                    <version>${version.jakarta.validation.validation-tck}</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
@@ -145,7 +145,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>jakarta.validation</groupId>
-                                    <artifactId>beanvalidation-tck-tests</artifactId>
+                                    <artifactId>validation-tck-tests</artifactId>
                                     <type>xml</type>
                                     <classifier>suite</classifier>
                                     <overWrite>false</overWrite>
@@ -207,8 +207,8 @@
             <dependencies>
                 <dependency>
                     <groupId>jakarta.validation</groupId>
-                    <artifactId>beanvalidation-standalone-container-adapter</artifactId>
-                    <version>${version.jakarta.validation.beanvalidation-tck}</version>
+                    <artifactId>validation-standalone-container-adapter</artifactId>
+                    <version>${version.jakarta.validation.validation-tck}</version>
                 </dependency>
             </dependencies>
             <build>
