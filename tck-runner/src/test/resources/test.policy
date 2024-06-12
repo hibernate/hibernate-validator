@@ -70,10 +70,10 @@ grant codeBase "file:${localRepository}/jakarta/validation/jakarta.validation-ap
 /* Bean Validation TCK */
 /* =================== */
 
-grant codeBase "file:${localRepository}/jakarta/validation/beanvalidation-tck-tests/-" {
+grant codeBase "file:${localRepository}/jakarta/validation/validation-tck-tests/-" {
     permission java.security.AllPermission;
 };
-grant codeBase "file:${localRepository}/jakarta/validation/beanvalidation-standalone-container-adapter/-" {
+grant codeBase "file:${localRepository}/jakarta/validation/validation-standalone-container-adapter/-" {
     permission java.security.AllPermission;
 };
 
@@ -86,7 +86,7 @@ grant codeBase "file:${localRepository}/jakarta/validation/beanvalidation-standa
 // and by TestNG (which does not use privileged actions either).
 grant codeBase "file:${project.build.directory}/classes" {
     permission java.util.PropertyPermission "validation.provider", "read";
-    permission java.io.FilePermission "${localRepository}/jakarta/validation/beanvalidation-tck-tests/${version.jakarta.validation.beanvalidation-tck}/beanvalidation-tck-tests-${version.jakarta.validation.beanvalidation-tck}.jar", "read";
+    permission java.io.FilePermission "${localRepository}/jakarta/validation/validation-tck-tests/${version.jakarta.validation.validation-tck}/validation-tck-tests-${version.jakarta.validation.validation-tck}.jar", "read";
     permission java.util.PropertyPermission "user.language", "write";
     permission org.hibernate.validator.HibernateValidatorPermission "accessPrivateMembers";
     permission "java.lang.reflect.ReflectPermission" "suppressAccessChecks";

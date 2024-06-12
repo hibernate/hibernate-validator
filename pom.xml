@@ -117,7 +117,7 @@
         <!-- Dependencies versions -->
 
         <version.jakarta.validation-api>3.1.0</version.jakarta.validation-api>
-        <version.jakarta.validation.beanvalidation-tck>3.0.1</version.jakarta.validation.beanvalidation-tck>
+        <version.jakarta.validation.validation-tck>3.1.1</version.jakarta.validation.validation-tck>
 
         <version.com.thoughtworks.paranamer>2.8</version.com.thoughtworks.paranamer>
         <version.jakarta.el-api>5.0.1</version.jakarta.el-api>
