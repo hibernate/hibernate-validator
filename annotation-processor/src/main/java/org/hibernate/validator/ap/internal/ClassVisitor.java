@@ -88,6 +88,19 @@ public class ClassVisitor extends AbstractElementVisitor<Void, Void> {
 	}
 
 	/**
+	 * Doesn't perform any checks at the moment but calls a visit methods on its own elements.
+	 *
+	 * @param element a class element to check
+	 * @param aVoid
+	 */
+	@Override
+	public Void visitTypeAsRecord(TypeElement element, Void aVoid) {
+		visitAllMyElements( element );
+
+		return null;
+	}
+
+	/**
 	 * Checks whether the constraints of the given method are valid.
 	 *
 	 * @param element a method under investigation

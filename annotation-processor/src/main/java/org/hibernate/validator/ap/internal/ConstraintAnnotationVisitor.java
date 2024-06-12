@@ -194,6 +194,24 @@ public final class ConstraintAnnotationVisitor extends AbstractElementVisitor<Vo
 	}
 
 	/**
+	 * <p>
+	 * Checks whether the given annotations are correctly specified at the given
+	 * record type declaration. The following checks are performed:
+	 * </p>
+	 * <ul>
+	 * <li>
+	 * Constraint annotations may at types supported by the constraints.</li>
+	 * <li>
+	 * </ul>
+	 */
+	@Override
+	public Void visitTypeAsRecord(TypeElement e, List<AnnotationMirror> p) {
+
+		checkConstraints( e, p );
+		return null;
+	}
+
+	/**
 	 * Retrieves the checks required for the given element and annotations,
 	 * executes them and reports all occurred errors.
 	 *

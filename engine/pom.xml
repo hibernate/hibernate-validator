@@ -306,38 +306,6 @@
                     <skip>false</skip>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-test-source-java17</id>
-                        <phase>${java-version.test.java17.add-test-source-phase}</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/test/java17</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>testWithJdk11+</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>!8</value>
-                </property>
-            </activation>
-            <properties>
-                <surefire.jvm.args.illegal-access>--illegal-access=deny</surefire.jvm.args.illegal-access>
-            </properties>
-        </profile>
-    </profiles>
 </project>

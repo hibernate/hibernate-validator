@@ -133,7 +133,7 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void scriptExpressionReturningNoBooleanRaisesException() throws Exception {
-		@ScriptAssert(lang = "groovy", script = "new java.util.Date()") class TmpType {
+		@ScriptAssert(lang = "groovy", script = "11") class TmpType {
 		}
 
 		assertNoViolations( validator.validate( new TmpType() ) );
