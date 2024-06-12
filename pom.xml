@@ -235,7 +235,7 @@
         <version.release.plugin>3.0.1</version.release.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
         <version.shade.plugin>3.6.0</version.shade.plugin>
-        <version.sigtest.plugin>1.7</version.sigtest.plugin>
+        <version.sigtest.plugin>2.3</version.sigtest.plugin>
         <version.source.plugin>3.3.1</version.source.plugin>
         <version.surefire.plugin>3.2.5</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.7</version.surefire.plugin.java-version.asm>
@@ -1157,7 +1157,7 @@
                     </dependencies>
                 </plugin>
                 <plugin>
-                    <groupId>org.netbeans.tools</groupId>
+                    <groupId>jakarta.tck</groupId>
                     <artifactId>sigtest-maven-plugin</artifactId>
                     <version>${version.sigtest.plugin}</version>
                 </plugin>

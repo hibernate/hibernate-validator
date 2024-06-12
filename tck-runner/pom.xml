@@ -433,7 +433,7 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.netbeans.tools</groupId>
+                        <groupId>jakarta.tck</groupId>
                         <artifactId>sigtest-maven-plugin</artifactId>
                         <executions>
                             <execution>
