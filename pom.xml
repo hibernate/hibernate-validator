@@ -102,7 +102,7 @@
         <!-- URLs used in javadoc and documentation generation -->
 
         <bv.spec.url>https://jakarta.ee/specifications/bean-validation/3.1/jakarta-validation-spec-3.1</bv.spec.url>
-        <java.api-docs.base-url>https://docs.oracle.com/en/java/javase/11/docs/api</java.api-docs.base-url>
+        <java.api-docs.base-url>https://docs.oracle.com/en/java/javase/17/docs/api</java.api-docs.base-url>
         <java.technotes.base-url>http://docs.oracle.com/javase/8/docs/technotes</java.technotes.base-url>
         <javaee.api-docs.base-url>https://jakarta.ee/specifications/platform/11/apidocs</javaee.api-docs.base-url>
         <javafx.docs.url>https://openjfx.io/openjfx-docs/</javafx.docs.url>
@@ -164,8 +164,8 @@
         <!-- Used in the Karaf features file: it is a dependency of Moneta, and for the documentation -->
         <version.javax.annotation>1.2</version.javax.annotation>
 
-        <!-- JavaFX dependencies (from JDK 11) -->
-        <version.org.openjfx>11.0.2</version.org.openjfx>
+        <!-- JavaFX dependencies -->
+        <version.org.openjfx>17.0.11</version.org.openjfx>
 
         <!-- Test dependencies -->
         <version.org.jboss.arquillian>1.8.0.Final</version.org.jboss.arquillian>
@@ -275,7 +275,7 @@
 
         <!-- The lowest supported version of Java for applications using Hibernate Validator -->
         <!-- Set statically, independently of the current JDK: we want our code to comply with this version -->
-        <java-version.main.release>11</java-version.main.release>
+        <java-version.main.release>17</java-version.main.release>
         <java-version.main.compiler.java_home>${java.home}</java-version.main.compiler.java_home>
         <java-version.main.compiler>${java-version.main.compiler.java_home}/bin/javac</java-version.main.compiler>
         <!-- The version of test bytecode, useful for testing compatibility with newer JDKs -->
@@ -287,7 +287,6 @@
         <!-- IMPORTANT: For Java 8, this must be the path to the JDK, not to the JRE -->
         <java-version.test.launcher.java_home>${java-version.test.compiler.java_home}</java-version.test.launcher.java_home>
         <java-version.test.launcher>${java-version.test.launcher.java_home}/bin/java</java-version.test.launcher>
-        <java-version.test.java17.add-test-source-phase>generate-test-sources</java-version.test.java17.add-test-source-phase>
 
         <!-- No need to build the javadocs per module. Aggregated javadocs are build in the distribution module. See also HV-894 -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
@@ -1397,19 +1396,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>testWithJdk11</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>11</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- Tests specific to Java 17+ won't work with JDK 11, so we disable them. -->
-                <java-version.test.java17.add-test-source-phase>none</java-version.test.java17.add-test-source-phase>
-            </properties>
         </profile>
         <profile>
             <id>testWithJdk11+</id>

@@ -6,9 +6,11 @@
  */
 package org.hibernate.validator.ap.record;
 
+import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
+import static org.testng.Assert.assertFalse;
+
 import java.io.File;
 import java.util.EnumSet;
-
 import javax.tools.Diagnostic;
 
 import org.hibernate.validator.ap.ConstraintValidationProcessor;
@@ -18,9 +20,6 @@ import org.hibernate.validator.ap.util.DiagnosticExpectation;
 
 import org.testng.annotations.Test;
 
-import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
-import static org.testng.Assert.assertFalse;
-
 /**
  * @author Jan Schatteman
  */
@@ -29,7 +28,7 @@ public class RecordConstraintValidationProcessorIT extends ConstraintValidationP
 	@Test
 	public void testRecordWithInvalidConstraints() {
 
-		File sourceFile = compilerHelper.getSourceFile( RecordWithInvalidConstraints.class, "/src/test/java17" );
+		File sourceFile = compilerHelper.getSourceFile( RecordWithInvalidConstraints.class );
 
 		boolean compilationResult =
 				compilerHelper.compile(
@@ -53,7 +52,7 @@ public class RecordConstraintValidationProcessorIT extends ConstraintValidationP
 	@Test
 	public void testRecordWithInvalidConstructorConstraints() {
 
-		File sourceFile = compilerHelper.getSourceFile( RecordWithInvalidConstructorConstraints.class, "/src/test/java17" );
+		File sourceFile = compilerHelper.getSourceFile( RecordWithInvalidConstructorConstraints.class );
 
 		boolean compilationResult =
 				compilerHelper.compile(
@@ -74,7 +73,7 @@ public class RecordConstraintValidationProcessorIT extends ConstraintValidationP
 	@Test
 	public void testRecordWithInvalidMethodConstraints() {
 
-		File sourceFile = compilerHelper.getSourceFile( RecordWithInvalidMethodConstraints.class, "/src/test/java17" );
+		File sourceFile = compilerHelper.getSourceFile( RecordWithInvalidMethodConstraints.class );
 
 		boolean compilationResult =
 				compilerHelper.compile(

@@ -108,25 +108,6 @@ public class CompilerTestHelper {
 	}
 
 	/**
-	 * Retrieves a file object containing the source of the given class.
-	 *
-	 * @param clazz The class of interest.
-	 * @param testSourceBase The test source base in which to look for the class of interest
-	 *
-	 * @return A file with the source of the given class.
-	 */
-	public File getSourceFile(Class<?> clazz, String testSourceBase) {
-		if ( testSourceBase == null || testSourceBase.trim().isEmpty() ) {
-			return getSourceFile( clazz );
-		}
-
-		String sourceFileName = File.separator + clazz.getName().replace( ".", File.separator ) + ".java";
-		String sourceBaseDir = BASE_DIR.getAbsolutePath() + testSourceBase;
-
-		return new File( sourceBaseDir + sourceFileName );
-	}
-
-	/**
 	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, EnumSet, File...)
 	 */
 	public boolean compile(Processor annotationProcessor,

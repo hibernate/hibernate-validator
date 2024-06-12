@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import javax.lang.model.element.ElementVisitor;
-import javax.lang.model.util.ElementKindVisitor8;
+import javax.lang.model.util.ElementKindVisitor14;
 
 import org.hibernate.validator.ap.internal.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.internal.util.CollectionHelper;
@@ -25,7 +25,7 @@ import org.hibernate.validator.ap.internal.util.MessagerAdapter;
  *
  * @author Marko Bekhta
  */
-public class AbstractElementVisitor<T, V> extends ElementKindVisitor8<T, V> {
+public class AbstractElementVisitor<T, V> extends ElementKindVisitor14<T, V> {
 
 	protected final MessagerAdapter messager;
 

@@ -119,8 +119,6 @@ stage('Configure') {
 					new JdkBuildEnvironment(testJavaVersion: '17', testCompilerTool: 'OpenJDK 17 Latest',
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
-					new JdkBuildEnvironment(testJavaVersion: '11', testCompilerTool: 'OpenJDK 11 Latest',
-							condition: TestCondition.BEFORE_MERGE),
 					// We want to enable preview features when testing newer builds of OpenJDK:
 					// even if we don't use these features, just enabling them can cause side effects
 					// and it's useful to test that.
@@ -138,7 +136,7 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE)
 			],
 			wildflyTck: [
-					new WildFlyTckBuildEnvironment(testJavaVersion: '11', testCompilerTool: 'OpenJDK 11 Latest',
+					new WildFlyTckBuildEnvironment(testJavaVersion: '17', testCompilerTool: 'OpenJDK 17 Latest',
 							condition: TestCondition.ON_DEMAND)
 			],
 			sigtest: [
