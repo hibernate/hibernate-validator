@@ -261,6 +261,11 @@
 
         <mavencentral.repo.url>https://repo.maven.apache.org/maven2/</mavencentral.repo.url>
 
+        <!-- Jakarta Staging repository -->
+        <!-- Can be used for versions of Validation TCK/API -->
+        <jakarta.staging.repo.id>jakarta-staging</jakarta.staging.repo.id>
+        <jakarta.staging.repo.url>https://jakarta.oss.sonatype.org/content/repositories/staging/</jakarta.staging.repo.url>
+
         <!-- Build settings -->
 
         <hibernate-validator-parent.path>.</hibernate-validator-parent.path>
@@ -1285,6 +1290,14 @@
         <url>http://github.com/hibernate/hibernate-validator</url>
         <tag>HEAD</tag>
     </scm>
+
+    <repositories>
+        <repository>
+            <id>${jakarta.staging.repo.id}</id>
+            <name>Jakarta OSS Staging Repository</name>
+            <url>${jakarta.staging.repo.url}</url>
+        </repository>
+    </repositories>
 
     <distributionManagement>
         <repository>
