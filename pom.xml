@@ -226,7 +226,7 @@
         <version.enforcer.plugin>3.0.0-M1</version.enforcer.plugin>
         <version.forbiddenapis.plugin>3.2</version.forbiddenapis.plugin>
         <version.gmavenplus.plugin>1.6</version.gmavenplus.plugin>
-        <version.gpg.plugin>3.0.1</version.gpg.plugin>
+        <version.gpg.plugin>3.2.4</version.gpg.plugin>
         <version.install.plugin>2.5.2</version.install.plugin>
         <version.japicmp.plugin>0.11.0</version.japicmp.plugin>
         <version.jar.plugin>3.0.2</version.jar.plugin>
