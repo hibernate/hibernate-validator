@@ -101,7 +101,7 @@ public class ValidatorFactoryScopedContext {
 						temporalValidationTolerance ) );
 	}
 
-	private ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
+	ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ClockProvider clockProvider,
