@@ -21,6 +21,9 @@
     <description>Hibernate Validator CDI Portable Extension</description>
 
     <properties>
+        <!-- This is a publicly distributed module that should be published: -->
+        <deploy.skip>false</deploy.skip>
+
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
 

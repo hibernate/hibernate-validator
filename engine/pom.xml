@@ -21,6 +21,9 @@
     <description>Hibernate's Jakarta Bean Validation reference implementation.</description>
 
     <properties>
+        <!-- This is a publicly distributed module that should be published: -->
+        <deploy.skip>false</deploy.skip>
+
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
         <surefire.jvm.args.additional>-Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
     </properties>
