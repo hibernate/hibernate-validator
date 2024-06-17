@@ -21,15 +21,10 @@
     <description>Hibernate Validator WildFly integration tests.</description>
 
     <properties>
-        <wildfly.target-dir>${project.build.directory}/wildfly-${version.wildfly}</wildfly.target-dir>
-        <wildfly.modules-dir>${wildfly.target-dir}/modules/system/layers/base</wildfly.modules-dir>
-        <!--
-        <wildfly-secondary.target-dir>${project.build.directory}/wildfly-${version.wildfly.secondary}</wildfly-secondary.target-dir>
-        <wildfly-secondary.modules-dir>${wildfly-secondary.target-dir}/modules/system/layers/base</wildfly-secondary.modules-dir>
-        -->
         <surefire.jvm.args.additional>-Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+        <skip.wildfly.patch.hibernate.validator>false</skip.wildfly.patch.hibernate.validator>
     </properties>
 
     <dependencies>
@@ -154,13 +149,6 @@
             <artifactId>wildfly-arquillian-container-managed</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-validator-modules</artifactId>
-            <classifier>wildfly-${version.wildfly}-patch</classifier>
-            <type>zip</type>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -215,46 +203,6 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack-wildfly-current</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <!-- WildFly current -->
-                                <artifactItem>
-                                    <groupId>org.wildfly</groupId>
-                                    <artifactId>wildfly-dist</artifactId>
-                                    <version>${version.wildfly}</version>
-                                    <type>tar.gz</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-patch-current</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <!-- WildFly current -->
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>hibernate-validator-modules</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>wildfly-${version.wildfly}-patch</classifier>
-                                    <type>zip</type>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>copy-javamoney-current</id>
                         <phase>pre-integration-test</phase>
                         <goals>
@@ -281,6 +229,10 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <!-- WildFly current -->
@@ -298,28 +250,6 @@
                                     <filtering>true</filtering>
                                 </resource>
                             </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.wildfly.plugins</groupId>
-                <artifactId>wildfly-maven-plugin</artifactId>
-                <executions>
-                    <!-- WildFly current -->
-                    <execution>
-                        <id>apply-wildfly-current-patch-file</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>execute-commands</goal>
-                        </goals>
-                        <configuration>
-                            <offline>true</offline>
-                            <jbossHome>${project.build.directory}/wildfly-${version.wildfly}/</jbossHome>
-                            <fail-on-error>true</fail-on-error>
-                            <commands>
-                                <command>patch apply ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${version.wildfly}-patch.zip</command>
-                            </commands>
                         </configuration>
                     </execution>
                 </executions>

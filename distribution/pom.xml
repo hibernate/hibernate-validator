@@ -90,21 +90,6 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-validator-modules</artifactId>
-            <classifier>wildfly-${version.wildfly}-patch</classifier>
-            <type>zip</type>
-        </dependency>
-        <!--
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-validator-modules</artifactId>
-            <classifier>wildfly-${version.wildfly.secondary}-patch</classifier>
-            <type>zip</type>
-        </dependency>
-        -->
     </dependencies>
 
     <build>
@@ -179,25 +164,6 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-jbossmodules-to-dist</id>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <phase>install</phase>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/dist/</outputDirectory>
-                            <includeGroupIds>${project.groupId}</includeGroupIds>
-                            <includeArtifactIds>hibernate-validator-modules</includeArtifactIds>
-                            <includeTypes>zip</includeTypes>
-                            <excludeTransitive>true</excludeTransitive>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

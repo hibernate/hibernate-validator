@@ -289,9 +289,6 @@
                         <jakartaElVersion>${version.org.glassfish.jakarta.el}</jakartaElVersion>
                         <expresslyVersion>${version.org.glassfish.expressly}</expresslyVersion>
 
-                        <wildflyVersion>${version.wildfly}</wildflyVersion>
-                        <wildflySecondaryVersion>${version.wildfly.secondary}</wildflySecondaryVersion>
-
                         <!-- URLs -->
                         <javaApiDocsUrl>${java.api-docs.base-url}/</javaApiDocsUrl>
                         <bvApiDocsUrl>${bv.api-docs.base-url}/</bvApiDocsUrl>
