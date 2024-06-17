@@ -83,6 +83,7 @@
     </mailingLists>
 
     <modules>
+        <module>bom</module>
         <module>test-utils</module>
         <module>build-config</module>
         <module>engine</module>
@@ -251,6 +252,7 @@
         <version.wildfly-patch-gen.plugin>2.1.3.Final</version.wildfly-patch-gen.plugin>
         <version.wildfly-patch-gen.plugin.woodstox>6.6.2</version.wildfly-patch-gen.plugin.woodstox>
         <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
+        <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
@@ -342,26 +344,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>hibernate-validator</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>hibernate-validator-test-utils</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>hibernate-validator-cdi</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>hibernate-validator-annotation-processor</artifactId>
-                <version>${project.version}</version>
-            </dependency>
             <dependency>
                 <groupId>jakarta.validation</groupId>
                 <artifactId>jakarta.validation-api</artifactId>
@@ -1347,6 +1329,31 @@
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>${version.flatten-maven-plugin}</version>
+                    <configuration>
+                        <outputDirectory>${project.build.directory}</outputDirectory>
+                        <!-- Keep things like url, inceptionYear, authors...
+                             everything that's required by the OSSRH Maven repository -->
+                        <flattenMode>ossrh</flattenMode>
+                        <pomElements>
+                            <!-- We have Jakarta staging repo listed to download the TCK,
+                                but there's no point in keeping it listed in the published POM files. -->
+                            <repositories>remove</repositories>
+                        </pomElements>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>flatten-pom</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -10,9 +10,9 @@
 
     <parent>
         <groupId>org.hibernate.validator</groupId>
-        <artifactId>hibernate-validator-parent</artifactId>
+        <artifactId>hibernate-validator-public-parent</artifactId>
         <version>9.0.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../parents/public/pom.xml</relativePath>
     </parent>
 
     <artifactId>hibernate-validator-annotation-processor</artifactId>
