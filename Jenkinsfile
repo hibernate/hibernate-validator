@@ -420,7 +420,7 @@ void keepOnlyEnvironmentsFromSet(String environmentSetName) {
 			enableDefaultEnv = true
 			enableBeforeMergeEnvs = true
 			enableAfterMergeEnvs = true
-			enableOptional = true
+			enableOnDemandEnvs = true
 			break
 		case 'AUTOMATIC':
 			if (helper.scmSource.pullRequest) {
