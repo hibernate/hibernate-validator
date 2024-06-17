@@ -265,6 +265,12 @@
         <ossrh.snapshots.repo.id>ossrh</ossrh.snapshots.repo.id>
         <ossrh.snapshots.repo.url>https://oss.sonatype.org/content/repositories/snapshots</ossrh.snapshots.repo.url>
 
+        <!--
+            We don't want to publish or sign any modules by default.
+            Specific modules will override the setting at their own level.
+        -->
+        <deploy.skip>true</deploy.skip>
+
         <!-- Maven Central repository -->
 
         <mavencentral.repo.url>https://repo.maven.apache.org/maven2/</mavencentral.repo.url>
@@ -1467,6 +1473,7 @@
                         <version>${version.nexus-staging-maven-plugin}</version>
                         <extensions>true</extensions>
                         <configuration>
+                            <skipNexusStagingDeployMojo>${deploy.skip}</skipNexusStagingDeployMojo>
                             <nexusUrl>${ossrh.releases.repo.baseUrl}</nexusUrl>
                             <serverId>${ossrh.releases.repo.id}</serverId>
                             <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>

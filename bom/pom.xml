@@ -21,6 +21,11 @@
     <description>Hibernate's Jakarta Bean Validation reference implementation BOM.</description>
     <packaging>pom</packaging>
 
+    <properties>
+        <!-- This is a publicly distributed module that should be published: -->
+        <deploy.skip>false</deploy.skip>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
