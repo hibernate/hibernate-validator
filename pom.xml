@@ -95,6 +95,8 @@
     </modules>
 
     <properties>
+        <project.build.outputTimestamp>2024-01-01T00:00:00Z</project.build.outputTimestamp>
+
         <!-- Version to be used as baseline for API/SPI change reports -->
 
         <previous.stable>6.0.10.Final</previous.stable>
