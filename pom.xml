@@ -90,7 +90,6 @@
         <module>annotation-processor</module>
         <module>performance</module>
         <module>cdi</module>
-        <module>modules</module>
         <module>integration</module>
     </modules>
 
@@ -133,6 +132,10 @@
         <!--<version.wildfly.secondary>18.0.1.Final</version.wildfly.secondary>-->
         <!-- Version used to run the TCK in incontainer mode -->
         <version.wildfly.tck>${version.wildfly}</version.wildfly.tck>
+        <skip.wildfly.patch.hibernate.validator>true</skip.wildfly.patch.hibernate.validator>
+        <skip.wildfly.patch.unpack.server>${skip.wildfly.patch.hibernate.validator}</skip.wildfly.patch.unpack.server>
+        <wildfly.target-dir>${project.build.directory}/wildfly-patched/wildfly-${version.wildfly}</wildfly.target-dir>
+        <wildfly.modules-dir>${wildfly.target-dir}/modules/system/layers/base</wildfly.modules-dir>
 
         <!--
             These dependencies should be aligned with the ones from the WildFly version we support
@@ -358,22 +361,6 @@
                 <artifactId>hibernate-validator-annotation-processor</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>hibernate-validator-modules</artifactId>
-                <version>${project.version}</version>
-                <classifier>wildfly-${version.wildfly}-patch</classifier>
-                <type>zip</type>
-            </dependency>
-            <!--
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>hibernate-validator-modules</artifactId>
-                <version>${project.version}</version>
-                <classifier>wildfly-${version.wildfly.secondary}-patch</classifier>
-                <type>zip</type>
-            </dependency>
-            -->
             <dependency>
                 <groupId>jakarta.validation</groupId>
                 <artifactId>jakarta.validation-api</artifactId>
@@ -969,6 +956,86 @@
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>${version.dependency.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>unpack-wildfly-patching-script</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>unpack</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${skip.wildfly.patch.hibernate.validator}</skip>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>${project.groupId}</groupId>
+                                        <artifactId>hibernate-validator-build-config</artifactId>
+                                        <version>${project.version}</version>
+                                        <type>jar</type>
+                                        <outputDirectory>${project.build.directory}/hibernate-validator-patch</outputDirectory>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>unpack-wildfly</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>unpack</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${skip.wildfly.patch.unpack.server}</skip>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>org.wildfly</groupId>
+                                        <artifactId>wildfly-dist</artifactId>
+                                        <version>${version.wildfly}</version>
+                                        <type>tar.gz</type>
+                                        <overWrite>false</overWrite>
+                                        <outputDirectory>${project.build.directory}/wildfly-patched</outputDirectory>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                        <!-- Update the BV/HV JARs in the unpacked ^ WF copy -->
+                        <execution>
+                            <id>prepare-patch-jars</id>
+                            <phase>generate-resources</phase>
+                            <goals>
+                                <goal>copy</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${skip.wildfly.patch.hibernate.validator}</skip>
+                                <artifactItems>
+                                    <!-- WildFly current -->
+                                    <artifactItem>
+                                        <groupId>jakarta.validation</groupId>
+                                        <artifactId>jakarta.validation-api</artifactId>
+                                        <version>${version.jakarta.validation-api}</version>
+                                        <overWrite>false</overWrite>
+                                        <outputDirectory>${wildfly.target-dir}/modules/system/layers/base/jakarta/validation/api/main</outputDirectory>
+                                        <!-- Specifying name to avoid timestamp in version on CI -->
+                                        <destFileName>jakarta.validation-api-${version.jakarta.validation-api}.jar</destFileName>
+                                    </artifactItem>
+                                    <artifactItem>
+                                        <groupId>${project.groupId}</groupId>
+                                        <artifactId>hibernate-validator</artifactId>
+                                        <version>${project.version}</version>
+                                        <overWrite>false</overWrite>
+                                        <outputDirectory>${wildfly.target-dir}/modules/system/layers/base/org/hibernate/validator/main</outputDirectory>
+                                        <destFileName>hibernate-validator-${project.version}.jar</destFileName>
+                                    </artifactItem>
+                                    <artifactItem>
+                                        <groupId>${project.groupId}</groupId>
+                                        <artifactId>hibernate-validator-cdi</artifactId>
+                                        <version>${project.version}</version>
+                                        <overWrite>false</overWrite>
+                                        <outputDirectory>${wildfly.target-dir}/modules/system/layers/base/org/hibernate/validator/cdi/main</outputDirectory>
+                                        <destFileName>hibernate-validator-cdi-${project.version}.jar</destFileName>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
@@ -1079,6 +1146,24 @@
                             <scope>runtime</scope>
                         </dependency>
                     </dependencies>
+                    <executions>
+                        <execution>
+                            <id>update-wildfly-current-modules</id>
+                            <phase>process-sources</phase>
+                            <goals>
+                                <goal>execute</goal>
+                            </goals>
+                            <configuration>
+                                <skipScriptExecution>${skip.wildfly.patch.hibernate.validator}</skipScriptExecution>
+                                <scripts>
+                                    <script>file:///${project.build.directory}/hibernate-validator-patch/setupModules.groovy</script>
+                                </scripts>
+                                <properties>
+                                    <wildflyPatchedTargetDir>${wildfly.target-dir}</wildflyPatchedTargetDir>
+                                </properties>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.servicemix.tooling</groupId>

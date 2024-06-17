@@ -22,7 +22,6 @@
 
     <properties>
         <tck.suite.file>${project.build.directory}/dependency/validation-tck-tests-suite.xml</tck.suite.file>
-        <wildfly.target-dir>${project.build.directory}/wildfly-${version.wildfly.tck}</wildfly.target-dir>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug />
 
@@ -244,6 +243,7 @@
             <properties>
                 <surefire.jvm.args.additional>-DincludeJavaFXTests=true -Xmx1024m -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
                 <arquillian.protocol>Servlet 5.0</arquillian.protocol>
+                <skip.wildfly.patch.hibernate.validator>false</skip.wildfly.patch.hibernate.validator>
             </properties>
             <dependencies>
                 <dependency>
@@ -251,81 +251,11 @@
                     <artifactId>wildfly-arquillian-container-managed</artifactId>
                     <scope>test</scope>
                 </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>hibernate-validator-modules</artifactId>
-                    <version>${project.version}</version>
-                    <classifier>wildfly-${version.wildfly.tck}-patch</classifier>
-                    <type>zip</type>
-                </dependency>
             </dependencies>
             <build>
                 <plugins>
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>unpack-wildfly</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.wildfly</groupId>
-                                            <artifactId>wildfly-dist</artifactId>
-                                            <version>${version.wildfly.tck}</version>
-                                            <type>tar.gz</type>
-                                            <overWrite>false</overWrite>
-                                            <outputDirectory>${project.build.directory}</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>copy-patch</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>${project.groupId}</groupId>
-                                            <artifactId>hibernate-validator-modules</artifactId>
-                                            <version>${project.version}</version>
-                                            <classifier>wildfly-${version.wildfly.tck}-patch</classifier>
-                                            <type>zip</type>
-                                            <outputDirectory>${project.build.directory}</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.wildfly.plugins</groupId>
-                        <artifactId>wildfly-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>apply-patch-file</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>execute-commands</goal>
-                                </goals>
-                                <configuration>
-                                    <offline>true</offline>
-                                    <fail-on-error>false</fail-on-error>
-                                    <commands>
-                                        <command>patch apply ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${version.wildfly.tck}-patch.zip</command>
-                                    </commands>
-                                </configuration>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <jbossHome>${wildfly.target-dir}</jbossHome>
-                        </configuration>
                     </plugin>
 
                     <!-- Additional resources are copied in the profiles below -->
@@ -372,6 +302,7 @@
             <properties>
                 <surefire.jvm.args.additional>-Xmx1024m -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
                 <arquillian.protocol>Servlet 5.0</arquillian.protocol>
+                <skip.wildfly.patch.unpack.server>true</skip.wildfly.patch.unpack.server>
             </properties>
             <dependencies>
                 <dependency>
