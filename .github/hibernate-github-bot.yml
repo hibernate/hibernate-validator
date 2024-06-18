@@ -1,3 +1,26 @@
 ---
 jira:
   projectKey: "HV"
+  ignore:
+    # See the `build-dependencies` group in the Dependabot's configuration file
+    - user: dependabot[bot]
+      titlePattern: "Bump the build-dependencies group with \\d+ updates?"
+  ignoreFiles:
+    # Git
+    - ".git*"
+    - ".mailmap"
+    # Maven
+    - "mvnw*"
+    - ".mvn/"
+    # CI
+    - ".github/"
+    - "jenkins/"
+    - "Jenkinsfile"
+    - "*/Jenkinsfile"
+    - "*.Jenkinsfile"
+    - "*.sh"
+    # In-repo documentation
+    - "copyright.txt"
+    - "README.md"
+    - "MAINTAINERS.md"
+    - "CONTRIBUTING.md"
