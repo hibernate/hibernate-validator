@@ -94,10 +94,10 @@ For using the Hibernate Validator annotation processor with Maven, set it up via
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>{compilerPluginVersion}</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>{jdkVersion}</source>
+                    <target>{jdkVersion}</target>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.hibernate.validator</groupId>
@@ -185,7 +185,7 @@ provided you have the https://www.eclipse.org/m2e/[M2E Eclipse plug-in] installe
 For plain Eclipse projects follow these steps to set up the annotation processor:
 
 * Right-click your project, choose "Properties"
-* Go to "Java Compiler" and make sure, that "Compiler compliance level" is set to "1.8".
+* Go to "Java Compiler" and make sure, that "Compiler compliance level" is set to "{jdkVersion}".
 Otherwise the processor won't be activated
 * Go to "Java Compiler - Annotation Processing" and choose "Enable annotation processing"
 * Go to "Java Compiler - Annotation Processing - Factory Path" and add the JAR
