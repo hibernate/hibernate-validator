@@ -94,7 +94,7 @@ public interface Messages {
 			"This can happen most notably in a Google App Engine environment or when running Hibernate Validator as Java 9 named module. " +
 			"A PlatformResourceBundleLocator without bundle aggregation was created. " +
 			"This only affects you in case you are using multiple ConstraintDefinitionContributor JARs. " +
-			"ConstraintDefinitionContributors are a Hibernate Validator specific feature. All Jakarta Bean Validation " +
+			"ConstraintDefinitionContributors are a Hibernate Validator specific feature. All Jakarta Validation " +
 			"features work as expected. See also https://hibernate.atlassian.net/browse/HV-1023.")
 	String unableToUseResourceBundleAggregation();
 

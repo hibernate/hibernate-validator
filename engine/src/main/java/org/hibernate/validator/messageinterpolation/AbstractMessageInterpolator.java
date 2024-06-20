@@ -414,7 +414,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			// resolve EL expressions (step 3)
 			// in the standard Hibernate Validator execution flow, the context is always an instance of
 			// HibernateMessageInterpolatorContext
-			// but it can be a spec Context in the Jakarta Bean Validation TCK.
+			// but it can be a spec Context in the Jakarta Validation TCK.
 			if ( !( context instanceof HibernateMessageInterpolatorContext )
 					|| ( (HibernateMessageInterpolatorContext) context ).getExpressionLanguageFeatureLevel() != ExpressionLanguageFeatureLevel.NONE ) {
 				resolvedMessage = interpolateExpression(

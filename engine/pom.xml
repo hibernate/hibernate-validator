@@ -18,7 +18,7 @@
     <artifactId>hibernate-validator</artifactId>
 
     <name>Hibernate Validator Engine</name>
-    <description>Hibernate's Jakarta Bean Validation reference implementation.</description>
+    <description>Hibernate's Jakarta Validation reference implementation.</description>
 
     <properties>
         <!-- This is a publicly distributed module that should be published: -->
@@ -243,7 +243,7 @@
                             <archive>
                                 <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                                 <manifestEntries>
-                                    <Specification-Title>Jakarta Bean Validation</Specification-Title>
+                                    <Specification-Title>Jakarta Validation</Specification-Title>
                                     <Specification-Version>3.0</Specification-Version>
                                     <Automatic-Module-Name>${hibernate-validator.module-name}</Automatic-Module-Name>
                                 </manifestEntries>
