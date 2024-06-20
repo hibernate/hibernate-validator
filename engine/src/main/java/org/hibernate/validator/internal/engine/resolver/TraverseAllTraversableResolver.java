@@ -16,7 +16,7 @@ import jakarta.validation.TraversableResolver;
 /**
  * {@link TraversableResolver} considering that all properties are reachable and cascadable.
  * <p>
- * This is the default behavior if JPA is not detected in the classpath.
+ * This is the default behavior if Jakarta Persistence is not detected in the classpath.
  *
  * @author Guillaume Smet
  */

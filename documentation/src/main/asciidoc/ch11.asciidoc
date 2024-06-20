@@ -95,9 +95,10 @@ configuration in _hibernate.cfg.xml_:
 ----
 ====
 
-==== JPA
+==== Jakarta Persistence
 
-If you are using JPA 2 and Hibernate Validator is in the classpath, the JPA 2 specification requires
+If you are using Jakarta Persistence {versionJakartaPersistence} and Hibernate Validator is in the classpath,
+the Jakarta Persistence {versionJakartaPersistence} specification requires
 that Jakarta Validation gets enabled. The properties `jakarta.persistence.validation.group.pre-persist`,
 `jakarta.persistence.validation.group.pre-update` and `jakarta.persistence.validation.group.pre-remove` as
 described in <<validator-checkconstraints-orm-hibernateevent>> can in this case be configured in

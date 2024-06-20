@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 import jakarta.validation.TraversableResolver;
 
 /**
- * Tests that the default {@link TraversableResolver} for a JPA environment is {@code JPATraversableResolver}.
+ * Tests that the default {@link TraversableResolver} for a Jakarta Persistence environment is {@code JPATraversableResolver}.
  *
  * @author Guillaume Smet
  */
