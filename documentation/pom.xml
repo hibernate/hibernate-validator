@@ -286,7 +286,6 @@
                         <bvVersion>${version.jakarta.validation-api}</bvVersion>
                         <jbossLoggingVersion>${version.org.jboss.logging.jboss-logging}</jbossLoggingVersion>
                         <classmateVersion>${version.com.fasterxml.classmate}</classmateVersion>
-                        <jakartaElVersion>${version.org.glassfish.jakarta.el}</jakartaElVersion>
                         <expresslyVersion>${version.org.glassfish.expressly}</expresslyVersion>
 
                         <!-- URLs -->
