@@ -1,9 +1,9 @@
 [[validator-gettingstarted]]
 == Getting started
 
-This chapter will show you how to get started with Hibernate Validator, the reference implementation (RI) of Jakarta Bean Validation. For the following quick-start you need:
+This chapter will show you how to get started with Hibernate Validator, the reference implementation (RI) of Jakarta Validation. For the following quick-start you need:
 
-* A JDK 8
+* A JDK {jdkVersion}
 * http://maven.apache.org/[Apache Maven]
 * An Internet connection (Maven has to download all required libraries)
 
@@ -26,7 +26,7 @@ your __pom.xml__:
 ----
 ====
 
-This transitively pulls in the dependency to the Jakarta Bean Validation API
+This transitively pulls in the dependency to the Jakarta Validation API
 (`jakarta.validation:jakarta.validation-api:{bvVersion}`).
 
 [[validator-gettingstarted-uel]]
@@ -57,13 +57,13 @@ implementation]:
 ====
 For environments where one cannot provide a EL implementation Hibernate Validator is offering a
 <<non-el-message-interpolator>>. However, the use of this interpolator
-is not Jakarta Bean Validation specification compliant.
+is not Jakarta Validation specification compliant.
 ====
 
 [[section-getting-started-cdi]]
 ==== CDI
 
-Jakarta Bean Validation defines integration points with CDI
+Jakarta Validation defines integration points with CDI
 (https://projects.eclipse.org/projects/ee4j.cdi[Contexts and Dependency Injection for Jakarta EE]).
 If your application runs in an
 environment which does not provide this integration out of the box, you may use the Hibernate
@@ -83,7 +83,7 @@ Validator CDI portable extension by adding the following Maven dependency to you
 ====
 
 Note that adding this dependency is usually not required for applications running on a Jakarta EE
-application server. You can learn more about the integration of Jakarta Bean Validation and CDI in
+application server. You can learn more about the integration of Jakarta Validation and CDI in
 <<section-integration-with-cdi>>.
 
 ==== Updating Hibernate Validator in WildFly
@@ -101,7 +101,7 @@ There are no JPMS module descriptors provided, but Hibernate Validator is usable
 
 These are the module names as declared using the `Automatic-Module-Name` header:
 
-* Jakarta Bean Validation API: `jakarta.validation`
+* Jakarta Validation API: `jakarta.validation`
 * Hibernate Validator core: `org.hibernate.validator`
 * Hibernate Validator CDI extension: `org.hibernate.validator.cdi`
 * Hibernate Validator test utilities: `org.hibernate.validator.testutils`
@@ -174,11 +174,11 @@ code.
 [[validator-gettingstarted-whatsnext]]
 === Where to go next?
 
-That concludes the 5 minutes tour through the world of Hibernate Validator and Jakarta Bean Validation.
+That concludes the 5 minutes tour through the world of Hibernate Validator and Jakarta Validation.
 Continue exploring the code examples or look at further examples referenced in
 <<validator-further-reading>>.
 
 To learn more about the validation of beans and properties, just continue reading
-<<chapter-bean-constraints>>. If you are interested in using Jakarta Bean Validation for the validation of
+<<chapter-bean-constraints>>. If you are interested in using Jakarta Validation for the validation of
 method pre- and postcondition refer to <<chapter-method-constraints>>. In case your application has
 specific validation requirements have a look at <<validator-customconstraints>>.

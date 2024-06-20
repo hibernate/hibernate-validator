@@ -5,8 +5,8 @@
 
 ## What is it?
 
-This is the reference implementation of [Jakarta Bean Validation 3.0](http://beanvalidation.org/).
-Jakarta Bean Validation defines a metadata model and API for JavaBean as well as method validation.
+This is the reference implementation of [Jakarta Validation 3.1](https://jakarta.ee/specifications/bean-validation/3.1/).
+Jakarta Validation defines a metadata model and API for JavaBean as well as method validation.
 The default metadata source are annotations, with the ability to override and extend
 the metadata through the use of XML validation descriptors.
 
@@ -20,7 +20,7 @@ The full list of changes for this release can be found in changelog.txt.
 
 ## System Requirements
 
-JDK 8 or above.
+JDK 17 or above.
 
 ## Using Hibernate Validator
 
@@ -47,7 +47,7 @@ Logging will delegate any log requests to that provider.
            <version>5.0.0</version>
         </dependency>
 
-* Jakarta Bean Validation defines integration points with [CDI](http://jcp.org/en/jsr/detail?id=346). If your application runs
+* Jakarta Validation defines integration points with [CDI](http://jcp.org/en/jsr/detail?id=346). If your application runs
 in an environment which does not provide this integration out of the box, you may use the Hibernate Validator CDI portable
 extension by adding the following dependency:
 
@@ -63,13 +63,13 @@ documentation](https://docs.jboss.org/hibernate/stable/validator/reference/en-US
 
 ## Licensing
 
-Hibernate Validator itself as well as the Jakarta Bean Validation API and TCK are all provided and distributed under
+Hibernate Validator itself as well as the Jakarta Validation API and TCK are all provided and distributed under
 the Apache Software License 2.0. Refer to license.txt for more information.
 
 ## Build from Source
 
 You can build Hibernate Validator from source by cloning the git repository `git://github.com/hibernate/hibernate-validator.git`.
-You will also need a JDK 17+ and Maven 3 (>= 3.3.1). With these prerequisites in place you can compile the source via:
+You will also need a JDK 17+ and Maven 3 (>= 3.9.6). With these prerequisites in place you can compile the source via:
 
     mvn clean install
 
@@ -84,7 +84,8 @@ We provide a `.travis.yml` file so that you can enable CI for your GitHub fork b
 ## Hibernate Validator URLs
 
 * [Home Page](http://hibernate.org/validator/)
-* [Jakarta Bean Validation Home](http://beanvalidation.org/)
+* [Jakarta Validation Home](http://beanvalidation.org/)
+* [Jakarta Validation Specs](https://jakarta.ee/specifications/bean-validation/)
 * [Downloads](http://hibernate.org/validator/downloads/)
 * [Mailing Lists](http://hibernate.org/community/)
 * [Issue Tracking](https://hibernate.atlassian.net/browse/HV)

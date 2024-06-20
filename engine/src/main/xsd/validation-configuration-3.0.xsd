@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Jakarta Bean Validation API
+  ~ Jakarta Validation API
   ~
   ~ License: Apache License, Version 2.0
   ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
@@ -14,10 +14,10 @@
 
     <xs:annotation>
         <xs:documentation><![CDATA[
-            This is the XML Schema for the Jakarta Bean Validation configuration file.
+            This is the XML Schema for the Jakarta Validation configuration file.
             The configuration file must be named "META-INF/validation.xml".
 
-            Jakarta Bean Validation configuration files must indicate the Jakarta Bean Validation
+            Jakarta Validation configuration files must indicate the Jakarta Validation
             XML schema by using the validation namespace:
 
             https://jakarta.ee/xml/ns/validation/configuration

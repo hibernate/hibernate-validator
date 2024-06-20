@@ -173,7 +173,7 @@
                             <archive>
                                 <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                                 <manifestEntries>
-                                    <Specification-Title>Jakarta Bean Validation</Specification-Title>
+                                    <Specification-Title>Jakarta Validation</Specification-Title>
                                     <Specification-Version>2.0</Specification-Version>
                                     <Automatic-Module-Name>${hibernate-validator-cdi.module-name}</Automatic-Module-Name>
                                 </manifestEntries>

@@ -12,7 +12,7 @@ If you are interested in applying constraints to method parameters and return va
 [[section-declaring-bean-constraints]]
 === Declaring bean constraints
 
-Constraints in Jakarta Bean Validation are expressed via Java annotations. In this section you will learn
+Constraints in Jakarta Validation are expressed via Java annotations. In this section you will learn
 how to enhance an object model with these annotations. There are four types of bean constraints:
 
 * field constraints
@@ -23,7 +23,7 @@ how to enhance an object model with these annotations. There are four types of b
 [NOTE]
 ====
 Not all constraints can be placed on all of these levels. In fact, none of the default constraints
-defined by Jakarta Bean Validation can be placed at class level. The `java.lang.annotation.Target` annotation
+defined by Jakarta Validation can be placed at class level. The `java.lang.annotation.Target` annotation
 in the constraint annotation itself determines on which elements a constraint can be placed. See
 <<validator-customconstraints>> for more information.
 ====
@@ -95,7 +95,7 @@ It is possible to specify constraints directly on the type argument of a
 parameterized type: these constraints are called container element constraints.
 
 This requires that `ElementType.TYPE_USE` is specified via `@Target`
-in the constraint definition. As of Jakarta Bean Validation 2.0, built-in Jakarta Bean Validation as well as
+in the constraint definition. As of Jakarta Bean Validation 2.0, built-in Jakarta Validation as well as
 Hibernate Validator specific constraints specify `ElementType.TYPE_USE` and can be used
 directly in this context.
 
@@ -332,7 +332,7 @@ evaluated in addition to the `@NotNull` constraint from the superclass.
 [[section-object-graph-validation]]
 ==== Object graphs
 
-The Jakarta Bean Validation API does not only allow to validate single class instances but also complete
+The Jakarta Validation API does not only allow to validate single class instances but also complete
 object graphs (cascaded validation). To do so, just annotate a field or property representing a
 reference to another object with `@Valid` as demonstrated in <<example-cascaded-validation>>.
 
@@ -410,7 +410,7 @@ as it is more expressive.
 [[section-validating-bean-constraints]]
 === Validating bean constraints
 
-The `Validator` interface is the most important object in Jakarta Bean Validation. The next section shows how
+The `Validator` interface is the most important object in Jakarta Validation. The next section shows how
 to obtain a `Validator` instance. Afterwards you'll learn how to use the different methods of the
 `Validator` interface.
 
@@ -496,7 +496,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/validation
 ====
 
 
-`Validator#validateProperty()` is for example used in the integration of Jakarta Bean Validation into JSF 2
+`Validator#validateProperty()` is for example used in the integration of Jakarta Validation into JSF 2
 (see <<section-presentation-layer>>) to perform a validation of the values entered into a form
 before they are propagated to the model.
 
@@ -539,28 +539,28 @@ The returned `Path` is composed of ``Node``s describing the path to the element.
 
 More information about the structure of the `Path` and the various types of ``Node``s can be found in
 {bvSpecUrl}#validationapi-constraintviolation[the `ConstraintViolation` section] of the
-Jakarta Bean Validation specification.
+Jakarta Validation specification.
 
 [[section-builtin-constraints]]
 === Built-in constraints
 
 Hibernate Validator comprises a basic set of commonly used constraints. These are foremost the
-constraints defined by the Jakarta Bean Validation specification (see <<validator-defineconstraints-spec>>).
+constraints defined by the Jakarta Validation specification (see <<validator-defineconstraints-spec>>).
 Additionally, Hibernate Validator provides useful custom constraints (see
 <<validator-defineconstraints-hv-constraints>>).
 
 [[validator-defineconstraints-spec]]
-==== Jakarta Bean Validation constraints
+==== Jakarta Validation constraints
 
-Below you can find a list of all constraints specified in the Jakarta Bean Validation API.
-All these constraints apply to the field/property level, there are no class-level constraints defined in the Jakarta Bean Validation specification.
+Below you can find a list of all constraints specified in the Jakarta Validation API.
+All these constraints apply to the field/property level, there are no class-level constraints defined in the Jakarta Validation specification.
 If you are using the Hibernate object-relational mapper, some of the constraints are taken into account when creating the DDL for your model (see "Hibernate metadata impact").
 
 [NOTE]
 ====
 Hibernate Validator allows some constraints to be applied to more data types than required by the
-Jakarta Bean Validation specification (e.g. `@Max` can be applied to strings). Relying on this feature can
-impact portability of your application between Jakarta Bean Validation providers.
+Jakarta Validation specification (e.g. `@Max` can be applied to strings). Relying on this feature can
+impact portability of your application between Jakarta Validation providers.
 ====
 
 `@AssertFalse`:: Checks that the annotated element is false
@@ -654,13 +654,13 @@ impact portability of your application between Jakarta Bean Validation providers
 [NOTE]
 ====
 On top of the parameters listed above each constraint has the parameters
-message, groups and payload. This is a requirement of the Jakarta Bean Validation specification.
+message, groups and payload. This is a requirement of the Jakarta Validation specification.
 ====
 
 [[validator-defineconstraints-hv-constraints]]
 ==== Additional constraints
 
-In addition to the constraints defined by the Jakarta Bean Validation API, Hibernate Validator provides several useful custom constraints which are listed below.
+In addition to the constraints defined by the Jakarta Validation API, Hibernate Validator provides several useful custom constraints which are listed below.
 With one exception also these constraints apply to the field/property level, only `@ScriptAssert` is a class-level constraint.
 
 `@CreditCardNumber(ignoreNonDigitCharacters=)`:: Checks that the annotated character sequence passes the Luhn checksum test. Note, this validation aims to check for user mistakes, not credit card validity! See also http://www.dirigodev.com/blog/ecommerce/anatomy-of-a-credit-card-number/[Anatomy of a credit card number]. `ignoreNonDigitCharacters` allows to ignore non digit characters. The default is `false`.
@@ -779,7 +779,7 @@ Hibernate Validator!
 
 [TIP]
 ====
-In some cases neither the Jakarta Bean Validation constraints nor the custom constraints provided by
+In some cases neither the Jakarta Validation constraints nor the custom constraints provided by
 Hibernate Validator will fulfill your requirements. In this case you can easily write your own
 constraint. You can find more information in <<validator-customconstraints>>.
 ====
