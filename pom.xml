@@ -648,6 +648,9 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${version.compiler.plugin}</version>
                     <configuration>
+                        <showWarnings>true</showWarnings>
+                        <showDeprecation>true</showDeprecation>
+                        <failOnWarning>true</failOnWarning>
                         <testCompilerArgument>-parameters</testCompilerArgument>
                     </configuration>
                     <executions>
