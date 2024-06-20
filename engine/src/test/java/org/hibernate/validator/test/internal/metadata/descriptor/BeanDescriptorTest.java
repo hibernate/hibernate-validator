@@ -368,7 +368,7 @@ public class BeanDescriptorTest {
 		assertEquals( methodDescriptors.size(), 0, "There should be no match" );
 
 		// passing null as vararg
-		methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.GETTER, null );
+		methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.GETTER, (MethodType) null );
 		assertEquals( methodDescriptors.size(), 1, "There should be only one getter" );
 	}
 

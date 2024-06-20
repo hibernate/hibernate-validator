@@ -6,9 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.el;
 
-import java.beans.FeatureDescriptor;
 import java.util.IllegalFormatException;
-import java.util.Iterator;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
@@ -30,11 +28,6 @@ public class RootResolver extends ELResolver {
 
 	@Override
 	public Class<?> getCommonPropertyType(ELContext context, Object base) {
-		return null;
-	}
-
-	@Override
-	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
 		return null;
 	}
 
