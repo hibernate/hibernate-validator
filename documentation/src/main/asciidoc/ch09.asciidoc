@@ -151,7 +151,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Bootstrapp
 ==== `TraversableResolver`
 
 In some cases the validation engine should not access the state of a bean property.
-The most obvious example for that is a lazily loaded property or association of a JPA entity.
+The most obvious example for that is a lazily loaded property or association of a Jakarta Persistence entity.
 Validating this lazy property or association would mean that its state would have to be accessed,
 triggering a load from the database.
 
@@ -174,11 +174,11 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Bootstrapp
 ====
 
 If no specific traversable resolver has been configured, the default behavior is to consider all properties as reachable and cascadable.
-When using Hibernate Validator together with a JPA 2 provider such as Hibernate ORM, only those properties will be considered reachable
+When using Hibernate Validator together with a Jakarta Persistence {versionJakartaPersistence} provider such as Hibernate ORM, only those properties will be considered reachable
 which already have been loaded by the persistence provider and all properties will be considered cascadable.
 
 By default, the traversable resolver calls are cached per validation call.
-This is especially important in a JPA environment where calling `isReachable()` has a significant cost.
+This is especially important in a Jakarta Persistence environment where calling `isReachable()` has a significant cost.
 
 This caching adds some overhead.
 In the case your custom traversable resolver is very fast, it might be better to consider turning off the cache.

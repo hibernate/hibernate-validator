@@ -349,6 +349,7 @@
         <!-- Maven version required for the build -->
         <!-- Remember to update README when changing the version here. -->
         <maven.min.version>3.9.6</maven.min.version>
+        <version.jakarta.persistence>3.2</version.jakarta.persistence>
     </properties>
 
     <dependencyManagement>
