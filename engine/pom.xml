@@ -62,19 +62,6 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging-processor</artifactId>
-            <!--
-            HV-963
-            This is actually not a dependency which is needed at runtime, however,
-            Maven does not have a compile time only scope. The dependency is needed to
-            run the JBoss Logging annotation processor as part of the main compilation.
-            Trying different setups via compiler plugin local dependencies or extensions
-            all fail. See also http://stackoverflow.com/questions/14322904/maven-3-how-to-add-annotation-processor-dependency
-            -->
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-annotations</artifactId>
             <scope>provided</scope>
         </dependency>
@@ -217,6 +204,32 @@
                 <groupId>de.thetaphi</groupId>
                 <artifactId>forbiddenapis</artifactId>
             </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <configuration combine.self="append">
+                            <compilerArgs>
+                                <compilerArg>-Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArg>
+                            </compilerArgs>
+                            <annotationProcessorPaths>
+                                <path>
+                                    <groupId>org.jboss.logging</groupId>
+                                    <artifactId>jboss-logging-processor</artifactId>
+                                    <version>${version.org.jboss.logging.jboss-logging-tools}</version>
+                                </path>
+                                <path>
+                                    <groupId>org.jboss.logging</groupId>
+                                    <artifactId>jboss-logging</artifactId>
+                                    <version>${version.org.jboss.logging.jboss-logging}</version>
+                                </path>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
