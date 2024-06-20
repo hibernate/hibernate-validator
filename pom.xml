@@ -135,7 +135,8 @@
         <skip.wildfly.patch.hibernate.validator>true</skip.wildfly.patch.hibernate.validator>
         <skip.wildfly.patch.unpack.server>${skip.wildfly.patch.hibernate.validator}</skip.wildfly.patch.unpack.server>
         <wildfly.target-dir>${project.build.directory}/wildfly-patched/wildfly-${version.wildfly}</wildfly.target-dir>
-        <wildfly.modules-dir>${wildfly.target-dir}/modules/system/layers/base</wildfly.modules-dir>
+        <wildfly.actual.target-dir>${wildfly.target-dir}</wildfly.actual.target-dir>
+        <wildfly.modules-dir>${wildfly.actual.target-dir}/modules/system/layers/base</wildfly.modules-dir>
 
         <!--
             These dependencies should be aligned with the ones from the WildFly version we support
@@ -1012,7 +1013,7 @@
                                         <artifactId>jakarta.validation-api</artifactId>
                                         <version>${version.jakarta.validation-api}</version>
                                         <overWrite>false</overWrite>
-                                        <outputDirectory>${wildfly.target-dir}/modules/system/layers/base/jakarta/validation/api/main</outputDirectory>
+                                        <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/jakarta/validation/api/main</outputDirectory>
                                         <!-- Specifying name to avoid timestamp in version on CI -->
                                         <destFileName>jakarta.validation-api-${version.jakarta.validation-api}.jar</destFileName>
                                     </artifactItem>
@@ -1021,7 +1022,7 @@
                                         <artifactId>hibernate-validator</artifactId>
                                         <version>${project.version}</version>
                                         <overWrite>false</overWrite>
-                                        <outputDirectory>${wildfly.target-dir}/modules/system/layers/base/org/hibernate/validator/main</outputDirectory>
+                                        <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/org/hibernate/validator/main</outputDirectory>
                                         <destFileName>hibernate-validator-${project.version}.jar</destFileName>
                                     </artifactItem>
                                     <artifactItem>
@@ -1029,7 +1030,7 @@
                                         <artifactId>hibernate-validator-cdi</artifactId>
                                         <version>${project.version}</version>
                                         <overWrite>false</overWrite>
-                                        <outputDirectory>${wildfly.target-dir}/modules/system/layers/base/org/hibernate/validator/cdi/main</outputDirectory>
+                                        <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/org/hibernate/validator/cdi/main</outputDirectory>
                                         <destFileName>hibernate-validator-cdi-${project.version}.jar</destFileName>
                                     </artifactItem>
                                 </artifactItems>
@@ -1159,7 +1160,7 @@
                                     <script>file:///${project.build.directory}/hibernate-validator-patch/setupModules.groovy</script>
                                 </scripts>
                                 <properties>
-                                    <wildflyPatchedTargetDir>${wildfly.target-dir}</wildflyPatchedTargetDir>
+                                    <wildflyPatchedTargetDir>${wildfly.actual.target-dir}</wildflyPatchedTargetDir>
                                 </properties>
                             </configuration>
                         </execution>
