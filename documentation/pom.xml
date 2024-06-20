@@ -288,6 +288,9 @@
                         <classmateVersion>${version.com.fasterxml.classmate}</classmateVersion>
                         <expresslyVersion>${version.org.glassfish.expressly}</expresslyVersion>
 
+                        <jdkVersion>${java-version.main.release}</jdkVersion>
+                        <compilerPluginVersion>${version.compiler.plugin}</compilerPluginVersion>
+
                         <!-- URLs -->
                         <javaApiDocsUrl>${java.api-docs.base-url}/</javaApiDocsUrl>
                         <bvApiDocsUrl>${bv.api-docs.base-url}/</bvApiDocsUrl>
