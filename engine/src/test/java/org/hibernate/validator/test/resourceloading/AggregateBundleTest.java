@@ -25,6 +25,7 @@ import static org.testng.Assert.assertTrue;
  *
  * @author Gunnar Morling
  */
+@SuppressWarnings( "deprecation" )
 public class AggregateBundleTest {
 
 	private static final String BUNDLE_NAME_1 = AggregateResourceBundleLocatorTest.class.getPackage()

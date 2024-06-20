@@ -141,15 +141,12 @@ public class ConfigurationFilePropertiesTest {
 		Field[] fields = subject.getClass().getDeclaredFields();
 		for ( Field field : fields ) {
 			if ( field.getType().equals( clazz ) ) {
-				boolean accessible = field.isAccessible();
+				boolean accessible = field.canAccess( subject );
 				try {
 					field.setAccessible( true );
 					return clazz.cast( field.get( subject ) );
 				}
-				catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				}
-				catch (IllegalAccessException e) {
+				catch (IllegalArgumentException | IllegalAccessException e) {
 					e.printStackTrace();
 				}
 				finally {

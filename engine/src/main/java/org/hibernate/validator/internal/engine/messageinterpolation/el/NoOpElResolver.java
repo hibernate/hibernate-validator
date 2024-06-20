@@ -6,10 +6,6 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Collections;
-import java.util.Iterator;
-
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
 
@@ -41,11 +37,6 @@ public class NoOpElResolver extends ELResolver {
 	@Override
 	public boolean isReadOnly(ELContext context, Object base, Object property) {
 		return true;
-	}
-
-	@Override
-	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-		return Collections.emptyIterator();
 	}
 
 	@Override

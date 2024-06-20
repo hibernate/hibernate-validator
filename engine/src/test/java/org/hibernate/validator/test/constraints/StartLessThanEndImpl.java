@@ -18,7 +18,8 @@ public class StartLessThanEndImpl implements ConstraintValidator<StartLessThanEn
 	public boolean isValid(Interval value, ConstraintValidatorContext c) {
 		if ( value.start > value.end ) {
 			c.disableDefaultConstraintViolation();
-			c.buildConstraintViolationWithTemplate( c.getDefaultConstraintMessageTemplate() ).addNode( "start" ).addConstraintViolation();
+			c.buildConstraintViolationWithTemplate( c.getDefaultConstraintMessageTemplate() )
+					.addPropertyNode( "start" ).addConstraintViolation();
 			return false;
 		}
 		return true;
