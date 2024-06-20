@@ -1,7 +1,7 @@
 [[validator-metadata-api]]
 == Using constraint metadata
 
-The Jakarta Bean Validation specification provides not only a validation engine, but also an API for
+The Jakarta Validation specification provides not only a validation engine, but also an API for
 retrieving constraint metadata in a uniform way, no matter whether the constraints are declared
 using annotations or via XML mappings. Read this chapter to learn more about this API and its
 possibilities. You can find all the metadata API types in the package `jakarta.validation.metadata`.

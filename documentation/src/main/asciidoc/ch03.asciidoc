@@ -3,7 +3,7 @@
 
 As of Bean Validation 1.1, constraints can not only be applied to JavaBeans and their properties,
 but also to the parameters and return values of the methods and constructors of any Java type. That
-way Jakarta Bean Validation constraints can be used to specify
+way Jakarta Validation constraints can be used to specify
 
 * the preconditions that must be satisfied by the caller before a method or constructor may be
 invoked (by applying constraints to the parameters of an executable)
@@ -232,7 +232,7 @@ fail to satisfy these preconditions as is not aware of them. The rules of behavi
 also known as the http://en.wikipedia.org/wiki/Liskov_substitution_principle[Liskov
 substitution principle].
 
-The Jakarta Bean Validation specification implements the first rule by disallowing parameter constraints on
+The Jakarta Validation specification implements the first rule by disallowing parameter constraints on
 methods which override or implement a method declared in a supertype (superclass or interface).
 <<example-illegal-parameter-constraints>> shows a violation of this rule.
 

@@ -57,7 +57,7 @@ The behavior of the Hibernate Validator Annotation Processor can be controlled u
 `methodConstraintsSupported`:: Controls whether constraints are allowed at methods of any
             kind. Must be set to `true` when working with method level constraints as supported by
             Hibernate Validator. Can be set to `false` to allow constraints only at
-            JavaBeans getter methods as defined by the Jakarta Bean Validation API. Defaults to `true`.
+            JavaBeans getter methods as defined by the Jakarta Validation API. Defaults to `true`.
 
 `verbose`:: Controls whether detailed processing information shall be
             displayed or not, useful for debugging purposes. Must be either
