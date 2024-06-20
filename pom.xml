@@ -648,9 +648,6 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${version.compiler.plugin}</version>
                     <configuration>
-                        <compilerArgs>
-                            <compilerArg>-Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArg>
-                        </compilerArgs>
                         <testCompilerArgument>-parameters</testCompilerArgument>
                     </configuration>
                     <executions>
@@ -1676,7 +1673,6 @@
                             <version>${version.compiler.plugin}</version>
                             <configuration>
                                 <compilerArgs>
-                                    <compilerArg>-Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArg>
                                     <!-- Make sure IDEA uses the -parameters for all code;
                                          IDEA ignores the "testCompilerArguments" option... -->
                                     <compilerArg>-parameters</compilerArg>
