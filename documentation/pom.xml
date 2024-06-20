@@ -290,6 +290,7 @@
 
                         <jdkVersion>${java-version.main.release}</jdkVersion>
                         <compilerPluginVersion>${version.compiler.plugin}</compilerPluginVersion>
+                        <versionJakartaPersistence>${version.jakarta.persistence}</versionJakartaPersistence>
 
                         <!-- URLs -->
                         <javaApiDocsUrl>${java.api-docs.base-url}/</javaApiDocsUrl>

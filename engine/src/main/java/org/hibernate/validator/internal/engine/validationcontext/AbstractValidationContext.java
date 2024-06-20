@@ -84,7 +84,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	protected final ValidatorScopedContext validatorScopedContext;
 
 	/**
-	 * Allows a JPA provider to decide whether a property should be validated.
+	 * Allows a Jakarta Persistence provider to decide whether a property should be validated.
 	 */
 	private final TraversableResolver traversableResolver;
 
