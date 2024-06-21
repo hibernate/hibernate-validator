@@ -933,4 +933,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 265, value = "Inconsistent show validation value in trace logs configuration. It is enabled via programmatic API, but explicitly disabled via properties.")
 	ValidationException getInconsistentShowValidatedValuesInTraceLogsViolationConfigurationException();
+
+	@Message(id = 266, value = "'%c' is not a digit or upper case letter.")
+	IllegalArgumentException getCharacterIsNotADigitOrUpperCaseLetterException(char c);
 }
