@@ -47,7 +47,8 @@ public class Mod11CheckValidatorTest {
 				false,
 				'0',
 				'0',
-				ProcessingDirection.RIGHT_TO_LEFT
+				ProcessingDirection.RIGHT_TO_LEFT,
+				false
 		);
 		validator.initialize( modCheck );
 	}
@@ -62,7 +63,8 @@ public class Mod11CheckValidatorTest {
 				false,
 				'0',
 				'0',
-				ProcessingDirection.RIGHT_TO_LEFT
+				ProcessingDirection.RIGHT_TO_LEFT,
+				false
 		);
 		validator.initialize( modCheck );
 	}
@@ -77,7 +79,8 @@ public class Mod11CheckValidatorTest {
 				false,
 				'0',
 				'0',
-				ProcessingDirection.RIGHT_TO_LEFT
+				ProcessingDirection.RIGHT_TO_LEFT,
+				false
 		);
 		validator.initialize( modCheck );
 	}
@@ -92,7 +95,8 @@ public class Mod11CheckValidatorTest {
 				false,
 				'0',
 				'0',
-				ProcessingDirection.RIGHT_TO_LEFT
+				ProcessingDirection.RIGHT_TO_LEFT,
+				false
 		);
 		validator.initialize( modCheck );
 	}
@@ -107,7 +111,8 @@ public class Mod11CheckValidatorTest {
 				false,
 				'0',
 				'0',
-				ProcessingDirection.RIGHT_TO_LEFT
+				ProcessingDirection.RIGHT_TO_LEFT,
+				false
 		);
 		validator.initialize( modCheck );
 
@@ -124,7 +129,8 @@ public class Mod11CheckValidatorTest {
 				true,
 				'0',
 				'0',
-				ProcessingDirection.RIGHT_TO_LEFT
+				ProcessingDirection.RIGHT_TO_LEFT,
+				false
 		);
 		validator.initialize( modCheck );
 
@@ -141,7 +147,8 @@ public class Mod11CheckValidatorTest {
 				true,
 				'0',
 				'X',
-				ProcessingDirection.LEFT_TO_RIGHT
+				ProcessingDirection.LEFT_TO_RIGHT,
+				false
 		);
 		validator.initialize( modCheck );
 
@@ -158,7 +165,8 @@ public class Mod11CheckValidatorTest {
 				true,
 				'0',
 				'0',
-				ProcessingDirection.RIGHT_TO_LEFT
+				ProcessingDirection.RIGHT_TO_LEFT,
+				false
 		);
 		validator.initialize( modCheck );
 
@@ -177,7 +185,8 @@ public class Mod11CheckValidatorTest {
 				true,
 				'0',
 				'0',
-				ProcessingDirection.RIGHT_TO_LEFT
+				ProcessingDirection.RIGHT_TO_LEFT,
+				false
 		);
 		validator.initialize( modCheck );
 
@@ -196,7 +205,8 @@ public class Mod11CheckValidatorTest {
 				false,
 				'X',
 				'Z',
-				ProcessingDirection.RIGHT_TO_LEFT
+				ProcessingDirection.RIGHT_TO_LEFT,
+				false
 		);
 		validator.initialize( modCheck );
 
@@ -214,7 +224,8 @@ public class Mod11CheckValidatorTest {
 				false,
 				'X',
 				'Z',
-				ProcessingDirection.RIGHT_TO_LEFT
+				ProcessingDirection.RIGHT_TO_LEFT,
+				false
 		);
 		validator.initialize( modCheck );
 
@@ -232,7 +243,8 @@ public class Mod11CheckValidatorTest {
 				false,
 				'X',
 				'Z',
-				ProcessingDirection.LEFT_TO_RIGHT
+				ProcessingDirection.LEFT_TO_RIGHT,
+				false
 		);
 		validator.initialize( modCheck );
 
@@ -250,7 +262,8 @@ public class Mod11CheckValidatorTest {
 				false,
 				'X',
 				'Z',
-				ProcessingDirection.LEFT_TO_RIGHT
+				ProcessingDirection.LEFT_TO_RIGHT,
+				false
 		);
 		validator.initialize( modCheck );
 
@@ -284,6 +297,26 @@ public class Mod11CheckValidatorTest {
 		assertNoViolations( constraintViolations );
 	}
 
+
+	@Test
+	public void testValidMod11WithUpperLetters() throws Exception {
+		Mod11CheckValidator validator = new Mod11CheckValidator();
+		Mod11Check modCheck = createMod11CheckAnnotation(
+				0,
+				Integer.MAX_VALUE,
+				-1,
+				true,
+				'0',
+				'0',
+				ProcessingDirection.RIGHT_TO_LEFT,
+				true
+		);
+		validator.initialize( modCheck );
+
+		assertTrue( validator.isValid( "9A50A90A000A0", null ) );
+		assertTrue( validator.isValid( "9A.50A.90A/000A-0", null ) );
+	}
+
 	private Mod11Check createMod11CheckAnnotation(
 			int start,
 			int end,
@@ -291,7 +324,8 @@ public class Mod11CheckValidatorTest {
 			boolean ignoreNonDigits,
 			char treatCheck10As,
 			char treatCheck11As,
-			ProcessingDirection processingDirection) {
+			ProcessingDirection processingDirection,
+			boolean alphanumeric) {
 		ConstraintAnnotationDescriptor.Builder<Mod11Check> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Mod11Check.class );
 		descriptorBuilder.setAttribute( "startIndex", start );
 		descriptorBuilder.setAttribute( "endIndex", end );
@@ -300,6 +334,7 @@ public class Mod11CheckValidatorTest {
 		descriptorBuilder.setAttribute( "treatCheck10As", treatCheck10As );
 		descriptorBuilder.setAttribute( "treatCheck11As", treatCheck11As );
 		descriptorBuilder.setAttribute( "processingDirection", processingDirection );
+		descriptorBuilder.setAttribute( "alphanumeric", alphanumeric );
 
 		return descriptorBuilder.build().getAnnotation();
 	}
