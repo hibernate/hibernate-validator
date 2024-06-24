@@ -230,6 +230,7 @@
         <version.depends.plugin>1.5.0</version.depends.plugin>
         <version.deploy.plugin>3.1.2</version.deploy.plugin>
         <version.enforcer.plugin>3.5.0</version.enforcer.plugin>
+        <!-- Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting. -->
         <version.forbiddenapis.plugin>3.7</version.forbiddenapis.plugin>
         <version.gmavenplus.plugin>3.0.2</version.gmavenplus.plugin>
         <version.gpg.plugin>3.2.4</version.gpg.plugin>
@@ -287,8 +288,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <!-- The lowest supported version of Java for applications using Hibernate Validator -->
-        <!-- Set statically, independently of the current JDK: we want our code to comply with this version -->
+        <!--
+            The lowest supported version of Java for applications using Hibernate Validator
+            Set statically, independently of the current JDK: we want our code to comply with this version
+
+            Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting.
+        -->
         <java-version.main.release>17</java-version.main.release>
         <java-version.main.compiler.java_home>${java.home}</java-version.main.compiler.java_home>
         <java-version.main.compiler>${java-version.main.compiler.java_home}/bin/javac</java-version.main.compiler>
@@ -773,38 +778,23 @@
                                     <bundledSignature>jdk-non-portable</bundledSignature>
 
                                     <!-- All following signatures should be replicated for each target JDK version we intend to support -->
-                                    <bundledSignature>jdk-unsafe-1.8</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-9</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-10</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-11</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-12</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-13</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-14</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-15</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-16</bundledSignature>
                                     <bundledSignature>jdk-unsafe-17</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-18</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-19</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-21</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-22</bundledSignature>
 
-                                    <bundledSignature>jdk-deprecated-1.8</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-9</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-10</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-11</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-12</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-13</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-14</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-15</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-16</bundledSignature>
                                     <bundledSignature>jdk-deprecated-17</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-18</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-19</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-21</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-22</bundledSignature>
 
-                                    <bundledSignature>jdk-internal-1.8</bundledSignature>
-                                    <bundledSignature>jdk-internal-9</bundledSignature>
-                                    <bundledSignature>jdk-internal-10</bundledSignature>
-                                    <bundledSignature>jdk-internal-11</bundledSignature>
-                                    <bundledSignature>jdk-internal-12</bundledSignature>
-                                    <bundledSignature>jdk-internal-13</bundledSignature>
-                                    <bundledSignature>jdk-internal-14</bundledSignature>
-                                    <bundledSignature>jdk-internal-15</bundledSignature>
-                                    <bundledSignature>jdk-internal-16</bundledSignature>
                                     <bundledSignature>jdk-internal-17</bundledSignature>
+                                    <bundledSignature>jdk-internal-18</bundledSignature>
+                                    <bundledSignature>jdk-internal-19</bundledSignature>
+                                    <bundledSignature>jdk-internal-21</bundledSignature>
+                                    <bundledSignature>jdk-internal-22</bundledSignature>
                                 </bundledSignatures>
                             </configuration>
                         </execution>
