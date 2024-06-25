@@ -1001,3 +1001,57 @@ should be used as a default way of resolving the name (see how it is used in <<e
 - `org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty` is an interface that holds metadata about a bean property. It
 extends `org.hibernate.validator.spi.nodenameprovider.Property` and provide some additional methods like `Class<?> getDeclaringClass()`
 which returns the class that is the owner of the property.
+
+[[section-fail-fast-on-property-violation]]
+=== Fail fast on property violation mode
+
+[WARNING]
+====
+This mode is marked as `@Incubating`, so it might be subject to change in the future.
+====
+
+Fail fast on property violation mode allows to perform class level constraint validation only if all property level constrints have passed without any violations.
+Enabling such mode should make writing class level constraint validators easier and cleaner, as the user will be working with valid properties.
+Hence, there will be no need in any additional `null` checks or data sanity checks.
+
+This mode can be enabled using one of the Hibernate Validator common ways.
+It can be done either programmatically (<<example-programmatic-fail-fast-on-property-violation>>), or through the property (<<example-property-fail-fast-on-property-violation>>).
+
+[[example-programmatic-fail-fast-on-property-violation]]
+.Using the fail fast on property violation validation mode
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/failfastonpropertyviolation/Book.java[tags=include]
+----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/failfastonpropertyviolation/FailFastOnPropertyViolationTest.java[tags=include]
+----
+====
+
+Using this mode allows us to omit any additional checks in our class level validator.
+We don't need to be worried about any of the properties being `null` as we've dealt with it already, using standard constraints.
+
+[WARNING]
+====
+It is important to mention that only simple property constraints will be checked before going to class level ones. Any cascading constraints will be delayed till later.
+====
+
+.Implementation of `NonSelfPublishing` class level constrain validator
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/failfastonpropertyviolation/NonSelfPublishing.java[tags=include]
+----
+====
+
+[[example-property-fail-fast-on-property-violation]]
+.Setting the fail fast on property violation validation mode using an XML property
+====
+[source, XML, indent=0]
+----
+include::{resourcesdir}/org/hibernate/validator/referenceguide/chapter12/fail-fast-on-property-violation-validation.xml[]
+----
+====

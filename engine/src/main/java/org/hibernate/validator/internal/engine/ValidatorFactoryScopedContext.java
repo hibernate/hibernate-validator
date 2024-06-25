@@ -59,6 +59,12 @@ public class ValidatorFactoryScopedContext {
 	private final boolean failFast;
 
 	/**
+	 * Hibernate Validator specific flag to skip validation of class level constraints if any of property ones generated
+	 * a constraint violation.
+	 */
+	private final boolean failFastOnPropertyViolation;
+
+	/**
 	 * Hibernate Validator specific flag to disable the {@code TraversableResolver} result cache.
 	 */
 	private final boolean traversableResolverResultCacheEnabled;
@@ -95,13 +101,14 @@ public class ValidatorFactoryScopedContext {
 			Duration temporalValidationTolerance,
 			ScriptEvaluatorFactory scriptEvaluatorFactory,
 			boolean failFast,
+			boolean failFastOnPropertyViolation,
 			boolean traversableResolverResultCacheEnabled,
 			Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
 			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
 			boolean showValidatedValuesInTraceLogs) {
 		this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
-				traversableResolverResultCacheEnabled, showValidatedValuesInTraceLogs, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
+				failFastOnPropertyViolation, traversableResolverResultCacheEnabled, showValidatedValuesInTraceLogs, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
 				customViolationExpressionLanguageFeatureLevel,
 				new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
 						temporalValidationTolerance ) );
@@ -114,6 +121,7 @@ public class ValidatorFactoryScopedContext {
 			Duration temporalValidationTolerance,
 			ScriptEvaluatorFactory scriptEvaluatorFactory,
 			boolean failFast,
+			boolean failFastOnPropertyViolation,
 			boolean traversableResolverResultCacheEnabled,
 			boolean showValidatedValuesInTraceLogs, Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
@@ -126,6 +134,7 @@ public class ValidatorFactoryScopedContext {
 		this.temporalValidationTolerance = temporalValidationTolerance;
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.failFast = failFast;
+		this.failFastOnPropertyViolation = failFastOnPropertyViolation;
 		this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
 		this.constraintValidatorPayload = constraintValidatorPayload;
 		this.constraintExpressionLanguageFeatureLevel = constraintExpressionLanguageFeatureLevel;
@@ -162,6 +171,10 @@ public class ValidatorFactoryScopedContext {
 		return this.failFast;
 	}
 
+	public boolean isFailFastOnPropertyViolation() {
+		return this.failFastOnPropertyViolation;
+	}
+
 	public boolean isTraversableResolverResultCacheEnabled() {
 		return this.traversableResolverResultCacheEnabled;
 	}
@@ -196,6 +209,7 @@ public class ValidatorFactoryScopedContext {
 		private ScriptEvaluatorFactory scriptEvaluatorFactory;
 		private Duration temporalValidationTolerance;
 		private boolean failFast;
+		private boolean failFastOnPropertyViolation;
 		private boolean traversableResolverResultCacheEnabled;
 		private Object constraintValidatorPayload;
 		private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
@@ -215,6 +229,7 @@ public class ValidatorFactoryScopedContext {
 			this.scriptEvaluatorFactory = defaultContext.scriptEvaluatorFactory;
 			this.temporalValidationTolerance = defaultContext.temporalValidationTolerance;
 			this.failFast = defaultContext.failFast;
+			this.failFastOnPropertyViolation = defaultContext.failFastOnPropertyViolation;
 			this.traversableResolverResultCacheEnabled = defaultContext.traversableResolverResultCacheEnabled;
 			this.constraintValidatorPayload = defaultContext.constraintValidatorPayload;
 			this.constraintExpressionLanguageFeatureLevel = defaultContext.constraintExpressionLanguageFeatureLevel;
@@ -284,6 +299,11 @@ public class ValidatorFactoryScopedContext {
 			return this;
 		}
 
+		public ValidatorFactoryScopedContext.Builder setFailFastOnPropertyViolation(boolean failFastOnPropertyViolation) {
+			this.failFastOnPropertyViolation = failFastOnPropertyViolation;
+			return this;
+		}
+
 		public ValidatorFactoryScopedContext.Builder setTraversableResolverResultCacheEnabled(boolean traversableResolverResultCacheEnabled) {
 			this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
 			return this;
@@ -321,6 +341,7 @@ public class ValidatorFactoryScopedContext {
 					temporalValidationTolerance,
 					scriptEvaluatorFactory,
 					failFast,
+					failFastOnPropertyViolation,
 					traversableResolverResultCacheEnabled,
 					showValidatedValuesInTraceLogs, constraintValidatorPayload,
 					constraintExpressionLanguageFeatureLevel,

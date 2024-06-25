@@ -250,12 +250,32 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 		}
 
 		@Override
-		public Set<MetaConstraint<?>> getMetaConstraints() {
+		public Set<MetaConstraint<?>> getAllMetaConstraints() {
 			return Collections.emptySet();
 		}
 
 		@Override
-		public Set<MetaConstraint<?>> getDirectMetaConstraints() {
+		public Set<MetaConstraint<?>> getAllDirectMetaConstraints() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public Set<MetaConstraint<?>> getClassMetaConstraints() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public Set<MetaConstraint<?>> getPropertyMetaConstraints() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public Set<MetaConstraint<?>> getDirectClassMetaConstraints() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public Set<MetaConstraint<?>> getDirectPropertyMetaConstraints() {
 			return Collections.emptySet();
 		}
 
