@@ -35,6 +35,16 @@ public class CNPJValidatorTest extends AbstractConstrainedTest {
 			"16.468.665/0001-64", "11.720.867/0001-38", "00.000.000/0001-91"
 	};
 
+	private String[] validCNPJsWithLetters = {
+			"70B0XZ010UTA84", "3Y59DJD8484J90", "84JNG734MJKD82",
+			"UU3UCXJCUDEM68", "ABCDEFGHIJKL80", "11AA22BB33CC06"
+	};
+
+	private String[] invalidCNPJsWithLetters = {
+			"70B0XZ010UTA83", "3Y59DJD8484J80", "84JNG734MJKD00",
+			"UU3UCXJCUDEM11", "ABCDEFGHIJKLAA", "11AA22BB33CC07"
+	};
+
 	@Test
 	@TestForIssue(jiraKey = "HV-1971")
 	public void any_length_less_then_14_is_invalid() {
@@ -127,11 +137,74 @@ public class CNPJValidatorTest extends AbstractConstrainedTest {
 		assertNoViolations( violations );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1999")
+	public void incorrect_cnpj_with_letters_creates_constraint_violation() {
+		Set<ConstraintViolation<Company>> violations = validator.validate( new Company( "9A50A90A000A66" ) );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CNPJ.class ).withProperty( "cnpj" )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1999")
+	public void incorrect_cnpj_with_letters_separators_creates_constraint_violation() {
+		Set<ConstraintViolation<Company>> violations = validator.validate( new Company( "9A.50A.90A/000A-66" ) );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CNPJ.class ).withProperty( "cnpj" )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1999")
+	public void correct_new_cnpj_with_letters_validates() {
+		for ( String validCNPJ : validCNPJsWithLetters ) {
+			Set<ConstraintViolation<CompanyCNPJWithLetters>> violations = validator.validate( new CompanyCNPJWithLetters( validCNPJ ) );
+			assertNoViolations( violations );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1999")
+	public void correct_new_cnpj_with_letters_separators_validates() {
+		Set<ConstraintViolation<CompanyCNPJWithLetters>> violations = validator.validate( new CompanyCNPJWithLetters( "9A.50A.90A/000A-66" ) );
+		assertNoViolations( violations );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1999")
+	public void incorrect_new_cnpj_with_letters_creates_constraint_violation() {
+		Set<ConstraintViolation<CompanyCNPJWithLetters>> violations = validator.validate( new CompanyCNPJWithLetters( "9A.50A.90A/000A-67" ) );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CNPJ.class ).withProperty( "cnpj" )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1999")
+	public void incorrect_new_cnpj_with_letters_separators_creates_constraint_violation() {
+		for ( String invalidCNPJ : invalidCNPJsWithLetters ) {
+			Set<ConstraintViolation<CompanyCNPJWithLetters>> violations = validator.validate( new CompanyCNPJWithLetters( invalidCNPJ ) );
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( CNPJ.class ).withProperty( "cnpj" )
+			);
+		}
+	}
+
 	public static class Company {
 		@CNPJ
 		private String cnpj;
 
 		public Company(String cnpj) {
+			this.cnpj = cnpj;
+		}
+	}
+
+	public static class CompanyCNPJWithLetters {
+		@CNPJ(alphanumeric = true)
+		private String cnpj;
+
+		public CompanyCNPJWithLetters(String cnpj) {
 			this.cnpj = cnpj;
 		}
 	}

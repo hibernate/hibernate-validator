@@ -31,7 +31,7 @@ import org.hibernate.validator.constraints.br.CNPJ.List;
  *
  * @author George Gastaldi
  */
-@Pattern(regexp = "([0-9]{2}[.]?[0-9]{3}[.]?[0-9]{3}[/]?[0-9]{4}[-]?[0-9]{2})")
+@Pattern(regexp = "([0-9A-Z]{2}[.]?[0-9A-Z]{3}[.]?[0-9A-Z]{3}[/]?[0-9A-Z]{4}[-]?[0-9]{2})")
 @ReportAsSingleViolation
 @Documented
 @Constraint(validatedBy = { })
@@ -44,6 +44,8 @@ public @interface CNPJ {
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
+
+	boolean alphanumeric() default false;
 
 	/**
 	 * Defines several {@code @CNPJ} annotations on the same element.
