@@ -17,9 +17,9 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
- * An implementation of {@code TraversableResolver} which is aware of JPA 2 and utilizes {@code PersistenceUtil} to
+ * An implementation of {@code TraversableResolver} which is aware of Jakarta Persistence and utilizes {@code PersistenceUtil} to
  * query the reachability of a property.
- * This resolver will be automatically enabled if JPA 2 is on the classpath and the default {@code TraversableResolver} is
+ * This resolver will be automatically enabled if Jakarta Persistence is on the classpath and the default {@code TraversableResolver} is
  * used.
  * <p>
  * This class needs to be public as it's instantiated via a privileged action that is not in this package.

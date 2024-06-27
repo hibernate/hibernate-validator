@@ -24,7 +24,7 @@ public class TraversableResolvers {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
-	 * Class to load to check whether JPA is on the classpath.
+	 * Class to load to check whether Jakarta Persistence is on the classpath.
 	 */
 	private static final String PERSISTENCE_CLASS_NAME = "jakarta.persistence.Persistence";
 
@@ -34,7 +34,7 @@ public class TraversableResolvers {
 	private static final String PERSISTENCE_UTIL_METHOD = "getPersistenceUtil";
 
 	/**
-	 * Class to instantiate in case JPA 2 is on the classpath.
+	 * Class to instantiate in case Jakarta Persistence is on the classpath.
 	 */
 	private static final String JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME = "org.hibernate.validator.internal.engine.resolver.JPATraversableResolver";
 
@@ -44,7 +44,7 @@ public class TraversableResolvers {
 	/**
 	 * Initializes and returns the default {@link TraversableResolver} depending on the environment.
 	 * <p>
-	 * If JPA 2 is present in the classpath, a {@link JPATraversableResolver} instance is returned.
+	 * If Jakarta Persistence is present in the classpath, a {@link JPATraversableResolver} instance is returned.
 	 * <p>
 	 * Otherwise, it returns an instance of the default {@link TraverseAllTraversableResolver}.
 	 */
@@ -56,7 +56,7 @@ public class TraversableResolvers {
 		}
 		catch (ValidationException e) {
 			LOG.debugf(
-					"Cannot find %s on classpath. Assuming non JPA 2 environment. All properties will per default be traversable.",
+					"Cannot find %s on classpath. Assuming non Jakarta Persistence environment. All properties will per default be traversable.",
 					PERSISTENCE_CLASS_NAME
 			);
 			return getTraverseAllTraversableResolver();
@@ -81,7 +81,7 @@ public class TraversableResolvers {
 		}
 		catch (Exception e) {
 			LOG.debugf(
-					"Unable to invoke %s.%s. Inconsistent JPA environment. All properties will per default be traversable.",
+					"Unable to invoke %s.%s. Inconsistent Jakarta Persistence environment. All properties will per default be traversable.",
 					PERSISTENCE_CLASS_NAME,
 					PERSISTENCE_UTIL_METHOD
 			);
@@ -89,7 +89,7 @@ public class TraversableResolvers {
 		}
 
 		LOG.debugf(
-				"Found %s on classpath containing '%s'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver",
+				"Found %s on classpath containing '%s'. Assuming Jakarta Persistence environment. Trying to instantiate Jakarta Persistence aware TraversableResolver",
 				PERSISTENCE_CLASS_NAME,
 				PERSISTENCE_UTIL_METHOD
 		);
@@ -99,7 +99,7 @@ public class TraversableResolvers {
 			Class<? extends TraversableResolver> jpaAwareResolverClass = (Class<? extends TraversableResolver>)
 					LoadClass.action( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, TraversableResolvers.class.getClassLoader() );
 			LOG.debugf(
-					"Instantiated JPA aware TraversableResolver of type %s.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
+					"Instantiated Jakarta Persistence aware TraversableResolver of type %s.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
 			return NewInstance.action( jpaAwareResolverClass, "" );
 		}
@@ -117,7 +117,7 @@ public class TraversableResolvers {
 	 * <p>
 	 * If {@code traversableResolver} is an instance of our {@code JPATraversableResolver}, we wrap it with a caching
 	 * wrapper specially tailored for the requirements of the spec. It is a very common case as it is used as soon as we
-	 * have a JPA implementation in the classpath so optimizing this case is worth it.
+	 * have a Jakarta Persistence implementation in the classpath so optimizing this case is worth it.
 	 * <p>
 	 * In all the other cases, we wrap the resolver for caching.
 	 * <p>

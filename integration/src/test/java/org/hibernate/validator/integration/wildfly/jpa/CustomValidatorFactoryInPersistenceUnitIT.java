@@ -22,7 +22,7 @@ import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
 
 /**
- * Tests the usage of HV by JPA, applying a custom validation.xml. Also making sure that the VF is CDI-enabled.
+ * Tests the usage of HV by Jakarta Persistence, applying a custom validation.xml. Also making sure that the VF is CDI-enabled.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
