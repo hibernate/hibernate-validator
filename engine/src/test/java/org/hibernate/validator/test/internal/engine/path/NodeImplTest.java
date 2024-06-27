@@ -39,8 +39,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.valueextraction.ExtractedValue;
+import jakarta.validation.valueextraction.UnwrapByDefault;
 import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.path.ContainerElementNode;
@@ -505,6 +507,46 @@ public class NodeImplTest {
 		assertFalse( nodeIterator.hasNext() );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1946")
+	public void testIndexedContainerElementMultipleFailuresCorrectPath() {
+		class People {
+			@Pattern( regexp = "[a-z]+")
+			Person[] people;
+
+			public People(Person... people) {
+				this.people = people;
+			}
+		}
+
+		Validator validator = ValidatorUtil.getConfiguration()
+				.addValueExtractor( new PersonArrayValueExtractor() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		Set<ConstraintViolation<People>> constraintViolations = validator.validate(
+				new People( new Person( "name1" ), new Person( "name2" ), new Person( "name3" ) )
+		);
+
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( Pattern.class )
+						.withPropertyPath( pathWith()
+								.property( "people" )
+								.containerElement( null, true, null, 0, Person[].class, null )
+						),
+				violationOf( Pattern.class )
+						.withPropertyPath( pathWith()
+								.property( "people" )
+								.containerElement( null, true, null, 1, Person[].class, null )
+						),
+				violationOf( Pattern.class )
+						.withPropertyPath( pathWith()
+								.property( "people" )
+								.containerElement( null, true, null, 2, Person[].class, null )
+						)
+		);
+	}
+
 	private void assertConstraintViolationToOneValidation(Set<ConstraintViolation<AWithB>> constraintViolations) {
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( NotNull.class )
@@ -749,6 +791,17 @@ public class NodeImplTest {
 		public void extractValues(CustomContainer<?> originalValue, ValueExtractor.ValueReceiver receiver) {
 			for ( Object element : originalValue.values ) {
 				receiver.iterableValue( "<iterable element>", element );
+			}
+		}
+	}
+
+	@UnwrapByDefault
+	private static final class PersonArrayValueExtractor implements ValueExtractor<Person @ExtractedValue(type = String.class) []> {
+
+		@Override
+		public void extractValues(Person[] originalValue, ValueExtractor.ValueReceiver receiver) {
+			for ( int i = 0; i < originalValue.length; i++ ) {
+				receiver.indexedValue( null, i, originalValue[i].name );
 			}
 		}
 	}

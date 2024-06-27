@@ -226,10 +226,7 @@ public class MetaConstraint<A extends Annotation> {
 				valueContext.setTypeParameter( containerClass, currentValueExtractionPathNode.getTypeParameterIndex() );
 			}
 
-			if ( nodeName != null ) {
-				valueContext.appendTypeParameterNode( nodeName );
-			}
-
+			valueContext.appendTypeParameterNode( nodeName );
 			valueContext.setCurrentValidatedValue( value );
 
 			if ( currentValueExtractionPathNode.hasNext() ) {
