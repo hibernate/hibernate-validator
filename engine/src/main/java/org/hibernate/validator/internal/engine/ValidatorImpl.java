@@ -831,7 +831,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		Optional<ExecutableMetaData> executableMetaDataOptional = validationContext.getExecutableMetaData();
 
-		if ( !executableMetaDataOptional.isPresent() ) {
+		if ( executableMetaDataOptional.isEmpty() ) {
 			// the method is unconstrained
 			return;
 		}
@@ -1015,7 +1015,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		Optional<ExecutableMetaData> executableMetaDataOptional = validationContext.getExecutableMetaData();
 
-		if ( !executableMetaDataOptional.isPresent() ) {
+		if ( executableMetaDataOptional.isEmpty() ) {
 			// the method is unconstrained
 			return;
 		}
