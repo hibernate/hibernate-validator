@@ -188,16 +188,90 @@
                     <artifactId>expressly</artifactId>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
-            <!-- adding sources for BV 2.0 tests -->
+            <!-- adding sources for BV 2.0 and Predefined Scope tests -->
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${project.basedir}/src/main/java-bv2</source>
+                                        <source>${project.basedir}/src/main/java-predefined-scope</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>hv-6.2</id>
+            <activation>
+                <property>
+                    <name>validator</name>
+                    <value>hv-6.2</value>
+                </property>
+            </activation>
+            <properties>
+                <validation-api.version>2.0.1.Final</validation-api.version>
+                <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
+                <beanvalidation-impl.version>6.2.1-SNAPSHOT</beanvalidation-impl.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${beanvalidation-impl.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.el</artifactId>
+                    <version>3.0.1-b11</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
+                </dependency>
+            </dependencies>
+            <!-- adding sources for BV 2.0 Predefined Scope tests -->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${project.basedir}/src/main/java-bv2</source>
+                                        <source>${project.basedir}/src/main/java-predefined-scope</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -213,7 +287,7 @@
             <properties>
                 <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>6.1.2.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>6.1.7.Final</beanvalidation-impl.version>
             </properties>
             <dependencies>
                 <dependency>
@@ -232,16 +306,31 @@
                     <version>3.0.1-b12</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
-            <!-- adding sources for BV 2.0 tests -->
+            <!-- adding sources for BV 2.0 and Predefined Scope tests -->
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${project.basedir}/src/main/java-bv2</source>
+                                        <source>${project.basedir}/src/main/java-predefined-scope</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -257,7 +346,7 @@
             <properties>
                 <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>6.0.19.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>6.0.22.Final</beanvalidation-impl.version>
             </properties>
             <dependencies>
                 <dependency>
@@ -276,8 +365,8 @@
                     <version>3.0.1-b12</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
             <!-- adding sources for BV 2.0 tests -->
@@ -286,6 +375,20 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${project.basedir}/src/main/java-bv2</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -320,8 +423,8 @@
                     <version>3.0.1-b12</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -361,8 +464,8 @@
                     <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -402,8 +505,8 @@
                     <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -443,8 +546,8 @@
                     <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -484,8 +587,8 @@
                     <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -514,8 +617,8 @@
                     <version>${beanvalidation-impl.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
