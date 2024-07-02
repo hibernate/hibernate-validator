@@ -92,6 +92,11 @@
         <module>performance</module>
         <module>cdi</module>
         <module>integration</module>
+        <module>java/simple</module>
+        <module>java/no-el</module>
+        <module>java/test-utils</module>
+        <!-- CDI module test has problems with Weld and JBoss Logging version mismatch. Disabled for now. -->
+        <!-- <module>java/cdi</module> -->
     </modules>
 
     <properties>
@@ -230,6 +235,7 @@
         <version.depends.plugin>1.5.0</version.depends.plugin>
         <version.deploy.plugin>3.1.2</version.deploy.plugin>
         <version.enforcer.plugin>3.5.0</version.enforcer.plugin>
+        <!-- Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting. -->
         <version.forbiddenapis.plugin>3.7</version.forbiddenapis.plugin>
         <version.gmavenplus.plugin>3.0.2</version.gmavenplus.plugin>
         <version.gpg.plugin>3.2.4</version.gpg.plugin>
@@ -247,12 +253,9 @@
         <version.surefire.plugin>3.3.0</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.7</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
-        <version.wildfly.plugin>5.0.0.Final</version.wildfly.plugin>
-        <version.org.wildfly.core>22.0.2.Final</version.org.wildfly.core>
-        <version.wildfly-patch-gen.plugin>2.1.3.Final</version.wildfly-patch-gen.plugin>
-        <version.wildfly-patch-gen.plugin.woodstox>7.0.0</version.wildfly-patch-gen.plugin.woodstox>
         <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
+        <version.moditect.plugin>1.2.1.Final</version.moditect.plugin>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
@@ -287,8 +290,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <!-- The lowest supported version of Java for applications using Hibernate Validator -->
-        <!-- Set statically, independently of the current JDK: we want our code to comply with this version -->
+        <!--
+            The lowest supported version of Java for applications using Hibernate Validator
+            Set statically, independently of the current JDK: we want our code to comply with this version
+
+            Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting.
+        -->
         <java-version.main.release>17</java-version.main.release>
         <java-version.main.compiler.java_home>${java.home}</java-version.main.compiler.java_home>
         <java-version.main.compiler>${java-version.main.compiler.java_home}/bin/javac</java-version.main.compiler>
@@ -369,6 +376,8 @@
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging-annotations</artifactId>
                 <version>${version.org.jboss.logging.jboss-logging-tools}</version>
+                <scope>provided</scope>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.expressly</groupId>
@@ -648,9 +657,9 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${version.compiler.plugin}</version>
                     <configuration>
-                        <compilerArgs>
-                            <compilerArg>-Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArg>
-                        </compilerArgs>
+                        <showWarnings>true</showWarnings>
+                        <showDeprecation>true</showDeprecation>
+                        <failOnWarning>true</failOnWarning>
                         <testCompilerArgument>-parameters</testCompilerArgument>
                     </configuration>
                     <executions>
@@ -718,7 +727,9 @@
                             **/Messages_$bundle.java,
                             **/ConcurrentReferenceHashMap.java,
                             **/TypeHelper*.java,
-                            **/TckRunner.java
+                            **/TckRunner.java,
+                            <!-- checkstyle cannot process module-info files ...  -->
+                            **/module-info.java
                         </excludes>
                     </configuration>
                     <executions>
@@ -773,38 +784,23 @@
                                     <bundledSignature>jdk-non-portable</bundledSignature>
 
                                     <!-- All following signatures should be replicated for each target JDK version we intend to support -->
-                                    <bundledSignature>jdk-unsafe-1.8</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-9</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-10</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-11</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-12</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-13</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-14</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-15</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-16</bundledSignature>
                                     <bundledSignature>jdk-unsafe-17</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-18</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-19</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-21</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-22</bundledSignature>
 
-                                    <bundledSignature>jdk-deprecated-1.8</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-9</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-10</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-11</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-12</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-13</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-14</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-15</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-16</bundledSignature>
                                     <bundledSignature>jdk-deprecated-17</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-18</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-19</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-21</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-22</bundledSignature>
 
-                                    <bundledSignature>jdk-internal-1.8</bundledSignature>
-                                    <bundledSignature>jdk-internal-9</bundledSignature>
-                                    <bundledSignature>jdk-internal-10</bundledSignature>
-                                    <bundledSignature>jdk-internal-11</bundledSignature>
-                                    <bundledSignature>jdk-internal-12</bundledSignature>
-                                    <bundledSignature>jdk-internal-13</bundledSignature>
-                                    <bundledSignature>jdk-internal-14</bundledSignature>
-                                    <bundledSignature>jdk-internal-15</bundledSignature>
-                                    <bundledSignature>jdk-internal-16</bundledSignature>
                                     <bundledSignature>jdk-internal-17</bundledSignature>
+                                    <bundledSignature>jdk-internal-18</bundledSignature>
+                                    <bundledSignature>jdk-internal-19</bundledSignature>
+                                    <bundledSignature>jdk-internal-21</bundledSignature>
+                                    <bundledSignature>jdk-internal-22</bundledSignature>
                                 </bundledSignatures>
                             </configuration>
                         </execution>
@@ -911,7 +907,6 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <outputDirectory>${project.build.directory}/surefire-reports</outputDirectory>
                         <outputName>test-report</outputName>
                     </configuration>
                 </plugin>
@@ -1020,6 +1015,15 @@
                                         <overWrite>false</overWrite>
                                         <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/org/hibernate/validator/cdi/main</outputDirectory>
                                         <destFileName>hibernate-validator-cdi-${project.version}.jar</destFileName>
+                                    </artifactItem>
+                                    <!-- We also need to patch the jboss logging jar  -->
+                                    <artifactItem>
+                                        <groupId>org.jboss.logging</groupId>
+                                        <artifactId>jboss-logging</artifactId>
+                                        <version>${version.org.jboss.logging.jboss-logging}</version>
+                                        <overWrite>false</overWrite>
+                                        <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/org/jboss/logging/main</outputDirectory>
+                                        <destFileName>jboss-logging-${version.org.jboss.logging.jboss-logging}.jar</destFileName>
                                     </artifactItem>
                                 </artifactItems>
                             </configuration>
@@ -1149,6 +1153,7 @@
                                 </scripts>
                                 <properties>
                                     <wildflyPatchedTargetDir>${wildfly.actual.target-dir}</wildflyPatchedTargetDir>
+                                    <jbossLoggingVersion>${version.org.jboss.logging.jboss-logging}</jbossLoggingVersion>
                                 </properties>
                             </configuration>
                         </execution>
@@ -1200,37 +1205,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
                     <version>${version.shade.plugin}</version>
-                </plugin>
-                <!-- WildFly patching infrastructure plugins -->
-                <plugin>
-                    <groupId>org.jboss.as</groupId>
-                    <artifactId>patch-gen-maven-plugin</artifactId>
-                    <version>${version.wildfly-patch-gen.plugin}</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.fasterxml.woodstox</groupId>
-                            <artifactId>woodstox-core</artifactId>
-                            <version>${version.wildfly-patch-gen.plugin.woodstox}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-                <plugin>
-                    <groupId>org.wildfly.plugins</groupId>
-                    <artifactId>wildfly-maven-plugin</artifactId>
-                    <version>${version.wildfly.plugin}</version>
-                    <dependencies>
-                        <!-- Contains the patch command -->
-                        <dependency>
-                            <groupId>org.wildfly.core</groupId>
-                            <artifactId>wildfly-patching</artifactId>
-                            <version>${version.org.wildfly.core}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.wildfly.core</groupId>
-                            <artifactId>wildfly-cli</artifactId>
-                            <version>${version.org.wildfly.core}</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>jakarta.tck</groupId>
@@ -1360,6 +1334,11 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.moditect</groupId>
+                    <artifactId>moditect-maven-plugin</artifactId>
+                    <version>${version.moditect.plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -1676,7 +1655,6 @@
                             <version>${version.compiler.plugin}</version>
                             <configuration>
                                 <compilerArgs>
-                                    <compilerArg>-Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArg>
                                     <!-- Make sure IDEA uses the -parameters for all code;
                                          IDEA ignores the "testCompilerArguments" option... -->
                                     <compilerArg>-parameters</compilerArg>

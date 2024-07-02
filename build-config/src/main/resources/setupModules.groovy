@@ -58,4 +58,14 @@ processFileInplace( hvCdiModuleXml ) { text ->
 
 deleteFiles( new FileNameByRegexFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/org/hibernate/validator/cdi/main', 'hibernate-validator-cdi-.*\\.jar' ) )
 
+// JBoss Logging
+jbossLoggingModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/org/jboss/logging/main/module.xml' )
+def jbossArtifactName = 'jboss-logging-' + jbossLoggingVersion + '.jar';
+println "[INFO] Using JBoss Logging version " + jbossArtifactName;
+processFileInplace( jbossLoggingModuleXml ) { text ->
+    text.replaceAll( /jboss-logging.*jar/, jbossArtifactName )
+}
+
+deleteFiles( new FileNameByRegexFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/org/jboss/logging/main', 'jboss-logging-.*\\.jar' ) )
+
 println "[INFO] ------------------------------------------------------------------------";

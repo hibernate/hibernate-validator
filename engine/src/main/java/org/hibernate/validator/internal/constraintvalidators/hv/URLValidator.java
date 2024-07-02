@@ -7,6 +7,8 @@
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -35,9 +37,9 @@ public class URLValidator implements ConstraintValidator<org.hibernate.validator
 
 		java.net.URL url;
 		try {
-			url = new java.net.URL( value.toString() );
+			url = new java.net.URI( value.toString() ).toURL();
 		}
-		catch (MalformedURLException e) {
+		catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
 			return false;
 		}
 

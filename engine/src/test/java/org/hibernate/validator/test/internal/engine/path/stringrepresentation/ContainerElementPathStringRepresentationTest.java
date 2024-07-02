@@ -198,7 +198,7 @@ public class ContainerElementPathStringRepresentationTest extends AbstractPathSt
 	public void testArrayPath() throws Exception {
 		Set<ConstraintViolation<Region>> constraintViolations = validator.validate( new Region(
 				Arrays.asList( new Address( null, null ) ),
-				Arrays.asList( null )
+				Arrays.asList( (Address)null )
 		) );
 
 		assertCorrectPropertyPathStringRepresentations(
