@@ -26,6 +26,7 @@
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
         <surefire.jvm.args.additional>-Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
+        <java.module.name>${hibernate-validator.module-name}</java.module.name>
     </properties>
 
     <distributionManagement>
@@ -59,6 +60,7 @@
             <groupId>org.glassfish.expressly</groupId>
             <artifactId>expressly</artifactId>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
@@ -245,7 +247,6 @@
                                 <manifestEntries>
                                     <Specification-Title>Jakarta Validation</Specification-Title>
                                     <Specification-Version>${parsed-version.jakarta.validation-api.majorVersion}.${parsed-version.jakarta.validation-api.minorVersion}</Specification-Version>
-                                    <Automatic-Module-Name>${hibernate-validator.module-name}</Automatic-Module-Name>
                                 </manifestEntries>
                             </archive>
                         </configuration>
@@ -257,7 +258,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${hibernate-validator.module-name}</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${java.module.name}</Bundle-SymbolicName>
                         <Import-Package>
                             jakarta.persistence.*;version="[3.0.0,4.0.0)";resolution:=optional,
                             jakarta.validation.*;version="[${version.jakarta.validation-api},${parsed-version.jakarta.validation-api.nextMajorVersion}.0.0)",
@@ -321,6 +322,51 @@
                 <configuration>
                     <skip>false</skip>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-module-infos</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>add-module-info</goal>
+                        </goals>
+                        <configuration>
+                            <module>
+                                <moduleInfo>
+                                    <name>${java.module.name}</name>
+                                    <requires>
+                                        <!-- jboss annotations are getting pulled even though they are for compilation only -->
+                                        !org.jboss.logging.annotations;
+                                        *;
+                                    </requires>
+                                    <exports>
+                                        org.hibernate.validator.*.logging to org.jboss.logging, org.hibernate.validator.cdi;
+                                        org.hibernate.validator.internal to org.hibernate.validator.cdi;
+                                        org.hibernate.validator.internal.* to org.hibernate.validator.cdi;
+                                        org.hibernate.validator.*.internal.* to org.hibernate.validator.cdi;
+                                        *;
+                                    </exports>
+                                    <opens>
+                                        <!-- We open constraints for reflection as these can be instantiated by a CDI container -->
+                                        org.hibernate.validator.internal.constraintvalidators.bv;
+                                        org.hibernate.validator.internal.constraintvalidators.bv.*;
+                                        org.hibernate.validator.internal.constraintvalidators.hv;
+                                        org.hibernate.validator.internal.constraintvalidators.hv.*;
+                                        <!-- As both Validator and ValidatorFactory have to be accessible by CDI ... -->
+                                        org.hibernate.validator.internal.engine;
+                                    </opens>
+                                    <uses>
+                                        jakarta.validation.valueextraction.ValueExtractor;
+                                        jakarta.validation.ConstraintValidator
+                                    </uses>
+                                </moduleInfo>
+                            </module>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

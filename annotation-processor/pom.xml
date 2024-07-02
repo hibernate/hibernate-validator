@@ -23,7 +23,7 @@
         <!-- This is a publicly distributed module that should be published: -->
         <deploy.skip>false</deploy.skip>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
-        <automatic.module.name>org.hibernate.validator.annotationprocessor</automatic.module.name>
+        <java.module.name>org.hibernate.validator.annotationprocessor</java.module.name>
     </properties>
 
     <dependencies>
@@ -112,13 +112,6 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
-                        <configuration>
-                            <archive>
-                                <manifestEntries>
-                                    <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
-                                </manifestEntries>
-                            </archive>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -138,6 +131,31 @@
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-module-infos</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>add-module-info</goal>
+                        </goals>
+                        <configuration>
+                            <module>
+                                <moduleInfo>
+                                    <name>${java.module.name}</name>
+                                    <exports>
+                                        !org.hibernate.validator.ap.internal;
+                                        !org.hibernate.validator.ap.internal.*;
+                                        *;
+                                    </exports>
+                                </moduleInfo>
+                            </module>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

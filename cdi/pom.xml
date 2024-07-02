@@ -23,6 +23,7 @@
     <properties>
         <!-- This is a publicly distributed module that should be published: -->
         <deploy.skip>false</deploy.skip>
+        <java.module.name>${hibernate-validator-cdi.module-name}</java.module.name>
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
@@ -184,7 +185,6 @@
                                 <manifestEntries>
                                     <Specification-Title>Jakarta Validation</Specification-Title>
                                     <Specification-Version>${parsed-version.jakarta.validation-api.majorVersion}.${parsed-version.jakarta.validation-api.minorVersion}</Specification-Version>
-                                    <Automatic-Module-Name>${hibernate-validator-cdi.module-name}</Automatic-Module-Name>
                                 </manifestEntries>
                             </archive>
                         </configuration>
@@ -196,7 +196,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${hibernate-validator-cdi.module-name}</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${java.module.name}</Bundle-SymbolicName>
                         <Fragment-Host>${hibernate-validator.module-name}</Fragment-Host>
                         <Import-Package>
                             jakarta.validation.*;version="[3.0,4.0)",
@@ -233,6 +233,35 @@
                 <configuration>
                     <skip>false</skip>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-module-infos</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>add-module-info</goal>
+                        </goals>
+                        <configuration>
+                            <module>
+                                <moduleInfo>
+                                    <name>${java.module.name}</name>
+                                    <exports>
+                                        !org.hibernate.validator.*.internal;
+                                        !org.hibernate.validator.*.internal.*;
+                                        *;
+                                    </exports>
+                                    <opens>
+                                        <!-- Interceptor has to provide reflection access -->
+                                        org.hibernate.validator.cdi.interceptor.spi;
+                                    </opens>
+                                </moduleInfo>
+                            </module>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

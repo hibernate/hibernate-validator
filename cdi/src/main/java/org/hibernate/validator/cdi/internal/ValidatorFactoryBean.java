@@ -39,6 +39,7 @@ import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cdi.spi.BeanNames;
+import org.hibernate.validator.cdi.spi.InjectingConstraintValidatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;

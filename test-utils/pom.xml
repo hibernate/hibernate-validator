@@ -19,7 +19,7 @@
 
     <properties>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
-        <automatic.module.name>org.hibernate.validator.testutils</automatic.module.name>
+        <java.module.name>org.hibernate.validator.testutils</java.module.name>
     </properties>
 
     <build>
@@ -33,19 +33,34 @@
             </plugin>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>default-jar</id>
+                        <id>add-module-infos</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>add-module-info</goal>
                         </goals>
                         <configuration>
-                            <archive>
-                                <manifestEntries>
-                                    <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
-                                </manifestEntries>
-                            </archive>
+                            <module>
+                                <moduleInfo>
+                                    <name>${java.module.name}</name>
+                                    <exports>
+                                        *;
+                                    </exports>
+                                </moduleInfo>
+                            </module>
+                            <!--
+                                Running the jdeps tool will fail without this option, if there are any multi-release jars
+                                on the path. And since some modules might have such jars, e.g. AssertJ is a multi-release jar,
+                                it's safer to add this additional option:
+                            -->
+                            <jdepsExtraArgs>
+                                --multi-release=${maven.compiler.release}
+                            </jdepsExtraArgs>
                         </configuration>
                     </execution>
                 </executions>
@@ -61,11 +76,6 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

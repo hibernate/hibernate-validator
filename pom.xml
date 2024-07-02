@@ -92,6 +92,11 @@
         <module>performance</module>
         <module>cdi</module>
         <module>integration</module>
+        <module>java/simple</module>
+        <module>java/no-el</module>
+        <module>java/test-utils</module>
+        <!-- CDI module test has problems with Weld and JBoss Logging version mismatch. Disabled for now. -->
+        <!-- <module>java/cdi</module> -->
     </modules>
 
     <properties>
@@ -253,6 +258,7 @@
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
+        <version.moditect.plugin>1.2.1.Final</version.moditect.plugin>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
@@ -379,6 +385,8 @@
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging-annotations</artifactId>
                 <version>${version.org.jboss.logging.jboss-logging-tools}</version>
+                <scope>provided</scope>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.expressly</groupId>
@@ -769,7 +777,9 @@
                             **/Messages_$bundle.java,
                             **/ConcurrentReferenceHashMap.java,
                             **/TypeHelper*.java,
-                            **/TckRunner.java
+                            **/TckRunner.java,
+                            <!-- checkstyle cannot process module-info files ...  -->
+                            **/module-info.java
                         </excludes>
                     </configuration>
                     <executions>
@@ -1375,6 +1385,11 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.moditect</groupId>
+                    <artifactId>moditect-maven-plugin</artifactId>
+                    <version>${version.moditect.plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
