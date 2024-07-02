@@ -6,9 +6,6 @@
  */
 package org.hibernate.validator.testutil;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
-
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -125,7 +122,7 @@ public final class ConstraintViolationAssert {
 	 * @param expectedPath The expected path
 	 */
 	public static void assertPathEquals(Path path, PathExpectation expectedPath) {
-		assertEquals( new PathExpectation( path ), expectedPath, "Path does not match" );
+		Assertions.assertThat( new PathExpectation( path ) ).as( "Path does not match" ).isEqualTo( expectedPath );
 	}
 
 	/**
@@ -326,7 +323,7 @@ public final class ConstraintViolationAssert {
 				actualPaths.add( actual );
 			}
 
-			fail( String.format( Locale.ROOT, "Didn't find path <%s> in actual paths <%s>.", expectedPath, actualPaths ) );
+			Assertions.fail( String.format( Locale.ROOT, "Didn't find path <%s> in actual paths <%s>.", expectedPath, actualPaths ) );
 		}
 
 		public void containsPaths(PathExpectation... expectedPaths) {
