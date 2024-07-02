@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.util.logging;
 
+import java.lang.invoke.MethodHandles;
+
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 
@@ -17,7 +19,7 @@ public interface Messages {
 	/**
 	 * The messages.
 	 */
-	Messages MESSAGES = org.jboss.logging.Messages.getBundle( Messages.class );
+	Messages MESSAGES = org.jboss.logging.Messages.getBundle( MethodHandles.lookup(), Messages.class );
 
 	@Message(value = "must not be null.", format = Message.Format.NO_FORMAT)
 	String mustNotBeNull();

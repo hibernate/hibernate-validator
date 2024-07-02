@@ -59,6 +59,7 @@ public class PredefinedScopeConfigurationImpl extends AbstractConfigurationImpl<
 	}
 
 	@Override
+	@Deprecated
 	public PredefinedScopeHibernateValidatorConfiguration initializeLocales(Set<Locale> localesToInitialize) {
 		Contracts.assertNotNull( localesToInitialize, MESSAGES.parameterMustNotBeNull( "localesToInitialize" ) );
 		locales( localesToInitialize );

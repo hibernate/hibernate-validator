@@ -174,17 +174,4 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 		return sourceBundles.isEmpty() ? null : new AggregateResourceBundle( sourceBundles );
 	}
 
-	/**
-	 * A {@link ResourceBundle} whose content is aggregated from multiple source bundles.
-	 *
-	 * @author Gunnar Morling
-	 * @deprecated This class should not have been part of the public API and will be removed at a later stage.
-	 */
-	@Deprecated
-	public static class AggregateBundle extends AggregateResourceBundle {
-
-		public AggregateBundle(List<ResourceBundle> bundles) {
-			super( bundles );
-		}
-	}
 }

@@ -179,7 +179,7 @@ public class ValidatorFactoryNoELBootstrapTest {
 
 			// it is our responsability to define the package of the class
 			String packageName = getPackageName( className );
-			if ( packageName != null && getPackage( packageName ) == null ) {
+			if ( packageName != null && getDefinedPackage( packageName ) == null ) {
 				definePackage( packageName, null, null, null, null, null, null, null );
 			}
 
@@ -198,22 +198,22 @@ public class ValidatorFactoryNoELBootstrapTest {
 
 		private byte[] loadClassData(String className) throws IOException, ClassNotFoundException {
 			String path = "/" + className.replace( ".", "/" ) + ".class";
-			InputStream in = ValidatorFactoryNoELBootstrapTest.class.getResourceAsStream( path );
+			try ( InputStream in = ValidatorFactoryNoELBootstrapTest.class.getResourceAsStream( path ) ) {
+				if ( in == null ) {
+					throw new ClassNotFoundException();
+				}
 
-			if ( in == null ) {
-				throw new ClassNotFoundException();
+				ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+				int bytesRead;
+				byte[] data = new byte[16384];
+				while ( ( bytesRead = in.read( data, 0, data.length ) ) != -1 ) {
+					buffer.write( data, 0, bytesRead );
+				}
+
+				buffer.flush();
+				return buffer.toByteArray();
 			}
-
-			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
-			int bytesRead;
-			byte[] data = new byte[16384];
-			while ( ( bytesRead = in.read( data, 0, data.length ) ) != -1 ) {
-				buffer.write( data, 0, bytesRead );
-			}
-
-			buffer.flush();
-			return buffer.toByteArray();
 		}
 	}
 

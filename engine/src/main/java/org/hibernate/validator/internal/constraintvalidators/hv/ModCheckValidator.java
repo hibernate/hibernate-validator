@@ -9,8 +9,6 @@ package org.hibernate.validator.internal.constraintvalidators.hv;
 import java.util.List;
 import jakarta.validation.ConstraintValidator;
 
-import org.hibernate.validator.constraints.ModCheck;
-import org.hibernate.validator.constraints.ModCheck.ModType;
 import org.hibernate.validator.internal.util.ModUtil;
 
 /**
@@ -24,7 +22,7 @@ import org.hibernate.validator.internal.util.ModUtil;
  * @deprecated As of release 5.1.0, replaced by {@link Mod10CheckValidator} and {@link Mod11CheckValidator}
  */
 @Deprecated
-public class ModCheckValidator extends ModCheckBase implements ConstraintValidator<ModCheck, CharSequence> {
+public class ModCheckValidator extends ModCheckBase implements ConstraintValidator<org.hibernate.validator.constraints.ModCheck, CharSequence> {
 	/**
 	 * Multiplier used by the mod algorithms
 	 */
@@ -33,10 +31,10 @@ public class ModCheckValidator extends ModCheckBase implements ConstraintValidat
 	/**
 	 * The type of checksum algorithm
 	 */
-	private ModType modType;
+	private org.hibernate.validator.constraints.ModCheck.ModType modType;
 
 	@Override
-	public void initialize(ModCheck constraintAnnotation) {
+	public void initialize(org.hibernate.validator.constraints.ModCheck constraintAnnotation) {
 		super.initialize(
 				constraintAnnotation.startIndex(),
 				constraintAnnotation.endIndex(),
@@ -61,7 +59,7 @@ public class ModCheckValidator extends ModCheckBase implements ConstraintValidat
 		int modResult = -1;
 		int checkValue = extractDigit( checkDigit );
 
-		if ( modType.equals( ModType.MOD11 ) ) {
+		if ( modType.equals( org.hibernate.validator.constraints.ModCheck.ModType.MOD11 ) ) {
 			modResult = ModUtil.calculateMod11Check( digits, multiplier );
 
 			if ( modResult == 10 || modResult == 11 ) {

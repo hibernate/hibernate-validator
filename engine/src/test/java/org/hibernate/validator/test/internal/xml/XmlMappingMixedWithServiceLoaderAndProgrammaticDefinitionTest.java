@@ -20,6 +20,10 @@ import java.io.InputStream;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
@@ -204,7 +208,7 @@ public class XmlMappingMixedWithServiceLoaderAndProgrammaticDefinitionTest {
 		@Override
 		public Enumeration<URL> getResources(String name) throws IOException {
 			if ( SERVICE_FILE.equals( name ) ) {
-				URL url = new URL( "protocol", "host", -1, "file", new URLStreamHandler() {
+				URL url = urlWithHandler( new URLStreamHandler() {
 					@Override
 					protected URLConnection openConnection(URL u) {
 						return new URLConnection( u ) {
@@ -238,6 +242,28 @@ public class XmlMappingMixedWithServiceLoaderAndProgrammaticDefinitionTest {
 				};
 			}
 			return super.getResources( name );
+		}
+	}
+
+	private static URL urlWithHandler(URLStreamHandler handler) {
+		try {
+			Method of = URL.class.getMethod( "of", URI.class, URLStreamHandler.class );
+			return (URL) of.invoke( null, URI.create( "protocol://foo" ), handler );
+		}
+		catch (NoSuchMethodException e) {
+			// means we are using JDK < 20, use a constructor in this case:
+			try {
+				Constructor<URL> constructor = URL.class.getConstructor( String.class, String.class, int.class, String.class,
+						URLStreamHandler.class
+				);
+				return constructor.newInstance( "protocol", "host", -1, "file", handler );
+			}
+			catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ex) {
+				throw new IllegalStateException( ex );
+			}
+		}
+		catch (InvocationTargetException | IllegalAccessException e) {
+			throw new IllegalStateException( e );
 		}
 	}
 

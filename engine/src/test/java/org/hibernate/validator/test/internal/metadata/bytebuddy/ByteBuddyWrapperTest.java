@@ -152,7 +152,7 @@ public class ByteBuddyWrapperTest {
 					if ( field.getType().isPrimitive() ) {
 						PrimitiveBoxingDelegate.forPrimitive( new TypeDescription.ForLoadedType( field.getType() ) )
 								.assignBoxedTo(
-										TypeDescription.Generic.OBJECT,
+										TypeDescription.Generic.OfNonGenericType.ForLoadedType.of( Object.class ),
 										ReferenceTypeAwareAssigner.INSTANCE,
 										Assigner.Typing.STATIC
 								)
@@ -275,7 +275,7 @@ public class ByteBuddyWrapperTest {
 					if ( method.getReturnType().isPrimitive() ) {
 						PrimitiveBoxingDelegate.forPrimitive( new TypeDescription.ForLoadedType( method.getReturnType() ) )
 								.assignBoxedTo(
-										TypeDescription.Generic.OBJECT,
+										TypeDescription.Generic.OfNonGenericType.ForLoadedType.of( Object.class ),
 										ReferenceTypeAwareAssigner.INSTANCE,
 										Assigner.Typing.STATIC
 								)

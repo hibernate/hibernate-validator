@@ -73,7 +73,7 @@ public class LocaleResolverTest {
 		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
 				.localeResolver( new StaticFieldLocaleResolver() )
-				.initializeLocales( new HashSet<>( Arrays.asList( locales ) ) )
+				.locales( new HashSet<>( Arrays.asList( locales ) ) )
 				.initializeBeanMetaData( new HashSet<>( Arrays.asList( Bean.class ) ) )
 				.buildValidatorFactory();
 
@@ -84,7 +84,7 @@ public class LocaleResolverTest {
 		ValidatorFactory validatorFactory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
 				.configure()
 				.localeResolver( new StaticFieldLocaleResolver() )
-				.initializeLocales( new HashSet<>( Arrays.asList( locales ) ) )
+				.locales( new HashSet<>( Arrays.asList( locales ) ) )
 				.defaultLocale( defaultLocale )
 				.initializeBeanMetaData( new HashSet<>( Arrays.asList( Bean.class ) ) )
 				.buildValidatorFactory();
