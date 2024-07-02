@@ -1006,6 +1006,15 @@
                                         <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/org/hibernate/validator/cdi/main</outputDirectory>
                                         <destFileName>hibernate-validator-cdi-${project.version}.jar</destFileName>
                                     </artifactItem>
+                                    <!-- We also need to patch the jboss logging jar  -->
+                                    <artifactItem>
+                                        <groupId>org.jboss.logging</groupId>
+                                        <artifactId>jboss-logging</artifactId>
+                                        <version>${version.org.jboss.logging.jboss-logging}</version>
+                                        <overWrite>false</overWrite>
+                                        <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/org/jboss/logging/main</outputDirectory>
+                                        <destFileName>jboss-logging-${version.org.jboss.logging.jboss-logging}.jar</destFileName>
+                                    </artifactItem>
                                 </artifactItems>
                             </configuration>
                         </execution>
@@ -1134,6 +1143,7 @@
                                 </scripts>
                                 <properties>
                                     <wildflyPatchedTargetDir>${wildfly.actual.target-dir}</wildflyPatchedTargetDir>
+                                    <jbossLoggingVersion>${version.org.jboss.logging.jboss-logging}</jbossLoggingVersion>
                                 </properties>
                             </configuration>
                         </execution>
