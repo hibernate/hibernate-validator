@@ -23,14 +23,26 @@ import org.testng.annotations.Test;
 public class TituloEleitoralValidatorTest extends AbstractConstrainedTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-491")
-	public void testCorrectFormattedCPFWithReportAsSingleViolation() {
+	public void testCorrectFormattedTituloEleitoralWithReportAsSingleViolation() {
 		assertNoViolations( validator.validate( new Person( "040806680957" ) ) );
 		assertNoViolations( validator.validate( new Person( "038763000914" ) ) );
+		assertNoViolations( validator.validate( new Person( "975993331007" ) ) );
+		assertNoViolations( validator.validate( new Person( "524384240701" ) ) );
+		assertNoViolations( validator.validate( new Person( "311533282500" ) ) );
+		assertNoViolations( validator.validate( new Person( "083578481406" ) ) );
+		assertNoViolations( validator.validate( new Person( "233838490205" ) ) );
+		assertNoViolations( validator.validate( new Person( "585052440116" ) ) );
+		assertNoViolations( validator.validate( new Person( "650648840264" ) ) );
+		assertNoViolations( validator.validate( new Person( "357866370213" ) ) );
+		assertNoViolations( validator.validate( new Person( "074447240264" ) ) );
+		assertNoViolations( validator.validate( new Person( "164284280213" ) ) );
+		assertNoViolations( validator.validate( new Person( "465667341619" ) ) );
+		assertNoViolations( validator.validate( new Person( "362133720779" ) ) );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-491")
-	public void testIncorrectFormattedCPFWithReportAsSingleViolation() {
+	public void testIncorrectFormattedTituloEleitoralWithReportAsSingleViolation() {
 		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "48255-77" ) );
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( TituloEleitoral.class ).withProperty( "tituloEleitor" )
