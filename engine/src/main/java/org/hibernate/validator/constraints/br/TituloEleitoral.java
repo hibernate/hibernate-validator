@@ -30,7 +30,7 @@ import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.br.TituloEleitoral.List;
 
 /**
- * Validates a <a href="http://ghiorzi.org/cgcancpf.htm">T\u00edtulo Eleitoral</a> (Brazilian Voter ID card number).
+ * Validates a <a href="https://pt.wikipedia.org/wiki/T%C3%ADtulo_de_eleitor">T\u00edtulo Eleitoral</a> (Brazilian Voter ID card number).
  *
  * @author George Gastaldi
  */
@@ -38,11 +38,13 @@ import org.hibernate.validator.constraints.br.TituloEleitoral.List;
 @Mod11Check.List({
 		@Mod11Check(threshold = 9,
 				endIndex = 7,
-				checkDigitIndex = 10),
+				checkDigitIndex = 10,
+				treatCheck10As = '0'),
 		@Mod11Check(threshold = 9,
 				startIndex = 8,
 				endIndex = 10,
-				checkDigitIndex = 11)
+				checkDigitIndex = 11,
+				treatCheck10As = '0')
 })
 @ReportAsSingleViolation
 @Documented
