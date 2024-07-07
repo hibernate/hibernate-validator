@@ -51,7 +51,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 
 	@Test
 	public void countrySpecificProgrammaticDefinition() {
-		doProgrammaticTest( TituloEleitoral.class, new TituloEleitoralDef(), "038763000914", "48255-77", "invalid Brazilian Voter ID card number" );
+		doProgrammaticTest( TituloEleitoral.class, new TituloEleitoralDef(), "083578481406", "48255-77", "invalid Brazilian Voter ID card number" );
 		doProgrammaticTest( CPF.class, new CPFDef(), "134.241.313-00", "48255-77", "invalid Brazilian individual taxpayer registry number (CPF)" );
 		doProgrammaticTest( CNPJ.class, new CNPJDef(), "91.509.901/0001-69", "91.509.901/0001-60",
 				"invalid Brazilian corporate taxpayer registry number (CNPJ)"
