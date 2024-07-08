@@ -242,7 +242,7 @@
             <properties>
                 <surefire.jvm.args.additional>-DincludeJavaFXTests=true -Xmx1024m -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
                 <arquillian.protocol>Servlet 5.0</arquillian.protocol>
-                <skip.wildfly.patch.hibernate.validator>false</skip.wildfly.patch.hibernate.validator>
+                <skip.wildfly.integration.test.hibernate.validator>false</skip.wildfly.integration.test.hibernate.validator>
             </properties>
             <dependencies>
                 <dependency>

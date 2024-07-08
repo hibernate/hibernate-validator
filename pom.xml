@@ -133,7 +133,8 @@
         <!--<version.wildfly.secondary>18.0.1.Final</version.wildfly.secondary>-->
         <!-- Version used to run the TCK in incontainer mode -->
         <version.wildfly.tck>${version.wildfly}</version.wildfly.tck>
-        <skip.wildfly.patch.hibernate.validator>true</skip.wildfly.patch.hibernate.validator>
+        <skip.wildfly.integration.test.hibernate.validator>true</skip.wildfly.integration.test.hibernate.validator>
+        <skip.wildfly.patch.hibernate.validator>${skip.wildfly.integration.test.hibernate.validator}</skip.wildfly.patch.hibernate.validator>
         <skip.wildfly.patch.unpack.server>${skip.wildfly.patch.hibernate.validator}</skip.wildfly.patch.unpack.server>
         <wildfly.target-dir>${project.build.directory}/wildfly-patched/wildfly-${version.wildfly}</wildfly.target-dir>
         <wildfly.actual.target-dir>${wildfly.target-dir}</wildfly.actual.target-dir>
@@ -270,6 +271,9 @@
             Specific modules will override the setting at their own level.
         -->
         <deploy.skip>true</deploy.skip>
+        <maven-deploy-plugin.skip>true</maven-deploy-plugin.skip>
+        <forbiddenapis.skip>false</forbiddenapis.skip>
+        <checkstyle.skip>false</checkstyle.skip>
 
         <!-- Maven Central repository -->
 
@@ -749,6 +753,7 @@
                         </dependency>
                     </dependencies>
                     <configuration>
+                        <skip>${checkstyle.skip}</skip>
                         <configLocation>checkstyle.xml</configLocation>
                         <consoleOutput>true</consoleOutput>
                         <failsOnError>true</failsOnError>
@@ -805,6 +810,7 @@
                                 <path>${forbiddenapis-junit.path}</path>
                             </signaturesArtifact>
                         </signaturesArtifacts>
+                        <skip>${forbiddenapis.skip}</skip>
                     </configuration>
                     <executions>
                         <execution>
@@ -1138,7 +1144,7 @@
                     <version>${version.deploy.plugin}</version>
                     <configuration>
                         <!-- we use the nexus-staging plugin -->
-                        <skip>true</skip>
+                        <skip>${maven-deploy-plugin.skip}</skip>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1628,6 +1634,28 @@
                 <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK24+ -->
                 <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
+            </properties>
+        </profile>
+        <profile>
+            <!--
+                This profile set some properties to make running repro build easier.
+                Instead of
+                    mvn clean package -DskipTests -Dmaven.javadoc.skip -Dgpg.skip \
+                        -Dbuildinfo.detect.skip=false \
+                        -Dbuildinfo.skipModules='**/**distribution**,**/**integration**,**/**build**............'
+                We can run
+                    mvn clean package -Pskip-checks -Preproducible
+            -->
+            <id>reproducible</id>
+            <properties>
+                <maven-deploy-plugin.skip>false</maven-deploy-plugin.skip>
+                <maven.javadoc.skip>true</maven.javadoc.skip>
+                <skipTests>true</skipTests>
+                <gpg.skip>true</gpg.skip>
+                <forbiddenapis.skip>true</forbiddenapis.skip>
+                <checkstyle.skip>true</checkstyle.skip>
+                <skip.wildfly.patch.unpack.server>true</skip.wildfly.patch.unpack.server>
+                <skip.wildfly.patch.hibernate.validator>true</skip.wildfly.patch.hibernate.validator>
             </properties>
         </profile>
         <profile>
