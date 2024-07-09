@@ -244,7 +244,7 @@
                                 <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                                 <manifestEntries>
                                     <Specification-Title>Jakarta Validation</Specification-Title>
-                                    <Specification-Version>3.0</Specification-Version>
+                                    <Specification-Version>${parsed-version.jakarta.validation-api.majorVersion}.${parsed-version.jakarta.validation-api.minorVersion}</Specification-Version>
                                     <Automatic-Module-Name>${hibernate-validator.module-name}</Automatic-Module-Name>
                                 </manifestEntries>
                             </archive>
@@ -260,7 +260,7 @@
                         <Bundle-SymbolicName>${hibernate-validator.module-name}</Bundle-SymbolicName>
                         <Import-Package>
                             jakarta.persistence.*;version="[3.0.0,4.0.0)";resolution:=optional,
-                            jakarta.validation.*;version="[3.0.0,4.0.0)",
+                            jakarta.validation.*;version="[${version.jakarta.validation-api},${parsed-version.jakarta.validation-api.nextMajorVersion}.0.0)",
                             javax.script.*;version="0",
                             javax.xml.*;version="0",
                             jakarta.el.*;version="[5.0.0,6.0.0)";resolution:=optional,
