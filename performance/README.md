@@ -11,8 +11,9 @@ To allow performance testing of different Hibernate Validator versions there are
 Choosing a profile executes the tests against the specified Hibernate Validator or BVal version, respectively. The
 defined profiles are:
 
-* hv-current (Hibernate Validator 6.1.0-SNAPSHOT)
-* hv-6.0 (Hibernate Validator 6.0.15.Final)
+* hv-current (Hibernate Validator 6.2.1-SNAPSHOT)
+* hv-6.1 (Hibernate Validator 6.1.7.Final)
+* hv-6.0 (Hibernate Validator 6.0.22.Final)
 * hv-5.4 (Hibernate Validator 5.4.3.Final)
 * hv-5.3 (Hibernate Validator 5.3.4.Final)
 * hv-5.2 (Hibernate Validator 5.2.4.Final)
@@ -64,7 +65,7 @@ If you want to run one of those profilers - pass it as parameter when running a 
 
 To run a specific benchmark:
 
-    java -jar target/hibernate-validator-performance.jar CascadedValidation
+    java -jar target/hibernate-validator-performance-hv-current.jar CascadedValidation
 
 #### Creating reports for all major Hibernate Validator versions
 

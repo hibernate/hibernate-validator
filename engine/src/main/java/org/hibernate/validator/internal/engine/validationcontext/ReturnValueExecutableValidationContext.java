@@ -61,7 +61,7 @@ public class ReturnValueExecutableValidationContext<T> extends AbstractValidatio
 	) {
 		super( constraintValidatorManager, constraintValidatorFactory, validatorScopedContext, traversableResolver,
 				constraintValidatorInitializationContext, rootBean, rootBeanClass, rootBeanMetaData,
-				buildDisableAlreadyValidatedBeanTracking( executableMetaData )
+				isTrackingEnabled( executableMetaData )
 		);
 		this.executable = executable;
 		this.executableMetaData = executableMetaData;
@@ -78,13 +78,13 @@ public class ReturnValueExecutableValidationContext<T> extends AbstractValidatio
 		return executableMetaData;
 	}
 
-	private static boolean buildDisableAlreadyValidatedBeanTracking(Optional<ExecutableMetaData> executableMetaData) {
+	private static boolean isTrackingEnabled(Optional<ExecutableMetaData> executableMetaData) {
 		if ( !executableMetaData.isPresent() ) {
 			// the method is unconstrained so there's no need to worry about the tracking
 			return false;
 		}
 
-		return !executableMetaData.get().getReturnValueMetaData().hasCascadables();
+		return executableMetaData.get().isTrackingEnabledForReturnValue();
 	}
 
 	@Override
