@@ -21,12 +21,29 @@
     <description>Aggregates dependencies and runs the Jakarta Validation TCK</description>
 
     <properties>
+        <!--
+            We are overriding the AssertJ version here and adding a dependency management for it
+            to override the one we are using for the main build.
+            The version here must be the exact same version as the one used in the Bean Validation TCK
+        -->
+        <version.org.assertj.assertj-core>3.8.0</version.org.assertj.assertj-core>
+
         <tck.suite.file>${project.build.directory}/dependency/validation-tck-tests-suite.xml</tck.suite.file>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug />
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${version.org.assertj.assertj-core}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
