@@ -27,7 +27,13 @@
             that are 2.0+. Since we are also using this plugin to parse versions in the root pom we want to control
             when the sources are added with this property:
         -->
-        <add.bv2.sources.skip>true</add.bv2.sources.skip>
+        <!--
+            We want to add sources depending on the implementation we are going to test.
+            See various profiles in this POM for different versions possible to run performance tests against
+            and which sources the profile is using.
+        -->
+        <sources.to.add.main>${project.basedir}/src/main/java</sources.to.add.main>
+        <sources.to.add.additional>${project.basedir}/src/main/java</sources.to.add.additional>
 
         <!--
         Need to specify something, since the plugin cannot handle empty options. Using something which does not have
@@ -36,6 +42,7 @@
         <profilingOptions>-showversion</profilingOptions>
         <history.directory>${project.basedir}/history</history.directory>
         <jmh.version>1.37</jmh.version>
+        <version.log4j>1.2.17</version.log4j>
 
         <!-- default values, overridden per profile -->
         <beanvalidation-impl.name>none</beanvalidation-impl.name>
@@ -70,7 +77,7 @@
     <build>
         <pluginManagement>
             <plugins>
-                <!-- adding sources for BV 2.0 tests -->
+                <!-- Adding sources depending on the spec implemented by the particular version. -->
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
@@ -82,9 +89,9 @@
                                 <goal>add-source</goal>
                             </goals>
                             <configuration>
-                                <skipAddSource>${add.bv2.sources.skip}</skipAddSource>
                                 <sources>
-                                    <source>${project.basedir}/src/main/java-bv2</source>
+                                    <source>${sources.to.add.main}</source>
+                                    <source>${sources.to.add.additional}</source>
                                 </sources>
                             </configuration>
                         </execution>
@@ -179,7 +186,7 @@
             <properties>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>${project.version}</beanvalidation-impl.version>
-                <add.bv2.sources.skip>false</add.bv2.sources.skip>
+                <sources.to.add.main>${project.basedir}/src/main/jakarta</sources.to.add.main>
             </properties>
             <dependencies>
                 <dependency>
@@ -198,6 +205,42 @@
                 <dependency>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
+                    <version>${version.log4j}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>hv-8.0</id>
+            <activation>
+                <property>
+                    <name>validator</name>
+                    <value>hv-8.0</value>
+                </property>
+            </activation>
+            <properties>
+                <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
+                <validation-api.version>3.0.0.Final</validation-api.version>
+                <beanvalidation-impl.version>8.0.1.Final</beanvalidation-impl.version>
+                <sources.to.add.main>${project.basedir}/src/main/jakarta</sources.to.add.main>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>jakarta.validation</groupId>
+                    <artifactId>jakarta.validation-api</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${beanvalidation-impl.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.expressly</groupId>
+                    <artifactId>expressly</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                    <version>${version.log4j}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -213,7 +256,8 @@
                 <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>6.1.2.Final</beanvalidation-impl.version>
-                <add.bv2.sources.skip>false</add.bv2.sources.skip>
+                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
+                <sources.to.add.additional>${project.basedir}/src/main/javax-bv2</sources.to.add.additional>
             </properties>
             <dependencies>
                 <dependency>
@@ -234,6 +278,7 @@
                 <dependency>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
+                    <version>${version.log4j}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -249,7 +294,8 @@
                 <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>6.0.19.Final</beanvalidation-impl.version>
-                <add.bv2.sources.skip>false</add.bv2.sources.skip>
+                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
+                <sources.to.add.additional>${project.basedir}/src/main/javax-bv2</sources.to.add.additional>
             </properties>
             <dependencies>
                 <dependency>
@@ -270,6 +316,7 @@
                 <dependency>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
+                    <version>${version.log4j}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -285,6 +332,7 @@
                 <validation-api.version>1.1.0.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>5.4.3.Final</beanvalidation-impl.version>
+                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
             </properties>
             <dependencies>
                 <dependency>
@@ -305,6 +353,7 @@
                 <dependency>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
+                    <version>${version.log4j}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -321,6 +370,7 @@
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>5.3.6.Final</beanvalidation-impl.version>
                 <javax-el.version>2.2.4</javax-el.version>
+                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
             </properties>
             <dependencies>
                 <dependency>
@@ -346,6 +396,7 @@
                 <dependency>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
+                    <version>${version.log4j}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -362,6 +413,7 @@
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>5.2.4.Final</beanvalidation-impl.version>
                 <javax-el.version>2.2.4</javax-el.version>
+                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
             </properties>
             <dependencies>
                 <dependency>
@@ -387,6 +439,7 @@
                 <dependency>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
+                    <version>${version.log4j}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -403,6 +456,7 @@
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>5.1.3.Final</beanvalidation-impl.version>
                 <javax-el.version>2.2.4</javax-el.version>
+                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
             </properties>
             <dependencies>
                 <dependency>
@@ -428,6 +482,7 @@
                 <dependency>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
+                    <version>${version.log4j}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -444,6 +499,7 @@
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>5.0.1.Final</beanvalidation-impl.version>
                 <javax-el.version>2.2.4</javax-el.version>
+                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
             </properties>
             <dependencies>
                 <dependency>
@@ -469,6 +525,7 @@
                 <dependency>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
+                    <version>${version.log4j}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -484,6 +541,7 @@
                 <validation-api.version>1.0.0.GA</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>4.3.0.Final</beanvalidation-impl.version>
+                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
             </properties>
             <dependencies>
                 <dependency>
@@ -514,6 +572,7 @@
                 <validation-api.version>1.0.0.GA</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>4.2.0.Final</beanvalidation-impl.version>
+                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
             </properties>
             <dependencies>
                 <dependency>
@@ -545,6 +604,7 @@
                 <validation-api.version>1.0.0.GA</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>4.1.0.Final</beanvalidation-impl.version>
+                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
             </properties>
             <dependencies>
                 <dependency>
@@ -576,6 +636,7 @@
                 <validation-api.version>1.1.0.Final</validation-api.version>
                 <beanvalidation-impl.name>Apache BVal</beanvalidation-impl.name>
                 <beanvalidation-impl.version>1.1.2</beanvalidation-impl.version>
+                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
             </properties>
             <dependencies>
                 <dependency>

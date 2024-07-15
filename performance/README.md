@@ -99,3 +99,18 @@ This test has a few more constraints than the previous one, allowing to test our
 A number of _TestEntity_s is created where each entity contains a property for each built-in constraint type and also a reference
 to another _TestEntity_. All constraints are evaluated by a single ConstraintValidator implementation which fails a specified
 percentage of the validations.
+
+## Adding more tests
+
+When adding new performance tests, note the sources structure of this module:
+
+- `java/`: main sources that contain the test runner
+- `jakarta/`: performance tests based on the `jakarta.validation` namespace and that are applicable to the Jakarta
+  Validation spec implementation.
+- `javax/`: performance tests based on the `javax.validation` namespace and that are applicable to the Java Bean
+  Validation spec implementation for versions 1.0 and 1.1.
+- `javax-bv2/` performance tests based on the `javax.validation` namespace and that are applicable to the Java Bean
+  Validation spec implementation for version 2.0.
+
+Hence, when a new test is added, consider adding it to the `jakarta` and `javax` directories depending on the tested
+functionality.
