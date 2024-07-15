@@ -13,18 +13,18 @@
         <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator-internal-parent</artifactId>
         <version>9.0.0-SNAPSHOT</version>
-        <relativePath>../../parents/internal/pom.xml</relativePath>
+        <relativePath>../../../../parents/internal/pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-validator-integrationtest-java-modules-simple</artifactId>
+    <artifactId>hibernate-validator-integrationtest-java-modules-no-el</artifactId>
 
-    <name>Hibernate Validator JPMS tests: Simple</name>
+    <name>Hibernate Validator JPMS tests: No EL</name>
     <description>Hibernate Validator JPMS integration tests.</description>
 
     <properties>
         <surefire.jvm.args.additional>-Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
 
-        <hibernate-validator-parent.path>../..</hibernate-validator-parent.path>
+        <hibernate-validator-parent.path>../../../..</hibernate-validator-parent.path>
     </properties>
 
     <dependencies>
@@ -33,8 +33,12 @@
             <artifactId>hibernate-validator</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.expressly</groupId>
-            <artifactId>expressly</artifactId>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-annotations</artifactId>
         </dependency>
         <!-- test -->
         <dependency>

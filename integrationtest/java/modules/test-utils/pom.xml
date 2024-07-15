@@ -13,18 +13,18 @@
         <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator-internal-parent</artifactId>
         <version>9.0.0-SNAPSHOT</version>
-        <relativePath>../../parents/internal/pom.xml</relativePath>
+        <relativePath>../../../../parents/internal/pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-validator-integrationtest-java-modules-no-el</artifactId>
+    <artifactId>hibernate-validator-integrationtest-java-modules-test-utils</artifactId>
 
-    <name>Hibernate Validator JPMS tests: No EL</name>
+    <name>Hibernate Validator JPMS tests: Test Utils</name>
     <description>Hibernate Validator JPMS integration tests.</description>
 
     <properties>
         <surefire.jvm.args.additional>-Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
 
-        <hibernate-validator-parent.path>../..</hibernate-validator-parent.path>
+        <hibernate-validator-parent.path>../../../..</hibernate-validator-parent.path>
     </properties>
 
     <dependencies>
@@ -33,27 +33,23 @@
             <artifactId>hibernate-validator</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
+            <groupId>org.glassfish.expressly</groupId>
+            <artifactId>expressly</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging-annotations</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-validator-test-utils</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>compile</scope>
         </dependency>
         <!-- test -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-validator-test-utils</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
