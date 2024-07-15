@@ -116,7 +116,6 @@
                             <archive>
                                 <manifestEntries>
                                     <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
-                                    <Multi-Release>true</Multi-Release>
                                 </manifestEntries>
                             </archive>
                         </configuration>
