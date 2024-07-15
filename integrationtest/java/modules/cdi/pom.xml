@@ -13,7 +13,7 @@
         <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator-internal-parent</artifactId>
         <version>9.0.0-SNAPSHOT</version>
-        <relativePath>../../parents/internal/pom.xml</relativePath>
+        <relativePath>../../../../parents/internal/pom.xml</relativePath>
     </parent>
 
     <artifactId>hibernate-validator-integrationtest-java-modules-cdi</artifactId>
@@ -33,7 +33,7 @@
             --add-reads=org.hibernate.validator=ALL-UNNAMED
         </surefire.jvm.args.add-opens>
 
-        <hibernate-validator-parent.path>../..</hibernate-validator-parent.path>
+        <hibernate-validator-parent.path>../../../..</hibernate-validator-parent.path>
     </properties>
 
     <dependencies>
