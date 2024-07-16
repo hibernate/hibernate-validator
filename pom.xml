@@ -175,7 +175,7 @@
         <version.org.openjfx>17.0.11</version.org.openjfx>
 
         <!-- Test dependencies -->
-        <version.org.jboss.arquillian>1.8.1.Final</version.org.jboss.arquillian>
+        <version.org.jboss.arquillian>1.9.0.Final</version.org.jboss.arquillian>
         <version.org.testng>7.10.2</version.org.testng>
         <!-- it must be the exact same version than the one used in the Bean Validation TCK -->
         <version.org.assertj.assertj-core>3.8.0</version.org.assertj.assertj-core>
@@ -184,7 +184,7 @@
         <version.io.rest-assured>5.5.0</version.io.rest-assured>
         <version.org.apache.groovy>4.0.22</version.org.apache.groovy>
         <version.com.google.guava>33.2.1-jre</version.com.google.guava>
-        <version.org.springframework.spring-expression>6.1.10</version.org.springframework.spring-expression>
+        <version.org.springframework.spring-expression>6.1.11</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.17.2</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.17.2</version.com.fasterxml.jackson.core.jackson-annotations>
@@ -240,12 +240,12 @@
         <version.jqassistant.plugin>2.3.1</version.jqassistant.plugin>
         <version.javadoc.plugin>3.7.0</version.javadoc.plugin>
         <version.license.plugin>4.5</version.license.plugin>
-        <version.release.plugin>3.1.0</version.release.plugin>
+        <version.release.plugin>3.1.1</version.release.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
         <version.shade.plugin>3.6.0</version.shade.plugin>
         <version.sigtest.plugin>2.3</version.sigtest.plugin>
         <version.source.plugin>3.3.1</version.source.plugin>
-        <version.surefire.plugin>3.3.0</version.surefire.plugin>
+        <version.surefire.plugin>3.3.1</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.7</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
