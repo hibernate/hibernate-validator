@@ -26,6 +26,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithISBNConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithJava8DateTime;
 import org.hibernate.validator.ap.testmodel.ModelWithJavaMoneyTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
+import org.hibernate.validator.ap.testmodel.ModelWithKorRRNConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNormalizedConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithUUIDConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithUniqueElementsConstraints;
@@ -769,6 +770,22 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 	public void isbnConstraints() {
 		File[] sourceFiles = new File[] {
 				compilerHelper.getSourceFile( ModelWithISBNConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 22 )
+		);
+	}
+
+	@Test
+	public void korRrnConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithKorRRNConstraints.class )
 		};
 
 		boolean compilationResult =

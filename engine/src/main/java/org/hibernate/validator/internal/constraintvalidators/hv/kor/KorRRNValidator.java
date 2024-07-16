@@ -46,24 +46,7 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 		return rrnValidationAlgorithm.isValid( rrnValue.toString().replace( "-", "" ) );
 	}
 
-	private interface RRNValidationAlgorithm {
-		int VALID_LENGTH = 13;
-		int THRESHOLD = 9;
-		int MODULDO = 11;
-
-		boolean isValid(String rrn);
-
-		// Returns an implementation of the algorithm based on the value of ValidateCheckDigit
-		static RRNValidationAlgorithm from(KorRRN.ValidateCheckDigit validateCheckDigit) {
-			Contracts.assertNotNull( validateCheckDigit );
-			if ( validateCheckDigit == KorRRN.ValidateCheckDigit.ALWAYS ) {
-				return RRNValidationAlgorithmImpl.ALWAYS;
-			}
-			return RRNValidationAlgorithmImpl.NEVER;
-		}
-	}
-
-	private enum RRNValidationAlgorithmImpl implements RRNValidationAlgorithm {
+	private enum RRNValidationAlgorithm {
 		NEVER {
 			@Override
 			public boolean isValid(String rrn) {
@@ -77,8 +60,23 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 			}
 		};
 
+		// Returns an implementation of the algorithm based on the value of ValidateCheckDigit
+		static RRNValidationAlgorithm from(KorRRN.ValidateCheckDigit validateCheckDigit) {
+			Contracts.assertNotNull( validateCheckDigit );
+			if ( validateCheckDigit == KorRRN.ValidateCheckDigit.ALWAYS ) {
+				return RRNValidationAlgorithm.ALWAYS;
+			}
+			return RRNValidationAlgorithm.NEVER;
+		}
+
+		abstract boolean isValid(String rrn);
+
+		private static final int VALID_LENGTH = 13;
+		private static final int THRESHOLD = 9;
+		private static final int MODULDO = 11;
+
 		// Check the check-digit of the RRN using ModUtil
-		boolean isValidChecksum(final String rrn) {
+		private static boolean isValidChecksum(final String rrn) {
 			int checksum = ModUtil.calculateModXCheckWithWeights(
 					toChecksumDigits( rrn ),
 					MODULDO,
@@ -86,10 +84,10 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 					CHECK_SUM_WEIGHT
 			);
 			checksum = checksum >= 10 ? checksum - 10 : checksum;
-			return checksum == getChectDigit( rrn );
+			return checksum == getCheckDigit( rrn );
 		}
 
-		boolean isValidDate(final String rrn) {
+		private static	boolean isValidDate(final String rrn) {
 			final int month = extractMonth( rrn );
 			final int day = extractDay( rrn );
 			if ( month > 12 || day < 0 || day > 31 ) {
@@ -98,19 +96,19 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 			return day <= 31 && ( day <= 30 || ( month != 4 && month != 6 && month != 9 && month != 11 ) ) && ( day <= 29 || month != 2 );
 		}
 
-		boolean isValidLength(String rrn) {
+		private static	boolean isValidLength(String rrn) {
 			return rrn.length() == VALID_LENGTH;
 		}
 
-		boolean isValidGenderDigit(String rrn) {
+		private static	boolean isValidGenderDigit(String rrn) {
 			return GENDER_DIGIT.contains( extractGenderDigit( rrn ) );
 		}
 
-		int extractGenderDigit(String rrn) {
+		private static	int extractGenderDigit(String rrn) {
 			return Character.getNumericValue( rrn.charAt( GENDER_DIGIT_INDEX ) );
 		}
 
-		List<Integer> toChecksumDigits(String rrn) {
+		private static	List<Integer> toChecksumDigits(String rrn) {
 			List<Integer> collect = new ArrayList<>();
 			for ( int i = 0; i < rrn.length() - 1; i++ ) {
 				collect.add( Character.getNumericValue( rrn.charAt( i ) ) );
@@ -118,15 +116,15 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 			return collect;
 		}
 
-		int getChectDigit(String rrn) {
+		private static int getCheckDigit(String rrn) {
 			return Character.getNumericValue( rrn.charAt( rrn.length() - 1 ) );
 		}
 
-		int extractDay(String rrn) {
+		private static	int extractDay(String rrn) {
 			return Integer.parseInt( rrn.substring( 4, 6 ) );
 		}
 
-		int extractMonth(String rrn) {
+		private static	int extractMonth(String rrn) {
 			return Integer.parseInt( rrn.substring( 2, 4 ) );
 		}
 	}
