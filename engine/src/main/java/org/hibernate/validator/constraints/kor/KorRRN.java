@@ -24,6 +24,8 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.hibernate.validator.Incubating;
+
 /**
  * Checks that the annotated character sequence is a valid Korean resident registration number.
  *
@@ -31,6 +33,7 @@ import java.lang.annotation.Target;
  * @see <a href="https://ko.wikipedia.org/wiki/%EC%A3%BC%EB%AF%BC%EB%93%B1%EB%A1%9D%EB%B2%88%ED%98%B8">Korean resident registration number</a>
  */
 
+@Incubating
 @Documented
 @Constraint(validatedBy = {})
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
