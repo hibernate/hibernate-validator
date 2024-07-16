@@ -175,7 +175,10 @@
         <version.org.openjfx>17.0.11</version.org.openjfx>
 
         <!-- Test dependencies -->
-        <version.org.jboss.arquillian>1.8.1.Final</version.org.jboss.arquillian>
+        <version.org.jboss.arquillian>1.9.0.Final</version.org.jboss.arquillian>
+        <version.shrinkwrap.core>1.2.6</version.shrinkwrap.core>
+        <version.shrinkwrap.resolvers>3.3.0</version.shrinkwrap.resolvers>
+        <version.shrinkwrap.descriptors>2.0.0</version.shrinkwrap.descriptors>
         <version.org.testng>7.10.2</version.org.testng>
         <!-- it must be the exact same version than the one used in the Bean Validation TCK -->
         <version.org.assertj.assertj-core>3.8.0</version.org.assertj.assertj-core>
@@ -474,6 +477,30 @@
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
                 <version>${version.org.jboss.arquillian}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--  ShrinkWrap  -->
+            <dependency>
+                <groupId>org.jboss.shrinkwrap</groupId>
+                <artifactId>shrinkwrap-bom</artifactId>
+                <version>${version.shrinkwrap.core}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--  ShrinkWrap Resolver  -->
+            <dependency>
+                <groupId>org.jboss.shrinkwrap.resolver</groupId>
+                <artifactId>shrinkwrap-resolver-bom</artifactId>
+                <version>${version.shrinkwrap.resolvers}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--  ShrinkWrap Descriptors  -->
+            <dependency>
+                <groupId>org.jboss.shrinkwrap.descriptors</groupId>
+                <artifactId>shrinkwrap-descriptors-bom</artifactId>
+                <version>${version.shrinkwrap.descriptors}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
