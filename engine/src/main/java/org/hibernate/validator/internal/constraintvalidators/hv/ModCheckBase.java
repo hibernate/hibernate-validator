@@ -29,10 +29,8 @@ public abstract class ModCheckBase {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final Pattern NUMBERS_ONLY_REGEXP = Pattern.compile( "[^0-9]" );
-	private static final Pattern NUMBERS_UPPER_LETTERS_ONLY_REGEXP = Pattern.compile( "[^0-9A-Z]" );
 
 	private static final int DEC_RADIX = 10;
-	private static final int BASE_CHAR_INDEX = 48;
 
 	/**
 	 * The start index for the checksum calculation
@@ -49,8 +47,7 @@ public abstract class ModCheckBase {
 	 */
 	private int checkDigitIndex;
 
-	private boolean ignoreNonValidCharacters;
-	private boolean alphanumeric;
+	protected boolean ignoreDelimitingCharacters;
 
 	public boolean isValid(final CharSequence value, final ConstraintValidatorContext context) {
 		if ( value == null ) {
@@ -82,22 +79,11 @@ public abstract class ModCheckBase {
 
 	public abstract boolean isCheckDigitValid(List<Integer> digits, char checkDigit);
 
-	protected void initialize(int startIndex, int endIndex, int checkDigitIndex, boolean ignoreNonValidCharacters) {
+	protected void initialize(int startIndex, int endIndex, int checkDigitIndex, boolean ignoreDelimitingCharacters) {
 		this.startIndex = startIndex;
 		this.endIndex = endIndex;
 		this.checkDigitIndex = checkDigitIndex;
-		this.ignoreNonValidCharacters = ignoreNonValidCharacters;
-		this.alphanumeric = false;
-
-		this.validateOptions();
-	}
-
-	protected void initialize(int startIndex, int endIndex, int checkDigitIndex, boolean ignoreNonValidCharacters, boolean alphanumeric) {
-		this.startIndex = startIndex;
-		this.endIndex = endIndex;
-		this.checkDigitIndex = checkDigitIndex;
-		this.ignoreNonValidCharacters = ignoreNonValidCharacters;
-		this.alphanumeric = alphanumeric;
+		this.ignoreDelimitingCharacters = ignoreDelimitingCharacters;
 
 		this.validateOptions();
 	}
@@ -112,21 +98,11 @@ public abstract class ModCheckBase {
 	 * @throws NumberFormatException in case character is not a digit
 	 */
 	protected int extractDigit(char value) throws NumberFormatException {
-		if ( alphanumeric ) {
-			if ( (value >= '0' && value <= '9' ) || (value >= 'A' && value <= 'Z') ) {
-				 return value - BASE_CHAR_INDEX;
-			}
-			else {
-				throw LOG.getCharacterIsNotADigitOrUpperCaseLetterException( value );
-			}
+		if ( Character.isDigit( value ) ) {
+			return Character.digit( value, DEC_RADIX );
 		}
 		else {
-			if ( Character.isDigit( value ) ) {
-				return Character.digit( value, DEC_RADIX );
-			}
-			else {
-				throw LOG.getCharacterIsNotADigitException( value );
-			}
+			throw LOG.getCharacterIsNotADigitException( value );
 		}
 	}
 
@@ -168,14 +144,9 @@ public abstract class ModCheckBase {
 		return true;
 	}
 
-	private String stripNonDigitsIfRequired(String value) {
-		if ( ignoreNonValidCharacters ) {
-			if ( alphanumeric ) {
-				return NUMBERS_UPPER_LETTERS_ONLY_REGEXP.matcher( value ).replaceAll( "" );
-			}
-			else {
-				return NUMBERS_ONLY_REGEXP.matcher( value ).replaceAll( "" );
-			}
+	protected String stripNonDigitsIfRequired(String value) {
+		if ( ignoreDelimitingCharacters ) {
+			return NUMBERS_ONLY_REGEXP.matcher( value ).replaceAll( "" );
 		}
 		else {
 			return value;

@@ -75,6 +75,7 @@ public class TypeNames {
 		public static final String LUHN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".LuhnCheck";
 		public static final String MOD_10_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Mod10Check";
 		public static final String MOD_11_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Mod11Check";
+		public static final String CNPJ_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".br.CNPJ";
 		public static final String REGON_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.REGON";
 		public static final String NIP_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.NIP";
 		public static final String PESEL_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.PESEL";

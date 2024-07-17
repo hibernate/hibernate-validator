@@ -937,6 +937,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 266, value = "Inconsistent fail fast on property violation mode configuration. It is enabled via programmatic API, but explicitly disabled via properties.")
 	ValidationException getInconsistentFailFastOnPropertyViolationConfigurationException();
 
-	@Message(id = 267, value = "'%c' is not a digit or upper case letter.")
-	IllegalArgumentException getCharacterIsNotADigitOrUpperCaseLetterException(char c);
+	@Message(id = 267, value = "'%c' is neither a digit nor an upper case ASCII letter.")
+	IllegalArgumentException getCharacterIsNotDigitOrUpperCaseLetterException(char c);
 }

@@ -122,12 +122,6 @@ public @interface Mod11Check {
 	ProcessingDirection processingDirection() default ProcessingDirection.RIGHT_TO_LEFT;
 
 	/**
-	 * @return Whether upper case letters characters in the validated input should be allowed ({@code true}) or result in a
-	 * validation error ({@code false}).
-	 */
-	boolean alphanumeric() default false;
-
-	/**
 	 * Defines several {@code @Mod11Check} annotations on the same element.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
