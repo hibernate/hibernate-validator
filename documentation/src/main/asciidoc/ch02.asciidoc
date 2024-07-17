@@ -742,7 +742,7 @@ If you have to implement a country specific constraint, consider making it a con
 Hibernate Validator!
 ====
 
-`@CNPJ`:: Checks that the annotated character sequence represents a Brazilian corporate tax payer registry number (Cadastro de Pessoa Jurídica)
+`@CNPJ`:: Checks that the annotated character sequence represents a Brazilian corporate tax payer registry number (Cadastro de Pessoa Jurídica). An optional `format` parameter allows picking which format of CNPJ should be considered valid `NUMERIC`, the current format, or `ALPHANUMERIC`, the one that will replace the current one starting January 2026.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 	Country::: Brazil

@@ -65,8 +65,7 @@ public class Mod11CheckValidator extends ModCheckBase
 				constraintAnnotation.threshold(),
 				constraintAnnotation.treatCheck10As(),
 				constraintAnnotation.treatCheck11As(),
-				constraintAnnotation.processingDirection(),
-				constraintAnnotation.alphanumeric()
+				constraintAnnotation.processingDirection()
 		);
 	}
 
@@ -79,7 +78,6 @@ public class Mod11CheckValidator extends ModCheckBase
 			char treatCheck10As,
 			char treatCheck11As,
 			ProcessingDirection direction,
-			boolean alphanumeric,
 			int... customWeights
 	) {
 
@@ -87,8 +85,7 @@ public class Mod11CheckValidator extends ModCheckBase
 				startIndex,
 				endIndex,
 				checkDigitIndex,
-				ignoreNonDigitCharacters,
-				alphanumeric
+				ignoreNonDigitCharacters
 		);
 		this.threshold = threshold;
 		this.reverseOrder = direction == ProcessingDirection.LEFT_TO_RIGHT;

@@ -21,9 +21,8 @@ import java.lang.annotation.Target;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import jakarta.validation.ReportAsSingleViolation;
-import jakarta.validation.constraints.Pattern;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.constraints.br.CNPJ.List;
 
 /**
@@ -31,8 +30,6 @@ import org.hibernate.validator.constraints.br.CNPJ.List;
  *
  * @author George Gastaldi
  */
-@Pattern(regexp = "([0-9A-Z]{2}[.]?[0-9A-Z]{3}[.]?[0-9A-Z]{3}[/]?[0-9A-Z]{4}[-]?[0-9]{2})")
-@ReportAsSingleViolation
 @Documented
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
@@ -45,7 +42,26 @@ public @interface CNPJ {
 
 	Class<? extends Payload>[] payload() default { };
 
-	boolean alphanumeric() default false;
+	/**
+	 * @return The format type of the CNPJ number that should be considered as valid.
+	 * @see Format
+	 */
+	@Incubating
+	Format format() default Format.NUMERIC;
+
+	enum Format {
+		/**
+		 * The older, original, CNPJ format that is constructed from digits only,
+		 * e.g. {@code dd.ddd.ddd/dddd-dd}, where {@code d} represents a digit.
+		 */
+		NUMERIC,
+		/**
+		 * The new CNPJ format that is constructed from digits and ASCII letters,
+		 * e.g. {@code ss.sss.sss/ssss-dd}, where {@code d} represents a digit and {@code s} represents either a digit or a letter.
+		 * This format adoption should start in January 2026.
+		 */
+		ALPHANUMERIC;
+	}
 
 	/**
 	 * Defines several {@code @CNPJ} annotations on the same element.
