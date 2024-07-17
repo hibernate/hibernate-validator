@@ -730,6 +730,9 @@ With one exception also these constraints apply to the field/property level, onl
 `@UUID(allowEmpty=, allowNil=, version=, variant=, letterCase=)`:: Checks that the annotated character sequence is a valid universally unique identifier according to RFC 4122. `null` is always valid. The option `allowEmpty` allows empty character sequences. `allowNil` includes nil UUIDs (`00000000-0000-0000-0000-000000000000`). The `version` and `variant` parameters control which UUID versions and variants are allowed. `letterCase` ensures lower case or upper case, but can also be configured as case insensitive.
         Supported data types::: `CharSequence`
         Hibernate metadata impact::: None
+`@BitcoinAddress(value=)`:: Checks that the annotated character sequence is a valid Bitcoin address. `null` values are considered valid. The option `value` allows to specify which types of Bitcoin addresses should be considered as valid. By default, all address types are considered as valid. See `BitcoinAddress.BitcoinAddressType` for a list of available address types.
+        Supported data types::: `CharSequence`
+        Hibernate metadata impact::: None
 
 ===== Country specific constraints
 

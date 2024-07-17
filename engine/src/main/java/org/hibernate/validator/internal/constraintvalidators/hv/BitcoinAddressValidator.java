@@ -6,21 +6,18 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
-import org.hibernate.validator.constraints.BitcoinAddress;
-import org.hibernate.validator.constraints.BitcoinAddressType;
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.EnumMap;
 import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.regex.Matcher;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.hibernate.validator.constraints.BitcoinAddress;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * Checks that a given character sequence (e.g. string) is a well-formed BTC (Bitcoin) address.
@@ -29,23 +26,15 @@ import java.util.stream.Collectors;
  */
 public class BitcoinAddressValidator implements ConstraintValidator<BitcoinAddress, CharSequence> {
 
-	static final String HIBERNATE_VALIDATION_MESSAGES = "org.hibernate.validator.ValidationMessages";
+	static final String BITCOIN_BASE_MESSAGE_KEY = "org.hibernate.validator.constraints.BitcoinAddress.message";
 	static final String ADDRESS_TYPE_VALIDATION_MESSAGE_PREFIX = "org.hibernate.validator.constraints.BitcoinAddress.type.";
-	private final List<BitcoinAddressType> addressTypes = new ArrayList<>();
+	private final Set<AddressValidator> validators = new TreeSet<>();
 
 	@Override
 	public void initialize(BitcoinAddress bitcoinAddress) {
-		BitcoinAddressType[] types = bitcoinAddress.value();
-
-		if ( Arrays.stream( types ).anyMatch( type -> type == BitcoinAddressType.ANY ) ) {
-			this.addressTypes.addAll(
-					Arrays.stream( BitcoinAddressType.values() )
-							.filter( type -> type != BitcoinAddressType.ANY )
-							.collect( Collectors.toList() ) );
-			return;
+		for ( BitcoinAddress.BitcoinAddressType addressType : bitcoinAddress.value() ) {
+			validators.addAll( AddressValidator.validators( addressType ) );
 		}
-
-		Collections.addAll( this.addressTypes, types );
 	}
 
 	/**
@@ -57,45 +46,73 @@ public class BitcoinAddressValidator implements ConstraintValidator<BitcoinAddre
 	 */
 	@Override
 	public boolean isValid(CharSequence charSequence, ConstraintValidatorContext context) {
-
 		if ( charSequence == null ) {
 			return true;
 		}
 
-		for ( BitcoinAddressType type : this.addressTypes ) {
-			Pattern pattern = type.getPattern();
-			Matcher matcher = pattern.matcher( charSequence );
-
-			if ( matcher.matches() ) {
+		for ( AddressValidator validator : validators ) {
+			if ( validator.matches( charSequence ) ) {
 				return true;
 			}
 		}
 
-
-		context.unwrap( HibernateConstraintValidatorContext.class )
-				.addExpressionVariable( "singleType", isSingleType() )
-				.addExpressionVariable( "typesDescription", getTypesDescription() );
+		context.disableDefaultConstraintViolation();
+		boolean isSingle = isSingleType();
+		if ( isSingle ) {
+			context.unwrap( HibernateConstraintValidatorContext.class )
+					.buildConstraintViolationWithTemplate( String.format( Locale.ROOT, "{%s.single} %s", BITCOIN_BASE_MESSAGE_KEY, getAddressTypeName( validators.iterator().next() ) ) )
+					.addConstraintViolation();
+		}
+		else {
+			context.unwrap( HibernateConstraintValidatorContext.class )
+					.buildConstraintViolationWithTemplate( String.format( Locale.ROOT, "{%s.multiple} %s", BITCOIN_BASE_MESSAGE_KEY, validators.stream().map( this::getAddressTypeName )
+							.collect( Collectors.joining( ", " ) ) ) )
+					.addConstraintViolation();
+		}
 
 		return false;
 	}
 
-	boolean isSingleType() {
-		return addressTypes.size() == 1
-				|| addressTypes.containsAll( Arrays.stream( BitcoinAddressType.values() )
-				.filter( type -> type != BitcoinAddressType.ANY ).collect( Collectors.toList() ) );
+	private boolean isSingleType() {
+		return validators.size() == 1;
 	}
 
-	String getTypesDescription() {
-		if ( isSingleType() ) {
-			return getAddressTypeName( BitcoinAddressType.ANY );
+	String getAddressTypeName(AddressValidator validator) {
+		return String.format( Locale.ROOT, "{%s%s}", ADDRESS_TYPE_VALIDATION_MESSAGE_PREFIX, validator.name().toLowerCase( Locale.ROOT ) );
+	}
+
+	private enum AddressValidator {
+		P2PKH( "^(1)[a-zA-HJ-NP-Z0-9]{25,61}$" ),
+		P2SH( "^(3)[a-zA-HJ-NP-Z0-9]{33}$" ),
+		BECH32( "^(bc1)[a-zA-HJ-NP-Z0-9]{39,59}$" ),
+		P2WSH( "^(bc1q)[a-zA-HJ-NP-Z0-9]{58}$" ),
+		P2WPKH( "^(bc1q)[a-zA-HJ-NP-Z0-9]{38}$" ),
+		P2TR( "^(bc1p)[a-zA-HJ-NP-Z0-9]{58}$" );
+
+		private static final EnumMap<BitcoinAddress.BitcoinAddressType, Set<AddressValidator>> validators = new EnumMap<>( BitcoinAddress.BitcoinAddressType.class );
+
+		static {
+			validators.put( BitcoinAddress.BitcoinAddressType.ANY, Set.of( AddressValidator.values() ) );
+			validators.put( BitcoinAddress.BitcoinAddressType.P2PKH, Set.of( AddressValidator.P2PKH ) );
+			validators.put( BitcoinAddress.BitcoinAddressType.P2SH, Set.of( AddressValidator.P2SH ) );
+			validators.put( BitcoinAddress.BitcoinAddressType.BECH32, Set.of( AddressValidator.BECH32 ) );
+			validators.put( BitcoinAddress.BitcoinAddressType.P2WSH, Set.of( AddressValidator.P2WSH ) );
+			validators.put( BitcoinAddress.BitcoinAddressType.P2WPKH, Set.of( AddressValidator.P2WPKH ) );
+			validators.put( BitcoinAddress.BitcoinAddressType.P2TR, Set.of( AddressValidator.P2TR ) );
 		}
 
-		return this.addressTypes.stream().map( this::getAddressTypeName ).collect( Collectors.joining( "; " ) );
-	}
+		private final Pattern pattern;
 
-	String getAddressTypeName(BitcoinAddressType bitcoinAddressType) {
-		ResourceBundle resourceBundle = ResourceBundle.getBundle( HIBERNATE_VALIDATION_MESSAGES, Locale.getDefault() );
-		return resourceBundle.getString(
-				ADDRESS_TYPE_VALIDATION_MESSAGE_PREFIX + bitcoinAddressType.name().toLowerCase( Locale.getDefault() ) );
+		AddressValidator(String pattern) {
+			this.pattern = pattern != null ? Pattern.compile( pattern ) : null;
+		}
+
+		public boolean matches(CharSequence address) {
+			return pattern.matcher( address ).matches();
+		}
+
+		static Set<AddressValidator> validators(BitcoinAddress.BitcoinAddressType addressType) {
+			return validators.get( addressType );
+		}
 	}
 }

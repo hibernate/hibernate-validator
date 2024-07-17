@@ -6,22 +6,23 @@
  */
 package org.hibernate.validator.cfg.defs;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.BitcoinAddress;
-import org.hibernate.validator.constraints.BitcoinAddressType;
 
 /**
  * @author José Yoshiriro
- * @since 8.0.2
+ * @since 9.0.0
  */
+@Incubating
 public class BitcoinAddressDef extends ConstraintDef<BitcoinAddressDef, BitcoinAddress> {
 
 	public BitcoinAddressDef() {
 		super( BitcoinAddress.class );
 	}
 
-	public BitcoinAddressDef value(BitcoinAddressType type) {
-		addParameter( "value", new BitcoinAddressType[] { type } );
+	public BitcoinAddressDef value(BitcoinAddress.BitcoinAddressType... type) {
+		addParameter( "value", type );
 		return this;
 	}
 }
