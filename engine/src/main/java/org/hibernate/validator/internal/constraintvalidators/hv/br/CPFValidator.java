@@ -37,27 +37,27 @@ public class CPFValidator implements ConstraintValidator<CPF, CharSequence> {
 		// check digit being the digit directly after the hyphen. The second checksum is over all digits
 		// pre hyphen + first check digit. The check digit in this case is the second digit after the hyphen
 		withSeparatorMod11Validator1.initialize(
-				0, 10, 12, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT, false
+				0, 10, 12, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
 		);
 		withSeparatorMod11Validator2.initialize(
-				0, 12, 13, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT, false
+				0, 12, 13, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
 		);
 
 		// validates CPF strings with separator, eg 134241313-00
 		withDashOnlySeparatorMod11Validator1.initialize(
-				0, 8, 10, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT, false
+				0, 8, 10, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
 		);
 		withDashOnlySeparatorMod11Validator2.initialize(
-				0, 10, 11, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT, false
+				0, 10, 11, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
 		);
 
 		// validates CPF strings without separator, eg 13424131300
 		// checksums as described above, except there are no separator characters
 		withoutSeparatorMod11Validator1.initialize(
-				0, 8, 9, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT, false
+				0, 8, 9, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
 		);
 		withoutSeparatorMod11Validator2.initialize(
-				0, 9, 10, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT, false
+				0, 9, 10, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
 		);
 	}
 
