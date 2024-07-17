@@ -201,7 +201,7 @@ public class CNPJValidatorTest extends AbstractConstrainedTest {
 	}
 
 	public static class CompanyCNPJWithLetters {
-		@CNPJ(alphanumeric = true)
+		@CNPJ(format = CNPJ.Format.ALPHANUMERIC)
 		private String cnpj;
 
 		public CompanyCNPJWithLetters(String cnpj) {
