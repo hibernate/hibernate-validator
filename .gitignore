@@ -54,3 +54,6 @@ maven-eclipse.xml
 # Maven wrapper files
 .mvn/wrapper
 mvnw*
+
+# Cache folders for formatting plugins:
+.cache

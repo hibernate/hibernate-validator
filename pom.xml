@@ -158,7 +158,6 @@
             They should be aligned with the ones from the Wildfly version we support
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
-<!--        <version.jakarta.enterprise.cdi-api>4.0.1</version.jakarta.enterprise.cdi-api>-->
         <version.org.jboss.weld.weld>6.0.0.Beta4</version.org.jboss.weld.weld>
         <version.org.wildfly.arquillian>5.0.0.Alpha3</version.org.wildfly.arquillian>
         <version.jakarta.jakartaee-bom>11.0.0-M4</version.jakarta.jakartaee-bom>
@@ -260,6 +259,8 @@
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
         <version.moditect.plugin>1.2.1.Final</version.moditect.plugin>
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
+        <version.impsort-maven-plugin>1.11.0</version.impsort-maven-plugin>
+        <version.formatter-maven-plugin>2.24.1</version.formatter-maven-plugin>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
@@ -362,6 +363,11 @@
         <!-- Maven version required for the build -->
         <!-- Remember to update README when changing the version here. -->
         <maven.min.version>3.9.6</maven.min.version>
+
+        <!-- Formatting -->
+        <format.skip>false</format.skip>
+        <goal.impsort-maven-plugin>sort</goal.impsort-maven-plugin>
+        <goal.formatter-maven-plugin>format</goal.formatter-maven-plugin>
     </properties>
 
     <dependencyManagement>
@@ -1351,6 +1357,60 @@
                             <goals>
                                 <goal>flatten</goal>
                             </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>net.revelc.code</groupId>
+                    <artifactId>impsort-maven-plugin</artifactId>
+                    <version>${version.impsort-maven-plugin}</version>
+                    <configuration>
+                        <!-- store outside of target to speed up formatting when mvn clean is used -->
+                        <cachedir>.cache/impsort-maven-plugin-${version.impsort-maven-plugin}</cachedir>
+                        <groups>org.openjdk.jmh.,java.,javax.,jakarta.,org.hibernate., org.hibernate.testing., org.hibernate.test., org.junit., org.jboss., com., *</groups>
+                        <staticGroups>*</staticGroups>
+                        <!-- To make static imports go on top: -->
+                        <staticAfter>false</staticAfter>
+                        <skip>${format.skip}</skip>
+                        <removeUnused>true</removeUnused>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>import-sorting</id>
+                            <goals>
+                                <goal>${goal.impsort-maven-plugin}</goal>
+                            </goals>
+                            <phase>process-sources</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>net.revelc.code.formatter</groupId>
+                    <artifactId>formatter-maven-plugin</artifactId>
+                    <version>${version.formatter-maven-plugin}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate.validator</groupId>
+                            <artifactId>hibernate-validator-build-config</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <!-- store outside of target to speed up formatting when mvn clean is used -->
+                        <cachedir>.cache/formatter-maven-plugin-${version.formatter-maven-plugin}</cachedir>
+                        <configFile>hibernate_validator_style.xml</configFile>
+                        <skip>${format.skip}</skip>
+                        <removeTrailingWhitespace>true</removeTrailingWhitespace>
+                        <skipJsonFormatting>true</skipJsonFormatting>
+                        <skipHtmlFormatting>true</skipHtmlFormatting>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>code-formatting</id>
+                            <goals>
+                                <goal>${goal.formatter-maven-plugin}</goal>
+                            </goals>
+                            <phase>process-sources</phase>
                         </execution>
                     </executions>
                 </plugin>
