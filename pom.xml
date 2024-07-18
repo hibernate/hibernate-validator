@@ -1611,15 +1611,15 @@
         </profile>
         <profile>
             <!--
-                This profile set some properties to make running repro build easier.
+                This profile set some properties to make running reproducibility check build easier.
                 Instead of
                     mvn clean package -DskipTests -Dmaven.javadoc.skip -Dgpg.skip \
                         -Dbuildinfo.detect.skip=false \
                         -Dbuildinfo.skipModules='**/**distribution**,**/**integration**,**/**build**............'
                 We can run
-                    mvn clean package -Pskip-checks -Preproducible
+                    mvn clean package -Pskip-checks -Preproducibility-check
             -->
-            <id>reproducible</id>
+            <id>reproducibility-check</id>
             <properties>
                 <maven-deploy-plugin.skip>false</maven-deploy-plugin.skip>
                 <maven.javadoc.skip>true</maven.javadoc.skip>

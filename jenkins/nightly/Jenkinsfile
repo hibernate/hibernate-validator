@@ -43,12 +43,12 @@ pipeline {
 				timeout(time: 15, unit: 'MINUTES') {
 					withMavenWorkspace {
 						echo "Generate the artifacts."
-						sh "mvn clean install -Preproducible"
+						sh "mvn clean install -Preproducibility-check"
 
 						echo "Running the reproducibility check."
 						sh """mvn clean verify \
 							artifact:compare -Dreference.repo=hibernate-maven-central \
-							-Preproducible \
+							-Preproducibility-check \
 							--fail-at-end
 						"""
 					}
