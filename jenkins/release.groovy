@@ -14,7 +14,7 @@ pipeline {
 		label 'Worker&&Containers'
 	}
 	tools {
-		maven 'Apache Maven 3.8'
+		maven 'Apache Maven 3.9'
 		jdk 'OpenJDK 17 Latest'
 	}
 	options {
