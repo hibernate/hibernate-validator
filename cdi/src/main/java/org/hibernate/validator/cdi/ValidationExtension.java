@@ -47,12 +47,12 @@ import jakarta.validation.executable.ValidateOnExecution;
 import jakarta.validation.metadata.BeanDescriptor;
 import jakarta.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.cdi.interceptor.internal.ValidationEnabledAnnotatedType;
+import org.hibernate.validator.cdi.interceptor.spi.ValidationInterceptor;
 import org.hibernate.validator.cdi.internal.InheritedMethodsHelper;
 import org.hibernate.validator.cdi.internal.ValidationProviderHelper;
 import org.hibernate.validator.cdi.internal.ValidatorBean;
 import org.hibernate.validator.cdi.internal.ValidatorFactoryBean;
-import org.hibernate.validator.cdi.interceptor.internal.ValidationEnabledAnnotatedType;
-import org.hibernate.validator.cdi.interceptor.spi.ValidationInterceptor;
 import org.hibernate.validator.cdi.internal.util.GetterPropertySelectionStrategyHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;

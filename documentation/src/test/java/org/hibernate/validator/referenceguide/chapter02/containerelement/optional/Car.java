@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter02.containerelement.optional;
 
 //end::include[]
-
 import java.util.Optional;
 
 //tag::include[]

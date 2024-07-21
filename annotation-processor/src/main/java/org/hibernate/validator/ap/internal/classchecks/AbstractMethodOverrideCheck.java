@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.ap.internal.classchecks;
 
-
 import java.util.Collections;
 import java.util.Set;
 

@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 
 import org.hibernate.validator.tckrunner.securitymanager.DelegatingExecutor;
 import org.hibernate.validator.tckrunner.securitymanager.Executor;
+
 import org.jboss.arquillian.container.test.impl.execution.event.LocalExecutionEvent;
 import org.jboss.arquillian.test.spi.TestMethodExecutor;
 

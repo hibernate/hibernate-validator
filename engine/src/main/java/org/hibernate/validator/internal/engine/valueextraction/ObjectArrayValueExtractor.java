@@ -8,10 +8,10 @@ package org.hibernate.validator.internal.engine.valueextraction;
 
 import java.util.Optional;
 
-import org.hibernate.validator.internal.engine.path.NodeImpl;
-
 import jakarta.validation.valueextraction.ExtractedValue;
 import jakarta.validation.valueextraction.ValueExtractor;
+
+import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 class ObjectArrayValueExtractor implements ValueExtractor<Object @ExtractedValue []> {
 

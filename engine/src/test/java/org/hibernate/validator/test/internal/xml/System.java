@@ -8,6 +8,7 @@ package org.hibernate.validator.test.internal.xml;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import jakarta.validation.Valid;
 
 /**

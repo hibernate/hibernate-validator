@@ -10,6 +10,7 @@ import static org.testng.Assert.assertTrue;
 
 import org.hibernate.validator.ap.testmodel.circular.CircularProperty;
 import org.hibernate.validator.ap.testmodel.circular.CircularPropertyImpl;
+
 import org.testng.annotations.Test;
 
 /**

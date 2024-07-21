@@ -7,6 +7,7 @@
 package org.hibernate.validator.ap.testmodel;
 
 import java.util.Collection;
+
 import jakarta.validation.Valid;
 
 public class ValidationUsingAtValidAnnotation {

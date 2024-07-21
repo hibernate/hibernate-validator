@@ -9,6 +9,7 @@ package org.hibernate.validator.test.spi.nodenameprovider.jackson;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Set;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 import jakarta.validation.Validation;
@@ -21,6 +22,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

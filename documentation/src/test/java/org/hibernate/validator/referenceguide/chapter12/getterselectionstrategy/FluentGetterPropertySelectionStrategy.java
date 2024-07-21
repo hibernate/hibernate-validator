@@ -5,9 +5,9 @@ package org.hibernate.validator.referenceguide.chapter12.getterselectionstrategy
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.validator.spi.properties.ConstrainableExecutable;

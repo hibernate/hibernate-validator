@@ -27,9 +27,10 @@ import jakarta.validation.executable.ExecutableValidator;
 import org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider;
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.testng.annotations.Test;
 
 import com.thoughtworks.paranamer.AnnotationParanamer;
+
+import org.testng.annotations.Test;
 
 /**
  * Test for {@link ParanamerParameterNameProvider}.

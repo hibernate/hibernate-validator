@@ -9,12 +9,13 @@ package org.hibernate.validator.integrationtest.java.module.no.el.constraint;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.integrationtest.java.module.no.el.model.Car;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
 import org.testng.annotations.Test;
 
 public class JavaModulePathIT {

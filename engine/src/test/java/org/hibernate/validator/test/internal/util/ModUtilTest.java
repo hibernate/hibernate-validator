@@ -6,16 +6,16 @@
  */
 package org.hibernate.validator.test.internal.util;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+
 import java.util.Arrays;
 import java.util.List;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.util.ModUtil;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import org.testng.annotations.Test;
 
 /**
  * Tests for the {@code ModUtil}.

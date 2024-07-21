@@ -2,8 +2,8 @@
 package org.hibernate.validator.referenceguide.chapter09;
 
 //end::include[]
-
 import java.util.List;
+
 import jakarta.validation.ValidationProviderResolver;
 import jakarta.validation.spi.ValidationProvider;
 

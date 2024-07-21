@@ -8,6 +8,7 @@ package org.hibernate.validator.ap.internal.checks;
 
 import java.util.Collections;
 import java.util.Set;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;

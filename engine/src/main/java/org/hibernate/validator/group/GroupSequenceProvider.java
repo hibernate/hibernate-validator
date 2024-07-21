@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.group;
 
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
-
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * The {@code GroupSequenceProvider} annotation defines the {@code DefaultGroupSequenceProvider}

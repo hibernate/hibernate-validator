@@ -2,8 +2,8 @@
 package org.hibernate.validator.referenceguide.chapter09;
 
 //end::include[]
-
 import java.util.Locale;
+
 import jakarta.validation.MessageInterpolator;
 
 //tag::include[]

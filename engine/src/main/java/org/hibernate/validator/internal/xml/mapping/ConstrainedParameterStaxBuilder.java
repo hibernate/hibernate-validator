@@ -12,8 +12,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.validation.ValidationException;
 import javax.xml.namespace.QName;
+
+import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;

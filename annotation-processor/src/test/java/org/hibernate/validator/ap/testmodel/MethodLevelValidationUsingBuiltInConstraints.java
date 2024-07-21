@@ -7,6 +7,7 @@
 package org.hibernate.validator.ap.testmodel;
 
 import java.util.Date;
+
 import jakarta.validation.constraints.Size;
 
 public class MethodLevelValidationUsingBuiltInConstraints {

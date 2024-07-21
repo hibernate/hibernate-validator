@@ -12,7 +12,6 @@ import jakarta.validation.ConstraintValidator;
 
 import org.hibernate.validator.Incubating;
 
-
 /**
  * Constraint mapping creational context representing a constraint (i.e. annotation type). Allows to define which
  * validators should validate this constraint.

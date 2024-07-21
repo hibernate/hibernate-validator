@@ -6,19 +6,20 @@
  */
 package org.hibernate.validator.ap.internal.checks.annotationparameters;
 
-import org.hibernate.validator.ap.internal.checks.AbstractConstraintCheck;
-import org.hibernate.validator.ap.internal.checks.ConstraintCheckIssue;
-import org.hibernate.validator.ap.internal.util.AnnotationApiHelper;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+
+import org.hibernate.validator.ap.internal.checks.AbstractConstraintCheck;
+import org.hibernate.validator.ap.internal.checks.ConstraintCheckIssue;
+import org.hibernate.validator.ap.internal.util.AnnotationApiHelper;
 
 /**
  * Checks that parameters used on annotation are valid.

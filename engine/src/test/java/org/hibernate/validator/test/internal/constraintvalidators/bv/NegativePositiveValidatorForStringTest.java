@@ -9,17 +9,18 @@ package org.hibernate.validator.test.internal.constraintvalidators.bv;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import jakarta.validation.constraints.Negative;
+import jakarta.validation.constraints.NegativeOrZero;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeOrZeroValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveOrZeroValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForCharSequence;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
-import org.testng.annotations.Test;
 
-import jakarta.validation.constraints.Negative;
-import jakarta.validation.constraints.NegativeOrZero;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import org.testng.annotations.Test;
 
 /**
  * @author Guillaume Smet

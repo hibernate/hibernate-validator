@@ -6,14 +6,14 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
-import org.hibernate.validator.constraints.CodePointLength;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
 import java.lang.invoke.MethodHandles;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
+import org.hibernate.validator.constraints.CodePointLength;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Check that the code point length of a character sequence is between min and max.

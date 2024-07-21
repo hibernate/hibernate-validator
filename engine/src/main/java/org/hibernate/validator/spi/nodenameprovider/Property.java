@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.spi.nodenameprovider;
 
-
 import org.hibernate.validator.Incubating;
 
 /**

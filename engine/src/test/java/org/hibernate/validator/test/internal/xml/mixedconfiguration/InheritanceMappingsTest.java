@@ -6,15 +6,17 @@
  */
 package org.hibernate.validator.test.internal.xml.mixedconfiguration;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
+
 import java.lang.annotation.Annotation;
 import java.util.Set;
+
 import jakarta.validation.Configuration;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import jakarta.validation.constraints.NotNull;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.internal.xml.mixedconfiguration.annotation.Competition;
 import org.hibernate.validator.test.internal.xml.mixedconfiguration.annotation.Fixture;
@@ -23,9 +25,7 @@ import org.hibernate.validator.test.internal.xml.mixedconfiguration.annotation.T
 import org.hibernate.validator.testutil.DummyTraversableResolver;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
-
+import org.testng.annotations.Test;
 
 /**
  * See HV-265

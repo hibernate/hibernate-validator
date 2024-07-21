@@ -17,7 +17,6 @@ import java.lang.annotation.Target;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-
 @Documented
 @Constraint(validatedBy = MustNotMatchValidator.class)
 @Target({ METHOD, FIELD })

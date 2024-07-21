@@ -8,14 +8,16 @@ package org.hibernate.validator.integration.cdi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hibernate.validator.integration.AbstractArquillianIT;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.testng.annotations.Test;
-
 import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.inject.Inject;
 import jakarta.validation.ValidatorFactory;
+
+import org.hibernate.validator.integration.AbstractArquillianIT;
+
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.test.cdi.internal.methodvalidation;
 
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -16,8 +18,6 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
 import jakarta.validation.executable.ValidateOnExecution;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * @author Hardy Ferentschik

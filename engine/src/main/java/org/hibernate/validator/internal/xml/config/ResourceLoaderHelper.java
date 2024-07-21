@@ -10,9 +10,9 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.validator.internal.util.actions.GetClassLoader;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.actions.GetClassLoader;
 
 /**
  * Helper methods for loading resource files

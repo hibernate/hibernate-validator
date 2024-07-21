@@ -6,9 +6,10 @@
  */
 package org.hibernate.validator.ap.internal.checks;
 
+import java.util.Arrays;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
-import java.util.Arrays;
 
 /**
  * The result of the execution of a {@link ConstraintCheck}. Comprises

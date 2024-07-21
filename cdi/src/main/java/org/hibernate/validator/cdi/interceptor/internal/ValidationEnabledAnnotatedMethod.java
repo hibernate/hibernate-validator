@@ -7,6 +7,7 @@
 package org.hibernate.validator.cdi.interceptor.internal;
 
 import java.lang.reflect.Method;
+
 import jakarta.enterprise.inject.spi.AnnotatedMethod;
 
 /**

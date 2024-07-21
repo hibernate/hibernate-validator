@@ -6,15 +6,15 @@
  */
 package org.hibernate.validator.test;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.testng.Assert.assertNotNull;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.internal.engine.ConfigurationImpl;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertNotNull;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Test for {@link org.hibernate.validator.HibernateValidatorConfiguration}.

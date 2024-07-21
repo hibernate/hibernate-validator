@@ -6,17 +6,18 @@
  */
 package org.hibernate.validator.ap.internal.checks.annotationparameters;
 
-import org.hibernate.validator.ap.internal.checks.ConstraintCheckIssue;
-import org.hibernate.validator.ap.internal.util.AnnotationApiHelper;
-import org.hibernate.validator.ap.internal.util.CollectionHelper;
-import org.hibernate.validator.ap.internal.util.TypeNames;
-
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
 import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+
+import org.hibernate.validator.ap.internal.checks.ConstraintCheckIssue;
+import org.hibernate.validator.ap.internal.util.AnnotationApiHelper;
+import org.hibernate.validator.ap.internal.util.CollectionHelper;
+import org.hibernate.validator.ap.internal.util.TypeNames;
 
 /**
  * Checks that the parameters used on {@code jakarta.validation.constraints.Pattern} annotations are valid.

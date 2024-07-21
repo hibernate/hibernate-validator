@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.constraintvalidators.hv.br;
 
 import java.util.regex.Pattern;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

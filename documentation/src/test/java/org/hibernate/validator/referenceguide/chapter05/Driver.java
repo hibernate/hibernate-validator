@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter05;
 
 //end::include[]
-
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
 

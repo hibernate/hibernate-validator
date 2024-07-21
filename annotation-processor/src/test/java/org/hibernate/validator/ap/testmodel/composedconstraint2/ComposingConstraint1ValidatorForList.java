@@ -7,6 +7,7 @@
 package org.hibernate.validator.ap.testmodel.composedconstraint2;
 
 import java.util.List;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

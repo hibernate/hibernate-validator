@@ -12,7 +12,6 @@ import jakarta.validation.Path;
 import jakarta.validation.Path.Node;
 import jakarta.validation.TraversableResolver;
 
-
 /**
  * {@link TraversableResolver} considering that all properties are reachable and cascadable.
  * <p>

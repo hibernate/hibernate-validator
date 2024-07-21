@@ -7,6 +7,7 @@
 package org.hibernate.validator.test.internal.util;
 
 import java.lang.annotation.Annotation;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

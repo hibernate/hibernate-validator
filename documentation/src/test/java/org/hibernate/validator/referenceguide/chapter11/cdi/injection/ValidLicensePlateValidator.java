@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter11.cdi.injection;
 
 //end::include[]
-
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;

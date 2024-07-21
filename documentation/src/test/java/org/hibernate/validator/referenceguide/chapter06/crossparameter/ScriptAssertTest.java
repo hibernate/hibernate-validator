@@ -1,6 +1,7 @@
 package org.hibernate.validator.referenceguide.chapter06.crossparameter;
 
 import java.util.List;
+
 import jakarta.validation.ConstraintTarget;
 
 public class ScriptAssertTest {

@@ -8,17 +8,19 @@ package org.hibernate.validator.integration.wildfly;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hibernate.validator.integration.AbstractArquillianIT;
-import org.hibernate.validator.integration.util.IntegrationTestUtil;
-import org.hibernate.validator.integration.util.MyValidator;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.testng.annotations.Test;
-
 import jakarta.inject.Inject;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+
+import org.hibernate.validator.integration.AbstractArquillianIT;
+import org.hibernate.validator.integration.util.IntegrationTestUtil;
+import org.hibernate.validator.integration.util.MyValidator;
+
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+
+import org.testng.annotations.Test;
 
 /**
  * Tests the usage of a custom validation provider coming as part of the deployment unit.

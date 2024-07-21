@@ -1,21 +1,22 @@
 package org.hibernate.validator.referenceguide.chapter03.parameterscriptassert;
 
+import static org.junit.Assert.assertEquals;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;
 import jakarta.validation.executable.ExecutableValidator;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class ParameterScriptAssertTest {
 

@@ -9,12 +9,12 @@ package org.hibernate.validator.test.internal.constraintvalidators.hv;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.text.Normalizer;
+
 import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.internal.constraintvalidators.hv.NormalizedValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
-
-import java.text.Normalizer;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

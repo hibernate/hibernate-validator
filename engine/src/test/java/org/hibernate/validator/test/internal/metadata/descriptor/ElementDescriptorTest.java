@@ -6,15 +6,20 @@
  */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
 import java.lang.annotation.ElementType;
 import java.util.Set;
+
 import jakarta.validation.Validator;
 import jakarta.validation.metadata.BeanDescriptor;
 import jakarta.validation.metadata.ConstraintDescriptor;
 import jakarta.validation.metadata.ElementDescriptor;
 import jakarta.validation.metadata.PropertyDescriptor;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.internal.metadata.ChildWithAtValid;
 import org.hibernate.validator.test.internal.metadata.ChildWithoutAtValid;
@@ -25,12 +30,7 @@ import org.hibernate.validator.test.internal.metadata.Order;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

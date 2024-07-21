@@ -15,9 +15,10 @@ import jakarta.validation.Validator;
 import jakarta.validation.metadata.BeanDescriptor;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
-import org.assertj.core.api.Assertions;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.testutil.TestForIssue;
+
+import org.assertj.core.api.Assertions;
 import org.testng.annotations.Test;
 
 /**

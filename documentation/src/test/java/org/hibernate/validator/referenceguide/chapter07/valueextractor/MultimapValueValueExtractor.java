@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter07.valueextractor;
 
 //end::include[]
-
 import java.util.Map.Entry;
 
 import jakarta.validation.valueextraction.ExtractedValue;

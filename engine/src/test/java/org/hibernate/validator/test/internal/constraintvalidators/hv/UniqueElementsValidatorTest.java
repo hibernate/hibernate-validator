@@ -22,13 +22,14 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.MessageInterpolator;
 import jakarta.validation.Validator;
 
-import org.assertj.core.api.Assertions;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.hibernate.validator.engine.HibernateConstraintViolation;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.AggregateResourceBundleLocator;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
+import org.assertj.core.api.Assertions;
 import org.testng.annotations.Test;
 
 /**

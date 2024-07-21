@@ -7,6 +7,7 @@
 package org.hibernate.validator.ap.internal.checks;
 
 import java.util.Map;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.util.Elements;

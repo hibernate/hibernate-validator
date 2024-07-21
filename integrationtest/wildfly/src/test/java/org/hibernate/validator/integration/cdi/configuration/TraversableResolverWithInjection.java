@@ -7,6 +7,7 @@
 package org.hibernate.validator.integration.cdi.configuration;
 
 import java.lang.annotation.ElementType;
+
 import jakarta.inject.Inject;
 import jakarta.validation.Path;
 import jakarta.validation.TraversableResolver;

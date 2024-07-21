@@ -6,17 +6,18 @@
  */
 package org.hibernate.validator.test.parameternameprovider;
 
+import static org.testng.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import jakarta.validation.ParameterNameProvider;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import jakarta.validation.ParameterNameProvider;
 
 import org.hibernate.validator.parameternameprovider.ReflectionParameterNameProvider;
 
-import static org.testng.Assert.assertEquals;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Tests for {@link org.hibernate.validator.parameternameprovider.ReflectionParameterNameProvider}.

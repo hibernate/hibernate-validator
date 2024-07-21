@@ -22,6 +22,7 @@ import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.test.constraintvalidator.MustMatch;
 import org.hibernate.validator.test.constraintvalidator.MustNotMatch;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

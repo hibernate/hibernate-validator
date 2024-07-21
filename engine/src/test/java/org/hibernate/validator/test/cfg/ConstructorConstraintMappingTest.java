@@ -38,6 +38,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

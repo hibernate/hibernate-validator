@@ -10,6 +10,14 @@ import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 import java.util.Map;
 
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.MethodNotFoundException;
+import jakarta.el.PropertyNotFoundException;
+import jakarta.el.ValueExpression;
+import jakarta.validation.MessageInterpolator;
+
 import org.hibernate.validator.internal.engine.messageinterpolation.el.BeanMethodsELContext;
 import org.hibernate.validator.internal.engine.messageinterpolation.el.BeanPropertiesElContext;
 import org.hibernate.validator.internal.engine.messageinterpolation.el.DisabledFeatureELException;
@@ -18,14 +26,6 @@ import org.hibernate.validator.internal.engine.messageinterpolation.el.Variables
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
-
-import jakarta.el.ELContext;
-import jakarta.el.ELException;
-import jakarta.el.ExpressionFactory;
-import jakarta.el.MethodNotFoundException;
-import jakarta.el.PropertyNotFoundException;
-import jakarta.el.ValueExpression;
-import jakarta.validation.MessageInterpolator;
 
 /**
  * Resolver for the el expressions.

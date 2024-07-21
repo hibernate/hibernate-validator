@@ -12,8 +12,8 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
-import org.testng.annotations.Test;
 
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

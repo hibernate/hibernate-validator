@@ -8,14 +8,15 @@ package org.hibernate.validator.test.cdi.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.executable.ExecutableValidator;
+
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cdi.internal.ValidationProviderHelper;
 import org.hibernate.validator.internal.engine.ConfigurationImpl;
 import org.hibernate.validator.test.cdi.internal.injection.MyValidationProvider;
 
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-import jakarta.validation.executable.ExecutableValidator;
 import org.testng.annotations.Test;
 
 public class ValidationProviderHelperTest {

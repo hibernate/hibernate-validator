@@ -1,7 +1,10 @@
 package org.hibernate.validator.referenceguide.chapter06.classlevel;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.Set;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -9,8 +12,6 @@ import jakarta.validation.ValidatorFactory;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class ClassLevelConstraintTest {
 

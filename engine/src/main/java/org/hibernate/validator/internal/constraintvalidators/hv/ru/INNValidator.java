@@ -8,11 +8,11 @@ package org.hibernate.validator.internal.constraintvalidators.hv.ru;
 
 import java.util.regex.Pattern;
 
-import org.hibernate.validator.constraints.ru.INN;
-import org.hibernate.validator.internal.util.Contracts;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
+import org.hibernate.validator.constraints.ru.INN;
+import org.hibernate.validator.internal.util.Contracts;
 
 /**
  * Checks that a given character sequence (e.g. string) is a valid INN.

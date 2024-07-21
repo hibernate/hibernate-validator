@@ -11,6 +11,7 @@ import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.cfg.ConstraintMapping;
+
 import org.junit.Test;
 
 public class BootstrappingTest {

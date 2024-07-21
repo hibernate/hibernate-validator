@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter02.inheritance;
 
 //end::include[]
-
 import jakarta.validation.constraints.NotNull;
 
 //tag::include[]

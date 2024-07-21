@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.BEGIN_TERM;
+import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.EL_DESIGNATOR;
 import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.END_TERM;
 import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.ESCAPE_CHARACTER;
-import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.EL_DESIGNATOR;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 import java.util.Collections;
 import java.util.List;

@@ -6,11 +6,19 @@
  */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.METHOD;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.testutils.ValidatorUtil.getBeanDescriptor;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Set;
+
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintTarget;
 import jakarta.validation.ConstraintValidator;
@@ -27,13 +35,6 @@ import jakarta.validation.metadata.MethodType;
 import jakarta.validation.metadata.PropertyDescriptor;
 
 import org.testng.annotations.Test;
-
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.testutils.ValidatorUtil.getBeanDescriptor;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
 
 /**
  * @author Hardy Ferentschik

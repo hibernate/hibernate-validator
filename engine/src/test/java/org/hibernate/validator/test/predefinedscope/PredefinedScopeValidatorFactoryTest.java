@@ -35,10 +35,11 @@ import jakarta.validation.ValidatorFactory;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
-import org.assertj.core.api.Assertions;
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.testutil.TestForIssue;
+
+import org.assertj.core.api.Assertions;
 import org.testng.annotations.Test;
 
 @TestForIssue(jiraKey = "HV-1667")

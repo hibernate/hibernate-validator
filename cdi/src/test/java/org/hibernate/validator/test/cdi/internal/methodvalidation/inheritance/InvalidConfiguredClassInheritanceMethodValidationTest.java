@@ -17,10 +17,12 @@ import jakarta.inject.Inject;
 import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.cdi.ValidationExtension;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+
 import org.testng.annotations.Test;
 
 /**

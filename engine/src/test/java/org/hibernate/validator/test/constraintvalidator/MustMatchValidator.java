@@ -9,7 +9,6 @@ package org.hibernate.validator.test.constraintvalidator;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-
 public class MustMatchValidator implements ConstraintValidator<MustMatch, String> {
 
 	private String match;

@@ -6,24 +6,25 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.ElementType;
+
 import jakarta.validation.Configuration;
 import jakarta.validation.Path;
 import jakarta.validation.TraversableResolver;
 import jakarta.validation.ValidationException;
 import jakarta.validation.ValidatorFactory;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNotSame;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

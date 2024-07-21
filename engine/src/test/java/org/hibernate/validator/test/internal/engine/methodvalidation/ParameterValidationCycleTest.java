@@ -11,15 +11,16 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.validator.testutil.ConstraintViolationAssert;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.ValidatorUtil;
-import org.testng.annotations.Test;
-
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ExecutableValidator;
+
+import org.hibernate.validator.testutil.ConstraintViolationAssert;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.ValidatorUtil;
+
+import org.testng.annotations.Test;
 
 /**
  * @author Guillaume Smet

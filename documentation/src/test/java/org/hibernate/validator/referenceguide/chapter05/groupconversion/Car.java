@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter05.groupconversion;
 
 //end::include[]
-
 import jakarta.validation.GroupSequence;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;

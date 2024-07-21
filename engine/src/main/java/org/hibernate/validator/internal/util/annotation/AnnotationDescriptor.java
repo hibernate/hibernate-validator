@@ -22,10 +22,10 @@ import java.util.TreeSet;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.actions.GetAnnotationAttributes;
 import org.hibernate.validator.internal.util.actions.GetDeclaredMethods;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Encapsulates the data you need to create an annotation. In

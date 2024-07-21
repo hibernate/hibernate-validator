@@ -7,6 +7,7 @@
 package org.hibernate.validator.ap.testmodel;
 
 import javax.money.MonetaryAmount;
+
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;

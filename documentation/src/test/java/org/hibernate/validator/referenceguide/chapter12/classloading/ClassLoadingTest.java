@@ -4,6 +4,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 
 import org.hibernate.validator.HibernateValidator;
+
 import org.junit.Test;
 
 public class ClassLoadingTest {

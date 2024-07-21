@@ -7,11 +7,10 @@
 
 package org.hibernate.validator.cfg.defs;
 
-import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.constraints.Normalized;
-
 import java.text.Normalizer;
 
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.constraints.Normalized;
 
 /**
  * Constraint definition for {@link Normalized}.

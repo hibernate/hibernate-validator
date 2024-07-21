@@ -9,14 +9,14 @@ package org.hibernate.validator.internal.constraintvalidators.hv.br;
 import java.lang.invoke.MethodHandles;
 import java.util.regex.Pattern;
 
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * @author Hardy Ferentschik

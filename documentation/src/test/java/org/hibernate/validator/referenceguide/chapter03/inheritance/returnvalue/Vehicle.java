@@ -2,8 +2,8 @@
 package org.hibernate.validator.referenceguide.chapter03.inheritance.returnvalue;
 
 //end::include[]
-
 import java.util.List;
+
 import jakarta.validation.constraints.NotNull;
 
 //tag::include[]

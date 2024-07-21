@@ -10,7 +10,6 @@ package org.hibernate.validator.cfg.defs;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.Length;
 
-
 /**
  * @author Hardy Ferentschik
  */

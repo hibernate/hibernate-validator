@@ -1,14 +1,15 @@
 package org.hibernate.validator.referenceguide.chapter04.complete;
 
+import static org.junit.Assert.assertEquals;
+
 import java.math.BigDecimal;
+
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class CarTest {
 

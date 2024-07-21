@@ -6,21 +6,22 @@
  */
 package org.hibernate.validator.ap.internal.checks;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.TypeElement;
 
 import org.hibernate.validator.ap.internal.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.internal.util.CollectionHelper;
-
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
 
 /**
  * Checks, that at least one of the {@link ElementType}s FIELD, METHOD, TYPE or ANNOTATION_TYPE is specified

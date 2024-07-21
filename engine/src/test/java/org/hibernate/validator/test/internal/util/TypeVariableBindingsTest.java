@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.validator.internal.util.TypeVariableBindings;
+
 import org.testng.annotations.Test;
 
 /**

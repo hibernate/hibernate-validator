@@ -15,10 +15,10 @@ import java.lang.reflect.Modifier;
 
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Signature;
+import org.hibernate.validator.internal.util.actions.GetResolvedMemberMethods;
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.actions.GetResolvedMemberMethods;
 
 import com.fasterxml.classmate.Filter;
 import com.fasterxml.classmate.MemberResolver;

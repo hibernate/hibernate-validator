@@ -10,6 +10,7 @@ import jakarta.validation.Configuration;
 import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeMethod;
 
 /**

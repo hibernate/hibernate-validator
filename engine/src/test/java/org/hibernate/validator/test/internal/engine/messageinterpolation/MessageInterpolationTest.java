@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.testng.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -14,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+
 import jakarta.validation.Configuration;
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
@@ -26,16 +31,12 @@ import jakarta.validation.ValidatorFactory;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.testng.Assert.assertEquals;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

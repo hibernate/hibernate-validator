@@ -6,15 +6,16 @@
  */
 package org.hibernate.validator.test.constraints.boolcomposition.localconstrval;
 
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
+
 import java.lang.annotation.Retention;
+
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.ConstraintComposition;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 
 /**
  * Test mode for HV-390.

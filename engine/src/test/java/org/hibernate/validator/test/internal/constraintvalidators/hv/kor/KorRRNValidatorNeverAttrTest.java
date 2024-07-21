@@ -6,16 +6,15 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv.kor;
 
+import static org.hibernate.validator.constraints.kor.KorRRN.ValidateCheckDigit.NEVER;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import org.hibernate.validator.constraints.kor.KorRRN;
 import org.hibernate.validator.internal.constraintvalidators.hv.kor.KorRRNValidator;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import static org.hibernate.validator.constraints.kor.KorRRN.ValidateCheckDigit.NEVER;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Tests for {@link KorRRN} constraint validator ({@link KorRRNValidator}),

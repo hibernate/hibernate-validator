@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter06.constraintcomposition.reportassingle;
 
 //end::include[]
-
 import jakarta.validation.Payload;
 import jakarta.validation.ReportAsSingleViolation;
 

@@ -12,9 +12,11 @@ import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.internal.util.actions.LoadClass;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.classloader.ShrinkWrapClassLoader;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+
 import org.testng.annotations.Test;
 
 /**

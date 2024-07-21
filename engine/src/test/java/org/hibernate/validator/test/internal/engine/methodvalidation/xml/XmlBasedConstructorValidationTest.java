@@ -9,11 +9,11 @@ package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 import jakarta.validation.Configuration;
 import jakarta.validation.ValidatorFactory;
 
-import org.testng.annotations.BeforeMethod;
-
 import org.hibernate.validator.test.internal.engine.methodvalidation.AbstractConstructorValidationTest;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
+import org.testng.annotations.BeforeMethod;
 
 /**
  * Tests for XML configured constructor validation.

@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter06;
 
 //end::include[]
-
 import java.time.Clock;
 import java.time.Instant;
 

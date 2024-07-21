@@ -2,13 +2,13 @@ package org.hibernate.validator.referenceguide.chapter09;
 
 import static org.junit.Assert.assertTrue;
 
-import org.hibernate.validator.HibernateValidator;
-
-import org.junit.Test;
-
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.Positive;
+
+import org.hibernate.validator.HibernateValidator;
+
+import org.junit.Test;
 
 public class LoggingConfigurationTest {
 

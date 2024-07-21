@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter05.groupsequenceprovider;
 
 //end::include[]
-
 import jakarta.validation.constraints.AssertFalse;
 
 import org.hibernate.validator.group.GroupSequenceProvider;

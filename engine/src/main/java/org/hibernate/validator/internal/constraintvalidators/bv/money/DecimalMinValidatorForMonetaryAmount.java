@@ -8,7 +8,9 @@ package org.hibernate.validator.internal.constraintvalidators.bv.money;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
+
 import javax.money.MonetaryAmount;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.constraints.DecimalMin;

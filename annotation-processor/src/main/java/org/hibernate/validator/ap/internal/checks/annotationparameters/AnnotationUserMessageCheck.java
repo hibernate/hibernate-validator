@@ -8,6 +8,7 @@ package org.hibernate.validator.ap.internal.checks.annotationparameters;
 
 import java.util.Collections;
 import java.util.Set;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;

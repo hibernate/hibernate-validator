@@ -18,12 +18,12 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.hibernate.validator.integrationtest.java.module.cdi.model.Car;
-
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
+
+import org.hibernate.validator.integrationtest.java.module.cdi.model.Car;
 
 @Documented
 @Constraint(validatedBy = { })

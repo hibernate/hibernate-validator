@@ -1,6 +1,7 @@
 package org.hibernate.validator.referenceguide.chapter03.inheritance.parameter;
 
 import java.lang.reflect.Method;
+
 import jakarta.validation.ConstraintDeclarationException;
 import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;

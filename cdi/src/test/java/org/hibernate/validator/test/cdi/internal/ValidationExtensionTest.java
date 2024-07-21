@@ -30,12 +30,13 @@ import jakarta.enterprise.util.AnnotationLiteral;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
 import org.hibernate.validator.cdi.ValidationExtension;
 import org.hibernate.validator.cdi.internal.ValidationProviderHelper;
 import org.hibernate.validator.cdi.internal.ValidatorBean;
 import org.hibernate.validator.cdi.internal.ValidatorFactoryBean;
+
+import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

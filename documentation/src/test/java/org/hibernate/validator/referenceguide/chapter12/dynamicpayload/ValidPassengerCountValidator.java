@@ -4,7 +4,6 @@ package org.hibernate.validator.referenceguide.chapter12.dynamicpayload;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 //end::include[]
-
 import java.util.Map;
 
 import jakarta.validation.ConstraintValidator;

@@ -31,18 +31,19 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureClassLoader;
 import java.util.Enumeration;
 
-import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
-import org.hibernate.validator.testutils.ValidatorUtil;
-
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
+import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.Test;
 
 public class XmlMappingMixedWithServiceLoaderAndProgrammaticDefinitionTest {

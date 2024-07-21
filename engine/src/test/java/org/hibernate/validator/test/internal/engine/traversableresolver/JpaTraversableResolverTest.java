@@ -17,9 +17,9 @@ import jakarta.validation.Validator;
 import org.hibernate.validator.internal.engine.resolver.JPATraversableResolver;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-
 
 /**
  * See HV-305

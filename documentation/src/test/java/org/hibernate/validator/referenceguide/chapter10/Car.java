@@ -2,8 +2,8 @@
 package org.hibernate.validator.referenceguide.chapter10;
 
 //end::include[]
-
 import java.util.List;
+
 import jakarta.validation.ConstraintTarget;
 import jakarta.validation.Payload;
 import jakarta.validation.Valid;

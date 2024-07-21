@@ -6,13 +6,12 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
+import static org.testng.Assert.assertFalse;
+
 import jakarta.validation.Configuration;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import jakarta.validation.metadata.BeanDescriptor;
-
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Address;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
@@ -22,7 +21,8 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.service.Rep
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import static org.testng.Assert.assertFalse;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

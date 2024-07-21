@@ -9,10 +9,10 @@ package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 import jakarta.validation.Configuration;
 import jakarta.validation.ValidationException;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

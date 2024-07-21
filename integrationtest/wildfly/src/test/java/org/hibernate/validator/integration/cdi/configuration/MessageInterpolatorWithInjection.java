@@ -7,6 +7,7 @@
 package org.hibernate.validator.integration.cdi.configuration;
 
 import java.util.Locale;
+
 import jakarta.inject.Inject;
 import jakarta.validation.MessageInterpolator;
 

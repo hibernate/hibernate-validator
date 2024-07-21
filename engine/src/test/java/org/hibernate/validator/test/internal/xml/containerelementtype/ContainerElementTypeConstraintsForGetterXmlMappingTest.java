@@ -27,6 +27,7 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.Test;
 
 public class ContainerElementTypeConstraintsForGetterXmlMappingTest {

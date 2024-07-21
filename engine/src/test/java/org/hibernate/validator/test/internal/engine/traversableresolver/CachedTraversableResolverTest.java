@@ -26,6 +26,7 @@ import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

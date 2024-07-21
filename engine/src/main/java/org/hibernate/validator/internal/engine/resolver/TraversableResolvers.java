@@ -13,11 +13,11 @@ import jakarta.validation.TraversableResolver;
 import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.actions.GetMethod;
 import org.hibernate.validator.internal.util.actions.LoadClass;
 import org.hibernate.validator.internal.util.actions.NewInstance;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 public class TraversableResolvers {
 

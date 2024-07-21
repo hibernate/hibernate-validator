@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter11.cdi.validator.qualifier;
 
 //end::include[]
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.Validator;

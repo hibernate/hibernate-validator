@@ -10,7 +10,6 @@ import jakarta.validation.constraints.Pattern;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 
-
 /**
  * @author Hardy Ferentschik
  */

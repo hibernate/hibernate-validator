@@ -14,10 +14,10 @@ import static org.testng.Assert.assertNull;
 import java.util.Arrays;
 import java.util.Locale;
 
-import org.hibernate.validator.testutil.TestForIssue;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.util.StringHelper;
+import org.hibernate.validator.testutil.TestForIssue;
+
+import org.testng.annotations.Test;
 
 /**
  * Unit test for {@link StringHelper}.

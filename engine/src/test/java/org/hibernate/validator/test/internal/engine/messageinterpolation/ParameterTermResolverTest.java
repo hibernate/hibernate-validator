@@ -12,15 +12,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.easymock.EasyMock;
+import jakarta.validation.MessageInterpolator;
+import jakarta.validation.metadata.ConstraintDescriptor;
+
 import org.hibernate.validator.internal.engine.messageinterpolation.ParameterTermResolver;
 import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
 import org.hibernate.validator.testutil.TestForIssue;
+
+import org.easymock.EasyMock;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import jakarta.validation.MessageInterpolator;
-import jakarta.validation.metadata.ConstraintDescriptor;
 
 /**
  * Test for {@link org.hibernate.validator.internal.engine.messageinterpolation.ParameterTermResolver}

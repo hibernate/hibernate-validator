@@ -66,14 +66,14 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanParameter;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.actions.GetDeclaredConstructors;
 import org.hibernate.validator.internal.util.actions.GetDeclaredFields;
 import org.hibernate.validator.internal.util.actions.GetDeclaredMethods;
 import org.hibernate.validator.internal.util.actions.GetMethods;
 import org.hibernate.validator.internal.util.actions.NewInstance;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 /**

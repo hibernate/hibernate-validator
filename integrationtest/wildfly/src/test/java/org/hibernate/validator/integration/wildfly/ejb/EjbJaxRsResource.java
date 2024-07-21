@@ -8,6 +8,7 @@ package org.hibernate.validator.integration.wildfly.ejb;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 import jakarta.ejb.Stateless;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.Consumes;

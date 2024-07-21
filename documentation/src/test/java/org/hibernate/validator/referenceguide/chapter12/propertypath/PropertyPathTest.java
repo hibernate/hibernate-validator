@@ -1,5 +1,9 @@
 package org.hibernate.validator.referenceguide.chapter12.propertypath;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+
 import java.util.Iterator;
 import java.util.Set;
 
@@ -8,14 +12,10 @@ import jakarta.validation.Path;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 
-import org.junit.Test;
-
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.path.PropertyNode;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
+import org.junit.Test;
 
 /**
  * @author Gunnar Morling

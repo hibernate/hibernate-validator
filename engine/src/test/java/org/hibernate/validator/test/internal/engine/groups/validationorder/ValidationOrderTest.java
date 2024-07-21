@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.validationorder;
 
+import static org.testng.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,9 +17,8 @@ import jakarta.validation.groups.Default;
 import org.hibernate.validator.internal.engine.groups.DefaultValidationOrder;
 import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.Sequence;
-import org.testng.annotations.Test;
 
-import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

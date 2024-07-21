@@ -7,6 +7,7 @@
 package org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution;
 
 import java.util.Set;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

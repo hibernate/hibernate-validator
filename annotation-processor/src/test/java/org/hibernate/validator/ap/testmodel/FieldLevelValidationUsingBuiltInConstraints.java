@@ -9,6 +9,7 @@ package org.hibernate.validator.ap.testmodel;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+
 import jakarta.validation.constraints.Size;
 
 public class FieldLevelValidationUsingBuiltInConstraints {

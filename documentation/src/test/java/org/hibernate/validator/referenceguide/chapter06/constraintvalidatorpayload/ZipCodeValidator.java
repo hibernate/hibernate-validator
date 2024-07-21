@@ -1,10 +1,9 @@
 //tag::include[]
 package org.hibernate.validator.referenceguide.chapter06.constraintvalidatorpayload;
 
-//end::include[]
-
-import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.ConstraintValidator;
+//end::include[]
+import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 

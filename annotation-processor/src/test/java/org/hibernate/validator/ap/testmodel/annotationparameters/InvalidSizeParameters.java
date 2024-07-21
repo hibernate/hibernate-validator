@@ -7,6 +7,7 @@
 package org.hibernate.validator.ap.testmodel.annotationparameters;
 
 import java.util.Collection;
+
 import jakarta.validation.constraints.Size;
 
 /**

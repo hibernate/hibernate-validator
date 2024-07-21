@@ -8,7 +8,6 @@ package org.hibernate.validator.test.internal.metadata;
 
 import jakarta.validation.constraints.Pattern;
 
-
 /**
  * @author Hardy Ferentschik
  */

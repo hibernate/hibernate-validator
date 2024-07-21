@@ -28,6 +28,7 @@ import jakarta.validation.metadata.ReturnValueDescriptor;
 import jakarta.validation.metadata.Scope;
 
 import org.hibernate.validator.referenceguide.chapter10.Car.SeverityInfo;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

@@ -24,6 +24,7 @@ import org.hibernate.validator.test.internal.engine.groups.sequence.SequenceOfSe
 import org.hibernate.validator.test.internal.engine.groups.sequence.SequenceOfSequencesTest.AllConstraints.ComplexConstraints.SomewhatComplexConstraints;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.Test;
 
 /**

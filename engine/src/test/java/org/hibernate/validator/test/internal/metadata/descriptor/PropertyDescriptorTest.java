@@ -6,11 +6,13 @@
  */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
+import static org.hibernate.validator.testutil.DescriptorAssert.assertThat;
+import static org.hibernate.validator.testutils.ValidatorUtil.getPropertyDescriptor;
+
 import java.util.Set;
+
 import jakarta.validation.metadata.GroupConversionDescriptor;
 import jakarta.validation.metadata.PropertyDescriptor;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;
@@ -20,8 +22,7 @@ import org.hibernate.validator.test.internal.metadata.Customer.CustomerGetterCom
 import org.hibernate.validator.test.internal.metadata.Order.OrderBasic;
 import org.hibernate.validator.test.internal.metadata.Order.OrderComplex;
 
-import static org.hibernate.validator.testutil.DescriptorAssert.assertThat;
-import static org.hibernate.validator.testutils.ValidatorUtil.getPropertyDescriptor;
+import org.testng.annotations.Test;
 
 /**
  * @author Gunnar Morling

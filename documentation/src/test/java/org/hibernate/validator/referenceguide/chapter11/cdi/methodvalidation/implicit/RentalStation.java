@@ -2,9 +2,9 @@
 package org.hibernate.validator.referenceguide.chapter11.cdi.methodvalidation.implicit;
 
 //end::include[]
-
 import java.util.Date;
 import java.util.List;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;

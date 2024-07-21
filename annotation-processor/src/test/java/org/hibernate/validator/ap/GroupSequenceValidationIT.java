@@ -18,6 +18,7 @@ import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidGroupSeq
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidGroupSequenceParameters;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 /**

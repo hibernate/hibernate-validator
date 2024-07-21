@@ -8,10 +8,11 @@ package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.NullValidator;
+
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * @author Alaa Nassef

@@ -11,6 +11,7 @@ import static org.testng.Assert.assertFalse;
 
 import java.io.File;
 import java.util.EnumSet;
+
 import javax.tools.Diagnostic;
 
 import org.hibernate.validator.ap.ConstraintValidationProcessor;

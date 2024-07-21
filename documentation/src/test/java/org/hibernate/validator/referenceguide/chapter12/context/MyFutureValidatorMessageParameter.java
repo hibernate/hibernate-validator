@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter12.context;
 
 //end::include[]
-
 import java.time.Instant;
 
 import jakarta.validation.ConstraintValidator;

@@ -25,6 +25,7 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
+
 import org.testng.annotations.Test;
 
 @CandidateForTck

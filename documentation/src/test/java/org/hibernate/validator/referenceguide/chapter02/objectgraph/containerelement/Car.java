@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter02.objectgraph.containerelement;
 
 //end::include[]
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

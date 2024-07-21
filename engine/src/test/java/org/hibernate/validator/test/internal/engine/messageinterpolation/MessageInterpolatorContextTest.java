@@ -7,15 +7,25 @@
 
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
-import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
-import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
-import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
-import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
-import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.ValidatorUtil;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
+
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 import jakarta.validation.Configuration;
 import jakarta.validation.ConstraintViolation;
@@ -29,25 +39,17 @@ import jakarta.validation.constraints.Size;
 import jakarta.validation.metadata.BeanDescriptor;
 import jakarta.validation.metadata.ConstraintDescriptor;
 import jakarta.validation.metadata.PropertyDescriptor;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.ResourceBundle;
-import java.util.Set;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
+import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
+import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.ValidatorUtil;
+
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

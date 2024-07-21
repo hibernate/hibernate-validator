@@ -24,6 +24,7 @@ import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.Test;
 
 /**

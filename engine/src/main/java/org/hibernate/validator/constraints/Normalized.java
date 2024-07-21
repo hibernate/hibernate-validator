@@ -25,7 +25,6 @@ import jakarta.validation.Payload;
 
 import org.hibernate.validator.constraints.Normalized.List;
 
-
 /**
  * Validate that a character sequence is of normalization form.
  * <p>
