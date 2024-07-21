@@ -20,8 +20,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
-import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
-
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -30,6 +28,9 @@ import jakarta.validation.Payload;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ExecutableValidator;
+
+import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

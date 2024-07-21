@@ -25,7 +25,6 @@ import jakarta.validation.Payload;
 
 import org.hibernate.validator.constraints.CodePointLength.List;
 
-
 /**
  * Validate that the code point length of a character sequence is between min and max included.
  * <p>

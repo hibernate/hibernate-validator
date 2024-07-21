@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter02.containerelement.list;
 
 //end::include[]
-
 import java.util.ArrayList;
 import java.util.List;
 

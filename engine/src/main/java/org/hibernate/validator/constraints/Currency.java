@@ -21,6 +21,7 @@ import java.lang.annotation.Target;
 
 import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
+
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.ReportAsSingleViolation;

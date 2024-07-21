@@ -43,6 +43,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

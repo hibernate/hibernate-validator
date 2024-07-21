@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.constraintvalidators.bv.size;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.constraints.Size;

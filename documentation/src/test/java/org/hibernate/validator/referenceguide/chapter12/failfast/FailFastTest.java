@@ -1,5 +1,7 @@
 package org.hibernate.validator.referenceguide.chapter12.failfast;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Set;
 
 import jakarta.validation.ConstraintViolation;
@@ -7,9 +9,8 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 
 import org.hibernate.validator.HibernateValidator;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class FailFastTest {
 

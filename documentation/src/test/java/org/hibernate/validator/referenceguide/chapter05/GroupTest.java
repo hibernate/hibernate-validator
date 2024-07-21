@@ -13,6 +13,7 @@ import jakarta.validation.groups.Default;
 
 import org.hibernate.validator.referenceguide.chapter05.groupinheritance.RaceCarChecks;
 import org.hibernate.validator.referenceguide.chapter05.groupinheritance.SuperCar;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

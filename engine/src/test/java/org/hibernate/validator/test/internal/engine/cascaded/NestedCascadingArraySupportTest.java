@@ -24,6 +24,7 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 @TestForIssue(jiraKey = "HV-1237")

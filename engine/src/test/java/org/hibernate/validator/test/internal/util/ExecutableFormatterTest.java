@@ -13,6 +13,7 @@ import java.util.Date;
 import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatter;
 import org.hibernate.validator.test.internal.util.ExecutableHelperTest.Bar;
 import org.hibernate.validator.test.internal.util.ExecutableHelperTest.Foo;
+
 import org.testng.annotations.Test;
 
 /**

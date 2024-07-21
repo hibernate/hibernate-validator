@@ -8,7 +8,6 @@ package org.hibernate.validator.test.internal.engine.traversableresolver;
 
 import jakarta.validation.constraints.Max;
 
-
 /**
  * @author Emmanuel Bernard
  */

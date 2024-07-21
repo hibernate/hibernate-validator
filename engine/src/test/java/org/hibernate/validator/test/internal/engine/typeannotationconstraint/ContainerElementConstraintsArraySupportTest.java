@@ -25,6 +25,7 @@ import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

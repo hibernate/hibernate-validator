@@ -20,6 +20,7 @@ import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolverContext;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
+
 import org.testng.annotations.Test;
 
 @TestForIssue(jiraKey = "HV-1749")

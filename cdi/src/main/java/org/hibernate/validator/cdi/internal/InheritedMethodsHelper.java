@@ -13,8 +13,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.actions.GetMethods;
+import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 
 /**
  * Deals with methods of types in inheritance hierarchies.

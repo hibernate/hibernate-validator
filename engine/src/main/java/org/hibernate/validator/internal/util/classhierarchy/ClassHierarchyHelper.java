@@ -6,14 +6,14 @@
  */
 package org.hibernate.validator.internal.util.classhierarchy;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import org.hibernate.validator.internal.util.Contracts;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Helper class for dealing with inheritance hierarchies of given types which

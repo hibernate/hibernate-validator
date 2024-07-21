@@ -11,7 +11,6 @@ import static java.lang.annotation.ElementType.TYPE;
 
 import java.lang.annotation.Target;
 
-
 /**
  * Marks tests that should be promoted to the TCK.
  *

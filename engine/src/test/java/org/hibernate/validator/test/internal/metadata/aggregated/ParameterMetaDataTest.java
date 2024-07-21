@@ -44,6 +44,7 @@ import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

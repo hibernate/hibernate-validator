@@ -1,10 +1,10 @@
 package org.hibernate.validator.referenceguide.chapter06.elinjection;
 
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.hibernate.validator.referenceguide.chapter06.constraintvalidatorpayload.ZipCode;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.referenceguide.chapter06.constraintvalidatorpayload.ZipCode;
 
 //tag::include[]
 public class SafeValidator implements ConstraintValidator<ZipCode, String> {

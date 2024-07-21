@@ -7,6 +7,7 @@
 package org.hibernate.validator.ap.testmodel;
 
 import java.util.Date;
+
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Past;
 

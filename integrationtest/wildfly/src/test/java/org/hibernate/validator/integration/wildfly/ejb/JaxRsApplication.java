@@ -8,6 +8,7 @@ package org.hibernate.validator.integration.wildfly.ejb;
 
 import java.util.Collections;
 import java.util.Set;
+
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 

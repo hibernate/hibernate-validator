@@ -6,15 +6,16 @@
  */
 package org.hibernate.validator.ap.internal.checks.annotationparameters;
 
+import java.util.Collections;
+import java.util.Set;
+
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+
 import org.hibernate.validator.ap.internal.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.internal.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.internal.util.CollectionHelper;
 import org.hibernate.validator.ap.internal.util.TypeNames;
-
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
-import java.util.Collections;
-import java.util.Set;
 
 /**
  * Checks that the parameters used on {@code jakarta.validation.constraints.Size} and

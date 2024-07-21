@@ -6,18 +6,18 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
+import static org.testng.Assert.assertNotNull;
+
 import jakarta.validation.Configuration;
 import jakarta.validation.Validator;
 import jakarta.validation.metadata.BeanDescriptor;
 import jakarta.validation.metadata.MethodDescriptor;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import static org.testng.Assert.assertNotNull;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter06;
 
 //end::include[]
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

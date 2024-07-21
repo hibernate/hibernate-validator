@@ -11,17 +11,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.validator.integration.AbstractArquillianIT;
-import org.hibernate.validator.integration.util.IntegrationTestUtil;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.testng.annotations.Test;
-
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+
+import org.hibernate.validator.integration.AbstractArquillianIT;
+import org.hibernate.validator.integration.util.IntegrationTestUtil;
+import org.hibernate.validator.testutil.TestForIssue;
+
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

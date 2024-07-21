@@ -2,8 +2,8 @@
 package org.hibernate.validator.referenceguide.chapter03.cascaded.containerelement;
 
 //end::include[]
-
 import java.util.List;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 

@@ -6,10 +6,16 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.METHOD;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
 import jakarta.validation.Configuration;
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
@@ -25,15 +31,10 @@ import jakarta.validation.metadata.ConstructorDescriptor;
 import jakarta.validation.metadata.CrossParameterDescriptor;
 import jakarta.validation.metadata.MethodDescriptor;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static java.lang.annotation.ElementType.METHOD;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

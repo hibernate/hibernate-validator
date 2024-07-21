@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter11.javaee;
 
 //end::include[]
-
 import jakarta.annotation.Resource;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;

@@ -10,15 +10,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 
-import org.hibernate.validator.integration.AbstractArquillianIT;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.shrinkwrap.api.Archive;
-import org.testng.annotations.Test;
-
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
+
+import org.hibernate.validator.integration.AbstractArquillianIT;
+
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.shrinkwrap.api.Archive;
+
+import org.testng.annotations.Test;
 
 /**
  * Asserts constraints mappings contributed via {@code validation.xml} are applied.

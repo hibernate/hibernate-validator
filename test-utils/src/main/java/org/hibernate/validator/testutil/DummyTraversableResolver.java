@@ -7,6 +7,7 @@
 package org.hibernate.validator.testutil;
 
 import java.lang.annotation.ElementType;
+
 import jakarta.validation.Path;
 import jakarta.validation.TraversableResolver;
 

@@ -13,11 +13,11 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.hibernate.validator.constraints.BitcoinAddress;
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
+import org.hibernate.validator.constraints.BitcoinAddress;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 
 /**
  * Checks that a given character sequence (e.g. string) is a well-formed BTC (Bitcoin) address.

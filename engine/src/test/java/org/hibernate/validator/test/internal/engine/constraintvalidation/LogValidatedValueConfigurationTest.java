@@ -18,9 +18,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Set;
 
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.ListAppender;
-
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -28,6 +25,10 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.ListAppender;
+
 import org.apache.logging.log4j.core.LoggerContext;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;

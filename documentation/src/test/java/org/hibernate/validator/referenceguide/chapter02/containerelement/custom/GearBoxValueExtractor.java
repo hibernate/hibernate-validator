@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter02.containerelement.custom;
 
 //end::include[]
-
 import jakarta.validation.valueextraction.ExtractedValue;
 import jakarta.validation.valueextraction.ValueExtractor;
 

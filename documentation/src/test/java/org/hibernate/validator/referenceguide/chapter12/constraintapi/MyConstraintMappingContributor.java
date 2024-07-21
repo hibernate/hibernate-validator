@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter12.constraintapi;
 
 //end::include[]
-
 import org.hibernate.validator.cfg.defs.AssertTrueDef;
 import org.hibernate.validator.cfg.defs.MinDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;

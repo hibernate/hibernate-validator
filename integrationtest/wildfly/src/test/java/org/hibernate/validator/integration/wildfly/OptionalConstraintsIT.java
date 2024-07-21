@@ -12,19 +12,21 @@ import java.util.Set;
 
 import javax.money.MonetaryAmount;
 
-import org.hibernate.validator.constraints.Currency;
-import org.hibernate.validator.integration.AbstractArquillianIT;
-import org.javamoney.moneta.Money;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.shrinkwrap.api.Archive;
-import org.joda.time.DateTime;
-import org.testng.annotations.Test;
-
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.Future;
+
+import org.hibernate.validator.constraints.Currency;
+import org.hibernate.validator.integration.AbstractArquillianIT;
+
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.shrinkwrap.api.Archive;
+
+import org.javamoney.moneta.Money;
+import org.joda.time.DateTime;
+import org.testng.annotations.Test;
 
 /**
  * Asserts that the constraints based on the JodaTime and Javax Money server modules can be used.

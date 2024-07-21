@@ -16,6 +16,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.constraints.Pattern;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.Test;
 
 public class RegexpEscapingInterpolationTest {

@@ -8,6 +8,10 @@ package org.hibernate.validator.integrationtest.java.module.cdi.constraint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import jakarta.inject.Inject;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.integrationtest.java.module.cdi.model.TestEntity;
@@ -17,9 +21,6 @@ import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
-import jakarta.inject.Inject;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import org.testng.annotations.Test;
 
 public class InjectionTest extends Arquillian {

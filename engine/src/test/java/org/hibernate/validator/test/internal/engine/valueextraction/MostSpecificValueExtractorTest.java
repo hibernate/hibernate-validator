@@ -36,6 +36,7 @@ import org.hibernate.validator.test.internal.engine.valueextraction.model.Wrappe
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
+
 import org.testng.annotations.Test;
 
 /**

@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.bound.de
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.constraints.DecimalMin;

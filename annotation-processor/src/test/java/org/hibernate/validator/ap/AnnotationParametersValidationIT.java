@@ -31,6 +31,7 @@ import org.hibernate.validator.ap.testmodel.annotationparameters.ValidScriptAsse
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidSizeParameters;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 /**

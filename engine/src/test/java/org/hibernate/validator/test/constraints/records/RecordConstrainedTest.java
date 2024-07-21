@@ -6,6 +6,13 @@
  */
 package org.hibernate.validator.test.constraints.records;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -33,13 +40,6 @@ import org.hibernate.validator.testutils.ValidatorUtil;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 /**
  * @author Jan Schatteman

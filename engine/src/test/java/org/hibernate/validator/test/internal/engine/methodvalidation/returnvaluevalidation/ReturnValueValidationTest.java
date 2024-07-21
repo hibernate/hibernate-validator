@@ -11,10 +11,10 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.groups.Default;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

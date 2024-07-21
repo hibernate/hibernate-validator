@@ -6,9 +6,12 @@
  */
 package org.hibernate.validator.ap.internal.checks;
 
+import static javax.lang.model.util.ElementFilter.methodsIn;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
@@ -24,8 +27,6 @@ import javax.lang.model.util.Types;
 import org.hibernate.validator.ap.internal.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.internal.util.CollectionHelper;
 import org.hibernate.validator.ap.internal.util.TypeNames.BeanValidationTypes;
-
-import static javax.lang.model.util.ElementFilter.methodsIn;
 
 /**
  * Checks, that each constraint annotation type declares the members message(), groups() and payload() as

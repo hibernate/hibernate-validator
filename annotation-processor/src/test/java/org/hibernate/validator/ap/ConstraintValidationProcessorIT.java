@@ -86,6 +86,7 @@ import org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests;
 import org.hibernate.validator.ap.testutil.CompilerTestHelper.Library;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 /**

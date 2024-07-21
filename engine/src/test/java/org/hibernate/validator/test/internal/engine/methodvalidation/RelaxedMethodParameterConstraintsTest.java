@@ -7,6 +7,7 @@
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
 import java.util.Set;
+
 import jakarta.validation.ConstraintDeclarationException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
@@ -16,11 +17,11 @@ import jakarta.validation.ValidatorFactory;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
+
+import org.testng.annotations.Test;
 
 /**
  * Integration test for {@link org.hibernate.validator.internal.engine.ValidatorImpl} which tests that illegal method parameter constraints are properly allowed

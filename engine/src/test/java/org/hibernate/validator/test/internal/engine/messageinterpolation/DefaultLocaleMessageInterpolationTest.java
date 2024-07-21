@@ -16,6 +16,7 @@ import jakarta.validation.ValidatorFactory;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.HibernateValidator;
+
 import org.testng.annotations.Test;
 
 public class DefaultLocaleMessageInterpolationTest {

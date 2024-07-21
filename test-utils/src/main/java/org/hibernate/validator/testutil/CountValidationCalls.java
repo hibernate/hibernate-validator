@@ -6,14 +6,15 @@
  */
 package org.hibernate.validator.testutil;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import jakarta.validation.Constraint;
-import jakarta.validation.Payload;
-
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
 /**
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI

@@ -6,16 +6,16 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
+import static org.testng.Assert.assertSame;
+
 import jakarta.validation.Validation;
 import jakarta.validation.ValidationException;
 import jakarta.validation.ValidatorFactory;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 
-import static org.testng.Assert.assertSame;
+import org.testng.annotations.Test;
 
 /**
  * Test for {@link ValidatorFactoryImpl}.

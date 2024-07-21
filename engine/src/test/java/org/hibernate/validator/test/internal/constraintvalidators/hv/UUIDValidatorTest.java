@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.internal.constraintvalidators.hv.UUIDValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
@@ -13,10 +17,6 @@ import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 /**
  * Tests the {@link UUID} constraint.

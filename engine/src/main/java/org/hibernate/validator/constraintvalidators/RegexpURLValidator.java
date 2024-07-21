@@ -8,6 +8,7 @@ package org.hibernate.validator.constraintvalidators;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

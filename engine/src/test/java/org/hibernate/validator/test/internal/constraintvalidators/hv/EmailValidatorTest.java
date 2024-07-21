@@ -29,6 +29,7 @@ import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

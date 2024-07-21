@@ -11,9 +11,9 @@ import java.lang.invoke.MethodHandles;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import org.hibernate.validator.internal.util.actions.GetClassLoader;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.actions.GetClassLoader;
 import org.hibernate.validator.spi.scripting.AbstractCachingScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEngineScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluationException;

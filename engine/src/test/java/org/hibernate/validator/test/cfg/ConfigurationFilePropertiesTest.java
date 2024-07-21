@@ -20,6 +20,7 @@ import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

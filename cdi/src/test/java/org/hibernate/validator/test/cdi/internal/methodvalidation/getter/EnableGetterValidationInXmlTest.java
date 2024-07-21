@@ -6,16 +6,19 @@
  */
 package org.hibernate.validator.test.cdi.internal.methodvalidation.getter;
 
+import static org.testng.Assert.fail;
+
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
+
 import org.hibernate.validator.test.util.TestHelper;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.testng.annotations.Test;
 
-import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

@@ -2,8 +2,8 @@
 package org.hibernate.validator.referenceguide.chapter11.cdi.methodvalidation;
 
 //end::include[]
-
 import java.util.Date;
+
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 

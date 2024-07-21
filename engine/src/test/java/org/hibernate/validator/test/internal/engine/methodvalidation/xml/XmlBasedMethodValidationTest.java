@@ -8,10 +8,10 @@ package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
 import jakarta.validation.Configuration;
 
-import org.testng.annotations.BeforeMethod;
-
 import org.hibernate.validator.test.internal.engine.methodvalidation.AbstractMethodValidationTest;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
+import org.testng.annotations.BeforeMethod;
 
 /**
  * @author Hardy Ferentschik

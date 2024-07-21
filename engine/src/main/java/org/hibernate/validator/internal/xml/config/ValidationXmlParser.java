@@ -12,18 +12,19 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Map;
 
-import jakarta.validation.BootstrapConfiguration;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 
+import jakarta.validation.BootstrapConfiguration;
+
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.actions.GetClassLoader;
 import org.hibernate.validator.internal.util.actions.SetContextClassLoader;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.xml.CloseIgnoringInputStream;
 import org.hibernate.validator.internal.xml.XmlParserHelper;
 

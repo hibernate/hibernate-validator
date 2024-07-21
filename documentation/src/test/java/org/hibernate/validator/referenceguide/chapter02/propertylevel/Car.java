@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter02.propertylevel;
 
 //end::include[]
-
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 

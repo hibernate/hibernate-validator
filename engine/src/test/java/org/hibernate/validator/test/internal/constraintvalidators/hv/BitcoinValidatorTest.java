@@ -6,24 +6,6 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
-import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.defs.BitcoinAddressDef;
-import org.hibernate.validator.constraints.BitcoinAddress;
-import org.hibernate.validator.internal.constraintvalidators.hv.BitcoinAddressValidator;
-import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
-import org.hibernate.validator.testutils.ValidatorUtil;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import static org.hibernate.validator.constraints.BitcoinAddress.BitcoinAddressType.ANY;
 import static org.hibernate.validator.constraints.BitcoinAddress.BitcoinAddressType.BECH32;
 import static org.hibernate.validator.constraints.BitcoinAddress.BitcoinAddressType.P2PKH;
@@ -36,6 +18,26 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.BitcoinAddressDef;
+import org.hibernate.validator.constraints.BitcoinAddress;
+import org.hibernate.validator.internal.constraintvalidators.hv.BitcoinAddressValidator;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+import org.hibernate.validator.testutils.ValidatorUtil;
+
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 /**
  * Tests the {@code BitcoinAddress} constraint.

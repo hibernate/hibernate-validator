@@ -7,6 +7,7 @@
 package org.hibernate.validator.ap.internal.classchecks;
 
 import java.util.Collection;
+
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 

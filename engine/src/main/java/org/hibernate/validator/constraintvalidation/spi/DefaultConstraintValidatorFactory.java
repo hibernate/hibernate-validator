@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.constraintvalidation.spi;
 
-import org.hibernate.validator.internal.util.actions.NewInstance;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorFactory;
+
+import org.hibernate.validator.internal.util.actions.NewInstance;
 
 /**
  * Default {@code ConstraintValidatorFactory} using a no-arg constructor.

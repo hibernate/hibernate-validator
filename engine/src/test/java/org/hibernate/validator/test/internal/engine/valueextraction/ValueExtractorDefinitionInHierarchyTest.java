@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.test.internal.engine.valueextraction;
 
-
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -23,6 +22,7 @@ import jakarta.validation.valueextraction.ValueExtractorDefinitionException;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 /**

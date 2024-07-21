@@ -9,12 +9,12 @@ package org.hibernate.validator.integrationtest.java.module.test.utils;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
-import org.hibernate.validator.HibernateValidator;
-
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+
+import org.hibernate.validator.HibernateValidator;
 
 public class Car {
 

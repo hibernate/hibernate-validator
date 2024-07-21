@@ -6,16 +6,17 @@
  */
 package org.hibernate.validator.test.internal.engine.methodlevel.generic;
 
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-import org.testng.annotations.Test;
 
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

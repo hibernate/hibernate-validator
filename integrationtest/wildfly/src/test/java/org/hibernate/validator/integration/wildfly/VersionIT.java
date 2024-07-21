@@ -12,10 +12,12 @@ import java.util.Properties;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.integration.AbstractArquillianIT;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+
 import org.testng.annotations.Test;
 
 /**

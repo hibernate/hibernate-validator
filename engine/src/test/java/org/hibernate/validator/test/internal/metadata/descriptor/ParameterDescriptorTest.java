@@ -27,6 +27,7 @@ import org.hibernate.validator.test.internal.metadata.Customer.CustomerComplex;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerRepositoryExtComplex;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

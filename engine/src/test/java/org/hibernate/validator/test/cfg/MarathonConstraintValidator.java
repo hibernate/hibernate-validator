@@ -9,7 +9,6 @@ package org.hibernate.validator.test.cfg;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-
 /**
  * @author Hardy Ferentschik
  */

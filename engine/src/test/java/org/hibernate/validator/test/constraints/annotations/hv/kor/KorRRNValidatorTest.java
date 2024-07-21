@@ -10,9 +10,9 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
-import jakarta.validation.ConstraintViolation;
-
 import java.util.Set;
+
+import jakarta.validation.ConstraintViolation;
 
 import org.hibernate.validator.constraints.kor.KorRRN;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;

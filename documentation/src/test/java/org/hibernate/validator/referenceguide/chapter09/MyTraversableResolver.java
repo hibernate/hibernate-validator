@@ -2,8 +2,8 @@
 package org.hibernate.validator.referenceguide.chapter09;
 
 //end::include[]
-
 import java.lang.annotation.ElementType;
+
 import jakarta.validation.Path;
 import jakarta.validation.Path.Node;
 import jakarta.validation.TraversableResolver;

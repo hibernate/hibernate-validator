@@ -8,6 +8,7 @@ package org.hibernate.validator.ap.testmodel.constrainttypes;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.Size;

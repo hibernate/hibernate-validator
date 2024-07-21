@@ -4,6 +4,7 @@ import jakarta.validation.Validation;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
+
 import org.junit.Test;
 
 public class RelaxationTest {

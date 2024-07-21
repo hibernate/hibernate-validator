@@ -49,6 +49,7 @@ import org.hibernate.validator.path.ContainerElementNode;
 import org.hibernate.validator.path.PropertyNode;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

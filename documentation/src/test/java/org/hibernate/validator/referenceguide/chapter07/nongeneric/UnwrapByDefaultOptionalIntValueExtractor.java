@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter07.nongeneric;
 
 //end::include[]
-
 import java.util.OptionalInt;
 
 import jakarta.validation.valueextraction.ExtractedValue;

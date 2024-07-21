@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter06.classlevel;
 
 //end::include[]
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

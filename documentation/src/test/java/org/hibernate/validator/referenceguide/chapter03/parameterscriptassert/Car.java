@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter03.parameterscriptassert;
 
 //end::include[]
-
 import java.util.List;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;

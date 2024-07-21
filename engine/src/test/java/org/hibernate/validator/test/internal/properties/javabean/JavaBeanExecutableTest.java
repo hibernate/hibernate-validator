@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.hibernate.validator.internal.properties.javabean.JavaBeanConstructor;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 public class JavaBeanExecutableTest {

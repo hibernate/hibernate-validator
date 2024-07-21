@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter03.crossparameter;
 
 //end::include[]
-
 import java.util.List;
 
 //tag::include[]

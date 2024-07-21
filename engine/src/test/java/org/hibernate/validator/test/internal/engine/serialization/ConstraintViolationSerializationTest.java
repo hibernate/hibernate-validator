@@ -33,6 +33,7 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.test.internal.engine.serialization.SerializableClass.TestPayload;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
+
 import org.testng.annotations.Test;
 
 /**

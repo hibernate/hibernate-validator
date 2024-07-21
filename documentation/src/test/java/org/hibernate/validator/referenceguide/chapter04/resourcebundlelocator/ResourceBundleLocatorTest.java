@@ -1,18 +1,19 @@
 package org.hibernate.validator.referenceguide.chapter04.resourcebundlelocator;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.Set;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-
-import org.junit.Test;
 
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.AggregateResourceBundleLocator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class ResourceBundleLocatorTest {
 

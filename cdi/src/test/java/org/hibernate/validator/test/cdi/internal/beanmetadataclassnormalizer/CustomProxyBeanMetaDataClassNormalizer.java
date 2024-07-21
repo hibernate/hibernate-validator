@@ -10,6 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Set;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.literal.NamedLiteral;
@@ -18,7 +19,6 @@ import jakarta.enterprise.inject.spi.InjectionPoint;
 
 import org.hibernate.validator.cdi.spi.BeanNames;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
-
 
 public class CustomProxyBeanMetaDataClassNormalizer
 		implements BeanMetaDataClassNormalizer, Bean<BeanMetaDataClassNormalizer> {

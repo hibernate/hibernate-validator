@@ -8,6 +8,7 @@ package org.hibernate.validator.test.internal.engine.methodvalidation.returnvalu
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

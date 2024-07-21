@@ -6,21 +6,22 @@
  */
 package org.hibernate.validator.test.internal.metadata.core;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.util.List;
-import jakarta.validation.constraints.Pattern;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.test.internal.metadata.Engine;
-
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.List;
+
+import jakarta.validation.constraints.Pattern;
+
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.test.internal.metadata.Engine;
+
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter03.inheritance.parallel;
 
 //end::include[]
-
 import jakarta.validation.constraints.Max;
 
 //tag::include[]

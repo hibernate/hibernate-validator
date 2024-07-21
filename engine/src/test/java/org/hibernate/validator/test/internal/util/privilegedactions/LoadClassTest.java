@@ -6,18 +6,18 @@
  */
 package org.hibernate.validator.test.internal.util.privilegedactions;
 
-import jakarta.validation.ValidationException;
+import static java.lang.Thread.currentThread;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
-import org.testng.annotations.Test;
+import java.util.function.Supplier;
+
+import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.internal.util.actions.LoadClass;
 
-import static java.lang.Thread.currentThread;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.fail;
-import static org.testng.Assert.assertTrue;
-
-import java.util.function.Supplier;
+import org.testng.annotations.Test;
 
 /**
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>

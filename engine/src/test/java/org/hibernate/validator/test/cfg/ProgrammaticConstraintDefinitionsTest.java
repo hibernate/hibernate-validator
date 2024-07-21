@@ -15,6 +15,11 @@ import static org.testng.Assert.fail;
 import java.lang.annotation.Annotation;
 import java.util.Set;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -39,12 +44,8 @@ import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
 import org.hibernate.validator.constraints.ru.INN;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
-import org.testng.annotations.Test;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
+import org.testng.annotations.Test;
 
 /**
  * @author Marko Bekhta

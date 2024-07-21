@@ -1,9 +1,11 @@
 package org.hibernate.validator.referenceguide.chapter03.inheritance.returnvalue;
 
-import java.lang.reflect.Method;
+import static org.junit.Assert.assertEquals;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Set;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;
@@ -12,8 +14,6 @@ import jakarta.validation.executable.ExecutableValidator;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class CarTest {
 

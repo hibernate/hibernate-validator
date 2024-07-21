@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter12.failfastonpropertyviolation;
 
 //end::include[]
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

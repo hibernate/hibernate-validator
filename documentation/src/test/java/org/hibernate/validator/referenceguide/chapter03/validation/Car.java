@@ -2,9 +2,9 @@
 package org.hibernate.validator.referenceguide.chapter03.validation;
 
 //end::include[]
-
 import java.util.Collections;
 import java.util.List;
+
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

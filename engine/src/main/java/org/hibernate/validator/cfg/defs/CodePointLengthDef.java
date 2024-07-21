@@ -10,7 +10,6 @@ package org.hibernate.validator.cfg.defs;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.CodePointLength;
 
-
 /**
  * Constraint definition for {@link CodePointLength}.
  * @author Kazuki Shimizu

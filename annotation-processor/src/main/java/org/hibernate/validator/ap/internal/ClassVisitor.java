@@ -8,6 +8,7 @@ package org.hibernate.validator.ap.internal;
 
 import java.util.Collection;
 import java.util.Set;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;

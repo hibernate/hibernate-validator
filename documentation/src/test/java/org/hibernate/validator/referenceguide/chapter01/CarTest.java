@@ -1,6 +1,9 @@
 package org.hibernate.validator.referenceguide.chapter01;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Set;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -8,8 +11,6 @@ import jakarta.validation.ValidatorFactory;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class CarTest {
 

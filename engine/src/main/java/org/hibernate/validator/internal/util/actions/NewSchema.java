@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.util.actions;
 
 import java.net.URL;
+
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 

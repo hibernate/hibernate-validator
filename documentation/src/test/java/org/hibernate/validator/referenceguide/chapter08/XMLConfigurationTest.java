@@ -1,10 +1,14 @@
 package org.hibernate.validator.referenceguide.chapter08;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
 import jakarta.validation.Configuration;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -23,9 +27,6 @@ import jakarta.validation.metadata.ReturnValueDescriptor;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik

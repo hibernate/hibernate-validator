@@ -19,11 +19,13 @@ import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.test.cdi.internal.injection.MyValidationProvider.MyValidator;
 import org.hibernate.validator.test.cdi.internal.injection.MyValidationProvider.MyValidatorFactory;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+
 import org.testng.annotations.Test;
 
 /**

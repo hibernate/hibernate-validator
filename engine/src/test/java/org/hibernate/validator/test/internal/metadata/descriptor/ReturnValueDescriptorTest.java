@@ -14,13 +14,12 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Set;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.metadata.GroupConversionDescriptor;
 import jakarta.validation.metadata.ReturnValueDescriptor;
 import jakarta.validation.metadata.Scope;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;
@@ -31,6 +30,8 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerRepositoryExtBasic;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerRepositoryExtReturnValueComplex;
 import org.hibernate.validator.testutil.TestForIssue;
+
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

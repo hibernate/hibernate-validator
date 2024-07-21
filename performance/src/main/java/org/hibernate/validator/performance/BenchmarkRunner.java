@@ -6,9 +6,6 @@
  */
 package org.hibernate.validator.performance;
 
-import java.util.Objects;
-import java.util.stream.Stream;
-
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -17,6 +14,9 @@ import org.openjdk.jmh.runner.options.CommandLineOptionException;
 import org.openjdk.jmh.runner.options.CommandLineOptions;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * Class containing main method to run all performance tests.

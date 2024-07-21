@@ -1,5 +1,3 @@
-import org.hibernate.validator.integrationtest.java.module.simple.constraint.CarServiceConstraint;
-
 /*
  * Hibernate Validator, declare and validate application constraints
  *
@@ -16,6 +14,6 @@ module org.hibernate.validator.integrationtest.java.module.simple {
 	exports org.hibernate.validator.integrationtest.java.module.simple.constraint to org.hibernate.validator;
 
 	// we let all know that there's a `ConstraintValidator` "service" to be "loaded"
-	provides jakarta.validation.ConstraintValidator with CarServiceConstraint.Validator;
+	provides jakarta.validation.ConstraintValidator with org.hibernate.validator.integrationtest.java.module.simple.constraint.CarServiceConstraint.Validator;
 
 }

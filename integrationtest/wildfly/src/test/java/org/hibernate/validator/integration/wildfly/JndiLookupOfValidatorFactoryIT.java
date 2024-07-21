@@ -13,13 +13,15 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import jakarta.validation.ValidatorFactory;
+
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
-import org.testng.annotations.Test;
 
-import jakarta.validation.ValidatorFactory;
+import org.testng.annotations.Test;
 
 /**
  * Tests the integration of Hibernate Validator in Wildfly.

@@ -8,8 +8,8 @@ package org.hibernate.validator.test.internal.engine.groups.defaultgroupsequence
 
 import jakarta.validation.constraints.Pattern;
 
-import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.group.GroupSequenceProvider;
 
 /**
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI

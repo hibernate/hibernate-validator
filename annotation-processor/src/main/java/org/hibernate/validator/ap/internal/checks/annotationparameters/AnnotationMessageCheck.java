@@ -7,6 +7,7 @@
 package org.hibernate.validator.ap.internal.checks.annotationparameters;
 
 import java.util.regex.Pattern;
+
 import javax.lang.model.element.AnnotationMirror;
 
 import org.hibernate.validator.ap.internal.util.AnnotationApiHelper;

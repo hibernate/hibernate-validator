@@ -23,6 +23,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVi
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.testutil.ConstraintViolationAssert.PathExpectation;
+
 import org.testng.annotations.Test;
 
 /**

@@ -20,6 +20,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.dec
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 /**

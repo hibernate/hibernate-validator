@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter03.cascaded;
 
 //end::include[]
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 

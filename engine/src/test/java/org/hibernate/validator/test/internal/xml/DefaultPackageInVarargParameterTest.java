@@ -6,8 +6,11 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
+import static org.testng.Assert.assertTrue;
+
 import java.util.List;
 import java.util.Set;
+
 import jakarta.validation.Configuration;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -17,9 +20,8 @@ import jakarta.validation.metadata.MethodType;
 import jakarta.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
-import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * Test that arrays and varargs can be specified in XML with and without default package

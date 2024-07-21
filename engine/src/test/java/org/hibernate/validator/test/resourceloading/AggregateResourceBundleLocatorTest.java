@@ -6,19 +6,19 @@
  */
 package org.hibernate.validator.test.resourceloading;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.resourceloading.AggregateResourceBundleLocator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
+import org.testng.annotations.Test;
 
 /**
  * Test for {@link org.hibernate.validator.resourceloading.AggregateResourceBundleLocator}.

@@ -12,8 +12,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.hibernate.validator.cdi.interceptor.internal.MethodValidated;
-
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.interceptor.AroundConstruct;
@@ -26,6 +24,8 @@ import jakarta.validation.ElementKind;
 import jakarta.validation.Path;
 import jakarta.validation.Validator;
 import jakarta.validation.executable.ExecutableValidator;
+
+import org.hibernate.validator.cdi.interceptor.internal.MethodValidated;
 
 /**
  * An interceptor which performs a validation of the Bean Validation constraints specified at the parameters and/or return

@@ -7,18 +7,19 @@
 
 package org.hibernate.validator.test.constraints.boolcomposition.localconstrval;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.constraints.CompositionType.OR;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.ConstraintComposition;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.constraints.CompositionType.OR;
 
 /**
  * Test constraint for HV-390.

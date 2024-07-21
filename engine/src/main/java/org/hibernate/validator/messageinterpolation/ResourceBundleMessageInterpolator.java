@@ -11,20 +11,20 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
+import jakarta.el.ELManager;
+import jakarta.el.ExpressionFactory;
+
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.actions.GetClassLoader;
 import org.hibernate.validator.internal.util.actions.SetContextClassLoader;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 import com.sun.el.ExpressionFactoryImpl;
-
-import jakarta.el.ELManager;
-import jakarta.el.ExpressionFactory;
 
 /**
  * Resource bundle backed message interpolator.

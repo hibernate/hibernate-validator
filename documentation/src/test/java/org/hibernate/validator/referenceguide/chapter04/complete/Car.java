@@ -2,8 +2,8 @@
 package org.hibernate.validator.referenceguide.chapter04.complete;
 
 //end::include[]
-
 import java.math.BigDecimal;
+
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

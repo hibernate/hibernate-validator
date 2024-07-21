@@ -3,6 +3,7 @@ package org.hibernate.validator.referenceguide.chapter12.nodenameprovider;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Set;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;

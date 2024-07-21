@@ -7,6 +7,7 @@
 package org.hibernate.validator.ap.testmodel.annotationparameters;
 
 import java.math.BigDecimal;
+
 import jakarta.validation.constraints.Digits;
 
 /**

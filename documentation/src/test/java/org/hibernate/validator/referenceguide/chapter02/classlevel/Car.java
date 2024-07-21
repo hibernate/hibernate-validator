@@ -2,7 +2,6 @@
 package org.hibernate.validator.referenceguide.chapter02.classlevel;
 
 //end::include[]
-
 import java.util.List;
 
 //tag::include[]

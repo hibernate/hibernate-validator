@@ -6,16 +6,16 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
-import java.util.Arrays;
+import static org.hibernate.validator.constraints.UUID.LetterCase;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
-import org.hibernate.validator.constraints.UUID;
-import org.hibernate.validator.internal.util.Contracts;
+import java.util.Arrays;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import static org.hibernate.validator.constraints.UUID.LetterCase;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+import org.hibernate.validator.constraints.UUID;
+import org.hibernate.validator.internal.util.Contracts;
 
 /**
  * Checks that the annotated character sequence is a valid
