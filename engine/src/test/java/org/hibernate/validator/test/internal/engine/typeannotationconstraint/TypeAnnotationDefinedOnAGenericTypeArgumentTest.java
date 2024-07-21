@@ -37,27 +37,27 @@ public class TypeAnnotationDefinedOnAGenericTypeArgumentTest {
 	// HV-1428 Container element support is disabled for arrays
 	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*", enabled = false)
 	public void constraintOnGenericTypeArgumentOfArrayFieldThrowsException() {
-		validator.validate( new GenericArrayEntity<>( new String[]{ "Too long" } ) );
+		validator.validate( new GenericArrayEntity<>( new String[] { "Too long" } ) );
 	}
 
 	// HV-1428 Container element support is disabled for arrays
 	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*", enabled = false)
 	public void constraintOnGenericTypeArgumentOfArrayGetterThrowsException() {
-		validator.validate( new GenericArrayWithGetterEntity<>( new String[]{ "Too long" } ) );
+		validator.validate( new GenericArrayWithGetterEntity<>( new String[] { "Too long" } ) );
 	}
 
 	// HV-1428 Container element support is disabled for arrays
 	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*", enabled = false)
 	public void constraintOnGenericTypeArgumentOfArrayParameterThrowsException() {
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-		fishTank.test2( new String[]{ "Too long" } );
+		fishTank.test2( new String[] { "Too long" } );
 	}
 
 	// HV-1428 Container element support is disabled for arrays
 	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*", enabled = false)
 	public void constraintOnGenericTypeArgumentOfArrayReturnValueThrowsException() {
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-		fishTank.test4( new String[]{ "Too long" } );
+		fishTank.test4( new String[] { "Too long" } );
 	}
 
 	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
@@ -132,8 +132,11 @@ public class TypeAnnotationDefinedOnAGenericTypeArgumentTest {
 
 	public interface IFishTank {
 		<T> void test1(List<T> fishNames);
+
 		<T> void test2(T[] fishNames);
+
 		<T> List<T> test3(List<T> list);
+
 		<T> T[] test4(T[] array);
 	}
 

@@ -132,9 +132,7 @@ public final class ReflectionHelper {
 	 * {@code Iterable}, {@code Map} or array type).
 	 */
 	public static boolean isCollection(Type type) {
-		return isIterable( type ) ||
-				isMap( type ) ||
-				TypeHelper.isArray( type );
+		return isIterable( type ) || isMap( type ) || TypeHelper.isArray( type );
 	}
 
 	/**
@@ -166,9 +164,7 @@ public final class ReflectionHelper {
 	 * @return Returns true if the type is indexable.
 	 */
 	public static boolean isIndexable(Type type) {
-		return isList( type ) ||
-				isMap( type ) ||
-				TypeHelper.isArray( type );
+		return isList( type ) || isMap( type ) || TypeHelper.isArray( type );
 	}
 
 	/**

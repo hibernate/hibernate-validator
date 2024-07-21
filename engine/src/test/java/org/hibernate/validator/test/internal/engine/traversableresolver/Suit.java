@@ -15,13 +15,14 @@ import jakarta.validation.groups.Default;
 /**
  * @author Emmanuel Bernard
  */
-@GroupSequence( {Suit.class, Cloth.class })
+@GroupSequence({ Suit.class, Cloth.class })
 public class Suit {
 
 	@Max(value = 50, groups = { Default.class, Cloth.class })
 	@Min(1)
 	private Integer size;
-	@Valid private Trousers trousers;
+	@Valid
+	private Trousers trousers;
 	private Jacket jacket;
 
 	public Trousers getTrousers() {

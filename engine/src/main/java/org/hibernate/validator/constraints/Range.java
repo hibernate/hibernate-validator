@@ -46,9 +46,11 @@ import org.hibernate.validator.constraints.Range.List;
 @Max(Long.MAX_VALUE)
 @ReportAsSingleViolation
 public @interface Range {
-	@OverridesAttribute(constraint = Min.class, name = "value") long min() default 0;
+	@OverridesAttribute(constraint = Min.class, name = "value")
+	long min() default 0;
 
-	@OverridesAttribute(constraint = Max.class, name = "value") long max() default Long.MAX_VALUE;
+	@OverridesAttribute(constraint = Max.class, name = "value")
+	long max() default Long.MAX_VALUE;
 
 	String message() default "{org.hibernate.validator.constraints.Range.message}";
 

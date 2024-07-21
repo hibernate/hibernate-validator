@@ -34,11 +34,11 @@ public class InvalidXmlConfigurationTest {
 		validationXmlTestHelper.runWithCustomValidationXml(
 				"validation-InvalidXmlConfigurationTest.xml", new Runnable() {
 
-			@Override
-			public void run() {
-				ValidatorUtil.getValidator();
-			}
-		}
+					@Override
+					public void run() {
+						ValidatorUtil.getValidator();
+					}
+				}
 		);
 	}
 }

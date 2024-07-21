@@ -43,9 +43,9 @@ public final class PathImpl implements Path, Serializable {
 	 *
 	 * @see <a href="http://www.regexplanet.com/simple/index.jsp">Regular expression tester</a>
 	 */
-	private static final String LEADING_PROPERTY_GROUP = "[^\\[\\.]+";  // everything up to a [ or .
+	private static final String LEADING_PROPERTY_GROUP = "[^\\[\\.]+"; // everything up to a [ or .
 	private static final String OPTIONAL_INDEX_GROUP = "\\[(\\w*)\\]";
-	private static final String REMAINING_PROPERTY_STRING = "\\.(.*)";  // processed recursively
+	private static final String REMAINING_PROPERTY_STRING = "\\.(.*)"; // processed recursively
 
 	private static final Pattern PATH_PATTERN = Pattern.compile( "(" + LEADING_PROPERTY_GROUP + ")(" + OPTIONAL_INDEX_GROUP + ")?(" + REMAINING_PROPERTY_STRING + ")*" );
 	private static final int PROPERTY_NAME_GROUP = 1;
@@ -470,7 +470,7 @@ public final class PathImpl implements Path, Serializable {
 	 * @param other the path to compare with
 	 * @return true, if this path is a subpath
 	 */
-	public boolean isSubPathOf( PathImpl other ) {
+	public boolean isSubPathOf(PathImpl other) {
 		if ( nodeList.size() > other.nodeList.size() ) {
 			// cannot be a subpath as it is already longer then the other path
 			return false;

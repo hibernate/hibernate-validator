@@ -130,8 +130,8 @@ public class StringHelper {
 		return toShortString( method.getGenericReturnType() ) + " " +
 				method.getName() +
 				Arrays.stream( method.getGenericParameterTypes() )
-					.map( StringHelper::toShortString )
-					.collect( Collectors.joining( ", ", "(", ")" ) );
+						.map( StringHelper::toShortString )
+						.collect( Collectors.joining( ", ", "(", ")" ) );
 	}
 
 	/**
@@ -172,8 +172,8 @@ public class StringHelper {
 		}
 
 		String typeArgumentsString = Arrays.stream( parameterizedType.getActualTypeArguments() )
-			.map( t -> toShortString( t ) )
-			.collect( Collectors.joining( ", ", "<", ">" ) );
+				.map( t -> toShortString( t ) )
+				.collect( Collectors.joining( ", ", "<", ">" ) );
 
 		return toShortString( rawType ) + typeArgumentsString;
 	}
@@ -182,14 +182,14 @@ public class StringHelper {
 		String[] packageParts = DOT.split( pakkage.getName() );
 
 		return Arrays.stream( packageParts )
-			.map( n -> n.substring( 0, 1 ) )
-			.collect( Collectors.joining( "." ) );
+				.map( n -> n.substring( 0, 1 ) )
+				.collect( Collectors.joining( "." ) );
 	}
 
 	private static boolean startsWithSeveralUpperCaseLetters(String string) {
-		return string.length() > 1 &&
-				Character.isUpperCase( string.charAt( 0 ) ) &&
-				Character.isUpperCase( string.charAt( 1 ) );
+		return string.length() > 1
+				&& Character.isUpperCase( string.charAt( 0 ) )
+				&& Character.isUpperCase( string.charAt( 1 ) );
 	}
 
 	public static String format(String format, Object... args) {

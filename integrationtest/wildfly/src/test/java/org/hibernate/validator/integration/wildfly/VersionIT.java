@@ -56,6 +56,6 @@ public class VersionIT extends AbstractArquillianIT {
 		props.load( VersionIT.class.getResourceAsStream( "/" + VERSION_FILE_NAME ) );
 		String expectedVersion = props.getProperty( KEY );
 
-		assertThat( actualVersion ).isEqualTo( expectedVersion  );
+		assertThat( actualVersion ).isEqualTo( expectedVersion );
 	}
 }

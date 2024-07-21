@@ -35,7 +35,7 @@ import org.hibernate.validator.Incubating;
 
 @Incubating
 @Documented
-@Constraint(validatedBy = {})
+@Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(KorRRN.List.class)
@@ -44,9 +44,9 @@ public @interface KorRRN {
 
 	String message() default "{org.hibernate.validator.constraints.kor.KorRRN.message}";
 
-	Class<?>[] groups() default {};
+	Class<?>[] groups() default { };
 
-	Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default { };
 
 	ValidateCheckDigit validateCheckDigit() default NEVER;
 

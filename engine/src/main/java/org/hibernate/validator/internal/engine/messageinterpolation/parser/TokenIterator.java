@@ -84,5 +84,3 @@ public class TokenIterator {
 		return messageBuilder.toString();
 	}
 }
-
-

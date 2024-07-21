@@ -121,12 +121,14 @@ public class ReturnValueDescriptorTest {
 		assertConstraintTypes(
 				returnValueDescriptor.findConstraints()
 						.lookingAt( Scope.LOCAL_ELEMENT )
-						.getConstraintDescriptors(), Min.class
+						.getConstraintDescriptors(),
+				Min.class
 		);
 		assertConstraintTypes(
 				returnValueDescriptor.findConstraints()
 						.lookingAt( Scope.HIERARCHY )
-						.getConstraintDescriptors(), Min.class, NotNull.class
+						.getConstraintDescriptors(),
+				Min.class, NotNull.class
 		);
 	}
 
@@ -139,7 +141,8 @@ public class ReturnValueDescriptorTest {
 		assertConstraintTypes(
 				returnValueDescriptor.findConstraints()
 						.unorderedAndMatchingGroups( ValidationGroup.class )
-						.getConstraintDescriptors(), NotNull.class
+						.getConstraintDescriptors(),
+				NotNull.class
 		);
 	}
 

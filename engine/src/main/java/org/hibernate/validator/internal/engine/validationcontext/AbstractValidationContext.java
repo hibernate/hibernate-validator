@@ -438,7 +438,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			// No need to check if the class matches because of how this class is used in the set.
 			BeanPathMetaConstraintProcessedUnit that = (BeanPathMetaConstraintProcessedUnit) o;
 
-			if ( bean != that.bean ) {  // instance equality
+			if ( bean != that.bean ) { // instance equality
 				return false;
 			}
 			if ( metaConstraint != that.metaConstraint ) {
@@ -487,7 +487,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			// No need to check if the class matches because of how this class is used in the set.
 			BeanGroupProcessedUnit that = (BeanGroupProcessedUnit) o;
 
-			if ( bean != that.bean ) {  // instance equality
+			if ( bean != that.bean ) { // instance equality
 				return false;
 			}
 			if ( !group.equals( that.group ) ) {

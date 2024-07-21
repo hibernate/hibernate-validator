@@ -31,7 +31,7 @@ public class PropertyPathTest {
 				.buildValidatorFactory()
 				.getValidator();
 
-//tag::include[]
+		//tag::include[]
 		Building building = new Building();
 
 		// Assume the name of the person violates a @Size constraint
@@ -55,7 +55,7 @@ public class PropertyPathTest {
 		node = nodeIterator.next();
 		assertEquals( node.getName(), "name" );
 		assertEquals( node.as( PropertyNode.class ).getValue(), "Bob" );
-//end::include[]
+		//end::include[]
 
 		assertFalse( nodeIterator.hasNext() );
 	}

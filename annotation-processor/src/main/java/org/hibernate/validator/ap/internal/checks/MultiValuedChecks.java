@@ -32,7 +32,7 @@ public class MultiValuedChecks implements ConstraintChecks {
 	 * @param checks The checks to execute.
 	 */
 	public MultiValuedChecks(ConstraintHelper constraintHelper,
-							 ConstraintCheck... checks) {
+			ConstraintCheck... checks) {
 
 		this.constraintHelper = constraintHelper;
 		this.delegate = new SingleValuedChecks( checks );
@@ -43,8 +43,7 @@ public class MultiValuedChecks implements ConstraintChecks {
 		Set<ConstraintCheckIssue> theValue = CollectionHelper.newHashSet();
 
 		//execute the checks on each element of the multi-valued constraint
-		for ( AnnotationMirror onePartOfMultiValuedConstraint :
-				constraintHelper.getPartsOfMultiValuedConstraint( annotation ) ) {
+		for ( AnnotationMirror onePartOfMultiValuedConstraint : constraintHelper.getPartsOfMultiValuedConstraint( annotation ) ) {
 
 			theValue.addAll( delegate.execute( element, onePartOfMultiValuedConstraint ) );
 		}

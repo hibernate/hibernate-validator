@@ -356,12 +356,10 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		}
 
 		public User(
-				@Valid
-				@ConvertGroup.List({
+				@Valid @ConvertGroup.List({
 						@ConvertGroup(from = Default.class, to = BasicPostal.class),
 						@ConvertGroup(from = Complete.class, to = FullPostal.class)
-				})
-				Address address) {
+				}) Address address) {
 		}
 
 		public String getMail1() {
@@ -391,12 +389,10 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		}
 
 		public void setAddress1(
-				@Valid
-				@ConvertGroup.List({
+				@Valid @ConvertGroup.List({
 						@ConvertGroup(from = Default.class, to = BasicPostal.class),
 						@ConvertGroup(from = Complete.class, to = FullPostal.class)
-				})
-				Address address) {
+				}) Address address) {
 		}
 	}
 
@@ -422,12 +418,10 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 
 		@SuppressWarnings("unused")
 		public void setAddress(
-				@Valid
-				@ConvertGroup.List({
+				@Valid @ConvertGroup.List({
 						@ConvertGroup(from = Default.class, to = BasicPostal.class),
 						@ConvertGroup(from = Default.class, to = FullPostal.class)
-				})
-				Address address) {
+				}) Address address) {
 		}
 	}
 

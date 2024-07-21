@@ -46,9 +46,9 @@ public @interface UniqueElements {
 
 	String message() default "{org.hibernate.validator.constraints.UniqueElements.message}";
 
-	Class<?>[] groups() default {};
+	Class<?>[] groups() default { };
 
-	Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default { };
 
 	/**
 	 * Defines several {@code @UniqueElements} annotations on the same element.

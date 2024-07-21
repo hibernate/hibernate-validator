@@ -20,7 +20,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public abstract class SizeValidatorForArraysOfPrimitives {
 
-	private  static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected int min;
 	protected int max;

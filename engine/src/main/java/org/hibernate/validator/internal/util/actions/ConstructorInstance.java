@@ -31,8 +31,7 @@ public final class ConstructorInstance {
 		try {
 			return constructor.newInstance( initArgs );
 		}
-		catch (InstantiationException | IllegalAccessException | IllegalArgumentException |
-			   InvocationTargetException e) {
+		catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw LOG.getUnableToInstantiateException( constructor.getDeclaringClass(), e );
 		}
 	}

@@ -51,7 +51,7 @@ public class TckRunner {
 		XmlSuite suite = new XmlSuite();
 		suite.setName( "JSR-380-TCK" );
 
-		XmlTest test = new XmlTest(suite);
+		XmlTest test = new XmlTest( suite );
 		test.setName( "JSR-380-TCK" );
 
 		List<XmlPackage> packages = Collections.singletonList( new XmlPackage( "org.hibernate.beanvalidation.tck.tests" ) );
@@ -63,7 +63,7 @@ public class TckRunner {
 
 		XmlMethodSelector selector = new XmlMethodSelector();
 		selector.setClassName( IntegrationTestsMethodSelector.class.getName() );
-		test.setMethodSelectors( Collections.singletonList( selector  ) );
+		test.setMethodSelectors( Collections.singletonList( selector ) );
 
 		TestListenerAdapter tla = new TestListenerAdapter();
 		TestNG testng = new TestNG();
@@ -71,7 +71,7 @@ public class TckRunner {
 		testng.addListener( tla );
 		testng.run();
 
-		for ( ITestResult failure: tla.getConfigurationFailures() ) {
+		for ( ITestResult failure : tla.getConfigurationFailures() ) {
 			System.out.println( "Failure: " + failure.getName() );
 			failure.getThrowable().printStackTrace();
 		}

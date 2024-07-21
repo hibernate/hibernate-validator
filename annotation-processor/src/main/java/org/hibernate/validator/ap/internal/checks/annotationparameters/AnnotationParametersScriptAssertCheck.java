@@ -31,8 +31,7 @@ public class AnnotationParametersScriptAssertCheck extends AnnotationParametersA
 	protected Set<ConstraintCheckIssue> doCheck(Element element, AnnotationMirror annotation) {
 		String lang = (String) annotationApiHelper.getAnnotationValue( annotation, "lang" ).getValue();
 		String script = (String) annotationApiHelper.getAnnotationValue( annotation, "script" ).getValue();
-		String alias = annotationApiHelper.getAnnotationValue( annotation, "alias" ) != null ?
-				(String) annotationApiHelper.getAnnotationValue( annotation, "alias" ).getValue() : "_this";
+		String alias = annotationApiHelper.getAnnotationValue( annotation, "alias" ) != null ? (String) annotationApiHelper.getAnnotationValue( annotation, "alias" ).getValue() : "_this";
 
 		if ( ( lang.trim().length() == 0 ) || ( script.trim().length() == 0 ) || ( alias.trim().length() == 0 ) ) {
 			return CollectionHelper.asSet(

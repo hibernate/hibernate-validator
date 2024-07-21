@@ -12,5 +12,3 @@ package org.hibernate.validator.test.internal.xml.exception;
 public class TestEntity {
 	String testString;
 }
-
-

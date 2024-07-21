@@ -64,11 +64,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 	@Immutable
 	private final Set<Cascadable> cascadables;
 
-	private PropertyMetaData(String propertyName,
-							 Type type,
-							 Set<MetaConstraint<?>> constraints,
-							 Set<MetaConstraint<?>> containerElementsConstraints,
-							 Set<Cascadable> cascadables) {
+	private PropertyMetaData(String propertyName, Type type, Set<MetaConstraint<?>> constraints, Set<MetaConstraint<?>> containerElementsConstraints, Set<Cascadable> cascadables) {
 		super(
 				propertyName,
 				type,
@@ -184,8 +180,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		public final void add(ConstrainedElement constrainedElement) {
 			super.add( constrainedElement );
 
-			if ( constrainedElement.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ||
-					constrainedElement.getCascadingMetaDataBuilder().hasGroupConversionsOnAnnotatedObjectOrContainerElements() ) {
+			if ( constrainedElement.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements()
+					|| constrainedElement.getCascadingMetaDataBuilder().hasGroupConversionsOnAnnotatedObjectOrContainerElements() ) {
 
 				Property property = getConstrainableFromConstrainedElement( constrainedElement );
 
@@ -264,12 +260,11 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					else {
 						current = null;
 					}
-				}
-				while ( current != null );
+				} while ( current != null );
 
 				// 2. beginning at the root, transform each location so it references the transformed delegate
 				for ( ConstraintLocation location : locationStack ) {
-					if ( !(location instanceof TypeArgumentConstraintLocation) ) {
+					if ( !( location instanceof TypeArgumentConstraintLocation ) ) {
 						// Change the constraint location to a GetterConstraintLocation if it is not already one
 						if ( location instanceof GetterConstraintLocation ) {
 							converted = location;
@@ -280,9 +275,9 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					}
 					else {
 						converted = ConstraintLocation.forTypeArgument(
-							converted,
-							( (TypeArgumentConstraintLocation) location ).getTypeParameter(),
-							location.getTypeForValidatorResolution()
+								converted,
+								( (TypeArgumentConstraintLocation) location ).getTypeParameter(),
+								location.getTypeForValidatorResolution()
 						);
 					}
 				}

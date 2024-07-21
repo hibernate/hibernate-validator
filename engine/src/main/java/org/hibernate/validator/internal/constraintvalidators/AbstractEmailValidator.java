@@ -43,7 +43,8 @@ public class AbstractEmailValidator<A extends Annotation> implements ConstraintV
 	 */
 	private static final Pattern LOCAL_PART_PATTERN = Pattern.compile(
 			"(?:" + LOCAL_PART_ATOM + "+|\"" + LOCAL_PART_INSIDE_QUOTES_ATOM + "+\")" +
-					"(?:\\." + "(?:" + LOCAL_PART_ATOM + "+|\"" + LOCAL_PART_INSIDE_QUOTES_ATOM + "+\")" + ")*", CASE_INSENSITIVE
+					"(?:\\." + "(?:" + LOCAL_PART_ATOM + "+|\"" + LOCAL_PART_INSIDE_QUOTES_ATOM + "+\")" + ")*",
+			CASE_INSENSITIVE
 	);
 
 	@Override

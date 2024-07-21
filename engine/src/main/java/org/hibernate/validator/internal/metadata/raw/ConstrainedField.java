@@ -48,6 +48,7 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	public Field getField() {
 		return field;
 	}
+
 	@Override
 	public String toString() {
 		return "ConstrainedField [field=" + field.getName() + "]";

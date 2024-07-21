@@ -158,8 +158,7 @@ public class ConfigurationFilePropertiesTest {
 	}
 
 	private void runWithCustomValidationXml(String validationXmlName, Runnable runnable) {
-		new ValidationXmlTestHelper( ConfigurationFilePropertiesTest.class ).
-			runWithCustomValidationXml( validationXmlName, runnable );
+		new ValidationXmlTestHelper( ConfigurationFilePropertiesTest.class ).runWithCustomValidationXml( validationXmlName, runnable );
 	}
 
 }

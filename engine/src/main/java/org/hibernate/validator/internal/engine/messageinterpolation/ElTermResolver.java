@@ -58,7 +58,7 @@ public class ElTermResolver implements TermResolver {
 	 * set up early and to allow for application control.
 	 * @param locale the locale.
 	 * @param expressionFactory the expression factory.
-     */
+	 */
 	public ElTermResolver(Locale locale, ExpressionFactory expressionFactory) {
 		this.locale = locale;
 		this.expressionFactory = expressionFactory;

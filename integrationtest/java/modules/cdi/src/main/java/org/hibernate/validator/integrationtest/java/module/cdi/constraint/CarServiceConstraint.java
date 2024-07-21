@@ -26,15 +26,15 @@ import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
 
 @Documented
-@Constraint(validatedBy = {})
+@Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 public @interface CarServiceConstraint {
 	String message() default "CarServiceConstraint:message";
 
-	Class<?>[] groups() default {};
+	Class<?>[] groups() default { };
 
-	Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default { };
 
 	class Validator implements ConstraintValidator<CarServiceConstraint, Car> {
 

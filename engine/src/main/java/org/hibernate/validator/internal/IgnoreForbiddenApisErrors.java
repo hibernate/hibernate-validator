@@ -15,8 +15,16 @@ import java.lang.annotation.Target;
  * Annotation used to ignore forbidden apis errors.
  */
 @Retention(RetentionPolicy.CLASS)
-@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.CONSTRUCTOR,
-		ElementType.LOCAL_VARIABLE, ElementType.ANNOTATION_TYPE, ElementType.PACKAGE, ElementType.TYPE_PARAMETER,
+@Target({
+		ElementType.TYPE,
+		ElementType.FIELD,
+		ElementType.METHOD,
+		ElementType.PARAMETER,
+		ElementType.CONSTRUCTOR,
+		ElementType.LOCAL_VARIABLE,
+		ElementType.ANNOTATION_TYPE,
+		ElementType.PACKAGE,
+		ElementType.TYPE_PARAMETER,
 		ElementType.TYPE_USE })
 public @interface IgnoreForbiddenApisErrors {
 

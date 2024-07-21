@@ -29,10 +29,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	private final Type type;
 	private final int index;
 
-	public ConstrainedParameter(ConfigurationSource source,
-								Callable callable,
-								Type type,
-								int index) {
+	public ConstrainedParameter(ConfigurationSource source, Callable callable, Type type, int index) {
 		this(
 				source,
 				callable,
@@ -57,12 +54,12 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * @param cascadingMetaDataBuilder The cascaded validation metadata for this element and its container elements.
 	 */
 	public ConstrainedParameter(ConfigurationSource source,
-								Callable callable,
-								Type type,
-								int index,
-								Set<MetaConstraint<?>> constraints,
-								Set<MetaConstraint<?>> typeArgumentConstraints,
-								CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+			Callable callable,
+			Type type,
+			int index,
+			Set<MetaConstraint<?>> constraints,
+			Set<MetaConstraint<?>> typeArgumentConstraints,
+			CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 		super(
 				source,
 				ConstrainedElementKind.PARAMETER,

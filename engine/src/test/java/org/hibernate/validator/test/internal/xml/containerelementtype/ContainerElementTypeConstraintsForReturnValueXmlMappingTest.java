@@ -140,7 +140,7 @@ public class ContainerElementTypeConstraintsForReturnValueXmlMappingTest {
 		Validator validator = getValidator( "returnvalue-configuringConstraintsOnGenericTypeArgumentOfArrayThrowsException-mapping.xml" );
 
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-		fishTank.test9( new String[]{ "Too long" } );
+		fishTank.test9( new String[] { "Too long" } );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000217.*")
@@ -157,14 +157,23 @@ public class ContainerElementTypeConstraintsForReturnValueXmlMappingTest {
 
 	public interface IFishTank {
 		Map<String, Integer> test1();
+
 		Map<String, List<Fish>> test2();
+
 		List<Map<String, Set<String>>> test3();
+
 		Optional<Fish> test4();
+
 		String[] test5();
+
 		List<String[]> test6();
-		String[][]  test7();
+
+		String[][] test7();
+
 		<T> List<T> test8(List<T> list);
+
 		<T> T[] test9(T[] array);
+
 		int getSize();
 	}
 
@@ -212,13 +221,13 @@ public class ContainerElementTypeConstraintsForReturnValueXmlMappingTest {
 		@Override
 		public List<String[]> test6() {
 			List<String[]> fishNamesByMonth = new ArrayList<>();
-			fishNamesByMonth.add(  new String[] { "Too Long" } );
+			fishNamesByMonth.add( new String[] { "Too Long" } );
 			return fishNamesByMonth;
 		}
 
 		@Override
 		public String[][] test7() {
-			return new String[][]{ new String[] { "Too Long" } };
+			return new String[][] { new String[] { "Too Long" } };
 		}
 
 		@Override

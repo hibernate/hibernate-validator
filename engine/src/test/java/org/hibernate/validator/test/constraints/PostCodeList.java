@@ -25,7 +25,8 @@ import jakarta.validation.ConstraintValidatorContext;
  * @author Hardy Ferentschik
  */
 @Constraint(validatedBy = {
-		PostCodeList.PostCodeListValidatorForString.class, PostCodeList.PostCodeListValidatorForNumber.class
+		PostCodeList.PostCodeListValidatorForString.class,
+		PostCodeList.PostCodeListValidatorForNumber.class
 })
 @Documented
 @Target({ METHOD, FIELD, TYPE })
@@ -35,7 +36,7 @@ public @interface PostCodeList {
 
 	Class<?>[] groups() default { };
 
-	Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default { };
 
 	class PostCodeListValidatorForNumber
 			implements ConstraintValidator<PostCodeList, Collection<? extends Number>> {

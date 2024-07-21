@@ -13,7 +13,7 @@ package org.hibernate.validator.test.internal.xml;
  */
 public class Child extends Parent {
 
-	public Child( String parentAttribute ) {
+	public Child(String parentAttribute) {
 		super( parentAttribute );
 	}
 }

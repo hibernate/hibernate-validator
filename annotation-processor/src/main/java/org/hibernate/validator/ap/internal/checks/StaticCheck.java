@@ -36,10 +36,8 @@ public class StaticCheck extends AbstractConstraintCheck {
 		return checkInternal( element, annotation, "STATIC_METHODS_MAY_NOT_BE_ANNOTATED" );
 	}
 
-	private Set<ConstraintCheckIssue> checkInternal(Element element,
-													AnnotationMirror annotation, String messageKey) {
+	private Set<ConstraintCheckIssue> checkInternal(Element element, AnnotationMirror annotation, String messageKey) {
 		if ( isStaticElement( element ) ) {
-
 			return CollectionHelper.asSet( ConstraintCheckIssue.error( element, annotation, messageKey ) );
 		}
 

@@ -22,7 +22,7 @@ import jakarta.validation.Payload;
 @Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = { SimpleHibernateConstraintValidator.class } )
+@Constraint(validatedBy = { SimpleHibernateConstraintValidator.class })
 public @interface SimpleHibernateConstraintValidatorConstraint {
 	String message() default "Invalid";
 

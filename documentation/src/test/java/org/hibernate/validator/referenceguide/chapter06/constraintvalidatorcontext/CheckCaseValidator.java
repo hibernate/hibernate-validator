@@ -33,10 +33,9 @@ public class CheckCaseValidator implements ConstraintValidator<CheckCase, String
 		if ( !isValid ) {
 			constraintContext.disableDefaultConstraintViolation();
 			constraintContext.buildConstraintViolationWithTemplate(
-					"{org.hibernate.validator.referenceguide.chapter06." +
-					"constraintvalidatorcontext.CheckCase.message}"
-			)
-			.addConstraintViolation();
+					"{org.hibernate.validator.referenceguide.chapter06."
+							+ "constraintvalidatorcontext.CheckCase.message}"
+			).addConstraintViolation();
 		}
 
 		return isValid;

@@ -207,26 +207,26 @@ public class XmlMappingTest {
 		validationXmlTestHelper.runWithCustomValidationXml(
 				"parameter-name-provider-validation.xml", new Runnable() {
 
-			@Override
-			public void run() {
-				//given
-				Validator validator = ValidatorUtil.getValidator();
-				BootstrapConfiguration bootstrapConfiguration = ValidatorUtil.getConfiguration()
-						.getBootstrapConfiguration();
+					@Override
+					public void run() {
+						//given
+						Validator validator = ValidatorUtil.getValidator();
+						BootstrapConfiguration bootstrapConfiguration = ValidatorUtil.getConfiguration()
+								.getBootstrapConfiguration();
 
-				//when
-				MethodDescriptor methodDescriptor = validator.getConstraintsForClass( CustomerService.class )
-						.getConstraintsForMethod( "createCustomer", Customer.class );
+						//when
+						MethodDescriptor methodDescriptor = validator.getConstraintsForClass( CustomerService.class )
+								.getConstraintsForMethod( "createCustomer", Customer.class );
 
-				//then
-				assertEquals(
-						bootstrapConfiguration.getParameterNameProviderClassName(),
-						CustomParameterNameProvider.class.getName()
-				);
+						//then
+						assertEquals(
+								bootstrapConfiguration.getParameterNameProviderClassName(),
+								CustomParameterNameProvider.class.getName()
+						);
 
-				assertEquals( methodDescriptor.getParameterDescriptors().get( 0 ).getName(), "param0" );
-			}
-		}
+						assertEquals( methodDescriptor.getParameterDescriptors().get( 0 ).getName(), "param0" );
+					}
+				}
 		);
 	}
 
@@ -274,20 +274,20 @@ public class XmlMappingTest {
 		validationXmlTestHelper.runWithCustomValidationXml(
 				"bv-1.0-validation.xml", new Runnable() {
 
-			@Override
-			public void run() {
-				//given
-				BootstrapConfiguration bootstrapConfiguration = ValidatorUtil.getConfiguration()
-						.getBootstrapConfiguration();
+					@Override
+					public void run() {
+						//given
+						BootstrapConfiguration bootstrapConfiguration = ValidatorUtil.getConfiguration()
+								.getBootstrapConfiguration();
 
-				//when
-				//then
-				assertEquals(
-						bootstrapConfiguration.getDefaultValidatedExecutableTypes(),
-						asSet( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS )
-				);
-			}
-		}
+						//when
+						//then
+						assertEquals(
+								bootstrapConfiguration.getDefaultValidatedExecutableTypes(),
+								asSet( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS )
+						);
+					}
+				}
 		);
 	}
 
@@ -311,20 +311,20 @@ public class XmlMappingTest {
 		validationXmlTestHelper.runWithCustomValidationXml(
 				"bv-1.0-validation.xml", new Runnable() {
 
-			@Override
-			public void run() {
-				//given
-				BootstrapConfiguration bootstrapConfiguration = ValidatorUtil.getConfiguration()
-						.getBootstrapConfiguration();
+					@Override
+					public void run() {
+						//given
+						BootstrapConfiguration bootstrapConfiguration = ValidatorUtil.getConfiguration()
+								.getBootstrapConfiguration();
 
-				//when
-				//then
-				assertEquals(
-						bootstrapConfiguration.getProperties().get( "com.acme.validation.safetyChecking" ),
-						"failOnError"
-				);
-			}
-		}
+						//when
+						//then
+						assertEquals(
+								bootstrapConfiguration.getProperties().get( "com.acme.validation.safetyChecking" ),
+								"failOnError"
+						);
+					}
+				}
 		);
 	}
 
@@ -336,11 +336,11 @@ public class XmlMappingTest {
 		validationXmlTestHelper.runWithCustomValidationXml(
 				"unsupported-validation.xml", new Runnable() {
 
-			@Override
-			public void run() {
-				ValidatorUtil.getConfiguration().getBootstrapConfiguration();
-			}
-		}
+					@Override
+					public void run() {
+						ValidatorUtil.getConfiguration().getBootstrapConfiguration();
+					}
+				}
 		);
 	}
 
@@ -352,11 +352,11 @@ public class XmlMappingTest {
 		validationXmlTestHelper.runWithCustomValidationXml(
 				"invalid-bv-1.0-validation.xml", new Runnable() {
 
-			@Override
-			public void run() {
-				ValidatorUtil.getConfiguration().getBootstrapConfiguration();
-			}
-		}
+					@Override
+					public void run() {
+						ValidatorUtil.getConfiguration().getBootstrapConfiguration();
+					}
+				}
 		);
 	}
 
@@ -425,10 +425,10 @@ public class XmlMappingTest {
 
 		assertThat( childViolations ).containsOnlyViolations(
 				violationOf( NotNull.class )
-					.withPropertyPath(
-						pathWith()
-							.property( "parentListAttribute" )
-							.containerElement( "<list element>", true, null, 0, List.class, 0 ) )
+						.withPropertyPath(
+								pathWith()
+										.property( "parentListAttribute" )
+										.containerElement( "<list element>", true, null, 0, List.class, 0 ) )
 		);
 	}
 

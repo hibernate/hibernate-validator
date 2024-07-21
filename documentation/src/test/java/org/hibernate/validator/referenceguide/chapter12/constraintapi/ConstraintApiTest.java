@@ -15,12 +15,14 @@ import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraintvalidators.RegexpURLValidator;
+
 import org.junit.Test;
 
 public class ConstraintApiTest {
 
 	@Test
 	public void constraintMapping() {
+		// @formatter:off
 		//tag::constraintMapping[]
 		HibernateValidatorConfiguration configuration = Validation
 				.byProvider( HibernateValidator.class )
@@ -44,6 +46,7 @@ public class ConstraintApiTest {
 				.buildValidatorFactory()
 				.getValidator();
 		//end::constraintMapping[]
+		// @formatter:on
 	}
 
 	@Test
@@ -51,7 +54,7 @@ public class ConstraintApiTest {
 		HibernateValidatorConfiguration configuration = Validation
 				.byProvider( HibernateValidator.class )
 				.configure();
-
+		// @formatter:off
 		//tag::genericConstraintDef[]
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
@@ -62,6 +65,7 @@ public class ConstraintApiTest {
 						.param( "value", CaseMode.UPPER )
 					);
 		//end::genericConstraintDef[]
+		// @formatter:on
 	}
 
 	@Test
@@ -69,7 +73,7 @@ public class ConstraintApiTest {
 		HibernateValidatorConfiguration configuration = Validation
 				.byProvider( HibernateValidator.class )
 				.configure();
-
+		// @formatter:off
 		//tag::nestedContainerElementConstraint[]
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
@@ -90,6 +94,7 @@ public class ConstraintApiTest {
 				.getter( "rentalStation" )
 					.constraint( new NotNullDef() );
 		//end::nestedContainerElementConstraint[]
+		// @formatter:on
 	}
 
 
@@ -99,6 +104,7 @@ public class ConstraintApiTest {
 				.byProvider( HibernateValidator.class )
 				.configure();
 
+		// @formatter:off
 		//tag::cascaded[]
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
@@ -117,6 +123,7 @@ public class ConstraintApiTest {
 				.field( "name" )
 					.constraint( new NotNullDef().groups( PersonDefault.class ) );
 		//end::cascaded[]
+		// @formatter:on
 	}
 
 	@Test
@@ -125,6 +132,7 @@ public class ConstraintApiTest {
 				.byProvider( HibernateValidator.class )
 				.configure();
 
+		// @formatter:off
 		//tag::executableConfiguration[]
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
@@ -150,6 +158,7 @@ public class ConstraintApiTest {
 						.constraint( new NotNullDef() )
 						.valid();
 		//end::executableConfiguration[]
+		// @formatter:on
 	}
 
 	@Test
@@ -158,6 +167,7 @@ public class ConstraintApiTest {
 				.byProvider( HibernateValidator.class )
 				.configure();
 
+		// @formatter:off
 		//tag::defaultGroupSequence[]
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
@@ -167,6 +177,7 @@ public class ConstraintApiTest {
 			.type( RentalCar.class )
 				.defaultGroupSequenceProviderClass( RentalCarGroupSequenceProvider.class );
 		//end::defaultGroupSequence[]
+		// @formatter:on
 	}
 
 	@Test
@@ -175,6 +186,7 @@ public class ConstraintApiTest {
 				.byProvider( HibernateValidator.class )
 				.configure();
 
+		// @formatter:off
 		//tag::constraintDefinition[]
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
@@ -182,6 +194,7 @@ public class ConstraintApiTest {
 				.constraintDefinition( ValidPassengerCount.class )
 				.validatedBy( ValidPassengerCountValidator.class );
 		//end::constraintDefinition[]
+		// @formatter:on
 
 		configuration.addMapping( constraintMapping );
 	}
@@ -192,6 +205,7 @@ public class ConstraintApiTest {
 				.byProvider( HibernateValidator.class )
 				.configure();
 
+		// @formatter:off
 		//tag::constraintDefinitionUsingLambda[]
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
@@ -200,6 +214,7 @@ public class ConstraintApiTest {
 					.validateType( Bus.class )
 						.with( b -> b.getSeatCount() >= b.getPassengers().size() );
 		//end::constraintDefinitionUsingLambda[]
+		// @formatter:on
 
 		configuration.addMapping( constraintMapping );
 	}
@@ -207,9 +222,10 @@ public class ConstraintApiTest {
 	@Test
 	public void urlValidationOverride() {
 		HibernateValidatorConfiguration configuration = Validation
-			.byProvider( HibernateValidator.class )
-			.configure();
+				.byProvider( HibernateValidator.class )
+				.configure();
 
+		// @formatter:off
 		//tag::urlValidationOverride[]
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
@@ -218,6 +234,7 @@ public class ConstraintApiTest {
 				.includeExistingValidators( false )
 				.validatedBy( RegexpURLValidator.class );
 		//end::urlValidationOverride[]
+		// @formatter:on
 
 		configuration.addMapping( constraintMapping );
 	}

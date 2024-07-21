@@ -57,7 +57,7 @@ public abstract class AbstractGroupConversionTest {
 				),
 				violationOf( Size.class ).withPropertyPath( pathWith()
 						.property( "addresses" )
-						.property( "zipCode" , true, null, null, Set.class, 0 )
+						.property( "zipCode", true, null, null, Set.class, 0 )
 				)
 		);
 	}
@@ -72,7 +72,7 @@ public abstract class AbstractGroupConversionTest {
 				),
 				violationOf( Size.class ).withPropertyPath( pathWith()
 						.property( "addresses" )
-						.property( "zipCode" , true, null, null, Set.class, 0 )
+						.property( "zipCode", true, null, null, Set.class, 0 )
 				)
 		);
 	}
@@ -88,13 +88,13 @@ public abstract class AbstractGroupConversionTest {
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( NotNull.class ).withPropertyPath( pathWith()
 						.method( "setAddresses" )
-						.parameter( "addresses",0 )
+						.parameter( "addresses", 0 )
 						.property( "street1", true, null, 0, List.class, 0 )
 				),
 				violationOf( Size.class ).withPropertyPath( pathWith()
 						.method( "setAddresses" )
-						.parameter( "addresses",0 )
-						.property( "zipCode" , true, null, 0, List.class, 0 )
+						.parameter( "addresses", 0 )
+						.property( "zipCode", true, null, 0, List.class, 0 )
 				)
 		);
 	}
@@ -116,7 +116,7 @@ public abstract class AbstractGroupConversionTest {
 				violationOf( Size.class ).withPropertyPath( pathWith()
 						.method( "findAddresses" )
 						.returnValue()
-						.property( "zipCode" , true, null, 0, List.class, 0 )
+						.property( "zipCode", true, null, 0, List.class, 0 )
 				)
 		);
 		assertCorrectPropertyPathStringRepresentations(
@@ -136,7 +136,7 @@ public abstract class AbstractGroupConversionTest {
 				),
 				violationOf( Size.class ).withPropertyPath( pathWith()
 						.property( "addresses" )
-						.property( "zipCode" , true, null, null, Set.class, 0 )
+						.property( "zipCode", true, null, null, Set.class, 0 )
 				)
 		);
 
@@ -155,7 +155,7 @@ public abstract class AbstractGroupConversionTest {
 				),
 				violationOf( Size.class ).withPropertyPath( pathWith()
 						.property( "addresses" )
-						.property( "zipCode" , true, null, null, Set.class, 0 )
+						.property( "zipCode", true, null, null, Set.class, 0 )
 				)
 		);
 	}
@@ -170,7 +170,7 @@ public abstract class AbstractGroupConversionTest {
 				),
 				violationOf( Size.class ).withPropertyPath( pathWith()
 						.property( "addresses" )
-						.property( "zipCode" , true, null, null, Set.class, 0 )
+						.property( "zipCode", true, null, null, Set.class, 0 )
 				)
 		);
 
@@ -186,7 +186,7 @@ public abstract class AbstractGroupConversionTest {
 				),
 				violationOf( Size.class ).withPropertyPath( pathWith()
 						.property( "addresses" )
-						.property( "zipCode" , true, null, null, Set.class, 0 )
+						.property( "zipCode", true, null, null, Set.class, 0 )
 				)
 		);
 	}
@@ -205,7 +205,7 @@ public abstract class AbstractGroupConversionTest {
 				),
 				violationOf( Size.class ).withPropertyPath( pathWith()
 						.property( "addresses" )
-						.property( "zipCode" , true, null, null, Set.class, 0 )
+						.property( "zipCode", true, null, null, Set.class, 0 )
 				)
 		);
 	}
@@ -332,10 +332,7 @@ public abstract class AbstractGroupConversionTest {
 
 	private static class User6 {
 
-		public void setAddresses(
-				@Valid
-				@ConvertGroup(from = Default.class, to = BasicPostal.class)
-				List<Address> addresses) {
+		public void setAddresses(@Valid @ConvertGroup(from = Default.class, to = BasicPostal.class) List<Address> addresses) {
 		}
 	}
 

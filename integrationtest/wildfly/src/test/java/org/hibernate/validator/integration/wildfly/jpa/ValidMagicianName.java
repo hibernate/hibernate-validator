@@ -27,11 +27,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = {})
+@Constraint(validatedBy = { })
 public @interface ValidMagicianName {
 
 	String message() default "{org.hibernate.validator.integration.wildfly.jpa.ValidMagicianName.message}";
+
 	Class<?>[] groups() default { };
+
 	Class<? extends Payload>[] payload() default { };
 
 	class ValidMagicianNameValidator implements ConstraintValidator<ValidMagicianName, String> {
@@ -47,7 +49,7 @@ public @interface ValidMagicianName {
 		public boolean isValid(String value, ConstraintValidatorContext context) {
 			context.disableDefaultConstraintViolation();
 			context.buildConstraintViolationWithTemplate( errorNameProvider.getErrorName() )
-				.addConstraintViolation();
+					.addConstraintViolation();
 
 			return false;
 		}

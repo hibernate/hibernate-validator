@@ -64,11 +64,11 @@ public class GroupTest {
 		// just checking that everything is in order now
 		assertEquals(
 				0, validator.validate(
-				car,
-				Default.class,
-				CarChecks.class,
-				DriverChecks.class
-		).size()
+						car,
+						Default.class,
+						CarChecks.class,
+						DriverChecks.class
+				).size()
 		);
 		//end::driveAway[]
 	}
@@ -77,7 +77,7 @@ public class GroupTest {
 	public void testGroupInheritance() {
 		//tag::testGroupInheritance[]
 		// create a supercar and check that it's valid as a generic Car
-		SuperCar superCar = new SuperCar( "Morris", "DD-AB-123", 1  );
+		SuperCar superCar = new SuperCar( "Morris", "DD-AB-123", 1 );
 		assertEquals( "must be greater than or equal to 2", validator.validate( superCar ).iterator().next().getMessage() );
 
 		// check that this supercar is valid as generic car and also as race car

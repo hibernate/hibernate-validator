@@ -318,7 +318,7 @@ public class ISBNValidatorTest {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-1707")
+	@TestForIssue(jiraKey = "HV-1707")
 	public void testValidISBNAny() {
 		validator.initialize( initializeAnnotation( ISBN.Type.ANY ) );
 

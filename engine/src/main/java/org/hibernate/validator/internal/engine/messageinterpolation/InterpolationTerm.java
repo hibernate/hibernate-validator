@@ -43,7 +43,7 @@ public class InterpolationTerm {
 	 * @param expression the expression.
 	 * @param locale the locale.
 	 * @param expressionFactory the expression factory to use if the expression uses EL.
-     */
+	 */
 	public InterpolationTerm(String expression, Locale locale, ExpressionFactory expressionFactory) {
 		this.expression = expression;
 		if ( isElExpression( expression ) ) {
@@ -74,5 +74,3 @@ public class InterpolationTerm {
 		return sb.toString();
 	}
 }
-
-

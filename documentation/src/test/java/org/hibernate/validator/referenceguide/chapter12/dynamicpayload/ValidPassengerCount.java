@@ -18,8 +18,8 @@ public @interface ValidPassengerCount {
 
 	String message() default "The passenger count is exceeding the number of seats in the car";
 
-	Class<?>[] groups() default {};
+	Class<?>[] groups() default { };
 
-	Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default { };
 }
 

@@ -75,11 +75,11 @@ public class MethodConstraintMappingTest {
 			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
 					violationOf( NotNull.class )
 							.withMessage( "must not be null" )
-					.withPropertyPath( pathWith()
-							.method( "greet" )
-							.returnValue()
-							.property( "message" )
-					)
+							.withPropertyPath( pathWith()
+									.method( "greet" )
+									.returnValue()
+									.property( "message" )
+							)
 			);
 		}
 	}

@@ -209,9 +209,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		}
 
 		String parameters =
-				parameterBuilder.length() > 0 ?
-						parameterBuilder.substring( 0, parameterBuilder.length() - 2 ) :
-						parameterBuilder.toString();
+				parameterBuilder.length() > 0 ? parameterBuilder.substring( 0, parameterBuilder.length() - 2 ) : parameterBuilder.toString();
 
 		return "ExecutableMetaData [executable=" + getType() + " " + getName() + "(" + parameters + "), isCascading=" + isCascading() + ", isConstrained="
 				+ isConstrained() + "]";
@@ -347,10 +345,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 			// keep the "lowest" executable in hierarchy to make sure any type parameters declared on super-types (and
 			// used in overridden methods) are resolved for the specific sub-type we are interested in
-			if ( callable != null && overrides(
-					constrainedExecutable.getCallable(),
-					callable
-			) ) {
+			if ( callable != null && overrides( constrainedExecutable.getCallable(), callable ) ) {
 				callable = constrainedExecutable.getCallable();
 			}
 		}
@@ -384,8 +379,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					callable.getType(),
 					callable.getParameterTypes(),
 					kind == ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
-					kind == ConstrainedElementKind.CONSTRUCTOR ? Collections.singleton( callable.getSignature() ) :
-							CollectionHelper.toImmutableSet( signatures ),
+					kind == ConstrainedElementKind.CONSTRUCTOR ? Collections.singleton( callable.getSignature() ) : CollectionHelper.toImmutableSet( signatures ),
 					adaptOriginsAndImplicitGroups( getDirectConstraints() ),
 					adaptOriginsAndImplicitGroups( getContainerElementConstraints() ),
 					findParameterMetaData(),

@@ -28,7 +28,6 @@ public interface ConstraintChecks {
 	 * @return A set with errors. Will be empty in case all checks passed
 	 *         successfully.
 	 */
-	Set<ConstraintCheckIssue> execute(Element element,
-									  AnnotationMirror annotation);
+	Set<ConstraintCheckIssue> execute(Element element, AnnotationMirror annotation);
 
 }

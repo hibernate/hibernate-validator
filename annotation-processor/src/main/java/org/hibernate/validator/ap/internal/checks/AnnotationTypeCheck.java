@@ -30,8 +30,7 @@ public class AnnotationTypeCheck extends AbstractConstraintCheck {
 	}
 
 	@Override
-	public Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element,
-														 AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
 
 		if ( !constraintHelper.isConstraintAnnotation( element ) ) {
 

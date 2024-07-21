@@ -128,13 +128,13 @@ public class ConstraintValidatorManagerImpl extends AbstractConstraintValidatorM
 			ConstraintValidator<A, ?> constraintValidator) {
 		// we only cache constraint validator instances for the default and most recently used factory
 		if ( ( key.getConstraintValidatorFactory() != getDefaultConstraintValidatorFactory()
-				&& key.getConstraintValidatorFactory() != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) ||
-				( key.getConstraintValidatorInitializationContext() != getDefaultConstraintValidatorInitializationContext()
+				&& key.getConstraintValidatorFactory() != mostRecentlyUsedNonDefaultConstraintValidatorFactory )
+				|| ( key.getConstraintValidatorInitializationContext() != getDefaultConstraintValidatorInitializationContext()
 						&& key.getConstraintValidatorInitializationContext() != mostRecentlyUsedNonDefaultConstraintValidatorInitializationContext ) ) {
 
-			synchronized ( mostRecentlyUsedNonDefaultConstraintValidatorFactoryAndInitializationContextMutex ) {
-				if ( key.constraintValidatorFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ||
-						key.constraintValidatorInitializationContext != mostRecentlyUsedNonDefaultConstraintValidatorInitializationContext ) {
+			synchronized (mostRecentlyUsedNonDefaultConstraintValidatorFactoryAndInitializationContextMutex) {
+				if ( key.constraintValidatorFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory
+						|| key.constraintValidatorInitializationContext != mostRecentlyUsedNonDefaultConstraintValidatorInitializationContext ) {
 					clearEntries( mostRecentlyUsedNonDefaultConstraintValidatorFactory, mostRecentlyUsedNonDefaultConstraintValidatorInitializationContext );
 					mostRecentlyUsedNonDefaultConstraintValidatorFactory = key.getConstraintValidatorFactory();
 					mostRecentlyUsedNonDefaultConstraintValidatorInitializationContext = key.getConstraintValidatorInitializationContext();
@@ -154,8 +154,8 @@ public class ConstraintValidatorManagerImpl extends AbstractConstraintValidatorM
 
 		while ( cacheEntries.hasNext() ) {
 			Entry<CacheKey, ConstraintValidator<?, ?>> cacheEntry = cacheEntries.next();
-			if ( cacheEntry.getKey().getConstraintValidatorFactory() == constraintValidatorFactory &&
-					cacheEntry.getKey().getConstraintValidatorInitializationContext() == constraintValidatorInitializationContext ) {
+			if ( cacheEntry.getKey().getConstraintValidatorFactory() == constraintValidatorFactory
+					&& cacheEntry.getKey().getConstraintValidatorInitializationContext() == constraintValidatorInitializationContext ) {
 				constraintValidatorFactory.releaseInstance( cacheEntry.getValue() );
 				cacheEntries.remove();
 			}

@@ -114,12 +114,14 @@ public @interface URL {
 	/**
 	 * @return an additional regular expression the annotated URL must match. The default is any string ('.*')
 	 */
-	@OverridesAttribute(constraint = Pattern.class, name = "regexp") String regexp() default ".*";
+	@OverridesAttribute(constraint = Pattern.class, name = "regexp")
+	String regexp() default ".*";
 
 	/**
 	 * @return used in combination with {@link #regexp()} in order to specify a regular expression option
 	 */
-	@OverridesAttribute(constraint = Pattern.class, name = "flags") Pattern.Flag[] flags() default { };
+	@OverridesAttribute(constraint = Pattern.class, name = "flags")
+	Pattern.Flag[] flags() default { };
 
 	/**
 	 * Defines several {@code @URL} annotations on the same element.

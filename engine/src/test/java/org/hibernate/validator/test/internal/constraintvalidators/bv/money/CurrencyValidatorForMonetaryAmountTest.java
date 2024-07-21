@@ -73,13 +73,13 @@ public class CurrencyValidatorForMonetaryAmountTest {
 		HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Order.class )
-			.ignoreAllAnnotations()
-			.field( "amount" )
+				.ignoreAllAnnotations()
+				.field( "amount" )
 				.constraint( new CurrencyDef().value( "EUR", "USD" ) );
 
 		Validator validator = config.addMapping( mapping )
-			.buildValidatorFactory()
-			.getValidator();
+				.buildValidatorFactory()
+				.getValidator();
 
 		Set<ConstraintViolation<Order>> violations = validator.validate( new Order( Money.of( 100, "GBP" ) ) );
 		assertThat( violations ).containsOnlyViolations(

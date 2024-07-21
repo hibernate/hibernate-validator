@@ -43,12 +43,12 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 	private final Map<Signature, ConstructorDescriptor> constrainedConstructors;
 
 	public BeanDescriptorImpl(Type beanClass,
-							  Set<ConstraintDescriptorImpl<?>> classLevelConstraints,
-							  Map<String, PropertyDescriptor> constrainedProperties,
-							  Map<Signature, ExecutableDescriptorImpl> constrainedMethods,
-							  Map<Signature, ConstructorDescriptor> constrainedConstructors,
-							  boolean defaultGroupSequenceRedefined,
-							  List<Class<?>> defaultGroupSequence) {
+			Set<ConstraintDescriptorImpl<?>> classLevelConstraints,
+			Map<String, PropertyDescriptor> constrainedProperties,
+			Map<Signature, ExecutableDescriptorImpl> constrainedMethods,
+			Map<Signature, ConstructorDescriptor> constrainedConstructors,
+			boolean defaultGroupSequenceRedefined,
+			List<Class<?>> defaultGroupSequence) {
 		super( beanClass, classLevelConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 		this.constrainedProperties = CollectionHelper.toImmutableMap( constrainedProperties );

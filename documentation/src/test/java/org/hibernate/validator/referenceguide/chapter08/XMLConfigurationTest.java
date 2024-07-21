@@ -90,8 +90,7 @@ public class XMLConfigurationTest {
 		assertCorrectConstraintTypes( constraintDescriptors, ELAssert.class );
 	}
 
-	private void assertCorrectConstraintTypes( Set<ConstraintDescriptor<?>> constraintDescriptors,
-											  Class<?>... constraints) {
+	private void assertCorrectConstraintTypes(Set<ConstraintDescriptor<?>> constraintDescriptors, Class<?>... constraints) {
 		List<Class<?>> constraintAnnotations = new ArrayList<Class<?>>();
 		constraintAnnotations.addAll( Arrays.asList( constraints ) );
 		for ( ConstraintDescriptor descriptor : constraintDescriptors ) {

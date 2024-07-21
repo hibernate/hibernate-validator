@@ -101,7 +101,7 @@ public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 	 * @param currentTypeElement the class we are analyzing
 	 * @param methodInheritanceTreeBuilder the method inheritance tree builder
 	 */
-	private void collectOverriddenMethods( ExecutableElement overridingMethod, TypeElement currentTypeElement,
+	private void collectOverriddenMethods(ExecutableElement overridingMethod, TypeElement currentTypeElement,
 			MethodInheritanceTree.Builder methodInheritanceTreeBuilder) {
 		if ( isJavaLangObjectOrNull( currentTypeElement ) ) {
 			return;

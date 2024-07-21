@@ -56,10 +56,10 @@ public class TraversableResolverTest {
 	public static class ExceptionThrowingTraversableResolver implements TraversableResolver {
 		@Override
 		public boolean isReachable(Object traversableObject,
-								   Path.Node traversableProperty,
-								   Class<?> rootBeanType,
-								   Path pathToTraversableObject,
-								   ElementType elementType) {
+				Path.Node traversableProperty,
+				Class<?> rootBeanType,
+				Path pathToTraversableObject,
+				ElementType elementType) {
 
 			if ( ElementType.TYPE.equals( elementType ) ) {
 				throw new IllegalArgumentException( "ElementType.TYPE is not allowed as argument type" );
@@ -70,10 +70,10 @@ public class TraversableResolverTest {
 
 		@Override
 		public boolean isCascadable(Object traversableObject,
-									Path.Node traversableProperty,
-									Class<?> rootBeanType,
-									Path pathToTraversableObject,
-									ElementType elementType) {
+				Path.Node traversableProperty,
+				Class<?> rootBeanType,
+				Path pathToTraversableObject,
+				ElementType elementType) {
 
 			if ( ElementType.TYPE.equals( elementType ) ) {
 				throw new IllegalArgumentException( "ElementType.TYPE is not allowed as argument type" );
@@ -83,7 +83,3 @@ public class TraversableResolverTest {
 		}
 	}
 }
-
-
-
-

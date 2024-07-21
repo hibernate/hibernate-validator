@@ -15,13 +15,14 @@ package org.hibernate.validator.cfg.context;
  *
  * @since 6.0
  */
-public interface ContainerElementConstraintMappingContext extends Constrainable<ContainerElementConstraintMappingContext>,
-	ConstraintMappingTarget,
-	PropertyTarget,
-	ConstructorTarget,
-	MethodTarget,
-	ContainerElementTarget,
-	ParameterTarget,
-	ReturnValueTarget,
-	Cascadable<ContainerElementConstraintMappingContext> {
+public interface ContainerElementConstraintMappingContext
+		extends Constrainable<ContainerElementConstraintMappingContext>,
+		ConstraintMappingTarget,
+		PropertyTarget,
+		ConstructorTarget,
+		MethodTarget,
+		ContainerElementTarget,
+		ParameterTarget,
+		ReturnValueTarget,
+		Cascadable<ContainerElementConstraintMappingContext> {
 }

@@ -32,11 +32,7 @@ public class JPATraversableResolver implements TraversableResolver {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Override
-	public final boolean isReachable(Object traversableObject,
-									 Path.Node traversableProperty,
-									 Class<?> rootBeanType,
-									 Path pathToTraversableObject,
-									 ElementType elementType) {
+	public final boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 		if ( LOG.isTraceEnabled() ) {
 			LOG.tracef(
 					"Calling isReachable on object %s with node name %s.",

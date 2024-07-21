@@ -84,16 +84,14 @@ public class BeanMetaDataBuilder<T> {
 	public void add(BeanConfiguration<? super T> configuration) {
 		if ( configuration.getBeanClass().equals( beanClass ) ) {
 			if ( configuration.getDefaultGroupSequence() != null
-					&& ( sequenceSource == null || configuration.getSource()
-					.getPriority() >= sequenceSource.getPriority() ) ) {
+					&& ( sequenceSource == null || configuration.getSource().getPriority() >= sequenceSource.getPriority() ) ) {
 
 				sequenceSource = configuration.getSource();
 				defaultGroupSequence = configuration.getDefaultGroupSequence();
 			}
 
 			if ( configuration.getDefaultGroupSequenceProvider() != null
-					&& ( providerSource == null || configuration.getSource()
-					.getPriority() >= providerSource.getPriority() ) ) {
+					&& ( providerSource == null || configuration.getSource().getPriority() >= providerSource.getPriority() ) ) {
 
 				providerSource = configuration.getSource();
 				defaultGroupSequenceProvider = configuration.getDefaultGroupSequenceProvider();

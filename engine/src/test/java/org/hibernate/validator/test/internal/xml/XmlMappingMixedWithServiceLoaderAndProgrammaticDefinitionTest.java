@@ -164,16 +164,16 @@ public class XmlMappingMixedWithServiceLoaderAndProgrammaticDefinitionTest {
 	}
 
 	@Documented
-	@Constraint(validatedBy = {})
+	@Constraint(validatedBy = { })
 	@Target({ TYPE, METHOD, FIELD })
 	@Retention(RUNTIME)
 	public @interface MyOtherConstraint {
 
 		String message() default "MyOtherConstraint is not valid";
 
-		Class<?>[] groups() default {};
+		Class<?>[] groups() default { };
 
-		Class<? extends Payload>[] payload() default {};
+		Class<? extends Payload>[] payload() default { };
 
 		class MyOtherConstraintValidator implements ConstraintValidator<MyOtherConstraint, Object> {
 

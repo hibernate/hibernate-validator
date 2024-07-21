@@ -116,7 +116,7 @@ public class ClassHierarchyHelper {
 	private static <T> void getImplementedInterfaces(Class<? super T> clazz, Set<Class<? super T>> classes) {
 		for ( Class<?> currentInterface : clazz.getInterfaces() ) {
 			@SuppressWarnings("unchecked") //safe since interfaces are super-types
-					Class<? super T> currentInterfaceCasted = (Class<? super T>) currentInterface;
+			Class<? super T> currentInterfaceCasted = (Class<? super T>) currentInterface;
 			classes.add( currentInterfaceCasted );
 			getImplementedInterfaces( currentInterfaceCasted, classes );
 		}

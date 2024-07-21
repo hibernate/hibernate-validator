@@ -317,9 +317,10 @@ public class ValidationExtension implements Extension {
 
 	private boolean isGetterConstrained(BeanDescriptor beanDescriptor, Method method, String property) {
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( property );
-		return propertyDescriptor != null && propertyDescriptor.findConstraints()
-				.declaredOn( ElementType.METHOD )
-				.hasConstraints();
+		return propertyDescriptor != null
+				&& propertyDescriptor.findConstraints()
+						.declaredOn( ElementType.METHOD )
+						.hasConstraints();
 	}
 
 	private boolean veto(EnumSet<ExecutableType> classLevelExecutableTypes,
@@ -384,7 +385,7 @@ public class ValidationExtension implements Extension {
 		}
 
 		EnumSet<ExecutableType> executableTypes = EnumSet.noneOf( ExecutableType.class );
-		if ( validateOnExecutionAnnotation.type().length == 0 ) {  // HV-757
+		if ( validateOnExecutionAnnotation.type().length == 0 ) { // HV-757
 			executableTypes.add( ExecutableType.NONE );
 		}
 		else {

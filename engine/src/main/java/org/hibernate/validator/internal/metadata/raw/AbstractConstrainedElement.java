@@ -31,10 +31,10 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	protected final Set<MetaConstraint<?>> typeArgumentConstraints;
 
 	public AbstractConstrainedElement(ConfigurationSource source,
-									  ConstrainedElementKind kind,
-									  Set<MetaConstraint<?>> constraints,
-									  Set<MetaConstraint<?>> typeArgumentConstraints,
-									  CascadingMetaDataBuilder cascadingMetaDataBuilder) {
+			ConstrainedElementKind kind,
+			Set<MetaConstraint<?>> constraints,
+			Set<MetaConstraint<?>> typeArgumentConstraints,
+			CascadingMetaDataBuilder cascadingMetaDataBuilder) {
 		this.kind = kind;
 		this.source = source;
 		this.constraints = constraints != null ? CollectionHelper.toImmutableSet( constraints ) : Collections.<MetaConstraint<?>>emptySet();

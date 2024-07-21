@@ -245,7 +245,7 @@ public class ExecutableHelperTest {
 		Method subType = GreekLiterature.class.getDeclaredMethod( "getAuthor" );
 
 		assertFalse(
-				executableHelper. overrides( subType, superType ),
+				executableHelper.overrides( subType, superType ),
 				"Literature#getAuthor() is private. It should not be possible to override it."
 		);
 	}

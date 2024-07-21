@@ -98,7 +98,7 @@ public class CachedTraversableResolverTest {
 		}
 
 		// Cache disabled at the factory level but enabled in the context
-		v = ((HibernateValidatorContext) factory.usingContext())
+		v = ( (HibernateValidatorContext) factory.usingContext() )
 				.traversableResolver( new AskOnceTR() )
 				.enableTraversableResolverResultCache( true )
 				.getValidator();
@@ -124,7 +124,7 @@ public class CachedTraversableResolverTest {
 		}
 
 		// Cache enabled at the factory level but disabled in the context
-		v = ((HibernateValidatorContext) factory.usingContext())
+		v = ( (HibernateValidatorContext) factory.usingContext() )
 				.traversableResolver( new AskOnceTR() )
 				.enableTraversableResolverResultCache( false )
 				.getValidator();
@@ -189,10 +189,10 @@ public class CachedTraversableResolverTest {
 
 		@Override
 		public boolean isReachable(Object traversableObject,
-								   Path.Node traversableProperty,
-								   Class<?> rootBeanType,
-								   Path pathToTraversableObject,
-								   ElementType elementType) {
+				Path.Node traversableProperty,
+				Class<?> rootBeanType,
+				Path pathToTraversableObject,
+				ElementType elementType) {
 			return isTraversable(
 					askedReach,
 					traversableObject,
@@ -202,10 +202,10 @@ public class CachedTraversableResolverTest {
 
 		@Override
 		public boolean isCascadable(Object traversableObject,
-									Path.Node traversableProperty,
-									Class<?> rootBeanType,
-									Path pathToTraversableObject,
-									ElementType elementType) {
+				Path.Node traversableProperty,
+				Class<?> rootBeanType,
+				Path pathToTraversableObject,
+				ElementType elementType) {
 			return isTraversable(
 					askedCascade,
 					traversableObject,

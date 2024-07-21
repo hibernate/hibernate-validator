@@ -227,7 +227,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			ConstrainedParameter otherParameter = other.getParameterMetaData( i );
 			// FIXME: how to deal with method overriding with type overloading of one of the parameters?
 			if ( !parameter.getCascadingMetaDataBuilder().equals( otherParameter.getCascadingMetaDataBuilder() )
-				|| !getDescriptors( parameter.getConstraints() ).equals( getDescriptors( otherParameter.getConstraints() ) ) ) {
+					|| !getDescriptors( parameter.getConstraints() ).equals( getDescriptors( otherParameter.getConstraints() ) ) ) {
 				return false;
 			}
 			i++;
@@ -307,7 +307,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			return false;
 		}
 		ConstrainedExecutable other = (ConstrainedExecutable) obj;
-		 if ( !callable.equals( other.callable ) ) {
+		if ( !callable.equals( other.callable ) ) {
 			return false;
 		}
 		return true;

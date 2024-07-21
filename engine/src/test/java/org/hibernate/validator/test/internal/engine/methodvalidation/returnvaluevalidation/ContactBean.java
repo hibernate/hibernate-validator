@@ -37,5 +37,3 @@ public class ContactBean {
 		this.phone = phone;
 	}
 }
-
-

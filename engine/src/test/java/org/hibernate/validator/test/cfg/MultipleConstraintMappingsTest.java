@@ -84,7 +84,7 @@ public class MultipleConstraintMappingsTest {
 		ConstraintMapping marathonMapping = config.createConstraintMapping();
 		marathonMapping
 				.type( Marathon.class )
-					.defaultGroupSequence( Foo.class, Marathon.class )
+				.defaultGroupSequence( Foo.class, Marathon.class )
 				.type( Marathon.class );
 	}
 
@@ -123,7 +123,7 @@ public class MultipleConstraintMappingsTest {
 		ConstraintMapping marathonMapping = config.createConstraintMapping();
 		marathonMapping.type( Marathon.class )
 				.getter( "name" )
-					.constraint( new NotNullDef() )
+				.constraint( new NotNullDef() )
 				.getter( "name" );
 	}
 
@@ -132,8 +132,8 @@ public class MultipleConstraintMappingsTest {
 		ConstraintMapping marathonMapping = config.createConstraintMapping();
 		marathonMapping.type( Marathon.class )
 				.method( "setTournamentDate", Date.class )
-					.parameter( 0 )
-						.constraint( new NotNullDef() )
+				.parameter( 0 )
+				.constraint( new NotNullDef() )
 				.method( "setTournamentDate", Date.class );
 	}
 
@@ -142,8 +142,8 @@ public class MultipleConstraintMappingsTest {
 		ConstraintMapping marathonMapping = config.createConstraintMapping();
 		marathonMapping.type( Marathon.class )
 				.method( "setTournamentDate", Date.class )
-					.parameter( 0 )
-						.constraint( new NotNullDef() )
+				.parameter( 0 )
+				.constraint( new NotNullDef() )
 				.parameter( 0 );
 	}
 
@@ -152,10 +152,10 @@ public class MultipleConstraintMappingsTest {
 		ConstraintMapping marathonMapping = config.createConstraintMapping();
 		marathonMapping.type( Marathon.class )
 				.method( "addRunner", Runner.class )
-					.returnValue()
-						.constraint( new AssertFalseDef() )
-					.parameter( 0 )
-					.returnValue();
+				.returnValue()
+				.constraint( new AssertFalseDef() )
+				.parameter( 0 )
+				.returnValue();
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000177.*")
@@ -163,14 +163,14 @@ public class MultipleConstraintMappingsTest {
 		ConstraintMapping marathonMapping = config.createConstraintMapping();
 		marathonMapping.type( Marathon.class )
 				.method( "addRunner", Runner.class )
-					.crossParameter()
-						.constraint(
-							new GenericConstraintDef<GenericAndCrossParameterConstraint>(
+				.crossParameter()
+				.constraint(
+						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
 								GenericAndCrossParameterConstraint.class
-							)
 						)
-					.parameter( 0 )
-					.crossParameter();
+				)
+				.parameter( 0 )
+				.crossParameter();
 	}
 
 	private interface Foo {

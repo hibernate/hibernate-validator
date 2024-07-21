@@ -193,10 +193,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @param constraintMetaDataSet All constraint meta data relating to the represented type.
 	 */
 	public BeanMetaDataImpl(Class<T> beanClass,
-							List<Class<?>> defaultGroupSequence,
-							DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider,
-							Set<ConstraintMetaData> constraintMetaDataSet,
-							ValidationOrderGenerator validationOrderGenerator) {
+			List<Class<?>> defaultGroupSequence,
+			DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider,
+			Set<ConstraintMetaData> constraintMetaDataSet,
+			ValidationOrderGenerator validationOrderGenerator) {
 
 		this.validationOrderGenerator = validationOrderGenerator;
 		this.beanClass = beanClass;
@@ -510,7 +510,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return constrainedMethodDescriptors;
 	}
 
-	private static <T> DefaultGroupSequenceContext<T> getDefaultGroupSequenceData(Class<?> beanClass, List<Class<?>> defaultGroupSequence, DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider, ValidationOrderGenerator validationOrderGenerator) {
+	private static <T> DefaultGroupSequenceContext<T> getDefaultGroupSequenceData(Class<?> beanClass, List<Class<?>> defaultGroupSequence,
+			DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider, ValidationOrderGenerator validationOrderGenerator) {
 		if ( defaultGroupSequence != null && defaultGroupSequenceProvider != null ) {
 			throw LOG.getInvalidDefaultGroupSequenceDefinitionException();
 		}

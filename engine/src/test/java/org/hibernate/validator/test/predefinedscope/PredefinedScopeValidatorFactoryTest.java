@@ -58,7 +58,7 @@ public class PredefinedScopeValidatorFactoryTest {
 
 		violations = validator.forExecutables()
 				.validateParameters( new Bean(), Bean.class.getMethod( "setEmail", String.class ),
-						new Object[]{ "invalid" } );
+						new Object[] { "invalid" } );
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( Email.class )
 						.withPropertyPath( pathWith().method( "setEmail" ).parameter( "email", 0 ) ) );
@@ -71,7 +71,7 @@ public class PredefinedScopeValidatorFactoryTest {
 
 		violations = validator.forExecutables()
 				.validateConstructorParameters( Bean.class.getConstructor( String.class, String.class ),
-						new Object[]{ null, "invalid" } );
+						new Object[] { null, "invalid" } );
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith().constructor( Bean.class ).parameter( "property", 0 ) ),
@@ -107,7 +107,7 @@ public class PredefinedScopeValidatorFactoryTest {
 
 		violations = validator.forExecutables()
 				.validateParameters( new UnknownBean(), UnknownBean.class.getMethod( "setMethod", String.class ),
-						new Object[]{ "" } );
+						new Object[] { "" } );
 		assertNoViolations( violations );
 	}
 
@@ -126,7 +126,7 @@ public class PredefinedScopeValidatorFactoryTest {
 
 		Set<ConstraintViolation<UnknownBean>> violations = validator.forExecutables()
 				.validateConstructorParameters( UnknownBean.class.getConstructor( String.class ),
-						new Object[]{ "" } );
+						new Object[] { "" } );
 		assertNoViolations( violations );
 	}
 

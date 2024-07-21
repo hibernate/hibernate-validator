@@ -900,8 +900,8 @@ public class ConstraintHelper {
 	 */
 	public <A extends Annotation> List<ConstraintValidatorDescriptor<A>> findValidatorDescriptors(Class<A> annotationType, ValidationTarget validationTarget) {
 		return getAllValidatorDescriptors( annotationType ).stream()
-			.filter( d -> supportsValidationTarget( d, validationTarget ) )
-			.collect( Collectors.toList() );
+				.filter( d -> supportsValidationTarget( d, validationTarget ) )
+				.collect( Collectors.toList() );
 	}
 
 	private boolean supportsValidationTarget(ConstraintValidatorDescriptor<?> validatorDescriptor, ValidationTarget target) {
@@ -917,9 +917,7 @@ public class ConstraintHelper {
 	 * @param keepExistingClasses Whether already-registered validators should be kept or not
 	 * @param <A> the type of the annotation
 	 */
-	public <A extends Annotation> void putValidatorDescriptors(Class<A> annotationType,
-														   List<ConstraintValidatorDescriptor<A>> validatorDescriptors,
-														   boolean keepExistingClasses) {
+	public <A extends Annotation> void putValidatorDescriptors(Class<A> annotationType, List<ConstraintValidatorDescriptor<A>> validatorDescriptors, boolean keepExistingClasses) {
 
 		List<ConstraintValidatorDescriptor<A>> validatorDescriptorsToAdd = new ArrayList<>();
 
@@ -1113,8 +1111,9 @@ public class ConstraintHelper {
 
 	public boolean isJdkAnnotation(Class<? extends Annotation> annotation) {
 		Package pakkage = annotation.getPackage();
-		return pakkage != null && pakkage.getName() != null &&
-				( pakkage.getName().startsWith( "java." ) || pakkage.getName().startsWith( "jdk.internal" ) );
+		return pakkage != null
+				&& pakkage.getName() != null
+				&& ( pakkage.getName().startsWith( "java." ) || pakkage.getName().startsWith( "jdk.internal" ) );
 	}
 
 	public void clear() {

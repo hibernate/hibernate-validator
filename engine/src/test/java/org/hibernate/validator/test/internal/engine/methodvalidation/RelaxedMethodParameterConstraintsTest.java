@@ -66,7 +66,7 @@ public class RelaxedMethodParameterConstraintsTest {
 				.validateParameters(
 						new RealizationWithAdditionalMethodParameterConstraint(),
 						RealizationWithAdditionalMethodParameterConstraint.class.getDeclaredMethods()[0],
-						new Object[] {}
+						new Object[] { }
 				);
 	}
 
@@ -101,7 +101,7 @@ public class RelaxedMethodParameterConstraintsTest {
 		validator.forExecutables().validateParameters(
 				new SubRealizationWithValidConstraintOnMethodParameter(),
 				SubRealizationWithValidConstraintOnMethodParameter.class.getDeclaredMethods()[0],
-				new Object[] {}
+				new Object[] { }
 		);
 	}
 
@@ -133,7 +133,7 @@ public class RelaxedMethodParameterConstraintsTest {
 		validator.forExecutables().validateParameters(
 				new RealizationOfTwoInterface(),
 				RealizationOfTwoInterface.class.getDeclaredMethods()[0],
-				new Object[] {}
+				new Object[] { }
 		);
 	}
 

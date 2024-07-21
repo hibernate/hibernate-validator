@@ -34,8 +34,8 @@ public class CustomValidationProviderInDeploymentUnitIT extends AbstractArquilli
 	public static Archive<?> createTestArchive() {
 		return buildTestArchive( WAR_FILE_NAME )
 				.addAsLibrary( IntegrationTestUtil.createCustomBeanValidationProviderJar()
-								.as( JavaArchive.class )
-								.addAsManifestResource( BEANS_XML, "beans.xml" ) )
+						.as( JavaArchive.class )
+						.addAsManifestResource( BEANS_XML, "beans.xml" ) )
 				.addAsResource( "log4j.properties" )
 				.addAsResource( "validation-custom-provider.xml", "META-INF/validation.xml" )
 				.addAsWebInfResource( BEANS_XML, "beans.xml" );

@@ -373,7 +373,7 @@ public class RedefiningDefaultGroupTest {
 		}
 	}
 
-	@GroupSequence( { AnotherMiniRentalCar.class, CarChecks.class })
+	@GroupSequence({ AnotherMiniRentalCar.class, CarChecks.class })
 	private class AnotherMiniRentalCar extends RentalCar {
 		AnotherMiniRentalCar(String manufacturer, String licencePlate, int seatCount) {
 			super( manufacturer, licencePlate, seatCount );
@@ -386,7 +386,7 @@ public class RedefiningDefaultGroupTest {
 		}
 	}
 
-	@GroupSequence( { BigRentalCar.class, CarChecks.class })
+	@GroupSequence({ BigRentalCar.class, CarChecks.class })
 	private class BigRentalCar extends RentalCar {
 		BigRentalCar(String manufacturer, String licencePlate, int seatCount) {
 			super( manufacturer, licencePlate, seatCount );

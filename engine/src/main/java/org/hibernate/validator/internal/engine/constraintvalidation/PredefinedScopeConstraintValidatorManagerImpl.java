@@ -32,7 +32,7 @@ public class PredefinedScopeConstraintValidatorManagerImpl extends AbstractConst
 	public PredefinedScopeConstraintValidatorManagerImpl(
 			ConstraintValidatorFactory defaultConstraintValidatorFactory,
 			HibernateConstraintValidatorInitializationContext defaultConstraintValidatorInitializationContext
-		) {
+	) {
 		super( defaultConstraintValidatorFactory, defaultConstraintValidatorInitializationContext );
 	}
 

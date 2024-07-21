@@ -19,7 +19,7 @@ public class Parent {
 	private String parentAttribute = null;
 	private List<String> parentListAttribute = new ArrayList<>();
 
-	public Parent( String parentAttribute ) {
+	public Parent(String parentAttribute) {
 		this.parentAttribute = parentAttribute;
 	}
 

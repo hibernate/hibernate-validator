@@ -77,9 +77,7 @@ public final class ExecutableHelper {
 			return false;
 		}
 
-		if ( Modifier.isStatic( superTypeMethod.getModifiers() ) || Modifier.isStatic(
-				subTypeMethod.getModifiers()
-		) ) {
+		if ( Modifier.isStatic( superTypeMethod.getModifiers() ) || Modifier.isStatic( subTypeMethod.getModifiers() ) ) {
 			return false;
 		}
 
@@ -166,7 +164,8 @@ public final class ExecutableHelper {
 	}
 
 	private static boolean isMethodVisibleTo(Method visibleMethod, Method otherMethod) {
-		return Modifier.isPublic( visibleMethod.getModifiers() ) || Modifier.isProtected( visibleMethod.getModifiers() )
+		return Modifier.isPublic( visibleMethod.getModifiers() )
+				|| Modifier.isProtected( visibleMethod.getModifiers() )
 				|| visibleMethod.getDeclaringClass().getPackage().equals( otherMethod.getDeclaringClass().getPackage() );
 	}
 
@@ -291,8 +290,7 @@ public final class ExecutableHelper {
 
 		@Override
 		public boolean include(RawMethod element) {
-			return element.getRawMember().equals( method1 ) || element.getRawMember()
-					.equals( method2 );
+			return element.getRawMember().equals( method1 ) || element.getRawMember().equals( method2 );
 		}
 	}
 }

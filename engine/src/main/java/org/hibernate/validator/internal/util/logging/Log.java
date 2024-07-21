@@ -594,11 +594,13 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 162,
 			value = "The validated type %1$s does not specify the constructor/method: %2$s")
-	IllegalArgumentException getMethodOrConstructorNotDefinedByValidatedTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> validatedType, @FormatWith(ExecutableFormatter.class) Executable executable);
+	IllegalArgumentException getMethodOrConstructorNotDefinedByValidatedTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> validatedType,
+			@FormatWith(ExecutableFormatter.class) Executable executable);
 
 	@Message(id = 163,
 			value = "The actual parameter type '%1$s' is not assignable to the expected one '%2$s' for parameter %3$d of '%4$s'")
-	IllegalArgumentException getParameterTypesDoNotMatchException(@FormatWith(ClassObjectFormatter.class) Class<?> actualType, Type expectedType, int index, @FormatWith(ExecutableFormatter.class) Executable executable);
+	IllegalArgumentException getParameterTypesDoNotMatchException(@FormatWith(ClassObjectFormatter.class) Class<?> actualType, Type expectedType, int index,
+			@FormatWith(ExecutableFormatter.class) Executable executable);
 
 	@Message(id = 164, value = "%s has to be a auto-boxed type.")
 	IllegalArgumentException getHasToBeABoxedTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> clazz);

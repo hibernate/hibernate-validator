@@ -28,5 +28,3 @@ public enum CompositionType {
 	 */
 	ALL_FALSE
 }
-
-

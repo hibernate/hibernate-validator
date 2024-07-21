@@ -119,6 +119,7 @@ public interface BeanMetaData<T> extends Validatable {
 	 *         contain constraints from super classes or interfaces implemented by super classes
 	 */
 	Set<MetaConstraint<?>> getAllDirectMetaConstraints();
+
 	/**
 	 * Returns the constraint-related metadata for the given executable of the
 	 * class represented by this bean metadata.

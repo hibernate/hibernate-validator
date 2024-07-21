@@ -28,5 +28,3 @@ public class MustMatchValidator implements ConstraintValidator<MustMatch, String
 		return value.equals( match );
 	}
 }
-
-

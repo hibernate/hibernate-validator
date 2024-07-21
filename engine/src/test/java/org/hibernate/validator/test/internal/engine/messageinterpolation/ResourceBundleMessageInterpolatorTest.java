@@ -118,7 +118,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 		MessageInterpolatorContext messageInterpolatorContext = createMessageInterpolatorContext( notNullDescriptor );
 
-		String expected = "foo";  // missing {}
+		String expected = "foo"; // missing {}
 		String actual = interpolator.interpolate( "foo", messageInterpolatorContext );
 		assertEquals( actual, expected, "Wrong substitution" );
 
@@ -134,7 +134,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 		MessageInterpolatorContext messageInterpolatorContext = createMessageInterpolatorContext( notNullDescriptor );
 
-		String expected = "{bar}";  // unknown token {}
+		String expected = "{bar}"; // unknown token {}
 		String actual = interpolator.interpolate( "{bar}", messageInterpolatorContext );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
@@ -146,7 +146,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 		MessageInterpolatorContext messageInterpolatorContext = createMessageInterpolatorContext( notNullDescriptor );
 
-		String expected = "message interpolation successful";  // unknown token {}
+		String expected = "message interpolation successful"; // unknown token {}
 		String actual = interpolator.interpolate( "{key-with-dashes}", messageInterpolatorContext );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
@@ -158,7 +158,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 		MessageInterpolatorContext messageInterpolatorContext = createMessageInterpolatorContext( notNullDescriptor );
 
-		String expected = "message interpolation successful";  // unknown token {}
+		String expected = "message interpolation successful"; // unknown token {}
 		String actual = interpolator.interpolate( "{key with spaces}", messageInterpolatorContext );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
@@ -174,7 +174,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		String actual = interpolator.interpolate( notNullDescriptor.getAnnotation().message(), messageInterpolatorContext );
 		assertEquals( actual, expected, "Wrong substitution" );
 
-		expected = "size must be between 0 and 2147483647";  // unknown token {}
+		expected = "size must be between 0 and 2147483647"; // unknown token {}
 
 		messageInterpolatorContext = createMessageInterpolatorContext( sizeDescriptor );
 		actual = interpolator.interpolate( sizeDescriptor.getAnnotation().message(), messageInterpolatorContext );

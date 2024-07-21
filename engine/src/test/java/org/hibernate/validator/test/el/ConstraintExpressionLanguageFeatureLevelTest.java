@@ -160,7 +160,7 @@ public class ConstraintExpressionLanguageFeatureLevelTest {
 						Validator validator = ValidatorUtil.getValidator();
 
 						assertThat( validator.validate( new VariablesBean( "value" ) ) )
-						.containsOnlyViolations( violationOf( VariablesConstraint.class ).withMessage( "Variable: value" ) );
+								.containsOnlyViolations( violationOf( VariablesConstraint.class ).withMessage( "Variable: value" ) );
 						assertThat( validator.validate( new BeanPropertiesBean( "value" ) ) )
 								.containsOnlyViolations( violationOf( BeanPropertiesConstraint.class ).withMessage( "Bean property: 118" ) );
 						assertThat( validator.validate( new BeanMethodsBean() ) )

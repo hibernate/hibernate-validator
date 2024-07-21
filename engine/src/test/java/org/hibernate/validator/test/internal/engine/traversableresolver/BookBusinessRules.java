@@ -23,9 +23,9 @@ import jakarta.validation.Payload;
 @interface BookBusinessRules {
 	String message() default "";
 
-	Class<?>[] groups() default {};
+	Class<?>[] groups() default { };
 
-	Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default { };
 
 	class BookBusinessRulesValidator implements ConstraintValidator<BookBusinessRules, Object> {
 

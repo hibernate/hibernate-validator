@@ -431,7 +431,7 @@ public class ConstraintDefinitionTest {
 	@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })
 	@Retention(RUNTIME)
 	@Documented
-	@Constraint(validatedBy = {})
+	@Constraint(validatedBy = { })
 	public @interface Directory {
 		String message() default "";
 

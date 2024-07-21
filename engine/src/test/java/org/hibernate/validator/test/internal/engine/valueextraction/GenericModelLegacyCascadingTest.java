@@ -107,7 +107,7 @@ public class GenericModelLegacyCascadingTest {
 		Validator validator = getValidator();
 
 		GenericModelHolder<InvalidModel[]> holder = new GenericModelHolder<>();
-		holder.setModel( new InvalidModel[]{ new InvalidModel() } );
+		holder.setModel( new InvalidModel[] { new InvalidModel() } );
 
 		Set<ConstraintViolation<GenericModelHolder<?>>> constraintViolations = validator.validate( holder );
 

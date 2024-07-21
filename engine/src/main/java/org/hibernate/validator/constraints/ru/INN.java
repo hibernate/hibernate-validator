@@ -33,7 +33,7 @@ import org.hibernate.validator.constraints.ru.INN.List;
  * @see <a href="https://www.nalog.ru/rn77/fl/interest/inn/">russian taxpayer identification number</a>
  */
 @Documented
-@Constraint(validatedBy = {})
+@Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
@@ -42,9 +42,9 @@ public @interface INN {
 
 	String message() default "{org.hibernate.validator.constraints.ru.INN.message}";
 
-	Class<?>[] groups() default {};
+	Class<?>[] groups() default { };
 
-	Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default { };
 
 	Type type() default Type.ANY;
 

@@ -102,7 +102,7 @@ public class PESELValidatorTest extends AbstractConstrainedTest {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-1854")
+	@TestForIssue(jiraKey = "HV-1854")
 	public void testMeaningfulPESELNumber() {
 		assertThat( validator.validate( new Person( "00000000000" ) ) )
 				.containsOnlyViolations(

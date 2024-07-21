@@ -148,9 +148,9 @@ class ContainerElementTypeStaxBuilder extends AbstractStaxBuilder {
 		boolean isCascaded = validStaxBuilder.build();
 
 		containerElementTypesCascadingMetaDataBuilder.put( typeParameter, new CascadingMetaDataBuilder( enclosingType, typeParameter, isCascaded,
-						nestedContainerElementTypeConfiguration.getTypeParametersCascadingMetaData(),
-						groupConversionBuilder.build()
-				)
+				nestedContainerElementTypeConfiguration.getTypeParametersCascadingMetaData(),
+				groupConversionBuilder.build()
+		)
 		);
 
 		return new ContainerElementTypeConfiguration(

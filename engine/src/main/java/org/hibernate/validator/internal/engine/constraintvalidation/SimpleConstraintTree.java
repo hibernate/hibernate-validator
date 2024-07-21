@@ -44,10 +44,10 @@ class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 
 		if ( LOG.isTraceEnabled() ) {
 			if ( validationContext.isShowValidatedValuesInTraceLogs() ) {
-					LOG.tracef(
-							"Validating value %s against constraint defined by %s.",
-							valueContext.getCurrentValidatedValue(),
-							descriptor );
+				LOG.tracef(
+						"Validating value %s against constraint defined by %s.",
+						valueContext.getCurrentValidatedValue(),
+						descriptor );
 			}
 			else {
 				LOG.tracef( "Validating against constraint defined by %s.", descriptor );

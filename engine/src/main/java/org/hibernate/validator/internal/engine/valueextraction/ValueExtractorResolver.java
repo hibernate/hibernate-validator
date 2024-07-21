@@ -344,11 +344,8 @@ public class ValueExtractorResolver {
 		Set<ValueExtractorDescriptor> possibleValueExtractors = valueExtractorCandidates
 				.stream()
 				.filter( e -> TypeHelper.isAssignable( e.getContainerType(), runtimeType ) )
-				.filter( extractorDescriptor ->
-						checkValueExtractorTypeCompatibility(
-								typeParameter, isInternal, erasedDeclaredType, extractorDescriptor
-						)
-				).collect( Collectors.toSet() );
+				.filter( extractorDescriptor -> checkValueExtractorTypeCompatibility( typeParameter, isInternal, erasedDeclaredType, extractorDescriptor ) )
+				.collect( Collectors.toSet() );
 
 		valueExtractorDescriptors = getMaximallySpecificValueExtractors( possibleValueExtractors );
 
@@ -366,12 +363,12 @@ public class ValueExtractorResolver {
 	private boolean checkValueExtractorTypeCompatibility(TypeVariable<?> typeParameter, boolean isInternal, Class<?> erasedDeclaredType,
 			ValueExtractorDescriptor extractorDescriptor) {
 		return TypeHelper.isAssignable( extractorDescriptor.getContainerType(), erasedDeclaredType )
-				? validateValueExtractorCompatibility( isInternal, erasedDeclaredType, extractorDescriptor.getContainerType(), typeParameter,
-				extractorDescriptor.getExtractedTypeParameter()
-		)
-				: validateValueExtractorCompatibility( isInternal, extractorDescriptor.getContainerType(), erasedDeclaredType,
-				extractorDescriptor.getExtractedTypeParameter(), typeParameter
-		);
+				? validateValueExtractorCompatibility(
+						isInternal, erasedDeclaredType, extractorDescriptor.getContainerType(), typeParameter, extractorDescriptor.getExtractedTypeParameter()
+				)
+				: validateValueExtractorCompatibility(
+						isInternal, extractorDescriptor.getContainerType(), erasedDeclaredType, extractorDescriptor.getExtractedTypeParameter(), typeParameter
+				);
 	}
 
 	private boolean validateValueExtractorCompatibility(boolean isInternal,
@@ -423,8 +420,8 @@ public class ValueExtractorResolver {
 			}
 			// We don't check the class as an optimization, the keys of the map are ValueExtractorCacheKey anyway
 			ValueExtractorCacheKey that = (ValueExtractorCacheKey) o;
-			return Objects.equals( this.type, that.type ) &&
-					Objects.equals( this.typeParameter, that.typeParameter );
+			return Objects.equals( this.type, that.type )
+					&& Objects.equals( this.typeParameter, that.typeParameter );
 		}
 
 		@Override

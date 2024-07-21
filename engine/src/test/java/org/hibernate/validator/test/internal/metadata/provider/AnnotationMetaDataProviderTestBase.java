@@ -28,14 +28,16 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 public abstract class AnnotationMetaDataProviderTestBase {
 
 	protected <T> ConstrainedField findConstrainedField(BeanConfiguration<T> beanConfiguration,
-														Class<? super T> clazz, String fieldName) throws Exception {
+			Class<? super T> clazz, String fieldName)
+			throws Exception {
 
 		return (ConstrainedField) findConstrainedElement( beanConfiguration, clazz.getDeclaredField( fieldName ) );
 	}
 
 	protected <T> ConstrainedExecutable findConstrainedMethod(BeanConfiguration<T> beanConfiguration,
-															  Class<? super T> clazz, String methodName,
-			Class<?>... parameterTypes) throws Exception {
+			Class<? super T> clazz, String methodName,
+			Class<?>... parameterTypes)
+			throws Exception {
 
 		return (ConstrainedExecutable) findConstrainedElement( beanConfiguration, clazz.getMethod( methodName, parameterTypes ) );
 	}
@@ -46,8 +48,7 @@ public abstract class AnnotationMetaDataProviderTestBase {
 		return (ConstrainedExecutable) findConstrainedElement( beanConfigurations, clazz.getConstructor( parameterTypes ) );
 	}
 
-	protected <T> ConstrainedType findConstrainedType(BeanConfiguration<T> beanConfiguration,
-													  Class<? super T> type) {
+	protected <T> ConstrainedType findConstrainedType(BeanConfiguration<T> beanConfiguration, Class<? super T> type) {
 
 		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
 			if ( constrainedElement.getKind() == ConstrainedElementKind.TYPE ) {

@@ -28,7 +28,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = {})
+@Constraint(validatedBy = { })
 @SupportedValidationTarget(ValidationTarget.ANNOTATED_ELEMENT)
 @ReportAsSingleViolation
 public @interface ValidInvoiceAmount {
@@ -36,9 +36,9 @@ public @interface ValidInvoiceAmount {
 	String message() default "{org.hibernate.validator.referenceguide.chapter11.purelycomposed."
 			+ "ValidInvoiceAmount.message}";
 
-	Class<?>[] groups() default {};
+	Class<?>[] groups() default { };
 
-	Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default { };
 
 	@OverridesAttribute(constraint = Min.class, name = "value")
 	long value();

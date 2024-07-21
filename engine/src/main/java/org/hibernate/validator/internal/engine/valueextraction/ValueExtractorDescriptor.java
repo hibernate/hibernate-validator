@@ -34,7 +34,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class ValueExtractorDescriptor {
 
-	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup()  );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final Key key;
 	private final ValueExtractor<?> valueExtractor;
@@ -238,8 +238,8 @@ public class ValueExtractorDescriptor {
 			}
 			Key other = (Key) obj;
 
-			return containerType.equals( other.containerType ) &&
-					extractedTypeParameter.equals( other.extractedTypeParameter );
+			return containerType.equals( other.containerType )
+					&& extractedTypeParameter.equals( other.extractedTypeParameter );
 		}
 
 		@Override

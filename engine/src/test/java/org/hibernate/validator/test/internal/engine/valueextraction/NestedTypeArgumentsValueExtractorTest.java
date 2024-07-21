@@ -337,7 +337,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		private static NestedArray valid() {
 			NestedArray baz = new NestedArray();
 
-			baz.array = new String[][]{ { "email1@example.com", "email2@example.com" }, { "email3@example.com", "email4@example.com" } };
+			baz.array = new String[][] { { "email1@example.com", "email2@example.com" }, { "email3@example.com", "email4@example.com" } };
 
 			return baz;
 		}
@@ -345,7 +345,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		private static NestedArray invalidArrayFirstDimension() {
 			NestedArray baz = new NestedArray();
 
-			baz.array = new String[][]{ { "email1@example.com" }, { "email3@example.com", "email4@example.com" } };
+			baz.array = new String[][] { { "email1@example.com" }, { "email3@example.com", "email4@example.com" } };
 
 			return baz;
 		}
@@ -353,7 +353,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		private static NestedArray invalidArraySecondDimension() {
 			NestedArray baz = new NestedArray();
 
-			baz.array = new String[][]{ { "email1@example.com", "email2@example.com" }, { "email3@example.com", "not an email" } };
+			baz.array = new String[][] { { "email1@example.com", "email2@example.com" }, { "email3@example.com", "not an email" } };
 
 			return baz;
 		}

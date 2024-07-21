@@ -39,7 +39,7 @@ public class NodeImpl
 		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Path.ContainerElementNode,
 		org.hibernate.validator.path.PropertyNode, org.hibernate.validator.path.ContainerElementNode, Serializable {
 	private static final long serialVersionUID = 2075466571633860499L;
-	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[]{};
+	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[] { };
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -341,15 +341,12 @@ public class NodeImpl
 
 	@Override
 	public <T extends Path.Node> T as(Class<T> nodeType) {
-		if ( ( kind == ElementKind.BEAN && nodeType == BeanNode.class ) ||
-				( kind == ElementKind.CONSTRUCTOR && nodeType == ConstructorNode.class ) ||
-				( kind == ElementKind.CROSS_PARAMETER && nodeType == CrossParameterNode.class ) ||
-				( kind == ElementKind.METHOD && nodeType == MethodNode.class ) ||
-				( kind == ElementKind.PARAMETER && nodeType == ParameterNode.class ) ||
-				( kind == ElementKind.PROPERTY && ( nodeType == PropertyNode.class || nodeType == org.hibernate.validator.path.PropertyNode.class ) ) ||
-				( kind == ElementKind.RETURN_VALUE && nodeType == ReturnValueNode.class ) ||
-				( kind == ElementKind.CONTAINER_ELEMENT
-						&& ( nodeType == ContainerElementNode.class || nodeType == org.hibernate.validator.path.ContainerElementNode.class ) ) ) {
+		if ( ( kind == ElementKind.BEAN && nodeType == BeanNode.class )
+				|| ( kind == ElementKind.CONSTRUCTOR && nodeType == ConstructorNode.class ) || ( kind == ElementKind.CROSS_PARAMETER && nodeType == CrossParameterNode.class )
+				|| ( kind == ElementKind.METHOD && nodeType == MethodNode.class ) || ( kind == ElementKind.PARAMETER && nodeType == ParameterNode.class )
+				|| ( kind == ElementKind.PROPERTY && ( nodeType == PropertyNode.class || nodeType == org.hibernate.validator.path.PropertyNode.class ) )
+				|| ( kind == ElementKind.RETURN_VALUE && nodeType == ReturnValueNode.class )
+				|| ( kind == ElementKind.CONTAINER_ELEMENT && ( nodeType == ContainerElementNode.class || nodeType == org.hibernate.validator.path.ContainerElementNode.class ) ) ) {
 			return nodeType.cast( this );
 		}
 

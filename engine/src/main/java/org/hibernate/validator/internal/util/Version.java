@@ -17,8 +17,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public final class Version {
 
 	static {
-		LoggerFactory.make( MethodHandles.lookup() )
-			.version( getVersionString() );
+		LoggerFactory.make( MethodHandles.lookup() ).version( getVersionString() );
 	}
 
 	public static String getVersionString() {

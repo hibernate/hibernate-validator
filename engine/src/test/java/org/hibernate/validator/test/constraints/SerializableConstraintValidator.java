@@ -15,7 +15,7 @@ import jakarta.validation.ConstraintValidatorContext;
 public class SerializableConstraintValidator implements ConstraintValidator<Serializable, java.io.Serializable> {
 
 	@Override
-	public boolean isValid( java.io.Serializable value, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(java.io.Serializable value, ConstraintValidatorContext constraintValidatorContext) {
 		return true;
 	}
 }

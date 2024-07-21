@@ -27,5 +27,3 @@ public class Author {
 	@OneToMany(mappedBy = "author")
 	public List<Book> books = new ArrayList<Book>();
 }
-
-

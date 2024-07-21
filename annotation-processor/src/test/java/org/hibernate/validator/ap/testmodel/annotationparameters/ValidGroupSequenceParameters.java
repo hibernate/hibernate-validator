@@ -41,7 +41,7 @@ public class ValidGroupSequenceParameters {
 		public class SomeBean {
 		}
 
-		@GroupSequence(value = {Group2.class, SomeOtherBean.class})
+		@GroupSequence(value = { Group2.class, SomeOtherBean.class })
 		public class SomeOtherBean {
 		}
 

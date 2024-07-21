@@ -108,7 +108,7 @@ public class XmlParserHelper {
 			event = xmlEventReader.peek();
 		}
 
-		return event == null ?  null : event.asStartElement();
+		return event == null ? null : event.asStartElement();
 	}
 
 	/**

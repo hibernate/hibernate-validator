@@ -50,7 +50,7 @@ public @interface BitcoinAddress {
 	 * @return The type of the address to be considered as valid.
 	 * @see BitcoinAddressType
 	 */
-	BitcoinAddressType[] value() default BitcoinAddressType.ANY ;
+	BitcoinAddressType[] value() default BitcoinAddressType.ANY;
 
 	enum BitcoinAddressType {
 		ANY, P2PKH, P2SH, BECH32, P2WSH, P2WPKH, P2TR;

@@ -51,7 +51,8 @@ public class BitcoinConstrainedTest extends AbstractConstrainedTest {
 				violationOf( BitcoinAddress.class )
 						.withPropertyPath( pathWith()
 								.property( "address" )
-						).withMessage( "must be a valid Bitcoin address for one of these types: Legacy (P2PKH), Nested SegWit (P2SH), Native SegWit (Bech32), SegWit variant of P2SH (P2WSH), SegWit variant of P2PKH (P2WPKH), Taproot (P2TR)" ),
+						).withMessage(
+								"must be a valid Bitcoin address for one of these types: Legacy (P2PKH), Nested SegWit (P2SH), Native SegWit (Bech32), SegWit variant of P2SH (P2WSH), SegWit variant of P2PKH (P2WPKH), Taproot (P2TR)" ),
 				violationOf( BitcoinAddress.class )
 						.withPropertyPath( pathWith()
 								.property( "address2" )

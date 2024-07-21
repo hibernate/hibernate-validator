@@ -51,7 +51,7 @@ public class ParanamerParameterNameProvider implements ParameterNameProvider {
 		String[] parameterNames;
 
 		//there are no guarantees regarding thread-safety
-		synchronized ( paranamer ) {
+		synchronized (paranamer) {
 			parameterNames = paranamer.lookupParameterNames( constructor, false );
 		}
 
@@ -67,7 +67,7 @@ public class ParanamerParameterNameProvider implements ParameterNameProvider {
 	public List<String> getParameterNames(Method method) {
 		String[] parameterNames;
 
-		synchronized ( paranamer ) {
+		synchronized (paranamer) {
 			parameterNames = paranamer.lookupParameterNames( method, false );
 		}
 

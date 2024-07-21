@@ -182,7 +182,7 @@ public class MessagePropertiesTest {
 			collectInvalidMessages( locale, invalidMessages, violations );
 
 			Set<ConstraintViolation<ParameterScriptAssertBean>> parameterScriptAssertBeanViolations = validator.forExecutables().validateParameters(
-					new ParameterScriptAssertBean(), ParameterScriptAssertBean.class.getDeclaredMethod( "doTest", boolean.class ), new Object[]{ false } );
+					new ParameterScriptAssertBean(), ParameterScriptAssertBean.class.getDeclaredMethod( "doTest", boolean.class ), new Object[] { false } );
 
 			ConstraintViolationAssert.assertThat( parameterScriptAssertBeanViolations )
 					.containsOnlyViolations(

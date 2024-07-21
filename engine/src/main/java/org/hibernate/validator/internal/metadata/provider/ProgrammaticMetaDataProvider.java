@@ -38,8 +38,7 @@ public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 	private final Map<String, BeanConfiguration<?>> configuredBeans;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
-	public ProgrammaticMetaDataProvider(ConstraintCreationContext constraintCreationContext,
-										Set<DefaultConstraintMapping> constraintMappings) {
+	public ProgrammaticMetaDataProvider(ConstraintCreationContext constraintCreationContext, Set<DefaultConstraintMapping> constraintMappings) {
 		Contracts.assertNotNull( constraintMappings );
 
 		configuredBeans = CollectionHelper.toImmutableMap(

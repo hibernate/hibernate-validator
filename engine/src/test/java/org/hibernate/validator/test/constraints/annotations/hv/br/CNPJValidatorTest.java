@@ -22,33 +22,55 @@ import org.testng.annotations.Test;
 
 public class CNPJValidatorTest extends AbstractConstrainedTest {
 
-	private String[] invalidCNPJs = {"00.000.000/0000-00", "11.111.111/1111-11",
-			"22.222.222/2222-22", "33.333.333/3333-33",
-			"44.444.444/4444-44", "55.555.555/5555-55",
-			"66.666.666/6666-66", "77.777.777/7777-77",
-			"88.888.888/8888-88", "99.999.999/9999-99"
+	private String[] invalidCNPJs = {
+			"00.000.000/0000-00",
+			"11.111.111/1111-11",
+			"22.222.222/2222-22",
+			"33.333.333/3333-33",
+			"44.444.444/4444-44",
+			"55.555.555/5555-55",
+			"66.666.666/6666-66",
+			"77.777.777/7777-77",
+			"88.888.888/8888-88",
+			"99.999.999/9999-99"
 	};
 
-	private String[] validCNPJs = {"41.348.630/0001-39", "47.673.240/0001-10",
-			"65.627.745/0001-20", "81.110.141/0001-69", "68.321.178/0001-78",
-			"47.235.630/0001-09", "52.583.338/0001-17", "48.560.263/0001-81",
-			"16.468.665/0001-64", "11.720.867/0001-38", "00.000.000/0001-91"
+	private String[] validCNPJs = {
+			"41.348.630/0001-39",
+			"47.673.240/0001-10",
+			"65.627.745/0001-20",
+			"81.110.141/0001-69",
+			"68.321.178/0001-78",
+			"47.235.630/0001-09",
+			"52.583.338/0001-17",
+			"48.560.263/0001-81",
+			"16.468.665/0001-64",
+			"11.720.867/0001-38",
+			"00.000.000/0001-91"
 	};
 
 	private String[] validCNPJsWithLetters = {
-			"70B0XZ010UTA84", "3Y59DJD8484J90", "84JNG734MJKD82",
-			"UU3UCXJCUDEM68", "ABCDEFGHIJKL80", "11AA22BB33CC06"
+			"70B0XZ010UTA84",
+			"3Y59DJD8484J90",
+			"84JNG734MJKD82",
+			"UU3UCXJCUDEM68",
+			"ABCDEFGHIJKL80",
+			"11AA22BB33CC06"
 	};
 
 	private String[] invalidCNPJsWithLetters = {
-			"70B0XZ010UTA83", "3Y59DJD8484J80", "84JNG734MJKD00",
-			"UU3UCXJCUDEM11", "ABCDEFGHIJKLAA", "11AA22BB33CC07"
+			"70B0XZ010UTA83",
+			"3Y59DJD8484J80",
+			"84JNG734MJKD00",
+			"UU3UCXJCUDEM11",
+			"ABCDEFGHIJKLAA",
+			"11AA22BB33CC07"
 	};
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1971")
 	public void any_length_less_then_14_is_invalid() {
-		String[] invalidLengthCNPJs = {"1", "123", "0000000000019"};
+		String[] invalidLengthCNPJs = { "1", "123", "0000000000019" };
 		for ( String cnpj : invalidLengthCNPJs ) {
 			Set<ConstraintViolation<Company>> violations = validator.validate( new Company( cnpj ) );
 			assertThat( violations ).containsOnlyViolations(

@@ -85,7 +85,7 @@ final class ReturnValueConstraintMappingContextImpl
 		return super.containerElement(
 				this,
 				executableContext.getTypeContext(),
-				ConstraintLocation.forReturnValue( executableContext.getCallable()  ),
+				ConstraintLocation.forReturnValue( executableContext.getCallable() ),
 				index,
 				nestedIndexes
 		);

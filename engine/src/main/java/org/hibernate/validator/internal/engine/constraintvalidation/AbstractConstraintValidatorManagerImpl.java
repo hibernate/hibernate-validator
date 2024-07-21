@@ -49,7 +49,7 @@ public abstract class AbstractConstraintValidatorManagerImpl implements Constrai
 	 * {@code ValidatorFactory#usingContext()} or initialization context are only cached for the most recently used
 	 * factory and context.
 	 */
-	private final  HibernateConstraintValidatorInitializationContext defaultConstraintValidatorInitializationContext;
+	private final HibernateConstraintValidatorInitializationContext defaultConstraintValidatorInitializationContext;
 
 	/**
 	 * Creates a new {@code ConstraintValidatorManager}.

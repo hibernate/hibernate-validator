@@ -69,7 +69,7 @@ public class NestedCascadingArraySupportTest {
 		private static CinemaArray validCinemaArray() {
 			CinemaArray cinemaArray = new CinemaArray();
 
-			cinemaArray.array = new List[]{ Arrays.asList( new Cinema( "cinema1", new SomeReference<>( new Visitor( "Name 1" ) ) ) ) };
+			cinemaArray.array = new List[] { Arrays.asList( new Cinema( "cinema1", new SomeReference<>( new Visitor( "Name 1" ) ) ) ) };
 
 			return cinemaArray;
 		}
@@ -77,7 +77,7 @@ public class NestedCascadingArraySupportTest {
 		private static CinemaArray invalidCinemaArray() {
 			CinemaArray cinemaArray = new CinemaArray();
 
-			cinemaArray.array = new List[]{ Arrays.asList( null, new Cinema( "cinema2", new SomeReference<>( new Visitor() ) ) ) };
+			cinemaArray.array = new List[] { Arrays.asList( null, new Cinema( "cinema2", new SomeReference<>( new Visitor() ) ) ) };
 
 			return cinemaArray;
 		}

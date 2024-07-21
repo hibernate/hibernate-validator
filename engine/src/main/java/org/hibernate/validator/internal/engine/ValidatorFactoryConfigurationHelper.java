@@ -145,8 +145,7 @@ final class ValidatorFactoryConfigurationHelper {
 
 		for ( String contributorName : contributorNames ) {
 			@SuppressWarnings("unchecked")
-			Class<? extends ConstraintMappingContributor> contributorType = (Class<? extends ConstraintMappingContributor>)
-					LoadClass.action( contributorName, externalClassLoader );
+			Class<? extends ConstraintMappingContributor> contributorType = (Class<? extends ConstraintMappingContributor>) LoadClass.action( contributorName, externalClassLoader );
 			contributors.add( NewInstance.action( contributorType, "constraint mapping contributor class" ) );
 		}
 
@@ -233,8 +232,7 @@ final class ValidatorFactoryConfigurationHelper {
 		if ( scriptEvaluatorFactoryFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends ScriptEvaluatorFactory> clazz = (Class<? extends ScriptEvaluatorFactory>)
-						LoadClass.action( scriptEvaluatorFactoryFqcn, externalClassLoader );
+				Class<? extends ScriptEvaluatorFactory> clazz = (Class<? extends ScriptEvaluatorFactory>) LoadClass.action( scriptEvaluatorFactoryFqcn, externalClassLoader );
 				ScriptEvaluatorFactory scriptEvaluatorFactory = NewInstance.action( clazz, "script evaluator factory class" );
 				LOG.usingScriptEvaluatorFactory( clazz );
 
@@ -338,8 +336,8 @@ final class ValidatorFactoryConfigurationHelper {
 		if ( getterPropertySelectionStrategyFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends GetterPropertySelectionStrategy> clazz = (Class<? extends GetterPropertySelectionStrategy>)
-						LoadClass.action( getterPropertySelectionStrategyFqcn, externalClassLoader );
+				Class<? extends GetterPropertySelectionStrategy> clazz =
+						(Class<? extends GetterPropertySelectionStrategy>) LoadClass.action( getterPropertySelectionStrategyFqcn, externalClassLoader );
 				GetterPropertySelectionStrategy getterPropertySelectionStrategy = NewInstance.action( clazz, "getter property selection strategy class" );
 				LOG.usingGetterPropertySelectionStrategy( clazz );
 

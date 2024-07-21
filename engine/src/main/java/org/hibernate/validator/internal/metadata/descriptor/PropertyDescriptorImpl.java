@@ -37,13 +37,13 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 	private final Set<GroupConversionDescriptor> groupConversions;
 
 	public PropertyDescriptorImpl(Type returnType,
-								  String propertyName,
-								  Set<ConstraintDescriptorImpl<?>> constraints,
-								  Set<ContainerElementTypeDescriptor> constrainedContainerElementTypes,
-								  boolean cascaded,
-								  boolean defaultGroupSequenceRedefined,
-								  List<Class<?>> defaultGroupSequence,
-								  Set<GroupConversionDescriptor> groupConversions) {
+			String propertyName,
+			Set<ConstraintDescriptorImpl<?>> constraints,
+			Set<ContainerElementTypeDescriptor> constrainedContainerElementTypes,
+			boolean cascaded,
+			boolean defaultGroupSequenceRedefined,
+			List<Class<?>> defaultGroupSequence,
+			Set<GroupConversionDescriptor> groupConversions) {
 		super( returnType, constraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 		this.propertyName = propertyName;

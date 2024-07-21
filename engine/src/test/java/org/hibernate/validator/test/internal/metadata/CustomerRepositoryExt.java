@@ -83,13 +83,11 @@ public class CustomerRepositoryExt extends CustomerRepository {
 					to = CustomerComplex.class)
 	})
 	public Customer modifyCustomer(
-			@Valid
-			@ConvertGroup.List({
+			@Valid @ConvertGroup.List({
 					@ConvertGroup(from = Default.class, to = CustomerBasic.class),
 					@ConvertGroup(from = CustomerRepositoryExtComplex.class,
 							to = CustomerComplex.class)
-			})
-			Customer customer) {
+			}) Customer customer) {
 		return null;
 	}
 

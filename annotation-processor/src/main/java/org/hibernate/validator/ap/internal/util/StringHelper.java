@@ -97,9 +97,9 @@ public class StringHelper {
 	}
 
 	private static boolean startsWithSeveralUpperCaseLetters(String string) {
-		return string.length() > 1 &&
-				Character.isUpperCase( string.charAt( 0 ) ) &&
-				Character.isUpperCase( string.charAt( 1 ) );
+		return string.length() > 1
+				&& Character.isUpperCase( string.charAt( 0 ) )
+				&& Character.isUpperCase( string.charAt( 1 ) );
 	}
 
 	public static String format(String format, Object... args) {

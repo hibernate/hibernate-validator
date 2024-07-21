@@ -31,7 +31,8 @@ public class ParameterScriptAssertConstrainedTest extends AbstractConstrainedTes
 	private Foo foo;
 	private Method method;
 
-	@Override @BeforeMethod
+	@Override
+	@BeforeMethod
 	public void setUp() throws Exception {
 		super.setUp();
 		executableValidator = validator.forExecutables();

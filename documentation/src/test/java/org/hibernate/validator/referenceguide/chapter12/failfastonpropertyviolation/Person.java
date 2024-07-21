@@ -19,6 +19,6 @@ public class Person {
 		this.lastName = lastName;
 	}
 
-//getters, setters, equals and hashcode...
+	//getters, setters, equals and hashcode...
 }
 //end::include[]

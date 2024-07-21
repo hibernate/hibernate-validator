@@ -18,7 +18,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-@Target( { METHOD, FIELD })
+@Target({ METHOD, FIELD })
 @Retention(RUNTIME)
 @Constraint(validatedBy = CountValidationCallsValidator.class)
 public @interface CountValidationCalls {

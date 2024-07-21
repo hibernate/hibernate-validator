@@ -128,7 +128,8 @@ public class CascadingMetaDataBuilder {
 		return NON_CASCADING;
 	}
 
-	public static CascadingMetaDataBuilder annotatedObject(Type cascadableType, boolean cascading, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions) {
+	public static CascadingMetaDataBuilder annotatedObject(Type cascadableType, boolean cascading, Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData,
+			Map<Class<?>, Class<?>> groupConversions) {
 		return new CascadingMetaDataBuilder( cascadableType, AnnotatedObject.INSTANCE, cascading, containerElementTypesCascadingMetaData, groupConversions );
 	}
 
@@ -187,8 +188,7 @@ public class CascadingMetaDataBuilder {
 		Map<TypeVariable<?>, CascadingMetaDataBuilder> nestedCascadingTypeParameterMap = Stream
 				.concat( this.containerElementTypesCascadingMetaData.entrySet().stream(),
 						otherCascadingTypeParameter.containerElementTypesCascadingMetaData.entrySet().stream() )
-				.collect(
-						Collectors.toMap( entry -> entry.getKey(), entry -> entry.getValue(), ( value1, value2 ) -> value1.merge( value2 ) ) );
+				.collect( Collectors.toMap( entry -> entry.getKey(), entry -> entry.getValue(), (value1, value2) -> value1.merge( value2 ) ) );
 
 		return new CascadingMetaDataBuilder( this.enclosingType, this.typeParameter, cascading, nestedCascadingTypeParameterMap, groupConversions );
 	}
@@ -368,7 +368,7 @@ public class CascadingMetaDataBuilder {
 
 	private static Map<TypeVariable<?>, CascadingMetaDataBuilder> addCascadingMetaDataBasedOnContainerDetection(Type cascadableType, Map<TypeVariable<?>,
 			CascadingMetaDataBuilder> containerElementTypesCascadingMetaData, Map<Class<?>, Class<?>> groupConversions,
-			 ValueExtractorDescriptor possibleValueExtractor) {
+			ValueExtractorDescriptor possibleValueExtractor) {
 		Class<?> cascadableClass = ReflectionHelper.getClassFromType( cascadableType );
 		if ( cascadableClass.isArray() ) {
 			// for arrays, we need to add an ArrayElement cascading metadata: it's the only way arrays support cascading at the moment.
@@ -376,13 +376,13 @@ public class CascadingMetaDataBuilder {
 		}
 		else {
 			Map<TypeVariable<?>, CascadingMetaDataBuilder> cascadingMetaData = containerElementTypesCascadingMetaData;
-				cascadingMetaData = addCascadingMetaData(
-						cascadableClass,
-						possibleValueExtractor.getContainerType(),
-						possibleValueExtractor.getExtractedTypeParameter(),
-						cascadingMetaData,
-						groupConversions
-				);
+			cascadingMetaData = addCascadingMetaData(
+					cascadableClass,
+					possibleValueExtractor.getContainerType(),
+					possibleValueExtractor.getExtractedTypeParameter(),
+					cascadingMetaData,
+					groupConversions
+			);
 			return cascadingMetaData;
 		}
 	}

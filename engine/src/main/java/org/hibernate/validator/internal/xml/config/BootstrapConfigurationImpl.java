@@ -79,16 +79,16 @@ class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	}
 
 	public BootstrapConfigurationImpl(String defaultProviderClassName,
-									  String constraintValidatorFactoryClassName,
-									  String messageInterpolatorClassName,
-									  String traversableResolverClassName,
-									  String parameterNameProviderClassName,
-									  String clockProviderClassName,
-									  Set<String> valueExtractorClassNames,
-									  EnumSet<ExecutableType> validatedExecutableTypes,
-									  boolean isExecutableValidationEnabled,
-									  Set<String> constraintMappingResourcePaths,
-									  Map<String, String> properties) {
+			String constraintValidatorFactoryClassName,
+			String messageInterpolatorClassName,
+			String traversableResolverClassName,
+			String parameterNameProviderClassName,
+			String clockProviderClassName,
+			Set<String> valueExtractorClassNames,
+			EnumSet<ExecutableType> validatedExecutableTypes,
+			boolean isExecutableValidationEnabled,
+			Set<String> constraintMappingResourcePaths,
+			Map<String, String> properties) {
 		this.defaultProviderClassName = defaultProviderClassName;
 		this.constraintValidatorFactoryClassName = constraintValidatorFactoryClassName;
 		this.messageInterpolatorClassName = messageInterpolatorClassName;

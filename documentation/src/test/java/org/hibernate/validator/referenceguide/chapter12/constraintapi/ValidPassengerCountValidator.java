@@ -22,5 +22,3 @@ public class ValidPassengerCountValidator implements ConstraintValidator<ValidPa
 
 	}
 }
-
-

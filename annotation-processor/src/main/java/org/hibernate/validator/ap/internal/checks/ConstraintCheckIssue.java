@@ -140,9 +140,7 @@ public class ConstraintCheckIssue {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ( ( annotationMirror == null ) ? 0 : annotationMirror.hashCode() );
+		result = prime * result + ( ( annotationMirror == null ) ? 0 : annotationMirror.hashCode() );
 		result = prime * result + ( ( element == null ) ? 0 : element.hashCode() );
 		result = prime * result + ( ( kind == null ) ? 0 : kind.hashCode() );
 		result = prime * result

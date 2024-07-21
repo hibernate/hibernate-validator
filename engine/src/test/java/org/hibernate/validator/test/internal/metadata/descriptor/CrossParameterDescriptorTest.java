@@ -190,7 +190,8 @@ public class CrossParameterDescriptorTest {
 		assertConstraintTypes(
 				descriptor.findConstraints()
 						.unorderedAndMatchingGroups( ValidationGroup.class )
-						.getConstraintDescriptors(), ConsistentDateParameters.class
+						.getConstraintDescriptors(),
+				ConsistentDateParameters.class
 		);
 	}
 

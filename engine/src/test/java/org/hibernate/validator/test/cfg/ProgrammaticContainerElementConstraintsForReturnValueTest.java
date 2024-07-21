@@ -57,13 +57,13 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 	public void canDeclareContainerElementConstraintsForReturnValueProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test1" )
-					.returnValue()
-						.containerElementType( 0 )
-							.constraint( new SizeDef().min( 3 ).max( 10 ) )
-						.containerElementType( 1 )
-							.constraint( new MinDef().value( 1 ) );
+				.returnValue()
+				.containerElementType( 0 )
+				.constraint( new SizeDef().min( 3 ).max( 10 ) )
+				.containerElementType( 1 )
+				.constraint( new MinDef().value( 1 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory()
@@ -91,11 +91,11 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 	public void canDeclareNestedContainerElementConstraintsForReturnValueProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test2" )
-					.returnValue()
-						.containerElementType( 1, 0 )
-							.constraint( new NotNullDef() );
+				.returnValue()
+				.containerElementType( 1, 0 )
+				.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -119,11 +119,11 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 	public void canDeclareDeeplyNestedContainerElementConstraintsForReturnValueProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test3" )
-					.returnValue()
-						.containerElementType( 0, 1, 0 )
-							.constraint( new NotNullDef() );
+				.returnValue()
+				.containerElementType( 0, 1, 0 )
+				.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -147,14 +147,14 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 	public void canDeclareContainerElementCascadesForReturnValueProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test4" )
-					.returnValue()
-						.containerElementType()
-							.valid()
-			.type( Fish.class )
+				.returnValue()
+				.containerElementType()
+				.valid()
+				.type( Fish.class )
 				.field( "name" )
-					.constraint( new NotNullDef() );
+				.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -179,11 +179,11 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 	public void canDeclareContainerElementConstraintsForArrayTypedReturnValueProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test5" )
-					.returnValue()
-						.containerElementType()
-							.constraint( new SizeDef().max( 5 ) );
+				.returnValue()
+				.containerElementType()
+				.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -208,11 +208,11 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 	public void canDeclareContainerElementConstraintsForListContainingArrayTypeReturnValueProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test6" )
-					.returnValue()
-						.containerElementType( 0, 0 )
-							.constraint( new SizeDef().max( 5 ) );
+				.returnValue()
+				.containerElementType( 0, 0 )
+				.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -237,11 +237,11 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 	public void canDeclareContainerElementConstraintsForMultiDimensionalArrayTypeReturnValueProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test7" )
-					.returnValue()
-						.containerElementType( 0, 0 )
-							.constraint( new SizeDef().max( 5 ) );
+				.returnValue()
+				.containerElementType( 0, 0 )
+				.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -265,10 +265,10 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 	public void declaringContainerElementConstraintOnNonGenericReturnValueCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "getSize" )
-					.returnValue()
-						.containerElementType( 1 );
+				.returnValue()
+				.containerElementType( 1 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
@@ -276,10 +276,10 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 	public void declaringContainerElementConstraintForNonExistingTypeArgumentIndexOnReturnValueCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.method( "test1" )
-					.returnValue()
-						.containerElementType( 2 );
+				.returnValue()
+				.containerElementType( 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
@@ -287,10 +287,10 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 	public void declaringContainerElementConstraintForNonExistingNestedTypeArgumentIndexOnReturnValueCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.method( "test2" )
-					.returnValue()
-						.containerElementType( 1, 2 );
+				.returnValue()
+				.containerElementType( 1, 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000213.*")
@@ -298,10 +298,10 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 	public void omittingTypeArgumentForMultiTypeArgumentTypeOnReturnValueCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.method( "test1" )
-					.returnValue()
-						.containerElementType();
+				.returnValue()
+				.containerElementType();
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000214.*")
@@ -309,12 +309,12 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 	public void configuringSameContainerElementTwiceCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.method( "test3" )
-					.returnValue()
-						.containerElementType( 0, 1, 0 )
-							.constraint( new NotNullDef() )
-						.containerElementType( 0, 1, 0 );
+				.returnValue()
+				.containerElementType( 0, 1, 0 )
+				.constraint( new NotNullDef() )
+				.containerElementType( 0, 1, 0 );
 	}
 
 	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
@@ -322,11 +322,11 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 	public void configuringConstraintsOnGenericTypeArgumentOfListThrowsException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test8", List.class )
-					.returnValue()
-						.containerElementType( 0 )
-							.constraint( new SizeDef().max( 5 ) );
+				.returnValue()
+				.containerElementType( 0 )
+				.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -342,29 +342,38 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 	public void configuringConstraintsOnGenericTypeArgumentOfArrayThrowsException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test9", Object[].class )
-					.returnValue()
-						.containerElementType( 0 )
-							.constraint( new SizeDef().max( 5 ) );
+				.returnValue()
+				.containerElementType( 0 )
+				.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-		fishTank.test9( new String[]{ "Too long" } );
+		fishTank.test9( new String[] { "Too long" } );
 	}
 
 	public interface IFishTank {
 		Map<String, Integer> test1();
+
 		Map<String, List<Fish>> test2();
+
 		List<Map<String, Set<String>>> test3();
+
 		Optional<Fish> test4();
+
 		String[] test5();
+
 		List<String[]> test6();
-		String[][]  test7();
+
+		String[][] test7();
+
 		<T> List<T> test8(List<T> list);
+
 		<T> T[] test9(T[] array);
+
 		int getSize();
 	}
 
@@ -412,13 +421,13 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 		@Override
 		public List<String[]> test6() {
 			List<String[]> fishNamesByMonth = new ArrayList<>();
-			fishNamesByMonth.add(  new String[] { "Too Long" } );
+			fishNamesByMonth.add( new String[] { "Too Long" } );
 			return fishNamesByMonth;
 		}
 
 		@Override
 		public String[][] test7() {
-			return new String[][]{ new String[] { "Too Long" } };
+			return new String[][] { new String[] { "Too Long" } };
 		}
 
 		@Override

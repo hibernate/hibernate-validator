@@ -121,7 +121,8 @@ public class ParameterMetaDataTest {
 		).isEqualTo( ValidationGroup.class );
 	}
 
-	@Test @TestForIssue( jiraKey = "HV-887" )
+	@Test
+	@TestForIssue(jiraKey = "HV-887")
 	public void parameterNameInInheritanceHierarchy() throws Exception {
 
 		// The bug is due to a random choice for the parameter name used.

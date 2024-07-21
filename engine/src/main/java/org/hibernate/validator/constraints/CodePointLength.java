@@ -74,27 +74,27 @@ public @interface CodePointLength {
 		/**
 		 * No normalization.
 		 */
-		NONE(null),
+		NONE( null ),
 
 		/**
 		 * Normalization by canonical decomposition.
 		 */
-		NFD(Normalizer.Form.NFD),
+		NFD( Normalizer.Form.NFD ),
 
 		/**
 		 * Normalization by canonical decomposition, followed by canonical composition.
 		 */
-		NFC(Normalizer.Form.NFC),
+		NFC( Normalizer.Form.NFC ),
 
 		/**
 		 * Normalization by compatibility decomposition.
 		 */
-		NFKD(Normalizer.Form.NFKD),
+		NFKD( Normalizer.Form.NFKD ),
 
 		/**
 		 * Normalization by compatibility decomposition, followed by canonical composition.
 		 */
-		NFKC(Normalizer.Form.NFKC);
+		NFKC( Normalizer.Form.NFKC );
 
 		private final Normalizer.Form form;
 

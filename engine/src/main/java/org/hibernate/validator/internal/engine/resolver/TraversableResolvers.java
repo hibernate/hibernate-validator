@@ -96,8 +96,8 @@ public class TraversableResolvers {
 
 		try {
 			@SuppressWarnings("unchecked")
-			Class<? extends TraversableResolver> jpaAwareResolverClass = (Class<? extends TraversableResolver>)
-					LoadClass.action( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, TraversableResolvers.class.getClassLoader() );
+			Class<? extends TraversableResolver> jpaAwareResolverClass =
+					(Class<? extends TraversableResolver>) LoadClass.action( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, TraversableResolvers.class.getClassLoader() );
 			LOG.debugf(
 					"Instantiated Jakarta Persistence aware TraversableResolver of type %s.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);

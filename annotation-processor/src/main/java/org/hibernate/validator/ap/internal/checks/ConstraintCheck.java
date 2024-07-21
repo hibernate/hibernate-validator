@@ -38,8 +38,7 @@ public interface ConstraintCheck {
 	 *         given annotation is allowed at the given element), an empty set
 	 *         must be returned.
 	 */
-	Set<ConstraintCheckIssue> checkField(VariableElement element,
-										 AnnotationMirror annotation);
+	Set<ConstraintCheckIssue> checkField(VariableElement element, AnnotationMirror annotation);
 
 	/**
 	 * Checks, whether the given annotation is allowed at the given method.
@@ -52,8 +51,7 @@ public interface ConstraintCheck {
 	 *         given annotation is allowed at the given element), an empty set
 	 *         must be returned.
 	 */
-	Set<ConstraintCheckIssue> checkMethod(ExecutableElement element,
-										  AnnotationMirror annotation);
+	Set<ConstraintCheckIssue> checkMethod(ExecutableElement element, AnnotationMirror annotation);
 
 	/**
 	 * Checks, whether the given annotation is allowed at the given annotation
@@ -67,8 +65,7 @@ public interface ConstraintCheck {
 	 *         given annotation is allowed at the given element), an empty set
 	 *         must be returned.
 	 */
-	Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element,
-												  AnnotationMirror annotation);
+	Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element, AnnotationMirror annotation);
 
 	/**
 	 * Checks, whether the given annotation is allowed at the given type
@@ -82,7 +79,6 @@ public interface ConstraintCheck {
 	 *         given annotation is allowed at the given element), an empty set
 	 *         must be returned.
 	 */
-	Set<ConstraintCheckIssue> checkNonAnnotationType(TypeElement element,
-													 AnnotationMirror annotation);
+	Set<ConstraintCheckIssue> checkNonAnnotationType(TypeElement element, AnnotationMirror annotation);
 
 }

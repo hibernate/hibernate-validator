@@ -18,9 +18,8 @@ public class VoidMethodsMustNotBeReturnValueConstrained extends MethodConfigurat
 
 	@Override
 	public void apply(ConstrainedExecutable executable, ConstrainedExecutable otherExecutable) {
-		if (  !executable.getCallable().hasReturnValue() &&
-				( !executable.getConstraints().isEmpty()
-						|| executable.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ) ) {
+		if ( !executable.getCallable().hasReturnValue()
+				&& ( !executable.getConstraints().isEmpty() || executable.getCascadingMetaDataBuilder().isMarkedForCascadingOnAnnotatedObjectOrContainerElements() ) ) {
 			throw LOG.getVoidMethodsMustNotBeConstrainedException( executable.getCallable() );
 		}
 	}

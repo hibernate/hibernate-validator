@@ -37,7 +37,8 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 
 	public static HibernateConstraintValidatorInitializationContextImpl of(HibernateConstraintValidatorInitializationContextImpl defaultContext,
 			ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider, Duration temporalValidationTolerance) {
-		if ( scriptEvaluatorFactory == defaultContext.scriptEvaluatorFactory && clockProvider == defaultContext.clockProvider
+		if ( scriptEvaluatorFactory == defaultContext.scriptEvaluatorFactory
+				&& clockProvider == defaultContext.clockProvider
 				&& temporalValidationTolerance.equals( defaultContext.temporalValidationTolerance ) ) {
 			return defaultContext;
 		}

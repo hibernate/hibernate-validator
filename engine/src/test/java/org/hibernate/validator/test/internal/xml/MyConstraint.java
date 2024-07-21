@@ -26,11 +26,11 @@ public @interface MyConstraint {
 
 	String message() default "MyConstraint is not valid";
 
-	Class<?>[] groups() default {};
+	Class<?>[] groups() default { };
 
-	Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default { };
 
-	AdditionalConstraint[] additionalConstraints() default {};
+	AdditionalConstraint[] additionalConstraints() default { };
 
 	public @interface AdditionalConstraint {
 

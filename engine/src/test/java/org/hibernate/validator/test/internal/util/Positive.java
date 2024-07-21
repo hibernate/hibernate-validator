@@ -18,11 +18,12 @@ import jakarta.validation.Constraint;
 /**
  * @author Emmanuel Bernard
  */
-@Constraint( validatedBy = { PositiveConstraintValidator.class })
+@Constraint(validatedBy = { PositiveConstraintValidator.class })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE })
 @Retention(RUNTIME)
 @Documented
 public @interface Positive {
 	String message() default "{validation.positive}";
-	Class<?>[] groups() default {};
+
+	Class<?>[] groups() default { };
 }

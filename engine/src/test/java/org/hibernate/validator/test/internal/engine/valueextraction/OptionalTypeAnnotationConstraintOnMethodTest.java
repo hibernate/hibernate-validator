@@ -271,7 +271,7 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 	@Null
 	@NotBlank
 	@ReportAsSingleViolation
-	@Constraint(validatedBy = {})
+	@Constraint(validatedBy = { })
 	@Target({ TYPE_USE, METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 	@Retention(RUNTIME)
 	@Documented
@@ -279,9 +279,9 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 
 		String message() default "NullOrNotBlank";
 
-		Class<?>[] groups() default {};
+		Class<?>[] groups() default { };
 
-		Class<? extends Payload>[] payload() default {};
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	static class ModelA {
@@ -316,9 +316,7 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 
 	static class ModelF {
 
-		public
-		@NotNull(message = "container")
-		Optional<@NullOrNotBlank(message = "type") String> method() {
+		public @NotNull(message = "container") Optional<@NullOrNotBlank(message = "type") String> method() {
 			return null;
 		}
 	}

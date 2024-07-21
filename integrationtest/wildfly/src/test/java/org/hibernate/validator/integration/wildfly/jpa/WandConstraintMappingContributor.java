@@ -17,8 +17,8 @@ public class WandConstraintMappingContributor implements ConstraintMappingContri
 	@Override
 	public void createConstraintMappings(ConstraintMappingBuilder builder) {
 		builder.addConstraintMapping()
-			.type( Wand.class )
+				.type( Wand.class )
 				.field( "brand" )
-					.constraint( new SizeDef().min( 5 ) );
+				.constraint( new SizeDef().min( 5 ) );
 	}
 }
