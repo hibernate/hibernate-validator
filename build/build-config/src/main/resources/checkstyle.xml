@@ -72,8 +72,6 @@
 
         <!-- Checks for imports -->
         <module name="AvoidStarImport"/>
-        <module name="RedundantImport"/>
-        <module name="UnusedImports"/>
 
         <!-- Checks for common coding problems -->
         <module name="EqualsHashCode" />
@@ -81,7 +79,6 @@
 
         <!-- Miscellaneous other checks. -->
         <module name="ModifierOrder" />
-        <module name="GenericWhitespace" />
         <module name="PackageAnnotation" />
         <module name="CovariantEquals" />
         <module name="ModifiedControlVariable" />
@@ -89,14 +86,12 @@
         <module name="OneStatementPerLine" />
         <module name="EmptyStatement" />
         <module name="DefaultComesLast" />
-        <module name="WhitespaceAround" />
         <module name="TypecastParenPad" />
         <module name="HideUtilityClassConstructor"/>
         <module name="MutableException"/>
         <module name="CovariantEquals" />
         <module name="EqualsAvoidNull" />
         <module name="UpperEll"/>
-        <module name="ArrayTypeStyle"/>
 
         <!-- not checking for Constructor here: -->
         <module name="RedundantModifier">
