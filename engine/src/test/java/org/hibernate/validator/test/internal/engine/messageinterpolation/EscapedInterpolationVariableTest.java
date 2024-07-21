@@ -133,5 +133,3 @@ public class EscapedInterpolationVariableTest {
 		private int a = 2;
 	}
 }
-
-

@@ -45,12 +45,12 @@ public class CustomValidatorFactoryInPersistenceUnitIT extends AbstractArquillia
 		String persistenceXml = Descriptors.create( PersistenceDescriptor.class )
 				.version( "2.0" )
 				.createPersistenceUnit()
-					.name( "default" )
-					.jtaDataSource( "java:jboss/datasources/ExampleDS" )
-					.getOrCreateProperties()
-						.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
-						.createProperty().name( "hibernate.validator.apply_to_ddl" ).value( "false" ).up()
-					.up()
+				.name( "default" )
+				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
+				.getOrCreateProperties()
+				.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
+				.createProperty().name( "hibernate.validator.apply_to_ddl" ).value( "false" ).up()
+				.up()
 				.up()
 				.exportAsString();
 		return new StringAsset( persistenceXml );

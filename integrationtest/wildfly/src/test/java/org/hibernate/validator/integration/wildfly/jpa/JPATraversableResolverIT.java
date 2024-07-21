@@ -41,8 +41,8 @@ public class JPATraversableResolverIT extends AbstractArquillianIT {
 		String persistenceXml = Descriptors.create( PersistenceDescriptor.class )
 				.version( "2.0" )
 				.createPersistenceUnit()
-					.name( "default" )
-					.jtaDataSource( "java:jboss/datasources/ExampleDS" )
+				.name( "default" )
+				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
 				.up()
 				.exportAsString();
 		return new StringAsset( persistenceXml );

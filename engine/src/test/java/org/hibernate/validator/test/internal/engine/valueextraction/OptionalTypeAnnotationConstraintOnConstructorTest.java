@@ -237,7 +237,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 	@Null
 	@NotBlank
 	@ReportAsSingleViolation
-	@Constraint(validatedBy = {})
+	@Constraint(validatedBy = { })
 	@Target({ TYPE_USE, METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 	@Retention(RUNTIME)
 	@Documented
@@ -245,9 +245,9 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 
 		String message() default "NullOrNotBlank";
 
-		Class<?>[] groups() default {};
+		Class<?>[] groups() default { };
 
-		Class<? extends Payload>[] payload() default {};
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	static class ModelA {

@@ -73,9 +73,7 @@ public class CustomerRepository {
 	}
 
 	public void methodWithParameterGroupConversion(
-			@Valid
-			@ConvertGroup(from = Default.class, to = ValidationGroup.class)
-			Set<String> addresses) {
+			@Valid @ConvertGroup(from = Default.class, to = ValidationGroup.class) Set<String> addresses) {
 	}
 
 	@Valid

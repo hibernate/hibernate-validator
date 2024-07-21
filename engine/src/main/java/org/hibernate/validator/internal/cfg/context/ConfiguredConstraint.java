@@ -72,7 +72,8 @@ class ConfiguredConstraint<A extends Annotation> {
 		return new ConfiguredConstraint<>( constraint, ConstraintLocation.forCrossParameter( callable ) );
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A> forTypeArgument(ConstraintDef<?, A> constraint, ConstraintLocation delegate, TypeVariable<?> typeArgument, Type typeOfAnnotatedElement) {
+	public static <A extends Annotation> ConfiguredConstraint<A> forTypeArgument(ConstraintDef<?, A> constraint, ConstraintLocation delegate, TypeVariable<?> typeArgument,
+			Type typeOfAnnotatedElement) {
 		return new ConfiguredConstraint<>(
 				constraint,
 				ConstraintLocation.forTypeArgument( delegate, typeArgument, typeOfAnnotatedElement )

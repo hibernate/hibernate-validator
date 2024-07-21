@@ -11,7 +11,7 @@ import jakarta.validation.GroupSequence;
 /**
  * @author Jan-Willem Willebrands
  */
-@GroupSequence({ValidationGroup1.class, ValidationGroup2.class})
+@GroupSequence({ ValidationGroup1.class, ValidationGroup2.class })
 public interface CompoundGroup {
 
 }

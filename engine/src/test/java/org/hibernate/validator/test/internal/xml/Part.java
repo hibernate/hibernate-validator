@@ -23,5 +23,3 @@ public class Part {
 		this.partId = partId;
 	}
 }
-
-

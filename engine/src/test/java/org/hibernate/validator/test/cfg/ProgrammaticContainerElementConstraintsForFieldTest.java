@@ -56,15 +56,15 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 	public void canDeclareContainerElementConstraintsForFieldProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.field( "model" )
-					.containerElementType()
-						.constraint( new SizeDef().max( 5 ) )
+				.containerElementType()
+				.constraint( new SizeDef().max( 5 ) )
 				.field( "fishCountByType" )
-					.containerElementType( 0 )
-						.constraint( new SizeDef().min( 3 ).max( 10 ) )
-					.containerElementType( 1 )
-						.constraint( new MinDef().value( 1 ) );
+				.containerElementType( 0 )
+				.constraint( new SizeDef().min( 3 ).max( 10 ) )
+				.containerElementType( 1 )
+				.constraint( new MinDef().value( 1 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -85,10 +85,10 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 	public void canDeclareNestedContainerElementConstraintsForFieldProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.field( "fishOfTheMonth" )
-					.containerElementType( 1, 0 )
-						.constraint( new NotNullDef() );
+				.containerElementType( 1, 0 )
+				.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -105,10 +105,10 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 	public void canDeclareDeeplyNestedContainerElementConstraintsForFieldProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.field( "tagsOfFishOfTheMonth" )
-					.containerElementType( 0, 1, 0 )
-						.constraint( new NotNullDef() );
+				.containerElementType( 0, 1, 0 )
+				.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -125,13 +125,13 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 	public void canDeclareContainerElementCascadesForFieldProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.field( "boss" )
-					.containerElementType()
-						.valid()
-			.type( Fish.class )
+				.containerElementType()
+				.valid()
+				.type( Fish.class )
 				.field( "name" )
-					.constraint( new NotNullDef() );
+				.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -150,10 +150,10 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		newMapping
 				.type( FishTank.class )
 				.field( "tagsOfFishOfTheMonth" )
-					.containerElementType( 0, 0 )
-						.constraint( new LengthDef().min( 10 ).max( 20 ) )
-					.containerElementType( 0, 1, 0 )
-						.constraint( new NotNullDef() );
+				.containerElementType( 0, 0 )
+				.constraint( new LengthDef().min( 10 ).max( 20 ) )
+				.containerElementType( 0, 1, 0 )
+				.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -172,10 +172,10 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 	public void canDeclareContainerElementConstraintsForArrayTypedFieldProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.field( "fishNames" )
-					.containerElementType()
-						.constraint( new SizeDef().max( 5 ) );
+				.containerElementType()
+				.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -193,10 +193,10 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 	public void canDeclareContainerElementConstraintsForListContainingArrayTypeFieldProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.field( "fishNamesByMonth" )
-					.containerElementType( 0, 0 )
-						.constraint( new SizeDef().max( 5 ) );
+				.containerElementType( 0, 0 )
+				.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -214,10 +214,10 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 	public void canDeclareContainerElementConstraintsForMultiDimensionalArrayTypeFieldProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.field( "fishNamesByMonthAsArray" )
-					.containerElementType( 0, 0 )
-						.constraint( new SizeDef().max( 5 ) );
+				.containerElementType( 0, 0 )
+				.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -234,9 +234,9 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 	public void declaringContainerElementConstraintOnNonGenericFieldCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.field( "size" )
-					.containerElementType( 1 );
+				.containerElementType( 1 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
@@ -244,9 +244,9 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 	public void declaringContainerElementConstraintForNonExistingTypeArgumentIndexOnFieldCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.field( "model" )
-					.containerElementType( 2 );
+				.containerElementType( 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
@@ -254,9 +254,9 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 	public void declaringContainerElementConstraintForNonExistingNestedTypeArgumentIndexOnFieldCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.field( "fishOfTheMonth" )
-					.containerElementType( 1, 2 );
+				.containerElementType( 1, 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000213.*")
@@ -264,9 +264,9 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 	public void omittingTypeArgumentForMultiTypeArgumentTypeOnFieldCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.field( "fishCountByType" )
-					.containerElementType();
+				.containerElementType();
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000214.*")
@@ -274,11 +274,11 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 	public void configuringSameContainerElementTwiceCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.field( "tagsOfFishOfTheMonth" )
-					.containerElementType( 0, 1, 0 )
-						.constraint( new NotNullDef() )
-					.containerElementType( 0, 1, 0 );
+				.containerElementType( 0, 1, 0 )
+				.constraint( new NotNullDef() )
+				.containerElementType( 0, 1, 0 );
 	}
 
 	public static class FishTank {
@@ -290,7 +290,7 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		public List<Map<String, Set<String>>> tagsOfFishOfTheMonth;
 		public String[] fishNames = new String[] { "Too Long" };
 		public List<String[]> fishNamesByMonth;
-		public String[][] fishNamesByMonthAsArray = new String[][]{ new String[] { "Too Long" } };
+		public String[][] fishNamesByMonthAsArray = new String[][] { new String[] { "Too Long" } };
 		public int size = 0;
 
 		public FishTank() {
@@ -309,7 +309,7 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 			tagsOfFishOfTheMonth.add( januaryTags );
 
 			fishNamesByMonth = new ArrayList<>();
-			fishNamesByMonth.add(  new String[] { "Too Long" } );
+			fishNamesByMonth.add( new String[] { "Too Long" } );
 		}
 	}
 

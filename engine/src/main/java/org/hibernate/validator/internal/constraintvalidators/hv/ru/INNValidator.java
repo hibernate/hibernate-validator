@@ -151,7 +151,7 @@ public class INNValidator implements ConstraintValidator<INN, CharSequence> {
 			for ( int i = 0; i < weights.length; i++ ) {
 				sum += digits[i] * weights[i];
 			}
-			return  ( sum % MOD_11 ) % MOD_10;
+			return ( sum % MOD_11 ) % MOD_10;
 		}
 	}
 }

@@ -175,8 +175,7 @@ public class ValidationBootstrapParameters {
 		if ( messageInterpolatorFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends MessageInterpolator> messageInterpolatorClass = (Class<? extends MessageInterpolator>)
-						LoadClass.action( messageInterpolatorFqcn, externalClassLoader );
+				Class<? extends MessageInterpolator> messageInterpolatorClass = (Class<? extends MessageInterpolator>) LoadClass.action( messageInterpolatorFqcn, externalClassLoader );
 				messageInterpolator = NewInstance.action( messageInterpolatorClass, "message interpolator" );
 				LOG.usingMessageInterpolator( messageInterpolatorClass );
 			}
@@ -190,8 +189,7 @@ public class ValidationBootstrapParameters {
 		if ( traversableResolverFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends TraversableResolver> clazz = (Class<? extends TraversableResolver>)
-						LoadClass.action( traversableResolverFqcn, externalClassLoader );
+				Class<? extends TraversableResolver> clazz = (Class<? extends TraversableResolver>) LoadClass.action( traversableResolverFqcn, externalClassLoader );
 				traversableResolver = NewInstance.action( clazz, "traversable resolver" );
 				LOG.usingTraversableResolver( clazz );
 			}
@@ -205,8 +203,7 @@ public class ValidationBootstrapParameters {
 		if ( constraintValidatorFactoryFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends ConstraintValidatorFactory> clazz = (Class<? extends ConstraintValidatorFactory>)
-						LoadClass.action( constraintValidatorFactoryFqcn, externalClassLoader );
+				Class<? extends ConstraintValidatorFactory> clazz = (Class<? extends ConstraintValidatorFactory>) LoadClass.action( constraintValidatorFactoryFqcn, externalClassLoader );
 				constraintValidatorFactory = NewInstance.action( clazz, "constraint validator factory class" );
 				LOG.usingConstraintValidatorFactory( clazz );
 			}
@@ -220,8 +217,7 @@ public class ValidationBootstrapParameters {
 		if ( parameterNameProviderFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends ParameterNameProvider> clazz = (Class<? extends ParameterNameProvider>)
-						LoadClass.action( parameterNameProviderFqcn, externalClassLoader );
+				Class<? extends ParameterNameProvider> clazz = (Class<? extends ParameterNameProvider>) LoadClass.action( parameterNameProviderFqcn, externalClassLoader );
 				parameterNameProvider = NewInstance.action( clazz, "parameter name provider class" );
 				LOG.usingParameterNameProvider( clazz );
 			}
@@ -235,8 +231,7 @@ public class ValidationBootstrapParameters {
 		if ( clockProviderFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends ClockProvider> clazz = (Class<? extends ClockProvider>)
-						LoadClass.action( clockProviderFqcn, externalClassLoader );
+				Class<? extends ClockProvider> clazz = (Class<? extends ClockProvider>) LoadClass.action( clockProviderFqcn, externalClassLoader );
 				clockProvider = NewInstance.action( clazz, "clock provider class" );
 				LOG.usingClockProvider( clazz );
 			}
@@ -252,8 +247,7 @@ public class ValidationBootstrapParameters {
 			ValueExtractor<?> valueExtractor;
 
 			try {
-				Class<? extends ValueExtractor<?>> clazz = (Class<? extends ValueExtractor<?>>)
-						LoadClass.action( valueExtractorFqcn, externalClassLoader );
+				Class<? extends ValueExtractor<?>> clazz = (Class<? extends ValueExtractor<?>>) LoadClass.action( valueExtractorFqcn, externalClassLoader );
 				valueExtractor = NewInstance.action( clazz, "value extractor class" );
 			}
 			catch (ValidationException e) {

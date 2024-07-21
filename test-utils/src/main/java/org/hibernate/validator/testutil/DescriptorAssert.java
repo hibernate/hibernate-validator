@@ -47,8 +47,8 @@ public class DescriptorAssert {
 			boolean foundMatchingConversion = false;
 
 			for ( GroupConversionDescriptor groupConversionDescriptor : actual ) {
-				if ( groupConversionDescriptor.getFrom().equals( from ) &&
-						groupConversionDescriptor.getTo().equals( to ) ) {
+				if ( groupConversionDescriptor.getFrom().equals( from )
+						&& groupConversionDescriptor.getTo().equals( to ) ) {
 					foundMatchingConversion = true;
 					break;
 				}

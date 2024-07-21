@@ -43,14 +43,8 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 	private final ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel;
 	private final boolean customViolation;
 
-	public MessageInterpolatorContext(ConstraintDescriptor<?> constraintDescriptor,
-					Object validatedValue,
-					Class<?> rootBeanType,
-					Path propertyPath,
-					Map<String, Object> messageParameters,
-					Map<String, Object> expressionVariables,
-					ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel,
-					boolean customViolation) {
+	public MessageInterpolatorContext(ConstraintDescriptor<?> constraintDescriptor, Object validatedValue, Class<?> rootBeanType, Path propertyPath, Map<String, Object> messageParameters,
+			Map<String, Object> expressionVariables, ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel, boolean customViolation) {
 		this.constraintDescriptor = constraintDescriptor;
 		this.validatedValue = validatedValue;
 		this.rootBeanType = rootBeanType;

@@ -142,8 +142,7 @@ public class ContainerElementConstraintsArraySupportTest {
 						.withPropertyPath( pathWith()
 								.property( "strings" )
 								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
-						)
-				,
+						),
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.property( "strings" )
@@ -174,8 +173,7 @@ public class ContainerElementConstraintsArraySupportTest {
 								.method( "returnStrings" )
 								.returnValue()
 								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
-						)
-				,
+						),
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.method( "returnStrings" )
@@ -227,8 +225,7 @@ public class ContainerElementConstraintsArraySupportTest {
 								.method( "setValues" )
 								.parameter( "arrayParameter", 0 )
 								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
-						)
-				,
+						),
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.method( "setValues" )
@@ -262,8 +259,7 @@ public class ContainerElementConstraintsArraySupportTest {
 								.constructor( TypeWithArray8.class )
 								.parameter( "arrayParameter", 0 )
 								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
-						)
-				,
+						),
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.constructor( TypeWithArray8.class )

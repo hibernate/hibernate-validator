@@ -22,5 +22,3 @@ public class Book {
 	@ManyToOne
 	public Author author;
 }
-
-

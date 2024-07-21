@@ -395,7 +395,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			this.hashCode = buildHashCode( parameterNameProvider, valueExtractorManager, methodValidationConfiguration );
 		}
 
-		private static int buildHashCode(ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager, MethodValidationConfiguration methodValidationConfiguration) {
+		private static int buildHashCode(ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager,
+				MethodValidationConfiguration methodValidationConfiguration) {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + ( ( methodValidationConfiguration == null ) ? 0 : methodValidationConfiguration.hashCode() );
@@ -422,9 +423,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			}
 			BeanMetaDataManagerKey other = (BeanMetaDataManagerKey) obj;
 
-			return methodValidationConfiguration.equals( other.methodValidationConfiguration ) &&
-					parameterNameProvider.equals( other.parameterNameProvider ) &&
-					valueExtractorManager.equals( other.valueExtractorManager );
+			return methodValidationConfiguration.equals( other.methodValidationConfiguration )
+					&& parameterNameProvider.equals( other.parameterNameProvider )
+					&& valueExtractorManager.equals( other.valueExtractorManager );
 		}
 
 		@Override

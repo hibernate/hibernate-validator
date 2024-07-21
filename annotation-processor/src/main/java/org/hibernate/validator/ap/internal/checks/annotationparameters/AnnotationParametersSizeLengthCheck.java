@@ -30,10 +30,8 @@ public class AnnotationParametersSizeLengthCheck extends AnnotationParametersAbs
 
 	@Override
 	protected Set<ConstraintCheckIssue> doCheck(Element element, AnnotationMirror annotation) {
-		Integer min = annotationApiHelper.getAnnotationValue( annotation, "min" ) != null ?
-				(Integer) annotationApiHelper.getAnnotationValue( annotation, "min" ).getValue() : 0;
-		Integer max = annotationApiHelper.getAnnotationValue( annotation, "max" ) != null ?
-				(Integer) annotationApiHelper.getAnnotationValue( annotation, "max" ).getValue() : Integer.MAX_VALUE;
+		Integer min = annotationApiHelper.getAnnotationValue( annotation, "min" ) != null ? (Integer) annotationApiHelper.getAnnotationValue( annotation, "min" ).getValue() : 0;
+		Integer max = annotationApiHelper.getAnnotationValue( annotation, "max" ) != null ? (Integer) annotationApiHelper.getAnnotationValue( annotation, "max" ).getValue() : Integer.MAX_VALUE;
 
 		if ( ( min < 0 ) || ( max < 0 ) || ( min > max ) ) {
 			return CollectionHelper.asSet(

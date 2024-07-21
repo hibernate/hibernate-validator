@@ -27,9 +27,9 @@ public @interface WrongValidationAppliesToConstraintWithInvalidDefault {
 
 	String message() default "{WrongValidationAppliesToConstraintWithInvalidDefault.message}";
 
-	Class<?>[] groups() default {};
+	Class<?>[] groups() default { };
 
-	Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default { };
 
 	// Default value must be IMPLICIT
 	ConstraintTarget validationAppliesTo() default ConstraintTarget.PARAMETERS;

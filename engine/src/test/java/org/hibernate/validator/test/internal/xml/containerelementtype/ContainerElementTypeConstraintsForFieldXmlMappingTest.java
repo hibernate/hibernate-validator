@@ -119,7 +119,7 @@ public class ContainerElementTypeConstraintsForFieldXmlMappingTest {
 		public List<Map<String, Set<String>>> tagsOfFishOfTheMonth;
 		public String[] fishNames = new String[] { "Too Long" };
 		public List<String[]> fishNamesByMonth;
-		public String[][] fishNamesByMonthAsArray = new String[][]{ new String[] { "Too Long" } };
+		public String[][] fishNamesByMonthAsArray = new String[][] { new String[] { "Too Long" } };
 		public int size = 0;
 
 		public FishTank() {
@@ -138,7 +138,7 @@ public class ContainerElementTypeConstraintsForFieldXmlMappingTest {
 			tagsOfFishOfTheMonth.add( januaryTags );
 
 			fishNamesByMonth = new ArrayList<>();
-			fishNamesByMonth.add(  new String[] { "Too Long" } );
+			fishNamesByMonth.add( new String[] { "Too Long" } );
 		}
 	}
 

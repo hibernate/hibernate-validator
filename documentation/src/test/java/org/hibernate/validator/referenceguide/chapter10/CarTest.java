@@ -329,11 +329,7 @@ public class CarTest {
 				constraintDescriptor.getValidationAppliesTo()
 		);
 		assertEquals( Default.class, constraintDescriptor.getGroups().iterator().next() );
-		assertEquals(
-				"There must not be more than {piecesOfLuggagePerPassenger} pieces of luggage per " +
-				"passenger.",
-				constraintDescriptor.getMessageTemplate()
-		);
+		assertEquals( "There must not be more than {piecesOfLuggagePerPassenger} pieces of luggage per passenger.", constraintDescriptor.getMessageTemplate() );
 
 		//custom constraint attribute
 		assertEquals(

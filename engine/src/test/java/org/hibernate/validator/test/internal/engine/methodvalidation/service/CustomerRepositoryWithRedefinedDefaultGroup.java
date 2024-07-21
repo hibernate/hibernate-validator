@@ -25,20 +25,24 @@ public interface CustomerRepositoryWithRedefinedDefaultGroup {
 	void constraintInDefaultGroup(@NotNull(groups = ValidationGroup1.class) String name);
 
 	void constraintInLaterPartOfDefaultSequence(@List({
-			@Min(groups = ValidationGroup1.class, value = 5), @Min(groups = ValidationGroup2.class, value = 10)
+			@Min(groups = ValidationGroup1.class, value = 5),
+			@Min(groups = ValidationGroup2.class, value = 10)
 	}) int param);
 
 	void constraintInLaterPartOfDefaultSequenceAtDifferentParameters(@List({
-			@Min(groups = ValidationGroup1.class, value = 5), @Min(groups = ValidationGroup2.class, value = 10)
+			@Min(groups = ValidationGroup1.class, value = 5),
+			@Min(groups = ValidationGroup2.class, value = 10)
 	}) int param1, @Min(groups = ValidationGroup1.class, value = 7) int param2);
 
 
 	void constraintInLaterPartOfGroupSequence(@List({
-			@Min(groups = ValidationGroup2.class, value = 5), @Min(groups = ValidationGroup3.class, value = 10)
+			@Min(groups = ValidationGroup2.class, value = 5),
+			@Min(groups = ValidationGroup3.class, value = 10)
 	}) int param);
 
 	void constraintInLaterPartOfGroupSequenceAtDifferentParameters(@List({
-			@Min(groups = ValidationGroup2.class, value = 5), @Min(groups = ValidationGroup3.class, value = 10)
+			@Min(groups = ValidationGroup2.class, value = 5),
+			@Min(groups = ValidationGroup3.class, value = 10)
 	}) int param1, @Min(groups = ValidationGroup2.class, value = 7) int param2);
 
 	// methods used for return value validation tests
@@ -50,12 +54,14 @@ public interface CustomerRepositoryWithRedefinedDefaultGroup {
 	String constraintInDefaultGroupAtReturnValue();
 
 	@List({
-			@Min(groups = ValidationGroup1.class, value = 5), @Min(groups = ValidationGroup2.class, value = 10)
+			@Min(groups = ValidationGroup1.class, value = 5),
+			@Min(groups = ValidationGroup2.class, value = 10)
 	})
 	int constraintsInAllPartOfDefaultSequence();
 
 	@List({
-			@Min(groups = ValidationGroup2.class, value = 5), @Min(groups = ValidationGroup3.class, value = 10)
+			@Min(groups = ValidationGroup2.class, value = 5),
+			@Min(groups = ValidationGroup3.class, value = 10)
 	})
 	int constraintsInAllPartsOfGroupSequence();
 

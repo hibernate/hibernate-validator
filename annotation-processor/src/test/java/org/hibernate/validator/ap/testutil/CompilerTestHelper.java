@@ -110,9 +110,7 @@ public class CompilerTestHelper {
 	/**
 	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, EnumSet, File...)
 	 */
-	public boolean compile(Processor annotationProcessor,
-						   DiagnosticCollector<JavaFileObject> diagnostics,
-						   File... sourceFiles) {
+	public boolean compile(Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, File... sourceFiles) {
 		return compile(
 				annotationProcessor,
 				diagnostics,
@@ -127,11 +125,7 @@ public class CompilerTestHelper {
 	/**
 	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, EnumSet, File...)
 	 */
-	public boolean compile(Processor annotationProcessor,
-						   DiagnosticCollector<JavaFileObject> diagnostics,
-						   boolean verbose,
-						   boolean allowMethodConstraints,
-						   File... sourceFiles) {
+	public boolean compile(Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, boolean verbose, boolean allowMethodConstraints, File... sourceFiles) {
 		return compile(
 				annotationProcessor,
 				diagnostics,
@@ -146,10 +140,7 @@ public class CompilerTestHelper {
 	/**
 	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, EnumSet, File...)
 	 */
-	public boolean compile(Processor annotationProcessor,
-						   DiagnosticCollector<JavaFileObject> diagnostics,
-						   EnumSet<Library> dependencies,
-						   File... sourceFiles) {
+	public boolean compile(Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, EnumSet<Library> dependencies, File... sourceFiles) {
 		return compile( annotationProcessor, diagnostics, null, null, null, dependencies, sourceFiles );
 	}
 
@@ -170,13 +161,8 @@ public class CompilerTestHelper {
 	 *         in especially, that the given annotation processor didn't raise
 	 *         any errors), false otherwise.
 	 */
-	public boolean compile(Processor annotationProcessor,
-						   DiagnosticCollector<JavaFileObject> diagnostics,
-						   Kind diagnosticKind,
-						   Boolean verbose,
-						   Boolean allowMethodConstraints,
-						   EnumSet<Library> dependencies,
-						   File... sourceFiles) {
+	public boolean compile(Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, Kind diagnosticKind, Boolean verbose, Boolean allowMethodConstraints,
+			EnumSet<Library> dependencies, File... sourceFiles) {
 		StandardJavaFileManager fileManager = compiler.getStandardFileManager( null, null, null );
 		Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjects( sourceFiles );
 		List<String> options = new ArrayList<String>();

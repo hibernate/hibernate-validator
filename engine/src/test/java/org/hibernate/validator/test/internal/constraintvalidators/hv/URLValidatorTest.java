@@ -375,8 +375,8 @@ public class URLValidatorTest {
 			assertFalse( validator.isValid( "http://-error-.invalid/", null ) );
 			assertFalse( validator.isValid( "http://-a.b.co", null ) );
 			assertFalse( validator.isValid( "http://a.b-.co", null ) );
-//			assertFalse( validator.isValid( "http://123.123.123", null ) );
-//			assertFalse( validator.isValid( "http://3628126748", null ) );
+			//			assertFalse( validator.isValid( "http://123.123.123", null ) );
+			//			assertFalse( validator.isValid( "http://3628126748", null ) );
 			assertFalse( validator.isValid( "http://.www.foo.bar/", null ) );
 			assertFalse( validator.isValid( "http://www.foo.bar./", null ) );
 			assertFalse( validator.isValid( "http://.www.foo.bar./", null ) );

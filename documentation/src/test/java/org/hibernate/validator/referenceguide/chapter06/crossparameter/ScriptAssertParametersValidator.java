@@ -6,7 +6,8 @@ import jakarta.validation.constraintvalidation.SupportedValidationTarget;
 import jakarta.validation.constraintvalidation.ValidationTarget;
 
 @SupportedValidationTarget(ValidationTarget.PARAMETERS)
-public class ScriptAssertParametersValidator implements
+public class ScriptAssertParametersValidator
+		implements
 		ConstraintValidator<ScriptAssert, Object[]> {
 
 	@Override

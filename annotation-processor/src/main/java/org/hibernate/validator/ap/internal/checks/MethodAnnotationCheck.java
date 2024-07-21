@@ -32,8 +32,7 @@ public class MethodAnnotationCheck extends AbstractConstraintCheck {
 	}
 
 	@Override
-	public Set<ConstraintCheckIssue> checkMethod(ExecutableElement element,
-												 AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkMethod(ExecutableElement element, AnnotationMirror annotation) {
 
 		// Annotations on methods/constructors can refer to return type or parameters (not both)
 		AnnotationProcessorValidationTarget target;

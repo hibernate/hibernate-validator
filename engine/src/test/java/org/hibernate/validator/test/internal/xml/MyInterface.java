@@ -12,5 +12,3 @@ package org.hibernate.validator.test.internal.xml;
 public interface MyInterface {
 	Integer getId();
 }
-
-

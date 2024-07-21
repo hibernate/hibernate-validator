@@ -165,8 +165,8 @@ public class ValidationOrderGenerator {
 
 	private void addGroups(List<Group> resolvedGroupSequence, List<Group> groups) {
 		for ( Group tmpGroup : groups ) {
-			if ( resolvedGroupSequence.contains( tmpGroup ) && resolvedGroupSequence.indexOf( tmpGroup ) < resolvedGroupSequence
-					.size() - 1 ) {
+			if ( resolvedGroupSequence.contains( tmpGroup )
+					&& resolvedGroupSequence.indexOf( tmpGroup ) < resolvedGroupSequence.size() - 1 ) {
 				throw LOG.getUnableToExpandGroupSequenceException();
 			}
 			resolvedGroupSequence.add( tmpGroup );

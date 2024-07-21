@@ -728,7 +728,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 					validationAppliesTo = ConstraintTarget.PARAMETERS;
 				}
 				else {
-					 validationAppliesTo = ConstraintTarget.IMPLICIT;
+					validationAppliesTo = ConstraintTarget.IMPLICIT;
 				}
 			}
 

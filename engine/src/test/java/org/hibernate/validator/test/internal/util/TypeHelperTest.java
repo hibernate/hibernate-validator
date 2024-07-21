@@ -993,7 +993,7 @@ public class TypeHelperTest {
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			if ( "getBounds".equals( method.getName() ) ) {
-			 	return getBounds();
+				return getBounds();
 			}
 			else if ( "getGenericDeclaration".equals( method.getName() ) ) {
 				return getGenericDeclaration();

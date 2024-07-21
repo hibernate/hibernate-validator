@@ -65,7 +65,7 @@ public class ContainerElementTypeConstraintsForParameterXmlMappingTest {
 
 		try {
 			List<String[]> fishNamesByMonth = new ArrayList<>();
-			fishNamesByMonth.add(  new String[] { "Too Long" } );
+			fishNamesByMonth.add( new String[] { "Too Long" } );
 
 			fishTank.test6( fishNamesByMonth );
 
@@ -87,7 +87,7 @@ public class ContainerElementTypeConstraintsForParameterXmlMappingTest {
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
 
 		try {
-			String[][] fishNamesByMonthAsArray = new String[][]{ new String[] { "Too Long" } };
+			String[][] fishNamesByMonthAsArray = new String[][] { new String[] { "Too Long" } };
 
 			fishTank.test7( fishNamesByMonthAsArray );
 
@@ -141,7 +141,7 @@ public class ContainerElementTypeConstraintsForParameterXmlMappingTest {
 		Validator validator = getValidator( "parameter-configuringConstraintsOnGenericTypeArgumentOfArrayThrowsException-mapping.xml" );
 
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-		fishTank.test9( new String[]{ "Too long" } );
+		fishTank.test9( new String[] { "Too long" } );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000217.*")
@@ -158,14 +158,23 @@ public class ContainerElementTypeConstraintsForParameterXmlMappingTest {
 
 	public interface IFishTank {
 		void test1(Optional<String> model, Map<String, Integer> fishCountByType);
+
 		void test2(Map<String, List<Fish>> fishOfTheMonth);
+
 		void test3(List<Map<String, Set<String>>> tagsOfFishOfTheMonth);
+
 		void test4(Optional<Fish> boss);
+
 		void test5(String[] fishNames);
+
 		void test6(List<String[]> fishNamesByMonth);
+
 		void test7(String[][] fishNamesByMonthAsArray);
+
 		void setSize(int size);
+
 		<T> void test8(List<T> fishNames);
+
 		<T> void test9(T[] fishNames);
 	}
 

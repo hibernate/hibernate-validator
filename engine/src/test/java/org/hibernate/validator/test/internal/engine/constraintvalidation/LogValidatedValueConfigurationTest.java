@@ -157,9 +157,9 @@ public class LogValidatedValueConfigurationTest {
 	public @interface ComposingConstraint {
 		String message() default "";
 
-		Class<?>[] groups() default {};
+		Class<?>[] groups() default { };
 
-		Class<? extends Payload>[] payload() default {};
+		Class<? extends Payload>[] payload() default { };
 
 		class Validator implements ConstraintValidator<ComposingConstraint, Object> {
 

@@ -210,9 +210,9 @@ public class ConstraintValidatorContextImplTest {
 				.addPropertyNode( "foo" )
 				.addPropertyNode( "bar" ).inContainer( Map.class, 0 ).inIterable().atKey( "test" )
 				.addContainerElementNode( "<map value>", Map.class, 1 )
-						.inIterable().atKey( "key" )
+				.inIterable().atKey( "key" )
 				.addContainerElementNode( "<list element>", List.class, 0 )
-						.inIterable().atIndex( 3 )
+				.inIterable().atIndex( 3 )
 				.addConstraintViolation();
 
 		List<ConstraintViolationCreationContext> constraintViolationCreationContextList = context.getConstraintViolationCreationContexts();

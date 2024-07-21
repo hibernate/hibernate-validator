@@ -38,10 +38,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 
 	private final CascadingMetaData cascadingMetaData;
 
-	public ReturnValueMetaData(Type type,
-							   Set<MetaConstraint<?>> constraints,
-							   Set<MetaConstraint<?>> containerElementsConstraints,
-							   CascadingMetaData cascadingMetaData) {
+	public ReturnValueMetaData(Type type, Set<MetaConstraint<?>> constraints, Set<MetaConstraint<?>> containerElementsConstraints, CascadingMetaData cascadingMetaData) {
 		super(
 				RETURN_VALUE_NODE_NAME,
 				type,

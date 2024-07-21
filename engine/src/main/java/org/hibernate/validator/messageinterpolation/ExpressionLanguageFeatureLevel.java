@@ -28,26 +28,26 @@ public enum ExpressionLanguageFeatureLevel {
 	 * enabled for a given custom violation via the API, the default becomes
 	 * {@link ExpressionLanguageFeatureLevel#VARIABLES} in the context of this given custom violation.
 	 */
-	DEFAULT("default"),
+	DEFAULT( "default" ),
 
 	/**
 	 * Expression Language expressions are not interpolated.
 	 */
-	NONE("none"),
+	NONE( "none" ),
 
 	/**
 	 * Only allows access to the variables injected via
 	 * {@link HibernateConstraintValidatorContext#addExpressionVariable(String, Object)}, the Jakarta Bean
 	 * Validation-defined {@code formatter} and the {@code ResourceBundle}s.
 	 */
-	VARIABLES("variables"),
+	VARIABLES( "variables" ),
 
 	/**
 	 * Only allows to what is allowed with the {@code variables} level plus access to bean properties.
 	 * <p>
 	 * This is the minimal level to have a specification-compliant implementation.
 	 */
-	BEAN_PROPERTIES("bean-properties"),
+	BEAN_PROPERTIES( "bean-properties" ),
 
 	/**
 	 * This level allows what is allowed with the {@code bean-properties} level plus bean methods execution and can lead
@@ -56,7 +56,7 @@ public enum ExpressionLanguageFeatureLevel {
 	 * If using this level, you need to be sure you are not injecting user input in an expression without properly
 	 * escaping it using {@link HibernateConstraintValidatorContext#addExpressionVariable(String, Object)}.
 	 */
-	BEAN_METHODS("bean-methods");
+	BEAN_METHODS( "bean-methods" );
 
 	private final String externalRepresentation;
 

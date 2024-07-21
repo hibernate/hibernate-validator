@@ -528,12 +528,14 @@ public class ValidatorTest {
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 	@Retention(RUNTIME)
 	@Repeatable(ClassLevelConstraint.List.class)
-	@Constraint( validatedBy = ClassLevelConstraint.Validator.class )
+	@Constraint(validatedBy = ClassLevelConstraint.Validator.class)
 	public @interface ClassLevelConstraint {
 
 		String message() default "Invalid order shipment date must be after order date";
-		Class<?>[] groups() default {};
-		Class<? extends Payload>[] payload() default {};
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
 
 		@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 		@Retention(RUNTIME)

@@ -34,5 +34,3 @@ public class FormatterWrapper {
 		return sb.toString();
 	}
 }
-
-

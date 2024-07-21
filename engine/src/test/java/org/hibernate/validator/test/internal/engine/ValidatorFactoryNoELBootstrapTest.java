@@ -76,10 +76,10 @@ public class ValidatorFactoryNoELBootstrapTest {
 
 		public void run() {
 			Validator validator = Validation.byDefaultProvider()
-				.configure()
-				.messageInterpolator( new ParameterMessageInterpolator() )
-				.buildValidatorFactory()
-				.getValidator();
+					.configure()
+					.messageInterpolator( new ParameterMessageInterpolator() )
+					.buildValidatorFactory()
+					.getValidator();
 
 			assertNotNull( validator );
 
@@ -136,7 +136,7 @@ public class ValidatorFactoryNoELBootstrapTest {
 
 		private final String packageMissing;
 
-		public ELIgnoringClassLoader( String packageMissing ) {
+		public ELIgnoringClassLoader(String packageMissing) {
 			super( ELIgnoringClassLoader.class.getClassLoader() );
 			this.packageMissing = packageMissing;
 		}

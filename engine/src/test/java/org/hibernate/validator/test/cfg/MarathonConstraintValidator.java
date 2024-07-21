@@ -26,5 +26,3 @@ public class MarathonConstraintValidator implements ConstraintValidator<Marathon
 		return m.getRunners().size() >= minRunners;
 	}
 }
-
-

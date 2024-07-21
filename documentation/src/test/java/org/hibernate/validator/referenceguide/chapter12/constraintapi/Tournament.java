@@ -5,5 +5,3 @@ import java.util.Date;
 public interface Tournament {
 	Date getTournamentDate();
 }
-
-

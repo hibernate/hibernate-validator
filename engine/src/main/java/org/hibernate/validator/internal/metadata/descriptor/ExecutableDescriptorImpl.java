@@ -93,8 +93,9 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 
 	@Override
 	public boolean hasConstrainedReturnValue() {
-		return returnValueDescriptor != null && ( returnValueDescriptor.hasConstraints()
-				|| returnValueDescriptor.isCascaded() );
+		return returnValueDescriptor != null
+				&& ( returnValueDescriptor.hasConstraints()
+						|| returnValueDescriptor.isCascaded() );
 	}
 
 	@Override

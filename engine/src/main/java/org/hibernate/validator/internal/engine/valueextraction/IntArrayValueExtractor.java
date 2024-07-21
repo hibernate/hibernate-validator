@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 import jakarta.validation.valueextraction.ExtractedValue;
 import jakarta.validation.valueextraction.ValueExtractor;
 
-class IntArrayValueExtractor implements ValueExtractor<int @ExtractedValue[]> {
+class IntArrayValueExtractor implements ValueExtractor<int @ExtractedValue []> {
 
 	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new IntArrayValueExtractor(), int[].class,
 			new ArrayElement( int[].class ), false, Optional.empty() );

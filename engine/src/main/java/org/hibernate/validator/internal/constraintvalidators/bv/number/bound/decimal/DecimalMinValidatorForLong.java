@@ -14,7 +14,8 @@ package org.hibernate.validator.internal.constraintvalidators.bv.number.bound.de
  */
 public class DecimalMinValidatorForLong extends AbstractDecimalMinValidator<Long> {
 
-	@Override protected int compare(Long number) {
+	@Override
+	protected int compare(Long number) {
 		return DecimalNumberComparatorHelper.compare( number, minValue );
 	}
 }

@@ -74,9 +74,7 @@ public class TypeCheck extends AbstractConstraintCheck {
 	}
 
 	private Set<ConstraintCheckIssue> checkInternal(Element element, AnnotationMirror annotation, TypeMirror type, String messageKey) {
-		Optional<TypeMirror> typeToCheck = usesUnwrapping( annotation, type ) ?
-				getUnwrappedType( type ) :
-				Optional.of( type );
+		Optional<TypeMirror> typeToCheck = usesUnwrapping( annotation, type ) ? getUnwrappedType( type ) : Optional.of( type );
 		if ( typeToCheck.isPresent() ) {
 			if ( !isAnnotationAllowedForType( annotation, typeToCheck.get() ) ) {
 				return CollectionHelper.asSet(

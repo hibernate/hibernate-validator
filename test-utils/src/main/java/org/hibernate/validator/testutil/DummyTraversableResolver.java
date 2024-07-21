@@ -26,5 +26,3 @@ public class DummyTraversableResolver implements TraversableResolver {
 		return true;
 	}
 }
-
-

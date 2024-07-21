@@ -24,7 +24,7 @@ import org.testng.annotations.Test;
 /**
  * @author Marko Bekhta
  */
-@TestForIssue( jiraKey = "HV-1715")
+@TestForIssue(jiraKey = "HV-1715")
 public class SequenceTest {
 
 	@Test

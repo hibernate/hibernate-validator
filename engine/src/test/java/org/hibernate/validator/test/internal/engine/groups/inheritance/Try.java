@@ -35,5 +35,3 @@ public class Try {
 	public interface GlobalCheck {
 	}
 }
-
-

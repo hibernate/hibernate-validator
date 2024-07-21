@@ -56,7 +56,7 @@ public class ScriptEngineScriptEvaluator implements ScriptEvaluator {
 			return doEvaluate( script, bindings );
 		}
 		else {
-			synchronized ( engine ) {
+			synchronized (engine) {
 				return doEvaluate( script, bindings );
 			}
 		}

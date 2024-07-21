@@ -474,14 +474,20 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 						for ( Group defaultSequenceMember : groupOfGroups ) {
 							if ( validationContext.isFailFastOnPropertyViolationModeEnabled() ) {
-								boolean propertyValidationResult = propertyMetaConstraints.isEmpty() || validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, propertyMetaConstraints, defaultSequenceMember );
+								boolean propertyValidationResult = propertyMetaConstraints.isEmpty()
+										|| validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, propertyMetaConstraints,
+												defaultSequenceMember );
 								validationSuccessful = propertyValidationResult && validationSuccessful;
 								if ( propertyValidationResult ) {
-									validationSuccessful = ( classMetaConstraints.isEmpty() || validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, classMetaConstraints, defaultSequenceMember ) ) && validationSuccessful;
+									validationSuccessful = ( classMetaConstraints.isEmpty()
+											|| validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, classMetaConstraints,
+													defaultSequenceMember ) )
+											&& validationSuccessful;
 								}
 							}
 							else {
-								validationSuccessful = validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, hostingBeanMetaData.getAllMetaConstraints(), defaultSequenceMember ) && validationSuccessful;
+								validationSuccessful = validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz,
+										hostingBeanMetaData.getAllMetaConstraints(), defaultSequenceMember ) && validationSuccessful;
 							}
 						}
 
@@ -496,14 +502,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			// fast path in case the default group sequence hasn't been redefined
 			else {
 				if ( validationContext.isFailFastOnPropertyViolationModeEnabled() ) {
-					boolean propertyValidationResult = validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, hostingBeanMetaData.getDirectPropertyMetaConstraints(), Group.DEFAULT_GROUP );
+					boolean propertyValidationResult = validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz,
+							hostingBeanMetaData.getDirectPropertyMetaConstraints(), Group.DEFAULT_GROUP );
 					if ( !validationContext.isFailFastOnPropertyViolationModeEnabled() || propertyValidationResult ) {
-						validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, hostingBeanMetaData.getDirectClassMetaConstraints(), Group.DEFAULT_GROUP );
+						validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, hostingBeanMetaData.getDirectClassMetaConstraints(),
+								Group.DEFAULT_GROUP );
 					}
 
 				}
 				else {
-					validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, hostingBeanMetaData.getAllDirectMetaConstraints(), Group.DEFAULT_GROUP );
+					validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, hostingBeanMetaData.getAllDirectMetaConstraints(),
+							Group.DEFAULT_GROUP );
 				}
 				validationContext.markCurrentBeanAsProcessed( valueContext );
 			}
@@ -515,8 +524,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private <U> boolean validateConstraintsForSingleDefaultGroupElement(BaseBeanValidationContext<?> validationContext, ValueContext<U, Object> valueContext, final Map<Class<?>, Class<?>> validatedInterfaces,
-			Class<? super U> clazz, Set<MetaConstraint<?>> metaConstraints, Group defaultSequenceMember) {
+	private <U> boolean validateConstraintsForSingleDefaultGroupElement(BaseBeanValidationContext<?> validationContext, ValueContext<U, Object> valueContext,
+			final Map<Class<?>, Class<?>> validatedInterfaces, Class<? super U> clazz, Set<MetaConstraint<?>> metaConstraints, Group defaultSequenceMember) {
 		boolean validationSuccessful = true;
 
 		valueContext.setCurrentGroup( defaultSequenceMember.getDefiningClass() );
@@ -641,8 +650,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Class<?> originalGroup = valueContext.getCurrentGroup();
 		Class<?> currentGroup = cascadingMetaData.convertGroup( originalGroup );
 
-		if ( validationContext.isBeanAlreadyValidated( value, currentGroup, valueContext.getPropertyPath() ) ||
-				shouldFailFast( validationContext ) ) {
+		if ( validationContext.isBeanAlreadyValidated( value, currentGroup, valueContext.getPropertyPath() )
+				|| shouldFailFast( validationContext ) ) {
 			return;
 		}
 
@@ -720,9 +729,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			Class<?> originalGroup = valueContext.getCurrentGroup();
 			Class<?> currentGroup = cascadingMetaData.convertGroup( originalGroup );
 
-			if ( value == null ||
-					validationContext.isBeanAlreadyValidated( value, currentGroup, valueContext.getPropertyPath() ) ||
-					shouldFailFast( validationContext ) ) {
+			if ( value == null
+					|| validationContext.isBeanAlreadyValidated( value, currentGroup, valueContext.getPropertyPath() )
+					|| shouldFailFast( validationContext ) ) {
 				return;
 			}
 
@@ -973,7 +982,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private <T> void validateParametersForSingleGroup(ExecutableValidationContext<T> validationContext, Object[] parameterValues, ExecutableMetaData executableMetaData, Class<?> currentValidatedGroup) {
+	private <T> void validateParametersForSingleGroup(ExecutableValidationContext<T> validationContext, Object[] parameterValues, ExecutableMetaData executableMetaData,
+			Class<?> currentValidatedGroup) {
 		if ( !executableMetaData.getCrossParameterConstraints().isEmpty() ) {
 			ValueContext<T, Object> valueContext = getExecutableValueContext(
 					validationContext.getRootBean(), executableMetaData, executableMetaData.getValidatableParametersMetaData(), currentValidatedGroup

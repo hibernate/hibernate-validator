@@ -28,7 +28,7 @@ public class TypeVariableBindingsTest {
 
 		Map<TypeVariable<?>, TypeVariable<?>> listBindings = bindings.get( List.class );
 		assertThat( listBindings ).containsOnly(
-			entry( List.class.getTypeParameters()[0], List.class.getTypeParameters()[0] )
+				entry( List.class.getTypeParameters()[0], List.class.getTypeParameters()[0] )
 		);
 	}
 
@@ -38,14 +38,14 @@ public class TypeVariableBindingsTest {
 
 		Map<TypeVariable<?>, TypeVariable<?>> hashMapBindings = bindings.get( HashMap.class );
 		assertThat( hashMapBindings ).containsOnly(
-			entry( HashMap.class.getTypeParameters()[0], HashMap.class.getTypeParameters()[0] ),
-			entry( HashMap.class.getTypeParameters()[1], HashMap.class.getTypeParameters()[1] )
+				entry( HashMap.class.getTypeParameters()[0], HashMap.class.getTypeParameters()[0] ),
+				entry( HashMap.class.getTypeParameters()[1], HashMap.class.getTypeParameters()[1] )
 		);
 
 		Map<TypeVariable<?>, TypeVariable<?>> mapBindings = bindings.get( Map.class );
 		assertThat( mapBindings ).containsOnly(
-			entry( HashMap.class.getTypeParameters()[0], Map.class.getTypeParameters()[0] ),
-			entry( HashMap.class.getTypeParameters()[1], Map.class.getTypeParameters()[1] )
+				entry( HashMap.class.getTypeParameters()[0], Map.class.getTypeParameters()[0] ),
+				entry( HashMap.class.getTypeParameters()[1], Map.class.getTypeParameters()[1] )
 		);
 	}
 
@@ -55,9 +55,9 @@ public class TypeVariableBindingsTest {
 
 		Map<TypeVariable<?>, TypeVariable<?>> weirdMapBindings = bindings.get( WeirdMap.class );
 		assertThat( weirdMapBindings ).containsOnly(
-			entry( WeirdMap.class.getTypeParameters()[0], WeirdMap.class.getTypeParameters()[0] ),
-			entry( WeirdMap.class.getTypeParameters()[1], WeirdMap.class.getTypeParameters()[1] ),
-			entry( WeirdMap.class.getTypeParameters()[2], WeirdMap.class.getTypeParameters()[2] )
+				entry( WeirdMap.class.getTypeParameters()[0], WeirdMap.class.getTypeParameters()[0] ),
+				entry( WeirdMap.class.getTypeParameters()[1], WeirdMap.class.getTypeParameters()[1] ),
+				entry( WeirdMap.class.getTypeParameters()[2], WeirdMap.class.getTypeParameters()[2] )
 		);
 
 		Map<TypeVariable<?>, TypeVariable<?>> multimapBindings = bindings.get( Multimap.class );
@@ -78,12 +78,12 @@ public class TypeVariableBindingsTest {
 
 		Map<TypeVariable<?>, TypeVariable<?>> listBindings = bindings.get( List.class );
 		assertThat( listBindings ).containsOnly(
-			entry( WeirdMap.class.getTypeParameters()[2], List.class.getTypeParameters()[0] )
+				entry( WeirdMap.class.getTypeParameters()[2], List.class.getTypeParameters()[0] )
 		);
 
 		Map<TypeVariable<?>, TypeVariable<?>> iterableBindings = bindings.get( Iterable.class );
 		assertThat( iterableBindings ).containsOnly(
-			entry( WeirdMap.class.getTypeParameters()[2], Iterable.class.getTypeParameters()[0] )
+				entry( WeirdMap.class.getTypeParameters()[2], Iterable.class.getTypeParameters()[0] )
 		);
 	}
 

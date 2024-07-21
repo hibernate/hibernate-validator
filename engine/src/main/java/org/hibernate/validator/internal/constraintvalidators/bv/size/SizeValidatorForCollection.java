@@ -25,7 +25,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 // Collection here to support having properties defined as Collection (see HV-1551)
 public class SizeValidatorForCollection implements ConstraintValidator<Size, Collection> {
 
-	private  static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private int min;
 	private int max;

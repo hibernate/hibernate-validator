@@ -107,14 +107,14 @@ public class InheritanceMappingsTest {
 	}
 
 	private void validateAnnotatedFixture(Competition competition,
-										  Validator validator) {
+			Validator validator) {
 		Fixture fixture = new Fixture();
 		fixture.setCompetition( competition );
 		validateFixture( fixture, validator );
 	}
 
 	private void validateXmlDefinedFixture(org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Competition competition,
-										   Validator validator) {
+			Validator validator) {
 		org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Fixture fixture = new org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Fixture();
 		fixture.setCompetition( competition );
 		validateFixture( fixture, validator );

@@ -143,15 +143,15 @@ public class ReflectionHelperTest {
 
 	@Test
 	public void testGetIndexedValueForArray() {
-		doTestGetIndexedValueForArray( new String[]{ "value1", "value2" }, "value1", "value2" );
-		doTestGetIndexedValueForArray( new int[]{ 7, 4 }, 7, 4 );
-		doTestGetIndexedValueForArray( new long[]{ 7L, 4L }, 7L, 4L );
-		doTestGetIndexedValueForArray( new double[]{ 7d, 4d }, 7d, 4d );
-		doTestGetIndexedValueForArray( new float[]{ 7f, 4f }, 7f, 4f );
-		doTestGetIndexedValueForArray( new short[]{ (short) 7, (short) 4 }, (short) 7, (short) 4 );
-		doTestGetIndexedValueForArray( new byte[]{ (byte) 7, (byte) 4 }, (byte) 7, (byte) 4 );
-		doTestGetIndexedValueForArray( new char[]{ (char) 7, (char) 4 }, (char) 7, (char) 4 );
-		doTestGetIndexedValueForArray( new boolean[]{ true, false }, true, false );
+		doTestGetIndexedValueForArray( new String[] { "value1", "value2" }, "value1", "value2" );
+		doTestGetIndexedValueForArray( new int[] { 7, 4 }, 7, 4 );
+		doTestGetIndexedValueForArray( new long[] { 7L, 4L }, 7L, 4L );
+		doTestGetIndexedValueForArray( new double[] { 7d, 4d }, 7d, 4d );
+		doTestGetIndexedValueForArray( new float[] { 7f, 4f }, 7f, 4f );
+		doTestGetIndexedValueForArray( new short[] { (short) 7, (short) 4 }, (short) 7, (short) 4 );
+		doTestGetIndexedValueForArray( new byte[] { (byte) 7, (byte) 4 }, (byte) 7, (byte) 4 );
+		doTestGetIndexedValueForArray( new char[] { (char) 7, (char) 4 }, (char) 7, (char) 4 );
+		doTestGetIndexedValueForArray( new boolean[] { true, false }, true, false );
 	}
 
 	@Test

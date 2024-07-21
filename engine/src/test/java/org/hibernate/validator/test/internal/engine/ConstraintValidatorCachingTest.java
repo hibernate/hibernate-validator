@@ -289,5 +289,3 @@ public class ConstraintValidatorCachingTest {
 		String value = "The quick brown fox jumps over the lazy dog";
 	}
 }
-
-

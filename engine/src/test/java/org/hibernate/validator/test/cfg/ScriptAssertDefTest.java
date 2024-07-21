@@ -81,16 +81,14 @@ public class ScriptAssertDefTest {
 
 	private void assertCalendarEventViolations(Validator validator, ConstraintViolationAssert.PathExpectation propertyPath) {
 		assertTrue( validator.validate( new CalendarEvent(
-						Instant.now(),
-						Instant.now().plusMillis( 1000L )
-				)
+				Instant.now(),
+				Instant.now().plusMillis( 1000L ) )
 		).isEmpty(), "Should pass validation" );
 
 		Set<ConstraintViolation<CalendarEvent>> violations = validator.validate( new CalendarEvent(
-						Instant.now().plusMillis( 1000L ),
-						Instant.now().minusMillis( 1000L )
-				)
-		);
+				Instant.now().plusMillis( 1000L ),
+				Instant.now().minusMillis( 1000L )
+		) );
 
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( ScriptAssert.class ).withPropertyPath( propertyPath )

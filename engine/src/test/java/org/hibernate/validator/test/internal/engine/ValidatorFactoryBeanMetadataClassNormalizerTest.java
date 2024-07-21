@@ -67,8 +67,8 @@ public class ValidatorFactoryBeanMetadataClassNormalizerTest {
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( Email.class ).withPropertyPath(
 						pathWith().method( "setEmails" )
-						.parameter( "emails", 0 )
-						.containerElement( "<list element>", true, null, 0, List.class, 0 )
+								.parameter( "emails", 0 )
+								.containerElement( "<list element>", true, null, 0, List.class, 0 )
 				)
 		);
 	}

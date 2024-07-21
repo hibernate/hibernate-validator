@@ -42,7 +42,7 @@ public class ParameterValidationCycleTest {
 		ExecutableValidator executableValidator = ValidatorUtil.getValidator().forExecutables();
 		Set<ConstraintViolation<ExecutableHolder>> violations = executableValidator.validateParameters( new ExecutableHolder(),
 				ExecutableHolder.class.getDeclaredMethod( "post", Parent.class ),
-				new Object[]{ parent } );
+				new Object[] { parent } );
 		ConstraintViolationAssert.assertThat( violations ).containsOnlyViolations( violationOf( NotNull.class ) );
 	}
 

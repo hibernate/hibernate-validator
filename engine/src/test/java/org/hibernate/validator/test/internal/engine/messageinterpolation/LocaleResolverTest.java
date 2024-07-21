@@ -65,8 +65,7 @@ public class LocaleResolverTest {
 	}
 
 	private void runWithCustomValidationXml(String validationXmlName, Runnable runnable) {
-		new ValidationXmlTestHelper( LocaleResolverTest.class ).
-			runWithCustomValidationXml( validationXmlName, runnable );
+		new ValidationXmlTestHelper( LocaleResolverTest.class ).runWithCustomValidationXml( validationXmlName, runnable );
 	}
 
 	public static class StaticFieldLocaleResolver implements LocaleResolver {

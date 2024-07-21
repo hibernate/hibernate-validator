@@ -8,6 +8,7 @@ import org.hibernate.validator.cfg.defs.MinDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 
+// @formatter:off
 //tag::include[]
 public class MyConstraintMappingContributor implements ConstraintMappingContributor {
 
@@ -27,3 +28,4 @@ public class MyConstraintMappingContributor implements ConstraintMappingContribu
 	}
 }
 //end::include[]
+// @formatter:on

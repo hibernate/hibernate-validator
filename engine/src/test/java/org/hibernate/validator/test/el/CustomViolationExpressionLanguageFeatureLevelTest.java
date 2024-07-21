@@ -210,9 +210,9 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 
 		String message() default "-";
 
-		Class<?>[] groups() default {};
+		Class<?>[] groups() default { };
 
-		Class<? extends Payload>[] payload() default {};
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	public static class DefaultLevelStringValidator implements ConstraintValidator<DefaultLevelConstraint, String> {
@@ -245,9 +245,9 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 
 		String message() default "-";
 
-		Class<?>[] groups() default {};
+		Class<?>[] groups() default { };
 
-		Class<? extends Payload>[] payload() default {};
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	public static class EnableELStringValidator implements ConstraintValidator<EnableELConstraint, String> {
@@ -290,9 +290,9 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 
 		String message() default "-";
 
-		Class<?>[] groups() default {};
+		Class<?>[] groups() default { };
 
-		Class<? extends Payload>[] payload() default {};
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	public static class EnableELBeanPropertiesStringValidator implements ConstraintValidator<EnableELBeanPropertiesConstraint, String> {
@@ -409,9 +409,9 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 
 		String message() default "-";
 
-		Class<?>[] groups() default {};
+		Class<?>[] groups() default { };
 
-		Class<? extends Payload>[] payload() default {};
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	public static class EnableELBeanMethodsStringValidator implements ConstraintValidator<EnableELBeanMethodsConstraint, String> {
@@ -529,9 +529,9 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 
 		String message() default "-";
 
-		Class<?>[] groups() default {};
+		Class<?>[] groups() default { };
 
-		Class<? extends Payload>[] payload() default {};
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	public static class DefaultLevelWithExpressionVariablesStringValidator

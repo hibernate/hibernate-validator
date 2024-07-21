@@ -29,7 +29,7 @@ public class DefaultLocaleMessageInterpolationTest {
 		MessageInterpolator messageInterpolator = validatorFactory.getMessageInterpolator();
 
 		assertThat( messageInterpolator.interpolate( "{jakarta.validation.constraints.AssertFalse.message}", new TestContext() ) )
-						.isEqualTo( "must be false" );
+				.isEqualTo( "must be false" );
 	}
 
 	@Test
@@ -42,7 +42,7 @@ public class DefaultLocaleMessageInterpolationTest {
 		MessageInterpolator messageInterpolator = validatorFactory.getMessageInterpolator();
 
 		assertThat( messageInterpolator.interpolate( "{jakarta.validation.constraints.AssertFalse.message}", new TestContext() ) )
-						.isEqualTo( "doit avoir la valeur faux" );
+				.isEqualTo( "doit avoir la valeur faux" );
 
 		validatorFactory = Validation.byProvider( HibernateValidator.class )
 				.configure()
@@ -52,7 +52,7 @@ public class DefaultLocaleMessageInterpolationTest {
 		messageInterpolator = validatorFactory.getMessageInterpolator();
 
 		assertThat( messageInterpolator.interpolate( "{jakarta.validation.constraints.AssertFalse.message}", new TestContext() ) )
-						.isEqualTo( "deve essere false" );
+				.isEqualTo( "deve essere false" );
 	}
 
 	private static class TestContext implements MessageInterpolator.Context {

@@ -177,11 +177,10 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<? extends MessageInterpolator> messageInterpolatorClass = (Class<? extends MessageInterpolator>)
-				LoadClass.action(
-						messageInterpolatorFqcn,
-						null
-				);
+		Class<? extends MessageInterpolator> messageInterpolatorClass = (Class<? extends MessageInterpolator>) LoadClass.action(
+				messageInterpolatorFqcn,
+				null
+		);
 
 		return createInstance( messageInterpolatorClass );
 	}
@@ -195,11 +194,10 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<? extends TraversableResolver> traversableResolverClass = (Class<? extends TraversableResolver>)
-				LoadClass.action(
-						traversableResolverFqcn,
-						null
-				);
+		Class<? extends TraversableResolver> traversableResolverClass = (Class<? extends TraversableResolver>) LoadClass.action(
+				traversableResolverFqcn,
+				null
+		);
 
 		return createInstance( traversableResolverClass );
 	}
@@ -213,11 +211,10 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<? extends ParameterNameProvider> parameterNameProviderClass = (Class<? extends ParameterNameProvider>)
-				LoadClass.action(
-						parameterNameProviderFqcn,
-						null
-				);
+		Class<? extends ParameterNameProvider> parameterNameProviderClass = (Class<? extends ParameterNameProvider>) LoadClass.action(
+				parameterNameProviderFqcn,
+				null
+		);
 
 		return createInstance( parameterNameProviderClass );
 	}
@@ -231,11 +228,10 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<? extends ClockProvider> clockProviderClass = (Class<? extends ClockProvider>)
-				LoadClass.action(
-						clockProviderFqcn,
-						null
-				);
+		Class<? extends ClockProvider> clockProviderClass = (Class<? extends ClockProvider>) LoadClass.action(
+				clockProviderFqcn,
+				null
+		);
 
 		return createInstance( clockProviderClass );
 	}
@@ -250,11 +246,10 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<? extends ConstraintValidatorFactory> constraintValidatorFactoryClass = (Class<? extends ConstraintValidatorFactory>)
-				LoadClass.action(
-						constraintValidatorFactoryFqcn,
-						null
-				);
+		Class<? extends ConstraintValidatorFactory> constraintValidatorFactoryClass = (Class<? extends ConstraintValidatorFactory>) LoadClass.action(
+				constraintValidatorFactoryFqcn,
+				null
+		);
 
 		return createInstance( constraintValidatorFactoryClass );
 	}
@@ -265,7 +260,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 		@SuppressWarnings("unchecked")
 		Set<ValueExtractorDescriptor> valueExtractorDescriptors = valueExtractorFqcns.stream()
-				.map( fqcn -> createInstance( (Class<? extends ValueExtractor<?>>)  LoadClass.action( fqcn, null ) ) )
+				.map( fqcn -> createInstance( (Class<? extends ValueExtractor<?>>) LoadClass.action( fqcn, null ) ) )
 				.map( ValueExtractorDescriptor::new )
 				.collect( Collectors.toSet() );
 
@@ -301,9 +296,9 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 	}
 
 	private Configuration<?> getConfiguration() {
-		return validationProviderHelper.isDefaultProvider() ?
-				Validation.byDefaultProvider().configure() :
-				Validation.byProvider( org.hibernate.validator.HibernateValidator.class ).configure();
+		return validationProviderHelper.isDefaultProvider()
+				? Validation.byDefaultProvider().configure()
+				: Validation.byProvider( org.hibernate.validator.HibernateValidator.class ).configure();
 	}
 
 	@Override

@@ -55,7 +55,7 @@ public class PureCompositeConstraintsOnReturnValueTest {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-1494")
+	@TestForIssue(jiraKey = "HV-1494")
 	public void testHVSpecificNotEmpty() throws Exception {
 		Set<ConstraintViolation<Foo>> violations = validator.forExecutables()
 				.validateReturnValue(
@@ -77,7 +77,7 @@ public class PureCompositeConstraintsOnReturnValueTest {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-1494")
+	@TestForIssue(jiraKey = "HV-1494")
 	public void testCustomComposingConstraintOnReturnValue() throws Exception {
 		Set<ConstraintViolation<Foo>> violations = validator.forExecutables()
 				.validateReturnValue(
@@ -103,7 +103,7 @@ public class PureCompositeConstraintsOnReturnValueTest {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-1494")
+	@TestForIssue(jiraKey = "HV-1494")
 	public void testCustomComposingConstraintOnParameters() throws Exception {
 		Set<ConstraintViolation<Foo>> violations = validator.forExecutables()
 				.validateParameters(

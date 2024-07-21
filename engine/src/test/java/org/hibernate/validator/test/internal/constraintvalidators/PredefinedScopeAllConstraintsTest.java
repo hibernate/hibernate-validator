@@ -139,7 +139,7 @@ public class PredefinedScopeAllConstraintsTest {
 
 		Set<ConstraintViolation<ParameterScriptAssertBean>> parameterScriptAssertBeanViolations = getValidator( ParameterScriptAssert.class,
 				ParameterScriptAssertBean.class ).forExecutables().validateParameters(
-						new ParameterScriptAssertBean(), ParameterScriptAssertBean.class.getDeclaredMethod( "doTest", boolean.class ), new Object[]{ false } );
+						new ParameterScriptAssertBean(), ParameterScriptAssertBean.class.getDeclaredMethod( "doTest", boolean.class ), new Object[] { false } );
 
 		ConstraintViolationAssert.assertThat( parameterScriptAssertBeanViolations )
 				.containsOnlyViolations(

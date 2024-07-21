@@ -37,7 +37,7 @@ public abstract class AbstractJavaTimeValidator<C extends Annotation, T extends 
 	@Override
 	public void initialize(ConstraintDescriptor<C> constraintDescriptor, HibernateConstraintValidatorInitializationContext initializationContext) {
 		try {
-			this.referenceClock  = Clock.offset(
+			this.referenceClock = Clock.offset(
 					initializationContext.getClockProvider().getClock(),
 					getEffectiveTemporalValidationTolerance( initializationContext.getTemporalValidationTolerance() )
 			);

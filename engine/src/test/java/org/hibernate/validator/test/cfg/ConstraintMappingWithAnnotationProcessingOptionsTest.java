@@ -63,9 +63,9 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 	public void testIgnoreAllAnnotationsOnType() {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping
-			.type( Foo.class )
+				.type( Foo.class )
 				.ignoreAllAnnotations()
-			.type( Doer.class )
+				.type( Doer.class )
 				.ignoreAllAnnotations();
 
 		config.addMapping( mapping );
@@ -153,7 +153,7 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		mapping.type( Doer.class )
 				.ignoreAnnotations( true )
 				.method( "doSomething", String.class )
-					.ignoreAnnotations( false );
+				.ignoreAnnotations( false );
 		config.addMapping( mapping );
 
 		MethodDescriptor descriptor = config.buildValidatorFactory()
@@ -170,8 +170,8 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Doer.class )
 				.method( "doSomething", String.class )
-					.parameter( 0 )
-					.ignoreAnnotations( true );
+				.parameter( 0 )
+				.ignoreAnnotations( true );
 		config.addMapping( mapping );
 
 		MethodDescriptor descriptor = config.buildValidatorFactory()
@@ -189,9 +189,9 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		mapping = config.createConstraintMapping();
 		mapping.type( Doer.class )
 				.method( "doSomething", String.class )
-					.ignoreAnnotations( true )
-					.parameter( 0 )
-						.ignoreAnnotations( false );
+				.ignoreAnnotations( true )
+				.parameter( 0 )
+				.ignoreAnnotations( false );
 		config.addMapping( mapping );
 
 		MethodDescriptor descriptor = config.buildValidatorFactory()
@@ -207,8 +207,8 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Doer.class )
 				.method( "doAnotherThing", String.class )
-					.crossParameter()
-					.ignoreAnnotations( true );
+				.crossParameter()
+				.ignoreAnnotations( true );
 		config.addMapping( mapping );
 
 		MethodDescriptor descriptor = config.buildValidatorFactory()
@@ -226,9 +226,9 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		mapping = config.createConstraintMapping();
 		mapping.type( Doer.class )
 				.method( "doAnotherThing", String.class )
-					.ignoreAnnotations( true )
-					.crossParameter()
-						.ignoreAnnotations( false );
+				.ignoreAnnotations( true )
+				.crossParameter()
+				.ignoreAnnotations( false );
 		config.addMapping( mapping );
 
 		MethodDescriptor descriptor = config.buildValidatorFactory()
@@ -244,8 +244,8 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Doer.class )
 				.method( "doSomething", String.class )
-					.returnValue()
-						.ignoreAnnotations( true );
+				.returnValue()
+				.ignoreAnnotations( true );
 		config.addMapping( mapping );
 
 		MethodDescriptor descriptor = config.buildValidatorFactory()
@@ -261,9 +261,9 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Doer.class )
 				.method( "doSomething", String.class )
-					.ignoreAnnotations( true )
-					.returnValue()
-						.ignoreAnnotations( false );
+				.ignoreAnnotations( true )
+				.returnValue()
+				.ignoreAnnotations( false );
 		config.addMapping( mapping );
 
 		MethodDescriptor descriptor = config.buildValidatorFactory()
@@ -296,7 +296,7 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		mapping.type( Doer.class )
 				.ignoreAnnotations( true )
 				.constructor( String.class )
-					.ignoreAnnotations( false );
+				.ignoreAnnotations( false );
 		config.addMapping( mapping );
 
 		ConstructorDescriptor descriptor = config.buildValidatorFactory()
@@ -313,8 +313,8 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Doer.class )
 				.constructor( String.class )
-					.parameter( 0 )
-					.ignoreAnnotations( true );
+				.parameter( 0 )
+				.ignoreAnnotations( true );
 		config.addMapping( mapping );
 
 		ConstructorDescriptor descriptor = config.buildValidatorFactory()
@@ -332,9 +332,9 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		mapping = config.createConstraintMapping();
 		mapping.type( Doer.class )
 				.constructor( String.class )
-					.ignoreAnnotations( true )
-					.parameter( 0 )
-						.ignoreAnnotations( false );
+				.ignoreAnnotations( true )
+				.parameter( 0 )
+				.ignoreAnnotations( false );
 		config.addMapping( mapping );
 
 		ConstructorDescriptor descriptor = config.buildValidatorFactory()
@@ -350,8 +350,8 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Doer.class )
 				.constructor( String.class, String.class )
-					.crossParameter()
-					.ignoreAnnotations( true );
+				.crossParameter()
+				.ignoreAnnotations( true );
 		config.addMapping( mapping );
 
 		ConstructorDescriptor descriptor = config.buildValidatorFactory()
@@ -369,9 +369,9 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		mapping = config.createConstraintMapping();
 		mapping.type( Doer.class )
 				.constructor( String.class, String.class )
-					.ignoreAnnotations( true )
-					.crossParameter()
-						.ignoreAnnotations( false );
+				.ignoreAnnotations( true )
+				.crossParameter()
+				.ignoreAnnotations( false );
 		config.addMapping( mapping );
 
 		ConstructorDescriptor descriptor = config.buildValidatorFactory()
@@ -387,8 +387,8 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Doer.class )
 				.constructor( String.class )
-					.returnValue()
-						.ignoreAnnotations( true );
+				.returnValue()
+				.ignoreAnnotations( true );
 		config.addMapping( mapping );
 
 		ConstructorDescriptor descriptor = config.buildValidatorFactory()
@@ -404,9 +404,9 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Doer.class )
 				.constructor( String.class )
-					.ignoreAnnotations( true )
-					.returnValue()
-						.ignoreAnnotations( false );
+				.ignoreAnnotations( true )
+				.returnValue()
+				.ignoreAnnotations( false );
 		config.addMapping( mapping );
 
 		ConstructorDescriptor descriptor = config.buildValidatorFactory()
@@ -417,7 +417,7 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		assertTrue( descriptor.hasConstrainedReturnValue(), "Setting given for return value should take precedence" );
 	}
 
-	@SuppressWarnings( "unused" )
+	@SuppressWarnings("unused")
 	private static class Foo {
 		@NotNull
 		private String property;

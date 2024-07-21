@@ -65,6 +65,3 @@ public class DefaultPackageInVarargParameterTest {
 	public static class Bar {
 	}
 }
-
-
-

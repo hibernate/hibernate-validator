@@ -69,7 +69,7 @@ public class DefaultScriptEvaluatorFactory extends AbstractCachingScriptEvaluato
 
 	private ScriptEngineManager getScriptEngineManager() {
 		if ( scriptEngineManager == null ) {
-			synchronized ( this ) {
+			synchronized (this) {
 				if ( scriptEngineManager == null ) {
 					scriptEngineManager = new ScriptEngineManager( classLoader );
 				}
@@ -80,7 +80,7 @@ public class DefaultScriptEvaluatorFactory extends AbstractCachingScriptEvaluato
 
 	private ScriptEngineManager getThreadContextClassLoaderScriptEngineManager() {
 		if ( threadContextClassLoaderScriptEngineManager == null ) {
-			synchronized ( this ) {
+			synchronized (this) {
 				if ( threadContextClassLoaderScriptEngineManager == null ) {
 					threadContextClassLoaderScriptEngineManager = new ScriptEngineManager( GetClassLoader.fromContext() );
 				}

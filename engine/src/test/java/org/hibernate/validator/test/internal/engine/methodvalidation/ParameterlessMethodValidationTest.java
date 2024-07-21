@@ -57,7 +57,7 @@ public class ParameterlessMethodValidationTest {
 
 		Bar bar = new Bar();
 
-		assertNoViolations( validator.forExecutables().validateParameters( bar, bar.getClass().getMethod( "getString" ), new Object[]{} ) );
+		assertNoViolations( validator.forExecutables().validateParameters( bar, bar.getClass().getMethod( "getString" ), new Object[] { } ) );
 	}
 
 	private static class Bar {

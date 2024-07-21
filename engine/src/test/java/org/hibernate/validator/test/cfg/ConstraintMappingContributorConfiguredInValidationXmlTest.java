@@ -80,8 +80,7 @@ public class ConstraintMappingContributorConfiguredInValidationXmlTest {
 	}
 
 	private void runWithCustomValidationXml(String validationXmlName, Runnable runnable) {
-		new ValidationXmlTestHelper( ConstraintMappingContributorConfiguredInValidationXmlTest.class ).
-			runWithCustomValidationXml( validationXmlName, runnable );
+		new ValidationXmlTestHelper( ConstraintMappingContributorConfiguredInValidationXmlTest.class ).runWithCustomValidationXml( validationXmlName, runnable );
 	}
 
 	public static class MyConstraintMappingContributor1 implements ConstraintMappingContributor {
@@ -89,11 +88,11 @@ public class ConstraintMappingContributorConfiguredInValidationXmlTest {
 		@Override
 		public void createConstraintMappings(ConstraintMappingBuilder builder) {
 			builder.addConstraintMapping()
-				.type( Marathon.class )
+					.type( Marathon.class )
 					.getter( "name" )
-						.constraint( new NotNullDef() )
+					.constraint( new NotNullDef() )
 					.field( "numberOfHelpers" )
-						.constraint( new MinDef().value( 1 ) );
+					.constraint( new MinDef().value( 1 ) );
 		}
 	}
 
@@ -102,9 +101,9 @@ public class ConstraintMappingContributorConfiguredInValidationXmlTest {
 		@Override
 		public void createConstraintMappings(ConstraintMappingBuilder builder) {
 			builder.addConstraintMapping()
-				.type( Runner.class )
+					.type( Runner.class )
 					.field( "paidEntryFee" )
-						.constraint( new AssertTrueDef() );
+					.constraint( new AssertTrueDef() );
 		}
 	}
 }

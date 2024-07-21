@@ -39,5 +39,3 @@ public class System {
 		parts.add( part );
 	}
 }
-
-

@@ -130,7 +130,7 @@ public class UniqueElementsValidatorTest {
 		assertThat( violations ).containsOnlyViolations( violationOf( UniqueElements.class ) );
 
 		ConstraintViolation<?> violation = violations.iterator().next();
-		Assertions.assertThat( ((HibernateConstraintViolation<UniqueElements>) violation.unwrap( HibernateConstraintViolation.class )).getDynamicPayload( List.class ) )
+		Assertions.assertThat( ( (HibernateConstraintViolation<UniqueElements>) violation.unwrap( HibernateConstraintViolation.class ) ).getDynamicPayload( List.class ) )
 				.containsOnly( duplicate );
 	}
 

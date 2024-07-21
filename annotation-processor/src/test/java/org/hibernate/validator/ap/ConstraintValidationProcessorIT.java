@@ -136,15 +136,15 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		);
 
 		assertEquals( diagnostics.getDiagnostics().get( 0 ).getMessage( Locale.getDefault() ),
-				"Method parameters do not respect the inheritance rules. " +
-				"In subtypes, no parameter constraints may be declared on overridden or implemented methods, nor may parameters be marked for cascaded validation. " +
-				"Types that contain the overridden methods are: [ org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1 ]." );
+				"Method parameters do not respect the inheritance rules. "
+						+ "In subtypes, no parameter constraints may be declared on overridden or implemented methods, nor may parameters be marked for cascaded validation. "
+						+ "Types that contain the overridden methods are: [ org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1 ]." );
 
 		assertEquals( diagnostics.getDiagnostics().get( 11 ).getMessage( Locale.getDefault() ),
-				"Method parameters do not respect inheritance rules. " +
-				"If a subtype overrides/implements a method originally defined in several parallel types of the hierarchy, " +
-				"no parameter constraints may be declared for that method nor parameters be marked for cascaded validation. " +
-				"Parallel method definitions are in: [ java.lang.Object, org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.Case15.SimpleService ]." );
+				"Method parameters do not respect inheritance rules. "
+						+ "If a subtype overrides/implements a method originally defined in several parallel types of the hierarchy, "
+						+ "no parameter constraints may be declared for that method nor parameters be marked for cascaded validation. "
+						+ "Parallel method definitions are in: [ java.lang.Object, org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.Case15.SimpleService ]." );
 	}
 
 	@Test

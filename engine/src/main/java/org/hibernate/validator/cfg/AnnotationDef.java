@@ -87,7 +87,7 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 	}
 
 	protected C addAnnotationAsParameter(String key, AnnotationDef<?, ?> value) {
-		annotationsAsParameters.compute( key, ( k, oldValue ) -> {
+		annotationsAsParameters.compute( key, (k, oldValue) -> {
 			if ( oldValue == null ) {
 				return Collections.singletonList( value );
 			}
@@ -105,10 +105,10 @@ public abstract class AnnotationDef<C extends AnnotationDef<C, A>, A extends Ann
 		for ( Map.Entry<String, List<AnnotationDef<?, ?>>> annotationAsParameter : annotationsAsParameters.entrySet() ) {
 			annotationDescriptorBuilder.setAttribute(
 					annotationAsParameter.getKey(),
-							toAnnotationParameterArray(
-									annotationAsParameter.getValue(),
-									annotationsAsParametersTypes.get( annotationAsParameter.getKey() )
-							)
+					toAnnotationParameterArray(
+							annotationAsParameter.getValue(),
+							annotationsAsParametersTypes.get( annotationAsParameter.getKey() )
+					)
 			);
 		}
 

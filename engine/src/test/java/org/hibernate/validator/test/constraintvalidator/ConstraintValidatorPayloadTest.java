@@ -96,7 +96,7 @@ public class ConstraintValidatorPayloadTest {
 	@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })
 	@Retention(RUNTIME)
 	@Documented
-	@Constraint(validatedBy = { } )
+	@Constraint(validatedBy = { })
 	private @interface PayloadConstraint {
 		String message() default "PayloadConstraint is not valid";
 

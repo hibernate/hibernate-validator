@@ -30,5 +30,3 @@ public class SizeDef extends ConstraintDef<SizeDef, Size> {
 		return this;
 	}
 }
-
-

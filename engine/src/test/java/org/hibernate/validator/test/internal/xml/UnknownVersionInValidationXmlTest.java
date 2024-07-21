@@ -33,11 +33,11 @@ public class UnknownVersionInValidationXmlTest {
 		validationXmlTestHelper.runWithCustomValidationXml(
 				"validation-UnknownVersionInValidationXmlTest.xml", new Runnable() {
 
-			@Override
-			public void run() {
-				ValidatorUtil.getValidator();
-			}
-		}
+					@Override
+					public void run() {
+						ValidatorUtil.getValidator();
+					}
+				}
 		);
 	}
 }

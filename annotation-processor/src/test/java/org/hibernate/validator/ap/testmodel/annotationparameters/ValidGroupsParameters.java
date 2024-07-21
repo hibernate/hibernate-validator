@@ -32,21 +32,21 @@ public class ValidGroupsParameters {
 	private String string5;
 
 	@Size.List(
-			{
-					@Size(groups = {
-							Group1.class,
-							InvalidGroup1.class,
-							InvalidGroup2.class
-					}),
-					@Size(groups = {
-							InvalidGroup1.class,
-							InvalidGroup2.class
-					}),
-					@Size(groups = {
-							Group1.class,
-							Group2.class
-					})
-			}
+		{
+				@Size(groups = {
+						Group1.class,
+						InvalidGroup1.class,
+						InvalidGroup2.class
+				}),
+				@Size(groups = {
+						InvalidGroup1.class,
+						InvalidGroup2.class
+				}),
+				@Size(groups = {
+						Group1.class,
+						Group2.class
+				})
+		}
 	)
 	private String string6;
 

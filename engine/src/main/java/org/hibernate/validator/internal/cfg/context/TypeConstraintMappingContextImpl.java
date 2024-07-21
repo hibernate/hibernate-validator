@@ -263,10 +263,8 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	private DefaultGroupSequenceProvider<? super C> getDefaultGroupSequenceProvider() {
 		return defaultGroupSequenceProviderClass != null
-				? NewInstance.action(
-				defaultGroupSequenceProviderClass,
-				"default group sequence provider"
-		) : null;
+				? NewInstance.action( defaultGroupSequenceProviderClass, "default group sequence provider" )
+				: null;
 	}
 
 	Class<?> getBeanClass() {

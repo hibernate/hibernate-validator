@@ -23,7 +23,7 @@ public class GroupSequenceProviderDefinition {
 	 * Not allowed
 	 */
 	@GroupSequenceProvider(SampleDefaultGroupSequenceProvider.class)
-	@GroupSequence( { Sample.class })
+	@GroupSequence({ Sample.class })
 	public static class Sample {
 	}
 

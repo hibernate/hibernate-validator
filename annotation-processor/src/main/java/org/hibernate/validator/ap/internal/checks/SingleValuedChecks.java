@@ -67,9 +67,9 @@ public class SingleValuedChecks implements ConstraintChecks {
 				theValue.addAll( oneCheck.checkAnnotationType( (TypeElement) element, annotation ) );
 			}
 			else if (
-					element.getKind() == ElementKind.CLASS ||
-							element.getKind() == ElementKind.INTERFACE ||
-							element.getKind() == ElementKind.ENUM ) {
+				element.getKind() == ElementKind.CLASS
+						|| element.getKind() == ElementKind.INTERFACE
+						|| element.getKind() == ElementKind.ENUM ) {
 
 				theValue.addAll( oneCheck.checkNonAnnotationType( (TypeElement) element, annotation ) );
 			}

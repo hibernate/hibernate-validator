@@ -287,7 +287,7 @@ public class AnnotationTypeValidationIT extends ConstraintValidationProcessorITB
 	public void testMixDirectAnnotationAndListContainer() {
 		boolean compilationResult =
 				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics,
-										compilerHelper.getSourceFile( MixDirectAnnotationAndListContainerAnnotation.class )
+						compilerHelper.getSourceFile( MixDirectAnnotationAndListContainerAnnotation.class )
 				);
 
 		assertFalse( compilationResult );

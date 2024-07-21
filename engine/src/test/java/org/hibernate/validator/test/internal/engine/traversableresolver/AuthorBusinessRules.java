@@ -23,9 +23,9 @@ import jakarta.validation.Payload;
 public @interface AuthorBusinessRules {
 	String message() default "";
 
-	Class<?>[] groups() default {};
+	Class<?>[] groups() default { };
 
-	Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default { };
 
 	class AuthorBusinessRulesValidator implements ConstraintValidator<AuthorBusinessRules, Object> {
 

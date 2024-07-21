@@ -28,7 +28,7 @@ public class TypeVariableMethodParameterResolutionTest {
 				.getValidator().forExecutables();
 
 		Set<ConstraintViolation<Bean>> violations = validator.validateParameters( new Bean(), Bean.class.getMethod( "method", List.class ),
-				new Object[]{ new ArrayList<>() } );
+				new Object[] { new ArrayList<>() } );
 		assertThat( violations ).containsOnlyViolations( violationOf( Size.class ) );
 	}
 

@@ -37,8 +37,8 @@ final class ParameterConstraintMappingContextImpl
 
 	ParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext, int parameterIndex) {
 		super(
-			executableContext.getTypeContext().getConstraintMapping(),
-			executableContext.callable.getParameterGenericType( parameterIndex )
+				executableContext.getTypeContext().getConstraintMapping(),
+				executableContext.callable.getParameterGenericType( parameterIndex )
 		);
 
 		this.executableContext = executableContext;

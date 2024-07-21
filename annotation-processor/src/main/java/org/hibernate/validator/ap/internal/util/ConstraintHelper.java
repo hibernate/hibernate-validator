@@ -180,38 +180,38 @@ public class ConstraintHelper {
 	 * {@code java.time} types supported by {@code @Past}, {@code @Future}, {@code @PastOrPresent} and {@code @FutureOrPresent} annotations.
 	 */
 	private static final Class<?>[] JAVA_TIME_TYPES_SUPPORTED_BY_FUTURE_AND_PAST_ANNOTATIONS = new Class<?>[] {
-		HijrahDate.class,
-		Instant.class,
-		JapaneseDate.class,
-		LocalDate.class,
-		LocalDateTime.class,
-		LocalTime.class,
-		MinguoDate.class,
-		MonthDay.class,
-		OffsetDateTime.class,
-		OffsetTime.class,
-		ThaiBuddhistDate.class,
-		Year.class,
-		YearMonth.class,
-		ZonedDateTime.class
+			HijrahDate.class,
+			Instant.class,
+			JapaneseDate.class,
+			LocalDate.class,
+			LocalDateTime.class,
+			LocalTime.class,
+			MinguoDate.class,
+			MonthDay.class,
+			OffsetDateTime.class,
+			OffsetTime.class,
+			ThaiBuddhistDate.class,
+			Year.class,
+			YearMonth.class,
+			ZonedDateTime.class
 	};
 
 	/**
 	 * Types supported by {@code @Size} and {@code @NotEmpty} annotations.
 	 */
 	private static final Class<?>[] TYPES_SUPPORTED_BY_SIZE_AND_NOT_EMPTY_ANNOTATIONS = new Class<?>[] {
-		Object[].class,
-		boolean[].class,
-		byte[].class,
-		char[].class,
-		double[].class,
-		float[].class,
-		int[].class,
-		long[].class,
-		short[].class,
-		Collection.class,
-		Map.class,
-		CharSequence.class
+			Object[].class,
+			boolean[].class,
+			byte[].class,
+			char[].class,
+			double[].class,
+			float[].class,
+			int[].class,
+			long[].class,
+			short[].class,
+			Collection.class,
+			Map.class,
+			CharSequence.class
 	};
 
 	/**
@@ -740,8 +740,8 @@ public class ConstraintHelper {
 			return ConstraintCheckResult.MULTIPLE_VALIDATORS_FOUND;
 		}
 		//found exactly one matching validator OR the constraint is completely composed
-		else if ( assignableTypes.size() == 1 ||
-				( supportedTypes.size() == 0 && !getComposingConstraints( constraintAnnotationType ).isEmpty() ) ) {
+		else if ( assignableTypes.size() == 1
+				|| ( supportedTypes.size() == 0 && !getComposingConstraints( constraintAnnotationType ).isEmpty() ) ) {
 			return ConstraintCheckResult.ALLOWED;
 		}
 		//found no matching validator
@@ -824,19 +824,19 @@ public class ConstraintHelper {
 		}
 
 		return validationAppliesTo.accept(
-			new SimpleAnnotationValueVisitor8<AnnotationProcessorConstraintTarget, Void>() {
+				new SimpleAnnotationValueVisitor8<AnnotationProcessorConstraintTarget, Void>() {
 
-				private final TypeMirror constraintTargetMirror = annotationApiHelper.getDeclaredTypeByName( BeanValidationTypes.CONSTRAINT_TARGET );
+					private final TypeMirror constraintTargetMirror = annotationApiHelper.getDeclaredTypeByName( BeanValidationTypes.CONSTRAINT_TARGET );
 
-				@Override
-				public AnnotationProcessorConstraintTarget visitEnumConstant(VariableElement c, Void p) {
-					if ( typeUtils.isSameType( c.asType(), constraintTargetMirror ) ) {
-						return AnnotationProcessorConstraintTarget.valueOf( c.getSimpleName().toString() );
+					@Override
+					public AnnotationProcessorConstraintTarget visitEnumConstant(VariableElement c, Void p) {
+						if ( typeUtils.isSameType( c.asType(), constraintTargetMirror ) ) {
+							return AnnotationProcessorConstraintTarget.valueOf( c.getSimpleName().toString() );
+						}
+						return null;
 					}
-					return null;
-				}
 
-			}, null
+				}, null
 		);
 	}
 

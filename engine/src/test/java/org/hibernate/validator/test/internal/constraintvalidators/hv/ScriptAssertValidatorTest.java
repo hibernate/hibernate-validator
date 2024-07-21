@@ -43,7 +43,8 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 
 	@Test
 	public void scriptEvaluatesToTrue() throws Exception {
-		@ScriptAssert(lang = "groovy", script = "true") class TmpType {
+		@ScriptAssert(lang = "groovy", script = "true")
+		class TmpType {
 		}
 		assertNoViolations( validator.validate( new TmpType() ) );
 
@@ -51,7 +52,8 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 
 	@Test
 	public void scriptEvaluatesToFalse() throws Exception {
-		@ScriptAssert(lang = "groovy", script = "false") class TmpType {
+		@ScriptAssert(lang = "groovy", script = "false")
+		class TmpType {
 		}
 		assertThat( validator.validate( new TmpType() ) ).containsOnlyViolations(
 				violationOf( ScriptAssert.class )
@@ -60,7 +62,8 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 
 	@Test
 	public void scriptExpressionReferencingAnnotatedObject() throws Exception {
-		@ScriptAssert(lang = "groovy", script = "_this.startDate.before(_this.endDate)") class TmpType extends CalendarEvent {
+		@ScriptAssert(lang = "groovy", script = "_this.startDate.before(_this.endDate)")
+		class TmpType extends CalendarEvent {
 			public TmpType(Date startDate, Date endDate) {
 				super( startDate, endDate );
 			}
@@ -77,7 +80,8 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 
 	@Test
 	public void scriptExpressionUsingCustomizedAlias() throws Exception {
-		@ScriptAssert(lang = "groovy", script = "_.startDate.before(_.endDate)", alias = "_") class TmpType extends CalendarEvent {
+		@ScriptAssert(lang = "groovy", script = "_.startDate.before(_.endDate)", alias = "_")
+		class TmpType extends CalendarEvent {
 			public TmpType(Date startDate, Date endDate) {
 				super( startDate, endDate );
 			}
@@ -109,7 +113,8 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void unknownLanguageNameRaisesException() throws Exception {
-		@ScriptAssert(lang = "foo", script = "script") class TmpType {
+		@ScriptAssert(lang = "foo", script = "script")
+		class TmpType {
 		}
 
 		assertNoViolations( validator.validate( new TmpType() ) );
@@ -117,7 +122,8 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void illegalScriptExpressionRaisesException() throws Exception {
-		@ScriptAssert(lang = "groovy", script = "foo") class TmpType {
+		@ScriptAssert(lang = "groovy", script = "foo")
+		class TmpType {
 		}
 
 		assertNoViolations( validator.validate( new TmpType() ) );
@@ -125,7 +131,8 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void scriptExpressionReturningNullRaisesException() throws Exception {
-		@ScriptAssert(lang = "groovy", script = "null") class TmpType {
+		@ScriptAssert(lang = "groovy", script = "null")
+		class TmpType {
 		}
 
 		assertNoViolations( validator.validate( new TmpType() ) );
@@ -133,7 +140,8 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void scriptExpressionReturningNoBooleanRaisesException() throws Exception {
-		@ScriptAssert(lang = "groovy", script = "11") class TmpType {
+		@ScriptAssert(lang = "groovy", script = "11")
+		class TmpType {
 		}
 
 		assertNoViolations( validator.validate( new TmpType() ) );
@@ -145,9 +153,8 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 		Validator validator = ValidatorUtil.getValidator();
 
 		assertTrue( validator.validate( new AnnotatedCalendarEvent(
-						Date.from( Instant.now() ),
-						Date.from( Instant.now().plusMillis( 1000L ) )
-				)
+				Date.from( Instant.now() ),
+				Date.from( Instant.now().plusMillis( 1000L ) ) )
 		).isEmpty(), "Should pass validation" );
 
 		Set<ConstraintViolation<AnnotatedCalendarEvent>> fieldViolations = validator.validate(

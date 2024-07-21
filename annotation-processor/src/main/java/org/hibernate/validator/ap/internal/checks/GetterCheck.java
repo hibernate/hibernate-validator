@@ -24,12 +24,11 @@ public class GetterCheck extends AbstractConstraintCheck {
 	private final boolean methodConstraintsSupported;
 
 	public GetterCheck(boolean methodConstraintsSupported) {
-		this.methodConstraintsSupported  = methodConstraintsSupported;
+		this.methodConstraintsSupported = methodConstraintsSupported;
 	}
 
 	@Override
-	public Set<ConstraintCheckIssue> checkMethod(ExecutableElement element,
-												 AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkMethod(ExecutableElement element, AnnotationMirror annotation) {
 
 		if ( !methodConstraintsSupported && !isGetterMethod( element ) ) {
 			return CollectionHelper.asSet(

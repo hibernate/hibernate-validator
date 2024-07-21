@@ -123,8 +123,8 @@ public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProvi
 
 	private List<Class<? extends Annotation>> getAnnotationsTypes(Collection<MetaConstraint<?>> metaConstraints) {
 		return metaConstraints.stream()
-			.map( m -> m.getDescriptor().getAnnotationType() )
-			.collect( Collectors.toList() );
+				.map( m -> m.getDescriptor().getAnnotationType() )
+				.collect( Collectors.toList() );
 	}
 
 	static class A {

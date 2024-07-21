@@ -33,9 +33,9 @@ public class JacksonPropertyNodeNameProviderTest {
 
 		assertEquals( violation.getPropertyPath().toString(), "first_name" );
 	}
-//end::field[]
+	//end::field[]
 
-//tag::getter[]
+	//tag::getter[]
 	@Test
 	public void nameIsReadFromJacksonAnnotationOnGetter() {
 		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
@@ -70,5 +70,5 @@ public class JacksonPropertyNodeNameProviderTest {
 			return firstName;
 		}
 	}
-//end::getter[]
+	//end::getter[]
 }

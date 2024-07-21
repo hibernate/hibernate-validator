@@ -37,9 +37,7 @@ class BeanConstraintLocation implements ConstraintLocation {
 
 		// HV-623 - create a ParameterizedType in case the class has type parameters. Needed for constraint validator
 		// resolution (HF)
-		typeForValidatorResolution = declaringClass.getTypeParameters().length == 0 ?
-				declaringClass :
-				TypeHelper.parameterizedType( declaringClass, declaringClass.getTypeParameters() );
+		typeForValidatorResolution = declaringClass.getTypeParameters().length == 0 ? declaringClass : TypeHelper.parameterizedType( declaringClass, declaringClass.getTypeParameters() );
 	}
 
 	@Override

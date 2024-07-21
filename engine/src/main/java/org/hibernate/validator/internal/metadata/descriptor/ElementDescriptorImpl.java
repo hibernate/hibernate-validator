@@ -53,9 +53,9 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 	private final List<Class<?>> defaultGroupSequence;
 
 	public ElementDescriptorImpl(Type type,
-								 Set<ConstraintDescriptorImpl<?>> constraintDescriptors,
-								 boolean defaultGroupSequenceRedefined,
-								 List<Class<?>> defaultGroupSequence) {
+			Set<ConstraintDescriptorImpl<?>> constraintDescriptors,
+			boolean defaultGroupSequenceRedefined,
+			List<Class<?>> defaultGroupSequence) {
 		this.type = (Class<?>) TypeHelper.getErasedType( type );
 		this.constraintDescriptors = CollectionHelper.toImmutableSet( constraintDescriptors );
 		this.defaultGroupSequenceRedefined = defaultGroupSequenceRedefined;
@@ -90,7 +90,7 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 		ConstraintFinderImpl() {
 			elementTypes = EnumSet.of(
 					ElementType.TYPE, ElementType.METHOD, ElementType.CONSTRUCTOR,
-					ElementType.FIELD, ElementType.TYPE_USE ,
+					ElementType.FIELD, ElementType.TYPE_USE,
 					//for a bean descriptor there will be no parameter constraints, so we can safely add this element type here
 					ElementType.PARAMETER
 			);
@@ -142,7 +142,8 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 
 		private void addMatchingDescriptorsForGroup(Class<?> group, Set<ConstraintDescriptor<?>> matchingDescriptors) {
 			for ( ConstraintDescriptorImpl<?> descriptor : constraintDescriptors ) {
-				if ( definedInSet.contains( descriptor.getDefinedOn() ) && elementTypes.contains( descriptor.getConstraintLocationKind().getElementType() )
+				if ( definedInSet.contains( descriptor.getDefinedOn() )
+						&& elementTypes.contains( descriptor.getConstraintLocationKind().getElementType() )
 						&& descriptor.getGroups().contains( group ) ) {
 					matchingDescriptors.add( descriptor );
 				}

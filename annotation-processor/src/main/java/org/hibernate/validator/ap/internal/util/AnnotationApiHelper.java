@@ -278,8 +278,7 @@ public class AnnotationApiHelper {
 				}, null
 		);
 
-		return theValue != null ? theValue : Collections
-				.<AnnotationValue>emptyList();
+		return theValue != null ? theValue : Collections.<AnnotationValue>emptyList();
 	}
 
 	/**
@@ -317,9 +316,10 @@ public class AnnotationApiHelper {
 		for ( TypeMirror typeMirror1 : types ) {
 			boolean foundSubType = false;
 			for ( TypeMirror typeMirror2 : types ) {
-				if ( !typeUtils.isSameType( typeMirror2, typeMirror1 ) && typeUtils.isAssignable(
-						typeMirror2, typeMirror1
-				) ) {
+				if ( !typeUtils.isSameType( typeMirror2, typeMirror1 )
+						&& typeUtils.isAssignable(
+								typeMirror2, typeMirror1
+						) ) {
 					foundSubType = true;
 					continue;
 				}

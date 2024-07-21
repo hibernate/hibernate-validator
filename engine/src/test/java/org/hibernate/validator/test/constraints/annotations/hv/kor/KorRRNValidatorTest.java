@@ -34,7 +34,7 @@ public class KorRRNValidatorTest extends AbstractConstrainedTest {
 		final Set<ConstraintViolation<KorRegistrationCard>> violations = validator.validate( korRegistrationCard );
 		assertThat( violations )
 				.containsOnlyViolations( violationOf( KorRRN.class )
-												 .withMessage( "invalid Korean resident registration number (KorRRN)" ) );
+						.withMessage( "invalid Korean resident registration number (KorRRN)" ) );
 	}
 
 	private static class KorRegistrationCard {

@@ -89,5 +89,3 @@ public class Token {
 		return sb.toString();
 	}
 }
-
-

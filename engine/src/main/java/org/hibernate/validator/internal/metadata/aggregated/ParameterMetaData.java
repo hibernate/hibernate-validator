@@ -37,12 +37,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	private final int index;
 	private final CascadingMetaData cascadingMetaData;
 
-	private ParameterMetaData(int index,
-							  String name,
-							  Type type,
-							  Set<MetaConstraint<?>> constraints,
-							  Set<MetaConstraint<?>> containerElementsConstraints,
-							  CascadingMetaData cascadingMetaData) {
+	private ParameterMetaData(int index, String name, Type type, Set<MetaConstraint<?>> constraints, Set<MetaConstraint<?>> containerElementsConstraints, CascadingMetaData cascadingMetaData) {
 		super(
 				name,
 				type,
@@ -152,8 +147,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 			// use this parent class parameter name instead of the more specific one.
 			// Worse case, we are consistent, best case parameters from parents are more meaningful.
 			// See HV-887 and the associated unit test
-			if ( callableForNameRetrieval == null ||
-					newConstrainedParameter.getCallable().getDeclaringClass().isAssignableFrom( callableForNameRetrieval.getDeclaringClass() ) ) {
+			if ( callableForNameRetrieval == null || newConstrainedParameter.getCallable().getDeclaringClass().isAssignableFrom( callableForNameRetrieval.getDeclaringClass() ) ) {
 				callableForNameRetrieval = newConstrainedParameter.getCallable();
 			}
 		}

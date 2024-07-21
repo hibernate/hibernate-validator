@@ -25,7 +25,7 @@ public class Book {
 	private Person publisher;
 
 	//constructors, getters and setters...
-//end::include[]
+	//end::include[]
 
 	public Book(String isbn, String title, Person author, Person publisher) {
 		this.isbn = isbn;
@@ -50,6 +50,6 @@ public class Book {
 		return this.publisher;
 	}
 
-//tag::include[]
+	//tag::include[]
 }
 //end::include[]

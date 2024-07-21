@@ -35,7 +35,7 @@ public abstract class AbstractInstantBasedTimeValidator<C extends Annotation, T>
 	@Override
 	public void initialize(ConstraintDescriptor<C> constraintDescriptor, HibernateConstraintValidatorInitializationContext initializationContext) {
 		try {
-			this.referenceClock  = Clock.offset(
+			this.referenceClock = Clock.offset(
 					initializationContext.getClockProvider().getClock(),
 					getEffectiveTemporalValidationTolerance( initializationContext.getTemporalValidationTolerance() )
 			);

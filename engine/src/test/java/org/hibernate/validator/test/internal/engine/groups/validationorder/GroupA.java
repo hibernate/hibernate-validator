@@ -11,5 +11,3 @@ package org.hibernate.validator.test.internal.engine.groups.validationorder;
  */
 interface GroupA {
 }
-
-

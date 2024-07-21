@@ -14,5 +14,3 @@ public class ContactServiceImpl implements ContactService {
 	public void validateValidBeanParamConstraint(ContactBean bean) {
 	}
 }
-
-

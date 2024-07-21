@@ -86,7 +86,8 @@ public abstract class ConstraintTree<A extends Annotation> {
 		return true;
 	}
 
-	protected abstract void validateConstraints(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext, Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts);
+	protected abstract void validateConstraints(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext,
+			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts);
 
 	public final ConstraintDescriptorImpl<A> getDescriptor() {
 		return descriptor;
@@ -130,7 +131,7 @@ public abstract class ConstraintTree<A extends Annotation> {
 				validator = defaultInitializedConstraintValidator;
 
 				if ( validator == null ) {
-					synchronized ( this ) {
+					synchronized (this) {
 						validator = defaultInitializedConstraintValidator;
 						if ( validator == null ) {
 							validator = validationContext.getConstraintValidatorManager().getInitializedValidator(

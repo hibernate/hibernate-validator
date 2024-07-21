@@ -264,10 +264,14 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 					@Override
 					public Boolean visitWildcard(WildcardType t, Void p) {
 
-						boolean extendsBoundMatches = ( t.getExtendsBound() == null ? expectedExtendsBound == null : expectedExtendsBound != null && typeUtils
-								.isSameType( t.getExtendsBound(), expectedExtendsBound ) );
-						boolean superBoundMatches = ( t.getSuperBound() == null ? expectedSuperBound == null : expectedSuperBound != null && typeUtils
-								.isSameType( t.getSuperBound(), expectedSuperBound ) );
+						boolean extendsBoundMatches = ( t.getExtendsBound() == null
+								? expectedExtendsBound == null
+								: expectedExtendsBound != null
+										&& typeUtils.isSameType( t.getExtendsBound(), expectedExtendsBound ) );
+						boolean superBoundMatches = ( t.getSuperBound() == null
+								? expectedSuperBound == null
+								: expectedSuperBound != null
+										&& typeUtils.isSameType( t.getSuperBound(), expectedSuperBound ) );
 
 						return extendsBoundMatches && superBoundMatches;
 					}
@@ -287,18 +291,17 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 	 */
 	private boolean isEmptyArray(AnnotationValue annotationValue) {
 
-		return annotationValue != null && Boolean.TRUE.equals(
-				annotationValue.accept(
-						new SimpleAnnotationValueVisitor8<Boolean, Void>() {
+		return annotationValue != null
+				&& Boolean.TRUE.equals(
+						annotationValue.accept( new SimpleAnnotationValueVisitor8<Boolean, Void>() {
 
 							@Override
 							public Boolean visitArray(List<? extends AnnotationValue> values, Void p) {
 								return values.size() == 0;
 							}
 
-						}, null
-				)
-		);
+						}, null )
+				);
 	}
 
 }

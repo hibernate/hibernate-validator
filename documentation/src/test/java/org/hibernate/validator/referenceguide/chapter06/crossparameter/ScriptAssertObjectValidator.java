@@ -3,7 +3,8 @@ package org.hibernate.validator.referenceguide.chapter06.crossparameter;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class ScriptAssertObjectValidator implements
+public class ScriptAssertObjectValidator
+		implements
 		ConstraintValidator<ScriptAssert, Object> {
 
 	@Override

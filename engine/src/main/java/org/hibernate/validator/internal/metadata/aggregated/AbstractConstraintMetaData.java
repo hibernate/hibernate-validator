@@ -50,16 +50,12 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	@Immutable
 	private final Set<MetaConstraint<?>> containerElementsConstraints;
 	@Immutable
-	private final Set<MetaConstraint<?>>  allConstraints;
+	private final Set<MetaConstraint<?>> allConstraints;
 	private final boolean isCascading;
 	private final boolean isConstrained;
 
-	public AbstractConstraintMetaData(String name,
-									  Type type,
-									  Set<MetaConstraint<?>> directConstraints,
-									  Set<MetaConstraint<?>> containerElementsConstraints,
-									  boolean isCascading,
-									  boolean isConstrained) {
+	public AbstractConstraintMetaData(String name, Type type, Set<MetaConstraint<?>> directConstraints, Set<MetaConstraint<?>> containerElementsConstraints, boolean isCascading,
+			boolean isConstrained) {
 		this.name = name;
 		this.type = type;
 		this.directConstraints = CollectionHelper.toImmutableSet( directConstraints );
@@ -175,8 +171,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 			ContainerElementMetaDataTree childContainerElementMetaDataTree = entry.getValue();
 
 			Set<ContainerElementTypeDescriptor> childrenDescriptors =
-					asContainerElementTypeDescriptors( childContainerElementMetaDataTree.elementType, childContainerElementMetaDataTree,
-					defaultGroupSequenceRedefined, defaultGroupSequence );
+					asContainerElementTypeDescriptors( childContainerElementMetaDataTree.elementType, childContainerElementMetaDataTree, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 			containerElementTypeDescriptors.add( new ContainerElementTypeDescriptorImpl(
 					childContainerElementMetaDataTree.elementType,

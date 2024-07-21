@@ -25,6 +25,7 @@ public @interface NonSelfPublishing {
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
+
 	// tag::include[]
 	class NonSelfPublishingValidator implements ConstraintValidator<NonSelfPublishing, Book> {
 

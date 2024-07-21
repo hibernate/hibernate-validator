@@ -511,7 +511,7 @@ public class NodeImplTest {
 	@TestForIssue(jiraKey = "HV-1946")
 	public void testIndexedContainerElementMultipleFailuresCorrectPath() {
 		class People {
-			@Pattern( regexp = "[a-z]+")
+			@Pattern(regexp = "[a-z]+")
 			Person[] people;
 
 			public People(Person... people) {

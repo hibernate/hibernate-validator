@@ -421,8 +421,7 @@ public final class TypeHelper {
 		return null;
 	}
 
-	private static void putPrimitiveSubtypes(Map<Class<?>, Set<Class<?>>> subtypesByPrimitive, Class<?> primitiveType,
-											 Class<?>... directSubtypes) {
+	private static void putPrimitiveSubtypes(Map<Class<?>, Set<Class<?>>> subtypesByPrimitive, Class<?> primitiveType, Class<?>... directSubtypes) {
 		Set<Class<?>> subtypes = newHashSet();
 
 		for ( Class<?> directSubtype : directSubtypes ) {
@@ -458,7 +457,8 @@ public final class TypeHelper {
 
 		if ( !rawSupertype.equals( rawType ) ) {
 			// short circuit when class raw types are unassignable
-			if ( rawSupertype instanceof Class<?> && rawType instanceof Class<?>
+			if ( rawSupertype instanceof Class<?>
+					&& rawType instanceof Class<?>
 					&& !( ( (Class<?>) rawSupertype ).isAssignableFrom( (Class<?>) rawType ) ) ) {
 				return false;
 			}

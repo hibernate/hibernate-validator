@@ -75,9 +75,9 @@ public final class ConstraintViolationAssert {
 	public static void assertCorrectPropertyPathStringRepresentations(Set<? extends ConstraintViolation<?>> violations,
 			String... expectedPropertyPaths) {
 		List<String> actualPaths = violations.stream()
-			.map( ConstraintViolation::getPropertyPath )
-			.map( Path::toString )
-			.collect( Collectors.toList() );
+				.map( ConstraintViolation::getPropertyPath )
+				.map( Path::toString )
+				.collect( Collectors.toList() );
 
 		Assertions.assertThat( actualPaths ).containsExactlyInAnyOrder( expectedPropertyPaths );
 	}

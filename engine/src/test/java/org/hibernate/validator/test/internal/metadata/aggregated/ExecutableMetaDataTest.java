@@ -189,16 +189,16 @@ public class ExecutableMetaDataTest {
 		methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getSignatures() )
-			.describedAs( "Expecting only super-type method signature" )
-			.containsOnly( new Signature( "createJob", Object.class ) );
+				.describedAs( "Expecting only super-type method signature" )
+				.containsOnly( new Signature( "createJob", Object.class ) );
 
 		method = SpecialJobRepositoryImpl.class.getMethod( "createJob", Object.class );
 		beanMetaData = beanMetaDataManager.getBeanMetaData( SpecialJobRepositoryImpl.class );
 		methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getSignatures() )
-			.describedAs( "Expecting method signatures from super-types" )
-			.containsOnly( new Signature( "createJob", Object.class ), new Signature( "createJob", UUID.class ) );
+				.describedAs( "Expecting method signatures from super-types" )
+				.containsOnly( new Signature( "createJob", Object.class ), new Signature( "createJob", UUID.class ) );
 	}
 
 	@Test
@@ -209,8 +209,8 @@ public class ExecutableMetaDataTest {
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).get();
 
 		assertThat( methodMetaData.getSignatures() )
-			.describedAs( "Expecting sub-type method signature which overloads but not overrides super-type methods" )
-			.containsOnly( new Signature( "createJob", String.class ) );
+				.describedAs( "Expecting sub-type method signature which overloads but not overrides super-type methods" )
+				.containsOnly( new Signature( "createJob", String.class ) );
 	}
 
 	@Test

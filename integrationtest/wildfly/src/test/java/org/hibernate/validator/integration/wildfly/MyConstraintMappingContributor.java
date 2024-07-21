@@ -17,8 +17,8 @@ public class MyConstraintMappingContributor implements ConstraintMappingContribu
 	@Override
 	public void createConstraintMappings(ConstraintMappingBuilder builder) {
 		builder.addConstraintMapping()
-			.type( Broomstick.class )
+				.type( Broomstick.class )
 				.field( "brand" )
-					.constraint( new NotNullDef() );
+				.constraint( new NotNullDef() );
 	}
 }

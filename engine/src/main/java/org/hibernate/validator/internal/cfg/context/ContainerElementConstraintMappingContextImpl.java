@@ -49,7 +49,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  *
  */
-public class ContainerElementConstraintMappingContextImpl extends CascadableConstraintMappingContextImplBase<ContainerElementConstraintMappingContext> implements ContainerElementConstraintMappingContext {
+public class ContainerElementConstraintMappingContextImpl extends CascadableConstraintMappingContextImplBase<ContainerElementConstraintMappingContext>
+		implements ContainerElementConstraintMappingContext {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -218,27 +219,27 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 
 	CascadingMetaDataBuilder getContainerElementCascadingMetaDataBuilder() {
 		return new CascadingMetaDataBuilder(
-			parentLocation.getTypeForValidatorResolution(),
-			typeParameter,
-			isCascading,
-			nestedContainerElementContexts.values()
-					.stream()
-					.map( ContainerElementConstraintMappingContextImpl::getContainerElementCascadingMetaDataBuilder )
-					.collect( Collectors.toMap( CascadingMetaDataBuilder::getTypeParameter, Function.identity() ) ),
-			groupConversions
+				parentLocation.getTypeForValidatorResolution(),
+				typeParameter,
+				isCascading,
+				nestedContainerElementContexts.values()
+						.stream()
+						.map( ContainerElementConstraintMappingContextImpl::getContainerElementCascadingMetaDataBuilder )
+						.collect( Collectors.toMap( CascadingMetaDataBuilder::getTypeParameter, Function.identity() ) ),
+				groupConversions
 		);
 	}
 
 	Set<MetaConstraint<?>> build(ConstraintCreationContext constraintCreationContext) {
 		return Stream.concat(
-			constraints.stream()
-				.map( c -> asMetaConstraint( c, constraintCreationContext ) ),
-			nestedContainerElementContexts.values()
-				.stream()
-				.map( c -> c.build( constraintCreationContext ) )
-				.flatMap( Set::stream )
-			)
-			.collect( Collectors.toSet() );
+				constraints.stream()
+						.map( c -> asMetaConstraint( c, constraintCreationContext ) ),
+				nestedContainerElementContexts.values()
+						.stream()
+						.map( c -> c.build( constraintCreationContext ) )
+						.flatMap( Set::stream )
+		)
+				.collect( Collectors.toSet() );
 	}
 
 	private <A extends Annotation> MetaConstraint<A> asMetaConstraint(ConfiguredConstraint<A> config, ConstraintCreationContext constraintCreationContext) {

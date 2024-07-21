@@ -38,7 +38,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  */
 abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C>>
-		extends ConstraintMappingContextImplBase implements Cascadable<C> {
+		extends ConstraintMappingContextImplBase
+		implements Cascadable<C> {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -124,7 +125,7 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 		boolean configuredBefore = !configuredPaths.add( key );
 		if ( configuredBefore ) {
 			throw LOG.getContainerElementTypeHasAlreadyBeenConfiguredViaProgrammaticApiException(
-				location.getTypeForValidatorResolution()
+					location.getTypeForValidatorResolution()
 			);
 		}
 
@@ -151,10 +152,10 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 
 	protected Set<MetaConstraint<?>> getTypeArgumentConstraints(ConstraintCreationContext constraintCreationContext) {
 		return containerElementContexts.values()
-			.stream()
-			.map( t -> t.build( constraintCreationContext ) )
-			.flatMap( Set::stream )
-			.collect( Collectors.toSet() );
+				.stream()
+				.map( t -> t.build( constraintCreationContext ) )
+				.flatMap( Set::stream )
+				.collect( Collectors.toSet() );
 	}
 
 	protected CascadingMetaDataBuilder getCascadingMetaDataBuilder() {

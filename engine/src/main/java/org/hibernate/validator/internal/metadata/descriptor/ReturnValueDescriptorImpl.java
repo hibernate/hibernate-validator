@@ -33,12 +33,12 @@ public class ReturnValueDescriptorImpl extends ElementDescriptorImpl
 	private final Set<GroupConversionDescriptor> groupConversions;
 
 	public ReturnValueDescriptorImpl(Type returnType,
-									 Set<ConstraintDescriptorImpl<?>> returnValueConstraints,
-									 Set<ContainerElementTypeDescriptor> constrainedContainerElementTypes,
-									 boolean cascaded,
-									 boolean defaultGroupSequenceRedefined,
-									 List<Class<?>> defaultGroupSequence,
-									 Set<GroupConversionDescriptor> groupConversions) {
+			Set<ConstraintDescriptorImpl<?>> returnValueConstraints,
+			Set<ContainerElementTypeDescriptor> constrainedContainerElementTypes,
+			boolean cascaded,
+			boolean defaultGroupSequenceRedefined,
+			List<Class<?>> defaultGroupSequence,
+			Set<GroupConversionDescriptor> groupConversions) {
 		super(
 				returnType,
 				returnValueConstraints,

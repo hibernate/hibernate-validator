@@ -129,6 +129,7 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 			return ( (HibernateValidatorEnhancedBean) bean ).$$_hibernateValidator_getGetterValue( getterFullName );
 		}
 	}
+
 	private static class GetterAccessor implements PropertyAccessor {
 
 		private Method accessibleGetter;

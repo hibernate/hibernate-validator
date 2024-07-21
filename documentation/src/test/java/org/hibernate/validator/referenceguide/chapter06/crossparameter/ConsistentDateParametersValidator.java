@@ -11,7 +11,8 @@ import jakarta.validation.constraintvalidation.ValidationTarget;
 
 //tag::include[]
 @SupportedValidationTarget(ValidationTarget.PARAMETERS)
-public class ConsistentDateParametersValidator implements
+public class ConsistentDateParametersValidator
+		implements
 		ConstraintValidator<ConsistentDateParameters, Object[]> {
 
 	@Override

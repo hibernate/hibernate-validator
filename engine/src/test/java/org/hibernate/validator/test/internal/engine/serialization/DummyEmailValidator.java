@@ -19,5 +19,3 @@ public class DummyEmailValidator implements ConstraintValidator<Email, String> {
 		return false;
 	}
 }
-
-

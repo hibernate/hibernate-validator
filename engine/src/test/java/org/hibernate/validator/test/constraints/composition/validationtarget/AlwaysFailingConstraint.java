@@ -40,9 +40,9 @@ public @interface AlwaysFailingConstraint {
 
 	String message() default "{org.hibernate.validator.test.constraints.composition.validationtarget.CustomComposingConstraint.message}";
 
-	Class<?>[] groups() default {};
+	Class<?>[] groups() default { };
 
-	Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default { };
 
 	ConstraintTarget validationAppliesTo() default ConstraintTarget.IMPLICIT;
 

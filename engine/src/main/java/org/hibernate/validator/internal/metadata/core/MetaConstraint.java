@@ -81,9 +81,12 @@ public class MetaConstraint<A extends Annotation> {
 
 	private static ValueExtractionPathNode getValueExtractionPath(List<ContainerClassTypeParameterAndExtractor> valueExtractionPath) {
 		switch ( valueExtractionPath.size() ) {
-			case 0: return null;
-			case 1: return new SingleValueExtractionPathNode( valueExtractionPath.iterator().next() );
-			default: return new LinkedValueExtractionPathNode( null, valueExtractionPath );
+			case 0:
+				return null;
+			case 1:
+				return new SingleValueExtractionPathNode( valueExtractionPath.iterator().next() );
+			default:
+				return new LinkedValueExtractionPathNode( null, valueExtractionPath );
 		}
 	}
 
@@ -277,11 +280,17 @@ public class MetaConstraint<A extends Annotation> {
 
 	private interface ValueExtractionPathNode {
 		boolean hasNext();
+
 		ValueExtractionPathNode getPrevious();
+
 		ValueExtractionPathNode getNext();
+
 		Class<?> getContainerClass();
+
 		TypeVariable<?> getTypeParameter();
+
 		Integer getTypeParameterIndex();
+
 		ValueExtractorDescriptor getValueExtractorDescriptor();
 	}
 
@@ -351,7 +360,7 @@ public class MetaConstraint<A extends Annotation> {
 		private final Integer typeParameterIndex;
 		private final ValueExtractorDescriptor valueExtractorDescriptor;
 
-		private LinkedValueExtractionPathNode( ValueExtractionPathNode previous, List<ContainerClassTypeParameterAndExtractor> elements) {
+		private LinkedValueExtractionPathNode(ValueExtractionPathNode previous, List<ContainerClassTypeParameterAndExtractor> elements) {
 			ContainerClassTypeParameterAndExtractor first = elements.get( 0 );
 			this.containerClass = first.containerClass;
 			this.typeParameter = first.typeParameter;

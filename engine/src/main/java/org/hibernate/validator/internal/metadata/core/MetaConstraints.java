@@ -66,8 +66,7 @@ public class MetaConstraints {
 			else {
 				current = null;
 			}
-		}
-		while ( current != null );
+		} while ( current != null );
 
 		Collections.reverse( valueExtractionPath );
 
@@ -129,14 +128,15 @@ public class MetaConstraints {
 			Class<?> wrappedValueType = getWrappedValueType( typeResolutionHelper, location.getTypeForValidatorResolution(), selectedValueExtractorDescriptor );
 			TypeVariable<?> typeParameter = getContainerClassTypeParameter( declaredType, selectedValueExtractorDescriptor );
 
-			valueExtractionPath.add( new ContainerClassTypeParameterAndExtractor( declaredType, typeParameter, TypeVariables.getTypeParameterIndex( typeParameter ), selectedValueExtractorDescriptor ) );
+			valueExtractionPath
+					.add( new ContainerClassTypeParameterAndExtractor( declaredType, typeParameter, TypeVariables.getTypeParameterIndex( typeParameter ), selectedValueExtractorDescriptor ) );
 
 			return wrappedValueType;
 		}
 	}
 
-	private static void addValueExtractorDescriptorForTypeArgumentLocation( ValueExtractorManager valueExtractorManager,
-			List<ContainerClassTypeParameterAndExtractor> valueExtractionPath, TypeArgumentConstraintLocation typeArgumentConstraintLocation ) {
+	private static void addValueExtractorDescriptorForTypeArgumentLocation(ValueExtractorManager valueExtractorManager,
+			List<ContainerClassTypeParameterAndExtractor> valueExtractionPath, TypeArgumentConstraintLocation typeArgumentConstraintLocation) {
 		Class<?> declaredType = typeArgumentConstraintLocation.getContainerClass();
 		TypeVariable<?> typeParameter = typeArgumentConstraintLocation.getTypeParameter();
 

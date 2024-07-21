@@ -66,7 +66,7 @@ abstract class ConstraintMappingContextImplBase extends ConstraintContextImplBas
 		return metaConstraints;
 	}
 
-	private <A extends Annotation> MetaConstraint<A> asMetaConstraint(ConfiguredConstraint<A> config, ConstraintCreationContext constraintCreationContext ) {
+	private <A extends Annotation> MetaConstraint<A> asMetaConstraint(ConfiguredConstraint<A> config, ConstraintCreationContext constraintCreationContext) {
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
 				constraintCreationContext.getConstraintHelper(),
 				config.getLocation().getConstrainable(),

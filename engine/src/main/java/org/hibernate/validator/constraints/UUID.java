@@ -46,7 +46,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @since 8.0.0
  */
 @Documented
-@Constraint(validatedBy = {})
+@Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
@@ -54,9 +54,9 @@ public @interface UUID {
 
 	String message() default "{org.hibernate.validator.constraints.UUID.message}";
 
-	Class<?>[] groups() default {};
+	Class<?>[] groups() default { };
 
-	Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default { };
 
 	/**
 	 * @return allow empty strings.
@@ -84,7 +84,7 @@ public @interface UUID {
 	 * @return the allowed UUID variant numbers
 	 * Per default variants 0 to 2 are allowed
 	 */
-	int[] variant() default { 0, 1, 2};
+	int[] variant() default { 0, 1, 2 };
 
 	/**
 	 * @return the required letter case

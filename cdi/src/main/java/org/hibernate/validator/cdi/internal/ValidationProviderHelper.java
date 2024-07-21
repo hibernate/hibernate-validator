@@ -179,6 +179,6 @@ public class ValidationProviderHelper {
 	private static boolean isHibernateValidatorInternalType(Class<?> klass) {
 		return klass.getPackageName().startsWith( "org.hibernate.validator." )
 				&& ( klass.getPackageName().endsWith( ".internal" )
-				|| klass.getPackageName().contains( ".internal." ) );
+						|| klass.getPackageName().contains( ".internal." ) );
 	}
 }

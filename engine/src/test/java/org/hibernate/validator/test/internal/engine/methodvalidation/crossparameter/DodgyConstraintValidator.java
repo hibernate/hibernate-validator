@@ -14,7 +14,7 @@ import jakarta.validation.constraintvalidation.ValidationTarget;
 /**
  * @author Hardy Ferentschik
  */
-@SupportedValidationTarget( value = ValidationTarget.PARAMETERS)
+@SupportedValidationTarget(value = ValidationTarget.PARAMETERS)
 public class DodgyConstraintValidator implements ConstraintValidator<DodgyConstraint, Object[]> {
 
 	@Override

@@ -29,7 +29,7 @@ public class CustomErrorMessageTest {
 	 * @throws Exception in case the test fails.
 	 */
 	@Test
-	@TestForIssue( jiraKey = "HV-297" )
+	@TestForIssue(jiraKey = "HV-297")
 	public void testReportAsSingleViolationDoesNotInfluenceCustomError() throws Exception {
 		Validator validator = getValidator();
 		DummyTestClass dummyTestClass = new DummyTestClass();

@@ -18,9 +18,9 @@ public class OverridingMethodMustNotAlterParameterConstraints extends MethodConf
 
 	@Override
 	public void apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
-		if ( isDefinedOnSubType( method, otherMethod ) &&
-				otherMethod.hasParameterConstraints() &&
-				!method.isEquallyParameterConstrained( otherMethod ) ) {
+		if ( isDefinedOnSubType( method, otherMethod )
+				&& otherMethod.hasParameterConstraints()
+				&& !method.isEquallyParameterConstrained( otherMethod ) ) {
 			throw LOG.getParameterConfigurationAlteredInSubTypeException(
 					method.getCallable(),
 					otherMethod.getCallable()

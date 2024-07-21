@@ -253,7 +253,7 @@ public class SpecExamplePropertyPathTest {
 
 		Map<Integer, List<String>> tagsByChapter = new HashMap<>();
 		tagsByChapter.put( 4, Arrays.asList( "some tag", "another tag", "" ) );
-		book.setTagsByChapter( tagsByChapter  );
+		book.setTagsByChapter( tagsByChapter );
 
 		Set<ConstraintViolation<Book>> constraintViolations = validator.validate( book );
 		assertThat( constraintViolations ).containsOnlyViolations( violationOf( NotBlank.class ) );
@@ -300,7 +300,7 @@ public class SpecExamplePropertyPathTest {
 
 		Map<Integer, List<Author>> authorsByChapter = new HashMap<>();
 		authorsByChapter.put( 4, Arrays.asList( new Author( "Bob" ), new Author( "Bruce" ), new Author( "" ) ) );
-		book.setAuthorsByChapter( authorsByChapter  );
+		book.setAuthorsByChapter( authorsByChapter );
 
 		Set<ConstraintViolation<Book>> constraintViolations = validator.validate( book );
 		assertThat( constraintViolations ).containsOnlyViolations( violationOf( NonEmpty.class ) );
@@ -322,7 +322,7 @@ public class SpecExamplePropertyPathTest {
 		Constructor<Library> constructor = Library.class.getConstructor( String.class, String.class );
 
 		Set<ConstraintViolation<Library>> constraintViolations = validator.validateConstructorParameters( constructor,
-				new Object[]{ "Passages", null } );
+				new Object[] { "Passages", null } );
 		assertThat( constraintViolations ).containsOnlyViolations( violationOf( NotNull.class ) );
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();
@@ -342,7 +342,7 @@ public class SpecExamplePropertyPathTest {
 		Library library = new Library( "Passages", "Lyon" );
 		Method method = Library.class.getMethod( "addBook", Book.class );
 
-		Set<ConstraintViolation<Library>> constraintViolations = validator.validateParameters( library, method, new Object[]{ null } );
+		Set<ConstraintViolation<Library>> constraintViolations = validator.validateParameters( library, method, new Object[] { null } );
 		assertThat( constraintViolations ).containsOnlyViolations( violationOf( NotNull.class ) );
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();
@@ -363,7 +363,7 @@ public class SpecExamplePropertyPathTest {
 		Method method = Library.class.getMethod( "addBook", Book.class );
 
 		Set<ConstraintViolation<Library>> constraintViolations = validator.validateParameters( library, method,
-				new Object[]{ new Book( null, new Author( "Irving" ) ) } );
+				new Object[] { new Book( null, new Author( "Irving" ) ) } );
 		assertThat( constraintViolations ).containsOnlyViolations( violationOf( NonEmpty.class ) );
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();
@@ -384,12 +384,13 @@ public class SpecExamplePropertyPathTest {
 		Method method = Library.class.getMethod( "addAllBooks", List.class );
 
 		Set<ConstraintViolation<Library>> constraintViolations = validator.validateParameters( library, method,
-				new Object[]{ Arrays.asList(
-						new Book( "The Water-Method Man", new Author( "Irving" ) ),
-						new Book( "The World According to Garp", new Author( "Irving" ) ),
-						new Book( "Avenue of Mysteries", new Author( "Irving" ) ),
-						new Book( "", new Author( "Irving" ) )
-				) }
+				new Object[] {
+						Arrays.asList(
+								new Book( "The Water-Method Man", new Author( "Irving" ) ),
+								new Book( "The World According to Garp", new Author( "Irving" ) ),
+								new Book( "Avenue of Mysteries", new Author( "Irving" ) ),
+								new Book( "", new Author( "Irving" ) )
+						) }
 		);
 		assertThat( constraintViolations ).containsOnlyViolations( violationOf( NonEmpty.class ) );
 
@@ -454,7 +455,7 @@ public class SpecExamplePropertyPathTest {
 		Set<ConstraintViolation<Author>> constraintViolations = validator.validateParameters(
 				new Author( "John", "Doe" ),
 				Author.class.getMethod( "renewPassword", String.class, String.class, String.class ),
-				new Object[]{ "foo", "foo", "foo" } );
+				new Object[] { "foo", "foo", "foo" } );
 		assertThat( constraintViolations ).containsOnlyViolations( violationOf( OldAndNewPasswordsDifferent.class ) );
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();
@@ -474,7 +475,7 @@ public class SpecExamplePropertyPathTest {
 		Set<ConstraintViolation<Author>> constraintViolations = validator.validateParameters(
 				new Author( "John", "Doe" ),
 				Author.class.getMethod( "renewPassword", String.class, String.class, String.class ),
-				new Object[]{ "foo", "bar", "baz" } );
+				new Object[] { "foo", "bar", "baz" } );
 		assertThat( constraintViolations ).containsOnlyViolations( violationOf( NewPasswordsIdentical.class ) );
 
 		Path path = constraintViolations.iterator().next().getPropertyPath();

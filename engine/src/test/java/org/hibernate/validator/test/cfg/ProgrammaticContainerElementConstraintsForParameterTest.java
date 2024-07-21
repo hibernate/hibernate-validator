@@ -57,16 +57,16 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 	public void canDeclareContainerElementConstraintsForParameterProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test1", Optional.class, Map.class )
-					.parameter( 0 )
-						.containerElementType()
-							.constraint( new SizeDef().max( 5 ) )
-					.parameter( 1 )
-						.containerElementType( 0 )
-							.constraint( new SizeDef().min( 3 ).max( 10 ) )
-					.containerElementType( 1 )
-						.constraint( new MinDef().value( 1 ) );
+				.parameter( 0 )
+				.containerElementType()
+				.constraint( new SizeDef().max( 5 ) )
+				.parameter( 1 )
+				.containerElementType( 0 )
+				.constraint( new SizeDef().min( 3 ).max( 10 ) )
+				.containerElementType( 1 )
+				.constraint( new MinDef().value( 1 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory()
@@ -99,11 +99,11 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 	public void canDeclareNestedContainerElementConstraintsForParameterProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test2", Map.class )
-					.parameter( 0 )
-						.containerElementType( 1, 0 )
-							.constraint( new NotNullDef() );
+				.parameter( 0 )
+				.containerElementType( 1, 0 )
+				.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -131,11 +131,11 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 	public void canDeclareDeeplyNestedContainerElementConstraintsForParameterProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test3", List.class )
-					.parameter( 0 )
-						.containerElementType( 0, 1, 0 )
-							.constraint( new NotNullDef() );
+				.parameter( 0 )
+				.containerElementType( 0, 1, 0 )
+				.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -165,14 +165,14 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 	public void canDeclareContainerElementCascadesForParameterProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test4", Optional.class )
-					.parameter( 0 )
-						.containerElementType()
-							.valid()
-			.type( Fish.class )
+				.parameter( 0 )
+				.containerElementType()
+				.valid()
+				.type( Fish.class )
 				.field( "name" )
-					.constraint( new NotNullDef() );
+				.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -197,11 +197,11 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 	public void canDeclareContainerElementConstraintsForArrayTypedParameterProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test5", String[].class )
-					.parameter( 0 )
-						.containerElementType()
-							.constraint( new SizeDef().max( 5 ) );
+				.parameter( 0 )
+				.containerElementType()
+				.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -226,11 +226,11 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 	public void canDeclareContainerElementConstraintsForListContainingArrayTypeParameterProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test6", List.class )
-					.parameter( 0 )
-						.containerElementType( 0, 0 )
-							.constraint( new SizeDef().max( 5 ) );
+				.parameter( 0 )
+				.containerElementType( 0, 0 )
+				.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -239,7 +239,7 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 
 		try {
 			List<String[]> fishNamesByMonth = new ArrayList<>();
-			fishNamesByMonth.add(  new String[] { "Too Long" } );
+			fishNamesByMonth.add( new String[] { "Too Long" } );
 
 			fishTank.test6( fishNamesByMonth );
 
@@ -258,11 +258,11 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 	public void canDeclareContainerElementConstraintsForMultiDimensionalArrayTypeParameterProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test7", String[][].class )
-					.parameter( 0 )
-						.containerElementType( 0, 0 )
-							.constraint( new SizeDef().max( 5 ) );
+				.parameter( 0 )
+				.containerElementType( 0, 0 )
+				.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -270,7 +270,7 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
 
 		try {
-			String[][] fishNamesByMonthAsArray = new String[][]{ new String[] { "Too Long" } };
+			String[][] fishNamesByMonthAsArray = new String[][] { new String[] { "Too Long" } };
 
 			fishTank.test7( fishNamesByMonthAsArray );
 
@@ -288,10 +288,10 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 	public void declaringContainerElementConstraintOnNonGenericParameterCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "setSize", int.class )
-					.parameter( 0 )
-						.containerElementType( 1 );
+				.parameter( 0 )
+				.containerElementType( 1 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
@@ -299,10 +299,10 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 	public void declaringContainerElementConstraintForNonExistingTypeArgumentIndexOnParameterCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.method( "test1", Optional.class, Map.class )
-					.parameter( 0 )
-						.containerElementType( 2 );
+				.parameter( 0 )
+				.containerElementType( 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
@@ -310,10 +310,10 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 	public void declaringContainerElementConstraintForNonExistingNestedTypeArgumentIndexOnParameterCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.method( "test2", Map.class )
-					.parameter( 0 )
-					.containerElementType( 1, 2 );
+				.parameter( 0 )
+				.containerElementType( 1, 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000213.*")
@@ -321,10 +321,10 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 	public void omittingTypeArgumentForMultiTypeArgumentTypeOnParameterCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.method( "test1", Optional.class, Map.class )
-					.parameter( 1 )
-						.containerElementType();
+				.parameter( 1 )
+				.containerElementType();
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000214.*")
@@ -332,12 +332,12 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 	public void configuringSameContainerElementTwiceCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( FishTank.class )
+				.type( FishTank.class )
 				.method( "test3", List.class )
-					.parameter( 0 )
-						.containerElementType( 0, 1, 0 )
-							.constraint( new NotNullDef() )
-						.containerElementType( 0, 1, 0 );
+				.parameter( 0 )
+				.containerElementType( 0, 1, 0 )
+				.constraint( new NotNullDef() )
+				.containerElementType( 0, 1, 0 );
 	}
 
 	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
@@ -345,11 +345,11 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 	public void configuringConstraintsOnGenericTypeArgumentOfListThrowsException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test8", List.class )
-					.parameter( 0 )
-						.containerElementType( 0 )
-							.constraint( new SizeDef().max( 5 ) );
+				.parameter( 0 )
+				.containerElementType( 0 )
+				.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -365,29 +365,38 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 	public void configuringConstraintsOnGenericTypeArgumentOfArrayThrowsException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
-			.type( IFishTank.class )
+				.type( IFishTank.class )
 				.method( "test9", Object[].class )
-					.parameter( 0 )
-						.containerElementType( 0 )
-							.constraint( new SizeDef().max( 5 ) );
+				.parameter( 0 )
+				.containerElementType( 0 )
+				.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
 		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-		fishTank.test9( new String[]{ "Too long" } );
+		fishTank.test9( new String[] { "Too long" } );
 	}
 
 	public interface IFishTank {
 		void test1(Optional<String> model, Map<String, Integer> fishCountByType);
+
 		void test2(Map<String, List<Fish>> fishOfTheMonth);
+
 		void test3(List<Map<String, Set<String>>> tagsOfFishOfTheMonth);
+
 		void test4(Optional<Fish> boss);
+
 		void test5(String[] fishNames);
+
 		void test6(List<String[]> fishNamesByMonth);
+
 		void test7(String[][] fishNamesByMonthAsArray);
+
 		void setSize(int size);
+
 		<T> void test8(List<T> fishNames);
+
 		<T> void test9(T[] fishNames);
 	}
 

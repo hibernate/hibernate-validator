@@ -87,7 +87,7 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 			return checksum == getCheckDigit( rrn );
 		}
 
-		private static	boolean isValidDate(final String rrn) {
+		private static boolean isValidDate(final String rrn) {
 			final int month = extractMonth( rrn );
 			final int day = extractDay( rrn );
 			if ( month > 12 || day < 0 || day > 31 ) {
@@ -96,19 +96,19 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 			return day <= 31 && ( day <= 30 || ( month != 4 && month != 6 && month != 9 && month != 11 ) ) && ( day <= 29 || month != 2 );
 		}
 
-		private static	boolean isValidLength(String rrn) {
+		private static boolean isValidLength(String rrn) {
 			return rrn.length() == VALID_LENGTH;
 		}
 
-		private static	boolean isValidGenderDigit(String rrn) {
+		private static boolean isValidGenderDigit(String rrn) {
 			return GENDER_DIGIT.contains( extractGenderDigit( rrn ) );
 		}
 
-		private static	int extractGenderDigit(String rrn) {
+		private static int extractGenderDigit(String rrn) {
 			return Character.getNumericValue( rrn.charAt( GENDER_DIGIT_INDEX ) );
 		}
 
-		private static	List<Integer> toChecksumDigits(String rrn) {
+		private static List<Integer> toChecksumDigits(String rrn) {
 			List<Integer> collect = new ArrayList<>();
 			for ( int i = 0; i < rrn.length() - 1; i++ ) {
 				collect.add( Character.getNumericValue( rrn.charAt( i ) ) );
@@ -120,11 +120,11 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 			return Character.getNumericValue( rrn.charAt( rrn.length() - 1 ) );
 		}
 
-		private static	int extractDay(String rrn) {
+		private static int extractDay(String rrn) {
 			return Integer.parseInt( rrn.substring( 4, 6 ) );
 		}
 
-		private static	int extractMonth(String rrn) {
+		private static int extractMonth(String rrn) {
 			return Integer.parseInt( rrn.substring( 2, 4 ) );
 		}
 	}

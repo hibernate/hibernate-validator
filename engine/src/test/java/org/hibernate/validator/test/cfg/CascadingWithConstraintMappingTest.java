@@ -43,11 +43,11 @@ public class CascadingWithConstraintMappingTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 				.type( C.class )
-					.field( "string" )
-						.constraint( new NotNullDef() )
+				.field( "string" )
+				.constraint( new NotNullDef() )
 				.type( A.class )
-					.field( "c" )
-						.valid();
+				.field( "c" )
+				.valid();
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -67,11 +67,11 @@ public class CascadingWithConstraintMappingTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 				.type( C.class )
-					.getter( "string" )
-						.constraint( new NotNullDef() )
+				.getter( "string" )
+				.constraint( new NotNullDef() )
 				.type( A.class )
-					.getter( "c" )
-						.valid();
+				.getter( "c" )
+				.valid();
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -91,11 +91,11 @@ public class CascadingWithConstraintMappingTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 				.type( C.class )
-					.getter( "string" )
-						.constraint( new NotNullDef() )
+				.getter( "string" )
+				.constraint( new NotNullDef() )
 				.type( A.class )
-					.getter( "c" )
-						.valid();
+				.getter( "c" )
+				.valid();
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
@@ -118,15 +118,15 @@ public class CascadingWithConstraintMappingTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 				.type( Bean.class )
-					.field( "property" )
-						.constraint( new NotNullDef() )
+				.field( "property" )
+				.constraint( new NotNullDef() )
 				.type( ArrayHolder.class )
-					.field( "beans" )
-						.valid();
+				.field( "beans" )
+				.valid();
 		config.addMapping( newMapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
-		ArrayHolder arrayHolder = new ArrayHolder( new Bean[]{ new Bean( null ) } );
+		ArrayHolder arrayHolder = new ArrayHolder( new Bean[] { new Bean( null ) } );
 
 		Set<ConstraintViolation<ArrayHolder>> violations = validator.validate( arrayHolder );
 

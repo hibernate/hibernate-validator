@@ -150,12 +150,12 @@ public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 		public List<String[]> getFishNamesByMonth() {
 			List<String[]> names = new ArrayList<>();
-			names.add(  new String[] { "Too Long" } );
+			names.add( new String[] { "Too Long" } );
 			return names;
 		}
 
 		public String[][] getFishNamesByMonthAsArray() {
-			String[][] names = new String[][]{ new String[] { "Too Long" } };
+			String[][] names = new String[][] { new String[] { "Too Long" } };
 			return names;
 		}
 

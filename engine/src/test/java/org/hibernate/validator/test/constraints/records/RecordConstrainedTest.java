@@ -68,7 +68,7 @@ public class RecordConstrainedTest extends AbstractConstrainedTest {
 		assertThat( violations ).containsOnlyViolations( violationOf( NotBlank.class ).withMessage( "Name cannot be null or empty" ) );
 
 		r = new PersonRecord( "David", 0 );
-		 violations = validator.validate( r );
+		violations = validator.validate( r );
 		assertThat( violations ).containsOnlyViolations( violationOf( Positive.class ).withProperty( "age" ) );
 		assertThat( violations ).containsOnlyViolations( violationOf( Positive.class ).withMessage( "Age has to be a strictly positive integer" ) );
 
@@ -214,8 +214,7 @@ public class RecordConstrainedTest extends AbstractConstrainedTest {
 		}
 	}
 
-	private record CompactConstructorValidationRecord(
-			@NotBlank(message = "Name cannot be null or empty") String name) implements ConstructorValidator {
+	private record CompactConstructorValidationRecord(@NotBlank(message = "Name cannot be null or empty") String name) implements ConstructorValidator {
 		private CompactConstructorValidationRecord {
 			validate( name );
 		}
@@ -228,12 +227,12 @@ public class RecordConstrainedTest extends AbstractConstrainedTest {
 		}
 
 		public void doSomethingSilly(@Positive int arg) {
-			validate( this, new Object() { }.getClass().getEnclosingMethod(), arg );
+			validate( this, new Object() {}.getClass().getEnclosingMethod(), arg );
 		}
 	}
 
 	private interface ConstructorValidator {
-		default void validate(Object ... args) {
+		default void validate(Object... args) {
 			Validator v = ValidatorUtil.getValidator();
 			Constructor c = getClass().getDeclaredConstructors()[0];
 			Set<ConstraintViolation<?>> violations = v.forExecutables().validateConstructorParameters( c, args );
@@ -247,7 +246,7 @@ public class RecordConstrainedTest extends AbstractConstrainedTest {
 	}
 
 	private interface MethodValidator {
-		default void validate(Object instance, Method m, Object ... args) {
+		default void validate(Object instance, Method m, Object... args) {
 			Validator v = ValidatorUtil.getValidator();
 			Set<ConstraintViolation<Object>> violations = v.forExecutables().validateParameters( instance, m, args );
 			if ( !violations.isEmpty() ) {
@@ -263,8 +262,8 @@ public class RecordConstrainedTest extends AbstractConstrainedTest {
 	@NotNull
 	@Documented
 	@Retention(RetentionPolicy.RUNTIME)
-	@Target({FIELD})
-	@Constraint(validatedBy = {})
+	@Target({ FIELD })
+	@Constraint(validatedBy = { })
 	@interface AtLeastNCharacters {
 
 		@OverridesAttribute(constraint = Size.class, name = "min")
@@ -272,17 +271,17 @@ public class RecordConstrainedTest extends AbstractConstrainedTest {
 
 		String message() default "message";
 
-		Class<?>[] groups() default {};
+		Class<?>[] groups() default { };
 
-		Class<? extends Payload>[] payload() default {};
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	@Size
 	@NotNull
 	@Documented
 	@Retention(RetentionPolicy.RUNTIME)
-	@Target({METHOD})
-	@Constraint(validatedBy = {})
+	@Target({ METHOD })
+	@Constraint(validatedBy = { })
 	@interface AtLeastNCharactersWrongTarget {
 
 		@OverridesAttribute(constraint = Size.class, name = "min")
@@ -290,8 +289,8 @@ public class RecordConstrainedTest extends AbstractConstrainedTest {
 
 		String message() default "message";
 
-		Class<?>[] groups() default {};
+		Class<?>[] groups() default { };
 
-		Class<? extends Payload>[] payload() default {};
+		Class<? extends Payload>[] payload() default { };
 	}
 }
