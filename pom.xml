@@ -238,10 +238,10 @@
         <version.gmavenplus.plugin>3.0.2</version.gmavenplus.plugin>
         <version.gpg.plugin>3.2.4</version.gpg.plugin>
         <version.install.plugin>3.1.2</version.install.plugin>
-        <version.japicmp.plugin>0.21.2</version.japicmp.plugin>
+        <version.japicmp.plugin>0.22.0</version.japicmp.plugin>
         <version.jar.plugin>3.4.2</version.jar.plugin>
         <version.jqassistant.plugin>2.3.1</version.jqassistant.plugin>
-        <version.javadoc.plugin>3.7.0</version.javadoc.plugin>
+        <version.javadoc.plugin>3.8.0</version.javadoc.plugin>
         <version.license.plugin>4.5</version.license.plugin>
         <version.release.plugin>3.1.1</version.release.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
