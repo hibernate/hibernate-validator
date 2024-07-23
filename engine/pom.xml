@@ -349,10 +349,6 @@
                                         org.hibernate.validator.*.internal.* to org.hibernate.validator.cdi;
                                         *;
                                     </exports>
-                                    <opens>
-                                        <!-- As both Validator and ValidatorFactory have to be accessible by CDI ... -->
-                                        org.hibernate.validator.internal.engine;
-                                    </opens>
                                     <uses>
                                         jakarta.validation.valueextraction.ValueExtractor;
                                         jakarta.validation.ConstraintValidator

@@ -41,8 +41,6 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cdi.spi.BeanNames;
 import org.hibernate.validator.cdi.spi.InjectingConstraintValidatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
-import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.actions.GetClassLoader;
 import org.hibernate.validator.internal.util.actions.GetInstancesFromServiceLoader;
 import org.hibernate.validator.internal.util.actions.LoadClass;
@@ -68,11 +66,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		this.beanManager = beanManager;
 		this.destructibleResources = newHashSet( 5 );
 		this.validationProviderHelper = validationProviderHelper;
-		this.types = Collections.unmodifiableSet(
-				CollectionHelper.<Type>newHashSet(
-						ClassHierarchyHelper.getHierarchy( validationProviderHelper.getValidatorFactoryBeanClass() )
-				)
-		);
+		this.types = validationProviderHelper.determineValidatorFactoryCdiTypes();
 	}
 
 	@Override

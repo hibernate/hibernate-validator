@@ -10,6 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Set;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.spi.Bean;
@@ -18,9 +19,6 @@ import jakarta.enterprise.inject.spi.InjectionPoint;
 import jakarta.enterprise.inject.spi.PassivationCapable;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-
-import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 
 /**
  * A {@link Bean} representing a {@link Validator}. There is one instance of this type representing the default
@@ -36,16 +34,11 @@ public class ValidatorBean implements Bean<Validator>, PassivationCapable {
 	private final Set<Type> types;
 	private final Bean<?> validatorFactoryBean;
 
-	public ValidatorBean(BeanManager beanManager, Bean<?> validatorFactoryBean,
-			ValidationProviderHelper validationProviderHelper) {
+	public ValidatorBean(BeanManager beanManager, Bean<?> validatorFactoryBean, ValidationProviderHelper validationProviderHelper) {
 		this.beanManager = beanManager;
 		this.validatorFactoryBean = validatorFactoryBean;
 		this.validationProviderHelper = validationProviderHelper;
-		this.types = Collections.unmodifiableSet(
-				CollectionHelper.<Type>newHashSet(
-						ClassHierarchyHelper.getHierarchy( validationProviderHelper.getValidatorBeanClass() )
-				)
-		);
+		this.types = validationProviderHelper.determineValidatorCdiTypes();
 	}
 
 	@Override
