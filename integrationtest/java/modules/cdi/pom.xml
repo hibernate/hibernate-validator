@@ -24,13 +24,14 @@
     <properties>
         <surefire.jvm.args.additional>-Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
         <!--
-           Caused by: java.lang.IllegalAccessError: superinterface check failed:
-           class org.hibernate.validator.internal.engine.ValidatorFactoryImpl$Proxy$_$$_WeldClientProxy
-           (in module org.hibernate.validator) cannot access class org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy
-           (in unnamed module @0x6d763516) because module org.hibernate.validator does not read unnamed module @0x6d763516
+          If we do not read all unnamed for jboss logging it'll lead to:
+            Caused by: java.lang.IllegalArgumentException: This library does not have private access to interface org.jboss.weld.logging.VersionLogger
+                at org.jboss.logging@3.6.0.Final/org.jboss.logging.Logger.getMessageLogger(Logger.java:2569)
+                at org.jboss.logging@3.6.0.Final/org.jboss.logging.Logger.getMessageLogger(Logger.java:2549)
+                at org.jboss.weld.logging.VersionLogger.<clinit>(VersionLogger.java:35)
        -->
         <surefire.jvm.args.add-opens>
-            --add-reads=org.hibernate.validator=ALL-UNNAMED
+            --add-reads=org.jboss.logging=ALL-UNNAMED
         </surefire.jvm.args.add-opens>
 
         <hibernate-validator-parent.path>../../../..</hibernate-validator-parent.path>

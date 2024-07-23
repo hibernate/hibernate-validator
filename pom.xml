@@ -96,7 +96,7 @@
         <module>integrationtest/java/modules/no-el</module>
         <module>integrationtest/java/modules/test-utils</module>
         <!-- CDI module test has problems with Weld and JBoss Logging version mismatch. Disabled for now. -->
-        <!-- <module>integrationtest/java/modules/cdi</module> -->
+         <module>integrationtest/java/modules/cdi</module>
     </modules>
 
     <properties>
