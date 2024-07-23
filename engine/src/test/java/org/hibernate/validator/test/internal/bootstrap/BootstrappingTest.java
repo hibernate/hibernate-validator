@@ -33,7 +33,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForCharSequence;
 import org.hibernate.validator.internal.engine.ConfigurationImpl;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
+import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 
@@ -84,7 +84,7 @@ public class BootstrappingTest {
 						if ( key == NotEmptyValidatorForCharSequence.class ) {
 							return key.cast( new BadlyBehavedNotEmptyValidatorForCharSequence() );
 						}
-						return new ConstraintValidatorFactoryImpl().getInstance( key );
+						return new DefaultConstraintValidatorFactory().getInstance( key );
 					}
 
 					@Override

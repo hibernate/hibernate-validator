@@ -14,7 +14,7 @@ import java.util.Collections;
 
 import jakarta.validation.constraints.NotNull;
 
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
+import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
@@ -48,7 +48,7 @@ public class MetaConstraintTest {
 		constraintHelper = ConstraintHelper.forAllBuiltinConstraints();
 		typeResolutionHelper = new TypeResolutionHelper();
 		valueExtractorManager = new ValueExtractorManager( Collections.emptySet() );
-		constraintValidatorManager = new ConstraintValidatorManagerImpl( new ConstraintValidatorFactoryImpl(), getDummyConstraintValidatorInitializationContext() );
+		constraintValidatorManager = new ConstraintValidatorManagerImpl( new DefaultConstraintValidatorFactory(), getDummyConstraintValidatorInitializationContext() );
 		barMethod = Foo.class.getMethod( "getBar" );
 		constraintAnnotationDescriptor = new ConstraintAnnotationDescriptor.Builder<>( barMethod.getAnnotation( NotNull.class ) ).build();
 	}

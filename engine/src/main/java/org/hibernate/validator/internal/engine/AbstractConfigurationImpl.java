@@ -38,7 +38,7 @@ import jakarta.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.BaseHibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
+import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
@@ -155,7 +155,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private AbstractConfigurationImpl() {
 		this.validationBootstrapParameters = new ValidationBootstrapParameters();
 
-		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
+		this.defaultConstraintValidatorFactory = new DefaultConstraintValidatorFactory();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
 		this.defaultPropertyNodeNameProvider = new DefaultPropertyNodeNameProvider();

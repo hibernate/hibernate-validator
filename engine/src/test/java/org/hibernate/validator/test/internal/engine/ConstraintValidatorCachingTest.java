@@ -43,7 +43,7 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForInteger;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCollection;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
+import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.annotations.Test;
@@ -138,7 +138,7 @@ public class ConstraintValidatorCachingTest {
 	}
 
 	public class OnceInstanceOnlyConstraintValidatorFactory implements ConstraintValidatorFactory {
-		ConstraintValidatorFactoryImpl factory = new ConstraintValidatorFactoryImpl();
+		DefaultConstraintValidatorFactory factory = new DefaultConstraintValidatorFactory();
 		Map<Class<?>, ConstraintValidator<?, ?>> instantiatedConstraintValidatorClasses = newHashMap();
 
 		OnceInstanceOnlyConstraintValidatorFactory() {

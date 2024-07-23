@@ -17,7 +17,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.DefaultClockProvider;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
+import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
@@ -74,7 +74,7 @@ public class ConstraintValidatorInitializationHelper {
 
 	public static ConstraintCreationContext getDummyConstraintCreationContext() {
 		return new ConstraintCreationContext( ConstraintHelper.forAllBuiltinConstraints(),
-				new ConstraintValidatorManagerImpl( new ConstraintValidatorFactoryImpl(), getDummyConstraintValidatorInitializationContext() ),
+				new ConstraintValidatorManagerImpl( new DefaultConstraintValidatorFactory(), getDummyConstraintValidatorInitializationContext() ),
 				new TypeResolutionHelper(),
 				new ValueExtractorManager( Collections.emptySet() ) );
 	}

@@ -33,7 +33,7 @@ import jakarta.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.internal.engine.DefaultClockProvider;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
+import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -83,7 +83,7 @@ public class NonHibernateValidatorConfigTest {
 		public NonHibernateValidatorConfiguration() {
 			this.defaultMessageInterpolator = new ParameterMessageInterpolator();
 			this.defaultTraversableResolver = TraversableResolvers.getDefault();
-			this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
+			this.defaultConstraintValidatorFactory = new DefaultConstraintValidatorFactory();
 			this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 			this.defaultClockProvider = DefaultClockProvider.INSTANCE;
 		}

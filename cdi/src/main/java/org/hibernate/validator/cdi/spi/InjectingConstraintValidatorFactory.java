@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.cdi.spi;
 
+import static org.hibernate.validator.cdi.internal.util.BuiltInConstraintValidatorUtils.isBuiltInConstraintValidator;
+
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -15,6 +17,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorFactory;
 
 import org.hibernate.validator.cdi.internal.DestructibleBeanInstance;
+import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.internal.util.Contracts;
 
 /**
@@ -24,7 +27,8 @@ import org.hibernate.validator.internal.util.Contracts;
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
-public class InjectingConstraintValidatorFactory implements ConstraintValidatorFactory {
+public class InjectingConstraintValidatorFactory extends DefaultConstraintValidatorFactory {
+
 	// TODO look for something with better performance (HF)
 	private final Map<Object, DestructibleBeanInstance<?>> constraintValidatorMap =
 			Collections.synchronizedMap( new IdentityHashMap<Object, DestructibleBeanInstance<?>>() );
@@ -39,6 +43,9 @@ public class InjectingConstraintValidatorFactory implements ConstraintValidatorF
 
 	@Override
 	public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
+		if ( isBuiltInConstraintValidator( key ) ) {
+			return super.getInstance( key );
+		}
 		DestructibleBeanInstance<T> destructibleBeanInstance = new DestructibleBeanInstance<T>( beanManager, key );
 		constraintValidatorMap.put( destructibleBeanInstance.getInstance(), destructibleBeanInstance );
 		return destructibleBeanInstance.getInstance();

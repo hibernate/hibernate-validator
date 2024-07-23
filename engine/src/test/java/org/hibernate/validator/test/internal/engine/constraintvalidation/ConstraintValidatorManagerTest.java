@@ -35,7 +35,7 @@ import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
 import org.hibernate.validator.internal.engine.DefaultClockProvider;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
+import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -55,7 +55,7 @@ public class ConstraintValidatorManagerTest {
 
 	@BeforeMethod
 	public void setUp() {
-		constraintValidatorFactory = new ConstraintValidatorFactoryImpl();
+		constraintValidatorFactory = new DefaultConstraintValidatorFactory();
 		constraintValidatorManager = new ConstraintValidatorManagerImpl( constraintValidatorFactory, getDummyConstraintValidatorInitializationContext() );
 		validator = getValidator();
 	}
@@ -488,7 +488,7 @@ public class ConstraintValidatorManagerTest {
 		private final ConstraintValidatorFactory delegate;
 
 		public MyCustomValidatorFactory() {
-			delegate = new ConstraintValidatorFactoryImpl();
+			delegate = new DefaultConstraintValidatorFactory();
 		}
 
 		@Override
