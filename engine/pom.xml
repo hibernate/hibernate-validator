@@ -350,11 +350,6 @@
                                         *;
                                     </exports>
                                     <opens>
-                                        <!-- We open constraints for reflection as these can be instantiated by a CDI container -->
-                                        org.hibernate.validator.internal.constraintvalidators.bv;
-                                        org.hibernate.validator.internal.constraintvalidators.bv.*;
-                                        org.hibernate.validator.internal.constraintvalidators.hv;
-                                        org.hibernate.validator.internal.constraintvalidators.hv.*;
                                         <!-- As both Validator and ValidatorFactory have to be accessible by CDI ... -->
                                         org.hibernate.validator.internal.engine;
                                     </opens>

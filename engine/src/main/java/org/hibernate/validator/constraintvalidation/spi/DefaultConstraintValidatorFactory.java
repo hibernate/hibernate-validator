@@ -4,12 +4,12 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.engine.constraintvalidation;
+package org.hibernate.validator.constraintvalidation.spi;
+
+import org.hibernate.validator.internal.util.actions.NewInstance;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorFactory;
-
-import org.hibernate.validator.internal.util.actions.NewInstance;
 
 /**
  * Default {@code ConstraintValidatorFactory} using a no-arg constructor.
@@ -18,10 +18,10 @@ import org.hibernate.validator.internal.util.actions.NewInstance;
  * @author Hardy Ferentschik
  */
 //TODO Can we make the constructor non-public?
-public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactory {
+public class DefaultConstraintValidatorFactory implements ConstraintValidatorFactory {
 
 	@Override
-	public final <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
+	public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
 		return NewInstance.action( key, "ConstraintValidator" );
 	}
 
