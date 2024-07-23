@@ -39,7 +39,7 @@ public class MyValidationProvider implements ValidationProvider<MyValidationProv
 
 	@Override
 	public MyConfiguration createSpecializedConfiguration(BootstrapState state) {
-		return null;
+		return new MyConfiguration();
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public class MyValidationProvider implements ValidationProvider<MyValidationProv
 
 		@Override
 		public ValidatorFactory buildValidatorFactory() {
-			return null;
+			return new MyValidatorFactory();
 		}
 	}
 

@@ -6,22 +6,27 @@
  */
 package org.hibernate.validator.cdi.internal;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import jakarta.enterprise.inject.Any;
-import jakarta.enterprise.inject.Default;
-import jakarta.enterprise.util.AnnotationLiteral;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
+import java.util.stream.Collectors;
 
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import jakarta.enterprise.inject.Any;
+import jakarta.enterprise.inject.Default;
+import jakarta.enterprise.util.AnnotationLiteral;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 /**
  * Provides functionality for dealing with validation provider types.
@@ -58,11 +63,13 @@ public class ValidationProviderHelper {
 		);
 	}
 
-	private ValidationProviderHelper(boolean isDefaultProvider,
+	private ValidationProviderHelper(
+			boolean isDefaultProvider,
 			boolean isHibernateValidator,
 			Class<? extends ValidatorFactory> validatorFactoryClass,
 			Class<? extends Validator> validatorClass,
-			Set<Annotation> qualifiers) {
+			Set<Annotation> qualifiers
+	) {
 		this.isDefaultProvider = isDefaultProvider;
 		this.isHibernateValidator = isHibernateValidator;
 		this.validatorFactoryClass = validatorFactoryClass;
@@ -108,8 +115,10 @@ public class ValidationProviderHelper {
 	 * Returns the qualifiers to be used for registering a validator or validator factory.
 	 */
 	@SuppressWarnings("serial")
-	private static Set<Annotation> determineRequiredQualifiers(boolean isDefaultProvider,
-			boolean isHibernateValidator) {
+	private static Set<Annotation> determineRequiredQualifiers(
+			boolean isDefaultProvider,
+			boolean isHibernateValidator
+	) {
 		HashSet<Annotation> qualifiers = newHashSet( 3 );
 
 		if ( isDefaultProvider ) {
@@ -134,6 +143,30 @@ public class ValidationProviderHelper {
 		return qualifiers;
 	}
 
+	public Set<Type> determineValidatorFactoryCdiTypes() {
+		return Collections.unmodifiableSet(
+				CollectionHelper.<Type>newHashSet(
+						ClassHierarchyHelper.getHierarchy( getValidatorFactoryBeanClass() )
+								.stream()
+								// We do not include Hibernate Validator internal types:
+								.filter( klass -> !( isHibernateValidator && isHibernateValidatorInternalType( klass ) ) )
+								.collect( Collectors.toSet() )
+				)
+		);
+	}
+
+	public Set<Type> determineValidatorCdiTypes() {
+		return Collections.unmodifiableSet(
+				CollectionHelper.<Type>newHashSet(
+						ClassHierarchyHelper.getHierarchy( getValidatorBeanClass() )
+								.stream()
+								// We do not include Hibernate Validator internal types:
+								.filter( klass -> !( isHibernateValidator && isHibernateValidatorInternalType( klass ) ) )
+								.collect( Collectors.toSet() )
+				)
+		);
+	}
+
 	@Override
 	public String toString() {
 		return "ValidationProviderHelper [isDefaultProvider="
@@ -141,5 +174,11 @@ public class ValidationProviderHelper {
 				+ isHibernateValidator + ", validatorFactoryClass="
 				+ validatorFactoryClass + ", validatorClass=" + validatorClass
 				+ ", qualifiers=" + qualifiers + "]";
+	}
+
+	private static boolean isHibernateValidatorInternalType(Class<?> klass) {
+		return klass.getPackageName().startsWith( "org.hibernate.validator." )
+				&& ( klass.getPackageName().endsWith( ".internal" )
+				|| klass.getPackageName().contains( ".internal." ) );
 	}
 }
