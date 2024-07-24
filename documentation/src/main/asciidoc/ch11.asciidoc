@@ -250,7 +250,7 @@ constructors.
 [NOTE]
 ====
 The interceptor `org.hibernate.validator.cdi.interceptor.spi.ValidationInterceptor` is
-registered by `org.hibernate.validator.cdi.internal.ValidationExtension`. This happens implicitly
+registered by `org.hibernate.validator.cdi.ValidationExtension`. This happens implicitly
 within a Jakarta EE runtime environment or explicitly by adding the _hibernate-validator-cdi_
 artifact - see <<section-getting-started-cdi>>
 ====
