@@ -128,8 +128,7 @@
         <version.jakarta.validation.validation-tck>3.1.1</version.jakarta.validation.validation-tck>
 
         <version.com.thoughtworks.paranamer>2.8</version.com.thoughtworks.paranamer>
-        <version.jakarta.el-api>5.0.1</version.jakarta.el-api>
-        <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
+        <version.org.glassfish.expressly>6.0.0-M1</version.org.glassfish.expressly>
         <version.org.jboss.logging.jboss-logging>3.6.0.Final</version.org.jboss.logging.jboss-logging>
         <version.org.jboss.logging.jboss-logging-tools>3.0.1.Final</version.org.jboss.logging.jboss-logging-tools>
 
@@ -160,15 +159,11 @@
             They should be aligned with the ones from the Wildfly version we support
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
-        <version.jakarta.enterprise.cdi-api>4.0.1</version.jakarta.enterprise.cdi-api>
-        <version.org.jboss.weld.weld>5.1.1.Final</version.org.jboss.weld.weld>
+<!--        <version.jakarta.enterprise.cdi-api>4.0.1</version.jakarta.enterprise.cdi-api>-->
+        <version.org.jboss.weld.weld>6.0.0.Beta4</version.org.jboss.weld.weld>
         <version.org.wildfly.arquillian>5.0.0.Alpha3</version.org.wildfly.arquillian>
-        <version.jakarta.ejb-api>4.0.1</version.jakarta.ejb-api>
-        <version.jakarta.interceptor-api>2.1.0</version.jakarta.interceptor-api>
-        <version.jakarta.annotation-api>2.1.1</version.jakarta.annotation-api>
-        <version.jakarta.inject-api>2.0.1</version.jakarta.inject-api>
-        <version.jakarta.persistence-api>3.1.0</version.jakarta.persistence-api>
-        <version.jakarta.ws.rs-api>3.1.0</version.jakarta.ws.rs-api>
+        <version.jakarta.jakartaee-bom>11.0.0-M4</version.jakarta.jakartaee-bom>
+        <version.jakarta.persistence-api>3.2.0</version.jakarta.persistence-api>
 
         <!-- JavaMoney dependencies -->
         <version.javax.money>1.1</version.javax.money>
@@ -367,10 +362,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- https://mvnrepository.com/artifact/jakarta.platform/jakarta.jakartaee-bom -->
             <dependency>
-                <groupId>jakarta.validation</groupId>
-                <artifactId>jakarta.validation-api</artifactId>
-                <version>${version.jakarta.validation-api}</version>
+                <groupId>jakarta.platform</groupId>
+                <artifactId>jakarta.jakartaee-bom</artifactId>
+                <version>${version.jakarta.jakartaee-bom}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>
@@ -451,11 +449,6 @@
                 <version>${version.org.apache.logging.log4j}</version>
             </dependency>
             <dependency>
-                <groupId>jakarta.persistence</groupId>
-                <artifactId>jakarta.persistence-api</artifactId>
-                <version>${version.jakarta.persistence-api}</version>
-            </dependency>
-            <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${version.junit}</version>
@@ -517,49 +510,9 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>jakarta.annotation</groupId>
-                <artifactId>jakarta.annotation-api</artifactId>
-                <version>${version.jakarta.annotation-api}</version>
-            </dependency>
-            <dependency>
                 <groupId>javax.annotation</groupId>
                 <artifactId>javax.annotation-api</artifactId>
                 <version>${version.javax.annotation-api}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.inject</groupId>
-                <artifactId>jakarta.inject-api</artifactId>
-                <version>${version.jakarta.inject-api}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.ws.rs</groupId>
-                <artifactId>jakarta.ws.rs-api</artifactId>
-                <version>${version.jakarta.ws.rs-api}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.interceptor</groupId>
-                <artifactId>jakarta.interceptor-api</artifactId>
-                <version>${version.jakarta.interceptor-api}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.ejb</groupId>
-                <artifactId>jakarta.ejb-api</artifactId>
-                <version>${version.jakarta.ejb-api}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.enterprise</groupId>
-                <artifactId>jakarta.enterprise.cdi-api</artifactId>
-                <version>${version.jakarta.enterprise.cdi-api}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>jakarta.interceptor</groupId>
-                        <artifactId>jakarta.interceptor-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>jakarta.el</groupId>
-                        <artifactId>jakarta.el-api</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.jboss.weld</groupId>
