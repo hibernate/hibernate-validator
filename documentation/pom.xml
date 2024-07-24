@@ -295,7 +295,7 @@
 
                         <jdkVersion>${java-version.main.release}</jdkVersion>
                         <compilerPluginVersion>${version.compiler.plugin}</compilerPluginVersion>
-                        <versionJakartaPersistence>${version.jakarta.persistence}</versionJakartaPersistence>
+                        <versionJakartaPersistence>${parsed-version.jakarta.persistence-api.majorVersion}.${parsed-version.jakarta.persistence-api.minorVersion}</versionJakartaPersistence>
 
                         <!-- URLs -->
                         <javaApiDocsUrl>${java.api-docs.base-url}/</javaApiDocsUrl>

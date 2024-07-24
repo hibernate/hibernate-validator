@@ -123,7 +123,6 @@
 
         <!-- Dependencies versions -->
 
-        <version.jakarta.validation-api>3.1.0</version.jakarta.validation-api>
         <version.jakarta.validation.validation-tck>3.1.1</version.jakarta.validation.validation-tck>
 
         <version.com.thoughtworks.paranamer>2.8</version.com.thoughtworks.paranamer>
@@ -162,6 +161,14 @@
         <version.org.jboss.weld.weld>6.0.0.Beta4</version.org.jboss.weld.weld>
         <version.org.wildfly.arquillian>5.0.0.Alpha3</version.org.wildfly.arquillian>
         <version.jakarta.jakartaee-bom>11.0.0-M4</version.jakarta.jakartaee-bom>
+        <!--
+            These are now managed by the BOM ^ but we want to have version properties available to us
+            so that we can use them elsewhere, e.g. in asciidoc files.
+
+            TODO: add an enforcer rile to check that the versions in these properties are aligned with the ones
+             coming from the BOM.
+        -->
+        <version.jakarta.validation-api>3.1.0</version.jakarta.validation-api>
         <version.jakarta.persistence-api>3.2.0</version.jakarta.persistence-api>
 
         <!-- JavaMoney dependencies -->
@@ -356,7 +363,6 @@
         <!-- Maven version required for the build -->
         <!-- Remember to update README when changing the version here. -->
         <maven.min.version>3.9.6</maven.min.version>
-        <version.jakarta.persistence>3.2</version.jakarta.persistence>
     </properties>
 
     <dependencyManagement>
@@ -625,6 +631,16 @@
                         <configuration>
                             <propertyPrefix>parsed-version.jakarta.validation-api</propertyPrefix>
                             <versionString>${version.jakarta.validation-api}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-jakarta-persistence-spec-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.jakarta.persistence-api</propertyPrefix>
+                            <versionString>${version.jakarta.persistence-api}</versionString>
                         </configuration>
                     </execution>
                 </executions>
