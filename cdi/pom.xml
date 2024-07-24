@@ -240,19 +240,9 @@
                 <executions>
                     <execution>
                         <id>add-module-infos</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>add-module-info</goal>
-                        </goals>
                         <configuration>
                             <module>
                                 <moduleInfo>
-                                    <name>${java.module.name}</name>
-                                    <exports>
-                                        !org.hibernate.validator.*.internal;
-                                        !org.hibernate.validator.*.internal.*;
-                                        *;
-                                    </exports>
                                     <opens>
                                         <!-- Interceptor has to provide reflection access -->
                                         org.hibernate.validator.cdi.interceptor.spi;

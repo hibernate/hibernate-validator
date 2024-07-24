@@ -329,14 +329,9 @@
                 <executions>
                     <execution>
                         <id>add-module-infos</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>add-module-info</goal>
-                        </goals>
                         <configuration>
                             <module>
                                 <moduleInfo>
-                                    <name>${java.module.name}</name>
                                     <requires>
                                         <!-- jboss annotations are getting pulled even though they are for compilation only -->
                                         !org.jboss.logging.annotations;

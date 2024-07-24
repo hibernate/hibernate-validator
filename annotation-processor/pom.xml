@@ -137,27 +137,6 @@
             <plugin>
                 <groupId>org.moditect</groupId>
                 <artifactId>moditect-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-module-infos</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>add-module-info</goal>
-                        </goals>
-                        <configuration>
-                            <module>
-                                <moduleInfo>
-                                    <name>${java.module.name}</name>
-                                    <exports>
-                                        !org.hibernate.validator.ap.internal;
-                                        !org.hibernate.validator.ap.internal.*;
-                                        *;
-                                    </exports>
-                                </moduleInfo>
-                            </module>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

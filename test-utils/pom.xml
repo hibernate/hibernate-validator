@@ -40,19 +40,7 @@
                 <executions>
                     <execution>
                         <id>add-module-infos</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>add-module-info</goal>
-                        </goals>
                         <configuration>
-                            <module>
-                                <moduleInfo>
-                                    <name>${java.module.name}</name>
-                                    <exports>
-                                        *;
-                                    </exports>
-                                </moduleInfo>
-                            </module>
                             <!--
                                 Running the jdeps tool will fail without this option, if there are any multi-release jars
                                 on the path. And since some modules might have such jars, e.g. AssertJ is a multi-release jar,
