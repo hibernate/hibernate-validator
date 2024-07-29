@@ -10,7 +10,6 @@ buildSrc/.gradle
 
 # Build output directories
 target/
-build/
 bin/
 
 # Test output directories

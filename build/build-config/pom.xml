@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator-parent</artifactId>
+        <version>9.0.0-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
+    </parent>
+
+    <artifactId>hibernate-validator-build-config</artifactId>
+
+    <name>Hibernate Validator Build Configuration</name>
+    <description>Configuration for the build of Hibernate Validator</description>
+
+    <properties>
+        <hibernate-validator-parent.path>../..</hibernate-validator-parent.path>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <!--
+                        We cannot include this execution in the root pom because it depends on a project artifact
+                        that we need to build first.
+                        It should be enough to only run this rule on this build module, since the check it performs is always
+                        the same - get the property value, and compare it to the dependency version from dependency management.
+                    -->
+                    <execution>
+                        <id>enforce-custom-rules</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <versionAlignRule>
+                                    <propertiesToCheck>
+                                        <!--
+                                            We want to make sure that the value we store in the property matches
+                                            the version that is imported from the Jakarta EE BOM
+                                         -->
+                                        <item>
+                                            <property>${version.jakarta.validation-api}</property>
+                                            <artifact>jakarta.validation:jakarta.validation-api</artifact>
+                                            <failOnNotFound>true</failOnNotFound>
+                                        </item>
+                                        <!--
+                                            We want to make sure that the value we store in the property matches
+                                            the version that is imported from the Jakarta EE BOM
+                                         -->
+                                        <item>
+                                            <property>${version.jakarta.persistence-api}</property>
+                                            <artifact>jakarta.persistence:jakarta.persistence-api</artifact>
+                                            <failOnNotFound>true</failOnNotFound>
+                                        </item>
+                                    </propertiesToCheck>
+                                </versionAlignRule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate.validator</groupId>
+                        <artifactId>hibernate-validator-build-enforcer</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

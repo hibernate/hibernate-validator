@@ -84,20 +84,20 @@
     </mailingLists>
 
     <modules>
+        <module>build/build-config</module>
+        <module>build/enforcer</module>
         <module>bom</module>
         <module>test-utils</module>
-        <module>build-config</module>
         <module>engine</module>
         <module>tck-runner</module>
         <module>annotation-processor</module>
-        <module>performance</module>
         <module>cdi</module>
+        <module>performance</module>
         <module>integrationtest/wildfly</module>
         <module>integrationtest/java/modules/simple</module>
         <module>integrationtest/java/modules/no-el</module>
         <module>integrationtest/java/modules/test-utils</module>
-        <!-- CDI module test has problems with Weld and JBoss Logging version mismatch. Disabled for now. -->
-         <module>integrationtest/java/modules/cdi</module>
+        <module>integrationtest/java/modules/cdi</module>
     </modules>
 
     <properties>
@@ -165,9 +165,6 @@
         <!--
             These are now managed by the BOM ^ but we want to have version properties available to us
             so that we can use them elsewhere, e.g. in asciidoc files.
-
-            TODO: add an enforcer rile to check that the versions in these properties are aligned with the ones
-             coming from the BOM.
         -->
         <version.jakarta.validation-api>3.1.0</version.jakarta.validation-api>
         <version.jakarta.persistence-api>3.2.0</version.jakarta.persistence-api>
@@ -262,6 +259,7 @@
         <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
         <version.moditect.plugin>1.2.1.Final</version.moditect.plugin>
+        <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
@@ -846,7 +844,7 @@
                     <configuration>
                         <licenseSets>
                             <licenseSet>
-                                <header>${hibernate-validator-parent.path}/build-config/src/main/resources/license.header</header>
+                                <header>${hibernate-validator-parent.path}/build/build-config/src/main/resources/license.header</header>
                                 <excludes>
                                     <!-- Next two classes are copied from other project and have different headers -->
                                     <exclude>**/org/hibernate/validator/internal/util/TypeHelper.java</exclude>
@@ -866,8 +864,8 @@
                         </licenseSets>
                         <strictCheck>true</strictCheck>
                         <headerDefinitions>
-                            <headerDefinition>${hibernate-validator-parent.path}/build-config/src/main/resources/java-header-style.xml</headerDefinition>
-                            <headerDefinition>${hibernate-validator-parent.path}/build-config/src/main/resources/xml-header-style.xml</headerDefinition>
+                            <headerDefinition>${hibernate-validator-parent.path}/build/build-config/src/main/resources/java-header-style.xml</headerDefinition>
+                            <headerDefinition>${hibernate-validator-parent.path}/build/build-config/src/main/resources/xml-header-style.xml</headerDefinition>
                         </headerDefinitions>
                         <mapping>
                             <java>JAVA_CLASS_STYLE</java>
@@ -1381,6 +1379,11 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.eclipse.sisu</groupId>
+                    <artifactId>sisu-maven-plugin</artifactId>
+                    <version>${version.sisu-maven-plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
