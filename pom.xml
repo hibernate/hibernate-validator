@@ -140,7 +140,12 @@
         <skip.wildfly.integration.test.hibernate.validator>true</skip.wildfly.integration.test.hibernate.validator>
         <skip.wildfly.patch.hibernate.validator>${skip.wildfly.integration.test.hibernate.validator}</skip.wildfly.patch.hibernate.validator>
         <skip.wildfly.patch.unpack.server>${skip.wildfly.patch.hibernate.validator}</skip.wildfly.patch.unpack.server>
-        <wildfly.target-dir>${project.build.directory}/wildfly-patched/wildfly-${version.wildfly}</wildfly.target-dir>
+        <!--
+            Change between `wildfly` and `wildfly-preview` depending on which distribution you want to test against.
+            Currently (WF 33) the `wildfly-preview` is the distribution based on the Jakarta EE 11.
+        -->
+        <wildfly.distribution.name>wildfly-preview</wildfly.distribution.name>
+        <wildfly.target-dir>${project.build.directory}/wildfly-patched/${wildfly.distribution.name}-${version.wildfly}</wildfly.target-dir>
         <wildfly.actual.target-dir>${wildfly.target-dir}</wildfly.actual.target-dir>
         <wildfly.modules-dir>${wildfly.actual.target-dir}/modules/system/layers/base</wildfly.modules-dir>
 
@@ -990,7 +995,7 @@
                                 <artifactItems>
                                     <artifactItem>
                                         <groupId>org.wildfly</groupId>
-                                        <artifactId>wildfly-dist</artifactId>
+                                        <artifactId>${wildfly.distribution.name}-dist</artifactId>
                                         <version>${version.wildfly}</version>
                                         <type>tar.gz</type>
                                         <overWrite>false</overWrite>
