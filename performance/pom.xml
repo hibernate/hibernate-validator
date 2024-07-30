@@ -42,7 +42,7 @@
         <profilingOptions>-showversion</profilingOptions>
         <history.directory>${project.basedir}/history</history.directory>
         <jmh.version>1.37</jmh.version>
-        <version.log4j>1.2.17</version.log4j>
+        <version.log4j-core>2.23.1</version.log4j-core>
 
         <!-- default values, overridden per profile -->
         <beanvalidation-impl.name>none</beanvalidation-impl.name>
@@ -50,6 +50,16 @@
 
         <hibernate-validator-parent.path>../..</hibernate-validator-parent.path>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${version.log4j-core}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -203,9 +213,8 @@
                     <artifactId>expressly</artifactId>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                    <version>${version.log4j}</version>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -238,9 +247,8 @@
                     <artifactId>expressly</artifactId>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                    <version>${version.log4j}</version>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -276,9 +284,8 @@
                     <version>3.0.1-b12</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                    <version>${version.log4j}</version>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -314,9 +321,8 @@
                     <version>3.0.1-b12</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                    <version>${version.log4j}</version>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -351,9 +357,8 @@
                     <version>3.0.1-b12</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                    <version>${version.log4j}</version>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -394,9 +399,8 @@
                     <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                    <version>${version.log4j}</version>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -437,9 +441,8 @@
                     <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                    <version>${version.log4j}</version>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -480,9 +483,8 @@
                     <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                    <version>${version.log4j}</version>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -523,9 +525,8 @@
                     <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                    <version>${version.log4j}</version>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -555,8 +556,8 @@
                     <version>${beanvalidation-impl.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
                 </dependency>
             </dependencies>
         </profile>
