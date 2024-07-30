@@ -96,18 +96,16 @@ You can learn more about the WildFly patching infrastructure in general link:htt
 [[validator-gettingstarted-modulepath]]
 ==== [[validator-gettingstarted-java9]] Running in the modulepath
 
-Support for the Java Platform Module System (JPMS) is present in a preliminary form.
-There are no JPMS module descriptors provided, but Hibernate Validator is usable as automatic modules.
+Starting with Hibernate Validator 9.0,
+JPMS module descriptors are provided for those who want to use the Hibernate Validator with a modulepath.
 
-These are the module names as declared using the `Automatic-Module-Name` header:
+The names of the corresponding modules are:
 
 * Jakarta Validation API: `jakarta.validation`
 * Hibernate Validator core: `org.hibernate.validator`
 * Hibernate Validator CDI extension: `org.hibernate.validator.cdi`
 * Hibernate Validator test utilities: `org.hibernate.validator.testutils`
 * Hibernate Validator annotation processor: `org.hibernate.validator.annotationprocessor`
-
-These module names are preliminary and may be changed when providing real module descriptors in a future release.
 
 [[validator-gettingstarted-createmodel]]
 === Applying constraints
