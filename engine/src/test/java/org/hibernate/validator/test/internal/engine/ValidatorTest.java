@@ -353,6 +353,20 @@ public class ValidatorTest {
 		);
 	}
 
+	@Test
+	public void testValidateValueConstraintOnInterface() {
+		Validator validator = getValidator();
+
+		Set<ConstraintViolation<MyConstraints>> violations = validator.validateValue( MyConstraints.class, "property", null );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withProperty( "property" ) );
+	}
+
+	interface MyConstraints {
+		@NotNull
+		String getProperty();
+	}
+
 	class A {
 		@NotNull
 		String b;
