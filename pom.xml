@@ -1760,6 +1760,13 @@
             </build>
         </profile>
         <profile>
+            <id>ci-build</id>
+            <properties>
+                <goal.impsort-maven-plugin>check</goal.impsort-maven-plugin>
+                <goal.formatter-maven-plugin>validate</goal.formatter-maven-plugin>
+            </properties>
+        </profile>
+        <profile>
             <id>IDEA</id>
             <activation>
                 <!-- This is a trick to have the profile automatically activated by IDEA -->
