@@ -63,7 +63,8 @@
         <developer>
             <id>marko.bekhta</id>
             <name>Marko Bekhta</name>
-            <email>marko.prykladna@gmail.com</email>
+            <email>marko@hibernate.org</email>
+            <organization>Red Hat, Inc.</organization>
             <url>http://in.relation.to/marko-bekhta/</url>
         </developer>
     </developers>
