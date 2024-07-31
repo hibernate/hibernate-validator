@@ -15,7 +15,6 @@ package org.hibernate.validator.internal.util.classhierarchy;
 public class Filters {
 
 	private static final Filter PROXY_FILTER = new WeldProxyFilter();
-	private static final Filter INTERFACES_FILTER = new InterfacesFilter();
 
 	private Filters() {
 		// Not allowed
@@ -26,8 +25,8 @@ public class Filters {
 	 *
 	 * @return a filter which excludes interfaces
 	 */
-	public static Filter excludeInterfaces() {
-		return INTERFACES_FILTER;
+	public static Filter excludeInterfaces(Class<?> self) {
+		return new InterfacesFilter( self );
 	}
 
 	/**
@@ -41,9 +40,15 @@ public class Filters {
 
 	private static class InterfacesFilter implements Filter {
 
+		private final Class<?> self;
+
+		public InterfacesFilter(Class<?> self) {
+			this.self = self;
+		}
+
 		@Override
 		public boolean accepts(Class<?> clazz) {
-			return !clazz.isInterface();
+			return !clazz.isInterface() || self.equals( clazz );
 		}
 	}
 

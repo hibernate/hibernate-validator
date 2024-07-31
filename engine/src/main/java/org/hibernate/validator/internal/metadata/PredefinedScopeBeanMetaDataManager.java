@@ -88,7 +88,8 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 			Class<?> normalizedValidatedClass = beanMetaDataClassNormalizer.normalize( validatedClass );
 
 			@SuppressWarnings("unchecked")
-			List<Class<?>> classHierarchy = (List<Class<?>>) (Object) ClassHierarchyHelper.getHierarchy( normalizedValidatedClass, Filters.excludeInterfaces() );
+			List<Class<?>> classHierarchy = (List<Class<?>>) (Object) ClassHierarchyHelper.getHierarchy( normalizedValidatedClass,
+					Filters.excludeInterfaces( normalizedValidatedClass ) );
 
 			// note that the hierarchy also contains the initial class
 			for ( Class<?> hierarchyElement : classHierarchy ) {
@@ -200,7 +201,7 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 		@SuppressWarnings("unchecked")
 		private UninitializedBeanMetaData(Class<T> beanClass) {
 			this.beanClass = beanClass;
-			this.classHierarchy = (List<Class<? super T>>) (Object) ClassHierarchyHelper.getHierarchy( beanClass, Filters.excludeInterfaces() );
+			this.classHierarchy = (List<Class<? super T>>) (Object) ClassHierarchyHelper.getHierarchy( beanClass, Filters.excludeInterfaces( beanClass ) );
 			this.beanDescriptor = new UninitializedBeanDescriptor( beanClass );
 		}
 
