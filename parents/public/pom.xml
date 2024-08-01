@@ -23,11 +23,6 @@
     <description>Parent POM for public modules.</description>
 
     <properties>
-        <!--
-            We don't want to publish or sign any modules by default.
-            Specific modules will override the setting at their own level.
-        -->
-        <deploy.skip>false</deploy.skip>
     </properties>
 
     <dependencyManagement>
