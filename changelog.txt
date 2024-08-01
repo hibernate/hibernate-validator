@@ -1,6 +1,68 @@
 Hibernate Validator Changelog
 =============================
 
+9.0.0.Beta1 (2024-08-01)
+-------------------------
+
+** Bug
+    * HV-2008 hibernate-validator-test-utils are not compatible to current AssertJ versions
+    * HV-2002 Brazilian Titulo Eleitoral not correctly validating on some scenarios
+    * HV-1978 Expression Language not propagated to iterable node
+    * HV-1971 CNPJ with all digits the same
+    * HV-1965 Typo in CrossParameterConstraintValidatorContextImpl, wrong element kind assertion fail message.
+    * HV-1959 Typo fix for Ukrainian localization
+    * HV-1946 PathImpl.createCopy() only performs a shallow copy
+
+** Improvement
+    * HV-2015 Align Jakarta API versions with the Jakarta EE 11
+    * HV-2014 Update version.org.jboss.logging.jboss-logging-tools from 3.0.0.Final to 3.0.1.Final
+    * HV-2007 Add a nightly job to verify the build reproducibility
+    * HV-2006 Update org.jboss.logging:jboss-logging-processor from 2.2.1.Final to 3.0.0.Final
+    * HV-2001 Generate module-info for published artifacts
+    * HV-2000 Use URI for @URL validation
+    * HV-1999 New Alphanumeric CNPJ
+    * HV-1998 Reproducible builds
+    * HV-1997 Stop publishing test modules
+    * HV-1996 Create and publish Hibernate Validator BOM
+    * HV-1995 Test against latest Wildfly 32.0.1
+    * HV-1993 Simplify the checks whether the path was already validated
+    * HV-1992 Switch to a different sigtest-maven-plugin
+    * HV-1991 Upgrade to JDK 17 as the baseline and drop JDK 11 compatibility
+    * HV-1986 Add impsort and formatter plugins
+    * HV-1985 Bump joda-time to 2.12.7
+    * HV-1984 Bump jboss-logging to 3.5.3.Final
+    * HV-1983 Bump com.fasterxml:classmate to 1.7.0
+    * HV-1982 Bump javax.money:money-api to 1.1
+    * HV-1981 Use Maven 3.9.6 in CI builds and as a required minimum version for the build
+    * HV-1979 Upgrade to jakarta.validation-api 3.1.0
+    * HV-1943 Some french validation messages are not quite accurate
+
+** New Feature
+    * HV-1973 Bitcoint address validation
+    * HV-1970 Add South Korean specific RRN annotation
+    * HV-1328 Add an option to validate class-level constraints only if all property constraints are valid
+
+** Remove Feature
+    * HV-1994 Stop publishing and remove hibernate-validator-modules 
+    * HV-1975 Remove Security Manager usage 
+
+** Task
+    * HV-2017 Use wildfly-preview-dist in integration tests to test against the Jakarta EE 11
+    * HV-2016 Switch to log4j2 in performance tests
+    * HV-2013 Test against latest Wildfly 33.0.0
+    * HV-2012 Update to OpenJFX 17.0.12
+    * HV-2011 Update Arquillian dependency management configuration
+    * HV-2010 Clean up configuration of the performance tests
+    * HV-2009 Update Jakarta specification names where applicable
+    * HV-1990 Test Hibernate Validator against JDK 24
+    * HV-1989 Update documentation examples to use the min required Java version where applicable
+    * HV-1988 Upgrade jboss-logging to latest version (3.6.0)
+    * HV-1980 Update gpg plugin configuration
+    * HV-1977 Enable dependabot updates for more dependencies
+    * HV-1974 Update maven build configuration to address lib/plugin upgrades from Dependabot
+    * HV-1969 Test Hibernate Validator against JDK 23
+    * HV-1968 Force user.country when testing
+
 8.0.1.Final (2023-06-20)
 -------------------------
 
