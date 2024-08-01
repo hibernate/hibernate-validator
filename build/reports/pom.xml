@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator-internal-parent</artifactId>
+        <version>9.0.0-SNAPSHOT</version>
+        <relativePath>../../parents/internal</relativePath>
+    </parent>
+    <artifactId>hibernate-validator-reports</artifactId>
+
+    <name>Hibernate Validator Reports</name>
+    <description>Hibernate Validator build reports</description>
+    <packaging>pom</packaging>
+
+    <properties>
+        <!--
+        Disable the dependency convergence rule, because the dependencies of various integration tests do not converge
+        -->
+        <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-test-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-annotation-processor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-cdi</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-bom</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-build-enforcer</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-build-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-tck-runner</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-performance</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-integrationtest-wildfly</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-integrationtest-java-modules-simple</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-integrationtest-java-modules-no-el</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-integrationtest-java-modules-test-utils</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-integrationtest-java-modules-cdi</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-documentation</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-distribution</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+                Hack to deploy in the "reports" module without deploying the "reports" module itself.
+                The default lifecycle bindings of the plugin is to "stage locally" every artifact throughout
+                the maven execution, and only actually deploy the "locally staged" artifacts
+                in the very last executed module, which happens to be this "reports" module.
+                However, this "reports" module does not generate any artifact we want to deploy.
+                Thus, we'd like to prevent even its POM from being deployed: just deploy the "locally staged" artifacts,
+                without adding the POM from the "reports" module to these artifacts.
+                The default lifecycle bindings of the plugin does not offer a configuration option to do that,
+                so we have to explicitly bind it
+             -->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <extensions>false</extensions>
+                <!-- The <configuration> element is inherited from the parent module. -->
+                <executions>
+                    <!-- Skip the default deployment, as explained above we don't want it. -->
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>none</phase>
+                    </execution>
+                    <!-- ... but execute the deferred deployment for the other modules -->
+                    <execution>
+                        <id>deferred-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy-staged</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
