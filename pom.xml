@@ -245,6 +245,7 @@
         <version.wildfly-patch-gen.plugin>2.1.0.Final</version.wildfly-patch-gen.plugin>
         <version.wildfly-patch-gen.plugin.woodstox>5.0.3</version.wildfly-patch-gen.plugin.woodstox>
         <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
+        <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
@@ -1242,6 +1243,15 @@
                                 </pluginExecution>
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-wrapper-plugin</artifactId>
+                    <version>${version.maven-wrapper-plugin}</version>
+                    <configuration>
+                        <mavenVersion>${maven.min.version}</mavenVersion>
+                        <distributionType>bin</distributionType>
                     </configuration>
                 </plugin>
             </plugins>

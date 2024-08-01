@@ -51,7 +51,3 @@ maven-eclipse.xml
 *.log
 .clover
 .DS_Store
-
-# Maven wrapper files
-.mvn/wrapper
-mvnw*
