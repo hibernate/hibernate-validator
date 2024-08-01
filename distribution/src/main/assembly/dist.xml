@@ -97,6 +97,8 @@
                 <exclude>travis/**</exclude>
                 <exclude>.git</exclude>
                 <exclude>.gitignore</exclude>
+                <exclude>.gitattributes</exclude>
+                <exclude>.git-blame-ignore-revs</exclude>
                 <exclude>**/target/**</exclude>
                 <exclude>**/test-output/**</exclude>
                 <exclude>**/.settings/**</exclude>
