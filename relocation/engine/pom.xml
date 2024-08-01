@@ -17,6 +17,11 @@
     <artifactId>hibernate-validator</artifactId>
     <name>Hibernate Validator Engine - Relocation Artifact</name>
 
+    <properties>
+        <!-- This is a publicly distributed module that should be published: -->
+        <deploy.skip>false</deploy.skip>
+    </properties>
+
     <distributionManagement>
         <relocation>
             <groupId>org.hibernate.validator</groupId>
