@@ -270,6 +270,7 @@
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
         <version.impsort-maven-plugin>1.11.0</version.impsort-maven-plugin>
         <version.formatter-maven-plugin>2.24.1</version.formatter-maven-plugin>
+        <version.versions.plugin>2.17.1</version.versions.plugin>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
@@ -1453,6 +1454,11 @@
                     <groupId>org.eclipse.sisu</groupId>
                     <artifactId>sisu-maven-plugin</artifactId>
                     <version>${version.sisu-maven-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>${version.versions.plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
