@@ -112,6 +112,7 @@
                 <exclude>**/*.iws</exclude>
                 <exclude>**/performance/hibernate-validator.log</exclude>
                 <exclude>**/performance/dependency-reduced-pom.xml</exclude>
+                <exclude>**/.cache/**</exclude>
             </excludes>
         </fileSet>
 
