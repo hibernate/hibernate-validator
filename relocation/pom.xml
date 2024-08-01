@@ -22,6 +22,5 @@
         <module>annotation-processor</module>
         <module>cdi</module>
         <module>engine</module>
-        <module>karaf-features</module>
     </modules>
 </project>
