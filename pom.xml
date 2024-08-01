@@ -662,6 +662,36 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--
+                 Configure the nexus-staging-maven-plugin explicitly (without <extension>true</extension>)
+                 in order to work around a problem in the "reports" module (see that module's POM for more info).
+             -->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <extensions>false</extensions><!-- This is essential: do not put true here -->
+                <configuration>
+                    <serverId>${ossrh.releases.repo.id}</serverId>
+                    <!-- The following, by default, is only used for actual releases, not for snapshot deployments -->
+                    <nexusUrl>${ossrh.releases.repo.baseUrl}</nexusUrl>
+                    <!-- oss.sonatype.org has been very slow when closing repositories lately;
+                         let's raise the timeout until we switch to s01.sonatype.org -->
+                    <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <!--
+                                This will only put artifacts in a staging directory.
+                                See the "reports" module for actual deployment, at the end of the build.
+                             -->
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -1462,6 +1492,14 @@
                     <artifactId>versions-maven-plugin</artifactId>
                     <version>${version.versions.plugin}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.sonatype.plugins</groupId>
+                    <artifactId>nexus-staging-maven-plugin</artifactId>
+                    <version>${version.nexus-staging-maven-plugin}</version>
+                    <configuration>
+                        <skipNexusStagingDeployMojo>${deploy.skip}</skipNexusStagingDeployMojo>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -1571,18 +1609,6 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>${version.nexus-staging-maven-plugin}</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <skipNexusStagingDeployMojo>${deploy.skip}</skipNexusStagingDeployMojo>
-                            <nexusUrl>${ossrh.releases.repo.baseUrl}</nexusUrl>
-                            <serverId>${ossrh.releases.repo.id}</serverId>
-                            <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
-                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -1820,5 +1846,24 @@
                 </pluginManagement>
             </build>
         </profile>
+        <!--
+             WARNING: this MUST be the very last profile,
+             so that the "report" module is the very last module,
+             in particular when deploying artifacts to a Nexus repository.
+             See the "build/reports" module POM for more information.
+         -->
+        <profile>
+            <id>build-reports-as-last-module</id>
+            <activation>
+                <property>
+                    <name>!some.property.that.will.never.exist</name>
+                </property>
+            </activation>
+            <modules>
+                <module>build/reports</module>
+            </modules>
+        </profile>
+
+        <!-- DO NOT ADD ANY PROFILE AFTER THIS: see above -->
     </profiles>
 </project>
