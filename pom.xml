@@ -5,7 +5,11 @@
   ~ License: Apache License, Version 2.0
   ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- child.project.url.inherit.append.path is weird but necessary to have correct URLs in flattened POMs,
+     see XSD for more info. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+         child.project.url.inherit.append.path="false">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hibernate.validator</groupId>
@@ -1473,7 +1477,11 @@
         </license>
     </licenses>
 
-    <scm>
+    <!-- The various child.*.append.path are weird but necessary to have correct URLs in flattened POMs,
+        see XSD for more info. -->
+    <scm child.scm.connection.inherit.append.path="false"
+         child.scm.developerConnection.inherit.append.path="false"
+         child.scm.url.inherit.append.path="false">
         <connection>scm:git:git://github.com/hibernate/hibernate-validator.git</connection>
         <developerConnection>scm:git:git@github.com:hibernate/hibernate-validator.git</developerConnection>
         <url>http://github.com/hibernate/hibernate-validator</url>
