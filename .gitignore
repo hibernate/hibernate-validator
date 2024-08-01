@@ -3,6 +3,7 @@
 
 # Our build scripts - necessary for our release jobs
 hibernate-noorm-release-scripts
+hibernate-release-scripts
 
 # Gradle work directory
 .gradle

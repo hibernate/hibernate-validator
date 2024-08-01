@@ -90,6 +90,7 @@
                 <!-- only needed for documentation and helper scripts, no need to include them -->
                 <exclude>src/main/scripts/**</exclude>
                 <exclude>hibernate-noorm-release-scripts/**</exclude>
+                <exclude>hibernate-release-scripts/**</exclude>
 
                 <!-- actual files which should be ignored -->
                 <exclude>.travis.yml</exclude>
