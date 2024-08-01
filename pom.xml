@@ -88,6 +88,8 @@
     </mailingLists>
 
     <modules>
+        <module>parents/internal</module>
+        <module>parents/public</module>
         <module>build/build-config</module>
         <module>build/enforcer</module>
         <module>bom</module>
