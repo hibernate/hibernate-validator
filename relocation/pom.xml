@@ -23,4 +23,32 @@
         <module>cdi</module>
         <module>engine</module>
     </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <configuration>
+                        <!-- Keep dependency management -->
+                        <flattenMode>bom</flattenMode>
+                        <pomElements>
+                            <!-- But not properties, they are not useful in a bom -->
+                            <properties>remove</properties>
+                            <repositories>remove</repositories>
+                            <!-- and keep what we actually care about with relocation: -->
+                            <distributionManagement>keep</distributionManagement>
+                        </pomElements>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
