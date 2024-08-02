@@ -13,6 +13,8 @@ import jakarta.validation.constraints.Pattern;
 import org.hibernate.validator.cfg.ConstraintDef;
 
 /**
+ * An {@link Email} constraint definition.
+ *
  * @author Hardy Ferentschik
  */
 public class EmailDef extends ConstraintDef<EmailDef, Email> {

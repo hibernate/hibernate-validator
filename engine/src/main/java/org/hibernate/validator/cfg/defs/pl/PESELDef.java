@@ -10,6 +10,7 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.pl.PESEL;
 
 /**
+ * A {@link PESEL} constraint definition.
  * @author Marko Bekta
  */
 public class PESELDef extends ConstraintDef<PESELDef, PESEL> {

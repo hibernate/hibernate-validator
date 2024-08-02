@@ -10,6 +10,8 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
 
 /**
+ * A {@link TituloEleitoral} constraint definition.
+ *
  * @author Marko Bekta
  */
 public class TituloEleitoralDef extends ConstraintDef<TituloEleitoralDef, TituloEleitoral> {

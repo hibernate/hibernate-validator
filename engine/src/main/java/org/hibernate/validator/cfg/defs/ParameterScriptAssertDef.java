@@ -10,6 +10,7 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 
 /**
+ * A {@link ParameterScriptAssert} constraint definition.
  * @author Marko Bekta
  */
 public class ParameterScriptAssertDef extends ConstraintDef<ParameterScriptAssertDef, ParameterScriptAssert> {

@@ -10,6 +10,8 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.pl.NIP;
 
 /**
+ * An {@link NIP} constraint definition.
+ *
  * @author Marko Bekta
  */
 public class NIPDef extends ConstraintDef<NIPDef, NIP> {

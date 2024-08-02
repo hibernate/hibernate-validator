@@ -10,6 +10,8 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.Currency;
 
 /**
+ * A {@link Currency} constraint definition.
+ *
  * @author Gunnar Morling
  */
 public class CurrencyDef extends ConstraintDef<CurrencyDef, Currency> {

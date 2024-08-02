@@ -11,6 +11,8 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.Mod11Check;
 
 /**
+ * A {@link Mod11Check} constraint definition.
+ *
  * @author Hardy Ferentschik
  */
 public class Mod11CheckDef extends ConstraintDef<Mod11CheckDef, Mod11Check> {

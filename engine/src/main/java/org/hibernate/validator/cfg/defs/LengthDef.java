@@ -12,6 +12,7 @@ import org.hibernate.validator.constraints.Length;
 
 
 /**
+ * A {@link Length} constraint definition.
  * @author Hardy Ferentschik
  */
 public class LengthDef extends ConstraintDef<LengthDef, Length> {

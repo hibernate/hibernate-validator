@@ -10,6 +10,8 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.LuhnCheck;
 
 /**
+ * A {@link LuhnCheck} constraint definition.
+ *
  * @author Marko Bekta
  */
 public class LuhnCheckDef extends ConstraintDef<LuhnCheckDef, LuhnCheck> {

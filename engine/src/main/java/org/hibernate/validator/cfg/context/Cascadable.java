@@ -10,6 +10,7 @@ package org.hibernate.validator.cfg.context;
  * Facet of a constraint mapping creational context which allows to mark the underlying
  * element as to be validated in a cascaded way.
  *
+ * @param <C> The concrete type of the cascadable.
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */

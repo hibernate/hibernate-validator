@@ -11,6 +11,8 @@ import jakarta.validation.constraints.Min;
 import org.hibernate.validator.cfg.ConstraintDef;
 
 /**
+ * A {@link Min} constraint definition.
+ *
  * @author Hardy Ferentschik
  */
 public class MinDef extends ConstraintDef<MinDef, Min> {
