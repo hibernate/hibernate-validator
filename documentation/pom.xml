@@ -299,7 +299,7 @@
 
                         <!-- URLs -->
                         <javaApiDocsUrl>${java.api-docs.base-url}/</javaApiDocsUrl>
-                        <bvApiDocsUrl>${bv.api-docs.base-url}/</bvApiDocsUrl>
+                        <bvApiDocsUrl>${javadoc.jakarta.validation.url}/</bvApiDocsUrl>
                         <bvSpecUrl>${bv.spec.url}</bvSpecUrl>
                         <javaTechnotesBaseUrl>${java.technotes.base-url}</javaTechnotesBaseUrl>
                         <javafxDocsUrl>${javafx.docs.url}</javafxDocsUrl>

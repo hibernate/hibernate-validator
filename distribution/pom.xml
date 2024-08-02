@@ -9,9 +9,9 @@
 
     <parent>
         <groupId>org.hibernate.validator</groupId>
-        <artifactId>hibernate-validator-internal-parent</artifactId>
+        <artifactId>hibernate-validator-public-parent</artifactId>
         <version>9.0.0-SNAPSHOT</version>
-        <relativePath>../parents/internal/pom.xml</relativePath>
+        <relativePath>../parents/public/pom.xml</relativePath>
     </parent>
 
     <artifactId>hibernate-validator-distribution</artifactId>
@@ -24,7 +24,11 @@
         <maven.deploy.skip>true</maven.deploy.skip>
         <gpg.skip>true</gpg.skip>
         <maven.javadoc.skip>false</maven.javadoc.skip>
-        <javadoc.additional.param></javadoc.additional.param>
+        <!--
+            Any javadoc warnings should've been caught already while the previous modules were built.
+            Also see additional explanations on this property in the `hibernate-search-mapper-orm-jakarta-batch-core` module.
+        -->
+        <failOnJavadocWarning>false</failOnJavadocWarning>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
 
@@ -112,20 +116,8 @@
                         ${basedir}/../engine/src/main/java;
                         ${basedir}/../cdi/src/main/java;
                         ${basedir}/../annotation-processor/src/main/java
+                        ${basedir}/../test-utils/src/main/java
                     </sourcepath>
-                    <links>
-                        <link>${java.api-docs.base-url}</link>
-                        <link>${javaee.api-docs.base-url}</link>
-                        <link>${bv.api-docs.base-url}</link>
-                        <!--<link>${javamoney.api-docs.base-url}</link>-->
-                    </links>
-                    <tags>
-                        <tag>
-                            <name>hv.experimental</name>
-                            <placement>a</placement>
-                            <head>Experimental</head>
-                        </tag>
-                    </tags>
                     <packagesheader>Hibernate Validator Packages</packagesheader>
                     <doctitle>Hibernate Validator ${project.version}</doctitle>
                     <windowtitle>Hibernate Validator ${project.version}</windowtitle>
@@ -142,6 +134,10 @@
                         <group>
                             <title>Annotation Processor Packages</title>
                             <packages>org.hibernate.validator.ap*</packages>
+                        </group>
+                        <group>
+                            <title>Hibernate Validator Test Utilities Packages</title>
+                            <packages>org.hibernate.validator.testutil*</packages>
                         </group>
                     </groups>
                     <additionalOptions>${javadoc.additional.options}</additionalOptions>
@@ -179,18 +175,4 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>testWithJdk11+</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>!8</value>
-                </property>
-            </activation>
-            <properties>
-                <javadoc.additional.options>-html5</javadoc.additional.options>
-            </properties>
-        </profile>
-    </profiles>
 </project>

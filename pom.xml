@@ -120,8 +120,6 @@
         <java.technotes.base-url>http://docs.oracle.com/javase/8/docs/technotes</java.technotes.base-url>
         <javaee.api-docs.base-url>https://jakarta.ee/specifications/platform/11/apidocs</javaee.api-docs.base-url>
         <javafx.docs.url>https://openjfx.io/openjfx-docs/</javafx.docs.url>
-        <bv.api-docs.base-url>https://jakarta.ee/specifications/bean-validation/3.1/apidocs</bv.api-docs.base-url>
-        <javamoney.api-docs.base-url>http://javamoney.github.io/apidocs</javamoney.api-docs.base-url>
 
         <!-- Module names used for Java 9 modules and OSGi bundles -->
 
@@ -178,6 +176,7 @@
         -->
         <version.jakarta.validation-api>3.1.0</version.jakarta.validation-api>
         <version.jakarta.persistence-api>3.2.0</version.jakarta.persistence-api>
+        <version.jakarta.el-api>6.0.0</version.jakarta.el-api>
 
         <!-- JavaMoney dependencies -->
         <version.javax.money>1.1</version.javax.money>
@@ -329,8 +328,21 @@
         <java-version.test.launcher.java_home>${java-version.test.compiler.java_home}</java-version.test.launcher.java_home>
         <java-version.test.launcher>${java-version.test.launcher.java_home}/bin/java</java-version.test.launcher>
 
-        <!-- No need to build the javadocs per module. Aggregated javadocs are build in the distribution module. See also HV-894 -->
-        <maven.javadoc.skip>true</maven.javadoc.skip>
+        <!-- Set empty default value to avoid Maven leaving property references (${...}) when it doesn't find a value -->
+        <maven.javadoc.skip>false</maven.javadoc.skip>
+        <!-- Whether javadoc warnings should fail the build -->
+        <failOnJavadocWarning>true</failOnJavadocWarning>
+        <javadoc.generate.jar.phase>none</javadoc.generate.jar.phase>
+        <!-- We control whether we should download javadoc based on this property
+             that defines the phase of some Maven plugin executions,
+             because just skipping those plugins doesn't skip dependency resolution,
+             which will fail if javadoc wasn't downloaded. -->
+        <javadoc.download.phase>generate-resources</javadoc.download.phase>
+        <javadoc.packagelists.directory>${project.build.directory}/dependencies-javadoc-packagelists</javadoc.packagelists.directory>
+        <javadoc.jakarta.validation.url>https://jakarta.ee/specifications/bean-validation/${parsed-version.jakarta.validation-api.majorVersion}.${parsed-version.jakarta.validation-api.minorVersion}/apidocs/</javadoc.jakarta.validation.url>
+        <javadoc.jakarta.el.url>https://jakarta.ee/specifications/expression-language/${parsed-version.jakarta.el-api.majorVersion}.${parsed-version.jakarta.el-api.minorVersion}/apidocs/</javadoc.jakarta.el.url>
+        <javadoc.jakarta.el.url>https://jakarta.ee/specifications/expression-language/${parsed-version.jakarta.el-api.majorVersion}.${parsed-version.jakarta.el-api.minorVersion}/apidocs/</javadoc.jakarta.el.url>
+        <javadoc.javamoney.url>http://javamoney.github.io/apidocs</javadoc.javamoney.url>
 
         <!-- Also set source/target, because several other plugins rely on this and don't understand release -->
         <maven.compiler.source>${java-version.main.release}</maven.compiler.source>
@@ -658,6 +670,16 @@
                         <configuration>
                             <propertyPrefix>parsed-version.jakarta.persistence-api</propertyPrefix>
                             <versionString>${version.jakarta.persistence-api}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-jakarta-el-spec-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.jakarta.el-api</propertyPrefix>
+                            <versionString>${version.jakarta.el-api}</versionString>
                         </configuration>
                     </execution>
                 </executions>
@@ -1007,95 +1029,6 @@
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>${version.dependency.plugin}</version>
-                    <executions>
-                        <execution>
-                            <id>unpack-wildfly-patching-script</id>
-                            <phase>generate-sources</phase>
-                            <goals>
-                                <goal>unpack</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${skip.wildfly.patch.hibernate.validator}</skip>
-                                <artifactItems>
-                                    <artifactItem>
-                                        <groupId>${project.groupId}</groupId>
-                                        <artifactId>hibernate-validator-build-config</artifactId>
-                                        <version>${project.version}</version>
-                                        <type>jar</type>
-                                        <outputDirectory>${project.build.directory}/hibernate-validator-patch</outputDirectory>
-                                    </artifactItem>
-                                </artifactItems>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>unpack-wildfly</id>
-                            <phase>generate-sources</phase>
-                            <goals>
-                                <goal>unpack</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${skip.wildfly.patch.unpack.server}</skip>
-                                <artifactItems>
-                                    <artifactItem>
-                                        <groupId>org.wildfly</groupId>
-                                        <artifactId>${wildfly.distribution.name}-dist</artifactId>
-                                        <version>${version.wildfly}</version>
-                                        <type>tar.gz</type>
-                                        <overWrite>false</overWrite>
-                                        <outputDirectory>${project.build.directory}/wildfly-patched</outputDirectory>
-                                    </artifactItem>
-                                </artifactItems>
-                            </configuration>
-                        </execution>
-                        <!-- Update the BV/HV JARs in the unpacked ^ WF copy -->
-                        <execution>
-                            <id>prepare-patch-jars</id>
-                            <phase>generate-resources</phase>
-                            <goals>
-                                <goal>copy</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${skip.wildfly.patch.hibernate.validator}</skip>
-                                <artifactItems>
-                                    <!-- WildFly current -->
-                                    <artifactItem>
-                                        <groupId>jakarta.validation</groupId>
-                                        <artifactId>jakarta.validation-api</artifactId>
-                                        <version>${version.jakarta.validation-api}</version>
-                                        <overWrite>false</overWrite>
-                                        <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/jakarta/validation/api/main</outputDirectory>
-                                        <!-- Specifying name to avoid timestamp in version on CI -->
-                                        <destFileName>jakarta.validation-api-${version.jakarta.validation-api}.jar</destFileName>
-                                    </artifactItem>
-                                    <artifactItem>
-                                        <groupId>${project.groupId}</groupId>
-                                        <artifactId>hibernate-validator</artifactId>
-                                        <version>${project.version}</version>
-                                        <overWrite>false</overWrite>
-                                        <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/org/hibernate/validator/main</outputDirectory>
-                                        <destFileName>hibernate-validator-${project.version}.jar</destFileName>
-                                    </artifactItem>
-                                    <artifactItem>
-                                        <groupId>${project.groupId}</groupId>
-                                        <artifactId>hibernate-validator-cdi</artifactId>
-                                        <version>${project.version}</version>
-                                        <overWrite>false</overWrite>
-                                        <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/org/hibernate/validator/cdi/main</outputDirectory>
-                                        <destFileName>hibernate-validator-cdi-${project.version}.jar</destFileName>
-                                    </artifactItem>
-                                    <!-- We also need to patch the jboss logging jar  -->
-                                    <artifactItem>
-                                        <groupId>org.jboss.logging</groupId>
-                                        <artifactId>jboss-logging</artifactId>
-                                        <version>${version.org.jboss.logging.jboss-logging}</version>
-                                        <overWrite>false</overWrite>
-                                        <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/org/jboss/logging/main</outputDirectory>
-                                        <destFileName>jboss-logging-${version.org.jboss.logging.jboss-logging}.jar</destFileName>
-                                    </artifactItem>
-                                </artifactItems>
-                            </configuration>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
@@ -1153,15 +1086,90 @@
                 <plugin>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>${version.source.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${version.javadoc.plugin}</version>
                     <configuration>
+                        <!-- Fail on error alternative -->
                         <quiet>true</quiet>
-                        <docfilessubdirs>true</docfilessubdirs>
-                        <bottom>
-                            <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat, Inc.</a> All Rights Reserved]]></bottom>
+                        <verbose>false</verbose>
+                        <failOnWarnings>${failOnJavadocWarning}</failOnWarnings>
+                        <failOnError>true</failOnError>
+                        <release>${maven.compiler.release}</release>
+                        <!-- Exclude implementation classes from the javadoc -->
+                        <excludePackageNames>*.impl,*.impl.*,*.internal,*.internal.*</excludePackageNames>
+                        <!--
+                            This feature tries to set up links between javadoc of different modules.
+                            We don't need that since we merge everything together in the end,
+                            and it leads to really annoying additional Maven executions
+                            that end up publishing build scans on CI,
+                            so we disable it.
+                         -->
+                        <detectOfflineLinks>false</detectOfflineLinks>
+                        <!--
+                            Make sure to always use offline links,
+                            otherwise the build will need to access external websites,
+                            which leads to build failures from time to time when the websites are not available
+                            (used to happen a lot with apache.org in particular).
+                            maven-javadoc-plugin needs a package-list file to determine,
+                            for each package/class, the most appropriate link.
+                            These files are fetched from javadoc Maven artifacts
+                            in the build-config module and regrouped in a single ZIP
+                            (see maven-assembly-plugin config in the build-config POM)
+                            which is then extracted to target/ in each module that needs to generate javadoc
+                            (see maven-dependency-plugin config in this POM).
+                          -->
+                        <bottom><![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat, Inc.</a> All Rights Reserved]]></bottom>
+                        <!--
+                           Make sure to always use offline links,
+                           otherwise the build will need to access external websites,
+                           which leads to build failures from time to time when the websites are not available
+                           (used to happen a lot with apache.org in particular).
+                           maven-javadoc-plugin needs a package-list file to determine,
+                           for each package/class, the most appropriate link.
+                           These files are fetched from javadoc Maven artifacts
+                           in the build-config module and regrouped in a single ZIP
+                           (see maven-assembly-plugin config in the build-config POM)
+                           which is then extracted to target/ in each module that needs to generate javadoc
+                           (see maven-dependency-plugin config in this POM).
+                         -->
+                        <offlineLinks>
+                            <offlineLink>
+                                <url>${javadoc.javamoney.url}</url>
+                                <location>${javadoc.packagelists.directory}/javamoney-api</location>
+                            </offlineLink>
+                            <offlineLink>
+                                <url>${javadoc.jakarta.validation.url}</url>
+                                <location>${javadoc.packagelists.directory}/validation-api</location>
+                            </offlineLink>
+                            <offlineLink>
+                                <url>${javadoc.jakarta.el.url}</url>
+                                <location>${javadoc.packagelists.directory}/el-api</location>
+                            </offlineLink>
+                        </offlineLinks>
+                        <tags>
+                            <tag>
+                                <name>hv.experimental</name>
+                                <placement>a</placement>
+                                <head>Experimental</head>
+                            </tag>
+                        </tags>
+                        <additionalOptions>
+                            <!-- Java 9+ supports HTML5 for javadoc generation -->
+                            <additionalOption>-html5</additionalOption>
+                            <!-- Java 17+ adds a warning for every single class/method/etc. without a javadoc comment, and we have lots of those.-->
+                            <additionalOption>-Xdoclint:all,-missing</additionalOption>
+                        </additionalOptions>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1588,6 +1596,10 @@
         </profile>
         <profile>
             <id>release</id>
+            <properties>
+                <!-- We want this execution to happen before moditect (which executes at package phase) -->
+                <javadoc.generate.jar.phase>prepare-package</javadoc.generate.jar.phase>
+            </properties>
             <build>
                 <plugins>
                     <plugin>

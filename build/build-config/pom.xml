@@ -22,6 +22,8 @@
 
     <properties>
         <hibernate-validator-parent.path>../..</hibernate-validator-parent.path>
+
+        <tmpdir.dependencies-javadoc-packagelists>${project.build.directory}/dependencies-javadoc-packagelists</tmpdir.dependencies-javadoc-packagelists>
     </properties>
 
     <build>
@@ -78,6 +80,15 @@
                                             <artifact>jakarta.persistence:jakarta.persistence-api</artifact>
                                             <failOnNotFound>true</failOnNotFound>
                                         </item>
+                                        <!--
+                                           We want to make sure that the value we store in the property matches
+                                           the version that is imported from the Jakarta EE BOM
+                                        -->
+                                        <item>
+                                            <property>${version.jakarta.el-api}</property>
+                                            <artifact>jakarta.el:jakarta.el-api</artifact>
+                                            <failOnNotFound>true</failOnNotFound>
+                                        </item>
                                     </propertiesToCheck>
                                 </versionAlignRule>
                             </rules>
@@ -91,6 +102,69 @@
                         <version>${project.version}</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <!-- See https://maven.apache.org/plugins/maven-dependency-plugin/examples/unpacking-artifacts.html -->
+                    <execution>
+                        <id>unpack-dependencies-javadoc-packagelists</id>
+                        <phase>${javadoc.download.phase}</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${maven.javadoc.skip}</skip>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>jakarta.validation</groupId>
+                                    <artifactId>jakarta.validation-api</artifactId>
+                                    <classifier>javadoc</classifier>
+                                    <type>jar</type>
+                                    <version>${version.jakarta.validation-api}</version>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/validation-api</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>jakarta.el</groupId>
+                                    <artifactId>jakarta.el-api</artifactId>
+                                    <classifier>javadoc</classifier>
+                                    <type>jar</type>
+                                    <version>${version.jakarta.el-api}</version>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/el-api</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.javamoney</groupId>
+                                    <artifactId>moneta</artifactId>
+                                    <classifier>javadoc</classifier>
+                                    <type>jar</type>
+                                    <version>${version.org.javamoney.moneta}</version>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/javamoney-api</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                            <includes>package-list,element-list</includes>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>package-dependencies-javadoc-packagelists</id>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <skipAssembly>${maven.javadoc.skip}</skipAssembly>
+                            <descriptors>
+                                <descriptor>src/main/assembly/dependencies-javadoc-packagelists.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
