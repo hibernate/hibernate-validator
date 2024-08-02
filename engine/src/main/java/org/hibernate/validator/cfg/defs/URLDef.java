@@ -12,6 +12,8 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.URL;
 
 /**
+ * An {@link URL} constraint definition.
+ *
  * @author Hardy Ferentschik
  */
 public class URLDef extends ConstraintDef<URLDef, URL> {

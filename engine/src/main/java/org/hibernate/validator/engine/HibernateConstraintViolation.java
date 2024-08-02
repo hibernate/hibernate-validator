@@ -13,6 +13,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 /**
  * A custom {@link ConstraintViolation} which allows to get additional information for a constraint violation.
  *
+ * @param <T> The type of the root bean.
  * @since 5.3
  */
 public interface HibernateConstraintViolation<T> extends ConstraintViolation<T> {

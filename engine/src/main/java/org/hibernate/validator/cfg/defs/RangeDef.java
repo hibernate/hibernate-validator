@@ -10,6 +10,8 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.Range;
 
 /**
+ * A {@link Range} constraint definition.
+ *
  * @author Hardy Ferentschik
  */
 public class RangeDef extends ConstraintDef<RangeDef, Range> {

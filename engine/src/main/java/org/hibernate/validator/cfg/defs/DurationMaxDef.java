@@ -10,6 +10,7 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.time.DurationMax;
 
 /**
+ * A {@link DurationMax} constraint definition.
  * @author Marko Bekhta
  */
 public class DurationMaxDef extends ConstraintDef<DurationMaxDef, DurationMax> {

@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.validator.cfg.ConstraintDef;
 
 /**
+ * A {@link Size} constraint definition.
  * @author Hardy Ferentschik
  */
 public class SizeDef extends ConstraintDef<SizeDef, Size> {

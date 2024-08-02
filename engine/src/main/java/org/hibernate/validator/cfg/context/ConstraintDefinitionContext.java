@@ -44,7 +44,6 @@ public interface ConstraintDefinitionContext<A extends Annotation> extends Const
 	/**
 	 * Allows to configure a validation implementation using a Lambda expression or method reference. Useful for simple
 	 * validations without the need for accessing constraint properties or customization of error messages etc.
-	 * <p>
 	 *
 	 * @param type The type of the value to validate
 	 * @return This context for method chaining

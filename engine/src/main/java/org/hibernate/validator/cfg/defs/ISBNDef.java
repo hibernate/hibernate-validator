@@ -10,6 +10,7 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.ISBN;
 
 /**
+ * An {@link ISBN} constraint definition.
  * @author Marko Bekhta
  * @since 6.0.6
  */

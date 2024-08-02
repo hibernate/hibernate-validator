@@ -39,7 +39,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
  * }
  * }
  * </pre>
- * <p>
+ *
  * @see org.hibernate.validator.HibernateValidatorConfiguration#CONSTRAINT_MAPPING_CONTRIBUTORS
  * @author Gunnar Morling
  */

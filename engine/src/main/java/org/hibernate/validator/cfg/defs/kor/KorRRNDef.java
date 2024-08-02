@@ -10,6 +10,9 @@ import org.hibernate.validator.Incubating;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.kor.KorRRN;
 
+/**
+ * A {@link KorRRN} constraint definition.
+ */
 @Incubating
 public class KorRRNDef extends ConstraintDef<KorRRNDef, KorRRN> {
 

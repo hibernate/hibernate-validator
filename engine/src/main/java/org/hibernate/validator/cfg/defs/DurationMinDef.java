@@ -10,6 +10,8 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.time.DurationMin;
 
 /**
+ * A {@link DurationMin} constraint definition.
+ *
  * @author Marko Bekhta
  */
 public class DurationMinDef extends ConstraintDef<DurationMinDef, DurationMin> {

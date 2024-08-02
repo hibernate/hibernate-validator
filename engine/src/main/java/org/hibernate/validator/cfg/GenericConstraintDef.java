@@ -15,6 +15,7 @@ import java.lang.annotation.Annotation;
  * {@link GenericConstraintDef#param(String, Object)} which allows to add
  * arbitrary constraint parameters.
  *
+ * @param <A> The constraint annotation type.
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */

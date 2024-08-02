@@ -11,6 +11,8 @@ import jakarta.validation.constraints.DecimalMin;
 import org.hibernate.validator.cfg.ConstraintDef;
 
 /**
+ * A {@link DecimalMin} constraint definition.
+ *
  * @author Hardy Ferentschik
  */
 public class DecimalMinDef extends ConstraintDef<DecimalMinDef, DecimalMin> {

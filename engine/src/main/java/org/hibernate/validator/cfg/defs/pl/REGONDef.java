@@ -10,6 +10,8 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.pl.REGON;
 
 /**
+ * A {@link REGON} constraint definition.
+ *
  * @author Marko Bekta
  */
 public class REGONDef extends ConstraintDef<REGONDef, REGON> {

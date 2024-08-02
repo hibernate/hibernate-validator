@@ -40,6 +40,8 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
  * Should not be used directly, prefer {@link HibernateValidatorConfiguration} or
  * {@link PredefinedScopeHibernateValidatorConfiguration}.
  *
+ * @param <S> The actual type of the configuration.
+ *
  * @author Emmanuel Bernard
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
@@ -75,8 +77,8 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	String ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS = "hibernate.validator.allow_parallel_method_parameter_constraint";
 
 	/**
-	 * @deprecated planned for removal. Use hibernate.validator.constraint_mapping_contributors instead.
 	 * @since 5.2
+	 * @deprecated planned for removal. Use hibernate.validator.constraint_mapping_contributors instead.
 	 */
 	@Deprecated
 	String CONSTRAINT_MAPPING_CONTRIBUTOR = "hibernate.validator.constraint_mapping_contributor";
@@ -230,7 +232,6 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 *
 	 * @return the default {@code ValueExtractor} implementations compliant
 	 * with the specification
-	 *
 	 * @since 6.0
 	 */
 	@Incubating
@@ -241,9 +242,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * will be added to the constraints configured via annotations and/or xml.
 	 *
 	 * @param mapping {@code ConstraintMapping} instance containing programmatic configured constraints
-	 *
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @throws IllegalArgumentException if {@code mapping} is {@code null}
 	 */
 	S addMapping(ConstraintMapping mapping);
@@ -253,7 +252,6 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * will stop on the first constraint violation detected.
 	 *
 	 * @param failFast {@code true} to enable fail fast, {@code false} otherwise.
-	 *
 	 * @return {@code this} following the chaining method pattern
 	 */
 	S failFast(boolean failFast);
@@ -269,9 +267,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * last fallback through Hibernate Validator's own class loader.
 	 *
 	 * @param externalClassLoader The class loader for loading user-provided resources.
-	 *
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 5.2
 	 */
 	S externalClassLoader(ClassLoader externalClassLoader);
@@ -288,9 +284,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * </pre>
 	 *
 	 * @param allow flag determining whether validation will allow overriding to alter parameter constraints.
-	 *
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 5.3
 	 */
 	S allowOverridingMethodAlterParameterConstraint(boolean allow);
@@ -308,9 +302,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * </pre>
 	 *
 	 * @param allow flag determining whether validation will allow multiple cascaded validation on return values.
-	 *
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 5.3
 	 */
 	S allowMultipleCascadedValidationOnReturnValues(boolean allow);
@@ -328,9 +320,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * </pre>
 	 *
 	 * @param allow flag determining whether validation will allow parameter constraints in parallel hierarchies
-	 *
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 5.3
 	 */
 	S allowParallelMethodsDefineParameterConstraints(boolean allow);
@@ -344,9 +334,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 *
 	 * @param enabled flag determining whether per validation call caching is enabled for {@code TraversableResolver}
 	 * results.
-	 *
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 6.0.3
 	 */
 	S enableTraversableResolverResultCache(boolean enabled);
@@ -356,9 +344,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * used to evaluate script expressions for {@link ScriptAssert} and {@link ParameterScriptAssert} constraints.
 	 *
 	 * @param scriptEvaluatorFactory the {@link ScriptEvaluatorFactory} to be used
-	 *
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 6.0.3
 	 */
 	@Incubating
@@ -369,9 +355,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * {@link Past}/{@link PastOrPresent} and {@link Future}/{@link FutureOrPresent}.
 	 *
 	 * @param temporalValidationTolerance the acceptable tolerance
-	 *
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 6.0.5
 	 */
 	@Incubating
@@ -382,9 +366,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * times, only the payload passed last will be propagated.
 	 *
 	 * @param constraintValidatorPayload the payload passed to constraint validators
-	 *
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 6.0.8
 	 */
 	@Incubating
@@ -395,9 +377,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * or not.
 	 *
 	 * @param getterPropertySelectionStrategy the {@link GetterPropertySelectionStrategy} to be used
-	 *
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 6.1.0
 	 */
 	@Incubating
@@ -408,9 +388,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * when constructing a property path as the one returned by {@link ConstraintViolation#getPropertyPath()}.
 	 *
 	 * @param propertyNodeNameProvider the {@link PropertyNodeNameProvider} to be used
-	 *
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 6.1.0
 	 */
 	@Incubating
@@ -458,9 +436,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * Allows setting a locale resolver, defining how the locale will be resolved when interpolating the message of a constraint violation.
 	 *
 	 * @param localeResolver the {@link LocaleResolver} to be used
-	 *
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 6.1.1
 	 */
 	@Incubating
@@ -479,7 +455,6 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 *
 	 * @param expressionLanguageFeatureLevel the {@link ExpressionLanguageFeatureLevel} to be used
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 6.2
 	 */
 	@Incubating
@@ -492,7 +467,6 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 *
 	 * @param expressionLanguageFeatureLevel the {@link ExpressionLanguageFeatureLevel} to be used
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 6.2
 	 */
 	@Incubating
@@ -505,7 +479,6 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 *
 	 * @param enabled flag determining whether validated values will be printed out into trace level logs or not.
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 8.0
 	 */
 	@Incubating
@@ -517,9 +490,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * constraints generated a violation.
 	 *
 	 * @param failFastOnPropertyViolation {@code true} to enable the skipping mode, {@code false} otherwise.
-	 *
 	 * @return {@code this} following the chaining method pattern
-	 *
 	 * @since 9.0
 	 */
 	@Incubating

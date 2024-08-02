@@ -10,6 +10,7 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.br.CNPJ;
 
 /**
+ * A {@link CNPJ} constraint definition.
  * @author Marko Bekta
  */
 public class CNPJDef extends ConstraintDef<CNPJDef, CNPJ> {

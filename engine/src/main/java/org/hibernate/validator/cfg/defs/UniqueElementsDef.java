@@ -11,6 +11,8 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.UniqueElements;
 
 /**
+ * An {@link UniqueElements} constraint definition.
+ *
  * @author Guillaume Smet
  * @since 6.0.5
  */

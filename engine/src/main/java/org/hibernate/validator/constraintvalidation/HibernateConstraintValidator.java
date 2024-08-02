@@ -18,6 +18,8 @@ import org.hibernate.validator.Incubating;
 /**
  * Hibernate Validator specific extension to the {@link ConstraintValidator} contract.
  *
+ * @param <A> The constraint annotation type this validator applies to.
+ * @param <T> The target type this validator can validate.
  * @author Marko Bekhta
  * @since 6.0.5
  */
