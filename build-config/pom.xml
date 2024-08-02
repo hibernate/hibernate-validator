@@ -22,12 +22,75 @@
 
     <properties>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+
+        <tmpdir.dependencies-javadoc-packagelists>${project.build.directory}/dependencies-javadoc-packagelists</tmpdir.dependencies-javadoc-packagelists>
     </properties>
 
     <build>
         <plugins>
             <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <!-- See https://maven.apache.org/plugins/maven-dependency-plugin/examples/unpacking-artifacts.html -->
+                    <execution>
+                        <id>unpack-dependencies-javadoc-packagelists</id>
+                        <phase>${javadoc.download.phase}</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>jakarta.validation</groupId>
+                                    <artifactId>jakarta.validation-api</artifactId>
+                                    <classifier>javadoc</classifier>
+                                    <type>jar</type>
+                                    <version>${version.jakarta.validation-api}</version>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/validation-api</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>jakarta.el</groupId>
+                                    <artifactId>jakarta.el-api</artifactId>
+                                    <classifier>javadoc</classifier>
+                                    <type>jar</type>
+                                    <version>${version.jakarta.el-api}</version>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/el-api</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.javamoney</groupId>
+                                    <artifactId>moneta</artifactId>
+                                    <classifier>javadoc</classifier>
+                                    <type>jar</type>
+                                    <version>${version.org.javamoney.moneta}</version>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/javamoney-api</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                            <includes>package-list,element-list</includes>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>package-dependencies-javadoc-packagelists</id>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/dependencies-javadoc-packagelists.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

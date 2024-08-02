@@ -23,6 +23,18 @@
     <properties>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
         <surefire.jvm.args.additional>-Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
+        <!--
+            We want to skip the javadoc warnings for this module, since Jakarta Expression Language API is using proper modules,
+            resulting in a warning like:
+                [WARNING] Javadoc Warnings
+                [WARNING] warning: The code being documented uses packages in the unnamed module, but the packages defined in https://jakarta.ee/specifications/expression-language/6.0/apidocs/ are in named modules.
+                [WARNING] 1 warning
+            when trying to build this module. Since it cannot be suppressed, but the generated docs are actually OK
+            and links point to correct addresses, we just ignore all warnings for this module.
+        -->
+        <failOnJavadocWarning>false</failOnJavadocWarning>
+        <maven.javadoc.skip>false</maven.javadoc.skip>
+        <deploy.skip>false</deploy.skip>
     </properties>
 
     <distributionManagement>
@@ -344,6 +356,81 @@
             <properties>
                 <surefire.jvm.args.illegal-access>--illegal-access=deny</surefire.jvm.args.illegal-access>
             </properties>
+        </profile>
+        <profile>
+            <id>dist</id>
+            <activation>
+                <property>
+                    <name>disableDistributionBuild</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-dependencies-javadoc-packagelists</id>
+                                <phase>${javadoc.download.phase}</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>hibernate-validator-build-config</artifactId>
+                                            <classifier>dependencies-javadoc-packagelists</classifier>
+                                            <type>zip</type>
+                                            <version>${project.version}</version>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <outputDirectory>${javadoc.packagelists.directory}</outputDirectory>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <!--
+                                This ensures that using mvn install -pl <some project> -am
+                                will correctly force the build of the build-config module.
+                             -->
+                            <dependency>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>hibernate-validator-build-config</artifactId>
+                                <classifier>dependencies-javadoc-packagelists</classifier>
+                                <type>zip</type>
+                                <version>${project.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>generate-javadoc</id>
+                                <goals>
+                                    <goal>javadoc-no-fork</goal>
+                                </goals>
+                                <phase>process-resources</phase>
+                            </execution>
+                            <execution>
+                                <!--
+                                    This is the default name of an execution that is added automatically if release profile is enabled.
+                                    We want to "override" it so that we can control when it is actually executed.
+                                 -->
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <phase>${javadoc.generate.jar.phase}</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

@@ -26,6 +26,7 @@
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug />
         <deploy.skip>true</deploy.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>

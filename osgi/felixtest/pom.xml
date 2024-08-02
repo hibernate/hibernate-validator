@@ -25,6 +25,7 @@
         <!-- Temporary until we can get a Paraya version supporting jakarta.validation -->
         <skipTests>true</skipTests>
         <deploy.skip>true</deploy.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <dependencyManagement>

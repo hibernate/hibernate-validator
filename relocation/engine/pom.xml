@@ -17,6 +17,10 @@
     <artifactId>hibernate-validator</artifactId>
     <name>Hibernate Validator Engine - Relocation Artifact</name>
 
+    <properties>
+        <deploy.skip>false</deploy.skip>
+    </properties>
+
     <distributionManagement>
         <relocation>
             <groupId>org.hibernate.validator</groupId>

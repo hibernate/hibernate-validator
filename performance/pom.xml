@@ -24,6 +24,7 @@
         <!-- Disable enforcer as we are using banned dependencies for old versions -->
         <enforcer.skip>true</enforcer.skip>
         <deploy.skip>true</deploy.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
 
         <!--
         Need to specify something, since the plugin cannot handle empty options. Using something which does not have
@@ -37,6 +38,7 @@
         <beanvalidation-impl.name>none</beanvalidation-impl.name>
         <beanvalidation-impl.version>none</beanvalidation-impl.version>
         <deploy.skip>true</deploy.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>

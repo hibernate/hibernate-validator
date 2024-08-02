@@ -23,7 +23,11 @@
         <!-- Skip artifact deployment -->
         <deploy.skip>true</deploy.skip>
         <maven.javadoc.skip>false</maven.javadoc.skip>
-        <javadoc.additional.param></javadoc.additional.param>
+        <!--
+            Any javadoc warnings should've been caught already while the previous modules were built.
+            Also see additional explanations on this property in the `hibernate-search-mapper-orm-jakarta-batch-core` module.
+        -->
+        <failOnJavadocWarning>false</failOnJavadocWarning>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
 
@@ -116,20 +120,8 @@
                         ${basedir}/../engine/src/main/java;
                         ${basedir}/../cdi/src/main/java;
                         ${basedir}/../annotation-processor/src/main/java
+                        ${basedir}/../test-utils/src/main/java
                     </sourcepath>
-                    <links>
-                        <link>${java.api-docs.base-url}</link>
-                        <link>${javaee.api-docs.base-url}</link>
-                        <link>${bv.api-docs.base-url}</link>
-                        <!--<link>${javamoney.api-docs.base-url}</link>-->
-                    </links>
-                    <tags>
-                        <tag>
-                            <name>hv.experimental</name>
-                            <placement>a</placement>
-                            <head>Experimental</head>
-                        </tag>
-                    </tags>
                     <packagesheader>Hibernate Validator Packages</packagesheader>
                     <doctitle>Hibernate Validator ${project.version}</doctitle>
                     <windowtitle>Hibernate Validator ${project.version}</windowtitle>
@@ -146,6 +138,10 @@
                         <group>
                             <title>Annotation Processor Packages</title>
                             <packages>org.hibernate.validator.ap*</packages>
+                        </group>
+                        <group>
+                            <title>Hibernate Validator Test Utilities Packages</title>
+                            <packages>org.hibernate.validator.testutil*</packages>
                         </group>
                     </groups>
                     <additionalOptions>${javadoc.additional.options}</additionalOptions>
@@ -200,6 +196,45 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies-javadoc-packagelists</id>
+                        <phase>${javadoc.download.phase}</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>hibernate-validator-build-config</artifactId>
+                                    <classifier>dependencies-javadoc-packagelists</classifier>
+                                    <type>zip</type>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${javadoc.packagelists.directory}</outputDirectory>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <!--
+                        This ensures that using mvn install -pl <some project> -am
+                        will correctly force the build of the build-config module.
+                     -->
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>hibernate-validator-build-config</artifactId>
+                        <classifier>dependencies-javadoc-packagelists</classifier>
+                        <type>zip</type>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -212,7 +247,7 @@
                 </property>
             </activation>
             <properties>
-                <javadoc.additional.options>-html5 -source 8</javadoc.additional.options>
+                <javadoc.additional.options>-html5</javadoc.additional.options>
             </properties>
         </profile>
     </profiles>

@@ -40,6 +40,7 @@
         <forbiddenapis-junit.path>forbidden-allow-junit.txt</forbiddenapis-junit.path>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
         <deploy.skip>true</deploy.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <dependencies>
@@ -296,7 +297,7 @@
 
                         <!-- URLs -->
                         <javaApiDocsUrl>${java.api-docs.base-url}/</javaApiDocsUrl>
-                        <bvApiDocsUrl>${bv.api-docs.base-url}/</bvApiDocsUrl>
+                        <bvApiDocsUrl>${javadoc.jakarta.validation.url}/</bvApiDocsUrl>
                         <bvSpecUrl>${bv.spec.url}</bvSpecUrl>
                         <javaTechnotesBaseUrl>${java.technotes.base-url}</javaTechnotesBaseUrl>
                         <javafxDocsUrl>${javafx.docs.url}</javafxDocsUrl>

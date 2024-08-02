@@ -37,6 +37,7 @@
         -->
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+        <deploy.skip>false</deploy.skip>
     </properties>
 
     <dependencyManagement/>
@@ -317,6 +318,18 @@
                     </execution>
                     -->
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <configuration>
+                    <!-- Keep dependency management -->
+                    <flattenMode>bom</flattenMode>
+                    <pomElements>
+                        <!-- But not properties, they are not useful in a bom -->
+                        <properties>remove</properties>
+                    </pomElements>
+                </configuration>
             </plugin>
         </plugins>
     </build>

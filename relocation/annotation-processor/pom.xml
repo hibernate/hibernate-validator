@@ -17,6 +17,10 @@
     <artifactId>hibernate-validator-annotation-processor</artifactId>
     <name>Hibernate Validator Annotation Processor - Relocation Artifact</name>
 
+    <properties>
+        <deploy.skip>false</deploy.skip>
+    </properties>
+
     <distributionManagement>
         <relocation>
             <groupId>org.hibernate.validator</groupId>
