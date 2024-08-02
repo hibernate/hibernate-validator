@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Digits;
 import org.hibernate.validator.cfg.ConstraintDef;
 
 /**
+ * A {@link Digits} constraint definition.
  * @author Hardy Ferentschik
  */
 public class DigitsDef extends ConstraintDef<DigitsDef, Digits> {

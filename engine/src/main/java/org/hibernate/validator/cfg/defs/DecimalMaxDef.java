@@ -12,6 +12,7 @@ import jakarta.validation.constraints.DecimalMax;
 import org.hibernate.validator.cfg.ConstraintDef;
 
 /**
+ * A {@link DecimalMax} constraint definition.
  * @author Hardy Ferentschik
  */
 public class DecimalMaxDef extends ConstraintDef<DecimalMaxDef, DecimalMax> {

@@ -11,6 +11,8 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.BitcoinAddress;
 
 /**
+ * A {@link BitcoinAddress} constraint definition.
+ *
  * @author José Yoshiriro
  * @since 9.0.0
  */

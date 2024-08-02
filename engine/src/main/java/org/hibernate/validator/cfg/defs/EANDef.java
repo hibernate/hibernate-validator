@@ -10,6 +10,7 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.EAN;
 
 /**
+ * An {@link EAN} constraint definition.
  * @author Hardy Ferentschik
  */
 public class EANDef extends ConstraintDef<EANDef, EAN> {
