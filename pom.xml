@@ -5,7 +5,11 @@
   ~ License: Apache License, Version 2.0
   ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- child.project.url.inherit.append.path is weird but necessary to have correct URLs in flattened POMs,
+     see XSD for more info. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+         child.project.url.inherit.append.path="false">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hibernate.validator</groupId>
@@ -106,8 +110,6 @@
         <java.technotes.base-url>https://docs.oracle.com/javase/8/docs/technotes</java.technotes.base-url>
         <javaee.api-docs.base-url>https://jakarta.ee/specifications/platform/9/apidocs</javaee.api-docs.base-url>
         <javafx.docs.url>https://openjfx.io/openjfx-docs/</javafx.docs.url>
-        <bv.api-docs.base-url>https://jakarta.ee/specifications/bean-validation/3.0/apidocs</bv.api-docs.base-url>
-        <javamoney.api-docs.base-url>https://javamoney.github.io/apidocs</javamoney.api-docs.base-url>
 
         <!-- Module names used for Java 9 modules and OSGi bundles -->
 
@@ -221,7 +223,7 @@
         <version.copy.plugin>0.0.6</version.copy.plugin>
         <version.dependency.plugin>3.0.2</version.dependency.plugin>
         <version.depends.plugin>1.4.0</version.depends.plugin>
-        <version.deploy.plugin>2.8.2</version.deploy.plugin>
+        <version.deploy.plugin>3.1.4</version.deploy.plugin>
         <version.enforcer.plugin>3.0.0</version.enforcer.plugin>
         <version.forbiddenapis.plugin>3.2</version.forbiddenapis.plugin>
         <version.gmavenplus.plugin>1.6</version.gmavenplus.plugin>
@@ -229,7 +231,7 @@
         <version.japicmp.plugin>0.11.0</version.japicmp.plugin>
         <version.jar.plugin>3.0.2</version.jar.plugin>
         <version.jqassistant.plugin>1.11.1</version.jqassistant.plugin>
-        <version.javadoc.plugin>3.0.1</version.javadoc.plugin>
+        <version.javadoc.plugin>3.11.2</version.javadoc.plugin>
         <version.license.plugin>3.0</version.license.plugin>
         <version.release.plugin>2.5.3</version.release.plugin>
         <version.resources.plugin>3.0.2</version.resources.plugin>
@@ -244,6 +246,7 @@
         <version.wildfly-patch-gen.plugin>2.1.0.Final</version.wildfly-patch-gen.plugin>
         <version.wildfly-patch-gen.plugin.woodstox>5.0.3</version.wildfly-patch-gen.plugin.woodstox>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
+        <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
@@ -285,9 +288,21 @@
         <java-version.test.launcher>${java-version.test.launcher.java_home}/bin/java</java-version.test.launcher>
         <java-version.test.java17.add-test-source-phase>generate-test-sources</java-version.test.java17.add-test-source-phase>
 
-        <!-- No need to build the javadocs per module. Aggregated javadocs are build in the distribution module. See also HV-894 -->
+        <!-- Set empty default value to avoid Maven leaving property references (${...}) when it doesn't find a value -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
-        <deploy.skip>false</deploy.skip>
+        <deploy.skip>true</deploy.skip>
+        <!-- Whether javadoc warnings should fail the build -->
+        <failOnJavadocWarning>true</failOnJavadocWarning>
+        <javadoc.generate.jar.phase>none</javadoc.generate.jar.phase>
+        <!-- We control whether we should download javadoc based on this property
+             that defines the phase of some Maven plugin executions,
+             because just skipping those plugins doesn't skip dependency resolution,
+             which will fail if javadoc wasn't downloaded. -->
+        <javadoc.download.phase>generate-resources</javadoc.download.phase>
+        <javadoc.packagelists.directory>${project.build.directory}/dependencies-javadoc-packagelists</javadoc.packagelists.directory>
+        <javadoc.jakarta.validation.url>https://jakarta.ee/specifications/bean-validation/3.0/apidocs/</javadoc.jakarta.validation.url>
+        <javadoc.jakarta.el.url>https://jakarta.ee/specifications/expression-language/5.0/apidocs/</javadoc.jakarta.el.url>
+        <javadoc.javamoney.url>http://javamoney.github.io/apidocs</javadoc.javamoney.url>
 
         <!-- Also set source/target, because several other plugins rely on this and don't understand release -->
         <maven.compiler.source>${java-version.main.release}</maven.compiler.source>
@@ -637,6 +652,14 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -1017,15 +1040,90 @@
                 <plugin>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>${version.source.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${version.javadoc.plugin}</version>
                     <configuration>
+                        <!-- Fail on error alternative -->
                         <quiet>true</quiet>
-                        <docfilessubdirs>true</docfilessubdirs>
-                        <bottom>
-                            <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat, Inc.</a> All Rights Reserved]]></bottom>
+                        <verbose>false</verbose>
+                        <failOnWarnings>${failOnJavadocWarning}</failOnWarnings>
+                        <failOnError>true</failOnError>
+                        <release>${maven.compiler.release}</release>
+                        <!-- Exclude implementation classes from the javadoc -->
+                        <excludePackageNames>*.impl,*.impl.*,*.internal,*.internal.*</excludePackageNames>
+                        <!--
+                            This feature tries to set up links between javadoc of different modules.
+                            We don't need that since we merge everything together in the end,
+                            and it leads to really annoying additional Maven executions
+                            that end up publishing build scans on CI,
+                            so we disable it.
+                         -->
+                        <detectOfflineLinks>false</detectOfflineLinks>
+                        <!--
+                            Make sure to always use offline links,
+                            otherwise the build will need to access external websites,
+                            which leads to build failures from time to time when the websites are not available
+                            (used to happen a lot with apache.org in particular).
+                            maven-javadoc-plugin needs a package-list file to determine,
+                            for each package/class, the most appropriate link.
+                            These files are fetched from javadoc Maven artifacts
+                            in the build-config module and regrouped in a single ZIP
+                            (see maven-assembly-plugin config in the build-config POM)
+                            which is then extracted to target/ in each module that needs to generate javadoc
+                            (see maven-dependency-plugin config in this POM).
+                          -->
+                        <bottom><![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat, Inc.</a> All Rights Reserved]]></bottom>
+                        <!--
+                           Make sure to always use offline links,
+                           otherwise the build will need to access external websites,
+                           which leads to build failures from time to time when the websites are not available
+                           (used to happen a lot with apache.org in particular).
+                           maven-javadoc-plugin needs a package-list file to determine,
+                           for each package/class, the most appropriate link.
+                           These files are fetched from javadoc Maven artifacts
+                           in the build-config module and regrouped in a single ZIP
+                           (see maven-assembly-plugin config in the build-config POM)
+                           which is then extracted to target/ in each module that needs to generate javadoc
+                           (see maven-dependency-plugin config in this POM).
+                         -->
+                        <offlineLinks>
+                            <offlineLink>
+                                <url>${javadoc.javamoney.url}</url>
+                                <location>${javadoc.packagelists.directory}/javamoney-api</location>
+                            </offlineLink>
+                            <offlineLink>
+                                <url>${javadoc.jakarta.validation.url}</url>
+                                <location>${javadoc.packagelists.directory}/validation-api</location>
+                            </offlineLink>
+                            <offlineLink>
+                                <url>${javadoc.jakarta.el.url}</url>
+                                <location>${javadoc.packagelists.directory}/el-api</location>
+                            </offlineLink>
+                        </offlineLinks>
+                        <tags>
+                            <tag>
+                                <name>hv.experimental</name>
+                                <placement>a</placement>
+                                <head>Experimental</head>
+                            </tag>
+                        </tags>
+                        <additionalOptions>
+                            <!-- Java 9+ supports HTML5 for javadoc generation -->
+                            <additionalOption>-html5</additionalOption>
+                            <!-- Java 17+ adds a warning for every single class/method/etc. without a javadoc comment, and we have lots of those.-->
+                            <additionalOption>-Xdoclint:all,-missing</additionalOption>
+                        </additionalOptions>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1250,6 +1348,33 @@
                         <distributionType>bin</distributionType>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>${version.flatten-maven-plugin}</version>
+                    <configuration>
+                        <outputDirectory>${project.build.directory}</outputDirectory>
+                        <!-- Keep things like url, inceptionYear, authors...
+                             everything that's required by the OSSRH Maven repository -->
+                        <flattenMode>ossrh</flattenMode>
+                        <pomElements>
+                            <!-- We have Jakarta staging repo listed to download the TCK,
+                                but there's no point in keeping it listed in the published POM files. -->
+                            <repositories>remove</repositories>
+                        </pomElements>
+                        <!-- flatten only the poms we deploy -->
+                        <skip>${deploy.skip}</skip>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>flatten-pom</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -1273,7 +1398,11 @@
         </license>
     </licenses>
 
-    <scm>
+    <!-- The various child.*.append.path are weird but necessary to have correct URLs in flattened POMs,
+        see XSD for more info. -->
+    <scm child.scm.connection.inherit.append.path="false"
+         child.scm.developerConnection.inherit.append.path="false"
+         child.scm.url.inherit.append.path="false">
         <connection>scm:git:git://github.com/hibernate/hibernate-validator.git</connection>
         <developerConnection>scm:git:git@github.com:hibernate/hibernate-validator.git</developerConnection>
         <url>https://github.com/hibernate/hibernate-validator</url>
@@ -1326,6 +1455,10 @@
         </profile>
         <profile>
             <id>release</id>
+            <properties>
+                <!-- We want this execution to happen before moditect (which executes at package phase) -->
+                <javadoc.generate.jar.phase>prepare-package</javadoc.generate.jar.phase>
+            </properties>
             <build>
                 <plugins>
                     <plugin>

@@ -32,6 +32,7 @@
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
         <skip.failsafe.execution>false</skip.failsafe.execution>
         <deploy.skip>true</deploy.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <dependencies>

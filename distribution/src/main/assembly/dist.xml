@@ -114,7 +114,7 @@
 
         <!-- Include documentation -->
         <fileSet>
-            <directory>target/site/apidocs</directory>
+            <directory>target/reports/apidocs</directory>
             <outputDirectory>docs/api</outputDirectory>
         </fileSet>
         <fileSet>
