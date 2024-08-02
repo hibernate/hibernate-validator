@@ -91,19 +91,6 @@
                 <artifactId>forbiddenapis</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <links>
-                        <link>${java.api-docs.base-url}</link>
-                        <link>${bv.api-docs.base-url}</link>
-                    </links>
-                    <packagesheader>Hibernate Validator Annotation Processor Packages</packagesheader>
-                    <doctitle>Hibernate Validator Annotation Processor ${project.version}</doctitle>
-                    <windowtitle>Hibernate Validator Annotation Processor ${project.version}</windowtitle>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>

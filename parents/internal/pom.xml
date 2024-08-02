@@ -47,6 +47,98 @@
                 <groupId>net.revelc.code.formatter</groupId>
                 <artifactId>formatter-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-wildfly-patching-script</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skip.wildfly.patch.hibernate.validator}</skip>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>hibernate-validator-build-config</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <outputDirectory>${project.build.directory}/hibernate-validator-patch</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-wildfly</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skip.wildfly.patch.unpack.server}</skip>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.wildfly</groupId>
+                                    <artifactId>${wildfly.distribution.name}-dist</artifactId>
+                                    <version>${version.wildfly}</version>
+                                    <type>tar.gz</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/wildfly-patched</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <!-- Update the BV/HV JARs in the unpacked ^ WF copy -->
+                    <execution>
+                        <id>prepare-patch-jars</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skip.wildfly.patch.hibernate.validator}</skip>
+                            <artifactItems>
+                                <!-- WildFly current -->
+                                <artifactItem>
+                                    <groupId>jakarta.validation</groupId>
+                                    <artifactId>jakarta.validation-api</artifactId>
+                                    <version>${version.jakarta.validation-api}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/jakarta/validation/api/main</outputDirectory>
+                                    <!-- Specifying name to avoid timestamp in version on CI -->
+                                    <destFileName>jakarta.validation-api-${version.jakarta.validation-api}.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>hibernate-validator</artifactId>
+                                    <version>${project.version}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/org/hibernate/validator/main</outputDirectory>
+                                    <destFileName>hibernate-validator-${project.version}.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>hibernate-validator-cdi</artifactId>
+                                    <version>${project.version}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/org/hibernate/validator/cdi/main</outputDirectory>
+                                    <destFileName>hibernate-validator-cdi-${project.version}.jar</destFileName>
+                                </artifactItem>
+                                <!-- We also need to patch the jboss logging jar  -->
+                                <artifactItem>
+                                    <groupId>org.jboss.logging</groupId>
+                                    <artifactId>jboss-logging</artifactId>
+                                    <version>${version.org.jboss.logging.jboss-logging}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/org/jboss/logging/main</outputDirectory>
+                                    <destFileName>jboss-logging-${version.org.jboss.logging.jboss-logging}.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
