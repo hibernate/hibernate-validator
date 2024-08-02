@@ -12,6 +12,8 @@ import org.hibernate.validator.cfg.ConstraintDef;
 
 
 /**
+ * An {@link Pattern} constraint definition.
+ *
  * @author Hardy Ferentschik
  */
 public class PatternDef extends ConstraintDef<PatternDef, Pattern> {

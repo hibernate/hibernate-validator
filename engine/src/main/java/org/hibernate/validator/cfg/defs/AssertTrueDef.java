@@ -11,6 +11,8 @@ import jakarta.validation.constraints.AssertTrue;
 import org.hibernate.validator.cfg.ConstraintDef;
 
 /**
+ * An {@link AssertTrue} constraint definition.
+ *
  * @author Hardy Ferentschik
  */
 public class AssertTrueDef extends ConstraintDef<AssertTrueDef, AssertTrue> {

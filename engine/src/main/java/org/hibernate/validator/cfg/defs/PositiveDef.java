@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Positive;
 import org.hibernate.validator.cfg.ConstraintDef;
 
 /**
+ * A {@link Positive} constraint definition.
  * @author Gunnar Morling
  */
 public class PositiveDef extends ConstraintDef<PositiveDef, Positive> {

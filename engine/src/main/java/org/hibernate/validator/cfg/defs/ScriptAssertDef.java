@@ -10,6 +10,7 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.ScriptAssert;
 
 /**
+ * A {@link ScriptAssert} constraint definition.
  * @author Hardy Ferentschik
  */
 public class ScriptAssertDef extends ConstraintDef<ScriptAssertDef, ScriptAssert> {

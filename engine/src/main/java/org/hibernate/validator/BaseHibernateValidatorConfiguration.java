@@ -40,6 +40,8 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
  * Should not be used directly, prefer {@link HibernateValidatorConfiguration} or
  * {@link PredefinedScopeHibernateValidatorConfiguration}.
  *
+ * @param <S> The actual type of the configuration.
+ *
  * @author Emmanuel Bernard
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
@@ -75,8 +77,8 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	String ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS = "hibernate.validator.allow_parallel_method_parameter_constraint";
 
 	/**
-	 * @deprecated planned for removal. Use hibernate.validator.constraint_mapping_contributors instead.
 	 * @since 5.2
+	 * @deprecated planned for removal. Use hibernate.validator.constraint_mapping_contributors instead.
 	 */
 	@Deprecated
 	String CONSTRAINT_MAPPING_CONTRIBUTOR = "hibernate.validator.constraint_mapping_contributor";

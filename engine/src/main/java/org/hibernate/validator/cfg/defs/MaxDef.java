@@ -11,6 +11,8 @@ import jakarta.validation.constraints.Max;
 import org.hibernate.validator.cfg.ConstraintDef;
 
 /**
+ * A {@link Max} constraint definition.
+ *
  * @author Hardy Ferentschik
  */
 public class MaxDef extends ConstraintDef<MaxDef, Max> {
