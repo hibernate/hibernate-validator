@@ -141,6 +141,14 @@
                                     <version>${version.org.javamoney.moneta}</version>
                                     <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/javamoney-api</outputDirectory>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.assertj</groupId>
+                                    <artifactId>assertj-core</artifactId>
+                                    <classifier>javadoc</classifier>
+                                    <type>jar</type>
+                                    <version>${version.org.assertj.assertj-core}</version>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/assertj</outputDirectory>
+                                </artifactItem>
                             </artifactItems>
                             <includes>package-list,element-list</includes>
                             <overWriteSnapshots>true</overWriteSnapshots>

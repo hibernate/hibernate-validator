@@ -104,6 +104,11 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -115,8 +120,8 @@
                     <sourcepath>
                         ${basedir}/../engine/src/main/java;
                         ${basedir}/../cdi/src/main/java;
-                        ${basedir}/../annotation-processor/src/main/java
-                        ${basedir}/../test-utils/src/main/java
+                        ${basedir}/../annotation-processor/src/main/java;
+                        ${basedir}/../test-utils/src/main/java;
                     </sourcepath>
                     <packagesheader>Hibernate Validator Packages</packagesheader>
                     <doctitle>Hibernate Validator ${project.version}</doctitle>
