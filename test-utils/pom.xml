@@ -15,6 +15,7 @@
     <artifactId>hibernate-validator-test-utils</artifactId>
 
     <name>Hibernate Validator Test Utils</name>
+    <description>Set of test utilities that can help testing custom constraints.</description>
 
     <properties>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
