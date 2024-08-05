@@ -343,6 +343,7 @@
         <javadoc.jakarta.el.url>https://jakarta.ee/specifications/expression-language/${parsed-version.jakarta.el-api.majorVersion}.${parsed-version.jakarta.el-api.minorVersion}/apidocs/</javadoc.jakarta.el.url>
         <javadoc.jakarta.el.url>https://jakarta.ee/specifications/expression-language/${parsed-version.jakarta.el-api.majorVersion}.${parsed-version.jakarta.el-api.minorVersion}/apidocs/</javadoc.jakarta.el.url>
         <javadoc.javamoney.url>http://javamoney.github.io/apidocs</javadoc.javamoney.url>
+        <javadoc.assertj.url>https://www.javadoc.io/doc/org.assertj/assertj-core/${version.org.assertj.assertj-core}/</javadoc.assertj.url>
 
         <!-- Also set source/target, because several other plugins rely on this and don't understand release -->
         <maven.compiler.source>${java-version.main.release}</maven.compiler.source>
@@ -1155,6 +1156,10 @@
                             <offlineLink>
                                 <url>${javadoc.jakarta.el.url}</url>
                                 <location>${javadoc.packagelists.directory}/el-api</location>
+                            </offlineLink>
+                            <offlineLink>
+                                <url>${javadoc.assertj.url}</url>
+                                <location>${javadoc.packagelists.directory}/assertj</location>
                             </offlineLink>
                         </offlineLinks>
                         <tags>
