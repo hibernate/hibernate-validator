@@ -18,6 +18,7 @@
     <artifactId>hibernate-validator-annotation-processor</artifactId>
 
     <name>Hibernate Validator Annotation Processor</name>
+    <description>Annotation Processor to detect incorrect usage of constraint annotations.</description>
 
     <properties>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
