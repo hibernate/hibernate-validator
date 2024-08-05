@@ -18,6 +18,7 @@
     <artifactId>hibernate-validator-annotation-processor</artifactId>
 
     <name>Hibernate Validator Annotation Processor</name>
+    <description>Annotation Processor to detect incorrect usage of constraint annotations.</description>
 
     <properties>
         <!-- This is a publicly distributed module that should be published: -->

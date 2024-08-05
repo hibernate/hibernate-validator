@@ -16,6 +16,7 @@
     <artifactId>hibernate-validator-test-utils</artifactId>
 
     <name>Hibernate Validator Test Utils</name>
+    <description>Set of test utilities that can help testing custom constraints.</description>
 
     <properties>
         <!-- This is a publicly distributed module that should be published: -->
