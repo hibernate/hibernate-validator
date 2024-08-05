@@ -42,7 +42,7 @@
     <distributionManagement>
         <site>
             <id>site</id>
-            <url>http://hibernate.org/validator</url>
+            <url>https://hibernate.org/validator</url>
         </site>
     </distributionManagement>
 
