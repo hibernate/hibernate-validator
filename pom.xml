@@ -18,7 +18,7 @@
     <packaging>pom</packaging>
 
     <name>Hibernate Validator Aggregator</name>
-    <url>http://hibernate.org/validator</url>
+    <url>https://hibernate.org/validator</url>
     <description>Aggregator of the Hibernate Validator modules.</description>
 
     <developers>

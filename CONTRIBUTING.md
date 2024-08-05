@@ -4,7 +4,7 @@ Guidelines for contributing to Hibernate Validator
 Contributions from the community are essential in keeping Hibernate Validator strong and successful.
 This guide focuses on how to contribute back to Hibernate Validator using GitHub pull requests.
 If you need help with cloning, compiling or setting the project up in an IDE please refer to
-[this page](http://hibernate.org/validator/contribute/).
+[this page](https://hibernate.org/validator/contribute/).
 
 ## Legal
 

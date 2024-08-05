@@ -15,7 +15,7 @@ the metadata through the use of XML validation descriptors.
 
 ## Documentation
 
-The documentation for this release is included in the _docs_ directory of the distribution package or can be accessed [online](http://hibernate.org/validator/documentation/).
+The documentation for this release is included in the _docs_ directory of the distribution package or can be accessed [online](https://hibernate.org/validator/documentation/).
 
 ## Release Notes
 
@@ -76,7 +76,7 @@ You will also need a JDK 17+ and Maven 3 (>= 3.9.6). With these prerequisites in
 
     mvn clean install
 
-There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://hibernate.org/validator/contribute/).
+There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](https://hibernate.org/validator/contribute/).
 
 ## Continuous Integration
 
@@ -86,10 +86,10 @@ We provide a `.travis.yml` file so that you can enable CI for your GitHub fork b
 
 ## Hibernate Validator URLs
 
-* [Home Page](http://hibernate.org/validator/)
-* [Jakarta Validation Home](http://beanvalidation.org/)
+* [Home Page](https://hibernate.org/validator/)
+* [Jakarta Validation Home](https://beanvalidation.org/)
 * [Jakarta Validation Specs](https://jakarta.ee/specifications/bean-validation/)
-* [Downloads](http://hibernate.org/validator/downloads/)
-* [Mailing Lists](http://hibernate.org/community/)
+* [Downloads](https://hibernate.org/validator/downloads/)
+* [Mailing Lists](https://hibernate.org/community/)
 * [Issue Tracking](https://hibernate.atlassian.net/browse/HV)
 * [Continuous Integration](http://ci.hibernate.org/view/Validator/)
