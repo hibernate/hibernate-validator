@@ -728,7 +728,7 @@
                                 <Implementation-Version>${project.version}</Implementation-Version>
                                 <Implementation-Vendor>${project.parent.groupId}</Implementation-Vendor>
                                 <Implementation-Vendor-Id>${project.parent.groupId}</Implementation-Vendor-Id>
-                                <Implementation-URL>http://hibernate.org/validator/</Implementation-URL>
+                                <Implementation-URL>https://hibernate.org/validator/</Implementation-URL>
                             </manifestEntries>
                         </archive>
                     </configuration>
