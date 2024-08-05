@@ -82,8 +82,7 @@ its `ValidationProvider` implementation. In the case of Hibernate Validator, thi
 
 Depending on your environment and its classloading specifics, provider discovery via the Java's
 service loader mechanism might not work. In this case, you can plug in a custom
-`ValidationProviderResolver` implementation which performs the provider retrieval. An example is OSGi,
-where you could implement a provider resolver which uses OSGi services for provider discovery.
+`ValidationProviderResolver` implementation which performs the provider retrieval.
 
 To use a custom provider resolver, pass it via `providerResolver()` as shown in
 <<example-using-custom-validation-provider-resolver>>.
@@ -93,7 +92,7 @@ To use a custom provider resolver, pass it via `providerResolver()` as shown in
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/OsgiServiceDiscoverer.java[tags=include]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CustomValidationProviderResolver.java[tags=include]
 ----
 
 [source, JAVA, indent=0]
@@ -436,7 +435,7 @@ For constraints like `@ScriptAssert` and `@ParameterScriptAssert`, it might be u
 how the script engines are initialized and how the script evaluators are built.
 This can be done by setting a custom implementation of `ScriptEvaluatorFactory`.
 
-In particular, this is important for modular environments (e.g. OSGi), where user might face issues
+In particular, this is important for modular environments, where user might face issues
 with modular class loading and https://www.jcp.org/en/jsr/detail?id=223[JSR 223].
 It also allows to use any custom script engine, not necessarily based on the
 https://www.jcp.org/en/jsr/detail?id=223[JSR 223] (e.g. Spring Expression Language).
@@ -487,7 +486,7 @@ To solve this issue, the `MultiClassLoaderScriptEvaluatorFactory` class below ca
 ====
 [source, JAVA, indent=0]
 ----
-include::{osgi-integrationtest-sourcedir}/org/hibernate/validator/osgi/scripting/MultiClassLoaderScriptEvaluatorFactory.java[]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/MultiClassLoaderScriptEvaluatorFactory.java[]
 ----
 ====
 
@@ -496,32 +495,11 @@ and then declared with:
 ====
 [source, JAVA, indent=0]
 ----
-include::{osgi-integrationtest-sourcedir}/org/hibernate/validator/osgi/integrationtest/OsgiIntegrationTest.java[tags=scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory]
 ----
 ====
 
 This way, it is possible to pass multiple `ClassLoader` instances: typically the class loaders of the wanted ``ScriptEngine``s.
-
-An alternative approach for OSGi environments can be to use the `OsgiScriptEvaluatorFactory` defined below:
-
-====
-[source, JAVA, indent=0]
-----
-include::{osgi-integrationtest-sourcedir}/org/hibernate/validator/osgi/scripting/OsgiScriptEvaluatorFactory.java[]
-----
-====
-
-and then declared with:
-
-====
-[source, JAVA, indent=0]
-----
-include::{osgi-integrationtest-sourcedir}/org/hibernate/validator/osgi/integrationtest/OsgiIntegrationTest.java[tags=scriptEvaluatorFactoryOsgiScriptEvaluatorFactory]
-----
-====
-
-It is designed specifically for OSGi environments and allows you to pass the `BundleContext` which will be used to search
-for `ScriptEngineFactory` as a parameter.
 
 As already mentioned, you can also use script engines that are not based on https://www.jcp.org/en/jsr/detail?id=223[JSR 223].
 

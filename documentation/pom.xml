@@ -28,7 +28,6 @@
         <asciidoctor.examples-source-dir>${basedir}/src/test/java</asciidoctor.examples-source-dir>
         <asciidoctor.examples-resources-dir>${basedir}/src/test/resources</asciidoctor.examples-resources-dir>
         <asciidoctor.engine-source-dir>${basedir}/../engine/src/main/java</asciidoctor.engine-source-dir>
-        <asciidoctor.osgi-integrationtest-source-dir>${basedir}/../osgi/integrationtest/src/test/java</asciidoctor.osgi-integrationtest-source-dir>
 
         <html.meta.project-key>validator</html.meta.project-key>
         <html.google-analytics.id>G-282CVRCQHZ</html.google-analytics.id>
@@ -60,6 +59,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-validator-test-utils</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>jakarta.enterprise</groupId>
             <artifactId>jakarta.enterprise.cdi-api</artifactId>
             <scope>test</scope>
@@ -77,11 +81,6 @@
         <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-jsr223</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -285,7 +284,6 @@
                         <sourcedir>${asciidoctor.examples-source-dir}</sourcedir>
                         <resourcesdir>${asciidoctor.examples-resources-dir}</resourcesdir>
                         <engine-sourcedir>${asciidoctor.engine-source-dir}</engine-sourcedir>
-                        <osgi-integrationtest-sourcedir>${asciidoctor.osgi-integrationtest-source-dir}</osgi-integrationtest-sourcedir>
 
                         <hvVersion>${project.version}</hvVersion>
                         <bvVersion>${version.jakarta.validation-api}</bvVersion>
