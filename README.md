@@ -2,6 +2,9 @@
 
 *Version: 9.0.0.Beta2 - 2024-08-01*
 
+[![Maven Central](https://img.shields.io/maven-central/v/org.hibernate.validator/hibernate-validator.svg?label=Maven%20Central&style=for-the-badge)](https://central.sonatype.com/search?namespace=org.hibernate.validator&sort=name)
+[![Build Status](https://img.shields.io/jenkins/build?jobUrl=https://ci.hibernate.org/view/Validator/job/hibernate-validator/job/main/&style=for-the-badge)](https://ci.hibernate.org/view/Validator/job/hibernate-validator/job/main/)
+[![Reproducible Builds](https://img.shields.io/badge/Reproducible_Builds-ok-success?style=for-the-badge)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/org/hibernate/validator/hibernate-validator/README.md)
 
 ## What is it?
 
@@ -89,4 +92,4 @@ We provide a `.travis.yml` file so that you can enable CI for your GitHub fork b
 * [Downloads](http://hibernate.org/validator/downloads/)
 * [Mailing Lists](http://hibernate.org/community/)
 * [Issue Tracking](https://hibernate.atlassian.net/browse/HV)
-* [Continuous Integration](http://ci.hibernate.org/view/Validator/) | [![Build Status](https://ci.hibernate.org/view/Validator/job/hibernate-validator/job/main/badge/icon)](https://ci.hibernate.org/view/Validator/job/hibernate-validator/job/main/)
+* [Continuous Integration](http://ci.hibernate.org/view/Validator/)
