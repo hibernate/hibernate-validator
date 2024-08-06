@@ -803,6 +803,8 @@ There are several cases in which Hibernate Validator needs to load resources or 
 By default, Hibernate Validator tries to load these resources via the current thread context class loader.
 If that's not successful, Hibernate Validator's own class loader will be tried as a fallback.
 
+// Let's keep this mention of OSGi here in the docs, pointing the users,
+// to what they can do, if they are in the OSGi env.
 For cases where this strategy is not appropriate (e.g. modularized environments such as OSGi),
 you may provide a specific class loader for loading these resources when bootstrapping the validator factory:
 

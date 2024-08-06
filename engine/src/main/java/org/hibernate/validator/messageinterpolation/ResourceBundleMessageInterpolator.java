@@ -24,8 +24,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
-import com.sun.el.ExpressionFactoryImpl;
-
 /**
  * Resource bundle backed message interpolator.
  *
@@ -195,14 +193,16 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 				return expressionFactory;
 			}
 
-			// Finally we try the CL of the EL implementation itself. This is necessary for OSGi now that the
-			// implementation is separated from the API.
-			SetContextClassLoader.action( ExpressionFactoryImpl.class.getClassLoader() );
-			if ( canLoadExpressionFactory() ) {
-				ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
-				LOG.debug( "Loaded expression factory via com.sun.el classloader" );
-				return expressionFactory;
-			}
+			// We do not directly rely on Expressly anymore, which is the RI of EL.
+			// Keeping the code for now, just in case we decide to come back to OSGi support...
+			// // Finally we try the CL of the EL implementation itself. This is necessary for OSGi now that the
+			// // implementation is separated from the API.
+			// SetContextClassLoader.action( com.sun.el.ExpressionFactoryImpl.class.getClassLoader() );
+			// if ( canLoadExpressionFactory() ) {
+			// 	ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
+			// 	LOG.debug( "Loaded expression factory via com.sun.el classloader" );
+			// 	return expressionFactory;
+			// }
 		}
 		catch (Throwable e) {
 			throw LOG.getUnableToInitializeELExpressionFactoryException( e );

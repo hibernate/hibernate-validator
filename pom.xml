@@ -18,7 +18,7 @@
     <packaging>pom</packaging>
 
     <name>Hibernate Validator Aggregator</name>
-    <url>http://hibernate.org/validator</url>
+    <url>https://hibernate.org/validator</url>
     <description>Aggregator of the Hibernate Validator modules.</description>
 
     <developers>
@@ -211,7 +211,6 @@
         <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
         <version.org.ops4j.pax.exam>4.12.0</version.org.ops4j.pax.exam>
         <version.org.ops4j.pax.url>2.5.4</version.org.ops4j.pax.url>
-        <version.org.osgi.core>6.0.0</version.org.osgi.core>
         <version.fish.payara>5.2020.2</version.fish.payara>
         <version.fish.payara.arquillian>2.3.1</version.fish.payara.arquillian>
         <!-- Used in the Karaf tests -->
@@ -238,7 +237,6 @@
         <version.antrun.plugin>3.1.0</version.antrun.plugin>
         <version.assembly.plugin>3.7.1</version.assembly.plugin>
         <version.buildhelper.plugin>3.6.0</version.buildhelper.plugin>
-        <version.bundle.plugin>5.1.9</version.bundle.plugin>
         <version.checkstyle.plugin>3.4.0</version.checkstyle.plugin>
         <version.clean.plugin>3.4.0</version.clean.plugin>
         <version.compiler.plugin>3.13.0</version.compiler.plugin>
@@ -461,11 +459,6 @@
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
                 <version>${version.net.bytebuddy.byte-buddy}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.core</artifactId>
-                <version>${version.org.osgi.core}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
@@ -741,7 +734,7 @@
                                 <Implementation-Version>${project.version}</Implementation-Version>
                                 <Implementation-Vendor>${project.parent.groupId}</Implementation-Vendor>
                                 <Implementation-Vendor-Id>${project.parent.groupId}</Implementation-Vendor-Id>
-                                <Implementation-URL>http://hibernate.org/validator/</Implementation-URL>
+                                <Implementation-URL>https://hibernate.org/validator/</Implementation-URL>
                             </manifestEntries>
                         </archive>
                     </configuration>
@@ -1083,11 +1076,6 @@
                     <groupId>ch.mfrey.maven.plugin</groupId>
                     <artifactId>copy-maven-plugin</artifactId>
                     <version>${version.copy.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-bundle-plugin</artifactId>
-                    <version>${version.bundle.plugin}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-source-plugin</artifactId>

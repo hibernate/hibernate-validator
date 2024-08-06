@@ -8,12 +8,15 @@ import jakarta.validation.ValidationProviderResolver;
 import jakarta.validation.spi.ValidationProvider;
 
 //tag::include[]
-public class OsgiServiceDiscoverer implements ValidationProviderResolver {
+public class CustomValidationProviderResolver implements ValidationProviderResolver {
 
 	@Override
 	public List<ValidationProvider<?>> getValidationProviders() {
 		//...
-		return null;
+		//end::include[]
+		List<ValidationProvider<?>> providers = null;
+		//tag::include[]
+		return providers;
 	}
 }
 //end::include[]

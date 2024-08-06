@@ -1,7 +1,12 @@
 package org.hibernate.validator.referenceguide.chapter09;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+
 import java.io.InputStream;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -11,8 +16,11 @@ import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraints.ScriptAssert;
 
 import org.junit.Test;
+
+import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
 
 public class BootstrappingTest {
 
@@ -54,7 +62,7 @@ public class BootstrappingTest {
 	public void providerResolver() {
 		//tag::providerResolver[]
 		ValidatorFactory validatorFactory = Validation.byDefaultProvider()
-				.providerResolver( new OsgiServiceDiscoverer() )
+				.providerResolver( new CustomValidationProviderResolver() )
 				.configure()
 				.buildValidatorFactory();
 		Validator validator = validatorFactory.getValidator();
@@ -226,5 +234,42 @@ public class BootstrappingTest {
 				.buildValidatorFactory();
 		Validator validator = validatorFactory.getValidator();
 		//end::scriptEvaluatorFactoryProgrammatically[]
+	}
+
+	@Test
+	public void canUseScriptAssertConstraintWithMultiClassLoaderScriptEvaluatorFactory() {
+		//tag::scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory[]
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.scriptEvaluatorFactory(
+						new MultiClassLoaderScriptEvaluatorFactory( GroovyScriptEngineFactory.class.getClassLoader() )
+				)
+				.buildValidatorFactory()
+				.getValidator();
+		//end::scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory[]
+
+		canUseScriptAssertConstraint( validator );
+	}
+
+	private void canUseScriptAssertConstraint(Validator validator) {
+		assertThat(
+				validator.validate( new Event( LocalDate.of( 2017, 8, 8 ), LocalDate.of( 2016, 8, 8 ) ) )
+		).containsOnlyViolations(
+				violationOf( ScriptAssert.class ).withPropertyPath( pathWith().bean() )
+						.withMessage( "start of event cannot be after the end" )
+		);
+	}
+
+	@ScriptAssert(lang = "groovy", script = "_this.start < _this.end", message = "start of event cannot be after the end")
+	public class Event {
+
+		private final LocalDate start;
+
+		private final LocalDate end;
+
+		public Event(LocalDate start, LocalDate end) {
+			this.start = start;
+			this.end = end;
+		}
 	}
 }
