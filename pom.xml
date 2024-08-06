@@ -197,7 +197,7 @@
         <version.org.testng>7.10.2</version.org.testng>
         <version.org.assertj.assertj-core>3.26.3</version.org.assertj.assertj-core>
         <version.junit>4.13.2</version.junit>
-        <version.org.easymock>5.3.0</version.org.easymock>
+        <version.org.easymock>5.4.0</version.org.easymock>
         <version.io.rest-assured>5.5.0</version.io.rest-assured>
         <version.org.apache.groovy>4.0.22</version.org.apache.groovy>
         <version.com.google.guava>33.2.1-jre</version.com.google.guava>
@@ -231,7 +231,7 @@
         <version.org.hibernate.infra.hibernate-asciidoctor-extensions>2.0.1.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
         <version.org.jruby>9.3.2.0</version.org.jruby>
         <version.org.asciidoctor.asciidoctorj>2.5.13</version.org.asciidoctor.asciidoctorj>
-        <version.org.asciidoctor.asciidoctorj-pdf>2.3.17</version.org.asciidoctor.asciidoctorj-pdf>
+        <version.org.asciidoctor.asciidoctorj-pdf>2.3.18</version.org.asciidoctor.asciidoctorj-pdf>
 
         <!-- Maven plugins versions -->
 
@@ -267,7 +267,7 @@
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
-        <version.moditect.plugin>1.2.1.Final</version.moditect.plugin>
+        <version.moditect.plugin>1.2.2.Final</version.moditect.plugin>
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
         <version.impsort-maven-plugin>1.11.0</version.impsort-maven-plugin>
         <version.formatter-maven-plugin>2.24.1</version.formatter-maven-plugin>
@@ -387,7 +387,7 @@
         <jdk.min.version>17</jdk.min.version>
         <!-- Maven version required for the build -->
         <!-- Remember to update README when changing the version here. -->
-        <maven.min.version>3.9.6</maven.min.version>
+        <maven.min.version>3.9.8</maven.min.version>
 
         <!-- Formatting -->
         <format.skip>false</format.skip>
