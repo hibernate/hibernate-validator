@@ -23,7 +23,6 @@
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <gpg.skip>true</gpg.skip>
-        <maven.javadoc.skip>false</maven.javadoc.skip>
         <!--
             Any javadoc warnings should've been caught already while the previous modules were built.
             Also see additional explanations on this property in the `hibernate-search-mapper-orm-jakarta-batch-core` module.
