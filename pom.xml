@@ -1786,7 +1786,7 @@
             <!--
                 This profile set some properties to make running reproducibility check build easier.
                 Instead of
-                    mvn clean package -DskipTests -Dmaven.javadoc.skip -Dgpg.skip \
+                    mvn clean package -DskipTests -Dgpg.skip \
                         -Dbuildinfo.detect.skip=false \
                         -Dbuildinfo.skipModules='**/**distribution**,**/**integration**,**/**build**............'
                 We can run
@@ -1795,7 +1795,6 @@
             <id>reproducibility-check</id>
             <properties>
                 <maven-deploy-plugin.skip>false</maven-deploy-plugin.skip>
-                <maven.javadoc.skip>true</maven.javadoc.skip>
                 <skipTests>true</skipTests>
                 <gpg.skip>true</gpg.skip>
                 <forbiddenapis.skip>true</forbiddenapis.skip>
