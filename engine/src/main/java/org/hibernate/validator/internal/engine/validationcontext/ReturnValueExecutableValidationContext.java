@@ -79,7 +79,7 @@ public class ReturnValueExecutableValidationContext<T> extends AbstractValidatio
 	}
 
 	private static boolean buildDisableAlreadyValidatedBeanTracking(Optional<ExecutableMetaData> executableMetaData) {
-		if ( !executableMetaData.isPresent() ) {
+		if ( executableMetaData.isEmpty() ) {
 			// the method is unconstrained so there's no need to worry about the tracking
 			return false;
 		}
