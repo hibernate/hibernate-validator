@@ -13,7 +13,6 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Default;
@@ -27,6 +26,7 @@ import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
+import org.hibernate.validator.internal.util.classhierarchy.Filter;
 
 /**
  * Provides functionality for dealing with validation provider types.
@@ -146,11 +146,10 @@ public class ValidationProviderHelper {
 	public Set<Type> determineValidatorFactoryCdiTypes() {
 		return Collections.unmodifiableSet(
 				CollectionHelper.<Type>newHashSet(
-						ClassHierarchyHelper.getHierarchy( getValidatorFactoryBeanClass() )
-								.stream()
-								// We do not include Hibernate Validator internal types:
-								.filter( klass -> !( isHibernateValidator && isHibernateValidatorInternalType( klass ) ) )
-								.collect( Collectors.toSet() )
+						ClassHierarchyHelper.getHierarchy(
+								getValidatorFactoryBeanClass(),
+								isHibernateValidator ? HibernateValidatorInternalTypeFilter.INSTANCE : AcceptAllFilter.INSTANCE
+						)
 				)
 		);
 	}
@@ -158,13 +157,32 @@ public class ValidationProviderHelper {
 	public Set<Type> determineValidatorCdiTypes() {
 		return Collections.unmodifiableSet(
 				CollectionHelper.<Type>newHashSet(
-						ClassHierarchyHelper.getHierarchy( getValidatorBeanClass() )
-								.stream()
-								// We do not include Hibernate Validator internal types:
-								.filter( klass -> !( isHibernateValidator && isHibernateValidatorInternalType( klass ) ) )
-								.collect( Collectors.toSet() )
+						ClassHierarchyHelper.getHierarchy(
+								getValidatorBeanClass(),
+								isHibernateValidator ? HibernateValidatorInternalTypeFilter.INSTANCE : AcceptAllFilter.INSTANCE
+						)
 				)
 		);
+	}
+
+	private static class HibernateValidatorInternalTypeFilter implements Filter {
+
+		public static final HibernateValidatorInternalTypeFilter INSTANCE = new HibernateValidatorInternalTypeFilter();
+
+		@Override
+		public boolean accepts(Class<?> clazz) {
+			return !isHibernateValidatorInternalType( clazz );
+		}
+	}
+
+	private static class AcceptAllFilter implements Filter {
+
+		public static final AcceptAllFilter INSTANCE = new AcceptAllFilter();
+
+		@Override
+		public boolean accepts(Class<?> clazz) {
+			return true;
+		}
 	}
 
 	@Override

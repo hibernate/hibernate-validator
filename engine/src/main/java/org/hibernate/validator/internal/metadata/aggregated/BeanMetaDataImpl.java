@@ -253,7 +253,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		this.classHierarchyWithoutInterfaces = CollectionHelper.toImmutableList( ClassHierarchyHelper.getHierarchy(
 				beanClass,
-				Filters.excludeInterfaces()
+				Filters.excludeInterfaces( beanClass )
 		) );
 
 		DefaultGroupSequenceContext<? super T> defaultGroupContext = getDefaultGroupSequenceData( beanClass, defaultGroupSequence, defaultGroupSequenceProvider, validationOrderGenerator );

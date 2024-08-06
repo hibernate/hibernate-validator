@@ -30,9 +30,23 @@ public class ClassHierarchyHelperTest {
 
 		List<Class<? super Fubar>> superClasses = ClassHierarchyHelper.getHierarchy(
 				Fubar.class,
-				Filters.excludeInterfaces()
+				Filters.excludeInterfaces( Fubar.class )
 		);
 		assertThat( superClasses ).containsOnly( Fubar.class, Object.class );
+	}
+
+	@Test
+	public void testHierarchyWithoutInterfaces() {
+		List<Class<? super Snafu>> superClasses = ClassHierarchyHelper.getHierarchy(
+				Snafu.class
+		);
+		assertThat( superClasses ).containsOnly( Snafu.class );
+
+		superClasses = ClassHierarchyHelper.getHierarchy(
+				Snafu.class,
+				Filters.excludeInterfaces( Snafu.class )
+		);
+		assertThat( superClasses ).containsOnly( Snafu.class );
 	}
 
 	private interface Snafu {
