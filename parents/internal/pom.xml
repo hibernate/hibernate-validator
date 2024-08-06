@@ -23,6 +23,7 @@
     <description>Parent POM for internal modules.</description>
 
     <properties>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <dependencyManagement>
