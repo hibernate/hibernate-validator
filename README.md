@@ -82,7 +82,9 @@ There are more build options available as well. For more information refer to [C
 
 The official Continuous Integration service for the project is hosted on [ci.hibernate.org](http://ci.hibernate.org/view/Validator/).
 
-We provide a `.travis.yml` file so that you can enable CI for your GitHub fork by enabling the build in [your Travis CI account](https://travis-ci.org/).
+We also include a [GitHub action build file](.github/workflows/build.yml) that can be used by those interested in
+running builds on their own forks. 
+This build runs on Linux and Windows and executes the TCK both in standalone and in container [modes](tck-runner/README.md). 
 
 ## Hibernate Validator URLs
 

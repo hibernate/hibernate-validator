@@ -1,0 +1,146 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright Red Hat Inc. and Hibernate Authors
+
+# The main CI of Hibernate Validator is https://ci.hibernate.org/job/hibernate-validator/.
+# However, Hibernate Validator builds run on GitHub actions regularly
+# to build on Windows
+# and check that both the Linux and Windows workflows still work
+# and can be used in GitHub forks.
+# See https://docs.github.com/en/actions
+# for more information about GitHub actions.
+
+name: GitHub Actions Build
+
+on:
+  push:
+    branches:
+      # Pattern order matters: the last matching inclusion/exclusion wins
+      - '**'
+      - '!4.*'
+      - '!5.*'
+      - '!6.*'
+      - '!7.*'
+      - '!8.*'
+      - '!dependabot/**'
+    tags:
+      - '**'
+  # WARNING: Using pull_request_target to access secrets, but we check out the merge commit.
+  # See checkout action for details.
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      # Pattern order matters: the last matching inclusion/exclusion wins
+      - '**'
+      - '!4.*'
+      - '!5.*'
+      - '!6.*'
+      - '!7.*'
+      - '!8.*'
+      # Ignore dependabot PRs that are not just about build dependencies;
+      # we'll reject such dependant PRs and send a PR ourselves.
+      - '!dependabot/**'
+      - 'dependabot/maven/build-dependencies-**'
+
+concurrency:
+  group: "workflow = ${{ github.workflow }}, ref = ${{ github.event.ref }}, pr = ${{ github.event.pull_request.id }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request_target' || github.repository != 'hibernate/hibernate-validator' }}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end"
+  TESTCONTAINERS_REUSE_ENABLE: true
+
+jobs:
+  build:
+    name: ${{matrix.os.name}}
+    runs-on: ${{ matrix.os.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - {
+            name: "Linux JDK 17",
+            runs-on: 'ubuntu-latest',
+            java: {
+              version: 17
+            },
+            maven: {
+              args: '-Pci-build --no-transfer-progress'
+            }
+          }
+          - {
+            name: "Windows JDK 17",
+            runs-on: 'windows-latest',
+            java: {
+              version: 17
+            },
+            maven: {
+              args: '-Pci-build --no-transfer-progress'
+            }
+          }
+    steps:
+      - name: Support longpaths on Windows
+        if: "startsWith(matrix.os.runs-on, 'windows')"
+        run: git config --global core.longpaths true
+      - name: Check out commit already pushed to branch
+        if: "! github.event.pull_request.number"
+        uses: actions/checkout@v4
+      - name: Check out PR head
+        uses: actions/checkout@v4
+        if: github.event.pull_request.number
+        with:
+          # WARNING: This is potentially dangerous since we're checking out unreviewed code,
+          # and since we're using the pull_request_target event we can use secrets.
+          # Thus, we must be extra careful to never expose secrets to steps that execute this code,
+          # and to strictly limit our set of secrets to those that only pose minor security threats.
+          # This means in particular we won't expose Develocity credentials to the main maven executions,
+          # but instead will execute maven a third time just to push build scans to Develocity; (once we have scans enabled)
+          ref: "refs/pull/${{ github.event.pull_request.number }}/head"
+      - name: Set up Java ${{ matrix.os.java.version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.os.java.version }}
+          distribution: temurin
+      # https://github.com/actions/cache/blob/main/examples.md#java---maven
+      - name: Cache local Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Set up Maven
+        run: ./mvnw -v
+
+      - name: Build code and run tests and basic checks
+        run: |
+          ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean install \
+          -Pjqassistant -Pdist -Prelocation
+
+      - name: Build code and run tests in container mode
+        run: |
+          ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean verify \
+          -Pjqassistant -Pskip-checks \
+          -am -pl :hibernate-validator-tck-runner \
+          -Dincontainer -Dincontainer-prepared
+      # Workaround for https://github.com/actions/upload-artifact/issues/240
+      - name: List build reports to upload (if build failed)
+        if: ${{ failure() || cancelled() }}
+        # The weird syntax is because we're setting a multiline environment variable
+        # See https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-a-multiline-string
+        run: |
+          {
+            echo 'buildReportPaths<<EOF'
+            find . -path '**/*-reports'
+            echo EOF
+          } >> "$GITHUB_ENV"
+      - name: Upload build reports (if build failed)
+        uses: actions/upload-artifact@v4
+        if: ${{ failure() || cancelled() }}
+        with:
+          name: ${{ format('build-reports-{0}', matrix.os.name ) }}
+          path: ${{ env.buildReportPaths }}
+          retention-days: 7

@@ -1844,6 +1844,15 @@
             </properties>
         </profile>
         <profile>
+            <id>skip-checks</id>
+            <properties>
+                <enforcer.skip>true</enforcer.skip>
+                <checkstyle.skip>true</checkstyle.skip>
+                <format.skip>true</format.skip>
+                <forbiddenapis.skip>true</forbiddenapis.skip>
+            </properties>
+        </profile>
+        <profile>
             <id>IDEA</id>
             <activation>
                 <!-- This is a trick to have the profile automatically activated by IDEA -->
