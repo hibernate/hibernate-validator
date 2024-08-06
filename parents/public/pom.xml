@@ -80,6 +80,7 @@
                                     <goal>unpack</goal>
                                 </goals>
                                 <configuration>
+                                    <skip>${maven.javadoc.skip}</skip>
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>${project.groupId}</groupId>
