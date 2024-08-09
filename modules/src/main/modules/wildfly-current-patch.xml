@@ -16,6 +16,7 @@
                 <updated name="javax.validation.api" />
                 <updated name="org.hibernate.validator" />
                 <updated name="org.hibernate.validator.cdi" />
+                <updated name="org.jsoup" />
             </modules>
         </specified-content>
     </element>
