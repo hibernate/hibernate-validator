@@ -17,7 +17,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
 import org.jsoup.parser.Parser;
 import org.jsoup.safety.Cleaner;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 
 /**
  * Validate that the string does not contain malicious code.
@@ -31,7 +31,7 @@ import org.jsoup.safety.Whitelist;
  */
 @Deprecated
 public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequence> {
-	private Whitelist whitelist;
+	private Safelist safelist;
 
 	private String baseURI;
 
@@ -39,35 +39,35 @@ public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequ
 	public void initialize(SafeHtml safeHtmlAnnotation) {
 		switch ( safeHtmlAnnotation.whitelistType() ) {
 			case BASIC:
-				whitelist = Whitelist.basic();
+				safelist = Safelist.basic();
 				break;
 			case BASIC_WITH_IMAGES:
-				whitelist = Whitelist.basicWithImages();
+				safelist = Safelist.basicWithImages();
 				break;
 			case NONE:
-				whitelist = Whitelist.none();
+				safelist = Safelist.none();
 				break;
 			case RELAXED:
-				whitelist = Whitelist.relaxed();
+				safelist = Safelist.relaxed();
 				break;
 			case SIMPLE_TEXT:
-				whitelist = Whitelist.simpleText();
+				safelist = Safelist.simpleText();
 				break;
 		}
 		baseURI = safeHtmlAnnotation.baseURI();
-		whitelist.addTags( safeHtmlAnnotation.additionalTags() );
+		safelist.addTags( safeHtmlAnnotation.additionalTags() );
 
 		for ( SafeHtml.Tag tag : safeHtmlAnnotation.additionalTagsWithAttributes() ) {
-			whitelist.addTags( tag.name() );
+			safelist.addTags( tag.name() );
 			if ( tag.attributes().length > 0 ) {
-				whitelist.addAttributes( tag.name(), tag.attributes() );
+				safelist.addAttributes( tag.name(), tag.attributes() );
 			}
 
 			for ( SafeHtml.Attribute attribute : tag.attributesWithProtocols() ) {
-				whitelist.addAttributes( tag.name(), attribute.name() );
+				safelist.addAttributes( tag.name(), attribute.name() );
 
 				if ( attribute.protocols().length > 0 ) {
-					whitelist.addProtocols( tag.name(), attribute.name(), attribute.protocols() );
+					safelist.addProtocols( tag.name(), attribute.name(), attribute.protocols() );
 				}
 			}
 		}
@@ -79,7 +79,7 @@ public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequ
 			return true;
 		}
 
-		return new Cleaner( whitelist ).isValid( getFragmentAsDocument( value ) );
+		return new Cleaner( safelist ).isValid( getFragmentAsDocument( value ) );
 	}
 
 	/**

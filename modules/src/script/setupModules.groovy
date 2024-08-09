@@ -58,4 +58,14 @@ processFileInplace( hvCdiModuleXml ) { text ->
 
 deleteFiles( new FileNameFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/org/hibernate/validator/cdi/main', 'hibernate-validator-cdi-*.jar' ) )
 
+// JSOUP 1.15.4
+jsoupModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/org/jsoup/main/module.xml' )
+def jsoupArtifactName = 'jsoup-' + project.properties['jsoup.version'] + '.jar';
+println "[INFO] Using JSOUP version " + jsoupArtifactName;
+processFileInplace( jsoupModuleXml ) { text ->
+    text.replaceAll( /jsoup.*jar/, jsoupArtifactName )
+}
+
+deleteFiles( new FileNameFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/org/jsoup/main', 'jsoup-*.jar' ) )
+
 println "[INFO] ------------------------------------------------------------------------";
