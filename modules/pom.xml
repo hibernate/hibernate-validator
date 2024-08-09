@@ -53,6 +53,11 @@
             <artifactId>hibernate-validator</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>
@@ -239,6 +244,14 @@
                                     <outputDirectory>${wildfly-main.patched.target-dir}/modules/system/layers/base/org/hibernate/validator/cdi/main</outputDirectory>
                                     <destFileName>hibernate-validator-cdi-${project.version}.jar</destFileName>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.jsoup</groupId>
+                                    <artifactId>jsoup</artifactId>
+                                    <version>${jsoup.version}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${wildfly-main.patched.target-dir}/modules/system/layers/base/org/jsoup/main</outputDirectory>
+                                    <destFileName>jsoup-${jsoup.version}.jar</destFileName>
+                                </artifactItem>
                                 <!-- WildFly secondary version -->
                                 <artifactItem>
                                     <groupId>javax.validation</groupId>
@@ -264,6 +277,14 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${wildfly-secondary.patched.target-dir}/modules/system/layers/base/org/hibernate/validator/cdi/main</outputDirectory>
                                     <destFileName>hibernate-validator-cdi-${project.version}.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.jsoup</groupId>
+                                    <artifactId>jsoup</artifactId>
+                                    <version>${jsoup.version}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${wildfly-secondary.patched.target-dir}/modules/system/layers/base/org/jsoup/main</outputDirectory>
+                                    <destFileName>jsoup-${jsoup.version}.jar</destFileName>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

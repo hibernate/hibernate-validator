@@ -131,7 +131,7 @@
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
         <classmate.version>1.3.4</classmate.version>
-        <jsoup.version>1.8.3</jsoup.version>
+        <jsoup.version>1.15.4</jsoup.version>
         <joda-time.version>2.9.7</joda-time.version>
         <slf4j.version>1.7.22</slf4j.version>
         <javax.persistence-api.version>2.2</javax.persistence-api.version>
