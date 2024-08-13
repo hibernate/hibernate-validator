@@ -159,7 +159,7 @@
         -->
         <version.com.fasterxml.classmate>1.7.0</version.com.fasterxml.classmate>
         <version.joda-time>2.12.7</version.joda-time>
-        <version.org.slf4j>2.0.13</version.org.slf4j>
+        <version.org.slf4j>2.0.16</version.org.slf4j>
         <version.org.apache.logging.log4j>2.23.1</version.org.apache.logging.log4j>
 
         <!--
@@ -250,11 +250,11 @@
         <!-- Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting. -->
         <version.forbiddenapis.plugin>3.7</version.forbiddenapis.plugin>
         <version.gmavenplus.plugin>3.0.2</version.gmavenplus.plugin>
-        <version.gpg.plugin>3.2.4</version.gpg.plugin>
+        <version.gpg.plugin>3.2.5</version.gpg.plugin>
         <version.install.plugin>3.1.2</version.install.plugin>
         <version.japicmp.plugin>0.22.0</version.japicmp.plugin>
         <version.jar.plugin>3.4.2</version.jar.plugin>
-        <version.jqassistant.plugin>2.3.1</version.jqassistant.plugin>
+        <version.jqassistant.plugin>2.4.0</version.jqassistant.plugin>
         <version.javadoc.plugin>3.8.0</version.javadoc.plugin>
         <version.license.plugin>4.5</version.license.plugin>
         <version.release.plugin>3.1.1</version.release.plugin>
