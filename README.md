@@ -4,7 +4,7 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.hibernate.validator/hibernate-validator.svg?label=Maven%20Central&style=for-the-badge)](https://central.sonatype.com/search?namespace=org.hibernate.validator&sort=name)
 [![Build Status](https://img.shields.io/jenkins/build?jobUrl=https://ci.hibernate.org/view/Validator/job/hibernate-validator/job/main/&style=for-the-badge)](https://ci.hibernate.org/view/Validator/job/hibernate-validator/job/main/)
-[![Reproducible Builds](https://img.shields.io/badge/Reproducible_Builds-ok-success?style=for-the-badge)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/org/hibernate/validator/hibernate-validator/README.md)
+[![Reproducible Builds](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/org/hibernate/validator/hibernate-validator/badge.json&style=for-the-badge)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/org/hibernate/validator/hibernate-validator/README.md)
 
 ## What is it?
 
