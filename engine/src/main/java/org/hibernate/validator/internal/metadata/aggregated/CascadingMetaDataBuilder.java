@@ -351,11 +351,12 @@ public class CascadingMetaDataBuilder {
 		Map<Class<?>, Class<?>> mergedGroupConversions = new HashMap<>( groupConversions.size() + otherGroupConversions.size() );
 
 		for ( Entry<Class<?>, Class<?>> otherGroupConversionEntry : otherGroupConversions.entrySet() ) {
-			if ( groupConversions.containsKey( otherGroupConversionEntry.getKey() ) ) {
+			Class<?> convertTo = groupConversions.get( otherGroupConversionEntry.getKey() );
+			if ( convertTo != null && !convertTo.equals( otherGroupConversionEntry.getValue() ) ) {
 				throw LOG.getMultipleGroupConversionsForSameSourceException(
 						otherGroupConversionEntry.getKey(),
 						CollectionHelper.<Class<?>>asSet(
-								groupConversions.get( otherGroupConversionEntry.getKey() ),
+								convertTo,
 								otherGroupConversionEntry.getValue() ) );
 			}
 		}
