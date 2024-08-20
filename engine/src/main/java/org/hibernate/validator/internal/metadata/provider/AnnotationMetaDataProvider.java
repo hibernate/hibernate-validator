@@ -546,6 +546,13 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 	}
 
+	private Map<Class<?>, Class<?>> getGroupConversions(JavaBeanAnnotatedElement element) {
+		return getGroupConversions(
+				element.getAnnotation( ConvertGroup.class ),
+				element.getAnnotation( ConvertGroup.List.class )
+		);
+	}
+
 	private Map<Class<?>, Class<?>> getGroupConversions(ConvertGroup groupConversion, ConvertGroup.List groupConversionList) {
 		if ( groupConversion == null && ( groupConversionList == null || groupConversionList.value().length == 0 ) ) {
 			return Collections.emptyMap();
@@ -800,7 +807,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private CascadingMetaDataBuilder getCascadingMetaData(JavaBeanAnnotatedElement annotatedElement,
 			Map<TypeVariable<?>, CascadingMetaDataBuilder> containerElementTypesCascadingMetaData) {
 		return CascadingMetaDataBuilder.annotatedObject( annotatedElement.getType(), annotatedElement.isAnnotationPresent( Valid.class ),
-				containerElementTypesCascadingMetaData, getGroupConversions( annotatedElement.getAnnotatedType() ) );
+				containerElementTypesCascadingMetaData, getGroupConversions( annotatedElement ) );
 	}
 
 	/**
