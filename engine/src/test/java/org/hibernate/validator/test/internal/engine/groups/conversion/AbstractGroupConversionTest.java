@@ -101,6 +101,28 @@ public abstract class AbstractGroupConversionTest {
 	}
 
 	@Test
+	public void groupConversionOnParameterInHierarchy() throws Exception {
+		Set<ConstraintViolation<User6>> violations = getValidator().forExecutables().validateParameters(
+				new User6Extended(),
+				User6Extended.class.getMethod( "setAddresses", List.class ),
+				new List<?>[] { Arrays.asList( new Address() ) }
+		);
+
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( NotNull.class ).withPropertyPath( pathWith()
+						.method( "setAddresses" )
+						.parameter( "addresses", 0 )
+						.property( "street1", true, null, 0, List.class, 0 )
+				),
+				violationOf( Size.class ).withPropertyPath( pathWith()
+						.method( "setAddresses" )
+						.parameter( "addresses", 0 )
+						.property( "zipCode", true, null, 0, List.class, 0 )
+				)
+		);
+	}
+
+	@Test
 	public void groupConversionOnReturnValue() throws Exception {
 		Set<ConstraintViolation<User7>> violations = getValidator().forExecutables().validateReturnValue(
 				new User7(),
@@ -333,7 +355,19 @@ public abstract class AbstractGroupConversionTest {
 
 	private static class User6 {
 
-		public void setAddresses(@Valid @ConvertGroup(from = Default.class, to = BasicPostal.class) List<Address> addresses) {
+		public void setAddresses(
+				@Valid @ConvertGroup(from = Default.class, to = BasicPostal.class) List<Address> addresses
+		) {
+		}
+	}
+
+	private static class User6Extended extends User6 {
+
+		@Override
+		public void setAddresses(
+				@Valid @ConvertGroup(from = Default.class, to = BasicPostal.class) List<Address> addresses
+		) {
+			// do nothing as well
 		}
 	}
 
