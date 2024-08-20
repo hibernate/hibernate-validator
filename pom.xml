@@ -192,7 +192,7 @@
         <!-- Test dependencies -->
         <version.org.jboss.arquillian>1.9.1.Final</version.org.jboss.arquillian>
         <version.shrinkwrap.core>1.2.6</version.shrinkwrap.core>
-        <version.shrinkwrap.resolvers>3.3.0</version.shrinkwrap.resolvers>
+        <version.shrinkwrap.resolvers>3.3.1</version.shrinkwrap.resolvers>
         <version.shrinkwrap.descriptors>2.0.0</version.shrinkwrap.descriptors>
         <version.org.testng>7.10.2</version.org.testng>
         <version.org.assertj.assertj-core>3.26.3</version.org.assertj.assertj-core>
