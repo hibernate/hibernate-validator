@@ -40,6 +40,7 @@ updates:
           - "org.jboss.arquillian:*"
           - "org.jboss.arquillian.container:*"
           - "org.jboss.modules:*"
+          - "org.jboss.shrinkwrap.resolver:*"
           - "com.fasterxml.woodstox:*"
           - "io.rest-assured:*"
           - "net.bytebuddy:*"
