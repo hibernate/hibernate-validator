@@ -105,6 +105,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraintvalidation.ValidationTarget;
 
+import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.BitcoinAddress;
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.ConstraintComposition;
@@ -372,7 +373,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Gunnar Morling
  * @author Guillaume Smet
  */
-public class ConstraintHelper {
+public abstract class ConstraintHelper {
 
 	public static final String GROUPS = "groups";
 	public static final String PAYLOAD = "payload";
@@ -385,9 +386,6 @@ public class ConstraintHelper {
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
 	private static final String JAVA_MONEY_CLASS_NAME = "javax.money.MonetaryAmount";
 
-	@Immutable
-	private final Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> enabledBuiltinConstraints;
-
 	private final ConcurrentMap<Class<? extends Annotation>, Boolean> externalConstraints = new ConcurrentHashMap<>();
 
 	private final ConcurrentMap<Class<? extends Annotation>, Boolean> multiValueConstraints = new ConcurrentHashMap<>();
@@ -399,21 +397,20 @@ public class ConstraintHelper {
 	private Boolean jodaTimeInClassPath;
 
 	public static ConstraintHelper forAllBuiltinConstraints() {
-		return new ConstraintHelper( new HashSet<>( Arrays.asList( BuiltinConstraint.values() ) ) );
+		return new StaticConstraintHelper();
 	}
 
 	public static ConstraintHelper forBuiltinConstraints(Set<String> enabledConstraints) {
-		return new ConstraintHelper( BuiltinConstraint.resolve( enabledConstraints ) );
+		return new DynamicConstraintHelper( BuiltinConstraint.resolve( enabledConstraints ) );
 	}
 
 	@SuppressWarnings("deprecation")
-	private ConstraintHelper(Set<BuiltinConstraint> enabledBuiltinConstraints) {
+	protected Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> resolve(Set<BuiltinConstraint> enabledBuiltinConstraints) {
 		if ( enabledBuiltinConstraints.isEmpty() ) {
-			this.enabledBuiltinConstraints = Collections.emptyMap();
-			return;
+			return Collections.emptyMap();
 		}
 
-		Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> tmpConstraints = new HashMap<>();
+		Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> tmpConstraints = new HashMap<>();
 
 		// Bean Validation constraints
 
@@ -832,21 +829,27 @@ public class ConstraintHelper {
 			putBuiltinConstraint( tmpConstraints, BitcoinAddress.class, BitcoinAddressValidator.class );
 		}
 
-		this.enabledBuiltinConstraints = Collections.unmodifiableMap( tmpConstraints );
+		return tmpConstraints;
 	}
 
-	private static <A extends Annotation> void putBuiltinConstraint(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
-			Class<A> constraintType) {
+	private static <A extends Annotation> void putBuiltinConstraint(
+			Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> validators,
+			Class<A> constraintType
+	) {
 		validators.put( constraintType, Collections.emptyList() );
 	}
 
-	private static <A extends Annotation> void putBuiltinConstraint(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
-			Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType) {
+	private static <A extends Annotation> void putBuiltinConstraint(
+			Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> validators,
+			Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType
+	) {
 		validators.put( constraintType, Collections.singletonList( ConstraintValidatorDescriptor.forBuiltinClass( validatorType, constraintType ) ) );
 	}
 
-	private static <A extends Annotation> void putBuiltinConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators,
-			Class<A> constraintType, List<Class<? extends ConstraintValidator<A, ?>>> validatorTypes) {
+	private static <A extends Annotation> void putBuiltinConstraints(
+			Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> validators,
+			Class<A> constraintType, List<Class<? extends ConstraintValidator<A, ?>>> validatorTypes
+	) {
 		List<ConstraintValidatorDescriptor<?>> descriptors = new ArrayList<>( validatorTypes.size() );
 
 		for ( Class<? extends ConstraintValidator<A, ?>> validatorType : validatorTypes ) {
@@ -873,14 +876,13 @@ public class ConstraintHelper {
 	 * <li>internally registered validators for built-in constraints</li>
 	 * <li>XML configuration and</li>
 	 * <li>programmatically registered validators (see
-	 * {@link org.hibernate.validator.cfg.ConstraintMapping#constraintDefinition(Class)}).</li>
+	 * {@link ConstraintMapping#constraintDefinition(Class)}).</li>
 	 * </ul>
 	 *
 	 * The result is cached internally.
 	 *
 	 * @param annotationType The constraint annotation type.
 	 * @param <A> the type of the annotation
-	 *
 	 * @return The validator classes for the given type.
 	 */
 	public <A extends Annotation> List<ConstraintValidatorDescriptor<A>> getAllValidatorDescriptors(Class<A> annotationType) {
@@ -895,7 +897,6 @@ public class ConstraintHelper {
 	 * @param annotationType The annotation of interest.
 	 * @param validationTarget The target, either annotated element or parameters.
 	 * @param <A> the type of the annotation
-	 *
 	 * @return A list with matching validator descriptors.
 	 */
 	public <A extends Annotation> List<ConstraintValidatorDescriptor<A>> findValidatorDescriptors(Class<A> annotationType, ValidationTarget validationTarget) {
@@ -937,9 +938,8 @@ public class ConstraintHelper {
 	 * Checks whether a given annotation is a multi value constraint or not.
 	 *
 	 * @param annotationType the annotation type to check.
-	 *
 	 * @return {@code true} if the specified annotation is a multi value constraints, {@code false}
-	 *         otherwise.
+	 * otherwise.
 	 */
 	public boolean isMultiValueConstraint(Class<? extends Annotation> annotationType) {
 		if ( isJdkAnnotation( annotationType ) ) {
@@ -974,7 +974,6 @@ public class ConstraintHelper {
 	 *
 	 * @param multiValueConstraint the multi-value constraint annotation from which to retrieve the contained constraints
 	 * @param <A> the type of the annotation
-	 *
 	 * @return A list of constraint annotations, may be empty but never {@code null}.
 	 */
 	public <A extends Annotation> List<Annotation> getConstraintsFromMultiValueConstraint(A multiValueConstraint) {
@@ -997,7 +996,6 @@ public class ConstraintHelper {
 	 * </ul>
 	 *
 	 * @param annotationType The annotation type to test.
-	 *
 	 * @return {@code true} if the annotation fulfills the above conditions, {@code false} otherwise.
 	 */
 	public boolean isConstraintAnnotation(Class<? extends Annotation> annotationType) {
@@ -1139,32 +1137,84 @@ public class ConstraintHelper {
 	 * Returns the default validators for the given constraint type.
 	 *
 	 * @param annotationType The constraint annotation type.
-	 *
 	 * @return A list with the default validators as retrieved from
-	 *         {@link Constraint#validatedBy()} or the list of validators for
-	 *         built-in constraints.
+	 * {@link Constraint#validatedBy()} or the list of validators for
+	 * built-in constraints.
 	 */
 	@SuppressWarnings("unchecked")
-	private <A extends Annotation> List<ConstraintValidatorDescriptor<A>> getDefaultValidatorDescriptors(Class<A> annotationType) {
-		//safe cause all CV for a given annotation A are CV<A, ?>
-		final List<ConstraintValidatorDescriptor<A>> builtInValidators = (List<ConstraintValidatorDescriptor<A>>) enabledBuiltinConstraints
-				.get( annotationType );
-
-		if ( builtInValidators != null ) {
-			return builtInValidators;
-		}
-
-		Class<? extends ConstraintValidator<A, ?>>[] validatedBy = (Class<? extends ConstraintValidator<A, ?>>[]) annotationType
-				.getAnnotation( Constraint.class )
-				.validatedBy();
-
-		return Stream.of( validatedBy )
-				.map( c -> ConstraintValidatorDescriptor.forClass( c, annotationType ) )
-				.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) );
-	}
+	protected abstract <A extends Annotation> List<ConstraintValidatorDescriptor<A>> getDefaultValidatorDescriptors(Class<A> annotationType);
 
 	private static boolean isClassPresent(String className) {
 		return IsClassPresent.action( className, ConstraintHelper.class.getClassLoader() );
+	}
+
+	private static class StaticConstraintHelper extends ConstraintHelper {
+
+		@Immutable
+		private final Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> enabledBuiltinConstraints;
+
+		private StaticConstraintHelper() {
+			this.enabledBuiltinConstraints = Collections.unmodifiableMap( resolve( new HashSet<>( Arrays.asList( BuiltinConstraint.values() ) ) ) );
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		protected <A extends Annotation> List<ConstraintValidatorDescriptor<A>> getDefaultValidatorDescriptors(Class<A> annotationType) {
+			//safe cause all CV for a given annotation A are CV<A, ?>
+			final List<ConstraintValidatorDescriptor<A>> builtInValidators = (List<ConstraintValidatorDescriptor<A>>) enabledBuiltinConstraints
+					.get( annotationType );
+
+			if ( builtInValidators != null ) {
+				return builtInValidators;
+			}
+
+			Class<? extends ConstraintValidator<A, ?>>[] validatedBy = (Class<? extends ConstraintValidator<A, ?>>[]) annotationType
+					.getAnnotation( Constraint.class )
+					.validatedBy();
+
+			return Stream.of( validatedBy )
+					.map( c -> ConstraintValidatorDescriptor.forClass( c, annotationType ) )
+					.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) );
+		}
+	}
+
+	private static class DynamicConstraintHelper extends ConstraintHelper {
+
+		@Immutable
+		private final Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> enabledBuiltinConstraints;
+
+		private DynamicConstraintHelper(Set<BuiltinConstraint> initialConstraints) {
+			this.enabledBuiltinConstraints = new HashMap<>( resolve( initialConstraints ) );
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		protected <A extends Annotation> List<ConstraintValidatorDescriptor<A>> getDefaultValidatorDescriptors(Class<A> annotationType) {
+			//safe cause all CV for a given annotation A are CV<A, ?>
+			final List<ConstraintValidatorDescriptor<A>> builtInValidators = (List<ConstraintValidatorDescriptor<A>>) enabledBuiltinConstraints
+					.get( annotationType );
+
+			if ( builtInValidators != null ) {
+				return builtInValidators;
+			}
+			else {
+				// let's give it a try and see if we can find this constraint among the built-in ones:
+				Set<BuiltinConstraint> builtinConstraints = BuiltinConstraint.resolve( Collections.singleton( annotationType.getName() ) );
+				if ( !builtinConstraints.isEmpty() ) {
+					Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> additionalDescriptors = resolve( builtinConstraints );
+					enabledBuiltinConstraints.putAll( additionalDescriptors );
+					return (List<ConstraintValidatorDescriptor<A>>) additionalDescriptors.get( annotationType );
+				}
+			}
+
+			Class<? extends ConstraintValidator<A, ?>>[] validatedBy = (Class<? extends ConstraintValidator<A, ?>>[]) annotationType
+					.getAnnotation( Constraint.class )
+					.validatedBy();
+
+			return Stream.of( validatedBy )
+					.map( c -> ConstraintValidatorDescriptor.forClass( c, annotationType ) )
+					.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) );
+		}
 	}
 
 	/**
@@ -1183,8 +1233,10 @@ public class ConstraintHelper {
 			constraintValidatorDescriptors.put( annotationType, validatorDescriptors );
 		}
 
-		private <A extends Annotation> List<ConstraintValidatorDescriptor<A>> computeIfAbsent(Class<A> annotationType,
-				Function<? super Class<A>, List<ConstraintValidatorDescriptor<A>>> mappingFunction) {
+		private <A extends Annotation> List<ConstraintValidatorDescriptor<A>> computeIfAbsent(
+				Class<A> annotationType,
+				Function<? super Class<A>, List<ConstraintValidatorDescriptor<A>>> mappingFunction
+		) {
 			return (List<ConstraintValidatorDescriptor<A>>) constraintValidatorDescriptors.computeIfAbsent(
 					annotationType,
 					(Function<? super Class<? extends Annotation>, ? extends List<? extends ConstraintValidatorDescriptor<?>>>) mappingFunction

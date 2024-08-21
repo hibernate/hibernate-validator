@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.provider;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
@@ -65,5 +66,10 @@ public class XmlMetaDataProvider implements MetaDataProvider {
 	@Override
 	public AnnotationProcessingOptions getAnnotationProcessingOptions() {
 		return annotationProcessingOptions;
+	}
+
+	public Set<Class<?>> configuredBeanClasses() {
+		return configuredBeans.values().stream().map( BeanConfiguration::getBeanClass )
+				.collect( Collectors.toSet() );
 	}
 }

@@ -29,6 +29,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -188,9 +189,12 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		// or from programmatic mappings
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
 
+		Set<Class<?>> beanClassesToInitialize = new HashSet<>( hibernateSpecificConfig.getBeanClassesToInitialize() );
+
 		XmlMetaDataProvider xmlMetaDataProvider;
 		if ( mappingParser != null && mappingParser.createConstrainedElements() ) {
 			xmlMetaDataProvider = new XmlMetaDataProvider( mappingParser );
+			beanClassesToInitialize.addAll( xmlMetaDataProvider.configuredBeanClasses() );
 		}
 		else {
 			xmlMetaDataProvider = null;
@@ -205,7 +209,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				buildMetaDataProviders( constraintCreationContext, xmlMetaDataProvider, constraintMappings ),
 				methodValidationConfiguration,
 				determineBeanMetaDataClassNormalizer( hibernateSpecificConfig ),
-				hibernateSpecificConfig.getBeanClassesToInitialize()
+				beanClassesToInitialize
 		);
 
 		if ( LOG.isDebugEnabled() ) {
