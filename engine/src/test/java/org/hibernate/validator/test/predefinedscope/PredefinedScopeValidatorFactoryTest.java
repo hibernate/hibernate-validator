@@ -34,6 +34,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
@@ -326,6 +327,29 @@ public class PredefinedScopeValidatorFactoryTest {
 
 		violations = validator.validate( new Bean( null, null ) );
 		assertThat( violations ).containsOnlyViolations( violationOf( NotNull.class ).withMessage( "another string" ) );
+	}
+
+	@Test
+	public void testXmlDefinedConstraints() {
+		// we assume that all the metadata is defined in the xml,
+		// hence there is no built-in constraints nor beans to init:
+		try (
+				ValidatorFactory factory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
+						.configure()
+						.builtinConstraints( Collections.emptySet() )
+						.initializeBeanMetaData( Collections.emptySet() )
+						.addMapping( PredefinedScopeValidatorFactoryTest.class.getResourceAsStream( "constraints-simplexmlbean.xml" ) )
+						.buildValidatorFactory()
+		) {
+			Validator validator = factory.getValidator();
+
+			assertThat( validator.validate( new SimpleXmlBean() ) )
+					.containsOnlyViolations(
+							violationOf( Positive.class ).withMessage( "must be greater than 0" ),
+							violationOf( NotNull.class ).withMessage( "must not be null" )
+					);
+		}
+
 	}
 
 	private static ValidatorFactory getValidatorFactory() {
