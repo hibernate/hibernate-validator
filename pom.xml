@@ -361,6 +361,7 @@
         <surefire.jvm.args.illegal-access></surefire.jvm.args.illegal-access>
         <surefire.jvm.args.add-opens></surefire.jvm.args.add-opens>
         <surefire.jvm.args.java-version></surefire.jvm.args.java-version>
+        <surefire.jvm.args.jaxp.strict-args></surefire.jvm.args.jaxp.strict-args>
         <!--
           The arguments below are Shrinkwrap settings taken from
           https://github.com/shrinkwrap/resolver/blob/788a3c1148af3a7ebdfdaf817393273f5f5ee17b/impl-maven/src/main/java/org/jboss/shrinkwrap/resolver/impl/maven/bootstrap/MavenSettingsBuilder.java#L80
@@ -369,8 +370,8 @@
         <surefire.jvm.args.shrinkwrap>
             -Dmaven.repo.local=${settings.localRepository}
         </surefire.jvm.args.shrinkwrap>
-        <surefire.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access} ${surefire.jvm.args.shrinkwrap} ${surefire.jvm.args.java-version} ${surefire.jvm.args.commandline}</surefire.jvm.args>
-        <failsafe.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access} ${surefire.jvm.args.shrinkwrap} ${surefire.jvm.args.java-version} ${surefire.jvm.args.commandline}</failsafe.jvm.args>
+        <surefire.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access} ${surefire.jvm.args.shrinkwrap} ${surefire.jvm.args.java-version} ${surefire.jvm.args.commandline} ${surefire.jvm.args.jaxp.strict-args}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.additional} ${surefire.jvm.args.add-opens} ${surefire.jvm.args.illegal-access} ${surefire.jvm.args.shrinkwrap} ${surefire.jvm.args.java-version} ${surefire.jvm.args.commandline} ${surefire.jvm.args.jaxp.strict-args}</failsafe.jvm.args>
 
         <!--
             Should be set from the command line.

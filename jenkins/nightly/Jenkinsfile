@@ -8,7 +8,11 @@
 @Library('hibernate-jenkins-pipeline-helpers@1.17') _
 
 def withMavenWorkspace(Closure body) {
-	withMaven(jdk: 'OpenJDK 17 Latest', maven: 'Apache Maven 3.9',
+	withMavenWorkspace('OpenJDK 17 Latest', body)
+}
+
+def withMavenWorkspace(jdk, Closure body) {
+	withMaven(jdk: jdk, maven: 'Apache Maven 3.9',
 			mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository',
 			options: [
 					// Artifacts are not needed and take up disk space
@@ -33,24 +37,57 @@ pipeline {
 		overrideIndexTriggers(false)
 	}
 	stages {
-		stage('Build reproducibility check') {
-			agent {
-				label 'Worker&&Containers'
-			}
-			steps {
-				// The timeout cannot be in stage options, because that would
-				// include the time needed to provision a node.
-				timeout(time: 15, unit: 'MINUTES') {
-					withMavenWorkspace {
-						echo "Generate the artifacts."
-						sh "mvn clean install -Preproducibility-check"
+		stage ('Run checks') {
+			parallel {
+				stage('Build reproducibility check') {
+					agent {
+						label 'Worker&&Containers'
+					}
+					steps {
+						// The timeout cannot be in stage options, because that would
+						// include the time needed to provision a node.
+						timeout(time: 15, unit: 'MINUTES') {
+							withMavenWorkspace {
+								echo "Generate the artifacts."
+								sh "mvn clean install -Preproducibility-check"
 
-						echo "Running the reproducibility check."
-						sh """mvn clean verify \
-							artifact:compare -Dreference.repo=hibernate-maven-central \
-							-Preproducibility-check \
-							--fail-at-end
-						"""
+								echo "Running the reproducibility check."
+								sh """mvn clean verify \
+									artifact:compare -Dreference.repo=hibernate-maven-central \
+									-Preproducibility-check \
+									--fail-at-end
+								"""
+							}
+						}
+					}
+				}
+				stage('Build with strict JAXP security settings') {
+					agent {
+						label 'Worker&&Containers'
+					}
+					steps {
+						script {
+							jdkVersion = 'OpenJDK 23 Latest'
+						}
+						// The timeout cannot be in stage options, because that would
+						// include the time needed to provision a node.
+						timeout(time: 15, unit: 'MINUTES') {
+							withMavenWorkspace(jdkVersion, {
+								script {
+									compilerToolPath = tool(name: jdkVersion, type: 'jdk')
+									jaxpStrictProperties = pwd(tmp: true) + '/jaxp-strict.properties'
+								}
+
+								echo "Copy strict JAXP configuration properties."
+								sh "cp $compilerToolPath/conf/jaxp-strict.properties.template $jaxpStrictProperties"
+
+								echo "Run a build with strict JAXP configuration."
+								sh """mvn clean install \
+									 -Dsurefire.jvm.args.jaxp.strict-args="-Djava.xml.config.file=$jaxpStrictProperties" \
+									 -Djava-version.test.release=23
+								"""
+							})
+						}
 					}
 				}
 			}
