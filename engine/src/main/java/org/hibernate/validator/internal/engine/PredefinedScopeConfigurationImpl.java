@@ -30,6 +30,8 @@ public class PredefinedScopeConfigurationImpl extends AbstractConfigurationImpl<
 
 	private Set<Class<?>> beanClassesToInitialize;
 
+	private boolean includeBeansAndConstraintsDefinedOnlyInXml = true;
+
 	public PredefinedScopeConfigurationImpl(BootstrapState state) {
 		super( state );
 	}
@@ -58,11 +60,21 @@ public class PredefinedScopeConfigurationImpl extends AbstractConfigurationImpl<
 		return beanClassesToInitialize;
 	}
 
+	public boolean isIncludeBeansAndConstraintsDefinedOnlyInXml() {
+		return includeBeansAndConstraintsDefinedOnlyInXml;
+	}
+
 	@Override
 	@Deprecated
 	public PredefinedScopeHibernateValidatorConfiguration initializeLocales(Set<Locale> localesToInitialize) {
 		Contracts.assertNotNull( localesToInitialize, MESSAGES.parameterMustNotBeNull( "localesToInitialize" ) );
 		locales( localesToInitialize );
+		return thisAsT();
+	}
+
+	@Override
+	public PredefinedScopeHibernateValidatorConfiguration includeBeansAndConstraintsDefinedOnlyInXml(boolean include) {
+		this.includeBeansAndConstraintsDefinedOnlyInXml = include;
 		return thisAsT();
 	}
 

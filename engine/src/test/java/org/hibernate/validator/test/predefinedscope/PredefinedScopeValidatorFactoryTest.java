@@ -330,7 +330,27 @@ public class PredefinedScopeValidatorFactoryTest {
 	}
 
 	@Test
-	public void testXmlDefinedConstraints() {
+	public void testXmlDefinedConstraintsDiscoveryDisabled() {
+		// we assume that all the metadata is defined in the xml,
+		// hence there is no built-in constraints nor beans to init,
+		// But we also do not ask HV to append the sets with the beans from XMLs or built-in constraints:
+		try (
+				ValidatorFactory factory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
+						.configure()
+						.builtinConstraints( Collections.emptySet() )
+						.initializeBeanMetaData( Collections.emptySet() )
+						.includeBeansAndConstraintsDefinedOnlyInXml( false )
+						.addMapping( PredefinedScopeValidatorFactoryTest.class.getResourceAsStream( "constraints-simplexmlbean.xml" ) )
+						.buildValidatorFactory()
+		) {
+			Validator validator = factory.getValidator();
+			// Because all the metadata for this bean was in the XML, and we ignore it:
+			assertNoViolations( validator.validate( new SimpleXmlBean() ) );
+		}
+	}
+
+	@Test
+	public void testXmlDefinedConstraintsDiscoveryEnabled() {
 		// we assume that all the metadata is defined in the xml,
 		// hence there is no built-in constraints nor beans to init:
 		try (
@@ -349,7 +369,6 @@ public class PredefinedScopeValidatorFactoryTest {
 							violationOf( NotNull.class ).withMessage( "must not be null" )
 					);
 		}
-
 	}
 
 	private static ValidatorFactory getValidatorFactory() {
