@@ -400,8 +400,14 @@ public abstract class ConstraintHelper {
 		return new StaticConstraintHelper();
 	}
 
-	public static ConstraintHelper forBuiltinConstraints(Set<String> enabledConstraints) {
-		return new DynamicConstraintHelper( BuiltinConstraint.resolve( enabledConstraints ) );
+	public static ConstraintHelper forBuiltinConstraints(Set<String> enabledConstraints, boolean attemptToResolveMissingBuiltInConstraintsOnTheFly) {
+		Set<BuiltinConstraint> builtinConstraints = BuiltinConstraint.resolve( enabledConstraints );
+		if ( attemptToResolveMissingBuiltInConstraintsOnTheFly ) {
+			return new DynamicConstraintHelper( builtinConstraints );
+		}
+		else {
+			return new StaticConstraintHelper( builtinConstraints );
+		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -1154,7 +1160,11 @@ public abstract class ConstraintHelper {
 		private final Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> enabledBuiltinConstraints;
 
 		private StaticConstraintHelper() {
-			this.enabledBuiltinConstraints = Collections.unmodifiableMap( resolve( new HashSet<>( Arrays.asList( BuiltinConstraint.values() ) ) ) );
+			this( new HashSet<>( Arrays.asList( BuiltinConstraint.values() ) ) );
+		}
+
+		private StaticConstraintHelper(Set<BuiltinConstraint> builtinConstraints) {
+			this.enabledBuiltinConstraints = Collections.unmodifiableMap( resolve( builtinConstraints ) );
 		}
 
 		@SuppressWarnings("unchecked")

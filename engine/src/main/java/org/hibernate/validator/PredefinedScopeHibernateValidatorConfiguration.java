@@ -32,4 +32,17 @@ public interface PredefinedScopeHibernateValidatorConfiguration extends BaseHibe
 	@Incubating
 	@Deprecated
 	PredefinedScopeHibernateValidatorConfiguration initializeLocales(Set<Locale> locales);
+
+	/**
+	 * Specify whether to append the {@link #builtinConstraints(Set) built-in constraints} and {@link #initializeBeanMetaData(Set) beans to initialize}
+	 * with constraints and beans provided only through XML mapping.
+	 * <p>
+	 * This option is enabled by default.
+	 *
+	 * @param include Whether to include the beans defined only in xml as part of the {@link #initializeBeanMetaData(Set) set of beans to initialize}
+	 * and also add built-in constraints used only in xml definitions as part of the {@link #builtinConstraints(Set) set of built-in constraints}.
+	 * @return {@code this} for chaining configuration method calls.
+	 */
+	@Incubating
+	PredefinedScopeHibernateValidatorConfiguration includeBeansAndConstraintsDefinedOnlyInXml(boolean include);
 }

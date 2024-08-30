@@ -147,7 +147,9 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		this.propertyNodeNameProvider = ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, externalClassLoader );
 
 		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
-		ConstraintHelper constraintHelper = ConstraintHelper.forBuiltinConstraints( hibernateSpecificConfig.getBuiltinConstraints() );
+		ConstraintHelper constraintHelper = ConstraintHelper.forBuiltinConstraints(
+				hibernateSpecificConfig.getBuiltinConstraints(),
+				hibernateSpecificConfig.isIncludeBeansAndConstraintsDefinedOnlyInXml() );
 		TypeResolutionHelper typeResolutionHelper = new TypeResolutionHelper();
 
 		ConstraintCreationContext constraintCreationContext = new ConstraintCreationContext( constraintHelper,
@@ -194,7 +196,9 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		XmlMetaDataProvider xmlMetaDataProvider;
 		if ( mappingParser != null && mappingParser.createConstrainedElements() ) {
 			xmlMetaDataProvider = new XmlMetaDataProvider( mappingParser );
-			beanClassesToInitialize.addAll( xmlMetaDataProvider.configuredBeanClasses() );
+			if ( hibernateSpecificConfig.isIncludeBeansAndConstraintsDefinedOnlyInXml() ) {
+				beanClassesToInitialize.addAll( xmlMetaDataProvider.configuredBeanClasses() );
+			}
 		}
 		else {
 			xmlMetaDataProvider = null;
