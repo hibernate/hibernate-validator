@@ -104,23 +104,6 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	}
 
 	@Override
-	@Deprecated
-	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
-		Contracts.assertNotNull( elementType, "The element type must not be null." );
-
-		if ( !( ElementType.FIELD.equals( elementType ) || ElementType.METHOD.equals( elementType ) ) ) {
-			throw LOG.getElementTypeHasToBeFieldOrMethodException();
-		}
-
-		if ( ElementType.FIELD == elementType ) {
-			return field( property );
-		}
-		else {
-			return getter( property );
-		}
-	}
-
-	@Override
 	public PropertyConstraintMappingContext field(String property) {
 		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
 

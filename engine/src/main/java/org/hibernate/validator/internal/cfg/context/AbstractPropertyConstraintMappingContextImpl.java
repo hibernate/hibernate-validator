@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import java.lang.annotation.ElementType;
-
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
@@ -52,12 +50,6 @@ abstract class AbstractPropertyConstraintMappingContextImpl<T extends Property>
 	public PropertyConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
 		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsOnMember( property, ignoreAnnotations );
 		return this;
-	}
-
-	@Override
-	@SuppressWarnings("deprecation")
-	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
-		return typeContext.property( property, elementType );
 	}
 
 	@Override
