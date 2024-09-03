@@ -42,7 +42,6 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LUHN_CHECK;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD10_CHECK;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD11_CHECK;
-import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD_CHECK;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NORMALIZED;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PARAMETER_SCRIPT_ASSERT;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_NIP;
@@ -114,7 +113,6 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
-import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Range;
@@ -335,7 +333,6 @@ import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.NormalizedValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
@@ -770,9 +767,6 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LUHN_CHECK ) ) {
 			putBuiltinConstraint( tmpConstraints, LuhnCheck.class, LuhnCheckValidator.class );
-		}
-		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD_CHECK ) ) {
-			putBuiltinConstraint( tmpConstraints, ModCheck.class, ModCheckValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD10_CHECK ) ) {
 			putBuiltinConstraint( tmpConstraints, Mod10Check.class, Mod10CheckValidator.class );

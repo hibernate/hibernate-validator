@@ -56,7 +56,6 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
-import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Range;
@@ -83,7 +82,6 @@ import org.testng.annotations.Test;
  *
  * @author Guillaume Smet
  */
-@SuppressWarnings("deprecation")
 public class MessagePropertiesTest {
 
 	private static final List<Locale> ALL_SUPPORTED_LOCALES = Arrays.asList(
@@ -159,7 +157,6 @@ public class MessagePropertiesTest {
 							violationOf( LuhnCheck.class ),
 							violationOf( Mod10Check.class ),
 							violationOf( Mod11Check.class ),
-							violationOf( ModCheck.class ),
 							violationOf( Normalized.class ),
 							violationOf( Range.class ),
 							violationOf( UniqueElements.class ),
@@ -304,9 +301,6 @@ public class MessagePropertiesTest {
 
 		@Mod11Check
 		private String mod11Check = "4";
-
-		@ModCheck(multiplier = 2, modType = ModCheck.ModType.MOD10)
-		private String modCheck = "4";
 
 		@Normalized(form = java.text.Normalizer.Form.NFKC)
 		private String normalized = "\uFE64script\uFE65";

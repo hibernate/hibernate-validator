@@ -159,6 +159,9 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 57 ),
+				new DiagnosticExpectation( Kind.ERROR, 58 ),
+				new DiagnosticExpectation( Kind.ERROR, 59 ),
 				new DiagnosticExpectation( Kind.ERROR, 60 ),
 				new DiagnosticExpectation( Kind.ERROR, 61 ),
 				new DiagnosticExpectation( Kind.ERROR, 62 ),
@@ -170,11 +173,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 				new DiagnosticExpectation( Kind.ERROR, 68 ),
 				new DiagnosticExpectation( Kind.ERROR, 69 ),
 				new DiagnosticExpectation( Kind.ERROR, 70 ),
-				new DiagnosticExpectation( Kind.ERROR, 71 ),
-				new DiagnosticExpectation( Kind.ERROR, 72 ),
-				new DiagnosticExpectation( Kind.ERROR, 73 ),
-				new DiagnosticExpectation( Kind.ERROR, 74 ),
-				new DiagnosticExpectation( Kind.ERROR, 75 )
+				new DiagnosticExpectation( Kind.ERROR, 71 )
 		);
 	}
 
