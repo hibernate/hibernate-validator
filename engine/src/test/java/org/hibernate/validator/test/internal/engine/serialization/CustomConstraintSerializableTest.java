@@ -35,17 +35,6 @@ import org.testng.annotations.Test;
  */
 public class CustomConstraintSerializableTest {
 
-	@Test
-	public void testSerializeHibernateEmail() throws Exception {
-		Validator validator = ValidatorUtil.getValidator();
-
-		HibernateEmail invalidHibernateEmail = new HibernateEmail();
-		invalidHibernateEmail.email = "test@";
-
-		Set<ConstraintViolation<HibernateEmail>> constraintViolations = validator.validate( invalidHibernateEmail );
-		doSerialize( constraintViolations.iterator().next() );
-	}
-
 	/**
 	 * HV-291
 	 *
@@ -75,14 +64,6 @@ public class CustomConstraintSerializableTest {
 		@Email
 		String email;
 
-	}
-
-	@SuppressWarnings("deprecation")
-	static class HibernateEmail implements Serializable {
-		private static final long serialVersionUID = 7206154160792549270L;
-
-		@org.hibernate.validator.constraints.Email
-		String email;
 	}
 }
 
