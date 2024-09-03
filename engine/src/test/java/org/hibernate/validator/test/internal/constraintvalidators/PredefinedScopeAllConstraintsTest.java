@@ -55,7 +55,6 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
-import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Range;
@@ -82,7 +81,6 @@ import org.testng.annotations.Test;
  *
  * @author Guillaume Smet
  */
-@SuppressWarnings("deprecation")
 public class PredefinedScopeAllConstraintsTest {
 
 	@Test
@@ -118,7 +116,6 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( LuhnCheck.class, new LuhnCheckBean() );
 		testConstraint( Mod10Check.class, new Mod10CheckBean() );
 		testConstraint( Mod11Check.class, new Mod11CheckBean() );
-		testConstraint( ModCheck.class, new ModCheckBean() );
 		testConstraint( Normalized.class, new NormalizedBean() );
 		testConstraint( Range.class, new RangeBean() );
 		testConstraint( UniqueElements.class, new UniqueElementsBean() );
@@ -345,12 +342,6 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@Mod11Check
 		private String mod11Check = "4";
-	}
-
-	private static class ModCheckBean {
-
-		@ModCheck(multiplier = 2, modType = ModCheck.ModType.MOD10)
-		private String modCheck = "4";
 	}
 
 	private static class NormalizedBean {

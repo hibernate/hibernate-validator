@@ -14,7 +14,6 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
-import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
@@ -28,7 +27,6 @@ import org.hibernate.validator.constraints.time.DurationMax;
 import org.hibernate.validator.constraints.time.DurationMin;
 
 @ScriptAssert(script = "some script", lang = "javascript")
-@SuppressWarnings("deprecation")
 public class HibernateValidatorProvidedCustomConstraints {
 
 	/**
@@ -37,7 +35,6 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@CreditCardNumber
 	@Length
 	@LuhnCheck
-	@ModCheck(modType = ModCheck.ModType.MOD10, multiplier = 2)
 	@Mod10Check
 	@Mod11Check
 	@Range
@@ -60,7 +57,6 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@CreditCardNumber
 	@Length
 	@LuhnCheck
-	@ModCheck(modType = ModCheck.ModType.MOD10, multiplier = 2)
 	@Mod10Check
 	@Mod11Check
 	@Range
