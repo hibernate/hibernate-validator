@@ -15,7 +15,6 @@ import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.ModCheck;
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
@@ -42,7 +41,6 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@ModCheck(modType = ModCheck.ModType.MOD10, multiplier = 2)
 	@Mod10Check
 	@Mod11Check
-	@NotBlank
 	@NotEmpty
 	@Range
 	@URL
@@ -67,7 +65,6 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@ModCheck(modType = ModCheck.ModType.MOD10, multiplier = 2)
 	@Mod10Check
 	@Mod11Check
-	@NotBlank
 	@NotEmpty
 	@Range
 	@URL

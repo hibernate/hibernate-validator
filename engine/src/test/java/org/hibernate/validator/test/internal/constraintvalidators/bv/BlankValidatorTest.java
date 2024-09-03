@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.test.internal.constraintvalidators.hv;
+package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
@@ -17,23 +17,22 @@ import java.util.Set;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotBlank;
 
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.NotBlankValidator;
 
 import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-@SuppressWarnings("deprecation")
 public class BlankValidatorTest {
 	@Test
 	public void testConstraintValidator() {
 		NotBlankValidator constraintValidator = new NotBlankValidator();
 
 		assertTrue( constraintValidator.isValid( "a", null ) );
-		assertTrue( constraintValidator.isValid( null, null ) );
+		assertFalse( constraintValidator.isValid( null, null ) );
 		assertFalse( constraintValidator.isValid( "", null ) );
 		assertFalse( constraintValidator.isValid( " ", null ) );
 		assertFalse( constraintValidator.isValid( "\t", null ) );
