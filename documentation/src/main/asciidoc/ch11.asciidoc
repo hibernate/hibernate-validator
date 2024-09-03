@@ -384,3 +384,11 @@ dependency injection in constraint validators.
 Hibernate Validator also provides support for the unwrapping of JavaFX properties. If JavaFX is present
 on the classpath, ``ValueExtractor``s for JavaFX properties are automatically registered.
 See <<section-valueextraction-javafx>> for examples and further discussion.
+
+
+[[validator-osgi]]
+=== OSGi
+
+Starting with Hibernate Validator 9.0, the Hibernate team no longer tests nor maintains the OSGi integration.
+For users who would want to experiment with Hibernate Validator in an OSGi environment,
+we will keep the existing manifest entries in place as they were.
