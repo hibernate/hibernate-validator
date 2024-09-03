@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -115,12 +114,6 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 	@Override
 	protected ContainerElementConstraintMappingContext getThis() {
 		return this;
-	}
-
-	@Override
-	@Deprecated
-	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
-		return typeContext.property( property, elementType );
 	}
 
 	@Override

@@ -348,9 +348,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 87, value = "Property name cannot be null or empty.")
 	IllegalArgumentException getPropertyNameCannotBeNullOrEmptyException();
 
-	@Message(id = 88, value = "Element type has to be FIELD or METHOD.")
-	IllegalArgumentException getElementTypeHasToBeFieldOrMethodException();
-
 	@Message(id = 89, value = "Member %s is neither a field nor a method.")
 	IllegalArgumentException getMemberIsNeitherAFieldNorAMethodException(Member member);
 

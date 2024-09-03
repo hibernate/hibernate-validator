@@ -13,7 +13,6 @@ import static org.hibernate.validator.testutils.ConstraintValidatorInitializatio
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
-import java.lang.annotation.ElementType;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -528,13 +527,12 @@ public class ConstraintMappingTest {
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
 	public void testDeprecatedPropertyMethodForFieldAndGetterProgrammaticConstraintDefinition() {
 		mapping.type( Marathon.class )
-				.property( "name", ElementType.METHOD )
+				.getter( "name" )
 				.constraint( new SizeDef().min( 5 ) )
 				.constraint( new SizeDef().min( 10 ) )
-				.property( "runners", ElementType.FIELD )
+				.field( "runners" )
 				.constraint( new SizeDef().max( 10 ).min( 1 ) );
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
