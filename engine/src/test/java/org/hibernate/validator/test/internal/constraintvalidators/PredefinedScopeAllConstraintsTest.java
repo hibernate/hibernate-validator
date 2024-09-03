@@ -112,7 +112,6 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( CreditCardNumber.class, new CreditCardNumberBean() );
 		testConstraint( Currency.class, new CurrencyBean() );
 		testConstraint( EAN.class, new EANBean() );
-		testConstraint( org.hibernate.validator.constraints.Email.class, new HvEmailBean() );
 		testConstraint( ISBN.class, new ISBNBean() );
 		testConstraint( Length.class, new LengthBean() );
 		testConstraint( CodePointLength.class, new CodePointLengthBean() );
@@ -312,12 +311,6 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@EAN
 		private String ean = "invalid";
-	}
-
-	private static class HvEmailBean {
-
-		@org.hibernate.validator.constraints.Email
-		private String hvEmail = "invalid";
 	}
 
 	private static class ISBNBean {

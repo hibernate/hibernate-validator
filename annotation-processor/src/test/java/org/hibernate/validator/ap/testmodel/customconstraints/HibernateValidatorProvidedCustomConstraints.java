@@ -10,7 +10,6 @@ import java.time.Duration;
 import java.util.Date;
 
 import org.hibernate.validator.constraints.CreditCardNumber;
-import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
@@ -38,7 +37,6 @@ public class HibernateValidatorProvidedCustomConstraints {
 	 * Allowed.
 	 */
 	@CreditCardNumber
-	@Email
 	@Length
 	@LuhnCheck
 	@ModCheck(modType = ModCheck.ModType.MOD10, multiplier = 2)
@@ -64,7 +62,6 @@ public class HibernateValidatorProvidedCustomConstraints {
 	 * Not allowed.
 	 */
 	@CreditCardNumber
-	@Email
 	@Length
 	@LuhnCheck
 	@ModCheck(modType = ModCheck.ModType.MOD10, multiplier = 2)

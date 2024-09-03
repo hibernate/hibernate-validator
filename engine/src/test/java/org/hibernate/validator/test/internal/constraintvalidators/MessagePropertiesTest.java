@@ -153,7 +153,6 @@ public class MessagePropertiesTest {
 							violationOf( CreditCardNumber.class ),
 							violationOf( Currency.class ),
 							violationOf( EAN.class ),
-							violationOf( org.hibernate.validator.constraints.Email.class ),
 							violationOf( ISBN.class ),
 							violationOf( Length.class ),
 							violationOf( CodePointLength.class ),
@@ -289,9 +288,6 @@ public class MessagePropertiesTest {
 
 		@EAN
 		private String ean = "invalid";
-
-		@org.hibernate.validator.constraints.Email
-		private String hvEmail = "invalid";
 
 		@ISBN
 		private String isbn = "invalid";
