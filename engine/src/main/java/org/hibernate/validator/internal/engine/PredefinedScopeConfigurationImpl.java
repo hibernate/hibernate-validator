@@ -6,10 +6,7 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
-
 import java.util.Collections;
-import java.util.Locale;
 import java.util.Set;
 
 import jakarta.validation.spi.BootstrapState;
@@ -18,7 +15,6 @@ import jakarta.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.PredefinedScopeHibernateValidatorConfiguration;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.Contracts;
 
 /**
  * @author Guillaume Smet
@@ -62,14 +58,6 @@ public class PredefinedScopeConfigurationImpl extends AbstractConfigurationImpl<
 
 	public boolean isIncludeBeansAndConstraintsDefinedOnlyInXml() {
 		return includeBeansAndConstraintsDefinedOnlyInXml;
-	}
-
-	@Override
-	@Deprecated
-	public PredefinedScopeHibernateValidatorConfiguration initializeLocales(Set<Locale> localesToInitialize) {
-		Contracts.assertNotNull( localesToInitialize, MESSAGES.parameterMustNotBeNull( "localesToInitialize" ) );
-		locales( localesToInitialize );
-		return thisAsT();
 	}
 
 	@Override

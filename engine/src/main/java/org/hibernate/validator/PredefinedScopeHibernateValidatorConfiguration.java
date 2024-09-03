@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator;
 
-import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -25,13 +24,6 @@ public interface PredefinedScopeHibernateValidatorConfiguration extends BaseHibe
 
 	@Incubating
 	PredefinedScopeHibernateValidatorConfiguration initializeBeanMetaData(Set<Class<?>> beanClassesToInitialize);
-
-	/**
-	 * @deprecated Planned for removal, use {@link BaseHibernateValidatorConfiguration#locales(Set)} instead.
-	 */
-	@Incubating
-	@Deprecated
-	PredefinedScopeHibernateValidatorConfiguration initializeLocales(Set<Locale> locales);
 
 	/**
 	 * Specify whether to append the {@link #builtinConstraints(Set) built-in constraints} and {@link #initializeBeanMetaData(Set) beans to initialize}
