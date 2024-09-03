@@ -7,7 +7,7 @@ jira:
       # Examples:
       # Bump some-dep-GAV from some-version to some-version in the build-dependencies group
       # Bump the build-dependencies group with 2 updates
-      titlePattern: "Bump.*the build-dependencies group( with \\d+ updates?)?"
+      titlePattern: "Bump.*the build-dependencies group( across \\d+ director(ies|y))?( with \\d+ updates?)?"
   ignoreFiles:
     # Git
     - ".git*"
