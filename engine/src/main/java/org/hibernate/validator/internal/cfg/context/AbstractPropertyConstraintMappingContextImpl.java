@@ -49,12 +49,6 @@ abstract class AbstractPropertyConstraintMappingContextImpl<T extends Property>
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
-	public PropertyConstraintMappingContext ignoreAnnotations() {
-		return ignoreAnnotations( true );
-	}
-
-	@Override
 	public PropertyConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
 		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsOnMember( property, ignoreAnnotations );
 		return this;
