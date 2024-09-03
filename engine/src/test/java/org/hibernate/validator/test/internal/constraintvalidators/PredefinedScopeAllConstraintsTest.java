@@ -120,7 +120,6 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( Mod11Check.class, new Mod11CheckBean() );
 		testConstraint( ModCheck.class, new ModCheckBean() );
 		testConstraint( Normalized.class, new NormalizedBean() );
-		testConstraint( org.hibernate.validator.constraints.NotBlank.class, new HvNotBlankBean() );
 		testConstraint( org.hibernate.validator.constraints.NotEmpty.class, new HvNotEmptyBean() );
 		testConstraint( Range.class, new RangeBean() );
 		testConstraint( UniqueElements.class, new UniqueElementsBean() );
@@ -360,12 +359,6 @@ public class PredefinedScopeAllConstraintsTest {
 		@Normalized(form = java.text.Normalizer.Form.NFKC)
 		private String normalized = "\uFE64script\uFE65";
 
-	}
-
-	private static class HvNotBlankBean {
-
-		@org.hibernate.validator.constraints.NotBlank
-		private String hvNotBlank = "";
 	}
 
 	private static class HvNotEmptyBean {

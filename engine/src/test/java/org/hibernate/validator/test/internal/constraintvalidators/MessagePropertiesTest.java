@@ -161,7 +161,6 @@ public class MessagePropertiesTest {
 							violationOf( Mod11Check.class ),
 							violationOf( ModCheck.class ),
 							violationOf( Normalized.class ),
-							violationOf( org.hibernate.validator.constraints.NotBlank.class ),
 							violationOf( org.hibernate.validator.constraints.NotEmpty.class ),
 							violationOf( Range.class ),
 							violationOf( UniqueElements.class ),
@@ -312,9 +311,6 @@ public class MessagePropertiesTest {
 
 		@Normalized(form = java.text.Normalizer.Form.NFKC)
 		private String normalized = "\uFE64script\uFE65";
-
-		@org.hibernate.validator.constraints.NotBlank
-		private String hvNotBlank = "";
 
 		@org.hibernate.validator.constraints.NotEmpty
 		private List<String> hvNotEmpty = Collections.emptyList();
