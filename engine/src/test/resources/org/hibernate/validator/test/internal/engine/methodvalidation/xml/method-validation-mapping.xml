@@ -132,7 +132,7 @@
 
         <method name="getFoo">
             <parameter type="java.lang.String">
-                <constraint annotation="org.hibernate.validator.constraints.NotEmpty">
+                <constraint annotation="jakarta.validation.constraints.NotEmpty">
                     <message>[XML] - must not be null</message>
                 </constraint>
             </parameter>
@@ -211,7 +211,7 @@
             </parameter>
         </method>
     </bean>
-    
+
     <bean class="CustomerRepositoryWithConstrainedVoidMethod" ignore-annotations="true">
         <method name="voidMethodWithIllegalReturnValueConstraint">
             <return-value>

@@ -120,7 +120,6 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( Mod11Check.class, new Mod11CheckBean() );
 		testConstraint( ModCheck.class, new ModCheckBean() );
 		testConstraint( Normalized.class, new NormalizedBean() );
-		testConstraint( org.hibernate.validator.constraints.NotEmpty.class, new HvNotEmptyBean() );
 		testConstraint( Range.class, new RangeBean() );
 		testConstraint( UniqueElements.class, new UniqueElementsBean() );
 		testConstraint( URL.class, new URLBean() );
@@ -359,12 +358,6 @@ public class PredefinedScopeAllConstraintsTest {
 		@Normalized(form = java.text.Normalizer.Form.NFKC)
 		private String normalized = "\uFE64script\uFE65";
 
-	}
-
-	private static class HvNotEmptyBean {
-
-		@org.hibernate.validator.constraints.NotEmpty
-		private List<String> hvNotEmpty = Collections.emptyList();
 	}
 
 	private static class RangeBean {
