@@ -1,6 +1,37 @@
 Hibernate Validator Changelog
 =============================
 
+9.0.0.Beta3 (2024-09-04)
+-------------------------
+
+** Bug
+    * HV-2029 Exactly the same ConvertGroup defined on both original and overridden methods lead to an exception
+    * HV-2018 Validator.validateValue() prints no violations on an interface
+
+** Improvement
+    * HV-2032 Support strict Jaxp security settings from JDK 23
+    * HV-2031 Make PredefinedScopeHibernateValidatorFactory aware of constraint mappings defined purely in XML
+
+** Remove Feature
+    * HV-2043 Remove deprecated PropertyTarget#property
+    * HV-2042 Remove deprecated org.hibernate.validator.constraints.ModCheck constraint
+    * HV-2040 Remove deprecated `AnnotationProcessingOptions`
+    * HV-2039 Remove deprecated `PredefinedScopeHibernateValidatorConfiguration#initializeLocales`
+    * HV-2038 Remove deprecated ReflectionParameterNameProvider
+    * HV-2037 Remove deprecated org.hibernate.validator.constraints.NotEmpty constraint
+    * HV-2036 Remove deprecated org.hibernate.validator.constraints.NotBlank constraint
+    * HV-2035 Remove deprecated org.hibernate.validator.constraints.Email constraint
+    * HV-2034 Remove deprecated `hibernate.validator.constraint_mapping_contributor`
+    * HV-2025 Remove OSGi testing and support
+
+** Task
+    * HV-2041 Update to new versions of hibernate-infra extensions/theme that depend on AsciidoctorJ 3.0
+    * HV-2033 Test against wildfly-preview 33.0.1.Final
+    * HV-2026 Use Maven 3.9.8 as a required minimum version for the build
+    * HV-2022 Try using offline links for Javadoc generation
+    * HV-2021 Add simple GH actions to build Hibernate Validator
+    * HV-2019 FIx snapshot publishing
+
 9.0.0.Beta2 (2024-08-01)
 -------------------------
 
