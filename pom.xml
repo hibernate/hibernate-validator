@@ -925,6 +925,7 @@
                                     <exclude>**/src/test/resources/org/hibernate/validator/test/internal/xml/**/*.xml</exclude>
                                     <exclude>.mvn/**</exclude>
                                     <exclude>**/generated-sources/**</exclude>
+                                    <exclude>**/javadoc-bundle-options/**</exclude>
                                 </excludes>
                                 <includes>
                                     <include>**/*.java</include>
