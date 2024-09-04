@@ -145,6 +145,7 @@
                         </group>
                     </groups>
                     <additionalOptions>${javadoc.additional.options}</additionalOptions>
+                    <outputDirectory>${project.reporting.outputDirectory}/javadocs</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>
