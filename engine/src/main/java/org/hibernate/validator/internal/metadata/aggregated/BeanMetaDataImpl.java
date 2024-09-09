@@ -378,7 +378,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@Override
 	public List<Class<?>> getDefaultGroupSequence(T beanState) {
 		if ( hasDefaultGroupSequenceProvider() ) {
-			List<Class<?>> providerDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( beanState );
+			List<Class<?>> providerDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( beanClass, beanState );
 			return getValidDefaultGroupSequence( beanClass, providerDefaultGroupSequence );
 		}
 
@@ -388,7 +388,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@Override
 	public Iterator<Sequence> getDefaultValidationSequence(T beanState) {
 		if ( hasDefaultGroupSequenceProvider() ) {
-			List<Class<?>> providerDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( beanState );
+			List<Class<?>> providerDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( beanClass, beanState );
 			return validationOrderGenerator.getDefaultValidationOrder(
 					beanClass,
 					getValidDefaultGroupSequence( beanClass, providerDefaultGroupSequence )
