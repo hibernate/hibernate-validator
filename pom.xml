@@ -160,7 +160,7 @@
         <version.com.fasterxml.classmate>1.7.0</version.com.fasterxml.classmate>
         <version.joda-time>2.12.7</version.joda-time>
         <version.org.slf4j>2.0.16</version.org.slf4j>
-        <version.org.apache.logging.log4j>2.23.1</version.org.apache.logging.log4j>
+        <version.org.apache.logging.log4j>2.24.0</version.org.apache.logging.log4j>
 
         <!--
             These dependencies are used for integration tests with WildFly.
@@ -267,7 +267,7 @@
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
         <version.moditect.plugin>1.2.2.Final</version.moditect.plugin>
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
-        <version.impsort-maven-plugin>1.11.0</version.impsort-maven-plugin>
+        <version.impsort-maven-plugin>1.12.0</version.impsort-maven-plugin>
         <version.formatter-maven-plugin>2.24.1</version.formatter-maven-plugin>
         <version.versions.plugin>2.17.1</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
