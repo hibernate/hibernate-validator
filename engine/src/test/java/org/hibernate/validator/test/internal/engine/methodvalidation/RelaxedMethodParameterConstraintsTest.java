@@ -72,7 +72,7 @@ public class RelaxedMethodParameterConstraintsTest {
 	}
 
 	@Test
-	public void allowStrengtheningInSubType() {
+	public void allowStrengtheningInSubType() throws NoSuchMethodException {
 		HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
 
 		configuration.allowOverridingMethodAlterParameterConstraint( true );
@@ -83,7 +83,7 @@ public class RelaxedMethodParameterConstraintsTest {
 		Set<ConstraintViolation<RealizationWithAdditionalMethodParameterConstraint>> violations =
 				validator.forExecutables().validateParameters(
 						new RealizationWithAdditionalMethodParameterConstraint(),
-						RealizationWithAdditionalMethodParameterConstraint.class.getDeclaredMethods()[0],
+						RealizationWithAdditionalMethodParameterConstraint.class.getDeclaredMethod( "bar", String.class ),
 						new Object[] { "foo" }
 				);
 
