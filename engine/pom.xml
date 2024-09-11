@@ -316,6 +316,27 @@
                     <parallel>tests</parallel>
                     <threadCount>4</threadCount>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/ByteBuddy*Test</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>bytebuddy-test</id>
+                        <goals><goal>test</goal></goals>
+                        <phase>test</phase>
+                        <configuration>
+                            <argLine>${surefire.jvm.nojacoco.args}</argLine>
+                            <includes>
+                                <include>**/ByteBuddy*Test</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
