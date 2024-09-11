@@ -261,6 +261,7 @@ stage('Default build') {
 							install \
 					"} \
 					-Pdist \
+					-Pcoverage \
 					-Pjqassistant -Pci-build \
 					${enableDefaultBuildIT ? '' : '-DskipITs'} \
 					${toTestJdkArg(environments.content.jdk.default)} \
