@@ -48,6 +48,7 @@ updates:
           - "org.springframework:*"
           # only used for perf tests based on javax:
           - "org.glassfish:javax.el"
+          - "org.codehaus.plexus:plexus-utils"
     ignore:
       - dependency-name: "javax.validation:*"
       - dependency-name: "org.apache.bval:*"
