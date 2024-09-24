@@ -200,7 +200,7 @@
         <version.org.easymock>5.4.0</version.org.easymock>
         <version.io.rest-assured>5.5.0</version.io.rest-assured>
         <version.org.apache.groovy>4.0.23</version.org.apache.groovy>
-        <version.com.google.guava>33.3.0-jre</version.com.google.guava>
+        <version.com.google.guava>33.3.1-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>6.1.13</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.17.2</version.com.fasterxml.jackson.core.jackson-databind>
