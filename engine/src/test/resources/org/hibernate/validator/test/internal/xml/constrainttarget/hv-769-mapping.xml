@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Hibernate Validator, declare and validate application constraints
-  ~
-  ~ License: Apache License, Version 2.0
-  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
-  -->
+~ Hibernate Validator, declare and validate application constraints
+~
+~ License: Apache License, Version 2.0
+~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+-->
 <constraint-mappings
-        xmlns="https://jakarta.ee/xml/ns/validation/mapping"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="https://jakarta.ee/xml/ns/validation/mapping https://jakarta.ee/xml/ns/validation/validation-mapping-3.0.xsd"
-        version="3.0">
+		xmlns="https://jakarta.ee/xml/ns/validation/mapping"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="https://jakarta.ee/xml/ns/validation/mapping https://jakarta.ee/xml/ns/validation/validation-mapping-3.0.xsd"
+		version="3.0">
 
-    <default-package>org.hibernate.validator.test.internal.xml.constrainttarget</default-package>
+	<default-package>org.hibernate.validator.test.internal.xml.constrainttarget</default-package>
 
-    <bean class="OrderService">
-        <method name="getNumberOfOrders">
-            <parameter type="int"/>
-            <parameter type="boolean"/>
-            <return-value>
-                <constraint annotation="GenericAndCrossParameterConstraint"/>
-            </return-value>
-        </method>
+	<bean class="OrderService">
+		<method name="getNumberOfOrders">
+			<parameter type="int"/>
+			<parameter type="boolean"/>
+			<return-value>
+				<constraint annotation="GenericAndCrossParameterConstraint"/>
+			</return-value>
+		</method>
 
-        <method name="placeOrder">
-            <parameter type="int"/>
-            <parameter type="java.lang.String"/>
-            <parameter type="int"/>
-            <cross-parameter>
-                <constraint annotation="GenericAndCrossParameterConstraint"/>
-            </cross-parameter>
-        </method>
+		<method name="placeOrder">
+			<parameter type="int"/>
+			<parameter type="java.lang.String"/>
+			<parameter type="int"/>
+			<cross-parameter>
+				<constraint annotation="GenericAndCrossParameterConstraint"/>
+			</cross-parameter>
+		</method>
 
-        <method name="cancelOrder">
-            <parameter type="int"/>
-            <parameter type="java.lang.String"/>
-            <cross-parameter>
-                <constraint annotation="ComposedGenericAndCrossParameterConstraint"/>
-            </cross-parameter>
-        </method>
-    </bean>
+		<method name="cancelOrder">
+			<parameter type="int"/>
+			<parameter type="java.lang.String"/>
+			<cross-parameter>
+				<constraint annotation="ComposedGenericAndCrossParameterConstraint"/>
+			</cross-parameter>
+		</method>
+	</bean>
 </constraint-mappings>

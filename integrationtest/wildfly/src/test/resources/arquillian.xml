@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Hibernate Validator, declare and validate application constraints
-  ~
-  ~ License: Apache License, Version 2.0
-  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
-  -->
+~ Hibernate Validator, declare and validate application constraints
+~
+~ License: Apache License, Version 2.0
+~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+-->
 <arquillian xmlns="http://jboss.org/schema/arquillian"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://jboss.org/schema/arquillian
-        http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:schemaLocation="http://jboss.org/schema/arquillian
+		http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
 
-    <!-- Uncomment in order to inspect deployments -->
-    <!--
-    <engine>
-        <property name="deploymentExportPath">${basedir}/target/</property>
-    </engine>
-    -->
+	<!-- Uncomment in order to inspect deployments -->
+	<!--
+	<engine>
+		<property name="deploymentExportPath">${basedir}/target/</property>
+	</engine>
+	-->
 
-    <container qualifier="wildfly-current">
-        <protocol type="jmx-wildfly">
-            <property name="executionType">REMOTE</property>
-        </protocol>
-        <configuration>
-            <property name="jbossHome">${wildfly.target-dir}</property>
-            <!-- Java home is defined through an environment variable (see maven-failsafe-plugin config) -->
-            <property name="javaVmArguments">
-                ${arquillian.wildfly.jvm.args}
-            </property>
-            <!--
-            To be injected in javaVmArguments to enable debug mode:
-            -Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=y -Xmx512m
-            -->
-        </configuration>
-    </container>
+	<container qualifier="wildfly-current">
+		<protocol type="jmx-wildfly">
+			<property name="executionType">REMOTE</property>
+		</protocol>
+		<configuration>
+			<property name="jbossHome">${wildfly.target-dir}</property>
+			<!-- Java home is defined through an environment variable (see maven-failsafe-plugin config) -->
+			<property name="javaVmArguments">
+				${arquillian.wildfly.jvm.args}
+			</property>
+			<!--
+			To be injected in javaVmArguments to enable debug mode:
+			-Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=y -Xmx512m
+			-->
+		</configuration>
+	</container>
 
 </arquillian>

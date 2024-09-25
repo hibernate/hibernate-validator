@@ -1,131 +1,131 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!--
-  ~ Hibernate Validator, declare and validate application constraints
-  ~
-  ~ License: Apache License, Version 2.0
-  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
-  -->
+~ Hibernate Validator, declare and validate application constraints
+~
+~ License: Apache License, Version 2.0
+~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+-->
 
 <assembly>
-    <id>dist</id>
-    <formats>
-        <format>tar.gz</format>
-        <format>zip</format>
-        <!-- Uncomment the following line to simplify content inspection: -->
-        <!--
-        <format>dir</format>
-        -->
-    </formats>
+	<id>dist</id>
+	<formats>
+		<format>tar.gz</format>
+		<format>zip</format>
+		<!-- Uncomment the following line to simplify content inspection: -->
+		<!--
+		<format>dir</format>
+		-->
+	</formats>
 
-    <!-- Configure the artifacts to include  -->
-    <dependencySets>
-        <!-- first the actual project artifacts -->
-        <dependencySet>
-            <outputDirectory>dist</outputDirectory>
-            <includes>
-                <include>org.hibernate.validator:hibernate-validator</include>
-                <include>org.hibernate.validator:hibernate-validator-cdi</include>
-                <include>org.hibernate.validator:hibernate-validator-annotation-processor</include>
-            </includes>
-        </dependencySet>
+	<!-- Configure the artifacts to include  -->
+	<dependencySets>
+		<!-- first the actual project artifacts -->
+		<dependencySet>
+			<outputDirectory>dist</outputDirectory>
+			<includes>
+				<include>org.hibernate.validator:hibernate-validator</include>
+				<include>org.hibernate.validator:hibernate-validator-cdi</include>
+				<include>org.hibernate.validator:hibernate-validator-annotation-processor</include>
+			</includes>
+		</dependencySet>
 
-        <!-- Now we take care of the transitive dependencies -->
-        <dependencySet>
-            <outputDirectory>dist/lib/required</outputDirectory>
-            <includes>
-                <include>jakarta.validation:jakarta.validation-api</include>
-                <include>org.jboss.logging:jboss-logging</include>
-                <include>com.fasterxml:classmate</include>
-                <include>org.glassfish.expressly:expressly</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>dist/lib/optional</outputDirectory>
-            <includes>
-                <include>org.apache.logging.log4j:log4j-core</include>
-                <include>joda-time:joda-time</include>
-                <include>jakarta.persistence:jakarta.persistence-api</include>
-                <include>com.thoughtworks.paranamer:paranamer</include>
-            </includes>
-        </dependencySet>
-    </dependencySets>
+		<!-- Now we take care of the transitive dependencies -->
+		<dependencySet>
+			<outputDirectory>dist/lib/required</outputDirectory>
+			<includes>
+				<include>jakarta.validation:jakarta.validation-api</include>
+				<include>org.jboss.logging:jboss-logging</include>
+				<include>com.fasterxml:classmate</include>
+				<include>org.glassfish.expressly:expressly</include>
+			</includes>
+		</dependencySet>
+		<dependencySet>
+			<outputDirectory>dist/lib/optional</outputDirectory>
+			<includes>
+				<include>org.apache.logging.log4j:log4j-core</include>
+				<include>joda-time:joda-time</include>
+				<include>jakarta.persistence:jakarta.persistence-api</include>
+				<include>com.thoughtworks.paranamer:paranamer</include>
+			</includes>
+		</dependencySet>
+	</dependencySets>
 
-    <files>
-        <file>
-            <source>../README.md</source>
-            <outputDirectory>/</outputDirectory>
-        </file>
-        <file>
-            <source>../CONTRIBUTING.md</source>
-            <outputDirectory>/</outputDirectory>
-        </file>
-        <file>
-            <source>../changelog.txt</source>
-            <outputDirectory>/</outputDirectory>
-        </file>
-        <file>
-            <source>../copyright.txt</source>
-            <outputDirectory>/</outputDirectory>
-        </file>
-        <file>
-            <source>../license.txt</source>
-            <outputDirectory>/</outputDirectory>
-        </file>
-    </files>
+	<files>
+		<file>
+			<source>../README.md</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
+			<source>../CONTRIBUTING.md</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
+			<source>../changelog.txt</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
+			<source>../copyright.txt</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
+			<source>../license.txt</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+	</files>
 
-    <fileSets>
-        <!-- Include all sources  -->
-        <fileSet>
-            <directory>..</directory>
-            <outputDirectory>project</outputDirectory>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <excludes>
-                <!-- we already have these files at the top level of the distribution -->
-                <exclude>README.md</exclude>
-                <exclude>CONTRIBUTING.md</exclude>
-                <exclude>changelog.txt</exclude>
-                <exclude>copyright.txt</exclude>
-                <exclude>license.txt</exclude>
+	<fileSets>
+		<!-- Include all sources  -->
+		<fileSet>
+			<directory>..</directory>
+			<outputDirectory>project</outputDirectory>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<excludes>
+				<!-- we already have these files at the top level of the distribution -->
+				<exclude>README.md</exclude>
+				<exclude>CONTRIBUTING.md</exclude>
+				<exclude>changelog.txt</exclude>
+				<exclude>copyright.txt</exclude>
+				<exclude>license.txt</exclude>
 
-                <!-- only needed for documentation and helper scripts, no need to include them -->
-                <exclude>src/main/scripts/**</exclude>
-                <exclude>hibernate-noorm-release-scripts/**</exclude>
-                <exclude>hibernate-release-scripts/**</exclude>
+				<!-- only needed for documentation and helper scripts, no need to include them -->
+				<exclude>src/main/scripts/**</exclude>
+				<exclude>hibernate-noorm-release-scripts/**</exclude>
+				<exclude>hibernate-release-scripts/**</exclude>
 
-                <!-- actual files which should be ignored -->
-                <exclude>.travis.yml</exclude>
-                <exclude>travis/**</exclude>
-                <exclude>.git</exclude>
-                <exclude>.gitignore</exclude>
-                <exclude>.gitattributes</exclude>
-                <exclude>.git-blame-ignore-revs</exclude>
-                <exclude>**/target/**</exclude>
-                <exclude>**/test-output/**</exclude>
-                <exclude>**/.settings/**</exclude>
-                <exclude>**/.project</exclude>
-                <exclude>**/.classpath</exclude>
-                <exclude>**/.checkstyle</exclude>
-                <exclude>**/.idea/**</exclude>
-                <exclude>.sonar-ide.properties</exclude>
-                <exclude>**/*.iml</exclude>
-                <exclude>**/*.ipr</exclude>
-                <exclude>**/*.iws</exclude>
-                <exclude>**/performance/hibernate-validator.log</exclude>
-                <exclude>**/performance/dependency-reduced-pom.xml</exclude>
-                <exclude>**/.cache/**</exclude>
-            </excludes>
-        </fileSet>
+				<!-- actual files which should be ignored -->
+				<exclude>.travis.yml</exclude>
+				<exclude>travis/**</exclude>
+				<exclude>.git</exclude>
+				<exclude>.gitignore</exclude>
+				<exclude>.gitattributes</exclude>
+				<exclude>.git-blame-ignore-revs</exclude>
+				<exclude>**/target/**</exclude>
+				<exclude>**/test-output/**</exclude>
+				<exclude>**/.settings/**</exclude>
+				<exclude>**/.project</exclude>
+				<exclude>**/.classpath</exclude>
+				<exclude>**/.checkstyle</exclude>
+				<exclude>**/.idea/**</exclude>
+				<exclude>.sonar-ide.properties</exclude>
+				<exclude>**/*.iml</exclude>
+				<exclude>**/*.ipr</exclude>
+				<exclude>**/*.iws</exclude>
+				<exclude>**/performance/hibernate-validator.log</exclude>
+				<exclude>**/performance/dependency-reduced-pom.xml</exclude>
+				<exclude>**/.cache/**</exclude>
+			</excludes>
+		</fileSet>
 
-        <!-- Include documentation -->
-        <fileSet>
-            <directory>target/site/javadocs/apidocs</directory>
-            <outputDirectory>docs/api</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>../documentation/target/asciidoctor</directory>
-            <outputDirectory>docs/reference</outputDirectory>
-        </fileSet>
+		<!-- Include documentation -->
+		<fileSet>
+			<directory>target/site/javadocs/apidocs</directory>
+			<outputDirectory>docs/api</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>../documentation/target/asciidoctor</directory>
+			<outputDirectory>docs/reference</outputDirectory>
+		</fileSet>
 
-    </fileSets>
+	</fileSets>
 
 </assembly>

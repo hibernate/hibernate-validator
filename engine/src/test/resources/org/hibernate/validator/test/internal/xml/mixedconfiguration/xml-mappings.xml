@@ -1,44 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Hibernate Validator, declare and validate application constraints
-  ~
-  ~ License: Apache License, Version 2.0
-  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
-  -->
+~ Hibernate Validator, declare and validate application constraints
+~
+~ License: Apache License, Version 2.0
+~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+-->
 <constraint-mappings
-        xmlns="https://jakarta.ee/xml/ns/validation/mapping"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="
-        https://jakarta.ee/xml/ns/validation/mapping
-        https://jakarta.ee/xml/ns/validation/validation-mapping-3.0.xsd"
-        version="3.0">
+		xmlns="https://jakarta.ee/xml/ns/validation/mapping"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="
+		https://jakarta.ee/xml/ns/validation/mapping
+		https://jakarta.ee/xml/ns/validation/validation-mapping-3.0.xsd"
+		version="3.0">
 
-    <default-package>org.hibernate.validator.internal.xml.mixedconfiguration.xml</default-package>
+	<default-package>org.hibernate.validator.internal.xml.mixedconfiguration.xml</default-package>
 
-    <bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Competition" ignore-annotations="true">
-        <field name="name">
-            <constraint annotation="jakarta.validation.constraints.NotNull"/>
-            <constraint annotation="jakarta.validation.constraints.Size">
-                <element name="min">1</element>
-            </constraint>
-        </field>
-    </bean>
-    <bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.PersonCompetition" ignore-annotations="true"/>
-    <!--bean class="TeamCompetition"/-->
+	<bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Competition" ignore-annotations="true">
+		<field name="name">
+			<constraint annotation="jakarta.validation.constraints.NotNull"/>
+			<constraint annotation="jakarta.validation.constraints.Size">
+				<element name="min">1</element>
+			</constraint>
+		</field>
+	</bean>
+	<bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.PersonCompetition" ignore-annotations="true"/>
+	<!--bean class="TeamCompetition"/-->
 
-    <bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Game" ignore-annotations="true">
-        <field name="detail">
-            <valid/>
-            <constraint annotation="jakarta.validation.constraints.NotNull"/>
-        </field>
-    </bean>
+	<bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Game" ignore-annotations="true">
+		<field name="detail">
+			<valid/>
+			<constraint annotation="jakarta.validation.constraints.NotNull"/>
+		</field>
+	</bean>
 
-    <bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.GameDetail" ignore-annotations="true">
-        <field name="competition">
-            <valid/>
-            <constraint annotation="jakarta.validation.constraints.NotNull"/>
-        </field>
-    </bean>
-    <bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Fixture"/>
+	<bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.GameDetail" ignore-annotations="true">
+		<field name="competition">
+			<valid/>
+			<constraint annotation="jakarta.validation.constraints.NotNull"/>
+		</field>
+	</bean>
+	<bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Fixture"/>
 
 </constraint-mappings>

@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Hibernate Validator, declare and validate application constraints
-  ~
-  ~ License: Apache License, Version 2.0
-  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
-  -->
+~ Hibernate Validator, declare and validate application constraints
+~
+~ License: Apache License, Version 2.0
+~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+-->
 <constraint-mappings
-        xmlns="https://jakarta.ee/xml/ns/validation/mapping"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation=
-                "https://jakarta.ee/xml/ns/validation/mapping https://jakarta.ee/xml/ns/validation/validation-mapping-3.0.xsd"
-        version="3.0">
+		xmlns="https://jakarta.ee/xml/ns/validation/mapping"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation=
+				"https://jakarta.ee/xml/ns/validation/mapping https://jakarta.ee/xml/ns/validation/validation-mapping-3.0.xsd"
+		version="3.0">
 
-    <bean class="org.hibernate.validator.test.internal.engine.constraintvalidation.User" ignore-annotations="false">
-        <field name="firstName">
-            <constraint annotation="jakarta.validation.constraints.NotNull"/>
-        </field>
-        <field name="middleName">
-            <constraint annotation="jakarta.validation.constraints.Size">
-                <element name="min">5</element>
-                <element name="max">10</element>
-            </constraint>
-        </field>
-        <field name="address2">
-            <constraint annotation="jakarta.validation.constraints.Size">
-                <element name="min">5</element>
-                <element name="max">50</element>
-            </constraint>
-        </field>
-    </bean>
+	<bean class="org.hibernate.validator.test.internal.engine.constraintvalidation.User" ignore-annotations="false">
+		<field name="firstName">
+			<constraint annotation="jakarta.validation.constraints.NotNull"/>
+		</field>
+		<field name="middleName">
+			<constraint annotation="jakarta.validation.constraints.Size">
+				<element name="min">5</element>
+				<element name="max">10</element>
+			</constraint>
+		</field>
+		<field name="address2">
+			<constraint annotation="jakarta.validation.constraints.Size">
+				<element name="min">5</element>
+				<element name="max">50</element>
+			</constraint>
+		</field>
+	</bean>
 </constraint-mappings>
