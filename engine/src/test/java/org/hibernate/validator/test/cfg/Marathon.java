@@ -56,4 +56,3 @@ public class Marathon implements Tournament {
 		return runners.add( runner );
 	}
 }
-

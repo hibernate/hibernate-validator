@@ -128,4 +128,3 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 		}
 	}
 }
-

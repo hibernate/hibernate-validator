@@ -31,4 +31,3 @@ public class Car {
 		passengers.add( passenger );
 	}
 }
-

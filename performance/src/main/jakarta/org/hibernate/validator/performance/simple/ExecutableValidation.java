@@ -81,7 +81,7 @@ public class ExecutableValidation {
 		Driver driver = state.nextDriver();
 		Set<ConstraintViolation<DriverFactory>> violations = state.validator.validateParameters( new DriverFactory(),
 				DriverFactory.class.getMethod( "createDriver", String.class, int.class, boolean.class ),
-				new Object[]{ driver.name, driver.age, driver.hasDrivingLicense } );
+				new Object[] { driver.name, driver.age, driver.hasDrivingLicense } );
 		assert driver.getExpectedViolationCount() == violations.size();
 		bh.consume( violations );
 	}

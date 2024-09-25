@@ -83,4 +83,3 @@ public class Suburb {
 		this.boundingBox = boundingBox;
 	}
 }
-

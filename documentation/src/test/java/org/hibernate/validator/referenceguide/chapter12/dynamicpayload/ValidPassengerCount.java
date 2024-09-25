@@ -29,4 +29,3 @@ public @interface ValidPassengerCount {
 
 	Class<? extends Payload>[] payload() default { };
 }
-

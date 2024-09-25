@@ -31,4 +31,3 @@ public class Bus {
 		passengers.add( passenger );
 	}
 }
-
