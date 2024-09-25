@@ -271,6 +271,7 @@
         <version.formatter-maven-plugin>2.24.1</version.formatter-maven-plugin>
         <version.versions.plugin>2.17.1</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
+        <version.spotless-maven-plugin>2.43.0</version.spotless-maven-plugin>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
@@ -1468,6 +1469,86 @@
                             <phase>process-sources</phase>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>${version.spotless-maven-plugin}</version>
+                    <configuration>
+                        <upToDateChecking>
+                            <enabled>true</enabled>
+                            <indexFile>.cache/spotless-index-${version.spotless-maven-plugin}</indexFile>
+                        </upToDateChecking>
+                        <formats>
+                            <format>
+                                <!-- XML specific rules -->
+                                <includes>
+                                    <include>src/**/*.xml</include>
+                                </includes>
+                                <trimTrailingWhitespace/>
+                                <endWithNewline/>
+                                <licenseHeader>
+                                    <file>license.xml.header</file>
+                                    <!-- Delimiter is a regex which identifies the "top" of the file i.e. all above it is considered a header -->
+                                    <delimiter><![CDATA[(\n)*^(<[^!?]+|<!DOCTYPE.+)$]]></delimiter>
+                                    <skipLinesMatching><![CDATA[<\?xml.+\?>]]></skipLinesMatching>
+                                </licenseHeader>
+                                <indent>
+                                    <tabs>true</tabs>
+                                    <spacesPerTab>4</spacesPerTab>
+                                </indent>
+                            </format>
+                        </formats>
+                        <!-- define a language-specific format -->
+                        <java>
+                            <toggleOffOn/>
+                            <includes>
+                                <include>src/**/*.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/TypeHelper.java</exclude>
+                                <exclude>**/TypeHelperTest.java</exclude>
+                                <exclude>**/ConcurrentReferenceHashMap.java</exclude>
+                            </excludes>
+                            <indent>
+                                <tabs>true</tabs>
+                                <spacesPerTab>4</spacesPerTab>
+                            </indent>
+
+                            <importOrder>
+                                <!-- you can use an empty string for all the imports you didn't specify explicitly, '|' to join group without blank line, and '\#` prefix for static imports. -->
+                                <order>\#,java,javax,jakarta,org.openjdk.jmh,org.hibernate,org.hibernate.testing,org.hibernate.test,org.junit,org.jboss,com,javafx.beans,</order>
+                            </importOrder>
+                            <trimTrailingWhitespace/>
+                            <endWithNewline/>
+                            <eclipse>
+                                <!-- optional version of Eclipse Formatter -->
+                                <!-- <version>4.26</version> -->
+                                <file>hibernate_validator_style.xml</file>
+                            </eclipse>
+                            <removeUnusedImports>
+                                <!-- default one fails to process the classes -->
+                                <engine>cleanthat-javaparser-unnecessaryimport</engine>
+                            </removeUnusedImports>
+                            <licenseHeader>
+                                <file>license.java.header</file>
+                                <!-- Delimiter is a regex which identifies the "top" of the file i.e. all above it is considered a header -->
+                                <delimiter>(\n)*^(\/\/tag.+|\/\/spotless.+|package .+;|//.+)$</delimiter>
+                            </licenseHeader>
+                            <replaceRegex>
+                                <name>Remove wildcard imports</name>
+                                <searchRegex>^import\s+[^\*\s]+\*;$</searchRegex>
+                                <replacement>$1</replacement>
+                            </replaceRegex>
+                        </java>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate.validator</groupId>
+                            <artifactId>hibernate-validator-build-config</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.moditect</groupId>
