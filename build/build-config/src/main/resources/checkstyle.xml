@@ -14,69 +14,19 @@
 
 	<module name="TreeWalker">
 
+		<!-- cannot do with spotless but then is it really needed ? -->
 		<module name="RegexpSinglelineJava">
 			<!-- do not allow a package declaration that contains ".target." or "target;"  -->
 			<property name="format" value="^package .*\.target[\.;]"/>
 			<property name="message" value="Do not use &quot;target&quot; as package name element"/>
 		</module>
 
-		<!-- Use tabs -->
-		<module name="RegexpSinglelineJava">
-			<property name="format" value="^ +\t*\S" />
-			<property name="message" value="Line has leading space characters; indentation should be performed with tabs only." />
-			<property name="ignoreComments" value="true" />
-		</module>
-
-		<!-- Check parentheses padding -->
-		<module name="RegexpSinglelineJava">
-			<property name="format" value="^\t+(if|for|while|catch)([^ ])\(" />
-			<property name="message" value="Left parentheses should be preceeded by 1 whitespace" />
-			<property name="ignoreComments" value="true" />
-		</module>
-
-		<module name="RegexpSinglelineJava">
-			<property name="format" value="^\t+(if|for|while) \( .+[^ ]\) \{$" />
-			<property name="message" value="Right parentheses should be preceeded by 1 white space" />
-			<property name="ignoreComments" value="true" />
-		</module>
-
-		<module name="RegexpSinglelineJava">
-			<property name="format" value="^\t+(if|for|while) \([^ $]" />
-			<property name="message" value="Left parentheses should be followed by 1 whitespace" />
-			<property name="ignoreComments" value="true" />
-		</module>
-
-		<module name="RegexpSinglelineJava">
-			<property name="format" value="\)([^ ])\{$" />
-			<property name="message" value="Right parentheses should be followed by 1 white space" />
-			<property name="ignoreComments" value="true" />
-		</module>
-
-		<module name="RegexpSinglelineJava">
-			<property name="format" value="catch \([^\w]" />
-			<property name="message" value="'catch' clause does not require white space after left parentheses" />
-			<property name="ignoreComments" value="true" />
-		</module>
-
-		<module name="RegexpSinglelineJava">
-			<property name="format" value="catch \(.*\s\) \{" />
-			<property name="message" value="'catch' clause does not require white space before right parentheses" />
-			<property name="ignoreComments" value="true" />
-		</module>
-
-		<module name="RegexpSinglelineJava">
-			<property name="format" value="\)\s+;$" />
-			<property name="message" value="Unecessary whitespace after parentheses" />
-			<property name="ignoreComments" value="true" />
-		</module>
-
-		<!-- Checks for imports -->
-		<module name="AvoidStarImport"/>
-
 		<!-- Checks for common coding problems -->
+		<!-- didn't find any alternatives for these two: -->
 		<module name="EqualsHashCode" />
 		<module name="IllegalInstantiation" />
 
+		<!-- didn't find any alternatives for this next group: -->
 		<!-- Miscellaneous other checks. -->
 		<module name="ModifierOrder" />
 		<module name="PackageAnnotation" />
@@ -93,6 +43,7 @@
 		<module name="EqualsAvoidNull" />
 		<module name="UpperEll"/>
 
+		<!-- didn't find any alternatives for this next group: -->
 		<!-- not checking for Constructor here: -->
 		<module name="RedundantModifier">
 			<property name="tokens"
@@ -100,46 +51,11 @@
 		</module>
 		<module name="MissingOverride" />
 
-		<module name="MethodParamPad">
-			<property name="option" value="nospace" />
-			<property name="allowLineBreaks" value="false" />
-		</module>
-
-		<!-- Checks for blocks. You know, those {}'s, not doing this for methods because of 1 line getters/setters-->
-		<module name="LeftCurly">
-			<property name="option" value="eol"/>
-			<property name="tokens" value="INTERFACE_DEF, CLASS_DEF, ANNOTATION_DEF, ENUM_DEF, CTOR_DEF,
-						ENUM_CONSTANT_DEF, LITERAL_WHILE, LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY,
-						LITERAL_SYNCHRONIZED, LITERAL_SWITCH, LITERAL_DO, LITERAL_IF, LITERAL_ELSE, LITERAL_FOR,
-						STATIC_INIT, OBJBLOCK" />
-		</module>
-		<!-- not doing this for methods because of 1 line getters/setters -->
-		<module name="RightCurly">
-			<property name="option" value="alone"/>
-			<property name="tokens" value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF,
-						LITERAL_ELSE, CLASS_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE,
-						STATIC_INIT, INSTANCE_INIT" />
-		</module>
-
-		<module name="ParenPad">
-			<property name="tokens" value="CTOR_CALL, METHOD_CALL, SUPER_CTOR_CALL, LITERAL_FOR, LITERAL_IF,
-						LITERAL_WHILE, LITERAL_SWITCH, LITERAL_NEW, RESOURCE_SPECIFICATION"/>
-			<property name="option" value="space"/>
-		</module>
-
 		<module name="SuppressionCommentFilter" />
-	</module>
-
-	<module name="RegexpSingleline">
-		<property name="format" value="\s+$" />
-		<property name="message" value="White spaces at the end of line" />
 	</module>
 
 	<module name="SuppressionFilter">
 		<property name="file" value="/suppressions.xml" />
 	</module>
-
-	<!-- Checks that a file ends with a new line  -->
-	<module name="NewlineAtEndOfFile"/>
 
 </module>
