@@ -1,4 +1,3 @@
-
 /*
  * Hibernate Validator, declare and validate application constraints
  *
