@@ -11,7 +11,7 @@
         xsi:schemaLocation="https://jakarta.ee/xml/ns/validation/mapping
             https://jakarta.ee/xml/ns/validation/validation-mapping-3.0.xsd"
         version="3.0">
-        
+
     <default-package>org.hibernate.validator.internal.xml</default-package>
 
     <bean class="org.hibernate.validator.test.internal.xml.Child" ignore-annotations="false">
