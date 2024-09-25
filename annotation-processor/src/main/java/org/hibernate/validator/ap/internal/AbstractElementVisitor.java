@@ -62,4 +62,3 @@ public class AbstractElementVisitor<T, V> extends ElementKindVisitor14<T, V> {
 		messager.reportWarnings( warnings );
 	}
 }
-

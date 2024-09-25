@@ -42,4 +42,3 @@ public @interface NonSelfPublishing {
 	}
 	//end::include[]
 }
-

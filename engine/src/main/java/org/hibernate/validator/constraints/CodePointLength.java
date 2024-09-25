@@ -114,4 +114,3 @@ public @interface CodePointLength {
 		}
 	}
 }
-
