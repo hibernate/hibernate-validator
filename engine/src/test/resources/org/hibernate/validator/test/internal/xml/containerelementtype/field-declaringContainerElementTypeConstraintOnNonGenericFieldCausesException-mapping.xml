@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <constraint-mappings
         xmlns="https://jakarta.ee/xml/ns/validation/mapping"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -7,7 +8,8 @@
 
     <default-package>org.hibernate.validator.internal.xml.containerelementtype</default-package>
 
-    <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForFieldXmlMappingTest$FishTank" ignore-annotations="false">
+    <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForFieldXmlMappingTest$FishTank"
+          ignore-annotations="false">
         <field name="size">
             <container-element-type type-argument-index="1">
             </container-element-type>

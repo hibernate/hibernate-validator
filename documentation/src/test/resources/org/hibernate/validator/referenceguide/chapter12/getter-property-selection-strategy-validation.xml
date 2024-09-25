@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <validation-config
         xmlns="https://jakarta.ee/xml/ns/validation/configuration"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
