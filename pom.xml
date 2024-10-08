@@ -246,8 +246,8 @@
         <version.deploy.plugin>3.1.3</version.deploy.plugin>
         <version.enforcer.plugin>3.5.0</version.enforcer.plugin>
         <!-- Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting. -->
-        <version.forbiddenapis.plugin>3.7</version.forbiddenapis.plugin>
-        <version.gmavenplus.plugin>3.0.2</version.gmavenplus.plugin>
+        <version.forbiddenapis.plugin>3.8</version.forbiddenapis.plugin>
+        <version.gmavenplus.plugin>4.0.1</version.gmavenplus.plugin>
         <version.gpg.plugin>3.2.7</version.gpg.plugin>
         <version.install.plugin>3.1.3</version.install.plugin>
         <version.japicmp.plugin>0.23.0</version.japicmp.plugin>
@@ -260,8 +260,8 @@
         <version.shade.plugin>3.6.0</version.shade.plugin>
         <version.sigtest.plugin>2.3</version.sigtest.plugin>
         <version.source.plugin>3.3.1</version.source.plugin>
-        <version.surefire.plugin>3.5.0</version.surefire.plugin>
-        <version.surefire.plugin.java-version.asm>9.7</version.surefire.plugin.java-version.asm>
+        <version.surefire.plugin>3.5.1</version.surefire.plugin>
+        <version.surefire.plugin.java-version.asm>9.7.1</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
