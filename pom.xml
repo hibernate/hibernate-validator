@@ -393,6 +393,7 @@
 
         <!-- Formatting -->
         <format.skip>false</format.skip>
+        <goal.spotless-maven-plugin>apply</goal.spotless-maven-plugin>
     </properties>
 
     <dependencyManagement>
@@ -1440,6 +1441,18 @@
                             <version>${project.version}</version>
                         </dependency>
                     </dependencies>
+                    <executions>
+                        <execution>
+                            <id>check-apply-formatting</id>
+                            <configuration>
+                                <skip>${format.skip}</skip>
+                            </configuration>
+                            <phase>process-sources</phase>
+                            <goals>
+                                <goal>${goal.spotless-maven-plugin}</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.moditect</groupId>
@@ -1790,6 +1803,7 @@
         <profile>
             <id>ci-build</id>
             <properties>
+                <goal.spotless-maven-plugin>check</goal.spotless-maven-plugin>
             </properties>
         </profile>
         <profile>
