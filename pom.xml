@@ -1516,8 +1516,7 @@
                             </indent>
 
                             <importOrder>
-                                <!-- you can use an empty string for all the imports you didn't specify explicitly, '|' to join group without blank line, and '\#` prefix for static imports. -->
-                                <order>\#,java,javax,jakarta,org.openjdk.jmh,org.hibernate,org.hibernate.testing,org.hibernate.test,org.junit,org.jboss,com,javafx.beans,</order>
+                                <file>hibernate_validator_style.importorder</file>
                             </importOrder>
                             <trimTrailingWhitespace/>
                             <endWithNewline/>
