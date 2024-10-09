@@ -16,5 +16,5 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  */
 public interface BazDefaultGroupSequenceProvider extends DefaultGroupSequenceProvider<Baz> {
 	@Override
-	List<Class<?>> getValidationGroups(GroupSequenceProviderDefinition.Baz object);
+	List<Class<?>> getValidationGroups(Class<?> klass, GroupSequenceProviderDefinition.Baz object);
 }

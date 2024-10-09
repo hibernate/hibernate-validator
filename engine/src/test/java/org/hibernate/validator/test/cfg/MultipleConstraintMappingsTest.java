@@ -178,7 +178,7 @@ public class MultipleConstraintMappingsTest {
 
 	public static class MarathonDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<Marathon> {
 		@Override
-		public List<Class<?>> getValidationGroups(Marathon object) {
+		public List<Class<?>> getValidationGroups(Class<?> klass, Marathon object) {
 			return Arrays.<Class<?>>asList( Foo.class, Marathon.class );
 		}
 	}

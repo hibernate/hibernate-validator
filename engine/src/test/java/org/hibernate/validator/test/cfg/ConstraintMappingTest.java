@@ -628,21 +628,21 @@ public class ConstraintMappingTest {
 
 	public static class MarathonDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<Marathon> {
 		@Override
-		public List<Class<?>> getValidationGroups(Marathon object) {
+		public List<Class<?>> getValidationGroups(Class<?> klass, Marathon object) {
 			return Arrays.<Class<?>>asList( Foo.class, Marathon.class );
 		}
 	}
 
 	public static class BDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<B> {
 		@Override
-		public List<Class<?>> getValidationGroups(B object) {
+		public List<Class<?>> getValidationGroups(Class<?> klass, B object) {
 			return Arrays.<Class<?>>asList( Foo.class, B.class );
 		}
 	}
 
 	public static class ADefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<A> {
 		@Override
-		public List<Class<?>> getValidationGroups(A object) {
+		public List<Class<?>> getValidationGroups(Class<?> klass, A object) {
 			return Arrays.<Class<?>>asList( Foo.class, A.class );
 		}
 	}
