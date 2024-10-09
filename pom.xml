@@ -1748,7 +1748,6 @@
             <properties>
                 <maven-deploy-plugin.skip>false</maven-deploy-plugin.skip>
                 <skipTests>true</skipTests>
-                <gpg.skip>true</gpg.skip>
                 <forbiddenapis.skip>true</forbiddenapis.skip>
                 <checkstyle.skip>true</checkstyle.skip>
                 <skip.wildfly.patch.unpack.server>true</skip.wildfly.patch.unpack.server>
