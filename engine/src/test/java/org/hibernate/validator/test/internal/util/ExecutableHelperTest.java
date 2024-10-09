@@ -117,7 +117,7 @@ public class ExecutableHelperTest {
 
 	@Test
 	public void methodWithNarrowedParameterTypeDoesNotOverride() throws Exception {
-		Method methodFromBase = SimpleServiceBase.class.getDeclaredMethods()[0];
+		Method methodFromBase = SimpleServiceBase.class.getDeclaredMethod( "doSomething", Number.class );
 		Method methodFromImpl = SimpleServiceImpl1.class.getDeclaredMethod( "doSomething", Number.class );
 
 		assertThat( executableHelper.overrides( methodFromImpl, methodFromBase ) ).isTrue();
@@ -129,7 +129,7 @@ public class ExecutableHelperTest {
 
 	@Test
 	public void methodWithIntermediateClass() throws Exception {
-		Method methodFromBase = SimpleServiceBase.class.getDeclaredMethods()[0];
+		Method methodFromBase = SimpleServiceBase.class.getDeclaredMethod( "doSomething", Number.class );
 		Method methodFromImpl = SimpleServiceImpl2.class.getDeclaredMethod( "doSomething", Number.class );
 
 		assertThat( executableHelper.overrides( methodFromImpl, methodFromBase ) ).isTrue();
@@ -141,7 +141,7 @@ public class ExecutableHelperTest {
 
 	@Test
 	public void methodWithGenerics() throws Exception {
-		Method methodFromBase = GenericServiceBase.class.getDeclaredMethods()[0];
+		Method methodFromBase = GenericServiceBase.class.getDeclaredMethod( "doSomething", Object.class );
 		Method methodFromImpl = GenericServiceImpl1.class.getDeclaredMethod( "doSomething", Number.class );
 
 		assertThat( executableHelper.overrides( methodFromImpl, methodFromBase ) ).isTrue();
@@ -153,7 +153,7 @@ public class ExecutableHelperTest {
 
 	@Test
 	public void methodWithGenericsAndIntermediateClass() throws Exception {
-		Method methodFromBase = GenericServiceBase.class.getDeclaredMethods()[0];
+		Method methodFromBase = GenericServiceBase.class.getDeclaredMethod( "doSomething", Object.class );
 		Method methodFromImpl = GenericServiceImpl2.class.getDeclaredMethod( "doSomething", Number.class );
 
 		assertThat( executableHelper.overrides( methodFromImpl, methodFromBase ) ).isTrue();
@@ -165,10 +165,10 @@ public class ExecutableHelperTest {
 
 	@Test
 	public void methodWithGenericsAndMultipleIntermediateClasses() throws Exception {
-		Method methodFromBase = GenericServiceBase.class.getDeclaredMethods()[0];
+		Method methodFromBase = GenericServiceBase.class.getDeclaredMethod( "doSomething", Object.class );
 		Method methodFromImpl = GenericServiceImpl3.class.getDeclaredMethod( "doSomething", Number.class );
 
-		assertThat( executableHelper.overrides( methodFromImpl, methodFromBase ) ).isTrue();
+		assertThat( executableHelper.overrides( methodFromImpl, methodFromBase ) ).as( methodFromImpl + " : " + methodFromBase ).isTrue();
 
 		methodFromImpl = GenericServiceImpl2.class.getDeclaredMethod( "doSomething", Integer.class );
 
@@ -177,7 +177,7 @@ public class ExecutableHelperTest {
 
 	@Test
 	public void methodWithParameterizedSubType() throws Exception {
-		Method methodFromBase = GenericServiceBase.class.getDeclaredMethods()[0];
+		Method methodFromBase = GenericServiceBase.class.getDeclaredMethod( "doSomething", Object.class );
 		Method methodFromImpl = ParameterizedSubType.class.getDeclaredMethod( "doSomething", Object.class );
 
 		assertThat( executableHelper.overrides( methodFromImpl, methodFromBase ) ).isTrue();
