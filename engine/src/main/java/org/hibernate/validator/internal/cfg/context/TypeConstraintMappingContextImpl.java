@@ -109,7 +109,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 		Optional<JavaBeanField> foundField = javaBeanHelper.findDeclaredField( beanClass, property );
 
-		if ( !foundField.isPresent() ) {
+		if ( foundField.isEmpty() ) {
 			throw LOG.getUnableToFindPropertyWithAccessException( beanClass, property, ElementType.FIELD );
 		}
 
@@ -131,7 +131,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 		Optional<JavaBeanGetter> foundGetter = javaBeanHelper.findDeclaredGetter( beanClass, property );
 
-		if ( !foundGetter.isPresent() ) {
+		if ( foundGetter.isEmpty() ) {
 			throw LOG.getUnableToFindPropertyWithAccessException( beanClass, property, ElementType.METHOD );
 		}
 
@@ -153,7 +153,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 		Optional<JavaBeanMethod> foundMethod = javaBeanHelper.findDeclaredMethod( beanClass, name, parameterTypes );
 
-		if ( !foundMethod.isPresent() ) {
+		if ( foundMethod.isEmpty() ) {
 			throw LOG.getBeanDoesNotContainMethodException( beanClass, name, parameterTypes );
 		}
 
@@ -177,7 +177,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
 		Optional<JavaBeanConstructor> foundConstructor = javaBeanHelper.findDeclaredConstructor( beanClass, parameterTypes );
 
-		if ( !foundConstructor.isPresent() ) {
+		if ( foundConstructor.isEmpty() ) {
 			throw LOG.getBeanDoesNotContainConstructorException(
 					beanClass,
 					parameterTypes
