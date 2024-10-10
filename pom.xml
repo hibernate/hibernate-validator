@@ -254,7 +254,6 @@
         <version.jar.plugin>3.4.2</version.jar.plugin>
         <version.jqassistant.plugin>2.4.0</version.jqassistant.plugin>
         <version.javadoc.plugin>3.10.1</version.javadoc.plugin>
-        <version.license.plugin>4.6</version.license.plugin>
         <version.release.plugin>3.1.1</version.release.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
         <version.shade.plugin>3.6.0</version.shade.plugin>
@@ -267,10 +266,9 @@
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
         <version.moditect.plugin>1.2.2.Final</version.moditect.plugin>
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
-        <version.impsort-maven-plugin>1.12.0</version.impsort-maven-plugin>
-        <version.formatter-maven-plugin>2.24.1</version.formatter-maven-plugin>
         <version.versions.plugin>2.17.1</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
+        <version.spotless-maven-plugin>2.43.0</version.spotless-maven-plugin>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
@@ -395,8 +393,7 @@
 
         <!-- Formatting -->
         <format.skip>false</format.skip>
-        <goal.impsort-maven-plugin>sort</goal.impsort-maven-plugin>
-        <goal.formatter-maven-plugin>format</goal.formatter-maven-plugin>
+        <goal.spotless-maven-plugin>apply</goal.spotless-maven-plugin>
     </properties>
 
     <dependencyManagement>
@@ -643,10 +640,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -904,51 +897,6 @@
                                     <bundledSignature>jdk-deprecated</bundledSignature>
                                 </bundledSignatures>
                             </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>${version.license.plugin}</version>
-                    <configuration>
-                        <licenseSets>
-                            <licenseSet>
-                                <header>${hibernate-validator-parent.path}/build/build-config/src/main/resources/license.header</header>
-                                <excludes>
-                                    <!-- Next two classes are copied from other project and have different headers -->
-                                    <exclude>**/org/hibernate/validator/internal/util/TypeHelper.java</exclude>
-                                    <exclude>**/org/hibernate/validator/test/internal/util/TypeHelperTest.java</exclude>
-                                    <exclude>**/settings-example.xml</exclude>
-                                    <exclude>**/src/test/resources/org/hibernate/validator/referenceguide/**/*.*</exclude>
-                                    <exclude>**/org/hibernate/validator/referenceguide/**/*.*</exclude>
-                                    <exclude>**/src/test/resources/org/hibernate/validator/test/internal/xml/**/*.xml</exclude>
-                                    <exclude>.mvn/**</exclude>
-                                    <exclude>**/generated-sources/**</exclude>
-                                    <exclude>**/javadoc-bundle-options/**</exclude>
-                                </excludes>
-                                <includes>
-                                    <include>**/*.java</include>
-                                    <include>**/*.xml</include>
-                                </includes>
-                            </licenseSet>
-                        </licenseSets>
-                        <strictCheck>true</strictCheck>
-                        <headerDefinitions>
-                            <headerDefinition>${hibernate-validator-parent.path}/build/build-config/src/main/resources/java-header-style.xml</headerDefinition>
-                            <headerDefinition>${hibernate-validator-parent.path}/build/build-config/src/main/resources/xml-header-style.xml</headerDefinition>
-                        </headerDefinitions>
-                        <mapping>
-                            <java>JAVA_CLASS_STYLE</java>
-                            <xml>XML_FILE_STYLE</xml>
-                        </mapping>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>license-headers</id>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
                         </execution>
                     </executions>
                 </plugin>
@@ -1416,33 +1364,76 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>net.revelc.code</groupId>
-                    <artifactId>impsort-maven-plugin</artifactId>
-                    <version>${version.impsort-maven-plugin}</version>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>${version.spotless-maven-plugin}</version>
                     <configuration>
-                        <!-- store outside of target to speed up formatting when mvn clean is used -->
-                        <cachedir>.cache/impsort-maven-plugin-${version.impsort-maven-plugin}</cachedir>
-                        <groups>org.openjdk.jmh.,java.,javax.,jakarta.,org.hibernate., org.hibernate.testing., org.hibernate.test., org.junit., org.jboss., com., *</groups>
-                        <staticGroups>*</staticGroups>
-                        <!-- To make static imports go on top: -->
-                        <staticAfter>false</staticAfter>
-                        <skip>${format.skip}</skip>
-                        <removeUnused>true</removeUnused>
+                        <upToDateChecking>
+                            <enabled>true</enabled>
+                            <indexFile>.cache/spotless-index-${version.spotless-maven-plugin}</indexFile>
+                        </upToDateChecking>
+                        <formats>
+                            <format>
+                                <!-- XML specific rules -->
+                                <includes>
+                                    <include>src/**/*.xml</include>
+                                </includes>
+                                <trimTrailingWhitespace/>
+                                <endWithNewline/>
+                                <licenseHeader>
+                                    <file>license.xml.header</file>
+                                    <!-- Delimiter is a regex which identifies the "top" of the file i.e. all above it is considered a header -->
+                                    <delimiter><![CDATA[(\n)*^(<[^!?]+|<!DOCTYPE.+)$]]></delimiter>
+                                    <skipLinesMatching><![CDATA[<\?xml.+\?>]]></skipLinesMatching>
+                                </licenseHeader>
+                                <indent>
+                                    <tabs>true</tabs>
+                                    <spacesPerTab>4</spacesPerTab>
+                                </indent>
+                            </format>
+                        </formats>
+                        <!-- define a language-specific format -->
+                        <java>
+                            <toggleOffOn/>
+                            <includes>
+                                <include>src/**/*.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/TypeHelper.java</exclude>
+                                <exclude>**/TypeHelperTest.java</exclude>
+                                <exclude>**/ConcurrentReferenceHashMap.java</exclude>
+                            </excludes>
+                            <indent>
+                                <tabs>true</tabs>
+                                <spacesPerTab>4</spacesPerTab>
+                            </indent>
+
+                            <importOrder>
+                                <file>hibernate_validator_style.importorder</file>
+                            </importOrder>
+                            <trimTrailingWhitespace/>
+                            <endWithNewline/>
+                            <eclipse>
+                                <!-- optional version of Eclipse Formatter -->
+                                <!-- <version>4.26</version> -->
+                                <file>hibernate_validator_style.xml</file>
+                            </eclipse>
+                            <removeUnusedImports>
+                                <!-- default one fails to process the classes -->
+                                <engine>cleanthat-javaparser-unnecessaryimport</engine>
+                            </removeUnusedImports>
+                            <licenseHeader>
+                                <file>license.java.header</file>
+                                <!-- Delimiter is a regex which identifies the "top" of the file i.e. all above it is considered a header -->
+                                <delimiter>(\n)*^(\/\/tag.+|\/\/spotless.+|package .+;|//.+)$</delimiter>
+                            </licenseHeader>
+                            <replaceRegex>
+                                <name>Remove wildcard imports</name>
+                                <searchRegex>^import\s+[^\*\s]+\*;$</searchRegex>
+                                <replacement>$1</replacement>
+                            </replaceRegex>
+                        </java>
                     </configuration>
-                    <executions>
-                        <execution>
-                            <id>import-sorting</id>
-                            <goals>
-                                <goal>${goal.impsort-maven-plugin}</goal>
-                            </goals>
-                            <phase>process-sources</phase>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>net.revelc.code.formatter</groupId>
-                    <artifactId>formatter-maven-plugin</artifactId>
-                    <version>${version.formatter-maven-plugin}</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.hibernate.validator</groupId>
@@ -1450,22 +1441,16 @@
                             <version>${project.version}</version>
                         </dependency>
                     </dependencies>
-                    <configuration>
-                        <!-- store outside of target to speed up formatting when mvn clean is used -->
-                        <cachedir>.cache/formatter-maven-plugin-${version.formatter-maven-plugin}</cachedir>
-                        <configFile>hibernate_validator_style.xml</configFile>
-                        <skip>${format.skip}</skip>
-                        <removeTrailingWhitespace>true</removeTrailingWhitespace>
-                        <skipJsonFormatting>true</skipJsonFormatting>
-                        <skipHtmlFormatting>true</skipHtmlFormatting>
-                    </configuration>
                     <executions>
                         <execution>
-                            <id>code-formatting</id>
+                            <id>a</id>
+                            <configuration>
+                                <skip>${format.skip}</skip>
+                            </configuration>
+                            <phase>verify</phase>
                             <goals>
-                                <goal>${goal.formatter-maven-plugin}</goal>
+                                <goal>${goal.spotless-maven-plugin}</goal>
                             </goals>
-                            <phase>process-sources</phase>
                         </execution>
                     </executions>
                 </plugin>
@@ -1776,7 +1761,6 @@
             <properties>
                 <maven-deploy-plugin.skip>false</maven-deploy-plugin.skip>
                 <skipTests>true</skipTests>
-                <gpg.skip>true</gpg.skip>
                 <forbiddenapis.skip>true</forbiddenapis.skip>
                 <checkstyle.skip>true</checkstyle.skip>
                 <skip.wildfly.patch.unpack.server>true</skip.wildfly.patch.unpack.server>
@@ -1819,8 +1803,7 @@
         <profile>
             <id>ci-build</id>
             <properties>
-                <goal.impsort-maven-plugin>check</goal.impsort-maven-plugin>
-                <goal.formatter-maven-plugin>validate</goal.formatter-maven-plugin>
+                <goal.spotless-maven-plugin>check</goal.spotless-maven-plugin>
             </properties>
         </profile>
         <profile>

@@ -1,0 +1,16 @@
+#Organize Import Order
+# Import this file in Window -> Preferences -> Java -> Code Style -> Organize Imports -> Import...
+# java,javax,jakarta,org.openjdk.jmh,org.hibernate,org.hibernate.testing,org.hibernate.test,org.junit,org.jboss,com,javafx.beans
+0=\#
+1=java
+2=javax
+3=jakarta
+4=org.openjdk.jmh
+5=org.hibernate
+6=org.hibernate.testing
+7=org.hibernate.test
+8=org.junit
+9=org.jboss
+10=com
+11=javafx.beans
+12=

@@ -81,5 +81,3 @@ public class TestEntity {
 	@Valid
 	private TestEntity testEntity;
 }
-
-

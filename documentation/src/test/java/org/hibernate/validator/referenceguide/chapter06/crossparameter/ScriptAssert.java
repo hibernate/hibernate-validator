@@ -1,3 +1,10 @@
+/*
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
+//spotless:off
 //tag::include[]
 package org.hibernate.validator.referenceguide.chapter06.crossparameter;
 
@@ -13,6 +20,7 @@ import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintTarget;
 import jakarta.validation.Payload;
 
+//spotless:on
 //tag::include[]
 @Constraint(validatedBy = {
 		ScriptAssertObjectValidator.class,

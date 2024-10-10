@@ -1,114 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Hibernate Validator, declare and validate application constraints
-  ~
-  ~ License: Apache License, Version 2.0
-  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
-  -->
+~ Hibernate Validator, declare and validate application constraints
+~
+~ License: Apache License, Version 2.0
+~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+-->
 <constraint-mappings
-        xmlns="https://jakarta.ee/xml/ns/validation/mapping"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation=
-                "https://jakarta.ee/xml/ns/validation/mapping https://jakarta.ee/xml/ns/validation/validation-mapping-3.0.xsd" version="3.0">
+		xmlns="https://jakarta.ee/xml/ns/validation/mapping"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation=
+				"https://jakarta.ee/xml/ns/validation/mapping https://jakarta.ee/xml/ns/validation/validation-mapping-3.0.xsd" version="3.0">
 
-    <default-package>org.hibernate.validator.test.internal.engine.groups.conversion</default-package>
+	<default-package>org.hibernate.validator.test.internal.engine.groups.conversion</default-package>
 
-    <bean class="AbstractGroupConversionTest$User1" ignore-annotations="true">
-        <field name="addresses">
-            <valid/>
-            <convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicPostal"/>
-        </field>
-    </bean>
+	<bean class="AbstractGroupConversionTest$User1" ignore-annotations="true">
+		<field name="addresses">
+			<valid/>
+			<convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicPostal"/>
+		</field>
+	</bean>
 
-    <bean class="AbstractGroupConversionTest$User2" ignore-annotations="true">
-        <getter name="addresses">
-            <valid/>
-            <convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicPostal"/>
-        </getter>
-    </bean>
+	<bean class="AbstractGroupConversionTest$User2" ignore-annotations="true">
+		<getter name="addresses">
+			<valid/>
+			<convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicPostal"/>
+		</getter>
+	</bean>
 
-    <bean class="AbstractGroupConversionTest$User3" ignore-annotations="true">
-        <getter name="addresses">
-            <valid/>
-            <convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicPostal"/>
-            <convert-group from="AbstractGroupConversionTest$Complete" to="AbstractGroupConversionTest$FullPostal"/>
-        </getter>
-    </bean>
+	<bean class="AbstractGroupConversionTest$User3" ignore-annotations="true">
+		<getter name="addresses">
+			<valid/>
+			<convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicPostal"/>
+			<convert-group from="AbstractGroupConversionTest$Complete" to="AbstractGroupConversionTest$FullPostal"/>
+		</getter>
+	</bean>
 
-    <bean class="AbstractGroupConversionTest$User4" ignore-annotations="true">
-        <getter name="addresses">
-            <valid/>
-            <convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicPostal"/>
-            <convert-group from="AbstractGroupConversionTest$Complete" to="AbstractGroupConversionTest$FullPostal"/>
-        </getter>
-    </bean>
+	<bean class="AbstractGroupConversionTest$User4" ignore-annotations="true">
+		<getter name="addresses">
+			<valid/>
+			<convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicPostal"/>
+			<convert-group from="AbstractGroupConversionTest$Complete" to="AbstractGroupConversionTest$FullPostal"/>
+		</getter>
+	</bean>
 
-    <bean class="AbstractGroupConversionTest$User5" ignore-annotations="true">
-        <getter name="addresses">
-            <valid/>
-            <convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicPostal"/>
-        </getter>
-        <getter name="phoneNumber">
-            <valid/>
-            <convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicNumber"/>
-        </getter>
-    </bean>
+	<bean class="AbstractGroupConversionTest$User5" ignore-annotations="true">
+		<getter name="addresses">
+			<valid/>
+			<convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicPostal"/>
+		</getter>
+		<getter name="phoneNumber">
+			<valid/>
+			<convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicNumber"/>
+		</getter>
+	</bean>
 
-    <bean class="AbstractGroupConversionTest$User6" ignore-annotations="true">
-        <method name="setAddresses">
-            <parameter type="java.util.List">
-                <valid/>
-                <convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicPostal"/>
-            </parameter>
-        </method>
-    </bean>
+	<bean class="AbstractGroupConversionTest$User6" ignore-annotations="true">
+		<method name="setAddresses">
+			<parameter type="java.util.List">
+				<valid/>
+				<convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicPostal"/>
+			</parameter>
+		</method>
+	</bean>
 
-    <bean class="AbstractGroupConversionTest$User7" ignore-annotations="true">
-        <method name="findAddresses">
-            <return-value>
-                <valid/>
-                <convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicPostal"/>
-            </return-value>
-        </method>
-    </bean>
+	<bean class="AbstractGroupConversionTest$User7" ignore-annotations="true">
+		<method name="findAddresses">
+			<return-value>
+				<valid/>
+				<convert-group from="jakarta.validation.groups.Default" to="AbstractGroupConversionTest$BasicPostal"/>
+			</return-value>
+		</method>
+	</bean>
 
-    <bean class="AbstractGroupConversionTest$Address" ignore-annotations="true">
-        <field name="street1">
-            <constraint annotation="jakarta.validation.constraints.NotNull">
-                <groups>
-                    <value>AbstractGroupConversionTest$BasicPostal</value>
-                </groups>
-            </constraint>
-        </field>
-        <field name="street2">
-            <constraint annotation="jakarta.validation.constraints.NotNull">
-            </constraint>
-        </field>
-        <field name="zipCode">
-            <constraint annotation="jakarta.validation.constraints.Size">
-                <groups>
-                    <value>AbstractGroupConversionTest$BasicPostal</value>
-                </groups>
-                <element name="min">3</element>
-            </constraint>
-        </field>
-        <field name="doorCode">
-            <constraint annotation="jakarta.validation.constraints.Size">
-                <groups>
-                    <value>AbstractGroupConversionTest$FullPostal</value>
-                </groups>
-                <element name="max">2</element>
-            </constraint>
-        </field>
-    </bean>
-    <bean class="AbstractGroupConversionTest$PhoneNumber" ignore-annotations="true">
-        <field name="number">
-            <constraint annotation="jakarta.validation.constraints.NotNull">
-                <groups>
-                    <value>AbstractGroupConversionTest$BasicNumber</value>
-                </groups>
-            </constraint>
-        </field>
-    </bean>
+	<bean class="AbstractGroupConversionTest$Address" ignore-annotations="true">
+		<field name="street1">
+			<constraint annotation="jakarta.validation.constraints.NotNull">
+				<groups>
+					<value>AbstractGroupConversionTest$BasicPostal</value>
+				</groups>
+			</constraint>
+		</field>
+		<field name="street2">
+			<constraint annotation="jakarta.validation.constraints.NotNull">
+			</constraint>
+		</field>
+		<field name="zipCode">
+			<constraint annotation="jakarta.validation.constraints.Size">
+				<groups>
+					<value>AbstractGroupConversionTest$BasicPostal</value>
+				</groups>
+				<element name="min">3</element>
+			</constraint>
+		</field>
+		<field name="doorCode">
+			<constraint annotation="jakarta.validation.constraints.Size">
+				<groups>
+					<value>AbstractGroupConversionTest$FullPostal</value>
+				</groups>
+				<element name="max">2</element>
+			</constraint>
+		</field>
+	</bean>
+	<bean class="AbstractGroupConversionTest$PhoneNumber" ignore-annotations="true">
+		<field name="number">
+			<constraint annotation="jakarta.validation.constraints.NotNull">
+				<groups>
+					<value>AbstractGroupConversionTest$BasicNumber</value>
+				</groups>
+			</constraint>
+		</field>
+	</bean>
 
 </constraint-mappings>

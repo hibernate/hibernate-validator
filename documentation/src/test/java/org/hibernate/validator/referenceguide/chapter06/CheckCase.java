@@ -1,3 +1,10 @@
+/*
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
+//spotless:off
 //tag::include[]
 package org.hibernate.validator.referenceguide.chapter06;
 
@@ -19,6 +26,7 @@ import jakarta.validation.Payload;
 
 import org.hibernate.validator.referenceguide.chapter06.CheckCase.List;
 
+//spotless:on
 //tag::include[]
 @Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE, TYPE_USE })
 @Retention(RUNTIME)

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Hibernate Validator, declare and validate application constraints
-  ~
-  ~ License: Apache License, Version 2.0
-  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
-  -->
+~ Hibernate Validator, declare and validate application constraints
+~
+~ License: Apache License, Version 2.0
+~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+-->
 <validation-config xmlns="https://jakarta.ee/xml/ns/validation/configuration"
-                   xsi:schemaLocation="https://jakarta.ee/xml/ns/validation/configuration https://jakarta.ee/xml/ns/validation/validation-configuration-3.0.xsd"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   version="3.0">
+				xsi:schemaLocation="https://jakarta.ee/xml/ns/validation/configuration https://jakarta.ee/xml/ns/validation/validation-configuration-3.0.xsd"
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				version="3.0">
 
-    <!--
-        CustomValidatorFactoryInPersistenceUnitIT requires this config for passing; So if it passes we know
-        validation.xml is applied, in turn letting us know that the custom provider can be used successfully
-    -->
-    <constraint-mapping>META-INF/validation/constraints-magician.xml</constraint-mapping>
-    <property name="hibernate.validator.constraint_mapping_contributors">org.hibernate.validator.integration.wildfly.jpa.WandConstraintMappingContributor</property>
+	<!--
+		CustomValidatorFactoryInPersistenceUnitIT requires this config for passing; So if it passes we know
+		validation.xml is applied, in turn letting us know that the custom provider can be used successfully
+	-->
+	<constraint-mapping>META-INF/validation/constraints-magician.xml</constraint-mapping>
+	<property name="hibernate.validator.constraint_mapping_contributors">org.hibernate.validator.integration.wildfly.jpa.WandConstraintMappingContributor</property>
 </validation-config>

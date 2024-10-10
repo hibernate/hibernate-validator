@@ -35,4 +35,3 @@ public class AssertTrueValidatorTest {
 		assertFalse( constraint.isValid( Boolean.FALSE, null ) );
 	}
 }
-

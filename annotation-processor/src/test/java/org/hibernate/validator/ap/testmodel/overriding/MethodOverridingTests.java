@@ -475,4 +475,3 @@ public class MethodOverridingTests {
 		}
 	}
 }
-

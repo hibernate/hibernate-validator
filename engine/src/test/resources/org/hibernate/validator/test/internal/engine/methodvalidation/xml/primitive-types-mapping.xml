@@ -1,65 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Hibernate Validator, declare and validate application constraints
-  ~
-  ~ License: Apache License, Version 2.0
-  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
-  -->
+~ Hibernate Validator, declare and validate application constraints
+~
+~ License: Apache License, Version 2.0
+~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+-->
 <constraint-mappings
-        xmlns="https://jakarta.ee/xml/ns/validation/mapping"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation=
-                "https://jakarta.ee/xml/ns/validation/mapping https://jakarta.ee/xml/ns/validation/validation-mapping-3.0.xsd" version="3.0">
+		xmlns="https://jakarta.ee/xml/ns/validation/mapping"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation=
+				"https://jakarta.ee/xml/ns/validation/mapping https://jakarta.ee/xml/ns/validation/validation-mapping-3.0.xsd" version="3.0">
 
-    <bean class="org.hibernate.validator.test.internal.engine.methodvalidation.xml.PrimitiveTypesConfiguredInXmlTest$PrimitiveWrapper"
-          ignore-annotations="true">
-        <method name="setBoolean">
-            <parameter type="boolean">
-                <constraint annotation="jakarta.validation.constraints.NotNull"/>
-            </parameter>
-        </method>
+	<bean class="org.hibernate.validator.test.internal.engine.methodvalidation.xml.PrimitiveTypesConfiguredInXmlTest$PrimitiveWrapper"
+		ignore-annotations="true">
+		<method name="setBoolean">
+			<parameter type="boolean">
+				<constraint annotation="jakarta.validation.constraints.NotNull"/>
+			</parameter>
+		</method>
 
-        <method name="setChar">
-            <parameter type="char">
-                <constraint annotation="jakarta.validation.constraints.NotNull"/>
-            </parameter>
-        </method>
+		<method name="setChar">
+			<parameter type="char">
+				<constraint annotation="jakarta.validation.constraints.NotNull"/>
+			</parameter>
+		</method>
 
-        <method name="setDouble">
-            <parameter type="double">
-                <constraint annotation="jakarta.validation.constraints.NotNull"/>
-            </parameter>
-        </method>
+		<method name="setDouble">
+			<parameter type="double">
+				<constraint annotation="jakarta.validation.constraints.NotNull"/>
+			</parameter>
+		</method>
 
-        <method name="setFloat">
-            <parameter type="float">
-                <constraint annotation="jakarta.validation.constraints.NotNull"/>
-            </parameter>
-        </method>
+		<method name="setFloat">
+			<parameter type="float">
+				<constraint annotation="jakarta.validation.constraints.NotNull"/>
+			</parameter>
+		</method>
 
-        <method name="setLong">
-            <parameter type="long">
-                <constraint annotation="jakarta.validation.constraints.NotNull"/>
-            </parameter>
-        </method>
+		<method name="setLong">
+			<parameter type="long">
+				<constraint annotation="jakarta.validation.constraints.NotNull"/>
+			</parameter>
+		</method>
 
-        <method name="setInt">
-            <parameter type="int">
-                <constraint annotation="jakarta.validation.constraints.NotNull"/>
-            </parameter>
-        </method>
+		<method name="setInt">
+			<parameter type="int">
+				<constraint annotation="jakarta.validation.constraints.NotNull"/>
+			</parameter>
+		</method>
 
-        <method name="setShort">
-            <parameter type="short">
-                <constraint annotation="jakarta.validation.constraints.NotNull"/>
-            </parameter>
-        </method>
+		<method name="setShort">
+			<parameter type="short">
+				<constraint annotation="jakarta.validation.constraints.NotNull"/>
+			</parameter>
+		</method>
 
-        <method name="setByte">
-            <parameter type="byte">
-                <constraint annotation="jakarta.validation.constraints.NotNull"/>
-            </parameter>
-        </method>
+		<method name="setByte">
+			<parameter type="byte">
+				<constraint annotation="jakarta.validation.constraints.NotNull"/>
+			</parameter>
+		</method>
 
-    </bean>
+	</bean>
 </constraint-mappings>

@@ -32,6 +32,7 @@ import org.hibernate.validator.testutils.CandidateForTck;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
