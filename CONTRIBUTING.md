@@ -59,13 +59,32 @@ Code away...
 
 ## Formatting rules and style conventions
 
-The Hibernate family projects share the same style conventions. You can download the appropriate configuration
-files for your IDE from [the IDE codestyles GitHub repository](https://github.com/hibernate/hibernate-ide-codestyles).
+The project build comes with preconfigured plugins that apply automatic formatting/sorting of imports and
+a set of other checks. Running a simple build should automatically apply all the formatting rules and checks:
 
-You can very quickly check that you have respected the formatting rules by running Checkstyle:
 ```shell
-mvn checkstyle:check
+mvn clean verify
 ```
+
+Alternatively, if only applying the formatting is required, you could run the next command:
+
+```shell
+mvn spotless:apply checkstyle:check
+```
+
+---
+**NOTE**: running the above command requires the `org.hibernate.validator:hibernate-validator-build-config`
+being available. If it is a first time building the project you may need to execute:
+```shell
+mvn clean install -am -pl build/build-config
+```
+---
+
+The project comes with formatting files located in:
+- [hibernate_validator_style.xml](build/build-config/src/main/resources/hibernate_validator_style.xml)
+- [hibernate_validator_style.importorder](build/build-config/src/main/resources/hibernate_validator_style.importorder)
+
+These files can be used in the IDE if applying formatting as-you-code within the IDE is something you'd prefer.
 
 ## Commit
 
