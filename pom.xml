@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Hibernate Validator, declare and validate application constraints
-  ~
-  ~ License: Apache License, Version 2.0
-  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
-  -->
+    SPDX-License-Identifier: Apache-2.0
+    Copyright Red Hat Inc. and Hibernate Authors
+-->
 <!-- child.project.url.inherit.append.path is weird but necessary to have correct URLs in flattened POMs,
      see XSD for more info. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -1494,9 +1492,13 @@
                                 <engine>cleanthat-javaparser-unnecessaryimport</engine>
                             </removeUnusedImports>
                             <licenseHeader>
+                                <!--
+                                    NOTE: https://github.com/diffplug/spotless/issues/532
+                                    module/package -info.java files cannot apply license headers.
+                                 -->
                                 <file>license.java.header</file>
                                 <!-- Delimiter is a regex which identifies the "top" of the file i.e. all above it is considered a header -->
-                                <delimiter>(\n)*^(\/\/tag.+|\/\/spotless.+|package .+;|//.+)$</delimiter>
+                                <delimiter>(\n)*^(\/\/tag.+|\/\/spotless.+|package .+;|module .+;|\/\/.+|\/\*\*.*)$</delimiter>
                             </licenseHeader>
                             <replaceRegex>
                                 <name>Remove wildcard imports</name>
