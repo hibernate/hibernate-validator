@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
-~ Hibernate Validator, declare and validate application constraints
-~
-~ License: Apache License, Version 2.0
-~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+	SPDX-License-Identifier: Apache-2.0
+	Copyright Red Hat Inc. and Hibernate Authors
 -->
 <profiles version="23">
 	<profile kind="CodeFormatterProfile" name="hibernate-validator-style" version="23">

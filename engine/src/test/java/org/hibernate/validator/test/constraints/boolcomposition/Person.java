@@ -1,8 +1,6 @@
 /*
- * Hibernate Validator, declare and validate application constraints
- *
- * License: Apache License, Version 2.0
- * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright Red Hat Inc. and Hibernate Authors
  */
 
 // $Id: PersonBool.java 19547 2010-05-19 15:40:07Z hardy.ferentschik $
