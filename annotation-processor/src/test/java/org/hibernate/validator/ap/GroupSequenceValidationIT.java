@@ -49,20 +49,20 @@ public class GroupSequenceValidationIT extends ConstraintValidationProcessorITBa
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 29 ),
-				new DiagnosticExpectation( Kind.ERROR, 33 ),
-				new DiagnosticExpectation( Kind.ERROR, 48 ),
-				new DiagnosticExpectation( Kind.ERROR, 52 ),
-				new DiagnosticExpectation( Kind.WARNING, 67 ),
-				new DiagnosticExpectation( Kind.ERROR, 85 ),
-				new DiagnosticExpectation( Kind.ERROR, 94 ),
-				new DiagnosticExpectation( Kind.ERROR, 98 ),
-				new DiagnosticExpectation( Kind.ERROR, 113 ),
-				new DiagnosticExpectation( Kind.ERROR, 128 ),
-				new DiagnosticExpectation( Kind.ERROR, 132 ),
-				new DiagnosticExpectation( Kind.ERROR, 136 ),
-				new DiagnosticExpectation( Kind.ERROR, 151 ),
-				new DiagnosticExpectation( Kind.ERROR, 174 )
+				new DiagnosticExpectation( Kind.ERROR, 27 ),
+				new DiagnosticExpectation( Kind.ERROR, 31 ),
+				new DiagnosticExpectation( Kind.ERROR, 46 ),
+				new DiagnosticExpectation( Kind.ERROR, 50 ),
+				new DiagnosticExpectation( Kind.WARNING, 65 ),
+				new DiagnosticExpectation( Kind.ERROR, 83 ),
+				new DiagnosticExpectation( Kind.ERROR, 92 ),
+				new DiagnosticExpectation( Kind.ERROR, 96 ),
+				new DiagnosticExpectation( Kind.ERROR, 111 ),
+				new DiagnosticExpectation( Kind.ERROR, 126 ),
+				new DiagnosticExpectation( Kind.ERROR, 130 ),
+				new DiagnosticExpectation( Kind.ERROR, 134 ),
+				new DiagnosticExpectation( Kind.ERROR, 149 ),
+				new DiagnosticExpectation( Kind.ERROR, 172 )
 		);
 	}
 
