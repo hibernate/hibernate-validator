@@ -44,7 +44,7 @@ public class RecordConstraintValidationProcessorIT extends ConstraintValidationP
 		assertThatDiagnosticsMatch(
 				diagnostics,
 				new DiagnosticExpectation( Diagnostic.Kind.ERROR, -1 ),
-				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 16 )
+				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 14 )
 		);
 	}
 
@@ -65,7 +65,7 @@ public class RecordConstraintValidationProcessorIT extends ConstraintValidationP
 
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 17 )
+				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 15 )
 		);
 	}
 
@@ -86,7 +86,7 @@ public class RecordConstraintValidationProcessorIT extends ConstraintValidationP
 
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 19 )
+				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 17 )
 		);
 	}
 }
