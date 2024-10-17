@@ -267,6 +267,7 @@ stage('Default build') {
 			dir(helper.configuration.maven.localRepositoryPath) {
 				stash name:'default-build-result', includes:"org/hibernate/validator/**"
 			}
+			stash name:'default-build-jacoco-reports', includes:"**/jacoco.exec"
 		}
 	}
 }
@@ -330,6 +331,62 @@ stage('Non-default environments') {
 	}
 }
 
+stage('Sonar analysis') {
+	def sonarCredentialsId = helper.configuration.file?.sonar?.credentials
+	if (sonarCredentialsId) {
+		runBuildOnNode {
+			helper.withMavenWorkspace {
+				if (enableDefaultBuild && enableDefaultBuildIT) {
+					unstash name: "default-build-jacoco-reports"
+				}
+				environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
+					unstash name: "${buildEnv.tag}-build-jacoco-reports"
+				}
+				environments.content.wildflyTck.enabled.each { JdkBuildEnvironment buildEnv ->
+					unstash name: "${buildEnv.tag}-build-jacoco-reports"
+				}
+
+				// we don't clean to keep the unstashed jacoco reports:
+				sh "mvn package -Pskip-checks -Pci-build -DskipTests -Pcoverage-report ${toTestJdkArg(environments.content.jdk.default)}"
+
+
+				// WARNING: Make sure credentials are evaluated by sh, not Groovy.
+				// To that end, escape the '$' when referencing the variables.
+				// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
+				withCredentials([usernamePassword(
+						credentialsId: sonarCredentialsId,
+						usernameVariable: 'SONARCLOUD_ORGANIZATION',
+						// https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-maven/#analyzing
+						passwordVariable: 'SONAR_TOKEN'
+				)]) {
+					// We don't want to use the build cache or build scans for this execution
+					def miscMavenArgs = '-Dscan=false -Dno-build-cache'
+					sh """ \
+							mvn sonar:sonar \
+							${miscMavenArgs} \
+							-Dsonar.organization=\${SONARCLOUD_ORGANIZATION} \
+							-Dsonar.host.url=https://sonarcloud.io \
+							-Dsonar.projectKey=hibernate_hibernate-validator \
+							${helper.scmSource.pullRequest ? """ \
+									-Dsonar.pullrequest.branch=${helper.scmSource.branch.name} \
+									-Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id} \
+									-Dsonar.pullrequest.base=${helper.scmSource.pullRequest.target.name} \
+									${helper.scmSource.gitHubRepoId ? """ \
+											-Dsonar.pullrequest.provider=GitHub \
+											-Dsonar.pullrequest.github.repository=${helper.scmSource.gitHubRepoId} \
+									""" : ''} \
+							""" : """ \
+									-Dsonar.branch.name=${helper.scmSource.branch.name} \
+							"""} \
+					"""
+				}
+			}
+		}
+	} else {
+		echo "Skipping Sonar report: no credentials."
+	}
+}
+
 } // End of helper.runWithNotification
 
 // Job-specific helpers
@@ -364,6 +421,7 @@ abstract class BuildEnvironment {
 	abstract String getTag()
 	boolean isDefault() { isDefault }
 	boolean requiresDefaultBuildArtifacts() { true }
+	boolean generatesCoverage() { true }
 }
 
 class JdkBuildEnvironment extends BuildEnvironment {
@@ -386,6 +444,7 @@ class SigTestBuildEnvironment extends BuildEnvironment {
 	String getTag() { "sigtest-jdk$testJavaVersion" }
 	@Override
 	boolean requiresDefaultBuildArtifacts() { true }
+	boolean generatesCoverage() { false }
 }
 
 void keepOnlyEnvironmentsMatchingFilter(String regex) {
@@ -483,6 +542,12 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, String project
 						--fail-at-end \
 						$args \
 		"""
+	}
+
+	if ( buildEnv.generatesCoverage() ) {
+		// We allow an empty stash here since it can happen that a PR build is triggered
+		// but because of incremental build there will be no tests executed and no jacoco files generated:
+		stash name: "${buildEnv.tag}-build-jacoco-reports", includes:"**/jacoco.exec", allowEmpty: true
 	}
 }
 

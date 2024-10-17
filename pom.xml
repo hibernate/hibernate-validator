@@ -270,6 +270,7 @@
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
         <version.spotless-maven-plugin>2.43.0</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
+        <version.sonar.plugin>4.0.0.4121</version.sonar.plugin>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
@@ -351,6 +352,19 @@
         <maven.compiler.release>${java-version.main.release}</maven.compiler.release>
         <maven.compiler.testRelease>${java-version.test.release}</maven.compiler.testRelease>
 
+        <!--
+             The absolute path to the root project directory.
+             This property is set by the build-helper plugin.
+             We initialize it to some crude, potentially wrong value,
+             because the Sonar Maven plugin uses this property indirectly,
+             but ignores any change made by other plugins.
+             This default value is the best we can do without the help of a Maven plugin.
+
+             Useful resources:
+              - https://www.mojohaus.org/build-helper-maven-plugin/rootlocation-mojo.html
+          -->
+        <rootProject.directory>${user.dir}</rootProject.directory>
+
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
         <!-- Argument passed from the command line -->
         <surefire.jvm.args.commandline></surefire.jvm.args.commandline>
@@ -380,6 +394,7 @@
             Allows distinguishing between multiple executions of the same test in test reports.
          -->
         <surefire.environment>default</surefire.environment>
+        <jacoco.environment.sub-directory>${surefire.environment}</jacoco.environment.sub-directory>
 
         <arquillian.wildfly.jvm.args.add-opens></arquillian.wildfly.jvm.args.add-opens>
         <arquillian.wildfly.jvm.args.add-modules></arquillian.wildfly.jvm.args.add-modules>
@@ -399,6 +414,48 @@
         <!-- Formatting -->
         <format.skip>false</format.skip>
         <goal.spotless-maven-plugin>apply</goal.spotless-maven-plugin>
+
+        <!-- Sonar options -->
+        <!--
+            We want to take into account coverage data from integration tests from other projects as well.
+            This requires to use a single destination file for ITs, because:
+             - Integration tests cover code from other modules.
+             - The Sonar plugin computes coverage when inspecting each module,
+               and by default only takes into account JaCoCo coverage reports from the inspected module.
+               Thus it ignores some relevant ITs by default.
+             - Even when configured, the Sonar plugin only accept an *explicit* list of JaCoCo coverage reports
+               (no wildcards).
+               Thus we cannot easily configure the Sonar plugin to inspect JaCoCo coverage reports from other modules,
+               unless we somehow aggregate all of the coverage data into a single, shared JaCoCo coverage report.
+            The chosen solution was to make the "reports" module invoke jacoco's "report-aggregate" goal
+            to create a single aggregate report, and configure sonar to only inspect that file.
+
+            Useful resources to understand what is going on (caution, not everything is up-to-date):
+             - https://docs.sonarqube.org/display/SONAR/Analysis+Parameters
+             - https://docs.sonarqube.org/display/PLUG/Usage+of+JaCoCo+with+Java+Plugin
+             - https://www.devcon5.ch/en/blog/2015/05/29/multi-module-integration-test-coverage-sonar-jacoco/
+             - http://javamemento.blogspot.fr/2016/02/sonar-jacoco-maven-multi-module.html
+             - https://github.com/SonarSource/sonar-scanning-examples/blob/master/sonarqube-scanner-maven/pom.xml
+             - https://stackoverflow.com/a/49528226/6692043
+             - https://www.eclemma.org/jacoco/trunk/doc/report-aggregate-mojo.html
+             - Not relevant anymore, but we used to merge *.exec files: https://www.eclemma.org/jacoco/trunk/doc/merge-mojo.html
+         -->
+        <sonar.coverage.jacoco.xmlReportPaths>${rootProject.directory}/build/reports/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <!--
+            Exclude build code and integration tests defined in the main source from coverage computation.
+         -->
+        <sonar.coverage.exclusions>
+            **/org/hibernate/checkstyle/**,
+            **/org/hibernate/validator/build/enforcer/**,
+        </sonar.coverage.exclusions>
+        <!--
+            Exclude build code, unit tests and integration tests from duplication analysis.
+         -->
+        <sonar.cpd.exclusions>
+            **/org/hibernate/checkstyle/**,
+            **/org/hibernate/validator/build/enforcer/**,
+            **/src/test/java/**
+        </sonar.cpd.exclusions>
     </properties>
 
     <dependencyManagement>
@@ -650,6 +707,15 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
+                    <execution>
+                        <id>set-root-location-property</id>
+                        <goals>
+                            <goal>rootlocation</goal>
+                        </goals>
+                        <configuration>
+                            <rootLocationProperty>rootProject.directory</rootLocationProperty>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>parse-jakarta-validation-spec-version</id>
                         <goals>
@@ -1517,6 +1583,11 @@
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${version.jacoco.plugin}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>${version.sonar.plugin}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -1894,7 +1965,7 @@
                                 </goals>
                                 <configuration>
                                     <propertyName>failsafe.jvm.args.jacoco</propertyName>
-                                    <destFile>${project.build.directory}/coverage/jacoco.exec</destFile>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/coverage/jacoco.exec</destFile>
                                 </configuration>
                             </execution>
                         </executions>
