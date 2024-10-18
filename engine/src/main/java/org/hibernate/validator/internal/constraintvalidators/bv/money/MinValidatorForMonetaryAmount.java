@@ -35,7 +35,7 @@ public class MinValidatorForMonetaryAmount implements ConstraintValidator<Min, M
 			return true;
 		}
 
-		return value.getNumber().numberValueExact( BigDecimal.class ).compareTo( minValue ) != -1;
+		return value.getNumber().numberValueExact( BigDecimal.class ).compareTo( minValue ) >= 0;
 	}
 
 }
