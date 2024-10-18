@@ -8,8 +8,7 @@ package org.hibernate.validator.internal.engine.valuecontext;
 
 import java.lang.reflect.TypeVariable;
 
-import jakarta.validation.groups.Default;
-
+import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
@@ -150,7 +149,7 @@ public class ValueContext<T, V> {
 	}
 
 	public final boolean validatingDefault() {
-		return getCurrentGroup() != null && getCurrentGroup().getName().equals( Default.class.getName() );
+		return getCurrentGroup() != null && Group.isDefaultGroup( getCurrentGroup() );
 	}
 
 	public final ConstraintLocationKind getConstraintLocationKind() {

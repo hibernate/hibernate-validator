@@ -340,6 +340,7 @@ public final class TypeHelper {
 	}
 
 	public static Type extractConstraintValidatorTypeArgumentType(Class<? extends ConstraintValidator<?, ?>> validator, int typeArgumentIndex) {
+		Contracts.assertNotNull( validator, "validator cannot be null" );
 		Map<Type, Type> resolvedTypes = new HashMap<>();
 		Type constraintValidatorType = resolveTypes( resolvedTypes, validator );
 
