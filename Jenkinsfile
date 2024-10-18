@@ -367,6 +367,8 @@ stage('Sonar analysis') {
 							-Dsonar.organization=\${SONARCLOUD_ORGANIZATION} \
 							-Dsonar.host.url=https://sonarcloud.io \
 							-Dsonar.projectKey=hibernate_hibernate-validator \
+							-Dsonar.projectName="Hibernate Validator" \
+							-Dsonar.projectDescription="Hibernate Validator, declare and validate application constraints" \
 							${helper.scmSource.pullRequest ? """ \
 									-Dsonar.pullrequest.branch=${helper.scmSource.branch.name} \
 									-Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id} \
