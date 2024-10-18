@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.internal.xml;
 
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.xml.namespace.QName;
@@ -29,9 +30,8 @@ public abstract class AbstractStaxBuilder {
 	 * corresponding xml tag can be processed based on a tag name.
 	 *
 	 * @param xmlEvent an event to check
-	 *
 	 * @return {@code true} if corresponding event can be processed by current builder,
-	 * 		{@code false} otherwise
+	 * {@code false} otherwise
 	 */
 	protected boolean accept(XMLEvent xmlEvent) {
 		return xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().getLocalPart().equals( getAcceptableQName() );
@@ -57,7 +57,6 @@ public abstract class AbstractStaxBuilder {
 	 * return {@code some-value} as a string.
 	 *
 	 * @param xmlEventReader a current {@link XMLEventReader}
-	 *
 	 * @return a value of a current xml tag as a string
 	 */
 	protected String readSingleElement(XMLEventReader xmlEventReader) throws XMLStreamException {
@@ -76,11 +75,21 @@ public abstract class AbstractStaxBuilder {
 	 *
 	 * @param startElement an element to get an attribute from
 	 * @param qName a {@link QName} of an attribute to read
-	 *
 	 * @return a value of an attribute if it is present, {@link Optional#empty()} otherwise
 	 */
 	protected Optional<String> readAttribute(StartElement startElement, QName qName) {
 		Attribute attribute = startElement.getAttributeByName( qName );
 		return Optional.ofNullable( attribute ).map( Attribute::getValue );
+	}
+
+	protected String readRequiredAttribute(StartElement startElement, QName qName) {
+		Attribute attribute = startElement.getAttributeByName( qName );
+		if ( attribute == null ) {
+			// NOTE: we run schema validation before we try reading the xml,
+			// 	hence at this point if we want to get a required attribute, it should be there ...
+			//  and if not: then there's a bigger issue >_<
+			throw new IllegalStateException( String.format( Locale.ROOT, "Required attribute %s not found within %s", qName, startElement ) );
+		}
+		return attribute.getValue();
 	}
 }

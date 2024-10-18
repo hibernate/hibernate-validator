@@ -55,7 +55,7 @@ abstract class AbstractConstrainedExecutableElementStaxBuilder extends AbstractS
 	protected void add(XMLEventReader xmlEventReader, XMLEvent xmlEvent) throws XMLStreamException {
 		Optional<QName> mainAttributeValueQname = getMainAttributeValueQname();
 		if ( mainAttributeValueQname.isPresent() ) {
-			mainAttributeValue = readAttribute( xmlEvent.asStartElement(), mainAttributeValueQname.get() ).get();
+			mainAttributeValue = readRequiredAttribute( xmlEvent.asStartElement(), mainAttributeValueQname.get() );
 		}
 		ignoreAnnotations = readAttribute( xmlEvent.asStartElement(), IGNORE_ANNOTATIONS_QNAME ).map( Boolean::parseBoolean );
 		ConstrainedParameterStaxBuilder constrainedParameterStaxBuilder = getNewConstrainedParameterStaxBuilder();

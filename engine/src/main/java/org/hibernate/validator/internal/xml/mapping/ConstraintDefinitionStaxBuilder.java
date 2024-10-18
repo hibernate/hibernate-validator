@@ -58,7 +58,7 @@ class ConstraintDefinitionStaxBuilder extends AbstractStaxBuilder {
 
 	@Override
 	protected void add(XMLEventReader xmlEventReader, XMLEvent xmlEvent) throws XMLStreamException {
-		annotation = readAttribute( xmlEvent.asStartElement(), ANNOTATION_QNAME ).get();
+		annotation = readRequiredAttribute( xmlEvent.asStartElement(), ANNOTATION_QNAME );
 		while ( !( xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().getLocalPart().equals( getAcceptableQName() ) ) ) {
 			validatedByStaxBuilder.process( xmlEventReader, xmlEvent );
 			xmlEvent = xmlEventReader.nextEvent();

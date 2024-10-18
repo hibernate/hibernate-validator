@@ -58,7 +58,7 @@ class GroupConversionStaxBuilder extends AbstractStaxBuilder {
 	protected void add(XMLEventReader xmlEventReader, XMLEvent xmlEvent) {
 		StartElement startElement = xmlEvent.asStartElement();
 		String from = readAttribute( startElement, FROM_QNAME ).orElse( DEFAULT_GROUP_NAME );
-		String to = readAttribute( startElement, TO_QNAME ).get();
+		String to = readRequiredAttribute( startElement, TO_QNAME );
 		groupConversionRules.merge(
 				from,
 				Collections.singletonList( to ),

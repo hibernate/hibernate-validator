@@ -191,7 +191,7 @@ class ValidationConfigStaxBuilder extends AbstractStaxBuilder {
 		@Override
 		protected void add(XMLEventReader xmlEventReader, XMLEvent xmlEvent) throws XMLStreamException {
 			StartElement startElement = xmlEvent.asStartElement();
-			String name = readAttribute( startElement, NAME_QNAME ).get();
+			String name = readRequiredAttribute( startElement, NAME_QNAME );
 			String value = readSingleElement( xmlEventReader );
 			if ( LOG.isDebugEnabled() ) {
 				LOG.debugf(
