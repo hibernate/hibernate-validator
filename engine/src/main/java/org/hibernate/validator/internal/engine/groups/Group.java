@@ -13,6 +13,7 @@ import jakarta.validation.groups.Default;
  */
 public class Group {
 	public static final Group DEFAULT_GROUP = new Group( Default.class );
+	private static final String DEFAULT_GROUP_NAME = Default.class.getName();
 
 	/**
 	 * The actual group.
@@ -45,7 +46,12 @@ public class Group {
 	}
 
 	public boolean isDefaultGroup() {
-		return getDefiningClass().getName().equals( Default.class.getName() );
+		return isDefaultGroup( group );
+	}
+
+
+	public static boolean isDefaultGroup(Class<?> group) {
+		return DEFAULT_GROUP_NAME.equals( group.getName() );
 	}
 
 	@Override

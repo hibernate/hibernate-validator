@@ -25,6 +25,7 @@ import jakarta.validation.metadata.BeanDescriptor;
 import jakarta.validation.metadata.ConstructorDescriptor;
 import jakarta.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
@@ -577,7 +578,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					validDefaultGroupSequence.add( Default.class );
 					groupSequenceContainsDefault = true;
 				}
-				else if ( group.getName().equals( Default.class.getName() ) ) {
+				else if ( Group.isDefaultGroup( group ) ) {
 					throw LOG.getNoDefaultGroupInGroupSequenceException();
 				}
 				else {

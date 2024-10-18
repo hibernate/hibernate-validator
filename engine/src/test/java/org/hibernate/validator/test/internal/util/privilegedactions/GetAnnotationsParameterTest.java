@@ -63,7 +63,7 @@ public class GetAnnotationsParameterTest {
 			fail();
 		}
 		catch (ValidationException e) {
-			assertThat( e.getMessage() ).startsWith( "HV000082" ).as( "Wrong exception message" );
+			assertThat( e.getMessage() ).as( "Wrong exception message" ).startsWith( "HV000082" );
 		}
 
 		try {
@@ -71,7 +71,7 @@ public class GetAnnotationsParameterTest {
 			fail();
 		}
 		catch (ValidationException e) {
-			assertThat( e.getMessage() ).startsWith( "HV000083" ).as( "Wrong exception message" );
+			assertThat( e.getMessage() ).as( "Wrong exception message" ).startsWith( "HV000083" );
 		}
 	}
 }
