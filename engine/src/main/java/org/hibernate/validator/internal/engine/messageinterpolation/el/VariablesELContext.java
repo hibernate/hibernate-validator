@@ -18,19 +18,20 @@ import jakarta.el.StandardELContext;
  */
 public class VariablesELContext extends StandardELContext {
 
-	private static final ELResolver DEFAULT_RESOLVER = new CompositeELResolver() {
+	private static final ELResolver DEFAULT_RESOLVER;
 
-		{
-			add( new RootResolver() );
-			add( new ArrayELResolver( true ) );
-			add( new ListELResolver( true ) );
-			add( new MapELResolver( true ) );
-			add( new ResourceBundleELResolver() );
-			// this one is required so that expressions containing method calls are returned as is
-			// if not there, the expression is replaced by an empty string
-			add( new NoOpElResolver() );
-		}
-	};
+	static {
+		CompositeELResolver resolver = new CompositeELResolver();
+		resolver.add( new RootResolver() );
+		resolver.add( new ArrayELResolver( true ) );
+		resolver.add( new ListELResolver( true ) );
+		resolver.add( new MapELResolver( true ) );
+		resolver.add( new ResourceBundleELResolver() );
+		// this one is required so that expressions containing method calls are returned as is
+		// if not there, the expression is replaced by an empty string
+		resolver.add( new NoOpElResolver() );
+		DEFAULT_RESOLVER = resolver;
+	}
 
 	public VariablesELContext(ExpressionFactory expressionFactory) {
 		super( expressionFactory );

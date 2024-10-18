@@ -19,16 +19,18 @@ import jakarta.el.StandardELContext;
  * @author Guillaume Smet
  */
 public class BeanMethodsELContext extends StandardELContext {
-	private static final ELResolver DEFAULT_RESOLVER = new CompositeELResolver() {
-		{
-			add( new RootResolver() );
-			add( new ArrayELResolver( true ) );
-			add( new ListELResolver( true ) );
-			add( new MapELResolver( true ) );
-			add( new ResourceBundleELResolver() );
-			add( new BeanELResolver( true ) );
-		}
-	};
+	private static final ELResolver DEFAULT_RESOLVER;
+
+	static {
+		CompositeELResolver resolver = new CompositeELResolver();
+		resolver.add( new RootResolver() );
+		resolver.add( new ArrayELResolver( true ) );
+		resolver.add( new ListELResolver( true ) );
+		resolver.add( new MapELResolver( true ) );
+		resolver.add( new ResourceBundleELResolver() );
+		resolver.add( new BeanELResolver( true ) );
+		DEFAULT_RESOLVER = resolver;
+	}
 
 	public BeanMethodsELContext(ExpressionFactory expressionFactory) {
 		super( expressionFactory );
