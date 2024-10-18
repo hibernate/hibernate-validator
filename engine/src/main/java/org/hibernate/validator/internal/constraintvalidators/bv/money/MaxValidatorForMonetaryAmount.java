@@ -35,7 +35,7 @@ public class MaxValidatorForMonetaryAmount implements ConstraintValidator<Max, M
 			return true;
 		}
 
-		return value.getNumber().numberValueExact( BigDecimal.class ).compareTo( maxValue ) != 1;
+		return value.getNumber().numberValueExact( BigDecimal.class ).compareTo( maxValue ) <= 0;
 	}
 
 }
