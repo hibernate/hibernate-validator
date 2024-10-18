@@ -280,12 +280,7 @@ public class ValidationExtension implements Extension {
 			}
 
 			boolean needsValidation;
-			if ( correspondingProperty.isPresent() ) {
-				needsValidation = isGetterConstrained( beanDescriptor, method, correspondingProperty.get() );
-			}
-			else {
-				needsValidation = isNonGetterConstrained( beanDescriptor, method );
-			}
+			needsValidation = correspondingProperty.map( s -> isGetterConstrained( beanDescriptor, method, s ) ).orElseGet( () -> isNonGetterConstrained( beanDescriptor, method ) );
 
 			if ( needsValidation ) {
 				callables.add( annotatedMethod );
