@@ -97,7 +97,7 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 	@Override
 	protected void add(XMLEventReader xmlEventReader, XMLEvent xmlEvent) throws XMLStreamException {
 		StartElement startElement = xmlEvent.asStartElement();
-		constraintAnnotation = readAttribute( startElement, CONSTRAINT_ANNOTATION_QNAME ).get();
+		constraintAnnotation = readRequiredAttribute( startElement, CONSTRAINT_ANNOTATION_QNAME );
 		while ( !( xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().getLocalPart().equals( CONSTRAINT_QNAME_LOCAL_PART ) ) ) {
 			XMLEvent currentEvent = xmlEvent;
 			builders.forEach( builder -> builder.process( xmlEventReader, currentEvent ) );
@@ -177,7 +177,7 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 
 		@Override
 		protected void add(XMLEventReader xmlEventReader, XMLEvent xmlEvent) throws XMLStreamException {
-			String name = readAttribute( xmlEvent.asStartElement(), NAME_QNAME ).get();
+			String name = readRequiredAttribute( xmlEvent.asStartElement(), NAME_QNAME );
 			while ( !( xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().getLocalPart().equals( ELEMENT_QNAME_LOCAL_PART ) ) ) {
 				xmlEvent = xmlEventReader.nextEvent();
 				readElement( xmlEventReader, xmlEvent, name );
@@ -244,7 +244,7 @@ class ConstraintTypeStaxBuilder extends AbstractStaxBuilder {
 				if ( xmlEvent.isStartElement() ) {
 					StartElement startElement = xmlEvent.asStartElement();
 					if ( startElement.getName().getLocalPart().equals( ELEMENT_QNAME_LOCAL_PART ) ) {
-						String name = readAttribute( xmlEvent.asStartElement(), NAME_QNAME ).get();
+						String name = readRequiredAttribute( xmlEvent.asStartElement(), NAME_QNAME );
 
 						// we put empty collection here in case the corresponding string element in xml is empty
 						// if there will be a value it will get merged in this#addParameterValue()

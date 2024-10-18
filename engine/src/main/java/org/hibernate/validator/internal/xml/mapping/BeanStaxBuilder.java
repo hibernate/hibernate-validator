@@ -83,7 +83,7 @@ class BeanStaxBuilder extends AbstractStaxBuilder {
 
 	@Override
 	protected void add(XMLEventReader xmlEventReader, XMLEvent xmlEvent) throws XMLStreamException {
-		this.className = readAttribute( xmlEvent.asStartElement(), CLASS_QNAME ).get();
+		this.className = readRequiredAttribute( xmlEvent.asStartElement(), CLASS_QNAME );
 		this.ignoreAnnotations = readAttribute( xmlEvent.asStartElement(), IGNORE_ANNOTATIONS_QNAME ).map( Boolean::parseBoolean );
 		ConstrainedFieldStaxBuilder fieldStaxBuilder = getNewConstrainedFieldStaxBuilder();
 		ConstrainedGetterStaxBuilder getterStaxBuilder = getNewConstrainedGetterStaxBuilder();
