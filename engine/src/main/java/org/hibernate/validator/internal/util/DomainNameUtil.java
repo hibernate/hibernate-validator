@@ -23,8 +23,8 @@ public final class DomainNameUtil {
 	private static final int MAX_DOMAIN_PART_LENGTH = 255;
 
 	private static final String DOMAIN_CHARS_WITHOUT_DASH = "[a-z\u0080-\uFFFF0-9!#$%&'*+/=?^_`{|}~]";
-	private static final String DOMAIN_LABEL = "(?:" + DOMAIN_CHARS_WITHOUT_DASH + "-*)*" + DOMAIN_CHARS_WITHOUT_DASH + "+";
-	private static final String DOMAIN = DOMAIN_LABEL + "+(?:\\." + DOMAIN_LABEL + "+)*";
+	private static final String DOMAIN_LABEL = DOMAIN_CHARS_WITHOUT_DASH + "++(?:-++" + DOMAIN_CHARS_WITHOUT_DASH + "++)*+";
+	private static final String DOMAIN = DOMAIN_LABEL + "(?:\\." + DOMAIN_LABEL + ")*+";
 
 	private static final String IP_DOMAIN = "[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}";
 	//IP v6 regex taken from http://stackoverflow.com/questions/53497/regular-expression-that-matches-valid-ipv6-addresses
@@ -92,11 +92,7 @@ public final class DomainNameUtil {
 		}
 
 		Matcher matcher = pattern.matcher( domain );
-		if ( !matcher.matches() ) {
-			return false;
-		}
-
-		return true;
+		return matcher.matches();
 	}
 
 }
