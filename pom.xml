@@ -1439,7 +1439,7 @@
                     <configuration>
                         <upToDateChecking>
                             <enabled>true</enabled>
-                            <indexFile>.cache/spotless-index-${version.spotless-maven-plugin}</indexFile>
+                            <indexFile>${project.basedir}/.cache/spotless-index-${version.spotless-maven-plugin}</indexFile>
                         </upToDateChecking>
                         <formats>
                             <format>
