@@ -524,12 +524,6 @@
                 <version>${version.org.apache.logging.log4j}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-                <type>test-jar</type>
-                <version>${version.org.apache.logging.log4j}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${version.org.slf4j}</version>
