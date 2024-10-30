@@ -53,7 +53,8 @@ pipeline {
 								sh """mvn clean verify \
 									artifact:compare -Dreference.repo=hibernate-maven-central \
 									-Preproducibility-check \
-									--fail-at-end
+									--fail-at-end \
+									-Dscan=false -Dno-build-cache
 								"""
 							}
 						}
@@ -82,7 +83,8 @@ pipeline {
 								echo "Run a build with strict JAXP configuration."
 								sh """mvn clean install \
 									 -Dsurefire.jvm.args.jaxp.strict-args="-Djava.xml.config.file=$jaxpStrictProperties" \
-									 -Djava-version.test.release=23
+									 -Djava-version.test.release=23 \
+									 -Dscan=false -Dno-build-cache
 								"""
 							})
 						}
