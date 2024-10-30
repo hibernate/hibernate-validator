@@ -313,6 +313,7 @@ stage('Non-default environments') {
 							-Denforcer.skip=true \
 							-DskipTests=true -Dcheckstyle.skip=true \
 							-DdisableDistributionBuild=true -DdisableDocumentationBuild=true \
+							-Dscan=false -Dno-build-cache \
 					"""
 				}
 			}
