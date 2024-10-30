@@ -1,0 +1,33 @@
+<develocity
+        xmlns="https://www.gradle.com/develocity-maven" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://www.gradle.com/develocity-maven https://www.gradle.com/schema/develocity-maven.xsd">
+    <server>
+        <url>https://ge.hibernate.org</url>
+        <allowUntrusted>false</allowUntrusted>
+    </server>
+    <buildScan>
+        <!--
+        Expression support is documented here: https://docs.gradle.com/enterprise/maven-extension/#expression_support
+        -->
+        <obfuscation>
+            <!-- Don't share ip addresses-->
+            <ipAddresses>#{{'0.0.0.0'}}</ipAddresses>
+        </obfuscation>
+        <capture>
+            <fileFingerprints>true</fileFingerprints>
+        </capture>
+        <!-- https://docs.gradle.com/enterprise/maven-extension/#manual_access_key_configuration -->
+        <backgroundBuildScanUpload>#{env['CI'] == null}</backgroundBuildScanUpload>
+    </buildScan>
+    <buildCache>
+        <local>
+            <enabled>#{properties['no-build-cache'] == null}</enabled>
+        </local>
+        <remote>
+            <enabled>#{properties['no-build-cache'] == null}</enabled>
+            <storeEnabled>
+                #{env['CI'] != null and (env['CHANGE_ID']?:'').isBlank() and (env['GITHUB_BASE_REF']?:'').isBlank() and !(env['DEVELOCITY_ACCESS_KEY']?:'').isBlank()}
+            </storeEnabled>
+        </remote>
+    </buildCache>
+</develocity>

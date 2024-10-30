@@ -54,3 +54,6 @@ maven-eclipse.xml
 
 # Cache folders for formatting plugins:
 .cache
+
+# develocity cache related:
+.mvn/.develocity
