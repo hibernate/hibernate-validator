@@ -393,6 +393,7 @@
          -->
         <surefire.environment>default</surefire.environment>
         <jacoco.environment.sub-directory>${surefire.environment}</jacoco.environment.sub-directory>
+        <surefire.default.reportsDirectory>${project.build.directory}/surefire-reports</surefire.default.reportsDirectory>
 
         <arquillian.wildfly.jvm.args.add-opens></arquillian.wildfly.jvm.args.add-opens>
         <arquillian.wildfly.jvm.args.add-modules></arquillian.wildfly.jvm.args.add-modules>
@@ -980,6 +981,7 @@
                                  use the test Java home, not the Maven Java home -->
                             <JAVA_HOME>${java-version.test.launcher.java_home}</JAVA_HOME>
                         </environmentVariables>
+                        <reportsDirectory>${surefire.default.reportsDirectory}</reportsDirectory>
                     </configuration>
                     <dependencies>
                         <!--

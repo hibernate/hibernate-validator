@@ -25,6 +25,10 @@
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
         <surefire.jvm.args.additional>-Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
         <java.module.name>${hibernate-validator.module-name}</java.module.name>
+
+        <surefire.default.reportsDirectory>${project.build.directory}/surefire-reports/default</surefire.default.reportsDirectory>
+        <surefire.bytebuddy.reportsDirectory>${project.build.directory}/surefire-reports/bytebuddy</surefire.bytebuddy.reportsDirectory>
+
         <!--
             We want to skip the javadoc warnings for this module, since Jakarta Expression Language API is using proper modules,
             resulting in a warning like:
@@ -332,6 +336,7 @@
                             <includes>
                                 <include>**/ByteBuddy*Test</include>
                             </includes>
+                            <reportsDirectory>${surefire.bytebuddy.reportsDirectory}</reportsDirectory>
                         </configuration>
                     </execution>
                 </executions>
