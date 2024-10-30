@@ -246,9 +246,9 @@ stage('Default build') {
 		return
 	}
 	runBuildOnNode {
-		helper.withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
-			sh """ \
-					mvn clean \
+		withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
+			mvn """ \
+					clean \
 					--fail-at-end \
 					${deploySnapshot ? "\
 							deploy -DdeployAtEnd=true \
@@ -277,7 +277,7 @@ stage('Non-default environments') {
 	environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
 		parameters.put(buildEnv.tag, {
 			runBuildOnNode {
-				helper.withMavenWorkspace {
+				withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
 					"""
@@ -290,7 +290,7 @@ stage('Non-default environments') {
 	environments.content.wildflyTck.enabled.each { WildFlyTckBuildEnvironment buildEnv ->
 		parameters.put(buildEnv.tag, {
 			runBuildOnNode {
-				helper.withMavenWorkspace {
+				withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
 							-pl tck-runner \
@@ -305,7 +305,7 @@ stage('Non-default environments') {
 	environments.content.sigtest.enabled.each { SigTestBuildEnvironment buildEnv ->
 		parameters.put(buildEnv.tag, {
 			runBuildOnNode {
-				helper.withMavenWorkspace(jdk: buildEnv.jdkTool) {
+				withMavenWorkspace(jdk: buildEnv.jdkTool) {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
 							-pl tck-runner \
@@ -334,7 +334,7 @@ stage('Sonar analysis') {
 	def sonarCredentialsId = helper.configuration.file?.sonar?.credentials
 	if (sonarCredentialsId) {
 		runBuildOnNode {
-			helper.withMavenWorkspace {
+			withMavenWorkspace {
 				if (enableDefaultBuild && enableDefaultBuildIT) {
 					unstash name: "default-build-jacoco-reports"
 				}
@@ -537,8 +537,8 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, String project
 	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
 
 	dir(projectPath) {
-		sh """ \
-				mvn -Dsurefire.environment=$testSuffix \
+		mvn """ \
+				-Dsurefire.environment=$testSuffix \
 						${toTestJdkArg(buildEnv)} \
 						--fail-at-end \
 						$args \
@@ -577,4 +577,53 @@ String toTestJdkArg(BuildEnvironment buildEnv) {
 	}
 
 	return args
+}
+
+void withMavenWorkspace(Closure body) {
+	withMavenWorkspace([:], body)
+}
+
+void withMavenWorkspace(Map args, Closure body) {
+	args.put("options", [
+			// Artifacts are not needed and take up disk space
+			artifactsPublisher(disabled: true),
+			// stdout/stderr for successful tests is not needed and takes up disk space
+			// we archive test results and stdout/stderr as part of the build scan anyway,
+			// see https://ge.hibernate.org/scans?search.rootProjectNames=Hibernate%20Validator
+			junitPublisher(disabled: true)
+	])
+	helper.withMavenWorkspace(args, body)
+}
+
+void mvn(String args) {
+	def develocityMainCredentialsId = helper.configuration.file?.develocity?.credentials?.main
+	def develocityPrCredentialsId = helper.configuration.file?.develocity?.credentials?.pr
+	if ( !helper.scmSource.pullRequest && develocityMainCredentialsId ) {
+		// Not a PR: we can pass credentials to the build, allowing it to populate the build cache
+		// and to publish build scans directly.
+		withCredentials([string(credentialsId: develocityMainCredentialsId,
+				variable: 'DEVELOCITY_ACCESS_KEY')]) {
+			withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
+				sh "mvn $args"
+			}
+		}
+	}
+	else if ( helper.scmSource.pullRequest && develocityPrCredentialsId ) {
+		// Pull request: we can't pass credentials to the build, since we'd be exposing secrets to e.g. tests.
+		// We do the build first, then publish the build scan separately.
+		tryFinally({
+			sh "mvn $args"
+		}, { // Finally
+			withCredentials([string(credentialsId: develocityPrCredentialsId,
+					variable: 'DEVELOCITY_ACCESS_KEY')]) {
+				withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
+					sh 'mvn develocity:build-scan-publish-previous || true'
+				}
+			}
+		})
+	}
+	else {
+		// No Develocity credentials.
+		sh "mvn $args"
+	}
 }
