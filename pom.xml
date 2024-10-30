@@ -15,7 +15,7 @@
     <version>9.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Hibernate Validator Aggregator</name>
+    <name>Hibernate Validator</name>
     <url>https://hibernate.org/validator</url>
     <description>Aggregator of the Hibernate Validator modules.</description>
 
