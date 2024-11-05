@@ -40,7 +40,6 @@
         <profilingOptions>-showversion</profilingOptions>
         <history.directory>${project.basedir}/history</history.directory>
         <jmh.version>1.37</jmh.version>
-        <version.log4j-core>2.23.1</version.log4j-core>
 
         <!-- default values, overridden per profile -->
         <beanvalidation-impl.name>none</beanvalidation-impl.name>
@@ -48,16 +47,6 @@
 
         <hibernate-validator-parent.path>../..</hibernate-validator-parent.path>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-                <version>${version.log4j-core}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
