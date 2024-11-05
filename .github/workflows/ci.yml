@@ -103,35 +103,37 @@ jobs:
       - name: Set up Maven
         run: ./mvnw -v
 
-      - name: Build code and run tests and basic checks
+      - name: Build code and run tests and basic checks (Standalone)
         run: |
           ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean install \
           -Pjqassistant -Pdist -Prelocation
+        env:
+          DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
+      # For jobs running on 'pull_request', upload build scan data.
+      # The actual publishing must be done in a separate job (see ci-report.yml).
+      # We don't write to the remote cache as that would be unsafe.
+      - name: Upload GitHub Actions artifact for the Develocity build scan
+        uses: actions/upload-artifact@v4
+        if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
+        with:
+          name: build-scan-data-standalone-${{ matrix.os.name }}
+          path: ~/.m2/.develocity/build-scan-data
 
-      - name: Build code and run tests in container mode
+      - name: Run TCK tests in container mode
         run: |
           ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean verify \
           -Pjqassistant -Pskip-checks \
           -am -pl :hibernate-validator-tck-runner \
           -Dincontainer -Dincontainer-prepared
-      # Workaround for https://github.com/actions/upload-artifact/issues/240
-      - name: List build reports to upload (if build failed)
-        if: ${{ failure() || cancelled() }}
-        # The weird syntax is because we're setting a multiline environment variable
-        # See https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-a-multiline-string
-        run: |
-          {
-            echo 'buildReportPaths<<EOF'
-            find . -path '**/*-reports'
-            echo EOF
-          } >> "$GITHUB_ENV"
-      - name: Upload build reports (if build failed)
+        env:
+          DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
+
+      - name: Upload GitHub Actions artifact for the Develocity build scan
         uses: actions/upload-artifact@v4
-        if: ${{ failure() || cancelled() }}
+        if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
         with:
-          name: ${{ format('build-reports-{0}', matrix.os.name ) }}
-          path: ${{ env.buildReportPaths }}
-          retention-days: 7
+          name: build-scan-data-incontainer-${{ matrix.os.name }}
+          path: ~/.m2/.develocity/build-scan-data
 
       - name: Omit produced artifacts from build cache
         run: rm -r ~/.m2/repository/org/hibernate/validator
