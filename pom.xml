@@ -203,7 +203,7 @@
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.18.1</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.18.1</version.com.fasterxml.jackson.core.jackson-annotations>
-        <version.net.bytebuddy.byte-buddy>1.15.7</version.net.bytebuddy.byte-buddy>
+        <version.net.bytebuddy.byte-buddy>1.15.10</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
         <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
@@ -219,11 +219,11 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>10.19.0</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>10.20.0</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
-        <version.asciidoctor.plugin>3.0.0</version.asciidoctor.plugin>
+        <version.asciidoctor.plugin>3.1.0</version.asciidoctor.plugin>
         <version.org.hibernate.infra.hibernate-asciidoctor-theme>5.0.2.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
         <version.org.hibernate.infra.hibernate-asciidoctor-extensions>3.0.6.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
         <version.org.asciidoctor.asciidoctorj>3.0.0</version.org.asciidoctor.asciidoctorj>
@@ -251,13 +251,13 @@
         <version.japicmp.plugin>0.23.0</version.japicmp.plugin>
         <version.jar.plugin>3.4.2</version.jar.plugin>
         <version.jqassistant.plugin>2.5.0</version.jqassistant.plugin>
-        <version.javadoc.plugin>3.10.1</version.javadoc.plugin>
+        <version.javadoc.plugin>3.11.1</version.javadoc.plugin>
         <version.release.plugin>3.1.1</version.release.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
         <version.shade.plugin>3.6.0</version.shade.plugin>
         <version.sigtest.plugin>2.3</version.sigtest.plugin>
         <version.source.plugin>3.3.1</version.source.plugin>
-        <version.surefire.plugin>3.5.1</version.surefire.plugin>
+        <version.surefire.plugin>3.5.2</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.7.1</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
