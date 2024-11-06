@@ -627,3 +627,33 @@ void mvn(String args) {
 		sh "mvn $args"
 	}
 }
+
+// try-finally construct that properly suppresses exceptions thrown in the finally block.
+def tryFinally(Closure main, Closure ... finallies) {
+	def mainFailure = null
+	try {
+		main()
+	}
+	catch (Throwable t) {
+		mainFailure = t
+		throw t
+	}
+	finally {
+		finallies.each {it ->
+			try {
+				it()
+			}
+			catch (Throwable t) {
+				if ( mainFailure ) {
+					mainFailure.addSuppressed( t )
+				}
+				else {
+					mainFailure = t
+				}
+			}
+		}
+	}
+	if ( mainFailure ) { // We may reach here if only the "finally" failed
+		throw mainFailure
+	}
+}
