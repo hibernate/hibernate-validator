@@ -4,6 +4,9 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.hibernate.validator/hibernate-validator.svg?label=Maven%20Central&style=for-the-badge)](https://central.sonatype.com/search?namespace=org.hibernate.validator&sort=name)
 [![Build Status](https://img.shields.io/jenkins/build?jobUrl=https://ci.hibernate.org/view/Validator/job/hibernate-validator/job/main/&style=for-the-badge)](https://ci.hibernate.org/view/Validator/job/hibernate-validator/job/main/)
+[![Sonar Coverage](https://img.shields.io/sonar/coverage/hibernate_hibernate-validator?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/project/activity?id=hibernate_hibernate-validator&graph=coverage)
+[![Quality gate](https://img.shields.io/sonar/alert_status/hibernate_hibernate-validator?logo=sonarcloud&server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/dashboard?id=hibernate_hibernate-validator)
+[![Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?style=for-the-badge&logo=gradle)](https://ge.hibernate.org/scans?search.rootProjectNames=Hibernate%20Validator)
 [![Reproducible Builds](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/org/hibernate/validator/hibernate-validator/badge.json&style=for-the-badge)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/org/hibernate/validator/hibernate-validator/README.md)
 
 ## What is it?
