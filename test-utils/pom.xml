@@ -60,5 +60,17 @@
             <artifactId>assertj-core</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- test -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
