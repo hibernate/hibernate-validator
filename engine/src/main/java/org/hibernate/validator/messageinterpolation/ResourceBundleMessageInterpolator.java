@@ -7,6 +7,9 @@
 package org.hibernate.validator.messageinterpolation;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
@@ -23,8 +26,6 @@ import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
-
-import com.sun.el.ExpressionFactoryImpl;
 
 import jakarta.el.ELManager;
 import jakarta.el.ExpressionFactory;
@@ -200,7 +201,10 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 
 			// Finally we try the CL of the EL implementation itself. This is necessary for OSGi now that the
 			// implementation is separated from the API.
-			run( SetContextClassLoader.action( ExpressionFactoryImpl.class.getClassLoader() ) );
+			// Instead of running this:
+			// run( SetContextClassLoader.action( ExpressionFactoryImpl.class.getClassLoader() ) );
+			// we do some reflection "magic" to not have a dependency on an implementation of the expression language:
+			run( SetContextClassLoader.action( classLoaderForExpressionFactory( originalContextClassLoader ) ) );
 			if ( canLoadExpressionFactory() ) {
 				ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
 				LOG.debug( "Loaded expression factory via com.sun.el classloader" );
@@ -216,6 +220,33 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 
 		// HV-793 - We fail eagerly in case we have no EL dependencies on the classpath
 		throw LOG.getUnableToInitializeELExpressionFactoryException( null );
+	}
+
+	private static ClassLoader classLoaderForExpressionFactory(ClassLoader cl) throws Exception {
+		try {
+			Class<?> fu = cl.loadClass( "org.osgi.framework.FrameworkUtil" );
+			Method getBundle = fu.getMethod( "getBundle", Class.class );
+			Object currentBundle = getBundle.invoke( null, ResourceBundleMessageInterpolator.class );
+			if ( currentBundle != null ) {
+				Object context = cl.loadClass( "org.osgi.framework.Bundle" ).getMethod( "getBundleContext" ).invoke( currentBundle );
+				Object bundles = cl.loadClass( "org.osgi.framework.BundleContext" ).getMethod( "getBundles" ).invoke( context );
+				Method loadClass = cl.loadClass( "org.osgi.framework.Bundle" ).getMethod( "loadClass", String.class );
+				int n = Array.getLength( bundles );
+				for ( int i = 0; i < n; i++ ) {
+					try {
+						Object bundle = Array.get( bundles, i );
+						return ( (Class<?>) loadClass.invoke( bundle, "com.sun.el.ExpressionFactoryImpl" ) ).getClassLoader();
+					}
+					catch (Exception e) {
+						//
+					}
+				}
+			}
+		}
+		catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			throw e;
+		}
+		return null;
 	}
 
 	/**
