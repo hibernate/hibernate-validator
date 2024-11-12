@@ -20,6 +20,9 @@ updates:
       # use for Hibernate Bot rules.
       build-dependencies:
         patterns:
+          # Maven extensions:
+          - "*-maven-extension"
+          - "org.hibernate.infra.develocity:*"
           # Maven plugins:
           - "*maven*plugin*"
           - "org.apache.maven*:*"
