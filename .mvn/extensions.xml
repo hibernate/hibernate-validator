@@ -12,6 +12,6 @@
     <extension>
         <groupId>org.hibernate.infra.develocity</groupId>
         <artifactId>hibernate-develocity-maven-extension</artifactId>
-        <version>3.0.0.Final</version>
+        <version>3.0.1.Final</version>
     </extension>
 </extensions>
