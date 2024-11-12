@@ -197,7 +197,7 @@
         <version.junit>4.13.2</version.junit>
         <version.org.easymock>5.4.0</version.org.easymock>
         <version.io.rest-assured>5.5.0</version.io.rest-assured>
-        <version.org.apache.groovy>4.0.23</version.org.apache.groovy>
+        <version.org.apache.groovy>4.0.24</version.org.apache.groovy>
         <version.com.google.guava>33.3.1-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>6.1.14</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
@@ -219,7 +219,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>10.20.0</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>10.20.1</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
@@ -268,7 +268,7 @@
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
         <version.spotless-maven-plugin>2.43.0</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
-        <version.sonar.plugin>4.0.0.4121</version.sonar.plugin>
+        <version.sonar.plugin>5.0.0.4389</version.sonar.plugin>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
