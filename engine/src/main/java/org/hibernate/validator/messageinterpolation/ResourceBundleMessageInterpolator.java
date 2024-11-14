@@ -5,6 +5,8 @@
 package org.hibernate.validator.messageinterpolation;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
@@ -21,8 +23,6 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
-
-import com.sun.el.ExpressionFactoryImpl;
 
 /**
  * Resource bundle backed message interpolator.
@@ -195,7 +195,10 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 
 			// Finally we try the CL of the EL implementation itself. This is necessary for OSGi now that the
 			// implementation is separated from the API.
-			SetContextClassLoader.action( ExpressionFactoryImpl.class.getClassLoader() );
+			// Instead of running this:
+			// SetContextClassLoader.action( ExpressionFactoryImpl.class.getClassLoader() );
+			// we do some reflection "magic" to not have a dependency on an implementation of the expression language:
+			SetContextClassLoader.action( classLoaderForExpressionFactory( originalContextClassLoader ) );
 			if ( canLoadExpressionFactory() ) {
 				ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
 				LOG.debug( "Loaded expression factory via com.sun.el classloader" );
@@ -211,6 +214,36 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 
 		// HV-793 - We fail eagerly in case we have no EL dependencies on the classpath
 		throw LOG.getUnableToInitializeELExpressionFactoryException( null );
+	}
+
+	/*
+	 * In an OSGi environment we won't have access to the classloader that is capable to instantiate the EL factory from the get-go.
+	 * Instead, we have to use the classloader that loaded some class from the EL implementation, e.g. ExpressionFactoryImpl.
+	 * To get that classloader we list all the OSGi bundles through the OSGi BundleContext and go bundle by bundle to find the one
+	 * that is able to load the ExpressionFactoryImpl class.
+	 *
+	 * We rely on reflection here as we do not have a dependency on OSGi in the engine module, and we do not want to add it!
+	 */
+	private static ClassLoader classLoaderForExpressionFactory(ClassLoader cl) throws Exception {
+		Class<?> fu = cl.loadClass( "org.osgi.framework.FrameworkUtil" );
+		Method getBundle = fu.getMethod( "getBundle", Class.class );
+		Object currentBundle = getBundle.invoke( null, ResourceBundleMessageInterpolator.class );
+		if ( currentBundle != null ) {
+			Object context = cl.loadClass( "org.osgi.framework.Bundle" ).getMethod( "getBundleContext" ).invoke( currentBundle );
+			Object bundles = cl.loadClass( "org.osgi.framework.BundleContext" ).getMethod( "getBundles" ).invoke( context );
+			Method loadClass = cl.loadClass( "org.osgi.framework.Bundle" ).getMethod( "loadClass", String.class );
+			int n = Array.getLength( bundles );
+			for ( int i = 0; i < n; i++ ) {
+				try {
+					Object bundle = Array.get( bundles, i );
+					return ( (Class<?>) loadClass.invoke( bundle, "com.sun.el.ExpressionFactoryImpl" ) ).getClassLoader();
+				}
+				catch (Exception e) {
+					//
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
