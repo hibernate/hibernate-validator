@@ -3,7 +3,7 @@
  * Copyright Red Hat Inc. and Hibernate Authors
  */
 
-@Library('hibernate-jenkins-pipeline-helpers@1.18') _
+@Library('hibernate-jenkins-pipeline-helpers') _
 
 import org.hibernate.jenkins.pipeline.helpers.version.Version
 
