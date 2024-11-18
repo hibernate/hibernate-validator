@@ -3,7 +3,7 @@
  * Copyright Red Hat Inc. and Hibernate Authors
  */
 
-@Library('hibernate-jenkins-pipeline-helpers@1.17') _
+@Library('hibernate-jenkins-pipeline-helpers@1.18') _
 
 def withMavenWorkspace(Closure body) {
 	withMavenWorkspace('OpenJDK 17 Latest', body)

@@ -8,7 +8,7 @@ import groovy.transform.Field
 /*
  * See https://github.com/hibernate/hibernate-jenkins-pipeline-helpers
  */
-@Library('hibernate-jenkins-pipeline-helpers@1.17') _
+@Library('hibernate-jenkins-pipeline-helpers@1.18') _
 
 import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
 import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
