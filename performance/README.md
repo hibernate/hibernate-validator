@@ -77,24 +77,24 @@ To run a specific benchmark:
 
 At the moment the following benchmarks are defined:
 
-### [SimpleValidation](https://github.com/hibernate/hibernate-validator/blob/main/performance/src/main/java/org/hibernate/validator/performance/simple/SimpleValidation.java)
+### [SimpleValidation](https://github.com/hibernate/hibernate-validator/blob/main/performance/src/main/jakarta/org/hibernate/validator/performance/simple/SimpleValidation.java)
 
 A simple bean with a random number of failing constraints gets initialized and validated. The test is once executed with
 a shared _ValidatorFactory_ and once the factory is recreated on each invocation.
 
-### [CascadedValidation](https://github.com/hibernate/hibernate-validator/blob/main/performance/src/main/java/org/hibernate/validator/performance/cascaded/CascadedValidation.java)
+### [CascadedValidation](https://github.com/hibernate/hibernate-validator/blob/main/performance/src/main/jakarta/org/hibernate/validator/performance/cascaded/CascadedValidation.java)
 
 Simple bean with cascaded validation which gets executed over and over.
 
-### [CascadedWithLotsOfItemsValidation](https://github.com/hibernate/hibernate-validator/blob/main/performance/src/main/java/org/hibernate/validator/performance/cascaded/CascadedWithLotsOfItemsValidation.java)
+### [CascadedWithLotsOfItemsValidation](https://github.com/hibernate/hibernate-validator/blob/main/performance/src/main/jakarta/org/hibernate/validator/performance/cascaded/CascadedWithLotsOfItemsValidation.java)
 
 Validation of a bean containing a lot of beans to cascade to.
 
-### [CascadedWithLotsOfItemsAndMoreConstraintsValidation](https://github.com/hibernate/hibernate-validator/blob/main/performance/src/main/java/org/hibernate/validator/performance/cascaded/CascadedWithLotsOfItemsAndMoreConstraintsValidation.java)
+### [CascadedWithLotsOfItemsAndMoreConstraintsValidation](https://github.com/hibernate/hibernate-validator/blob/main/performance/src/main/jakarta/org/hibernate/validator/performance/cascaded/CascadedWithLotsOfItemsAndMoreConstraintsValidation.java)
 
 This test has a few more constraints than the previous one, allowing to test our hypothesis in more realistic situation.
 
-### [StatisticalValidation](https://github.com/hibernate/hibernate-validator/blob/main/performance/src/main/java/org/hibernate/validator/performance/statistical/StatisticalValidation.java)
+### [StatisticalValidation](https://github.com/hibernate/hibernate-validator/blob/main/performance/src/main/jakarta/org/hibernate/validator/performance/statistical/StatisticalValidation.java)
 
 A number of _TestEntity_s is created where each entity contains a property for each built-in constraint type and also a reference
 to another _TestEntity_. All constraints are evaluated by a single ConstraintValidator implementation which fails a specified
