@@ -195,11 +195,11 @@
         <version.org.testng>7.10.2</version.org.testng>
         <version.org.assertj.assertj-core>3.26.3</version.org.assertj.assertj-core>
         <version.junit>4.13.2</version.junit>
-        <version.org.easymock>5.4.0</version.org.easymock>
+        <version.org.easymock>5.5.0</version.org.easymock>
         <version.io.rest-assured>5.5.0</version.io.rest-assured>
         <version.org.apache.groovy>4.0.24</version.org.apache.groovy>
         <version.com.google.guava>33.3.1-jre</version.com.google.guava>
-        <version.org.springframework.spring-expression>6.1.14</version.org.springframework.spring-expression>
+        <version.org.springframework.spring-expression>6.2.0</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.18.1</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.18.1</version.com.fasterxml.jackson.core.jackson-annotations>
@@ -223,7 +223,7 @@
 
         <!-- Asciidoctor -->
 
-        <version.asciidoctor.plugin>3.1.0</version.asciidoctor.plugin>
+        <version.asciidoctor.plugin>3.1.1</version.asciidoctor.plugin>
         <version.org.hibernate.infra.hibernate-asciidoctor-theme>5.0.2.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
         <version.org.hibernate.infra.hibernate-asciidoctor-extensions>3.0.6.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
         <version.org.asciidoctor.asciidoctorj>3.0.0</version.org.asciidoctor.asciidoctorj>
@@ -264,7 +264,7 @@
         <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
         <version.moditect.plugin>1.2.2.Final</version.moditect.plugin>
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
-        <version.versions.plugin>2.17.1</version.versions.plugin>
+        <version.versions.plugin>2.18.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
         <version.spotless-maven-plugin>2.43.0</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
