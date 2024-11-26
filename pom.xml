@@ -158,7 +158,7 @@
         <version.com.fasterxml.classmate>1.7.0</version.com.fasterxml.classmate>
         <version.joda-time>2.13.0</version.joda-time>
         <version.org.slf4j>2.0.16</version.org.slf4j>
-        <version.org.apache.logging.log4j>2.24.1</version.org.apache.logging.log4j>
+        <version.org.apache.logging.log4j>2.24.2</version.org.apache.logging.log4j>
 
         <!--
             These dependencies are used for integration tests with WildFly.
@@ -255,7 +255,7 @@
         <version.release.plugin>3.1.1</version.release.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
         <version.shade.plugin>3.6.0</version.shade.plugin>
-        <version.sigtest.plugin>2.3</version.sigtest.plugin>
+        <version.sigtest.plugin>2.4</version.sigtest.plugin>
         <version.source.plugin>3.3.1</version.source.plugin>
         <version.surefire.plugin>3.5.2</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.7.1</version.surefire.plugin.java-version.asm>
