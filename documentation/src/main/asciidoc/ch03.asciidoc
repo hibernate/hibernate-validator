@@ -56,7 +56,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/parameter/
 
 The following preconditions are declared here:
 
-* The `name` passed to the `RentalCar` constructor must not be `null`
+* The `name` passed to the `RentalStation` constructor must not be `null`
 * When invoking the `rentCar()` method, the given `customer` must not be `null`, the rental's start
 date must not be `null` as well as be in the future and finally the rental duration must be at least
 one day
