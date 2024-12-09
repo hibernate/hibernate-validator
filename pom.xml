@@ -134,6 +134,7 @@
         <version.org.jboss.logging.jboss-logging-tools>3.0.3.Final</version.org.jboss.logging.jboss-logging-tools>
 
         <!-- Currently supported version of WildFly -->
+        <!-- Update JDK 24 configuration when changing this version: -->
         <version.wildfly>34.0.1.Final</version.wildfly>
         <!-- Used to create a patch file for the second version of WildFly we support -->
         <!--<version.wildfly.secondary>18.0.1.Final</version.wildfly.secondary>-->
@@ -165,8 +166,8 @@
             They should be aligned with the ones from the Wildfly version we support
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
-        <version.org.jboss.weld.weld>6.0.0.Beta4</version.org.jboss.weld.weld>
-        <version.org.wildfly.arquillian>5.0.0.Alpha3</version.org.wildfly.arquillian>
+        <version.org.jboss.weld.weld>6.0.0.Final</version.org.jboss.weld.weld>
+        <version.org.wildfly.arquillian>5.1.0.Beta9</version.org.wildfly.arquillian>
         <version.jakarta.jakartaee-bom>11.0.0-M4</version.jakarta.jakartaee-bom>
         <!--
             These are now managed by the BOM ^ but we want to have version properties available to us
@@ -399,7 +400,8 @@
 
         <arquillian.wildfly.jvm.args.add-opens></arquillian.wildfly.jvm.args.add-opens>
         <arquillian.wildfly.jvm.args.add-modules></arquillian.wildfly.jvm.args.add-modules>
-        <arquillian.wildfly.jvm.args>-Duser.language=en -Duser.country=US ${arquillian.wildfly.jvm.args.add-opens} ${arquillian.wildfly.jvm.args.add-modules}</arquillian.wildfly.jvm.args>
+        <arquillian.jvm.args.java-version></arquillian.jvm.args.java-version>
+        <arquillian.wildfly.jvm.args>-Duser.language=en -Duser.country=US ${arquillian.wildfly.jvm.args.add-opens} ${arquillian.wildfly.jvm.args.add-modules} ${arquillian.jvm.args.java-version}</arquillian.wildfly.jvm.args>
 
         <!-- JDK version required for the build -->
         <!-- Remember to update README when changing the version here. -->
@@ -1790,8 +1792,6 @@
             <properties>
                 <!-- ForbiddenAPIs doesn't work with JDK20+ yet -->
                 <forbiddenapis.skip>true</forbiddenapis.skip>
-                <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK21+ -->
-                <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
             </properties>
         </profile>
         <profile>
@@ -1805,8 +1805,6 @@
             <properties>
                 <!-- ForbiddenAPIs doesn't work with JDK23+ yet -->
                 <forbiddenapis.skip>true</forbiddenapis.skip>
-                <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK23+ -->
-                <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
             </properties>
         </profile>
         <profile>
@@ -1822,6 +1820,7 @@
                 <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK24+ -->
                 <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
+                <arquillian.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</arquillian.jvm.args.java-version>
             </properties>
         </profile>
         <profile>
@@ -1837,6 +1836,7 @@
                 <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK25+ -->
                 <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
+                <arquillian.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</arquillian.jvm.args.java-version>
             </properties>
         </profile>
         <profile>
