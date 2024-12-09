@@ -119,12 +119,11 @@ public class UUIDValidator implements ConstraintValidator<UUID, CharSequence> {
 			return allowNil;
 		}
 		else {
-			if ( Arrays.binarySearch( this.version, version ) == -1 ) {
+			if ( Arrays.binarySearch( this.version, version ) < 0 ) {
 				return false;
 			}
-			return Arrays.binarySearch( this.variant, variant ) != -1;
+			return Arrays.binarySearch( this.variant, variant ) > -1;
 		}
-
 	}
 
 	/**
