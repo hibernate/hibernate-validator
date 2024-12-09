@@ -60,29 +60,77 @@ public @interface UUID {
 
 	/**
 	 * @return allow empty strings.
-	 * Per default does not allow empty strings
+	 * Per default does not allow empty strings.
 	 */
 	boolean allowEmpty() default false;
 
 	/**
-	 * @return {@code true} if nil UUIDs {@code 00000000-0000-0000-0000-000000000000} are valid
-	 * Per default nil UUIDs are valid
+	 * @return {@code true} if nil UUIDs {@code 00000000-0000-0000-0000-000000000000} are valid.
+	 * Per default nil UUIDs are valid.
 	 */
 	boolean allowNil() default true;
 
 	/**
-	 * Must not be lower than version 1
+	 * Accepts values in the {@code [1; 15]} range, which corresponds to the hexadecimal {@code [1; f]} range.
 	 *
-	 * @return the accepted UUID version numbers
-	 * Per default versions 1 to 5 are allowed
+	 * @return the accepted UUID version numbers.
+	 * Per default, versions 1 through 5 are allowed.
 	 */
 	int[] version() default { 1, 2, 3, 4, 5 };
 
 	/**
-	 * Must not be lower than variant 0
+	 * Accepts values in the {@code [0; 2]} range.
+	 * <p>
+	 * The variant of the UUID is determined by the binary representation of the 17th hex digit
+	 * ({@code xxxxxxxx-xxxx-xxxx-Vxxx-xxxxxxxxxxxx} where {@code V} is the variant digit).
+	 * <p>
+	 * Currently, only variants {@code [0, 1, 2]} are supported by the validator:
+	 * <table>
+	 *     <caption>Table 1</caption>
+	 *     <thead>
+	 *         <tr>
+	 *             <th>Variant #</th>
+	 *             <th>Binary Representation</th>
+	 *             <th>Hex Digit</th>
+	 *             <th>Comment</th>
+	 *         </tr>
+	 *     </thead>
+	 *     <tbody>
+	 *         <tr>
+	 *             <td>0</td>
+	 *             <td>0xxx</td>
+	 *             <td>0 - 7</td>
+	 *             <td></td>
+	 *         </tr>
+	 *         <tr>
+	 *             <td>1</td>
+	 *             <td>10xx</td>
+	 *             <td>8 - b</td>
+	 *             <td></td>
+	 *         </tr>
+	 *         <tr>
+	 *             <td>2</td>
+	 *             <td>110x</td>
+	 *             <td>c - d</td>
+	 *             <td></td>
+	 *         </tr>
+	 *         <tr>
+	 *             <td>-</td>
+	 *             <td>1110</td>
+	 *             <td>e</td>
+	 *             <td>Unsupported, an UUID with such variant will be considered invalid.</td>
+	 *         </tr>
+	 *         <tr>
+	 *             <td>-</td>
+	 *             <td>1111</td>
+	 *             <td>f</td>
+	 *             <td>Unsupported, an UUID with such variant will be considered invalid.</td>
+	 *         </tr>
+	 *     </tbody>
+	 * </table>
 	 *
 	 * @return the allowed UUID variant numbers
-	 * Per default variants 0 to 2 are allowed
+	 * Per default, all variants 0 to 2 are allowed
 	 */
 	int[] variant() default { 0, 1, 2};
 
