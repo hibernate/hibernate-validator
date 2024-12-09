@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -287,5 +288,121 @@ public class UUIDValidatorTest {
 
 	}
 
+	@Test
+	public void versionNotInTheAllowedList() {
+		char[] versions = new char[] { '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
+		for ( int i = 0; i < versions.length; i++ ) {
+			int version = Character.digit( versions[i], 16 );
+			descriptorBuilder.setAttribute( "version", new int[] { version } );
+
+			uuidAnnotation = descriptorBuilder.build().getAnnotation();
+			uuidValidator.initialize( uuidAnnotation );
+
+			for ( int j = 0; j < versions.length; j++ ) {
+				if ( i == j ) {
+					continue;
+				}
+				String uuid = "24e6abaa-b2a8-%sa8e-0622-92adaaae229f".formatted( versions[j] );
+				assertThat( uuidValidator.isValid( uuid, null ) )
+						.as( "Expected uuid %s to be invalid because of the version %s not being allowed", uuid, versions[j] )
+						.isFalse();
+			}
+		}
+	}
+
+	@Test
+	public void variantNotInTheAllowedLis11t() {
+		descriptorBuilder.setAttribute( "variant", new int[] { 1 } );
+
+		uuidAnnotation = descriptorBuilder.build().getAnnotation();
+		uuidValidator.initialize( uuidAnnotation );
+
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-c622-92adaaae229f", null ) );
+	}
+
+	@Test
+	public void variantNotInTheAllowedList() {
+		// 0xxx 0 - 7    reserved (NCS backward compatible)
+		// 10xx 8 - b    DCE 1.1, ISO/IEC 11578:1996
+		// 110x c - d    reserved (Microsoft GUID)
+		// 1110 e        reserved (future use)
+		// 1111 f        unknown / invalid. Must end with "0"
+
+		descriptorBuilder.setAttribute( "variant", new int[] { 0 } );
+
+		uuidAnnotation = descriptorBuilder.build().getAnnotation();
+		uuidValidator.initialize( uuidAnnotation );
+
+		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-0622-92adaaae229f", null ) );
+		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-1622-92adaaae229f", null ) );
+		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-2622-92adaaae229f", null ) );
+		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-3622-92adaaae229f", null ) );
+		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-4622-92adaaae229f", null ) );
+		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-5622-92adaaae229f", null ) );
+		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-6622-92adaaae229f", null ) );
+		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-7622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-8622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-9622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-a622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-b622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-c622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-d622-92adaaae229f", null ) );
+		// Next two variants are always invalid as they are currently "undefined":
+		// 1110	e
+		// 1111	f
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-e622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-f622-92adaaae229f", null ) );
+
+		descriptorBuilder.setAttribute( "variant", new int[] { 1 } );
+
+		uuidAnnotation = descriptorBuilder.build().getAnnotation();
+		uuidValidator.initialize( uuidAnnotation );
+
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-0622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-1622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-2622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-3622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-4622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-5622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-6622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-7622-92adaaae229f", null ) );
+		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-8622-92adaaae229f", null ) );
+		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-9622-92adaaae229f", null ) );
+		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-a622-92adaaae229f", null ) );
+		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-b622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-c622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-d622-92adaaae229f", null ) );
+		// Next two variants are always invalid as they are currently "undefined":
+		// 1110	e
+		// 1111	f
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-e622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-f622-92adaaae229f", null ) );
+
+		descriptorBuilder.setAttribute( "variant", new int[] { 2 } );
+
+		uuidAnnotation = descriptorBuilder.build().getAnnotation();
+		uuidValidator.initialize( uuidAnnotation );
+
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-0622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-1622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-2622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-3622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-4622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-5622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-6622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-7622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-8622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-9622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-a622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-b622-92adaaae229f", null ) );
+		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-c622-92adaaae229f", null ) );
+		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-d622-92adaaae229f", null ) );
+		// Next two variants are always invalid as they are currently "undefined":
+		// 1110	e
+		// 1111	f
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-e622-92adaaae229f", null ) );
+		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-f622-92adaaae229f", null ) );
+
+	}
 }
