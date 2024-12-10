@@ -150,8 +150,6 @@ stage('Configure') {
 		maven {
 			defaultTool MAVEN_TOOL
 			producedArtifactPattern "org/hibernate/validator/*"
-			// Relocation artifacts
-			producedArtifactPattern "org/hibernate/hibernate-validator*"
 		}
 	}
 
