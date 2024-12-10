@@ -9,20 +9,20 @@ import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * Check that a character sequence is not {@code null} nor empty after removing any leading or trailing whitespace.
+ * Check that a character sequence is not {@code null} nor {@link String#isBlank() blank}.
  *
  * @author Guillaume Smet
  */
 public class NotBlankValidator implements ConstraintValidator<NotBlank, CharSequence> {
 
 	/**
-	 * Checks that the character sequence is not {@code null} nor empty after removing any leading or trailing
-	 * whitespace.
+	 * Checks that the character sequence is not {@code null} nor {@link String#isBlank() blank}.
 	 *
 	 * @param charSequence the character sequence to validate
 	 * @param constraintValidatorContext context in which the constraint is evaluated
-	 * @return returns {@code true} if the string is not {@code null} and the length of the trimmed
-	 * {@code charSequence} is strictly superior to 0, {@code false} otherwise
+	 * @return returns {@code true} if the string is not {@code null} and
+	 * the call to {@link String#isBlank() charSequence.isBlank()} returns {@code false}, {@code false} otherwise
+	 * @see String#isBlank()
 	 */
 	@Override
 	public boolean isValid(CharSequence charSequence, ConstraintValidatorContext constraintValidatorContext) {
@@ -30,6 +30,6 @@ public class NotBlankValidator implements ConstraintValidator<NotBlank, CharSequ
 			return false;
 		}
 
-		return charSequence.toString().trim().length() > 0;
+		return !charSequence.toString().isBlank();
 	}
 }
