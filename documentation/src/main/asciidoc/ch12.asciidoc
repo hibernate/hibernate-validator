@@ -780,8 +780,8 @@ configuring the default validator factory using _META-INF/validation.xml_ (see
 One use case for registering constraint definitions through the programmatic API is the ability to specify an alternative
 constraint validator for the `@URL` constraint. Historically, Hibernate Validator's default constraint
 validator for this constraint uses the `java.net.URL` constructor to validate an URL.
-However, there is also a purely regular expression based version available which can be configured using
-a `ConstraintDefinitionContributor`:
+However, there is also a purely regular expression based version available, which can be configured using
+the programmatic constraint declaration API:
 
 .Using the programmatic constraint declaration API to register a regular expression based constraint definition for `@URL`
 [source, JAVA, indent=0]
