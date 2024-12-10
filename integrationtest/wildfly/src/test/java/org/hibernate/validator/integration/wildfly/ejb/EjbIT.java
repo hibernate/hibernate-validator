@@ -44,7 +44,7 @@ public class EjbIT extends AbstractArquillianIT {
 				);
 	}
 
-	@Test(enabled = false)
+	@Test
 	@RunAsClient
 	public void testRestEasyWorks() {
 		given()
@@ -57,7 +57,7 @@ public class EjbIT extends AbstractArquillianIT {
 				.body( equalTo( "Hello bars a, b, c" ) );
 	}
 
-	@Test(enabled = false)
+	@Test
 	@RunAsClient
 	public void testValidationWorks() {
 		given()
