@@ -106,7 +106,7 @@ jobs:
       - name: Build code and run tests and basic checks (Standalone)
         run: |
           ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean install \
-          -Pjqassistant -Pdist -Prelocation
+          -Pjqassistant -Pdist
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
       # For jobs running on 'pull_request', upload build scan data.
