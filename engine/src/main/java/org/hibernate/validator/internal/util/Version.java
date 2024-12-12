@@ -19,7 +19,7 @@ public final class Version {
 	}
 
 	public static String getVersionString() {
-		return Version.class.getPackage().getImplementationVersion();
+		return "UNKNOWN";
 	}
 
 	public static void touch() {
