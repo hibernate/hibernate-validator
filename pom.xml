@@ -295,7 +295,8 @@
         <mavencentral.repo.url>https://repo.maven.apache.org/maven2/</mavencentral.repo.url>
 
         <!-- Jakarta Staging repository -->
-        <!-- Can be used for versions of Validation TCK/API -->
+        <!-- Can be used for versions of Validation TCK/API that are not yet available at Maven Central -->
+        <!-- This repository is currently not activated -->
         <jakarta.staging.repo.id>jakarta-staging</jakarta.staging.repo.id>
         <jakarta.staging.repo.url>https://jakarta.oss.sonatype.org/content/repositories/staging/</jakarta.staging.repo.url>
 
@@ -1620,14 +1621,6 @@
         <tag>HEAD</tag>
     </scm>
 
-    <repositories>
-        <repository>
-            <id>${jakarta.staging.repo.id}</id>
-            <name>Jakarta OSS Staging Repository</name>
-            <url>${jakarta.staging.repo.url}</url>
-        </repository>
-    </repositories>
-
     <distributionManagement>
         <repository>
             <id>${ossrh.releases.repo.id}</id>
@@ -1920,6 +1913,19 @@
                     </plugins>
                 </pluginManagement>
             </build>
+        </profile>
+        <profile>
+            <id>jakarta-staging</id>
+            <!-- Use something like: -->
+            <!-- <activation><jdk>[17,)</jdk></activation> -->
+            <!-- When needing to use this staging repository by default and hence activate the profile. -->
+            <repositories>
+                <repository>
+                    <id>${jakarta.staging.repo.id}</id>
+                    <name>Jakarta OSS Staging Repository</name>
+                    <url>${jakarta.staging.repo.url}</url>
+                </repository>
+            </repositories>
         </profile>
 
         <profile>
