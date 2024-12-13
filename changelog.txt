@@ -1,6 +1,46 @@
 Hibernate Validator Changelog
 =============================
 
+9.0.0.CR1 (2024-12-13)
+-------------------------
+
+** Bug
+    * HV-2067 UUID version not correctly validated
+    * HV-2061 OSGi: HV 9.0.0.Beta1/2/3 imports wrong OSGi package version of Jakarta EL
+    * HV-2044 The distribution package is missing the javadocs sub directory  
+    * HV-1955 NotBlankValidator is not consistent with Jakarta @NotBlank specs
+    * HV-1829 Hibernate docs still reference ConstraintDefinitionContributor which was removed in 5.3
+
+** Improvement
+    * HV-2066 update document section 3.1.1
+    * HV-2064 Upgrade jboss-logging-tools to 3.0.3.Final
+    * HV-2062 Version is lost when using JLink
+    * HV-2056 Update to OpenJFX from 17.0.12 to 17.0.13
+    * HV-2055 Update version.org.jboss.logging.jboss-logging-tools from 3.0.1.Final to 3.0.2.Final
+    * HV-2053 Add translation of Validation Messages for Azerbaijani language
+    * HV-2049 Bump Apache Groovy to 4.0.23 
+    * HV-2048 Bump joda-time to 2.13.0
+    * HV-2045 Upgrade to JBoss logging 3.6.1.Final
+    * HV-1962 Remove relativePath in pom because it's default
+    * HV-1942 Update DefaultGroupSequenceProvider add default method provide the class of instance
+    * HV-1931 No version info when running from the module path
+
+** Remove Feature
+    * HV-2068 Stop publishing relocation poms
+
+** Task
+    * HV-2069 Test Hibernate Validator against JDK 25
+    * HV-2065 Test against wildfly-preview 34.0.1.Final
+    * HV-2059 Integrate with Develocity build scans/build cache
+    * HV-2058 Test against wildfly-preview 34.0.0.Final
+    * HV-2057 Complete Validator + Sonar integration
+    * HV-2051 Use spotless maven plugin instead of formatter/impsorter/license check plugins
+    * HV-2050 Use SPDX headers format 
+    * HV-2047 Test against wildfly-preview 33.0.2.Final
+    * HV-2046 Enable code coverage with maven build
+    * HV-2020 Investigate if we can remove the dependency on Expressly
+    * HV-1754 Re-enable EjbIT when all tested versions of WildFly have fixed WFL-11566
+
 9.0.0.Beta3 (2024-09-04)
 -------------------------
 
