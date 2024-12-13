@@ -51,3 +51,10 @@ maven-eclipse.xml
 *.log
 .clover
 .DS_Store
+
+# Cache folders for formatting plugins:
+.cache
+
+# Gradle Enterprise/Develocity
+/.mvn/.gradle-enterprise
+/.mvn/.develocity
