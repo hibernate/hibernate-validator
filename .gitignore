@@ -55,3 +55,10 @@ maven-eclipse.xml
 # Maven wrapper files
 .mvn/wrapper
 mvnw*
+
+# Cache folders for formatting plugins:
+.cache
+
+# Gradle Enterprise/Develocity
+/.mvn/.gradle-enterprise
+/.mvn/.develocity
