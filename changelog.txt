@@ -1,6 +1,27 @@
 Hibernate Validator Changelog
 =============================
 
+8.0.2.Final (2024-12-13)
+-------------------------
+
+** Bug
+    * HV-2067 UUID version not correctly validated
+    * HV-2002 Brazilian Titulo Eleitoral not correctly validating on some scenarios
+    * HV-1959 Typo fix for Ukrainian localization
+    * HV-1829 Hibernate docs still reference ConstraintDefinitionContributor which was removed in 5.3
+
+** Improvement
+    * HV-2066 update document section 3.1.1
+    * HV-1981 Use Maven 3.9.6 in CI builds and as a required minimum version for the build
+    * HV-1943 Some french validation messages are not quite accurate
+
+** Task
+    * HV-1990 Test Hibernate Validator against JDK 24
+    * HV-1989 Update documentation examples to use the min required Java version where applicable
+    * HV-1980 Update gpg plugin configuration
+    * HV-1969 Test Hibernate Validator against JDK 23
+    * HV-1968 Force user.country when testing
+
 8.0.1.Final (2023-06-20)
 -------------------------
 
