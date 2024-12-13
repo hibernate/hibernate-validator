@@ -111,6 +111,10 @@
 				<exclude>**/performance/hibernate-validator.log</exclude>
 				<exclude>**/performance/dependency-reduced-pom.xml</exclude>
 				<exclude>**/.cache/**</exclude>
+				<exclude>Jenkinsfile</exclude>
+				<exclude>jenkins/**</exclude>
+				<exclude>.mvn/.develocity/**</exclude>
+				<exclude>.github/**</exclude>
 			</excludes>
 		</fileSet>
 
