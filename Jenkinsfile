@@ -10,7 +10,7 @@ import groovy.transform.Field
 /*
  * See https://github.com/hibernate/hibernate-jenkins-pipeline-helpers
  */
-@Library('hibernate-jenkins-pipeline-helpers@1.3')
+@Library('hibernate-jenkins-pipeline-helpers')
 import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
 import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
 
@@ -51,15 +51,6 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *
  * ### Integrations
  *
- * #### Nexus deployment
- *
- * This job is only able to deploy snapshot artifacts,
- * for every non-PR build on "primary" branches (main and maintenance branches),
- * but the name of a Maven settings file must be provided in the job configuration file
- * (see below).
- *
- * For actual releases, see jenkins/release.groovy.
- *
  * ### Job configuration
  *
  * This Jenkinsfile gets its configuration from four sources:
@@ -83,11 +74,6 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *
  * Below is the additional structure specific to this Jenkinsfile:
  *
- *     deployment:
- *       maven:
- *         # String containing the ID of a Maven settings file registered using the config-file-provider Jenkins plugin.
- *         # The settings must provide credentials to the server with ID 'ossrh'.
- *         settingsId: ...
  */
 
 @Field final String DEFAULT_JDK_TOOL = 'OpenJDK 17 Latest'
@@ -105,7 +91,6 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
 
 @Field boolean enableDefaultBuild = false
 @Field boolean enableDefaultBuildIT = false
-@Field boolean deploySnapshot = false
 
 this.helper = new JobHelper(this)
 
@@ -187,15 +172,6 @@ Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse'.
 			])
 	])
 
-	if (helper.scmSource.branch.primary && !helper.scmSource.pullRequest) {
-		if (helper.configuration.file?.deployment?.maven?.settingsId) {
-			deploySnapshot = true
-		}
-		else {
-			echo "Missing deployment configuration in job configuration file - snapshot deployment will be skipped."
-		}
-	}
-
 	if (params.ENVIRONMENT_FILTER) {
 		keepOnlyEnvironmentsMatchingFilter(params.ENVIRONMENT_FILTER)
 	}
@@ -219,8 +195,7 @@ Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse'.
 
 	enableDefaultBuild =
 			enableDefaultBuildIT ||
-			environments.content.any { key, envSet -> envSet.enabled.any { buildEnv -> buildEnv.requiresDefaultBuildArtifacts() } } ||
-			deploySnapshot
+			environments.content.any { key, envSet -> envSet.enabled.any { buildEnv -> buildEnv.requiresDefaultBuildArtifacts() } }
 
 	echo """Branch: ${helper.scmSource.branch.name}
 PR: ${helper.scmSource.pullRequest?.id}
@@ -231,7 +206,6 @@ Resulting execution plan:
     enableDefaultBuild=$enableDefaultBuild
     enableDefaultBuildIT=$enableDefaultBuildIT
     environments=${environments.enabledAsString}
-    deploySnapshot=$deploySnapshot
 """
 }
 
@@ -242,15 +216,10 @@ stage('Default build') {
 		return
 	}
 	runBuildOnNode {
-		helper.withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
+		helper.withMavenWorkspace {
 			sh """ \
-					mvn clean \
+					mvn clean install \
 					--fail-at-end \
-					${deploySnapshot ? "\
-							deploy -DdeployAtEnd=true \
-					" : "\
-							install \
-					"} \
 					-Pdist \
 					-Pjqassistant \
 					${enableDefaultBuildIT ? '' : '-DskipITs'} \
