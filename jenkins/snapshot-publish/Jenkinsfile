@@ -14,7 +14,7 @@ if (currentBuild.getBuildCauses().toString().contains('BranchIndexingCause')) {
 
 pipeline {
 	agent {
-		label 'Worker&&Containers'
+		label 'Release'
 	}
 	tools {
 		maven 'Apache Maven 3.9'
