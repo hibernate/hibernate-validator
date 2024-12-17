@@ -6,7 +6,7 @@
 @Library('hibernate-jenkins-pipeline-helpers') _
 
 def withMavenWorkspace(Closure body) {
-	withMavenWorkspace('OpenJDK 17 Latest', body)
+	withMavenWorkspace('OpenJDK 21 Latest', body)
 }
 
 def withMavenWorkspace(jdk, Closure body) {
