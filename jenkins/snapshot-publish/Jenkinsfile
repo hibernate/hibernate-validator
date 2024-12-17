@@ -1,0 +1,53 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright Red Hat Inc. and Hibernate Authors
+ */
+
+@Library('hibernate-jenkins-pipeline-helpers') _
+
+// Avoid running the pipeline on branch indexing
+if (currentBuild.getBuildCauses().toString().contains('BranchIndexingCause')) {
+	print "INFO: Build skipped due to trigger being Branch Indexing"
+	currentBuild.result = 'NOT_BUILT'
+	return
+}
+
+pipeline {
+	agent {
+		label 'Worker&&Containers'
+	}
+	tools {
+		maven 'Apache Maven 3.6'
+		jdk 'OpenJDK 17 Latest'
+	}
+	options {
+		// Wait for 1h before publishing snapshots, in case there's more commits.
+		quietPeriod 3600
+		// In any case, never publish snapshots more than once per hour.
+		rateLimitBuilds(throttle: [count: 1, durationName: 'hour', userBoost: true])
+
+		buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '3'))
+		disableConcurrentBuilds(abortPrevious: false)
+	}
+	stages {
+		stage('Publish') {
+			steps {
+				script {
+					withMaven(mavenSettingsConfig: 'ci-hibernate.deploy.settings.maven',
+							mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository') {
+						sh """mvn \
+								-Pci-build \
+								-DskipTests \
+								clean deploy \
+						"""
+					}
+				}
+			}
+		}
+	}
+	post {
+		always {
+			notifyBuildResult notifySuccessAfterSuccess: false, maintainers: 'marko@hibernate.org'
+		}
+	}
+}

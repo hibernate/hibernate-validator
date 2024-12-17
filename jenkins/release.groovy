@@ -5,7 +5,7 @@
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 
-@Library('hibernate-jenkins-pipeline-helpers@1.5') _
+@Library('hibernate-jenkins-pipeline-helpers') _
 
 import org.hibernate.jenkins.pipeline.helpers.version.Version
 
@@ -14,7 +14,7 @@ pipeline {
 		label 'Worker&&Containers'
 	}
 	tools {
-		maven 'Apache Maven 3.8'
+		maven 'Apache Maven 3.6'
 		jdk 'OpenJDK 17 Latest'
 	}
 	options {
