@@ -11,7 +11,7 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
 
 pipeline {
 	agent {
-		label 'Worker&&Containers'
+		label 'Release'
 	}
 	tools {
 		maven 'Apache Maven 3.8'
