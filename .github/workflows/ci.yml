@@ -60,20 +60,20 @@ jobs:
       matrix:
         os:
           - {
-            name: "Linux JDK 17",
+            name: "Linux JDK 21",
             runs-on: 'ubuntu-latest',
             java: {
-              version: 17
+              version: 21
             },
             maven: {
               args: ''
             }
           }
           - {
-            name: "Windows JDK 17",
+            name: "Windows JDK 21",
             runs-on: 'windows-latest',
             java: {
-              version: 17
+              version: 21
             },
             maven: {
               args: ''
