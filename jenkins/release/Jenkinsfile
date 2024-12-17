@@ -89,7 +89,7 @@ pipeline {
 	}
 	post {
 		always {
-			notifyBuildResult notifySuccessAfterSuccess: true, maintainers: 'guillaume.smet@hibernate.org'
+			notifyBuildResult notifySuccessAfterSuccess: true, maintainers: 'marko@hibernate.org'
 		}
 	}
 }
