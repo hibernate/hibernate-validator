@@ -203,7 +203,8 @@
                 <!-- Use Local for testing without security manager -->
                 <arquillian.protocol>LocalSecurityManagerTesting</arquillian.protocol>
                 <!-- Remove for testing without security manager -->
-                <surefire.jvm.args.additional>-DincludeJavaFXTests=true -Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/test.policy -Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
+                <surefire.jvm.args.additional.security>-Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/test.policy</surefire.jvm.args.additional.security>
+                <surefire.jvm.args.additional>-DincludeJavaFXTests=true -Duser.language=en -Duser.country=US ${surefire.jvm.args.additional.security}</surefire.jvm.args.additional>
                 <!-- Uncomment the following line to obtain the access log of the security manager -->
                 <!--<surefire.jvm.args.additional>-DincludeJavaFXTests=true -Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/test.policy -Djava.security.debug=access -Duser.language=en -Duser.country=US</surefire.jvm.args.additional>-->
             </properties>
@@ -551,6 +552,32 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>testWithJdk24</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>24</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.protocol>Local</arquillian.protocol>
+                <surefire.jvm.args.additional.security></surefire.jvm.args.additional.security>
+            </properties>
+        </profile>
+        <profile>
+            <id>testWithJdk25</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>25</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.protocol>Local</arquillian.protocol>
+                <surefire.jvm.args.additional.security></surefire.jvm.args.additional.security>
+            </properties>
         </profile>
         <!-- Resolution of the JavaFX platform -->
         <profile>
