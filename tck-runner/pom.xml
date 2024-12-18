@@ -189,8 +189,7 @@
                 </property>
             </activation>
             <properties>
-                <!-- Use Local for testing without security manager -->
-                <arquillian.protocol>LocalSecurityManagerTesting</arquillian.protocol>
+                <arquillian.protocol>Local</arquillian.protocol>
                 <surefire.jvm.args.additional>-DincludeJavaFXTests=true -Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
             </properties>
             <dependencies>
