@@ -124,7 +124,7 @@
 			<outputDirectory>docs/api</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<directory>../documentation/target/asciidoctor</directory>
+			<directory>../documentation/target/dist</directory>
 			<outputDirectory>docs/reference</outputDirectory>
 		</fileSet>
 
