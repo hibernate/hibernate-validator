@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+	SPDX-License-Identifier: Apache-2.0
+	Copyright Red Hat Inc. and Hibernate Authors
+-->
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
+	<id>pdf</id>
+	<formats>
+		<format>dir</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<!-- PDFs: -->
+	<files>
+		<file>
+			<source>${asciidoctor.base-output-dir}/pdf/index.pdf</source>
+			<outputDirectory>en-US/pdf/</outputDirectory>
+			<destName>hibernate_validator_reference.pdf</destName>
+		</file>
+	</files>
+</assembly>
