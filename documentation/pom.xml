@@ -306,6 +306,27 @@
                     </attributes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>${basedir}/src/main/assembly/dist.xml</descriptor>
+                    </descriptors>
+                    <attach>false</attach>
+                    <finalName>dist</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-dist</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -313,6 +334,16 @@
             <id>documentation-pdf</id>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration combine.children="append">
+                            <descriptors>
+                                <descriptor>${basedir}/src/main/assembly/dist.xml</descriptor>
+                                <descriptor>${basedir}/src/main/assembly/pdf.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>org.asciidoctor</groupId>
                         <artifactId>asciidoctor-maven-plugin</artifactId>
@@ -339,43 +370,6 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>ch.mfrey.maven.plugin</groupId>
-                        <artifactId>copy-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy</id>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <resources>
-                                        <resource>
-                                            <directory>${asciidoctor.base-output-dir}/pdf</directory>
-                                            <move>true</move>
-                                            <includes>
-                                                <include>index.pdf</include>
-                                            </includes>
-                                            <paths>
-                                                <path>
-                                                    <from>index.pdf</from>
-                                                    <to>hibernate_validator_reference.pdf</to>
-                                                </path>
-                                            </paths>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.codehaus.plexus</groupId>
-                                <artifactId>plexus-utils</artifactId>
-                                <version>4.0.2</version>
-                            </dependency>
-                        </dependencies>
                     </plugin>
                 </plugins>
             </build>
