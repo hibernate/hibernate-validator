@@ -1,0 +1,70 @@
+/*
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
+
+@Library('hibernate-jenkins-pipeline-helpers') _
+
+def withMavenWorkspace(Closure body) {
+	withMavenWorkspace('OpenJDK 17 Latest', body)
+}
+
+def withMavenWorkspace(jdk, Closure body) {
+	withMaven(jdk: jdk, maven: 'Apache Maven 3.9',
+			mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository',
+			options: [
+					// Artifacts are not needed and take up disk space
+					artifactsPublisher(disabled: true),
+					// stdout/stderr for successful tests is not needed and takes up disk space
+					// we archive test results and stdout/stderr as part of the build scan anyway,
+					// see https://ge.hibernate.org/scans?search.rootProjectNames=Hibernate%20Search
+					junitPublisher(disabled: true)
+			]) {
+		body()
+	}
+}
+
+pipeline {
+	agent none
+	triggers {
+		cron '@midnight'
+	}
+	options {
+		buildDiscarder logRotator(daysToKeepStr: '10', numToKeepStr: '3')
+		disableConcurrentBuilds(abortPrevious: true)
+		overrideIndexTriggers(false)
+	}
+	stages {
+		stage ('Run checks') {
+			parallel {
+				stage('Build documentation PDF') {
+					agent {
+						label 'Worker&&Containers'
+					}
+					steps {
+						// The timeout cannot be in stage options, because that would
+						// include the time needed to provision a node.
+						timeout(time: 15, unit: 'MINUTES') {
+							withMavenWorkspace {
+								echo "Generate documentation and distribution packages."
+								sh """mvn clean install \
+									-Pdocumentation-pdf \
+									-DskipTests \
+									--fail-at-end \
+									-Dscan=false -Dno-build-cache
+								"""
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	post {
+		always {
+			notifyBuildResult maintainers: 'marko@hibernate.org'
+		}
+	}
+}
