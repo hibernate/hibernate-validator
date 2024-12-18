@@ -90,6 +90,26 @@ pipeline {
 						}
 					}
 				}
+				stage('Build documentation PDF') {
+					agent {
+						label 'Worker&&Containers'
+					}
+					steps {
+						// The timeout cannot be in stage options, because that would
+						// include the time needed to provision a node.
+						timeout(time: 15, unit: 'MINUTES') {
+							withMavenWorkspace {
+								echo "Generate documentation and distribution packages."
+								sh """mvn clean install \
+									-Pdocumentation-pdf \
+									-DskipTests \
+									--fail-at-end \
+									-Dscan=false -Dno-build-cache
+								"""
+							}
+						}
+					}
+				}
 			}
 		}
 	}
