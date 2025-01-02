@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.test.spi.nodenameprovider;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertEquals;
 
 import java.lang.annotation.ElementType;
@@ -23,6 +25,9 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.annotations.BeforeMethod;
@@ -177,6 +182,30 @@ public class PropertyNodeNameProviderTest {
 		assertEquals( violation.getPropertyPath().toString(), "brand.name" );
 	}
 
+	@Test
+	public void constraintsDefinedProgrammatically() {
+		HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.propertyNodeNameProvider( new AnnotationPropertyNodeNameProvider( PropertyName.class ) );
+		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
+
+		constraintMapping
+				.type( ProgrammaticCar.class )
+				.field( "brand" )
+				.constraint( new SizeDef().min( 5 ).max( 50 ) );
+
+		ValidatorFactory validatorFactory = configuration
+				.addMapping( constraintMapping )
+				.buildValidatorFactory();
+
+		Validator val = validatorFactory.getValidator();
+
+		assertThat( val.validate( new ProgrammaticCar( INVALID_BRAND_NAME ) ) )
+				.containsOnlyViolations( violationOf( Size.class )
+						.withProperty( "car_brand" ) );
+
+	}
+
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.FIELD, ElementType.METHOD })
 	public @interface PropertyName {
@@ -235,6 +264,15 @@ public class PropertyNodeNameProviderTest {
 
 		public Airplane(Engine engine) {
 			this.engine = engine;
+		}
+	}
+
+	private static class ProgrammaticCar {
+		@PropertyName("car_brand")
+		public final String brand;
+
+		ProgrammaticCar(String brand) {
+			this.brand = brand;
 		}
 	}
 }

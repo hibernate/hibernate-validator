@@ -384,15 +384,10 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	@Override
 	public final DefaultConstraintMapping createConstraintMapping() {
-		GetterPropertySelectionStrategy getterPropertySelectionStrategyToUse = null;
-		if ( getterPropertySelectionStrategy == null ) {
-			getterPropertySelectionStrategyToUse = new DefaultGetterPropertySelectionStrategy();
-		}
-		else {
-			getterPropertySelectionStrategyToUse = getterPropertySelectionStrategy;
-		}
-
-		return new DefaultConstraintMapping( new JavaBeanHelper( getterPropertySelectionStrategyToUse, defaultPropertyNodeNameProvider ) );
+		return new DefaultConstraintMapping( new JavaBeanHelper(
+				getterPropertySelectionStrategy == null ? new DefaultGetterPropertySelectionStrategy() : getterPropertySelectionStrategy,
+				validationBootstrapParameters.getPropertyNodeNameProvider() == null ? defaultPropertyNodeNameProvider : validationBootstrapParameters.getPropertyNodeNameProvider()
+		) );
 	}
 
 	@Override
