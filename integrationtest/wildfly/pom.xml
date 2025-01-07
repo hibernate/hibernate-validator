@@ -28,7 +28,6 @@
 
         <hibernate-validator-parent.path>../..</hibernate-validator-parent.path>
         <skip.wildfly.integration.test.hibernate.validator>false</skip.wildfly.integration.test.hibernate.validator>
-        <skip.failsafe.execution>false</skip.failsafe.execution>
     </properties>
 
     <dependencies>
@@ -180,7 +179,6 @@
                             <goal>verify</goal>
                         </goals>
                         <configuration>
-                            <skip>${skip.failsafe.execution}</skip>
                             <systemPropertyVariables>
                                 <arquillian.launch>wildfly-current</arquillian.launch>
                             </systemPropertyVariables>
@@ -258,30 +256,6 @@
             <properties>
                 <!-- required by Arquillian to connect to the JMX interface of WildFly -->
                 <surefire.jvm.args.add-opens>--add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED</surefire.jvm.args.add-opens>
-            </properties>
-        </profile>
-        <profile>
-            <id>testWithJdk24</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>24</value>
-                </property>
-            </activation>
-            <properties>
-                <skip.failsafe.execution>true</skip.failsafe.execution>
-            </properties>
-        </profile>
-        <profile>
-            <id>testWithJdk25</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>25</value>
-                </property>
-            </activation>
-            <properties>
-                <skip.failsafe.execution>true</skip.failsafe.execution>
             </properties>
         </profile>
     </profiles>
