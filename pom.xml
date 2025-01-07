@@ -1816,6 +1816,8 @@
                 </property>
             </activation>
             <properties>
+                <!-- Remove once there's a 35 Final available -->
+                <version.wildfly>35.0.0.Beta1</version.wildfly>
                 <!-- ForbiddenAPIs doesn't work with JDK24+ yet -->
                 <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK24+ -->
@@ -1832,6 +1834,8 @@
                 </property>
             </activation>
             <properties>
+                <!-- Remove once there's a 35 Final available -->
+                <version.wildfly>35.0.0.Beta1</version.wildfly>
                 <!-- ForbiddenAPIs doesn't work with JDK25+ yet -->
                 <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK25+ -->
