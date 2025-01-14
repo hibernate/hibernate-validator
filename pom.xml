@@ -189,7 +189,7 @@
         <version.org.openjfx>17.0.13</version.org.openjfx>
 
         <!-- Test dependencies -->
-        <version.org.jboss.arquillian>1.9.2.Final</version.org.jboss.arquillian>
+        <version.org.jboss.arquillian>1.9.3.Final</version.org.jboss.arquillian>
         <version.shrinkwrap.core>1.2.6</version.shrinkwrap.core>
         <version.shrinkwrap.resolvers>3.3.3</version.shrinkwrap.resolvers>
         <version.shrinkwrap.descriptors>2.0.0</version.shrinkwrap.descriptors>
@@ -249,7 +249,7 @@
         <version.gmavenplus.plugin>4.1.1</version.gmavenplus.plugin>
         <version.gpg.plugin>3.2.7</version.gpg.plugin>
         <version.install.plugin>3.1.3</version.install.plugin>
-        <version.japicmp.plugin>0.23.0</version.japicmp.plugin>
+        <version.japicmp.plugin>0.23.1</version.japicmp.plugin>
         <version.jar.plugin>3.4.2</version.jar.plugin>
         <version.jqassistant.plugin>2.5.0</version.jqassistant.plugin>
         <version.javadoc.plugin>3.11.2</version.javadoc.plugin>
@@ -267,7 +267,7 @@
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
         <version.versions.plugin>2.18.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
-        <version.spotless-maven-plugin>2.44.0</version.spotless-maven-plugin>
+        <version.spotless-maven-plugin>2.44.1</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
         <version.sonar.plugin>5.0.0.4389</version.sonar.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
