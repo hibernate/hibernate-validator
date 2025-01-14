@@ -135,7 +135,7 @@
 
         <!-- Currently supported version of WildFly -->
         <!-- Update JDK 24 configuration when changing this version: -->
-        <version.wildfly>34.0.1.Final</version.wildfly>
+        <version.wildfly>35.0.0.Final</version.wildfly>
         <!-- Used to create a patch file for the second version of WildFly we support -->
         <!--<version.wildfly.secondary>18.0.1.Final</version.wildfly.secondary>-->
         <!-- Version used to run the TCK in incontainer mode -->
