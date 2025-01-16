@@ -96,6 +96,16 @@ this.helper = new JobHelper(this)
 helper.runWithNotification {
 
 stage('Configure') {
+	// We want to make sure that if we are building a PR that the branch name will not require any escaping of symbols in it.
+	// Otherwise, it may lead to cryptic build errors.
+	if (helper.scmSource.branch.name && !(helper.scmSource.branch.name ==~ /^[\w\d\/\\_\-\.]+$/)) {
+		throw new IllegalArgumentException("""
+											Branch name ${helper.scmSource.branch.name} contains unexpected symbols.
+											 Only characters, digits and -_.\\/ symbols are allowed in the branch name.
+											 Change the branch name and open a new Pull Request.
+										   """)
+	}
+
 	this.environments = AlternativeMultiMap.create([
 			jdk: [
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
