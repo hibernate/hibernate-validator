@@ -313,6 +313,7 @@
             Set statically, independently of the current JDK: we want our code to comply with this version
 
             Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting.
+            Adjust the contributing guide when changing the release Java version.
         -->
         <java-version.main.release>17</java-version.main.release>
         <java-version.main.compiler.java_home>${java.home}</java-version.main.compiler.java_home>
@@ -403,7 +404,7 @@
         <arquillian.wildfly.jvm.args>-Duser.language=en -Duser.country=US ${arquillian.wildfly.jvm.args.add-opens} ${arquillian.wildfly.jvm.args.add-modules} ${arquillian.jvm.args.java-version}</arquillian.wildfly.jvm.args>
 
         <!-- JDK version required for the build -->
-        <!-- Remember to update README when changing the version here. -->
+        <!-- Remember to update README/CONTRIBUTING when changing the version here. -->
         <jdk.min.version>21</jdk.min.version>
         <!-- Maven version required for the build -->
         <!--
