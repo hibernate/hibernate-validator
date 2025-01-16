@@ -106,6 +106,8 @@ stage('Configure') {
 										   """)
 	}
 
+	requireApprovalForPullRequest 'hibernate'
+
 	this.environments = AlternativeMultiMap.create([
 			jdk: [
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
