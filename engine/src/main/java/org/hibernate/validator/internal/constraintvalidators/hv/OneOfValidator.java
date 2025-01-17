@@ -2,12 +2,13 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright Red Hat Inc. and Hibernate Authors
  */
-package org.hibernate.validator.internal.constraintvalidators.bv;
+package org.hibernate.validator.internal.constraintvalidators.hv;
 
 
 import static java.util.Objects.nonNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -27,7 +28,7 @@ import org.hibernate.validator.constraints.OneOf;
  * @author Yusuf Àlàmù Musa
  * @version 1.0
  */
-public class OneOfValidator implements ConstraintValidator<OneOf, CharSequence> {
+public class OneOfValidator implements ConstraintValidator<OneOf, Object> {
 
 	private final List<String> acceptedValues = new ArrayList<>();
 	private boolean ignoreCase;
@@ -54,6 +55,30 @@ public class OneOfValidator implements ConstraintValidator<OneOf, CharSequence> 
 		if ( constraintAnnotation.allowedValues() != null ) {
 			initializeAcceptedValues( constraintAnnotation.allowedValues() );
 		}
+
+		// If specific allowed values are provided, initialize accepted values from them
+		if ( constraintAnnotation.allowedIntegers() != null ) {
+			final String[] acceptedValues = convertIntToStringArray( constraintAnnotation.allowedIntegers() );
+			initializeAcceptedValues( acceptedValues );
+		}
+
+		// If specific allowed values are provided, initialize accepted values from them
+		if ( constraintAnnotation.allowedLongs() != null ) {
+			final String[] acceptedValues = convertLongToStringArray( constraintAnnotation.allowedLongs() );
+			initializeAcceptedValues( acceptedValues );
+		}
+
+		// If specific allowed values are provided, initialize accepted values from them
+		if ( constraintAnnotation.allowedFloats() != null ) {
+			final String[] acceptedValues = convertFloatToStringArray( constraintAnnotation.allowedFloats() );
+			initializeAcceptedValues( acceptedValues );
+		}
+
+		// If specific allowed values are provided, initialize accepted values from them
+		if ( constraintAnnotation.allowedDoubles() != null ) {
+			final String[] acceptedValues = convertDoubleToStringArray( constraintAnnotation.allowedDoubles() );
+			initializeAcceptedValues( acceptedValues );
+		}
 	}
 
 	/**
@@ -67,7 +92,7 @@ public class OneOfValidator implements ConstraintValidator<OneOf, CharSequence> 
 	* @return {@code true} if the value is valid, {@code false} otherwise.
 	*/
 	@Override
-	public boolean isValid(final CharSequence value, final ConstraintValidatorContext context) {
+	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
 		if ( nonNull( value ) ) {
 			return checkIfValueTheSame( value.toString() );
 		}
@@ -118,4 +143,55 @@ public class OneOfValidator implements ConstraintValidator<OneOf, CharSequence> 
 			acceptedValues.addAll( Stream.of( values ).map( String::trim ).toList() );
 		}
 	}
+
+	/**
+	 * Converts an array of integers to an array of their corresponding string representations.
+	 *
+	 * @param allowedIntegers The array of integers to be converted.
+	 * @return A new array of strings, where each element is the string representation of the corresponding integer from the input array.
+	 */
+	private static String[] convertIntToStringArray(final int[] allowedIntegers) {
+		return Arrays.stream( allowedIntegers )
+				.mapToObj( String::valueOf ) // Convert each int to String
+				.toArray( String[]::new );
+	}
+
+	/**
+	 * Converts an array of longs to an array of their corresponding string representations.
+	 *
+	 * @param allowedLongs The array of longs to be converted.
+	 * @return A new array of strings, where each element is the string representation of the corresponding long from the input array.
+	 */
+	private static String[] convertLongToStringArray(final long[] allowedLongs) {
+		return Arrays.stream( allowedLongs )
+				.mapToObj( String::valueOf ) // Convert each long to String
+				.toArray( String[]::new );
+	}
+
+	/**
+	 * Converts an array of doubles to an array of their corresponding string representations.
+	 *
+	 * @param allowedDoubles The array of doubles to be converted.
+	 * @return A new array of strings, where each element is the string representation of the corresponding double from the input array.
+	 */
+	private static String[] convertDoubleToStringArray(final double[] allowedDoubles) {
+		return Arrays.stream( allowedDoubles )
+				.mapToObj( String::valueOf ) // Convert each double to String
+				.toArray( String[]::new );
+	}
+
+	/**
+	 * Converts an array of floats to an array of their corresponding string representations.
+	 *
+	 * @param allowedFloats The array of floats to be converted.
+	 * @return A new array of strings, where each element is the string representation of the corresponding float from the input array.
+	 */
+	private static String[] convertFloatToStringArray(final float[] allowedFloats) {
+		final String[] acceptedValues = new String[allowedFloats.length];
+		for ( int i = 0; i < allowedFloats.length; i++ ) {
+			acceptedValues[i] = String.valueOf( allowedFloats[i] ); // Convert each float to String
+		}
+		return acceptedValues;
+	}
+
 }
