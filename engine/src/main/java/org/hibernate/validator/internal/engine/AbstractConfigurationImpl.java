@@ -66,6 +66,7 @@ import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.spi.tracking.ProcessedBeansTrackingVoter;
 
 /**
  * Hibernate specific {@code Configuration} implementation.
@@ -132,6 +133,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private BeanMetaDataClassNormalizer beanMetaDataClassNormalizer;
 	private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
 	private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
+	private ProcessedBeansTrackingVoter processedBeansTrackingVoter;
 
 	protected AbstractConfigurationImpl(BootstrapState state) {
 		this();
@@ -658,6 +660,22 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	public ExpressionLanguageFeatureLevel getCustomViolationExpressionLanguageFeatureLevel() {
 		return customViolationExpressionLanguageFeatureLevel;
+	}
+
+	@Override
+	public T processedBeansTrackingVoter(ProcessedBeansTrackingVoter processedBeansTrackingVoter) {
+		if ( LOG.isDebugEnabled() ) {
+			if ( processedBeansTrackingVoter != null ) {
+				LOG.debug( "Setting custom ProcessedBeansTrackingVoter of type " + processedBeansTrackingVoter.getClass()
+						.getName() );
+			}
+		}
+		this.processedBeansTrackingVoter = processedBeansTrackingVoter;
+		return thisAsT();
+	}
+
+	public ProcessedBeansTrackingVoter getProcessedBeansTrackingVoter() {
+		return processedBeansTrackingVoter;
 	}
 
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {
