@@ -199,7 +199,7 @@
         <version.io.rest-assured>5.5.0</version.io.rest-assured>
         <version.org.apache.groovy>4.0.24</version.org.apache.groovy>
         <version.com.google.guava>33.4.0-jre</version.com.google.guava>
-        <version.org.springframework.spring-expression>6.2.1</version.org.springframework.spring-expression>
+        <version.org.springframework.spring-expression>6.2.2</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.18.2</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.18.2</version.com.fasterxml.jackson.core.jackson-annotations>
@@ -266,7 +266,7 @@
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
         <version.versions.plugin>2.18.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
-        <version.spotless-maven-plugin>2.44.1</version.spotless-maven-plugin>
+        <version.spotless-maven-plugin>2.44.2</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
         <version.sonar.plugin>5.0.0.4389</version.sonar.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
