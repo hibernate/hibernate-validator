@@ -203,7 +203,7 @@
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.18.2</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.18.2</version.com.fasterxml.jackson.core.jackson-annotations>
-        <version.net.bytebuddy.byte-buddy>1.15.11</version.net.bytebuddy.byte-buddy>
+        <version.net.bytebuddy.byte-buddy>1.16.1</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
         <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
