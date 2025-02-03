@@ -9,6 +9,13 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    groups:
+      workflow-actions:
+        patterns:
+          - "*"
+    allow:
+      - dependency-name: "actions/*"
+      - dependency-name: "redhat-actions/*"
     assignees: [ "marko-bekhta" ]
   - package-ecosystem: "maven"
     directory: "/" # Location of package manifests
