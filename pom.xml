@@ -203,7 +203,7 @@
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.18.2</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.18.2</version.com.fasterxml.jackson.core.jackson-annotations>
-        <version.net.bytebuddy.byte-buddy>1.16.1</version.net.bytebuddy.byte-buddy>
+        <version.net.bytebuddy.byte-buddy>1.17.0</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
         <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
@@ -255,7 +255,7 @@
         <version.release.plugin>3.1.1</version.release.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
         <version.shade.plugin>3.6.0</version.shade.plugin>
-        <version.sigtest.plugin>2.4</version.sigtest.plugin>
+        <version.sigtest.plugin>2.5</version.sigtest.plugin>
         <version.source.plugin>3.3.1</version.source.plugin>
         <version.surefire.plugin>3.5.2</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.7.1</version.surefire.plugin.java-version.asm>
