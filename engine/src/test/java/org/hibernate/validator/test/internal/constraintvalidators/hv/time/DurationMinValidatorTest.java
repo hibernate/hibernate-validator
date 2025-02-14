@@ -97,23 +97,30 @@ public class DurationMinValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-1232")
 	public void testMessage() {
+		testMessage( "must be longer than or equal to 30 days 12 hours 50 minutes", true, 30, 12, 50, Duration.ofDays( 2 ) );
+		testMessage( "must be longer than 30 days 12 hours 50 minutes", false, 30, 12, 50, Duration.ofDays( 2 ) );
+		testMessage( "must be longer than or equal to 0", true, 0, 0, 0, Duration.ofDays( -2 ) );
+		testMessage( "must be longer than 0", false, 0, 0, 0, Duration.ofDays( -2 ) );
+	}
+
+	public void testMessage(String message, boolean inclusive, int days, int hours, int minutes, Duration value) {
 		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class, Locale.ENGLISH );
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( AnotherTask.class )
 				.field( "timeToComplete" )
 				.constraint( new DurationMinDef()
-						.days( 30 )
-						.hours( 12 )
-						.minutes( 50 )
-						.inclusive( false )
+						.days( days )
+						.hours( hours )
+						.minutes( minutes )
+						.inclusive( inclusive )
 				);
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
-		AnotherTask task = new AnotherTask( Duration.ofDays( 2 ) );
+		AnotherTask task = new AnotherTask( value );
 		Set<ConstraintViolation<AnotherTask>> constraintViolations = validator.validate( task );
 		assertThat( constraintViolations ).containsOnlyViolations(
-				violationOf( DurationMin.class ).withMessage( "must be longer than 30 days 12 hours 50 minutes" )
+				violationOf( DurationMin.class ).withMessage( message )
 		);
 	}
 
