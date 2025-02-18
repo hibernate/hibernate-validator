@@ -167,14 +167,14 @@
         -->
         <version.org.jboss.weld.weld>6.0.0.Final</version.org.jboss.weld.weld>
         <version.org.wildfly.arquillian>5.1.0.Beta9</version.org.wildfly.arquillian>
-        <version.jakarta.jakartaee-bom>11.0.0-M4</version.jakarta.jakartaee-bom>
+        <version.jakarta.jakartaee-bom>11.0.0-M5</version.jakarta.jakartaee-bom>
         <!--
             These are now managed by the BOM ^ but we want to have version properties available to us
             so that we can use them elsewhere, e.g. in asciidoc files.
         -->
-        <version.jakarta.validation-api>3.1.0</version.jakarta.validation-api>
+        <version.jakarta.validation-api>3.1.1</version.jakarta.validation-api>
         <version.jakarta.persistence-api>3.2.0</version.jakarta.persistence-api>
-        <version.jakarta.el-api>6.0.0</version.jakarta.el-api>
+        <version.jakarta.el-api>6.0.1</version.jakarta.el-api>
 
         <!-- JavaMoney dependencies -->
         <version.javax.money>1.1</version.javax.money>
