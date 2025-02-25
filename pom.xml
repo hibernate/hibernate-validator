@@ -219,7 +219,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>10.21.2</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>10.21.3</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
@@ -236,8 +236,8 @@
         <version.buildhelper.plugin>3.6.0</version.buildhelper.plugin>
         <version.bundle.plugin>6.0.0</version.bundle.plugin>
         <version.checkstyle.plugin>3.6.0</version.checkstyle.plugin>
-        <version.clean.plugin>3.4.0</version.clean.plugin>
-        <version.compiler.plugin>3.13.0</version.compiler.plugin>
+        <version.clean.plugin>3.4.1</version.clean.plugin>
+        <version.compiler.plugin>3.14.0</version.compiler.plugin>
         <version.copy.plugin>1.0.0</version.copy.plugin>
         <version.dependency.plugin>3.8.1</version.dependency.plugin>
         <version.depends.plugin>1.5.0</version.depends.plugin>
@@ -266,7 +266,7 @@
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
         <version.versions.plugin>2.18.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
-        <version.spotless-maven-plugin>2.44.2</version.spotless-maven-plugin>
+        <version.spotless-maven-plugin>2.44.3</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
         <version.sonar.plugin>5.0.0.4389</version.sonar.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
