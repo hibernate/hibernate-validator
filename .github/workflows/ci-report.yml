@@ -34,7 +34,7 @@ jobs:
           distribution: temurin
       # https://github.com/actions/cache/blob/main/examples.md#java---maven
       - name: Cache local Maven repository
-        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # 4.2.0
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # 4.2.2
         with:
           path: ~/.m2/repository
           # use a different key than workflows running untrusted code
@@ -45,7 +45,7 @@ jobs:
         run: ./mvnw -v
       - name: Download GitHub Actions artifacts for the Develocity build scans
         id: downloadBuildScan
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # 4.1.8
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # 4.1.9
         with:
           pattern: build-scan-data-*
           github-token: ${{ github.token }}

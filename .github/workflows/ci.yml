@@ -93,7 +93,7 @@ jobs:
           distribution: temurin
       # https://github.com/actions/cache/blob/main/examples.md#java---maven
       - name: Cache local Maven repository
-        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # 4.2.0
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # 4.2.2
         with:
           path: ~/.m2/repository
           # use a different key than workflows running in trusted mode
@@ -113,7 +113,7 @@ jobs:
       # The actual publishing must be done in a separate job (see ci-report.yml).
       # We don't write to the remote cache as that would be unsafe.
       - name: Upload GitHub Actions artifact for the Develocity build scan
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # 4.6.0
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # 4.6.1
         if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
         with:
           name: build-scan-data-standalone-${{ matrix.os.name }}
@@ -129,7 +129,7 @@ jobs:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
 
       - name: Upload GitHub Actions artifact for the Develocity build scan
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # 4.6.0
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # 4.6.1
         if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
         with:
           name: build-scan-data-incontainer-${{ matrix.os.name }}
