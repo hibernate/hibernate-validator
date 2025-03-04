@@ -167,7 +167,7 @@
         -->
         <version.org.jboss.weld.weld>6.0.0.Final</version.org.jboss.weld.weld>
         <version.org.wildfly.arquillian>5.1.0.Beta9</version.org.wildfly.arquillian>
-        <version.jakarta.jakartaee-bom>11.0.0-M5</version.jakarta.jakartaee-bom>
+        <version.jakarta.jakartaee-bom>11.0.0-RC1</version.jakarta.jakartaee-bom>
         <!--
             These are now managed by the BOM ^ but we want to have version properties available to us
             so that we can use them elsewhere, e.g. in asciidoc files.
