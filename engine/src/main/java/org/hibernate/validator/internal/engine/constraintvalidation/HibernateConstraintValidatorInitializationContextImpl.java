@@ -5,6 +5,7 @@
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import java.time.Duration;
+import java.util.Map;
 
 import jakarta.validation.ClockProvider;
 
@@ -23,25 +24,29 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 
 	private final Duration temporalValidationTolerance;
 
+	private final Map<Class<?>, Object> constraintValidatorInitializationPayload;
+
 	private final int hashCode;
 
 	public HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider,
-			Duration temporalValidationTolerance) {
+			Duration temporalValidationTolerance, Map<Class<?>, Object> constraintValidatorInitializationPayload
+	) {
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.clockProvider = clockProvider;
 		this.temporalValidationTolerance = temporalValidationTolerance;
+		this.constraintValidatorInitializationPayload = constraintValidatorInitializationPayload;
 		this.hashCode = createHashCode();
 	}
 
 	public static HibernateConstraintValidatorInitializationContextImpl of(HibernateConstraintValidatorInitializationContextImpl defaultContext,
-			ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider, Duration temporalValidationTolerance) {
+			ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider, Duration temporalValidationTolerance, Map<Class<?>, Object> constraintValidatorInitializationPayload) {
 		if ( scriptEvaluatorFactory == defaultContext.scriptEvaluatorFactory
 				&& clockProvider == defaultContext.clockProvider
 				&& temporalValidationTolerance.equals( defaultContext.temporalValidationTolerance ) ) {
 			return defaultContext;
 		}
 
-		return new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider, temporalValidationTolerance );
+		return new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider, temporalValidationTolerance, constraintValidatorInitializationPayload );
 	}
 
 	@Override
@@ -57,6 +62,16 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 	@Override
 	public Duration getTemporalValidationTolerance() {
 		return temporalValidationTolerance;
+	}
+
+	@SuppressWarnings("unchecked") // because of the way we populate that map
+	@Override
+	public <C> C getConstraintValidatorInitializationPayload(Class<C> type) {
+		return ( (C) constraintValidatorInitializationPayload.get( type ) );
+	}
+
+	public Map<Class<?>, Object> getConstraintValidatorInitializationPayload() {
+		return constraintValidatorInitializationPayload;
 	}
 
 	@Override
