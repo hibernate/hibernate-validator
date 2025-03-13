@@ -56,4 +56,18 @@ public interface HibernateConstraintValidatorInitializationContext {
 	 */
 	@Incubating
 	Duration getTemporalValidationTolerance();
+
+	/**
+	 * Returns an instance of the specified type or {@code null} if the current constraint initialization context does not
+	 * contain an instance of such type.
+	 *
+	 * @param type the type of payload to retrieve
+	 * @return an instance of the specified type or {@code null} if the current constraint initialization context does not
+	 * contain an instance of such type
+	 *
+	 * @since 9.0.0
+	 * @see org.hibernate.validator.HibernateValidatorConfiguration#addConstraintValidatorInitializationPayload(Object)
+	 */
+	@Incubating
+	<C> C getConstraintValidatorInitializationPayload(Class<C> type);
 }
