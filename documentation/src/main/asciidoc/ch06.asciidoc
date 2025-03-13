@@ -278,6 +278,63 @@ It is not included in the constraint violations, unless a specific `ConstraintVa
 payload to emitted constraint violations by using the <<section-dynamic-payload,constraint violation dynamic payload mechanism>>.
 ====
 
+[[constraint-validator-shared-data]]
+===== Constraint validator initialization shared data
+
+While the <<constraint-validator-payload,constraint payload>> is intended to be used within the `isValid(..)` method,
+initialization shared data opens up a way for constraint validators to access a shared instance within the `initialize(..)`
+call. This can be used to cache and reuse elements required to construct a constraint validator. For example,
+internally, this mechanism is used by the pattern constraint validator to reuse the `java.util.regex.Pattern` instances
+when multiple constraints rely on the same pattern string and flags.
+
+This shared data is accessible through the `HibernateConstraintValidator` extension,
+more specifically through the `HibernateConstraintValidatorInitializationContext#getSharedData(..)` methods.
+The first overloaded variant is `getSharedData(Class<C>)`, which is intended to be used when the shared data is
+provided during the Hibernate Validator factory configuration.
+
+[[example-constraint-validator-shared-data-definition-validatorfactory]]
+.Defining a constraint validator initialization shared data during the `ValidatorFactory` initialization
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintvalidatorshareddata/ConstraintValidatorPayloadTest.java[tags=setSharedData]
+----
+====
+
+Once you have set the constraint validator initialization shared data, it can be accessed in your constraint validators as shown in the example below:
+
+[[example-constraint-validator-shared-data-usage]]
+.Accessing the constraint validator initialization shared data in a constraint validator
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintvalidatorshareddata/ZipCodeValidator.java[tags=include]
+----
+<1> Implement the Hibernate Validator `HibernateConstraintValidator` extension to have access to the initialization context.
+<2> Retrieve the shared data from the initialization context.
+<3> Perform some actions with the shared data instance.
+====
+
+The other overloaded method to access the shared data `getSharedData(Class<C>, Supplier<V>)` is intended
+for cases where the shared data is created lazily
+and is not defined at the time of configuring the validator factory.
+
+[[example-constraint-validator-shared-data-usage-alternative]]
+.Accessing the constraint validator lazy initialization shared data in a constraint validator
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintvalidatorshareddata/ParsableDateTimeFormatValidator.java[tags=include]
+----
+<1> Implement the Hibernate Validator `HibernateConstraintValidator` extension to have access to the initialization context.
+<2> Retrieve the shared data from the initialization context, providing the supplier that will be executed
+if the `DateTimeFormatterCache` is not yet available in the current initialization context.
+<3> Perform some actions with the shared data instance.
+<4> A simple wrapper around the map to cache the formatters.
+Compared to the use of a static field cache, using the shared data has the benefit that it is tied to the initialization context
+and will be garbage collected along with it.
+====
+
 [[validator-customconstraints-errormessage]]
 ==== The error message
 
