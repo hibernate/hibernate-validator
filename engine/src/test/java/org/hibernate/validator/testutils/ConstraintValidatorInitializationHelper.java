@@ -17,6 +17,7 @@ import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidat
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.DefaultClockProvider;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
+import org.hibernate.validator.internal.engine.constraintvalidation.PatternConstraintInitializer;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -95,6 +96,14 @@ public class ConstraintValidatorInitializationHelper {
 			@Override
 			public Duration getTemporalValidationTolerance() {
 				return duration;
+			}
+
+			@Override
+			public <C> C getConstraintValidatorInitializationSharedService(Class<C> type) {
+				if ( PatternConstraintInitializer.class.equals( type ) ) {
+					return (C) new PatternConstraintInitializer.SimplePatternConstraintInitializer();
+				}
+				return null;
 			}
 		};
 	}

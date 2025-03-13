@@ -56,4 +56,20 @@ public interface HibernateConstraintValidatorInitializationContext {
 	 */
 	@Incubating
 	Duration getTemporalValidationTolerance();
+
+	/**
+	 * Returns an instance of the specified service type or {@code null} if the current context does not
+	 * contain such service.
+	 * The requested service type must match the one with which it was originally added with
+	 * {@link org.hibernate.validator.HibernateValidatorConfiguration#addConstraintValidatorInitializationSharedService(Object)}.
+	 *
+	 * @param type the type of service to retrieve
+	 * @return an instance of the specified type or {@code null} if the current constraint initialization context does not
+	 * contain an instance of such type
+	 *
+	 * @since 9.1.0
+	 * @see org.hibernate.validator.HibernateValidatorConfiguration#addConstraintValidatorInitializationSharedService(Object)
+	 */
+	@Incubating
+	<C> C getConstraintValidatorInitializationSharedService(Class<C> type);
 }

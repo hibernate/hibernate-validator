@@ -21,6 +21,8 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
+import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationSharedServiceManager;
+import org.hibernate.validator.internal.engine.constraintvalidation.PatternConstraintInitializer;
 import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.metadata.DefaultBeanMetaDataClassNormalizer;
@@ -252,8 +254,7 @@ final class ValidatorFactoryConfigurationHelper {
 	}
 
 	static Object determineConstraintValidatorPayload(ConfigurationState configurationState) {
-		if ( configurationState instanceof AbstractConfigurationImpl ) {
-			AbstractConfigurationImpl<?> hibernateSpecificConfig = (AbstractConfigurationImpl<?>) configurationState;
+		if ( configurationState instanceof AbstractConfigurationImpl<?> hibernateSpecificConfig ) {
 			if ( hibernateSpecificConfig.getConstraintValidatorPayload() != null ) {
 				LOG.logConstraintValidatorPayload( hibernateSpecificConfig.getConstraintValidatorPayload() );
 				return hibernateSpecificConfig.getConstraintValidatorPayload();
@@ -261,6 +262,23 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 
 		return null;
+	}
+
+	static HibernateConstraintValidatorInitializationSharedServiceManager determineConstraintValidatorInitializationSharedServices(ConfigurationState configurationState,
+			PatternConstraintInitializer patternConstraintInitializer) {
+		HibernateConstraintValidatorInitializationSharedServiceManager configured = null;
+		if ( configurationState instanceof AbstractConfigurationImpl<?> hibernateSpecificConfig ) {
+			if ( hibernateSpecificConfig.getConstraintValidatorPayload() != null ) {
+				configured = hibernateSpecificConfig.getConstraintValidatorInitializationSharedServiceManager();
+			}
+		}
+		if ( configured == null ) {
+			configured = new HibernateConstraintValidatorInitializationSharedServiceManager();
+		}
+
+		return configured.immutableWithDefaultServices(
+				Map.of( PatternConstraintInitializer.class, patternConstraintInitializer )
+		);
 	}
 
 	static ExpressionLanguageFeatureLevel determineConstraintExpressionLanguageFeatureLevel(AbstractConfigurationImpl<?> hibernateSpecificConfig,
