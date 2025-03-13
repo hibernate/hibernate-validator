@@ -7,6 +7,7 @@ package org.hibernate.validator.testutils;
 import java.lang.annotation.Annotation;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.function.Supplier;
 
 import jakarta.validation.ClockProvider;
 import jakarta.validation.metadata.ConstraintDescriptor;
@@ -95,6 +96,16 @@ public class ConstraintValidatorInitializationHelper {
 			@Override
 			public Duration getTemporalValidationTolerance() {
 				return duration;
+			}
+
+			@Override
+			public <C> C getSharedData(Class<C> type) {
+				return null;
+			}
+
+			@Override
+			public <C, V extends C> C getSharedData(Class<C> type, Supplier<V> createIfNotPresent) {
+				return createIfNotPresent.get();
 			}
 		};
 	}

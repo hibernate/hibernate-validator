@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
+import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.initialize;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -26,10 +27,10 @@ public class PatternValidatorTest {
 		ConstraintAnnotationDescriptor.Builder<Pattern> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", "foobar" );
 		descriptorBuilder.setMessage( "pattern does not match" );
-		Pattern p = descriptorBuilder.build().getAnnotation();
+		ConstraintAnnotationDescriptor<Pattern> descriptor = descriptorBuilder.build();
 
 		PatternValidator constraint = new PatternValidator();
-		constraint.initialize( p );
+		initialize( constraint, descriptor );
 
 		assertTrue( constraint.isValid( null, null ) );
 		assertFalse( constraint.isValid( "", null ) );
@@ -42,10 +43,10 @@ public class PatternValidatorTest {
 	public void testIsValidForCharSequence() {
 		ConstraintAnnotationDescriptor.Builder<Pattern> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", "char sequence" );
-		Pattern p = descriptorBuilder.build().getAnnotation();
+		ConstraintAnnotationDescriptor<Pattern> descriptor = descriptorBuilder.build();
 
 		PatternValidator constraint = new PatternValidator();
-		constraint.initialize( p );
+		initialize( constraint, descriptor );
 
 		assertTrue( constraint.isValid( new MyCustomStringImpl( "char sequence" ), null ) );
 	}
@@ -55,10 +56,10 @@ public class PatternValidatorTest {
 		ConstraintAnnotationDescriptor.Builder<Pattern> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", "|^.*foo$" );
 		descriptorBuilder.setMessage( "pattern does not match" );
-		Pattern p = descriptorBuilder.build().getAnnotation();
+		ConstraintAnnotationDescriptor<Pattern> descriptor = descriptorBuilder.build();
 
 		PatternValidator constraint = new PatternValidator();
-		constraint.initialize( p );
+		initialize( constraint, descriptor );
 
 		assertTrue( constraint.isValid( null, null ) );
 		assertTrue( constraint.isValid( "", null ) );
@@ -72,9 +73,9 @@ public class PatternValidatorTest {
 		ConstraintAnnotationDescriptor.Builder<Pattern> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", "(unbalanced parentheses" );
 		descriptorBuilder.setMessage( "pattern does not match" );
-		Pattern p = descriptorBuilder.build().getAnnotation();
+		ConstraintAnnotationDescriptor<Pattern> descriptor = descriptorBuilder.build();
 
 		PatternValidator constraint = new PatternValidator();
-		constraint.initialize( p );
+		initialize( constraint, descriptor );
 	}
 }

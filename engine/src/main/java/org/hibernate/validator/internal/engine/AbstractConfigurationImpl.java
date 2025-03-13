@@ -37,6 +37,7 @@ import org.hibernate.validator.BaseHibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationSharedDataManager;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
@@ -114,11 +115,12 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = new HashMap<>();
 
 	// HV-specific options
+	private final HibernateConstraintValidatorInitializationSharedDataManager sharedDataManager;
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
+	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 	private boolean failFast;
 	private boolean failFastOnPropertyViolation;
 	private ClassLoader externalClassLoader;
-	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 	private boolean traversableResolverResultCacheEnabled = true;
 	private ScriptEvaluatorFactory scriptEvaluatorFactory;
 	private Duration temporalValidationTolerance;
@@ -159,6 +161,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
 		this.defaultPropertyNodeNameProvider = new DefaultPropertyNodeNameProvider();
+		this.sharedDataManager = new HibernateConstraintValidatorInitializationSharedDataManager();
 	}
 
 	@Override
@@ -349,6 +352,23 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		Contracts.assertNotNull( constraintValidatorPayload, MESSAGES.parameterMustNotBeNull( "constraintValidatorPayload" ) );
 
 		this.constraintValidatorPayload = constraintValidatorPayload;
+		return thisAsT();
+	}
+
+	@Override
+	public T addConstraintValidatorInitializationSharedData(Object constraintValidatorInitializationSharedData) {
+		Contracts.assertNotNull( constraintValidatorInitializationSharedData, MESSAGES.parameterMustNotBeNull( "constraintValidatorInitializationSharedData" ) );
+
+		this.sharedDataManager.register( constraintValidatorInitializationSharedData );
+		return thisAsT();
+	}
+
+	@Override
+	public <V, S extends V> T addConstraintValidatorInitializationSharedData(Class<V> dataClass, S constraintValidatorInitializationSharedData) {
+		Contracts.assertNotNull( constraintValidatorInitializationSharedData, MESSAGES.parameterMustNotBeNull( "dataClass" ) );
+		Contracts.assertNotNull( constraintValidatorInitializationSharedData, MESSAGES.parameterMustNotBeNull( "constraintValidatorInitializationSharedData" ) );
+		this.sharedDataManager.register( dataClass, constraintValidatorInitializationSharedData );
+
 		return thisAsT();
 	}
 
@@ -546,6 +566,10 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	public Object getConstraintValidatorPayload() {
 		return constraintValidatorPayload;
+	}
+
+	public HibernateConstraintValidatorInitializationSharedDataManager getSharedDataManager() {
+		return sharedDataManager;
 	}
 
 	public GetterPropertySelectionStrategy getGetterPropertySelectionStrategy() {
