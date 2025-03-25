@@ -2,7 +2,7 @@
         xmlns="https://www.gradle.com/develocity-maven" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="https://www.gradle.com/develocity-maven https://www.gradle.com/schema/develocity-maven.xsd">
     <server>
-        <url>https://ge.hibernate.org</url>
+        <url>#{env['DEVELOCITY_BASE_URL']?:'https://develocity.commonhaus.dev'}</url>
         <allowUntrusted>false</allowUntrusted>
     </server>
     <buildScan>
