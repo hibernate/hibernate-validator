@@ -581,13 +581,16 @@ void withMavenWorkspace(Map args, Closure body) {
 void mvn(String args) {
 	def develocityMainCredentialsId = helper.configuration.file?.develocity?.credentials?.main
 	def develocityPrCredentialsId = helper.configuration.file?.develocity?.credentials?.pr
+	def develocityBaseUrl = helper.configuration.file?.develocity?.url
 	if ( !helper.scmSource.pullRequest && develocityMainCredentialsId ) {
 		// Not a PR: we can pass credentials to the build, allowing it to populate the build cache
 		// and to publish build scans directly.
-		withCredentials([string(credentialsId: develocityMainCredentialsId,
-				variable: 'DEVELOCITY_ACCESS_KEY')]) {
-			withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
-				sh "mvn $args"
+		withEnv(["DEVELOCITY_BASE_URL=${develocityBaseUrl}"]) {
+			withCredentials([string(credentialsId: develocityMainCredentialsId,
+					variable: 'DEVELOCITY_ACCESS_KEY')]) {
+				withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
+					sh "mvn $args"
+				}
 			}
 		}
 	}
@@ -597,10 +600,12 @@ void mvn(String args) {
 		tryFinally({
 			sh "mvn $args"
 		}, { // Finally
-			withCredentials([string(credentialsId: develocityPrCredentialsId,
-					variable: 'DEVELOCITY_ACCESS_KEY')]) {
-				withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
-					sh 'mvn develocity:build-scan-publish-previous || true'
+			withEnv(["DEVELOCITY_BASE_URL=${develocityBaseUrl}"]) {
+				withCredentials([string(credentialsId: develocityPrCredentialsId,
+						variable: 'DEVELOCITY_ACCESS_KEY')]) {
+					withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
+						sh 'mvn develocity:build-scan-publish-previous || true'
+					}
 				}
 			}
 		})

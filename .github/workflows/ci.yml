@@ -109,6 +109,7 @@ jobs:
           -Pjqassistant -Pdist
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
+          DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
       # For jobs running on 'pull_request', upload build scan data.
       # The actual publishing must be done in a separate job (see ci-report.yml).
       # We don't write to the remote cache as that would be unsafe.
@@ -127,6 +128,7 @@ jobs:
           -Dincontainer -Dincontainer-prepared
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
+          DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
 
       - name: Upload GitHub Actions artifact for the Develocity build scan
         uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # 4.6.1
