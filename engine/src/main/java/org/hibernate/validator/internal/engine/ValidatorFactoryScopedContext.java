@@ -5,6 +5,7 @@
 package org.hibernate.validator.internal.engine;
 
 import java.time.Duration;
+import java.util.Map;
 
 import jakarta.validation.ClockProvider;
 import jakarta.validation.MessageInterpolator;
@@ -102,6 +103,7 @@ public class ValidatorFactoryScopedContext {
 			boolean failFastOnPropertyViolation,
 			boolean traversableResolverResultCacheEnabled,
 			Object constraintValidatorPayload,
+			Map<Class<?>, Object> constraintValidatorInitializationPayload,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
 			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
 			boolean showValidatedValuesInTraceLogs) {
@@ -109,7 +111,8 @@ public class ValidatorFactoryScopedContext {
 				failFastOnPropertyViolation, traversableResolverResultCacheEnabled, showValidatedValuesInTraceLogs, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
 				customViolationExpressionLanguageFeatureLevel,
 				new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
-						temporalValidationTolerance ) );
+						temporalValidationTolerance, constraintValidatorInitializationPayload
+				) );
 	}
 
 	private ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
@@ -214,7 +217,7 @@ public class ValidatorFactoryScopedContext {
 		private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 
 		private boolean showValidatedValuesInTraceLogs;
-		private HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
+		private final HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
 
 		Builder(ValidatorFactoryScopedContext defaultContext) {
 			Contracts.assertNotNull( defaultContext, "Default context cannot be null." );
@@ -348,7 +351,8 @@ public class ValidatorFactoryScopedContext {
 							constraintValidatorInitializationContext,
 							scriptEvaluatorFactory,
 							clockProvider,
-							temporalValidationTolerance
+							temporalValidationTolerance,
+							constraintValidatorInitializationContext.getConstraintValidatorInitializationPayload()
 					)
 			);
 		}

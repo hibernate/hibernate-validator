@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -122,6 +123,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private ScriptEvaluatorFactory scriptEvaluatorFactory;
 	private Duration temporalValidationTolerance;
 	private Object constraintValidatorPayload;
+	private final Map<Class<?>, Object> constraintValidatorInitializationPayload = newHashMap();
 	private GetterPropertySelectionStrategy getterPropertySelectionStrategy;
 	private Set<Locale> locales = Collections.emptySet();
 	private Locale defaultLocale = Locale.getDefault();
@@ -351,6 +353,14 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	}
 
 	@Override
+	public T addConstraintValidatorInitializationPayload(Object constraintValidatorInitializationPayload) {
+		Contracts.assertNotNull( constraintValidatorInitializationPayload, MESSAGES.parameterMustNotBeNull( "constraintValidatorInitializationPayload" ) );
+
+		this.constraintValidatorInitializationPayload.put( constraintValidatorInitializationPayload.getClass(), constraintValidatorInitializationPayload );
+		return thisAsT();
+	}
+
+	@Override
 	public T getterPropertySelectionStrategy(GetterPropertySelectionStrategy getterPropertySelectionStrategy) {
 		Contracts.assertNotNull( getterPropertySelectionStrategy, MESSAGES.parameterMustNotBeNull( "getterPropertySelectionStrategy" ) );
 
@@ -544,6 +554,10 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	public Object getConstraintValidatorPayload() {
 		return constraintValidatorPayload;
+	}
+
+	public Map<Class<?>, Object> getConstraintValidatorInitializationPayload() {
+		return constraintValidatorInitializationPayload;
 	}
 
 	public GetterPropertySelectionStrategy getGetterPropertySelectionStrategy() {
