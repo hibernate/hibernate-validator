@@ -156,7 +156,7 @@
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
         <version.com.fasterxml.classmate>1.7.0</version.com.fasterxml.classmate>
-        <version.joda-time>2.13.1</version.joda-time>
+        <version.joda-time>2.14.0</version.joda-time>
         <version.org.slf4j>2.0.17</version.org.slf4j>
         <version.org.apache.logging.log4j>2.24.3</version.org.apache.logging.log4j>
 
