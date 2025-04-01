@@ -188,7 +188,7 @@
         <version.org.openjfx>17.0.14</version.org.openjfx>
 
         <!-- Test dependencies -->
-        <version.org.jboss.arquillian>1.9.3.Final</version.org.jboss.arquillian>
+        <version.org.jboss.arquillian>1.9.4.Final</version.org.jboss.arquillian>
         <version.shrinkwrap.core>1.2.6</version.shrinkwrap.core>
         <version.shrinkwrap.resolvers>3.3.4</version.shrinkwrap.resolvers>
         <version.shrinkwrap.descriptors>2.0.0</version.shrinkwrap.descriptors>
@@ -198,12 +198,12 @@
         <version.org.easymock>5.5.0</version.org.easymock>
         <version.io.rest-assured>5.5.1</version.io.rest-assured>
         <version.org.apache.groovy>4.0.26</version.org.apache.groovy>
-        <version.com.google.guava>33.4.5-jre</version.com.google.guava>
+        <version.com.google.guava>33.4.6-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>6.2.5</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.18.3</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.18.3</version.com.fasterxml.jackson.core.jackson-annotations>
-        <version.net.bytebuddy.byte-buddy>1.17.4</version.net.bytebuddy.byte-buddy>
+        <version.net.bytebuddy.byte-buddy>1.17.5</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
         <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
@@ -219,7 +219,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>10.21.4</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>10.22.0</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
@@ -257,8 +257,8 @@
         <version.shade.plugin>3.6.0</version.shade.plugin>
         <version.sigtest.plugin>2.6</version.sigtest.plugin>
         <version.source.plugin>3.3.1</version.source.plugin>
-        <version.surefire.plugin>3.5.2</version.surefire.plugin>
-        <version.surefire.plugin.java-version.asm>9.7.1</version.surefire.plugin.java-version.asm>
+        <version.surefire.plugin>3.5.3</version.surefire.plugin>
+        <version.surefire.plugin.java-version.asm>9.8</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
         <version.flatten-maven-plugin>1.7.0</version.flatten-maven-plugin>
@@ -268,7 +268,7 @@
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
         <version.spotless-maven-plugin>2.44.3</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
-        <version.sonar.plugin>5.0.0.4389</version.sonar.plugin>
+        <version.sonar.plugin>5.1.0.4751</version.sonar.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
 
         <!-- Forbidden API related properties -->
