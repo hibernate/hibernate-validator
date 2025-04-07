@@ -453,4 +453,40 @@ public final class PathImpl implements Path, Serializable {
 		}
 		return true;
 	}
+
+	/**
+	 * checks if this PathImpl is a subpath of <code>other</code>.
+	 * @param other the path to compare with
+	 * @return true, if this path is a subpath
+	 */
+	public boolean isSubPathOf( PathImpl other ) {
+		if ( nodeList.size() > other.nodeList.size() ) {
+			// cannot be a subpath as it is already longer then the other path
+			return false;
+		}
+
+		for ( int i = 0; i < nodeList.size(); i++ ) {
+			if ( !nodeList.get( i ).equals( other.nodeList.get( i ) ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public boolean isSubPathOrContains(PathImpl other) {
+
+		// prefetch contant return values
+		int oSize = other.nodeList.size();
+		// calling Math.min will reduce speed significantly
+		int mySize = nodeList.size() < oSize
+						? nodeList.size()
+						: oSize;
+
+		for ( int i = 0; i < mySize; i++ ) {
+			if ( !nodeList.get( i ).equals( other.nodeList.get( i ) ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
