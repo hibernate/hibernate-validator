@@ -219,7 +219,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>10.22.0</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>10.23.0</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
@@ -244,7 +244,7 @@
         <version.deploy.plugin>3.1.4</version.deploy.plugin>
         <version.enforcer.plugin>3.5.0</version.enforcer.plugin>
         <!-- Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting. -->
-        <version.forbiddenapis.plugin>3.8</version.forbiddenapis.plugin>
+        <version.forbiddenapis.plugin>3.9</version.forbiddenapis.plugin>
         <version.gmavenplus.plugin>4.1.1</version.gmavenplus.plugin>
         <version.gpg.plugin>3.2.7</version.gpg.plugin>
         <version.install.plugin>3.1.4</version.install.plugin>
@@ -266,8 +266,8 @@
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
         <version.versions.plugin>2.18.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
-        <version.spotless-maven-plugin>2.44.3</version.spotless-maven-plugin>
-        <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
+        <version.spotless-maven-plugin>2.44.4</version.spotless-maven-plugin>
+        <version.jacoco.plugin>0.8.13</version.jacoco.plugin>
         <version.sonar.plugin>5.1.0.4751</version.sonar.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
 
