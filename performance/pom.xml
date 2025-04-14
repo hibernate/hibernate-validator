@@ -23,6 +23,7 @@
     <properties>
         <!-- Disable enforcer as we are using banned dependencies for old versions -->
         <enforcer.skip>true</enforcer.skip>
+        <deploy.skip>true</deploy.skip>
 
         <!--
         Need to specify something, since the plugin cannot handle empty options. Using something which does not have
@@ -35,6 +36,7 @@
         <!-- default values, overridden per profile -->
         <beanvalidation-impl.name>none</beanvalidation-impl.name>
         <beanvalidation-impl.version>none</beanvalidation-impl.version>
+        <deploy.skip>true</deploy.skip>
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
@@ -93,19 +95,6 @@
             <plugin>
                 <groupId>de.thetaphi</groupId>
                 <artifactId>forbiddenapis</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

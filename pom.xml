@@ -14,7 +14,7 @@
     <packaging>pom</packaging>
 
     <name>Hibernate Validator Aggregator</name>
-    <url>http://hibernate.org/validator</url>
+    <url>https://hibernate.org/validator</url>
     <description>Aggregator of the Hibernate Validator modules.</description>
 
     <developers>
@@ -23,48 +23,48 @@
             <name>Emmanuel Bernard</name>
             <email>emmanuel@hibernate.org</email>
             <organization>Red Hat, Inc.</organization>
-            <url>http://in.relation.to/emmanuel-bernard/</url>
+            <url>https://in.relation.to/emmanuel-bernard/</url>
         </developer>
         <developer>
             <id>hardy.ferentschik</id>
             <name>Hardy Ferentschik</name>
             <email>hferents@redhat.com</email>
             <organization>Red Hat, Inc.</organization>
-            <url>http://in.relation.to/hardy-ferentschik/</url>
+            <url>https://in.relation.to/hardy-ferentschik/</url>
         </developer>
         <developer>
             <id>gunnar.morling</id>
             <name>Gunnar Morling</name>
             <email>gunnar@hibernate.org</email>
             <organization>Red Hat, Inc.</organization>
-            <url>http://in.relation.to/gunnar-morling/</url>
+            <url>https://in.relation.to/gunnar-morling/</url>
         </developer>
         <developer>
             <id>kevinpollet</id>
             <name>Kevin Pollet</name>
             <email>kevin.pollet@serli.com</email>
             <organization>SERLI</organization>
-            <url>http://www.serli.com/</url>
+            <url>https://www.serli.com/</url>
         </developer>
         <developer>
             <id>davide.dalto</id>
             <name>Davide D'Alto</name>
             <email>davide@hibernate.org</email>
             <organization>Red Hat, Inc.</organization>
-            <url>http://in.relation.to/davide-dalto/</url>
+            <url>https://in.relation.to/davide-dalto/</url>
         </developer>
         <developer>
             <id>guillaume.smet</id>
             <name>Guillaume Smet</name>
             <email>guillaume.smet@hibernate.org</email>
             <organization>Red Hat, Inc.</organization>
-            <url>http://in.relation.to/guillaume-smet/</url>
+            <url>https://in.relation.to/guillaume-smet/</url>
         </developer>
         <developer>
             <id>marko.bekhta</id>
             <name>Marko Bekhta</name>
             <email>marko.prykladna@gmail.com</email>
-            <url>http://in.relation.to/marko-bekhta/</url>
+            <url>https//in.relation.to/marko-bekhta/</url>
         </developer>
     </developers>
 
@@ -103,11 +103,11 @@
 
         <bv.spec.url>https://jakarta.ee/specifications/bean-validation/3.0/jakarta-bean-validation-spec-3.0.html</bv.spec.url>
         <java.api-docs.base-url>https://docs.oracle.com/en/java/javase/11/docs/api</java.api-docs.base-url>
-        <java.technotes.base-url>http://docs.oracle.com/javase/8/docs/technotes</java.technotes.base-url>
+        <java.technotes.base-url>https://docs.oracle.com/javase/8/docs/technotes</java.technotes.base-url>
         <javaee.api-docs.base-url>https://jakarta.ee/specifications/platform/9/apidocs</javaee.api-docs.base-url>
         <javafx.docs.url>https://openjfx.io/openjfx-docs/</javafx.docs.url>
         <bv.api-docs.base-url>https://jakarta.ee/specifications/bean-validation/3.0/apidocs</bv.api-docs.base-url>
-        <javamoney.api-docs.base-url>http://javamoney.github.io/apidocs</javamoney.api-docs.base-url>
+        <javamoney.api-docs.base-url>https://javamoney.github.io/apidocs</javamoney.api-docs.base-url>
 
         <!-- Module names used for Java 9 modules and OSGi bundles -->
 
@@ -225,7 +225,6 @@
         <version.enforcer.plugin>3.0.0</version.enforcer.plugin>
         <version.forbiddenapis.plugin>3.2</version.forbiddenapis.plugin>
         <version.gmavenplus.plugin>1.6</version.gmavenplus.plugin>
-        <version.gpg.plugin>3.2.4</version.gpg.plugin>
         <version.install.plugin>2.5.2</version.install.plugin>
         <version.japicmp.plugin>0.11.0</version.japicmp.plugin>
         <version.jar.plugin>3.0.2</version.jar.plugin>
@@ -244,7 +243,6 @@
         <version.org.wildfly.core>14.0.0.Final</version.org.wildfly.core>
         <version.wildfly-patch-gen.plugin>2.1.0.Final</version.wildfly-patch-gen.plugin>
         <version.wildfly-patch-gen.plugin.woodstox>5.0.3</version.wildfly-patch-gen.plugin.woodstox>
-        <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
 
         <!-- Forbidden API related properties -->
@@ -252,11 +250,13 @@
 
         <!-- Repository Deployment URLs -->
 
-        <ossrh.releases.repo.id>ossrh</ossrh.releases.repo.id>
-        <ossrh.releases.repo.url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</ossrh.releases.repo.url>
-        <ossrh.releases.repo.baseUrl>https://oss.sonatype.org/</ossrh.releases.repo.baseUrl>
-        <ossrh.snapshots.repo.id>ossrh</ossrh.snapshots.repo.id>
-        <ossrh.snapshots.repo.url>https://oss.sonatype.org/content/repositories/snapshots</ossrh.snapshots.repo.url>
+        <!-- We always publish to a local directory, JReleaser is supposed to take care of publishing to Nexus: -->
+        <local.staging.releases.repo.id>staging-deploy</local.staging.releases.repo.id>
+        <local.staging.releases.repo.url>file:${maven.multiModuleProjectDirectory}/target/staging-deploy/maven</local.staging.releases.repo.url>
+        <central.releases.repo.id>central-releases</central.releases.repo.id>
+        <central.releases.repo.url>https://central.sonatype.com/api/v1/publisher/</central.releases.repo.url>
+        <central.snapshots.repo.id>central-snapshots</central.snapshots.repo.id>
+        <central.snapshots.repo.url>https://central.sonatype.com/repository/maven-snapshots/</central.snapshots.repo.url>
 
         <!-- Maven Central repository -->
 
@@ -287,6 +287,7 @@
 
         <!-- No need to build the javadocs per module. Aggregated javadocs are build in the distribution module. See also HV-894 -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
+        <deploy.skip>false</deploy.skip>
 
         <!-- Also set source/target, because several other plugins rely on this and don't understand release -->
         <maven.compiler.source>${java-version.main.release}</maven.compiler.source>
@@ -658,7 +659,7 @@
                                 <Implementation-Version>${project.version}</Implementation-Version>
                                 <Implementation-Vendor>${project.parent.groupId}</Implementation-Vendor>
                                 <Implementation-Vendor-Id>${project.parent.groupId}</Implementation-Vendor-Id>
-                                <Implementation-URL>http://hibernate.org/validator/</Implementation-URL>
+                                <Implementation-URL>https://hibernate.org/validator/</Implementation-URL>
                             </manifestEntries>
                         </archive>
                     </configuration>
@@ -1031,13 +1032,8 @@
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>${version.deploy.plugin}</version>
                     <configuration>
-                        <!-- we use the nexus-staging plugin -->
-                        <skip>true</skip>
+                        <skip>${deploy.skip}</skip>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>${version.gpg.plugin}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
@@ -1260,7 +1256,7 @@
 
     <ciManagement>
         <system>Jenkins</system>
-        <url>http://ci.hibernate.org/view/Validator/</url>
+        <url>https://ci.hibernate.org/view/Validator/</url>
     </ciManagement>
 
     <issueManagement>
@@ -1273,27 +1269,27 @@
     <licenses>
         <license>
             <name>Apache License 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
 
     <scm>
         <connection>scm:git:git://github.com/hibernate/hibernate-validator.git</connection>
         <developerConnection>scm:git:git@github.com:hibernate/hibernate-validator.git</developerConnection>
-        <url>http://github.com/hibernate/hibernate-validator</url>
+        <url>https://github.com/hibernate/hibernate-validator</url>
         <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
         <repository>
-            <id>${ossrh.releases.repo.id}</id>
-            <name>OSSRH Releases Repository</name>
-            <url>${ossrh.releases.repo.url}</url>
+            <id>${central.releases.repo.id}</id>
+            <name>Maven Central Releases Repository</name>
+            <url>${central.releases.repo.url}</url>
         </repository>
         <snapshotRepository>
-            <id>${ossrh.snapshots.repo.id}</id>
-            <name>OSSRH Snapshots Repository</name>
-            <url>${ossrh.snapshots.repo.url}</url>
+            <id>${central.snapshots.repo.id}</id>
+            <name>Maven Central Snapshots Repository</name>
+            <url>${central.snapshots.repo.url}</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -1333,6 +1329,12 @@
             <build>
                 <plugins>
                     <plugin>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <configuration>
+                            <altReleaseDeploymentRepository>${local.staging.releases.repo.id}::${local.staging.releases.repo.url}</altReleaseDeploymentRepository>
+                        </configuration>
+                    </plugin>
+                    <plugin>
                         <artifactId>maven-enforcer-plugin</artifactId>
                         <executions>
                             <execution>
@@ -1348,34 +1350,6 @@
                                         </requireJavaVersion>
                                     </rules>
                                     <fail>true</fail>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>${version.nexus-staging-maven-plugin}</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <nexusUrl>${ossrh.releases.repo.baseUrl}</nexusUrl>
-                            <serverId>${ossrh.releases.repo.id}</serverId>
-                            <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                                <configuration>
-                                    <homedir>${env.RELEASE_GPG_HOMEDIR}</homedir>
-                                    <bestPractices>true</bestPractices>
                                 </configuration>
                             </execution>
                         </executions>
