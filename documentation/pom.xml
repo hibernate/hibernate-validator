@@ -30,9 +30,6 @@
         <html.meta.project-key>validator</html.meta.project-key>
         <html.outdated-content.project-key>${html.meta.project-key}</html.outdated-content.project-key>
 
-        <!-- Skip artifact deployment -->
-        <maven.deploy.skip>true</maven.deploy.skip>
-        <gpg.skip>true</gpg.skip>
         <surefire.jvm.args.additional>-Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
 
         <forbiddenapis-junit.path>forbidden-allow-junit.txt</forbiddenapis-junit.path>
