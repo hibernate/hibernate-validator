@@ -1,0 +1,62 @@
+project:
+  languages:
+    java:
+      groupId: org.hibernate.validator
+
+release:
+  github:
+    skipTag: true
+    skipRelease: true
+    tagName: '{{projectVersion}}'
+
+# File signing is always active
+signing:
+  mode: COMMAND
+  active: RELEASE
+  armored: true
+
+# Deploy JARs and POMs to Maven Central
+deploy:
+  maven:
+    nexus2:
+      maven-central:
+        active: RELEASE
+        url: https://oss.sonatype.org/service/local
+        snapshotUrl: https://oss.sonatype.org/content/repositories/snapshots/
+        closeRepository: true
+        releaseRepository: false
+        stagingRepositories:
+          - target/staging-deploy/maven
+      maven-central-snapshot:
+        active: SNAPSHOT
+        url: https://oss.sonatype.org/service/local
+        snapshotUrl: https://oss.sonatype.org/content/repositories/snapshots/
+        closeRepository: true
+        releaseRepository: true
+        javadocJar: false
+        sign: false
+        stagingRepositories:
+          - target/staging-deploy/maven
+    mavenCentral:
+      maven-central:
+        # TODO: HV-2097 Change to RELEASE once switching to Maven-Central:
+        active: NEVER
+        url: https://central.sonatype.com/api/v1/publisher
+        snapshotSupported: false
+        applyMavenCentralRules: true
+        stagingRepositories:
+          - target/staging-deploy/maven
+        # Deployment identifier used for publication.
+        # deploymentId: dd9991b0-18a7-41e7-b1fe-37b8ea936f85
+      maven-central-snapshot:
+        # TODO: HV-2097 Change to SNAPSHOT once switching to Maven-Central:
+        active: NEVER
+        url: https://central.sonatype.com/api/v1/publisher
+        snapshotSupported: true
+        applyMavenCentralRules: true
+        javadocJar: false
+        sign: false
+        stagingRepositories:
+          - target/staging-deploy/maven
+        # Deployment identifier used for publication.
+        # deploymentId: dd9991b0-18a7-41e7-b1fe-37b8ea936f85
