@@ -199,7 +199,7 @@
         <version.io.rest-assured>5.5.1</version.io.rest-assured>
         <version.org.apache.groovy>4.0.26</version.org.apache.groovy>
         <version.com.google.guava>33.4.8-jre</version.com.google.guava>
-        <version.org.springframework.spring-expression>6.2.5</version.org.springframework.spring-expression>
+        <version.org.springframework.spring-expression>6.2.6</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.18.3</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.18.3</version.com.fasterxml.jackson.core.jackson-annotations>
