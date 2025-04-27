@@ -128,13 +128,13 @@
 
         <version.jakarta.validation.validation-tck>3.1.1</version.jakarta.validation.validation-tck>
 
-        <version.com.thoughtworks.paranamer>2.8</version.com.thoughtworks.paranamer>
+        <version.com.thoughtworks.paranamer>2.8.3</version.com.thoughtworks.paranamer>
         <version.org.glassfish.expressly>6.0.0-M1</version.org.glassfish.expressly>
         <version.org.jboss.logging.jboss-logging>3.6.1.Final</version.org.jboss.logging.jboss-logging>
-        <version.org.jboss.logging.jboss-logging-tools>3.0.3.Final</version.org.jboss.logging.jboss-logging-tools>
+        <version.org.jboss.logging.jboss-logging-tools>3.0.4.Final</version.org.jboss.logging.jboss-logging-tools>
 
         <!-- Currently supported version of WildFly -->
-        <version.wildfly>34.0.1.Final</version.wildfly>
+        <version.wildfly>36.0.0.Final</version.wildfly>
         <!-- Used to create a patch file for the second version of WildFly we support -->
         <!--<version.wildfly.secondary>18.0.1.Final</version.wildfly.secondary>-->
         <!-- Version used to run the TCK in incontainer mode -->
@@ -156,8 +156,8 @@
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
         <version.com.fasterxml.classmate>1.7.0</version.com.fasterxml.classmate>
-        <version.joda-time>2.13.0</version.joda-time>
-        <version.org.slf4j>2.0.16</version.org.slf4j>
+        <version.joda-time>2.14.0</version.joda-time>
+        <version.org.slf4j>2.0.17</version.org.slf4j>
         <version.org.apache.logging.log4j>2.24.3</version.org.apache.logging.log4j>
 
         <!--
@@ -165,16 +165,16 @@
             They should be aligned with the ones from the Wildfly version we support
             See http://search.maven.org/#search|gav|1|g%3A"org.wildfly"%20AND%20a%3A"wildfly-parent"
         -->
-        <version.org.jboss.weld.weld>6.0.0.Beta4</version.org.jboss.weld.weld>
-        <version.org.wildfly.arquillian>5.0.0.Alpha3</version.org.wildfly.arquillian>
-        <version.jakarta.jakartaee-bom>11.0.0-M4</version.jakarta.jakartaee-bom>
+        <version.org.jboss.weld.weld>6.0.0.Final</version.org.jboss.weld.weld>
+        <version.org.wildfly.arquillian>5.1.0.Beta9</version.org.wildfly.arquillian>
+        <version.jakarta.jakartaee-bom>11.0.0</version.jakarta.jakartaee-bom>
         <!--
             These are now managed by the BOM ^ but we want to have version properties available to us
             so that we can use them elsewhere, e.g. in asciidoc files.
         -->
-        <version.jakarta.validation-api>3.1.0</version.jakarta.validation-api>
+        <version.jakarta.validation-api>3.1.1</version.jakarta.validation-api>
         <version.jakarta.persistence-api>3.2.0</version.jakarta.persistence-api>
-        <version.jakarta.el-api>6.0.0</version.jakarta.el-api>
+        <version.jakarta.el-api>6.0.1</version.jakarta.el-api>
 
         <!-- JavaMoney dependencies -->
         <version.javax.money>1.1</version.javax.money>
@@ -185,25 +185,25 @@
         <version.javax.annotation>1.2</version.javax.annotation>
 
         <!-- JavaFX dependencies -->
-        <version.org.openjfx>17.0.13</version.org.openjfx>
+        <version.org.openjfx>17.0.14</version.org.openjfx>
 
         <!-- Test dependencies -->
-        <version.org.jboss.arquillian>1.9.1.Final</version.org.jboss.arquillian>
+        <version.org.jboss.arquillian>1.9.4.Final</version.org.jboss.arquillian>
         <version.shrinkwrap.core>1.2.6</version.shrinkwrap.core>
-        <version.shrinkwrap.resolvers>3.3.3</version.shrinkwrap.resolvers>
+        <version.shrinkwrap.resolvers>3.3.4</version.shrinkwrap.resolvers>
         <version.shrinkwrap.descriptors>2.0.0</version.shrinkwrap.descriptors>
-        <version.org.testng>7.10.2</version.org.testng>
+        <version.org.testng>7.11.0</version.org.testng>
         <version.org.assertj.assertj-core>3.26.3</version.org.assertj.assertj-core>
         <version.junit>4.13.2</version.junit>
         <version.org.easymock>5.5.0</version.org.easymock>
-        <version.io.rest-assured>5.5.0</version.io.rest-assured>
-        <version.org.apache.groovy>4.0.24</version.org.apache.groovy>
-        <version.com.google.guava>33.4.0-jre</version.com.google.guava>
-        <version.org.springframework.spring-expression>6.2.1</version.org.springframework.spring-expression>
+        <version.io.rest-assured>5.5.1</version.io.rest-assured>
+        <version.org.apache.groovy>4.0.26</version.org.apache.groovy>
+        <version.com.google.guava>33.4.8-jre</version.com.google.guava>
+        <version.org.springframework.spring-expression>6.2.6</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
-        <version.com.fasterxml.jackson.core.jackson-databind>2.18.2</version.com.fasterxml.jackson.core.jackson-databind>
-        <version.com.fasterxml.jackson.core.jackson-annotations>2.18.2</version.com.fasterxml.jackson.core.jackson-annotations>
-        <version.net.bytebuddy.byte-buddy>1.15.11</version.net.bytebuddy.byte-buddy>
+        <version.com.fasterxml.jackson.core.jackson-databind>2.18.3</version.com.fasterxml.jackson.core.jackson-databind>
+        <version.com.fasterxml.jackson.core.jackson-annotations>2.18.3</version.com.fasterxml.jackson.core.jackson-annotations>
+        <version.net.bytebuddy.byte-buddy>1.17.5</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
         <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
@@ -219,12 +219,12 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>10.21.0</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>10.23.0</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
-        <version.asciidoctor.plugin>3.1.1</version.asciidoctor.plugin>
-        <version.org.hibernate.infra.hibernate-asciidoctor-theme>5.0.2.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
+        <version.asciidoctor.plugin>3.2.0</version.asciidoctor.plugin>
+        <version.org.hibernate.infra.hibernate-asciidoctor-theme>5.0.6.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
         <version.org.hibernate.infra.hibernate-asciidoctor-extensions>3.0.6.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
         <version.org.asciidoctor.asciidoctorj>3.0.0</version.org.asciidoctor.asciidoctorj>
         <version.org.asciidoctor.asciidoctorj-pdf>2.3.19</version.org.asciidoctor.asciidoctorj-pdf>
@@ -236,39 +236,39 @@
         <version.buildhelper.plugin>3.6.0</version.buildhelper.plugin>
         <version.bundle.plugin>6.0.0</version.bundle.plugin>
         <version.checkstyle.plugin>3.6.0</version.checkstyle.plugin>
-        <version.clean.plugin>3.4.0</version.clean.plugin>
-        <version.compiler.plugin>3.13.0</version.compiler.plugin>
+        <version.clean.plugin>3.4.1</version.clean.plugin>
+        <version.compiler.plugin>3.14.0</version.compiler.plugin>
         <version.copy.plugin>1.0.0</version.copy.plugin>
         <version.dependency.plugin>3.8.1</version.dependency.plugin>
         <version.depends.plugin>1.5.0</version.depends.plugin>
-        <version.deploy.plugin>3.1.3</version.deploy.plugin>
+        <version.deploy.plugin>3.1.4</version.deploy.plugin>
         <version.enforcer.plugin>3.5.0</version.enforcer.plugin>
         <!-- Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting. -->
-        <version.forbiddenapis.plugin>3.8</version.forbiddenapis.plugin>
-        <version.gmavenplus.plugin>4.0.1</version.gmavenplus.plugin>
+        <version.forbiddenapis.plugin>3.9</version.forbiddenapis.plugin>
+        <version.gmavenplus.plugin>4.1.1</version.gmavenplus.plugin>
         <version.gpg.plugin>3.2.7</version.gpg.plugin>
-        <version.install.plugin>3.1.3</version.install.plugin>
-        <version.japicmp.plugin>0.23.0</version.japicmp.plugin>
+        <version.install.plugin>3.1.4</version.install.plugin>
+        <version.japicmp.plugin>0.23.1</version.japicmp.plugin>
         <version.jar.plugin>3.4.2</version.jar.plugin>
-        <version.jqassistant.plugin>2.5.0</version.jqassistant.plugin>
+        <version.jqassistant.plugin>2.6.0</version.jqassistant.plugin>
         <version.javadoc.plugin>3.11.2</version.javadoc.plugin>
         <version.release.plugin>3.1.1</version.release.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
         <version.shade.plugin>3.6.0</version.shade.plugin>
-        <version.sigtest.plugin>2.4</version.sigtest.plugin>
+        <version.sigtest.plugin>2.6</version.sigtest.plugin>
         <version.source.plugin>3.3.1</version.source.plugin>
-        <version.surefire.plugin>3.5.2</version.surefire.plugin>
-        <version.surefire.plugin.java-version.asm>9.7.1</version.surefire.plugin.java-version.asm>
+        <version.surefire.plugin>3.5.3</version.surefire.plugin>
+        <version.surefire.plugin.java-version.asm>9.8</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
-        <version.flatten-maven-plugin>1.6.0</version.flatten-maven-plugin>
+        <version.flatten-maven-plugin>1.7.0</version.flatten-maven-plugin>
         <version.moditect.plugin>1.2.2.Final</version.moditect.plugin>
         <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
         <version.versions.plugin>2.18.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
-        <version.spotless-maven-plugin>2.43.0</version.spotless-maven-plugin>
-        <version.jacoco.plugin>0.8.12</version.jacoco.plugin>
-        <version.sonar.plugin>5.0.0.4389</version.sonar.plugin>
+        <version.spotless-maven-plugin>2.44.4</version.spotless-maven-plugin>
+        <version.jacoco.plugin>0.8.13</version.jacoco.plugin>
+        <version.sonar.plugin>5.1.0.4751</version.sonar.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
 
         <!-- Forbidden API related properties -->
@@ -313,6 +313,7 @@
             Set statically, independently of the current JDK: we want our code to comply with this version
 
             Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting.
+            Adjust the contributing guide when changing the release Java version.
         -->
         <java-version.main.release>17</java-version.main.release>
         <java-version.main.compiler.java_home>${java.home}</java-version.main.compiler.java_home>
@@ -399,10 +400,11 @@
 
         <arquillian.wildfly.jvm.args.add-opens></arquillian.wildfly.jvm.args.add-opens>
         <arquillian.wildfly.jvm.args.add-modules></arquillian.wildfly.jvm.args.add-modules>
-        <arquillian.wildfly.jvm.args>-Duser.language=en -Duser.country=US ${arquillian.wildfly.jvm.args.add-opens} ${arquillian.wildfly.jvm.args.add-modules}</arquillian.wildfly.jvm.args>
+        <arquillian.jvm.args.java-version></arquillian.jvm.args.java-version>
+        <arquillian.wildfly.jvm.args>-Duser.language=en -Duser.country=US ${arquillian.wildfly.jvm.args.add-opens} ${arquillian.wildfly.jvm.args.add-modules} ${arquillian.jvm.args.java-version}</arquillian.wildfly.jvm.args>
 
         <!-- JDK version required for the build -->
-        <!-- Remember to update README when changing the version here. -->
+        <!-- Remember to update README/CONTRIBUTING when changing the version here. -->
         <jdk.min.version>21</jdk.min.version>
         <!-- Maven version required for the build -->
         <!--
@@ -1790,8 +1792,6 @@
             <properties>
                 <!-- ForbiddenAPIs doesn't work with JDK20+ yet -->
                 <forbiddenapis.skip>true</forbiddenapis.skip>
-                <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK21+ -->
-                <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
             </properties>
         </profile>
         <profile>
@@ -1805,8 +1805,6 @@
             <properties>
                 <!-- ForbiddenAPIs doesn't work with JDK23+ yet -->
                 <forbiddenapis.skip>true</forbiddenapis.skip>
-                <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK23+ -->
-                <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
             </properties>
         </profile>
         <profile>
@@ -1822,6 +1820,7 @@
                 <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK24+ -->
                 <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
+                <arquillian.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</arquillian.jvm.args.java-version>
             </properties>
         </profile>
         <profile>
@@ -1837,6 +1836,7 @@
                 <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK25+ -->
                 <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
+                <arquillian.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</arquillian.jvm.args.java-version>
             </properties>
         </profile>
         <profile>

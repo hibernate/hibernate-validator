@@ -17,7 +17,7 @@ def withMavenWorkspace(jdk, Closure body) {
 					artifactsPublisher(disabled: true),
 					// stdout/stderr for successful tests is not needed and takes up disk space
 					// we archive test results and stdout/stderr as part of the build scan anyway,
-					// see https://ge.hibernate.org/scans?search.rootProjectNames=Hibernate%20Search
+					// see https://develocity.commonhaus.dev/scans?search.rootProjectNames=Hibernate%20Search
 					junitPublisher(disabled: true)
 			]) {
 		body()
@@ -27,7 +27,7 @@ def withMavenWorkspace(jdk, Closure body) {
 pipeline {
 	agent none
 	triggers {
-		cron '@midnight'
+		cron 'H H(4-6) * * *'
 	}
 	options {
 		buildDiscarder logRotator(daysToKeepStr: '10', numToKeepStr: '3')
@@ -44,7 +44,7 @@ pipeline {
 					steps {
 						// The timeout cannot be in stage options, because that would
 						// include the time needed to provision a node.
-						timeout(time: 15, unit: 'MINUTES') {
+						timeout(time: 30, unit: 'MINUTES') {
 							withMavenWorkspace {
 								echo "Generate the artifacts."
 								sh "mvn clean install -Preproducibility-check"
@@ -70,7 +70,7 @@ pipeline {
 						}
 						// The timeout cannot be in stage options, because that would
 						// include the time needed to provision a node.
-						timeout(time: 15, unit: 'MINUTES') {
+						timeout(time: 30, unit: 'MINUTES') {
 							withMavenWorkspace(jdkVersion, {
 								script {
 									compilerToolPath = tool(name: jdkVersion, type: 'jdk')
@@ -97,7 +97,7 @@ pipeline {
 					steps {
 						// The timeout cannot be in stage options, because that would
 						// include the time needed to provision a node.
-						timeout(time: 15, unit: 'MINUTES') {
+						timeout(time: 30, unit: 'MINUTES') {
 							withMavenWorkspace {
 								echo "Generate documentation and distribution packages."
 								sh """mvn clean install \

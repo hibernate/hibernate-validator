@@ -23,18 +23,18 @@ jobs:
     steps:
       # Checkout target branch which has trusted code
       - name: Check out target branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
         with:
           persist-credentials: false
           ref: ${{ github.ref }}
       - name: Set up Java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # 4.7.0
         with:
           java-version: 21
           distribution: temurin
       # https://github.com/actions/cache/blob/main/examples.md#java---maven
       - name: Cache local Maven repository
-        uses: actions/cache@v4
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # 4.2.3
         with:
           path: ~/.m2/repository
           # use a different key than workflows running untrusted code
@@ -45,7 +45,7 @@ jobs:
         run: ./mvnw -v
       - name: Download GitHub Actions artifacts for the Develocity build scans
         id: downloadBuildScan
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # 4.2.1
         with:
           pattern: build-scan-data-*
           github-token: ${{ github.token }}

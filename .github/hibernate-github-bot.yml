@@ -7,7 +7,7 @@ jira:
       # Examples:
       # Bump some-dep-GAV from some-version to some-version in the build-dependencies group
       # Bump the build-dependencies group with 2 updates
-      titlePattern: "Bump.*the build-dependencies group( across \\d+ director(ies|y))?( with \\d+ updates?)?"
+      titlePattern: "Bump.*the (build-dependencies|workflow-actions) group.*+"
   ignoreFiles:
     # Git
     - ".git*"
@@ -47,3 +47,9 @@ develocity:
         replacement: "$1"
       - pattern: "org.hibernate.validator|Hibernate Validator|main|HEAD|\\d+.\\d+|PR-\\d+"
         replacement: "" # Just remove these tags
+licenseAgreement:
+  enabled: true
+  ignore:
+    # We ignore all dependabot PRs for a license check:
+    - user: dependabot[bot]
+      titlePattern: "Bump.*"

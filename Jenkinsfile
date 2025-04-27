@@ -96,6 +96,18 @@ this.helper = new JobHelper(this)
 helper.runWithNotification {
 
 stage('Configure') {
+	// We want to make sure that if we are building a PR that the branch name will not require any escaping of symbols in it.
+	// Otherwise, it may lead to cryptic build errors.
+	if (helper.scmSource.branch.name && !(helper.scmSource.branch.name ==~ /^[\w\d\/\\_\-\.]+$/)) {
+		throw new IllegalArgumentException("""
+											Branch name ${helper.scmSource.branch.name} contains unexpected symbols.
+											 Only characters, digits and -_.\\/ symbols are allowed in the branch name.
+											 Change the branch name and open a new Pull Request.
+										   """)
+	}
+
+	requireApprovalForPullRequest 'hibernate'
+
 	this.environments = AlternativeMultiMap.create([
 			jdk: [
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
@@ -560,7 +572,7 @@ void withMavenWorkspace(Map args, Closure body) {
 			artifactsPublisher(disabled: true),
 			// stdout/stderr for successful tests is not needed and takes up disk space
 			// we archive test results and stdout/stderr as part of the build scan anyway,
-			// see https://ge.hibernate.org/scans?search.rootProjectNames=Hibernate%20Validator
+			// see https://develocity.commonhaus.dev/scans?search.rootProjectNames=Hibernate%20Validator
 			junitPublisher(disabled: true)
 	])
 	helper.withMavenWorkspace(args, body)
@@ -569,13 +581,16 @@ void withMavenWorkspace(Map args, Closure body) {
 void mvn(String args) {
 	def develocityMainCredentialsId = helper.configuration.file?.develocity?.credentials?.main
 	def develocityPrCredentialsId = helper.configuration.file?.develocity?.credentials?.pr
+	def develocityBaseUrl = helper.configuration.file?.develocity?.url
 	if ( !helper.scmSource.pullRequest && develocityMainCredentialsId ) {
 		// Not a PR: we can pass credentials to the build, allowing it to populate the build cache
 		// and to publish build scans directly.
-		withCredentials([string(credentialsId: develocityMainCredentialsId,
-				variable: 'DEVELOCITY_ACCESS_KEY')]) {
-			withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
-				sh "mvn $args"
+		withEnv(["DEVELOCITY_BASE_URL=${develocityBaseUrl}"]) {
+			withCredentials([string(credentialsId: develocityMainCredentialsId,
+					variable: 'DEVELOCITY_ACCESS_KEY')]) {
+				withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
+					sh "mvn $args"
+				}
 			}
 		}
 	}
@@ -585,10 +600,12 @@ void mvn(String args) {
 		tryFinally({
 			sh "mvn $args"
 		}, { // Finally
-			withCredentials([string(credentialsId: develocityPrCredentialsId,
-					variable: 'DEVELOCITY_ACCESS_KEY')]) {
-				withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
-					sh 'mvn develocity:build-scan-publish-previous || true'
+			withEnv(["DEVELOCITY_BASE_URL=${develocityBaseUrl}"]) {
+				withCredentials([string(credentialsId: develocityPrCredentialsId,
+						variable: 'DEVELOCITY_ACCESS_KEY')]) {
+					withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
+						sh 'mvn develocity:build-scan-publish-previous || true'
+					}
 				}
 			}
 		})

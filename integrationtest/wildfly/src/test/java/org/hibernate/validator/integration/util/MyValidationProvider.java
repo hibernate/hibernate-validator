@@ -17,6 +17,8 @@ import jakarta.validation.spi.BootstrapState;
 import jakarta.validation.spi.ConfigurationState;
 import jakarta.validation.spi.ValidationProvider;
 
+import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
+
 /**
  * @author Hardy Ferentschik
  */
@@ -61,7 +63,7 @@ public class MyValidationProvider implements ValidationProvider<MyValidatorConfi
 
 		@Override
 		public ConstraintValidatorFactory getConstraintValidatorFactory() {
-			throw new UnsupportedOperationException();
+			return new DefaultConstraintValidatorFactory();
 		}
 
 		@Override

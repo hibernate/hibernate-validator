@@ -24,6 +24,18 @@
         <java.module.name>${hibernate-validator-cdi.module-name}</java.module.name>
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+
+        <!--
+            We want to skip the javadoc warnings for this module, since Jakarta Expression Language API is using proper modules,
+            resulting in a warning like:
+                [INFO] No previous run data found, generating javadoc.
+                [WARNING] Javadoc Warnings
+                [WARNING] warning: The code being documented uses packages in the unnamed module, but the packages defined in https://jakarta.ee/specifications/expression-language/6.0/apidocs/ are in named modules.
+                [WARNING] 1 warning
+            when trying to build this module. Since it cannot be suppressed, but the generated docs are actually OK
+            and links point to correct addresses, we just ignore all warnings for this module.
+        -->
+        <failOnJavadocWarning>false</failOnJavadocWarning>
     </properties>
 
     <dependencies>
