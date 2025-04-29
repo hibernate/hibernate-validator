@@ -201,8 +201,8 @@
         <version.com.google.guava>33.4.8-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>6.2.6</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
-        <version.com.fasterxml.jackson.core.jackson-databind>2.18.3</version.com.fasterxml.jackson.core.jackson-databind>
-        <version.com.fasterxml.jackson.core.jackson-annotations>2.18.3</version.com.fasterxml.jackson.core.jackson-annotations>
+        <version.com.fasterxml.jackson.core.jackson-databind>2.19.0</version.com.fasterxml.jackson.core.jackson-databind>
+        <version.com.fasterxml.jackson.core.jackson-annotations>2.19.0</version.com.fasterxml.jackson.core.jackson-annotations>
         <version.net.bytebuddy.byte-buddy>1.17.5</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
@@ -219,7 +219,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>10.23.0</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>10.23.1</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
@@ -245,7 +245,7 @@
         <version.enforcer.plugin>3.5.0</version.enforcer.plugin>
         <!-- Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting. -->
         <version.forbiddenapis.plugin>3.9</version.forbiddenapis.plugin>
-        <version.gmavenplus.plugin>4.1.1</version.gmavenplus.plugin>
+        <version.gmavenplus.plugin>4.2.0</version.gmavenplus.plugin>
         <version.gpg.plugin>3.2.7</version.gpg.plugin>
         <version.install.plugin>3.1.4</version.install.plugin>
         <version.japicmp.plugin>0.23.1</version.japicmp.plugin>
