@@ -7,10 +7,10 @@
 		xmlns="https://jakarta.ee/xml/ns/validation/mapping"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="https://jakarta.ee/xml/ns/validation/mapping
-			https://jakarta.ee/xml/ns/validation/validation-mapping-3.0.xsd"
-		version="3.0">
+			https://jakarta.ee/xml/ns/validation/validation-mapping-3.1.xsd"
+		version="3.1">
 
-	<default-package>org.hibernate.validator.internal.xml.containerelementtype</default-package>
+	<default-package>org.hibernate.validator.test.internal.xml.containerelementtype</default-package>
 
 	<bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForReturnValueXmlMappingTest$IFishTank" ignore-annotations="false">
 		<method name="test3">

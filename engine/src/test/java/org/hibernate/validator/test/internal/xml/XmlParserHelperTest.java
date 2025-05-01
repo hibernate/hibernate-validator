@@ -30,7 +30,7 @@ public class XmlParserHelperTest {
 	}
 
 	@Test
-	public void shouldRetrieveVersionFor30ValidationXml() {
+	public void shouldRetrieveVersionFor31ValidationXml() {
 		InputStream in = XmlParserHelperTest.class.getResourceAsStream( "parameter-name-provider-validation.xml" );
 		XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( "META-INF/validation.xml", in );
 
@@ -39,7 +39,7 @@ public class XmlParserHelperTest {
 				xmlEventReader
 		);
 
-		assertThat( version ).isEqualTo( "3.0" );
+		assertThat( version ).isEqualTo( "3.1" );
 	}
 
 	@Test
