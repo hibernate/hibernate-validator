@@ -4,8 +4,8 @@
 	Copyright Red Hat Inc. and Hibernate Authors
 -->
 <validation-config xmlns="https://jakarta.ee/xml/ns/validation/configuration"
-				xsi:schemaLocation="https://jakarta.ee/xml/ns/validation/configuration https://jakarta.ee/xml/ns/validation/validation-configuration-3.0.xsd"
+				xsi:schemaLocation="https://jakarta.ee/xml/ns/validation/configuration https://jakarta.ee/xml/ns/validation/validation-configuration-3.1.xsd"
 				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				version="3.0">
+				version="3.1">
 	<default-provider>org.hibernate.validator.test.cdi.internal.injection.MyValidationProvider</default-provider>
 </validation-config>
