@@ -7,7 +7,6 @@ package org.hibernate.validator.internal.xml.config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
 import java.util.Map;
 
 import javax.xml.stream.XMLEventReader;
@@ -18,7 +17,6 @@ import javax.xml.validation.Validator;
 
 import jakarta.validation.BootstrapConfiguration;
 
-import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.actions.GetClassLoader;
 import org.hibernate.validator.internal.util.actions.SetContextClassLoader;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -39,20 +37,15 @@ public class ValidationXmlParser {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String VALIDATION_XML_FILE = "META-INF/validation.xml";
-	private static final Map<String, String> SCHEMAS_BY_VERSION = Collections.unmodifiableMap( getSchemasByVersion() );
+	private static final Map<String, String> SCHEMAS_BY_VERSION = Map.of(
+			"1.0", "META-INF/validation-configuration-1.0.xsd",
+			"1.1", "META-INF/validation-configuration-1.1.xsd",
+			"2.0", "META-INF/validation-configuration-2.0.xsd",
+			"3.0", "META-INF/validation-configuration-3.0.xsd",
+			"3.1", "META-INF/validation-configuration-3.1.xsd"
+	);
 
 	private final ClassLoader externalClassLoader;
-
-	private static Map<String, String> getSchemasByVersion() {
-		Map<String, String> schemasByVersion = CollectionHelper.newHashMap( 4 );
-
-		schemasByVersion.put( "1.0", "META-INF/validation-configuration-1.0.xsd" );
-		schemasByVersion.put( "1.1", "META-INF/validation-configuration-1.1.xsd" );
-		schemasByVersion.put( "2.0", "META-INF/validation-configuration-2.0.xsd" );
-		schemasByVersion.put( "3.0", "META-INF/validation-configuration-3.0.xsd" );
-
-		return schemasByVersion;
-	}
 
 	public ValidationXmlParser(ClassLoader externalClassLoader) {
 		this.externalClassLoader = externalClassLoader;
