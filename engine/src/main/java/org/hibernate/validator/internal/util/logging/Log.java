@@ -942,4 +942,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 268, value = "The default group sequence provider %s does not implement neither `getValidationGroups(Class<?> klass, T object)` nor `getValidationGroups(T object)` methods."
 			+ " One of them has to be implemented for the default group sequence provider to be correctly defined.")
 	GroupDefinitionException getDefaultGroupSequenceProviderTypeDoesNotImplementAnyMethodsException(@FormatWith(ClassObjectFormatter.class) Class<?> klass);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = 269, value = "Unable to enable secure XML feature processing when loading %1$s: %2$s")
+	void unableToEnableSecureFeatureProcessingSchemaXml(String fileName, String message);
 }
