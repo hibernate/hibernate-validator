@@ -28,7 +28,7 @@ jobs:
           persist-credentials: false
           ref: ${{ github.ref }}
       - name: Set up Java 21
-        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # 4.7.0
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # 4.7.1
         with:
           java-version: 21
           distribution: temurin
@@ -45,7 +45,7 @@ jobs:
         run: ./mvnw -v
       - name: Download GitHub Actions artifacts for the Develocity build scans
         id: downloadBuildScan
-        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # 4.2.1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # 4.3.0
         with:
           pattern: build-scan-data-*
           github-token: ${{ github.token }}
