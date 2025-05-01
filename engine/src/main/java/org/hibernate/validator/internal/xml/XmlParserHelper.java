@@ -136,18 +136,27 @@ public class XmlParserHelper {
 	}
 
 	private Schema loadSchema(String schemaResource) {
-		ClassLoader loader = GetClassLoader.fromClass( XmlParserHelper.class );
-
-		URL schemaUrl = GetResource.action( loader, schemaResource );
-		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
-		Schema schema = null;
-		try {
-			schema = NewSchema.action( sf, schemaUrl );
-		}
-		catch (Exception e) {
-			LOG.unableToCreateSchema( schemaResource, e.getMessage() );
-		}
-		return schema;
-	}
+	    ClassLoader loader = GetClassLoader.fromClass(XmlParserHelper.class);
+	
+	    URL schemaUrl = GetResource.action(loader, schemaResource);
+	    SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+	    
+	    // Add security protection against XXE attacks
+	    try {
+	        sf.setProperty(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD, "");
+	        sf.setProperty(javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+	    } catch (SAXException e) {
+	        LOG.unableToCreateSchema(schemaResource, "Failed to set security properties: " + e.getMessage());
+	    }
+	    
+	    Schema schema = null;
+	    try {
+	        schema = NewSchema.action(sf, schemaUrl);
+	    }
+	    catch (Exception e) {
+	        LOG.unableToCreateSchema(schemaResource, e.getMessage());
+	    }
+	    return schema;
+}
 
 }
