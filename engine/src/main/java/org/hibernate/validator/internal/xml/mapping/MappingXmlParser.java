@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,18 +57,13 @@ public class MappingXmlParser {
 
 	private final ClassLoadingHelper classLoadingHelper;
 
-	private static final Map<String, String> SCHEMAS_BY_VERSION = Collections.unmodifiableMap( getSchemasByVersion() );
-
-	private static Map<String, String> getSchemasByVersion() {
-		Map<String, String> schemasByVersion = new HashMap<>();
-
-		schemasByVersion.put( "1.0", "META-INF/validation-mapping-1.0.xsd" );
-		schemasByVersion.put( "1.1", "META-INF/validation-mapping-1.1.xsd" );
-		schemasByVersion.put( "2.0", "META-INF/validation-mapping-2.0.xsd" );
-		schemasByVersion.put( "3.0", "META-INF/validation-mapping-3.0.xsd" );
-
-		return schemasByVersion;
-	}
+	private static final Map<String, String> SCHEMAS_BY_VERSION = Map.of(
+			"1.0", "META-INF/validation-mapping-1.0.xsd",
+			"1.1", "META-INF/validation-mapping-1.1.xsd",
+			"2.0", "META-INF/validation-mapping-2.0.xsd",
+			"3.0", "META-INF/validation-mapping-3.0.xsd",
+			"3.1", "META-INF/validation-mapping-3.1.xsd"
+	);
 
 	public MappingXmlParser(ConstraintCreationContext constraintCreationContext, JavaBeanHelper javaBeanHelper, ClassLoader externalClassLoader) {
 		this.constraintCreationContext = constraintCreationContext;
