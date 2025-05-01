@@ -29,6 +29,8 @@ import org.hibernate.validator.internal.util.actions.NewSchema;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import org.xml.sax.SAXException;
+
 /**
  * Provides common functionality used within the different XML descriptor
  * parsers.
@@ -140,6 +142,14 @@ public class XmlParserHelper {
 
 		URL schemaUrl = GetResource.action( loader, schemaResource );
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
+
+		try {
+			sf.setFeature( javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true );
+		}
+		catch (SAXException e) {
+			LOG.unableToEnableSecureFeatureProcessingSchemaXml( schemaResource, e.getMessage() );
+		}
+
 		Schema schema = null;
 		try {
 			schema = NewSchema.action( sf, schemaUrl );
