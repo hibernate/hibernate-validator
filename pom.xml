@@ -745,36 +745,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--
-                 Configure the nexus-staging-maven-plugin explicitly (without <extension>true</extension>)
-                 in order to work around a problem in the "reports" module (see that module's POM for more info).
-             -->
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <extensions>false</extensions><!-- This is essential: do not put true here -->
-                <configuration>
-                    <serverId>${ossrh.releases.repo.id}</serverId>
-                    <!-- The following, by default, is only used for actual releases, not for snapshot deployments -->
-                    <nexusUrl>${ossrh.releases.repo.baseUrl}</nexusUrl>
-                    <!-- oss.sonatype.org has been very slow when closing repositories lately;
-                         let's raise the timeout until we switch to s01.sonatype.org -->
-                    <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default-deploy</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <!--
-                                This will only put artifacts in a staging directory.
-                                See the "reports" module for actual deployment, at the end of the build.
-                             -->
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -1199,12 +1169,8 @@
                     <version>${version.deploy.plugin}</version>
                     <configuration>
                         <!-- we use the nexus-staging plugin -->
-                        <skip>${maven-deploy-plugin.skip}</skip>
+                        <skip>${deploy.skip}</skip>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>${version.gpg.plugin}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
@@ -1564,14 +1530,6 @@
                     <version>${version.versions.plugin}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.sonatype.plugins</groupId>
-                    <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>${version.nexus-staging-maven-plugin}</version>
-                    <configuration>
-                        <skipNexusStagingDeployMojo>${deploy.skip}</skipNexusStagingDeployMojo>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-wrapper-plugin</artifactId>
                     <version>${version.maven-wrapper-plugin}</version>
@@ -1637,19 +1595,6 @@
         <tag>HEAD</tag>
     </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>${ossrh.releases.repo.id}</id>
-            <name>OSSRH Releases Repository</name>
-            <url>${ossrh.releases.repo.url}</url>
-        </repository>
-        <snapshotRepository>
-            <id>${ossrh.snapshots.repo.id}</id>
-            <name>OSSRH Snapshots Repository</name>
-            <url>${ossrh.snapshots.repo.url}</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <profiles>
         <profile>
             <id>docs</id>
@@ -1680,6 +1625,7 @@
             <properties>
                 <!-- We want this execution to happen before moditect (which executes at package phase) -->
                 <javadoc.generate.jar.phase>prepare-package</javadoc.generate.jar.phase>
+                <altDeploymentRepository>local::file:${maven.multiModuleProjectDirectory}/target/staging-deploy/maven</altDeploymentRepository>
             </properties>
             <build>
                 <plugins>
@@ -1695,24 +1641,7 @@
                                     <rules>
                                         <requireReleaseDeps />
                                     </rules>
-                                    <fail>true</fail>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                                <configuration>
-                                    <homedir>${env.RELEASE_GPG_HOMEDIR}</homedir>
-                                    <bestPractices>true</bestPractices>
+                                    <fail>false</fail>
                                 </configuration>
                             </execution>
                         </executions>

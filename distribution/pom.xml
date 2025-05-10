@@ -19,9 +19,6 @@
     <description>Builds the distribution bundles</description>
 
     <properties>
-        <!-- Skip artifact deployment -->
-        <maven.deploy.skip>true</maven.deploy.skip>
-        <gpg.skip>true</gpg.skip>
         <!--
             Any javadoc warnings should've been caught already while the previous modules were built.
             Also see additional explanations on this property in the `hibernate-search-mapper-orm-jakarta-batch-core` module.
