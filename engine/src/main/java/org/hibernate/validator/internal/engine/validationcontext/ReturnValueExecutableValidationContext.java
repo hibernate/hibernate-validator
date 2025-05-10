@@ -19,6 +19,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
+import org.hibernate.validator.internal.engine.tracking.ProcessedBeansTrackingStrategy;
 import org.hibernate.validator.internal.engine.valuecontext.ValueContext;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
@@ -61,7 +62,8 @@ public class ReturnValueExecutableValidationContext<T> extends AbstractValidatio
 	) {
 		super( constraintValidatorManager, constraintValidatorFactory, validatorScopedContext, traversableResolver,
 				constraintValidatorInitializationContext, rootBean, rootBeanClass, rootBeanMetaData,
-				buildDisableAlreadyValidatedBeanTracking( executableMetaData )
+				buildProcessedBeansTrackingEnabled( validatorScopedContext.getProcessedBeansTrackingStrategy(), executable,
+						executableMetaData )
 		);
 		this.executable = executable;
 		this.executableMetaData = executableMetaData;
@@ -78,13 +80,15 @@ public class ReturnValueExecutableValidationContext<T> extends AbstractValidatio
 		return executableMetaData;
 	}
 
-	private static boolean buildDisableAlreadyValidatedBeanTracking(Optional<ExecutableMetaData> executableMetaData) {
+	private static boolean buildProcessedBeansTrackingEnabled(ProcessedBeansTrackingStrategy processedBeansTrackingStrategy,
+			Executable executable,
+			Optional<ExecutableMetaData> executableMetaData) {
 		if ( !executableMetaData.isPresent() ) {
 			// the method is unconstrained so there's no need to worry about the tracking
 			return false;
 		}
 
-		return !executableMetaData.get().getReturnValueMetaData().hasCascadables();
+		return processedBeansTrackingStrategy.isEnabledForReturnValue( executable, executableMetaData.get().getReturnValueMetaData().hasCascadables() );
 	}
 
 	@Override
