@@ -138,26 +138,28 @@ public class XmlParserHelper {
 	}
 
 	private Schema loadSchema(String schemaResource) {
-		ClassLoader loader = GetClassLoader.fromClass( XmlParserHelper.class );
-
-		URL schemaUrl = GetResource.action( loader, schemaResource );
-		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
-
-		try {
-			sf.setFeature( javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true );
-		}
-		catch (SAXException e) {
-			LOG.unableToEnableSecureFeatureProcessingSchemaXml( schemaResource, e.getMessage() );
-		}
-
-		Schema schema = null;
-		try {
-			schema = NewSchema.action( sf, schemaUrl );
-		}
-		catch (Exception e) {
-			LOG.unableToCreateSchema( schemaResource, e.getMessage() );
-		}
-		return schema;
+	    ClassLoader loader = GetClassLoader.fromClass(XmlParserHelper.class);
+	
+	    URL schemaUrl = GetResource.action(loader, schemaResource);
+	    SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+	    
+	    // Security improvement: Restrict access to external DTDs and schemas
+	    try {
+	        sf.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+	        sf.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+	    } catch (SAXException e) {
+	        // Some older parsers might not support these properties
+	        LOG.debug("Unable to set external access restrictions on schema factory", e);
+	    }
+	    
+	    Schema schema = null;
+	    try {
+	        schema = NewSchema.action(sf, schemaUrl);
+	    }
+	    catch (Exception e) {
+	        LOG.unableToCreateSchema(schemaResource, e.getMessage());
+	    }
+	    return schema;
 	}
 
 }
