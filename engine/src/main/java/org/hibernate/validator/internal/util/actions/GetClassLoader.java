@@ -17,7 +17,21 @@ public final class GetClassLoader {
 	}
 
 	public static ClassLoader fromContext() {
-		return Thread.currentThread().getContextClassLoader();
+	    if (System.getSecurityManager() == null) {
+	        // Fast path when no SecurityManager is active
+	        return Thread.currentThread().getContextClassLoader();
+	    } else {
+	        // Use AccessController when SecurityManager is active
+	        return AccessController.doPrivileged((PrivilegedAction<ClassLoader>) () -> {
+	            ClassLoader tccl = null;
+	            try {
+	                tccl = Thread.currentThread().getContextClassLoader();
+	            } catch (SecurityException ex) {
+	                LOG.warn("Unable to get context classloader instance.", ex);
+	            }
+	            return tccl;
+	        });
+	    }
 	}
 
 	public static ClassLoader fromClass(Class<?> clazz) {
