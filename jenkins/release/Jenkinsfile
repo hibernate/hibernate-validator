@@ -60,6 +60,7 @@ pipeline {
 
 					def releaseVersion = Version.parseReleaseVersion(params.RELEASE_VERSION)
 					def developmentVersion = Version.parseDevelopmentVersion(params.DEVELOPMENT_VERSION)
+					env.JRELEASER_DRY_RUN = params.RELEASE_DRY_RUN
 					echo "Performing full release for version ${releaseVersion.toString()}"
 
 					withMaven(mavenSettingsConfig: params.RELEASE_DRY_RUN ? null : 'ci-hibernate.deploy.settings.maven',
@@ -68,13 +69,20 @@ pipeline {
 											configFile(fileId: 'release.config.ssh.knownhosts', targetLocation: env.HOME + '/.ssh/known_hosts')]) {
 							// using MAVEN_GPG_PASSPHRASE (the default env variable name for passphrase in maven gpg plugin)
 							withCredentials([file(credentialsId: 'release.gpg.private-key', variable: 'RELEASE_GPG_PRIVATE_KEY_PATH'),
-											 string(credentialsId: 'release.gpg.passphrase', variable: 'MAVEN_GPG_PASSPHRASE')]) {
+											 string(credentialsId: 'release.gpg.passphrase', variable: 'JRELEASER_GPG_PASSPHRASE'),
+											 // TODO: Once we switch to maven-central publishing (from nexus2) we need to add a new credentials
+											 //  to use the following env variable names to set the user/password:
+											 //  JRELEASER_MAVENCENTRAL_USERNAME
+											 //  JRELEASER_MAVENCENTRAL_TOKEN
+											 usernamePassword(credentialsId: 'ossrh.sonatype.org', passwordVariable: 'JRELEASER_NEXUS2_PASSWORD', usernameVariable: 'JRELEASER_NEXUS2_USERNAME'),
+											 string(credentialsId: 'Hibernate-CI.github.com', variable: 'JRELEASER_GITHUB_TOKEN')]) {
 								sshagent(['ed25519.Hibernate-CI.github.com', 'hibernate.filemgmt.jboss.org', 'hibernate-ci.frs.sourceforge.net']) {
 									sh 'cat $HOME/.ssh/config'
-									sh 'git clone https://github.com/hibernate/hibernate-release-scripts.git'
-									env.RELEASE_GPG_HOMEDIR = env.WORKSPACE_TMP + '/.gpg'
+									dir('.release/scripts') {
+										sh 'git clone https://github.com/hibernate/hibernate-release-scripts.git .'
+									}
 									sh """
-										bash -xe hibernate-release-scripts/release.sh ${params.RELEASE_DRY_RUN ? '-d' : ''} \
+										bash -xe .release/scripts/release.sh -j ${params.RELEASE_DRY_RUN ? '-d' : ''} \
 												validator ${releaseVersion.toString()} ${developmentVersion.toString()}
 									"""
 								}
