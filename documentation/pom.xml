@@ -264,6 +264,9 @@
                         <extension>
                             <className>org.hibernate.infra.asciidoctor.extensions.customnumbering.CustomNumberingProcessor</className>
                         </extension>
+                        <extension>
+                            <className>org.hibernate.infra.asciidoctor.extensions.copytoclipboard.CopyToClipboardProcessor</className>
+                        </extension>
                     </extensions>
                     <sourceDocumentName>index.asciidoc</sourceDocumentName>
                     <attributes>
