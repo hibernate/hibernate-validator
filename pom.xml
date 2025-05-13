@@ -250,7 +250,7 @@
         <version.install.plugin>3.1.4</version.install.plugin>
         <version.japicmp.plugin>0.23.1</version.japicmp.plugin>
         <version.jar.plugin>3.4.2</version.jar.plugin>
-        <version.jqassistant.plugin>2.6.0</version.jqassistant.plugin>
+        <version.jqassistant.plugin>2.7.0</version.jqassistant.plugin>
         <version.javadoc.plugin>3.11.2</version.javadoc.plugin>
         <version.release.plugin>3.1.1</version.release.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
