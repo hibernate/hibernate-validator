@@ -277,6 +277,8 @@
         <!-- We always publish to a local directory, JReleaser is supposed to take care of publishing to Nexus: -->
         <local.staging.releases.repo.id>staging-deploy</local.staging.releases.repo.id>
         <local.staging.releases.repo.url>file:${maven.multiModuleProjectDirectory}/target/staging-deploy/maven</local.staging.releases.repo.url>
+        <ossrh.releases.repo.id>ossrh</ossrh.releases.repo.id>
+        <ossrh.releases.repo.url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</ossrh.releases.repo.url>
         <ossrh.snapshots.repo.id>ossrh</ossrh.snapshots.repo.id>
         <ossrh.snapshots.repo.url>https://oss.sonatype.org/content/repositories/snapshots</ossrh.snapshots.repo.url>
 
@@ -1595,9 +1597,9 @@
 
     <distributionManagement>
         <repository>
-            <id>${local.staging.releases.repo.id}</id>
-            <name>Local Staging Directory Releases Repository</name>
-            <url>${local.staging.releases.repo.url}</url>
+            <id>${ossrh.releases.repo.id}</id>
+            <name>OSSRH Releases Repository</name>
+            <url>${ossrh.releases.repo.url}</url>
         </repository>
         <snapshotRepository>
             <id>${ossrh.snapshots.repo.id}</id>
@@ -1639,6 +1641,12 @@
             </properties>
             <build>
                 <plugins>
+                    <plugin>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <configuration>
+                            <altReleaseDeploymentRepository>${local.staging.releases.repo.id}::${local.staging.releases.repo.url}</altReleaseDeploymentRepository>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <artifactId>maven-enforcer-plugin</artifactId>
                         <executions>
