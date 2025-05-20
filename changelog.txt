@@ -1,6 +1,45 @@
 Hibernate Validator Changelog
 =============================
 
+9.0.0.Final (2025-05-20)
+-------------------------
+
+** Bug
+    * HV-2074 Customizing PropertyNodeNameProvider Not Working in Programmatic Constraint Definition
+    * HV-1917 MinDuration/MaxDuration validation message (english) broken for zero duration.
+
+** Improvement
+    * HV-2103 Include Jakarta Validation 3.1 XSDs
+    * HV-2102 Disable external schema loading
+    * HV-2094 Bump Jakarta EE BOM to 11.0.0
+    * HV-2093 Bump joda-time to 2.14.0
+    * HV-2091 Upgrade paranamer to 2.8.3
+    * HV-2090 Update to OpenJFX to 17.0.14
+    * HV-2089 Upgrade paranamer to 2.8.2
+    * HV-2088 Bump Jakarta EE BOM to 11.0.0-RC1
+    * HV-2087 Upgrade jboss-logging-tools to 3.0.4.Final
+    * HV-2086 Bump Apache Groovy to 4.0.26
+    * HV-2085 Upgrade paranamer to 2.8.1
+    * HV-2084 Bump Jakarta EE BOM to 11.0.0-M5
+    * HV-2079 Bump joda-time to 2.13.1
+    * HV-2078 Bump Apache Groovy to 4.0.25
+
+** Task
+    * HV-2108 Test against wildfly-preview 36.0.1.Final
+    * HV-2107 Enable copytocliboard extension from hibernate-asciidoctor-extensions
+    * HV-2104 Remove Google Analytics
+    * HV-2101 Test against wildfly-preview 36.0.0.Final
+    * HV-2096 Use JReleaser to publish hibernate artifacts
+    * HV-2095 Upgrade hibernate-asciidoctor-theme to 5.0.6.Final
+    * HV-2081 Test against wildfly-preview 35.0.1.Final
+    * HV-2077 Align content of CONTRIBUTING.md with what's in other projects
+    * HV-2076 Test against wildfly-preview 35.0.0.Final
+    * HV-2075 Upgrade to wildfly-arquillian-container-managed 5.1.0.Beta9 for testing
+    * HV-2072 Make Hibernate Validator integration tests running on JDK 24+
+    * HV-2071 Build with JDK 21
+    * HV-2070 Use `maven-assembly-plugin` instead of `copy-maven-plugin` to rename the pdf documents
+    * HV-2023 Add a step to build pdf documentation to the nightly CI job
+
 9.0.0.CR1 (2024-12-13)
 -------------------------
 
