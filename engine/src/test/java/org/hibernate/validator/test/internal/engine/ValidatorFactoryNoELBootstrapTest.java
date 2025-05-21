@@ -40,7 +40,7 @@ public class ValidatorFactoryNoELBootstrapTest {
 
 	private final String EL_PACKAGE_PREFIX = "jakarta.el";
 
-	private final String EL_IMPL_PACKAGE_PREFIX = "com.sun.el";
+	private final String EL_IMPL_PACKAGE_PREFIX = "org.glassfish.expressly";
 
 	@Test
 	@TestForIssue(jiraKey = "HV-793")

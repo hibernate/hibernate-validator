@@ -50,7 +50,7 @@ Logging will delegate any log requests to that provider.
         <dependency>
            <groupId>org.glassfish.expressly</groupId>
            <artifactId>expressly</artifactId>
-           <version>6.0.0-M1</version>
+           <version>6.0.0</version>
         </dependency>
 
 * Jakarta Validation defines integration points with [CDI](http://jcp.org/en/jsr/detail?id=346). If your application runs
