@@ -21,7 +21,7 @@
 
     <properties>
         <asciidoctor.base-output-dir>${project.build.directory}/asciidoctor/en-US</asciidoctor.base-output-dir>
-        <asciidoctor.theme-dir>${project.build.directory}/hibernate-asciidoctor-theme</asciidoctor.theme-dir>
+        <asciidoctor.theme-dir>${project.build.directory}/hibernate-asciidoctor-theme/asciidoc</asciidoctor.theme-dir>
         <asciidoctor.aggregated-resources-dir>${project.build.directory}/aggregated-resources</asciidoctor.aggregated-resources-dir>
         <asciidoctor.examples-source-dir>${basedir}/src/test/java</asciidoctor.examples-source-dir>
         <asciidoctor.examples-resources-dir>${basedir}/src/test/resources</asciidoctor.examples-resources-dir>
@@ -120,30 +120,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack-asciidoctor-theme</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.hibernate.infra</groupId>
-                                    <artifactId>hibernate-asciidoctor-theme</artifactId>
-                                    <version>${version.org.hibernate.infra.hibernate-asciidoctor-theme}</version>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
