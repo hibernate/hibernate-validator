@@ -62,7 +62,7 @@
 			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>
-			<source>../copyright.txt</source>
+			<source>../AUTHORS.txt</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>
@@ -82,7 +82,7 @@
 				<exclude>README.md</exclude>
 				<exclude>CONTRIBUTING.md</exclude>
 				<exclude>changelog.txt</exclude>
-				<exclude>copyright.txt</exclude>
+				<exclude>AUTHORS.txt</exclude>
 				<exclude>license.txt</exclude>
 
 				<!-- only needed for documentation and helper scripts, no need to include them -->

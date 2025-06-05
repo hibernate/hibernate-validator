@@ -23,7 +23,7 @@ jira:
     - "*.Jenkinsfile"
     - "*.sh"
     # In-repo documentation
-    - "copyright.txt"
+    - "AUTHORS.txt"
     - "README.md"
     - "MAINTAINERS.md"
     - "CONTRIBUTING.md"
