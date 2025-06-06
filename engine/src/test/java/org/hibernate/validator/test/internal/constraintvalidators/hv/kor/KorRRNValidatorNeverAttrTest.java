@@ -70,6 +70,9 @@ public class KorRRNValidatorNeverAttrTest extends KorRRNValidatorTestHelper {
 	void invalidDate() {
 		assertInvalidRRN( "861324-2567481" );
 		assertInvalidRRN( "960292-2499371" );
+		assertInvalidRRN( "000001-1234560" );
+		assertInvalidRRN( "000100-1234560" );
+		assertInvalidRRN( "000000-1234560" );
 	}
 
 	// Invalid RRN Length
