@@ -47,6 +47,14 @@ public class KorRRNValidatorNeverAttrTest extends KorRRNValidatorTestHelper {
 		assertValidRRN( "750519-1404601" );
 	}
 
+	@Test
+	void testNeverForeignerGenderDigits() {
+		assertValidRRN( "850101-5000000" );
+		assertValidRRN( "920202-6000000" );
+		assertValidRRN( "010101-7000000" );
+		assertValidRRN( "030303-8000000" );
+	}
+
 	/**
 	 * The test succeeds without hyphen ('-')
 	 */
