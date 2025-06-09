@@ -22,7 +22,16 @@ import org.hibernate.validator.internal.util.ModUtil;
  */
 public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence> {
 
-	private static final List<Integer> GENDER_DIGIT = List.of( 1, 2, 3, 4 );
+	// Gender digit in Korean Resident Registration Number (RRN):
+	// 1: Male, born 1900–1999
+	// 2: Female, born 1900–1999
+	// 3: Male, born 2000–2099
+	// 4: Female, born 2000–2099
+	// 5: Foreign male, born 1900–1999
+	// 6: Foreign female, born 1900–1999
+	// 7: Foreign male, born 2000–2099
+	// 8: Foreign female, born 2000–2099
+	private static final List<Integer> GENDER_DIGIT = List.of( 1, 2, 3, 4, 5, 6, 7, 8 );
 	// Check sum weight for ModUtil
 	private static final int[] CHECK_SUM_WEIGHT = new int[] { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
 	// index of the digit representing the gender
@@ -90,7 +99,7 @@ public class KorRRNValidator implements ConstraintValidator<KorRRN, CharSequence
 			if ( month < 1 || month > 12 || day < 1 || day > 31 ) {
 				return false;
 			}
-			return day <= 31 && ( day <= 30 || ( month != 4 && month != 6 && month != 9 && month != 11 ) ) && ( day <= 29 || month != 2 );
+			return ( day <= 30 || month != 4 && month != 6 && month != 9 && month != 11 ) && ( day <= 29 || month != 2 );
 		}
 
 		private static boolean isValidLength(String rrn) {
