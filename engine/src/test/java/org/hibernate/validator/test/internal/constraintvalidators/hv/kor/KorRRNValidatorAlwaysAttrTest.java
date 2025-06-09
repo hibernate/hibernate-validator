@@ -33,7 +33,6 @@ public class KorRRNValidatorAlwaysAttrTest extends KorRRNValidatorTestHelper {
 	// valid RRN
 	@Test
 	void testBeforeOctober2020OnlyAttr() {
-
 		assertValidRRN( "861224-2567484" );
 		assertValidRRN( "960223-2499378" );
 		assertValidRRN( "790707-1133360" );
@@ -69,6 +68,14 @@ public class KorRRNValidatorAlwaysAttrTest extends KorRRNValidatorTestHelper {
 		assertInvalidRRN( "960292-2499371" );
 		assertInvalidRRN( "000000-5920021" );
 		assertInvalidRRN( "999999-6609491" );
+	}
+
+	@Test
+	void testAlwaysForeignerGenderDigits() {
+		assertValidRRN( "850101-5000005" );
+		assertValidRRN( "920202-6000003" );
+		assertValidRRN( "010101-7000006" );
+		assertValidRRN( "030303-8000001" );
 	}
 
 	// Invalid RRN Length
