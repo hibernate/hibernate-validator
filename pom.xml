@@ -861,10 +861,7 @@
 
     <profiles>
         <profile>
-            <id>pre-jdk9</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
+            <id>osgi</id>
             <modules>
                 <module>osgi</module>
             </modules>

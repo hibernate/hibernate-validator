@@ -60,7 +60,7 @@ public class JaxpContainedInDeploymentIT {
 				.addClass( Camera.class )
 				.addAsResource( validationXml(), "META-INF/validation.xml" )
 				.addAsResource( mappingXml(), "META-INF/my-mapping.xml" )
-				.addAsLibrary( Maven.resolver().resolve( "xerces:xercesImpl:2.9.1" ).withoutTransitivity().asSingleFile() )
+				.addAsLibrary( Maven.configureResolver().withRemoteRepo( "maven.central.repo", "https://repo1.maven.org/maven2", "default" ).resolve( "xerces:xercesImpl:2.9.1" ).withoutTransitivity().asSingleFile() )
 				.addAsResource( "log4j.properties" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}

@@ -151,6 +151,12 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <reuseForks>false</reuseForks>
+                    <systemProperties>
+                        <property>
+                            <name>org.ops4j.pax.url.mvn.repositories</name>
+                            <value>https://repo1.maven.org/maven2@id=maven.central.repo</value>
+                        </property>
+                    </systemProperties>
                 </configuration>
             </plugin>
         </plugins>
