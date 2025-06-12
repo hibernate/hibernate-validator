@@ -78,7 +78,7 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  */
 
 @Field final String DEFAULT_JDK_TOOL = 'OracleJDK8 Latest'
-@Field final String MAVEN_TOOL = 'Apache Maven 3.9'
+@Field final String MAVEN_TOOL = 'Apache Maven 3.2'
 
 // Default node pattern, to be used for resource-intensive stages.
 // Should not include the controller node.
@@ -141,7 +141,7 @@ helper.runWithNotification {
 			}
 			maven {
 				defaultTool MAVEN_TOOL
-				producedArtifactPattern "org/hibernate/validator/*"
+				producedArtifactPattern "org/hibernate/*"
 			}
 		}
 
@@ -238,9 +238,8 @@ Resulting execution plan:
 			"""
 
 				dir(helper.configuration.maven.localRepositoryPath) {
-					stash name:'default-build-result', includes:"org/hibernate/validator/**"
+					stash name:'default-build-result', includes:"org/hibernate/**"
 				}
-				stash name:'default-build-jacoco-reports', includes:"**/jacoco.exec"
 			}
 		}
 	}
@@ -304,65 +303,6 @@ Resulting execution plan:
 			parallel(parameters)
 		}
 	}
-
-	stage('Sonar analysis') {
-		def sonarCredentialsId = helper.configuration.file?.sonar?.credentials
-		if (sonarCredentialsId) {
-			runBuildOnNode {
-				withMavenWorkspace {
-					if (enableDefaultBuild && enableDefaultBuildIT) {
-						unstash name: "default-build-jacoco-reports"
-					}
-					environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
-						unstash name: "${buildEnv.tag}-build-jacoco-reports"
-					}
-					environments.content.wildflyTck.enabled.each { JdkBuildEnvironment buildEnv ->
-						unstash name: "${buildEnv.tag}-build-jacoco-reports"
-					}
-
-					// we don't clean to keep the unstashed jacoco reports:
-					sh "mvn package -Pskip-checks -Pci-build -DskipTests -Pcoverage-report ${toTestJdkArg(environments.content.jdk.default)}"
-
-
-					// WARNING: Make sure credentials are evaluated by sh, not Groovy.
-					// To that end, escape the '$' when referencing the variables.
-					// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
-					withCredentials([usernamePassword(
-							credentialsId: sonarCredentialsId,
-							usernameVariable: 'SONARCLOUD_ORGANIZATION',
-							// https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-maven/#analyzing
-							passwordVariable: 'SONAR_TOKEN'
-					)]) {
-						// We don't want to use the build cache or build scans for this execution
-						def miscMavenArgs = '-Dscan=false -Dno-build-cache'
-						sh """ \
-							mvn sonar:sonar \
-							${miscMavenArgs} \
-							-Dsonar.organization=\${SONARCLOUD_ORGANIZATION} \
-							-Dsonar.host.url=https://sonarcloud.io \
-							-Dsonar.projectKey=hibernate_hibernate-validator \
-							-Dsonar.projectName="Hibernate Validator" \
-							-Dsonar.projectDescription="Hibernate Validator, declare and validate application constraints" \
-							${helper.scmSource.pullRequest ? """ \
-									-Dsonar.pullrequest.branch=${helper.scmSource.branch.name} \
-									-Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id} \
-									-Dsonar.pullrequest.base=${helper.scmSource.pullRequest.target.name} \
-									${helper.scmSource.gitHubRepoId ? """ \
-											-Dsonar.pullrequest.provider=GitHub \
-											-Dsonar.pullrequest.github.repository=${helper.scmSource.gitHubRepoId} \
-									""" : ''} \
-							""" : """ \
-									-Dsonar.branch.name=${helper.scmSource.branch.name} \
-							"""} \
-					"""
-					}
-				}
-			}
-		} else {
-			echo "Skipping Sonar report: no credentials."
-		}
-	}
-
 } // End of helper.runWithNotification
 
 // Job-specific helpers
@@ -571,41 +511,7 @@ void withMavenWorkspace(Map args, Closure body) {
 }
 
 void mvn(String args) {
-	def develocityMainCredentialsId = helper.configuration.file?.develocity?.credentials?.main
-	def develocityPrCredentialsId = helper.configuration.file?.develocity?.credentials?.pr
-	def develocityBaseUrl = helper.configuration.file?.develocity?.url
-	if ( !helper.scmSource.pullRequest && develocityMainCredentialsId ) {
-		// Not a PR: we can pass credentials to the build, allowing it to populate the build cache
-		// and to publish build scans directly.
-		withEnv(["DEVELOCITY_BASE_URL=${develocityBaseUrl}"]) {
-			withCredentials([string(credentialsId: develocityMainCredentialsId,
-					variable: 'DEVELOCITY_ACCESS_KEY')]) {
-				withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
-					sh "mvn $args"
-				}
-			}
-		}
-	}
-	else if ( helper.scmSource.pullRequest && develocityPrCredentialsId ) {
-		// Pull request: we can't pass credentials to the build, since we'd be exposing secrets to e.g. tests.
-		// We do the build first, then publish the build scan separately.
-		tryFinally({
-			sh "mvn $args"
-		}, { // Finally
-			withEnv(["DEVELOCITY_BASE_URL=${develocityBaseUrl}"]) {
-				withCredentials([string(credentialsId: develocityPrCredentialsId,
-						variable: 'DEVELOCITY_ACCESS_KEY')]) {
-					withGradle { // withDevelocity, actually: https://plugins.jenkins.io/gradle/#plugin-content-capturing-build-scans-from-jenkins-pipeline
-						sh 'mvn develocity:build-scan-publish-previous || true'
-					}
-				}
-			}
-		})
-	}
-	else {
-		// No Develocity credentials.
-		sh "mvn $args"
-	}
+	sh "mvn $args"
 }
 
 // try-finally construct that properly suppresses exceptions thrown in the finally block.
