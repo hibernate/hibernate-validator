@@ -28,15 +28,18 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 	private final Object validatedValue;
 	private final Class<?> rootBeanType;
 	private final Map<String, Object> messageParameters;
+	private final boolean expressionLanguageEnabled;
 
 	public MessageInterpolatorContext(ConstraintDescriptor<?> constraintDescriptor,
 			Object validatedValue,
 			Class<?> rootBeanType,
-			Map<String, Object> messageParameters) {
+			Map<String, Object> messageParameters,
+			boolean expressionLanguageEnabled) {
 		this.constraintDescriptor = constraintDescriptor;
 		this.validatedValue = validatedValue;
 		this.rootBeanType = rootBeanType;
 		this.messageParameters = messageParameters;
+		this.expressionLanguageEnabled = expressionLanguageEnabled;
 	}
 
 	@Override
@@ -56,6 +59,11 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 
 	public Map<String, Object> getMessageParameters() {
 		return messageParameters;
+	}
+
+
+	public boolean isExpressionLanguageEnabled() {
+		return expressionLanguageEnabled;
 	}
 
 	@Override
@@ -105,6 +113,7 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 		sb.append( "MessageInterpolatorContext" );
 		sb.append( "{constraintDescriptor=" ).append( constraintDescriptor );
 		sb.append( ", validatedValue=" ).append( validatedValue );
+		sb.append( ", expressionLanguageEnabled=" ).append( expressionLanguageEnabled );
 		sb.append( '}' );
 		return sb.toString();
 	}

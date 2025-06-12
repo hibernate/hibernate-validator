@@ -17,7 +17,6 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -43,6 +42,7 @@ import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetEnvOrSystemVariableValue;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
@@ -62,6 +62,9 @@ import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private static final Log log = LoggerFactory.make();
+
+	private static final String EXPRESSION_LANGUAGE_ENABLED_ENV = "ORG_HIBERNATE_VALIDATOR_EXPRESSION_LANGUAGE_ENABLED";
+	private static final String EXPRESSION_LANGUAGE_ENABLED_SYSTEM = "org.hibernate.validator.expressionLanguageEnabled";
 
 	/**
 	 * The default message interpolator for this factory.
@@ -113,6 +116,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * Hibernate Validator specific flag to abort validation on first constraint violation.
 	 */
 	private final boolean failFast;
+
+	/**
+	 * Hibernate Validator specific flag to enable Expression Language message interpolation.
+	 */
+	private final boolean expressionLanguageEnabled;
 
 	/**
 	 * Hibernate validator specific flags to relax constraints on parameters.
@@ -208,6 +216,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		tmpFailFast = checkPropertiesForBoolean( properties, HibernateValidatorConfiguration.FAIL_FAST, tmpFailFast );
 		this.failFast = tmpFailFast;
+		this.expressionLanguageEnabled = getExpressionLanguageEnabled();
 
 		this.methodValidationConfiguration = new MethodValidationConfiguration();
 
@@ -265,8 +274,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 
 		// XML-defined constraint mapping contributors
-		List<ConstraintMappingContributor> contributors = getPropertyConfiguredConstraintMappingContributors( configurationState.getProperties(),
-				externalClassLoader );
+		List<ConstraintMappingContributor> contributors = getPropertyConfiguredConstraintMappingContributors(
+				configurationState.getProperties(),
+				externalClassLoader
+		);
 
 		for ( ConstraintMappingContributor contributor : contributors ) {
 			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
@@ -303,6 +314,15 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return timeProvider != null ? timeProvider : DefaultTimeProvider.getInstance();
 	}
 
+	private static boolean getExpressionLanguageEnabled() {
+		String enable = run( GetEnvOrSystemVariableValue.action( EXPRESSION_LANGUAGE_ENABLED_ENV, EXPRESSION_LANGUAGE_ENABLED_SYSTEM ) );
+		if ( enable == null ) {
+			log.expressionLanguageFeaturesNoExplicitSetting( EXPRESSION_LANGUAGE_ENABLED_ENV, EXPRESSION_LANGUAGE_ENABLED_SYSTEM );
+			enable = "false";
+		}
+		return "true".equalsIgnoreCase( enable );
+	}
+
 	@Override
 	public Validator getValidator() {
 		return createValidator(
@@ -311,6 +331,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				traversableResolver,
 				parameterNameProvider,
 				failFast,
+				expressionLanguageEnabled,
 				validatedValueHandlers,
 				timeProvider,
 				methodValidationConfiguration
@@ -339,6 +360,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	public boolean isFailFast() {
 		return failFast;
+	}
+
+	public boolean isExpressionLanguageEnabled() {
+		return expressionLanguageEnabled;
 	}
 
 	public List<ValidatedValueUnwrapper<?>> getValidatedValueHandlers() {
@@ -374,14 +399,17 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		xmlMetaDataProvider = null;
 	}
 
-	Validator createValidator(ConstraintValidatorFactory constraintValidatorFactory,
+	Validator createValidator(
+			ConstraintValidatorFactory constraintValidatorFactory,
 			MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
 			ParameterNameProvider parameterNameProvider,
 			boolean failFast,
+			boolean expressionLanguageEnabled,
 			List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
 			TimeProvider timeProvider,
-			MethodValidationConfiguration methodValidationConfiguration) {
+			MethodValidationConfiguration methodValidationConfiguration
+	) {
 
 		BeanMetaDataManager beanMetaDataManager;
 		if ( !beanMetaDataManagerMap.containsKey( parameterNameProvider ) ) {
@@ -408,7 +436,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				typeResolutionHelper,
 				validatedValueHandlers,
 				constraintValidatorManager,
-				failFast
+				failFast,
+				expressionLanguageEnabled
 		);
 	}
 
@@ -449,7 +478,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * {@link HibernateValidatorConfiguration#VALIDATED_VALUE_HANDLERS} property.
 	 *
 	 * @param properties the properties used to bootstrap the factory
-	 *
 	 * @return a list with property-configured {@link ValidatedValueUnwrapper}s; May be empty but never {@code null}
 	 */
 	private static List<ValidatedValueUnwrapper<?>> getPropertyConfiguredValidatedValueHandlers(
@@ -481,7 +509,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * property.
 	 *
 	 * @param properties the properties used to bootstrap the factory
-	 *
 	 * @return a list with property-configured {@link ContraintMappingContributor}s; May be empty but never {@code null}
 	 */
 	private static List<ConstraintMappingContributor> getPropertyConfiguredConstraintMappingContributors(
@@ -517,8 +544,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return contributors;
 	}
 
-	private static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,
-			ConstraintHelper constraintHelper) {
+	private static void registerCustomConstraintValidators(
+			Set<DefaultConstraintMapping> constraintMappings,
+			ConstraintHelper constraintHelper
+	) {
 		Set<Class<?>> definedConstraints = newHashSet();
 		for ( DefaultConstraintMapping constraintMapping : constraintMappings ) {
 			for ( ConstraintDefinitionContribution<?> contribution : constraintMapping.getConstraintDefinitionContributions() ) {
@@ -529,7 +558,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private static <A extends Annotation> void processConstraintDefinitionContribution(
 			ConstraintDefinitionContribution<A> constraintDefinitionContribution, ConstraintHelper constraintHelper,
-			Set<Class<?>> definedConstraints) {
+			Set<Class<?>> definedConstraints
+	) {
 		Class<A> constraintType = constraintDefinitionContribution.getConstraintType();
 		if ( definedConstraints.contains( constraintType ) ) {
 			throw log.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( constraintType.getName() );

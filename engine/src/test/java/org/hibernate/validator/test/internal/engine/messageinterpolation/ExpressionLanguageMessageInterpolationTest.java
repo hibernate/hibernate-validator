@@ -67,7 +67,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				notNullDescriptor,
 				user,
 				null,
-				Collections.<String, Object>emptyMap()
+				Collections.<String, Object>emptyMap(),
+				true
 		);
 
 		String expected = "18";
@@ -81,7 +82,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				notNullDescriptor,
 				new User(),
 				null,
-				Collections.<String, Object>emptyMap()
+				Collections.<String, Object>emptyMap(),
+				true
 		);
 
 		String expected = "${validatedValue.foo}";
@@ -170,7 +172,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				notNullDescriptor,
 				42.00000d,
 				null,
-				Collections.<String, Object>emptyMap()
+				Collections.<String, Object>emptyMap(),
+				true
 		);
 
 		// german locale
@@ -229,7 +232,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				notNullDescriptor,
 				42.00000d,
 				null,
-				Collections.<String, Object>emptyMap()
+				Collections.<String, Object>emptyMap(),
+				true
 		);
 
 		String expected = "${formatter.foo('%1$.2f', validatedValue)}";
@@ -304,7 +308,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				descriptor,
 				null,
 				null,
-				Collections.<String, Object>emptyMap()
+				Collections.<String, Object>emptyMap(),
+				true
 		);
 	}
 }

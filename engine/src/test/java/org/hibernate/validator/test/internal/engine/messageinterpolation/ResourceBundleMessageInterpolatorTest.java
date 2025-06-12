@@ -279,7 +279,8 @@ public class ResourceBundleMessageInterpolatorTest {
 				descriptor,
 				null,
 				null,
-				Collections.<String, Object>emptyMap()
+				Collections.<String, Object>emptyMap(),
+				true
 		);
 	}
 

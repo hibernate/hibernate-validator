@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
 import javax.validation.ValidationException;
 
+import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
 import org.hibernate.validator.internal.engine.messageinterpolation.LocalizedMessage;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
@@ -329,23 +330,29 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		);
 
 		// resolve EL expressions (step 5)
-		tokens = null;
-		if ( cachingEnabled ) {
-			tokens = tokenizedELMessages.get( resolvedMessage );
-		}
-		if ( tokens == null ) {
-			TokenCollector tokenCollector = new TokenCollector( resolvedMessage, InterpolationTermType.EL );
-			tokens = tokenCollector.getTokenList();
-
+		// in the standard Hibernate Validator execution flow, the context is always an instance of
+		// HibernateMessageInterpolatorContext
+		// but it can be a spec Context in the Jakarta Bean Validation TCK.
+		if ( !( context instanceof HibernateMessageInterpolatorContext )
+				|| ( (MessageInterpolatorContext) context ).isExpressionLanguageEnabled() ) {
+			tokens = null;
 			if ( cachingEnabled ) {
-				tokenizedELMessages.putIfAbsent( resolvedMessage, tokens );
+				tokens = tokenizedELMessages.get( resolvedMessage );
 			}
+			if ( tokens == null ) {
+				TokenCollector tokenCollector = new TokenCollector( resolvedMessage, InterpolationTermType.EL );
+				tokens = tokenCollector.getTokenList();
+
+				if ( cachingEnabled ) {
+					tokenizedELMessages.putIfAbsent( resolvedMessage, tokens );
+				}
+			}
+			resolvedMessage = interpolateExpression(
+					new TokenIterator( tokens ),
+					context,
+					locale
+			);
 		}
-		resolvedMessage = interpolateExpression(
-				new TokenIterator( tokens ),
-				context,
-				locale
-		);
 
 		// last but not least we have to take care of escaped literals
 		resolvedMessage = replaceEscapedLiterals( resolvedMessage );
