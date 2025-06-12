@@ -77,7 +77,7 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *
  */
 
-@Field final String DEFAULT_JDK_TOOL = 'OpenJDK 8 Latest'
+@Field final String DEFAULT_JDK_TOOL = 'OracleJDK8 Latest'
 @Field final String MAVEN_TOOL = 'Apache Maven 3.9'
 
 // Default node pattern, to be used for resource-intensive stages.
@@ -112,23 +112,23 @@ helper.runWithNotification {
 
 		this.environments = AlternativeMultiMap.create([
 				jdk: [
-						new JdkBuildEnvironment(testJavaVersion: '8', testCompilerTool: 'OpenJDK 8 Latest',
+						new JdkBuildEnvironment(testJavaVersion: '8', testCompilerTool: 'OracleJDK8 Latest',
 								condition: TestCondition.BEFORE_MERGE,
 								isDefault: true),
 
 						// We want to enable preview features when testing newer builds of OpenJDK:
 						// even if we don't use these features, just enabling them can cause side effects
 						// and it's useful to test that.
-						new JdkBuildEnvironment(testJavaVersion: '9', testCompilerTool: 'OpenJDK 9 Latest',
+						new JdkBuildEnvironment(testJavaVersion: '9', testCompilerTool: 'OracleJDK 9 Latest',
 								testLauncherArgs: '--enable-preview',
 								condition: TestCondition.AFTER_MERGE)
 				],
 				wildflyTck: [
-						new WildFlyTckBuildEnvironment(testJavaVersion: '8', testCompilerTool: 'OpenJDK 8 Latest',
+						new WildFlyTckBuildEnvironment(testJavaVersion: '8', testCompilerTool: 'OracleJDK8 Latest',
 								condition: TestCondition.ON_DEMAND)
 				],
 				sigtest: [
-						new SigTestBuildEnvironment(testJavaVersion: '8', jdkTool: 'OpenJDK 8 Latest',
+						new SigTestBuildEnvironment(testJavaVersion: '8', jdkTool: 'OracleJDK8 Latest',
 								condition: TestCondition.BEFORE_MERGE)
 				]
 		])
