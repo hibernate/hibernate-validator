@@ -92,7 +92,9 @@ public class MessageInterpolatorContextTest {
 								TestBean.class,
 								null,
 								Collections.<String, Object>emptyMap(),
-								Collections.<String, Object>emptyMap() )
+								Collections.<String, Object>emptyMap(),
+								false
+						)
 				)
 		)
 				.andReturn( "invalid" );
@@ -109,13 +111,13 @@ public class MessageInterpolatorContextTest {
 
 	@Test(expectedExceptions = ValidationException.class)
 	public void testUnwrapToImplementationCausesValidationException() {
-		Context context = new MessageInterpolatorContext( null, null, null, null, Collections.<String, Object>emptyMap(), Collections.<String, Object>emptyMap() );
+		Context context = new MessageInterpolatorContext( null, null, null, null, Collections.<String, Object>emptyMap(), Collections.<String, Object>emptyMap(), false );
 		context.unwrap( MessageInterpolatorContext.class );
 	}
 
 	@Test
 	public void testUnwrapToInterfaceTypesSucceeds() {
-		Context context = new MessageInterpolatorContext( null, null, null, null, Collections.<String, Object>emptyMap(), Collections.<String, Object>emptyMap() );
+		Context context = new MessageInterpolatorContext( null, null, null, null, Collections.<String, Object>emptyMap(), Collections.<String, Object>emptyMap(), false );
 
 		MessageInterpolator.Context asMessageInterpolatorContext = context.unwrap( MessageInterpolator.Context.class );
 		assertSame( asMessageInterpolatorContext, context );
@@ -138,7 +140,8 @@ public class MessageInterpolatorContextTest {
 				rootBeanType,
 				null,
 				Collections.<String, Object>emptyMap(),
-				Collections.<String, Object>emptyMap() );
+				Collections.<String, Object>emptyMap(),
+				false );
 
 		assertSame( context.unwrap( HibernateMessageInterpolatorContext.class ).getRootBeanType(), rootBeanType );
 	}
@@ -153,7 +156,8 @@ public class MessageInterpolatorContextTest {
 				null,
 				pathMock,
 				Collections.<String, Object>emptyMap(),
-				Collections.<String, Object>emptyMap() );
+				Collections.<String, Object>emptyMap(),
+				false );
 
 		assertSame( context.unwrap( HibernateMessageInterpolatorContext.class ).getPropertyPath(), pathMock );
 	}

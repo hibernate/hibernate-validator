@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
 import javax.validation.ValidationException;
 
+import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
 import org.hibernate.validator.internal.engine.messageinterpolation.LocalizedMessage;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
@@ -278,11 +279,16 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			);
 
 			// resolve EL expressions (step 3)
-			resolvedMessage = interpolateExpression(
-					new TokenIterator( getParameterTokens( resolvedMessage, tokenizedELMessages, InterpolationTermType.EL ) ),
-					context,
-					locale
-			);
+			// in the standard Hibernate Validator execution flow, the context is always an instance of
+			// HibernateMessageInterpolatorContext
+			// but it can be a spec Context in the Jakarta Bean Validation TCK.
+			if ( !( context instanceof HibernateMessageInterpolatorContext )
+					|| ( (MessageInterpolatorContext) context ).isExpressionLanguageEnabled() ) {
+				resolvedMessage = interpolateExpression(
+						new TokenIterator( getParameterTokens( resolvedMessage, tokenizedELMessages, InterpolationTermType.EL ) ),
+						context,
+						locale );
+			}
 		}
 
 		// last but not least we have to take care of escaped literals

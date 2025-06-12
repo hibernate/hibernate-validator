@@ -68,7 +68,9 @@ public class ExpressionLanguageMessageInterpolationTest {
 				null,
 				null,
 				Collections.<String, Object>emptyMap(),
-				Collections.<String, Object>emptyMap() );
+				Collections.<String, Object>emptyMap(),
+				true
+		);
 
 		String expected = "18";
 		String actual = interpolatorUnderTest.interpolate( "${validatedValue.age}", context );
@@ -83,7 +85,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				null,
 				null,
 				Collections.<String, Object>emptyMap(),
-				Collections.<String, Object>emptyMap() );
+				Collections.<String, Object>emptyMap(),
+				true );
 
 		String expected = "${validatedValue.foo}";
 		String actual = interpolatorUnderTest.interpolate( "${validatedValue.foo}", context );
@@ -173,7 +176,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				null,
 				null,
 				Collections.<String, Object>emptyMap(),
-				Collections.<String, Object>emptyMap() );
+				Collections.<String, Object>emptyMap(),
+				true );
 
 		// german locale
 		String expected = "42,00";
@@ -233,7 +237,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				null,
 				null,
 				Collections.<String, Object>emptyMap(),
-				Collections.<String, Object>emptyMap() );
+				Collections.<String, Object>emptyMap(),
+				true );
 
 		String expected = "${formatter.foo('%1$.2f', validatedValue)}";
 		String actual = interpolatorUnderTest.interpolate(
@@ -309,6 +314,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 				null,
 				null,
 				Collections.<String, Object>emptyMap(),
-				Collections.<String, Object>emptyMap() );
+				Collections.<String, Object>emptyMap(),
+				true );
 	}
 }

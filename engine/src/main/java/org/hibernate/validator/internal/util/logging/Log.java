@@ -858,4 +858,13 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 248, value = "Unable to get an XML schema named %s.")
 	ValidationException unableToGetXmlSchema(String schemaResourceName);
+
+	// Message ID is to match the one from the "future" versions of HV from which this change is cherry-picked
+	@LogMessage(level = WARN)
+	@Message(id = 257, value = "Expression variables have been defined for constraint %1$s while Expression Language is not enabled.")
+	void expressionVariablesDefinedWithExpressionLanguageNotEnabled(Class<? extends Annotation> constraintAnnotation);
+
+	@LogMessage(level = WARN)
+	@Message(id = 258, value = "Expression Language interpolation features are not explicitly enabled/disabled. Use '%1$s' environment variable, or '%2$s' system property to define the behavior. Defaulting to expression language features being disabled.")
+	void expressionLanguageFeaturesNoExplicitSetting(String expressionLanguageEnabledEnv, String expressionLanguageEnabledSystem);
 }

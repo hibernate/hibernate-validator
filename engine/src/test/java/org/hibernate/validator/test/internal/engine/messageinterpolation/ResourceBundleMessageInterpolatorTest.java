@@ -280,7 +280,8 @@ public class ResourceBundleMessageInterpolatorTest {
 				null,
 				null,
 				Collections.<String, Object>emptyMap(),
-				Collections.<String, Object>emptyMap() );
+				Collections.<String, Object>emptyMap(),
+				true );
 	}
 
 	private void runInterpolation(boolean cachingEnabled) {
