@@ -8,6 +8,7 @@ import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles;
 
 import jakarta.persistence.Persistence;
+import jakarta.persistence.PersistenceUtil;
 import jakarta.validation.Path;
 import jakarta.validation.TraversableResolver;
 
@@ -29,6 +30,8 @@ public class JPATraversableResolver implements TraversableResolver {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
+	private final PersistenceUtil persistenceUtil = Persistence.getPersistenceUtil();
+
 	@Override
 	public final boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 		if ( LOG.isTraceEnabled() ) {
@@ -43,7 +46,7 @@ public class JPATraversableResolver implements TraversableResolver {
 			return true;
 		}
 
-		return Persistence.getPersistenceUtil().isLoaded( traversableObject, traversableProperty.getName() );
+		return persistenceUtil.isLoaded( traversableObject, traversableProperty.getName() );
 	}
 
 	@Override
