@@ -56,6 +56,7 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.internal.util.privilegedactions.GetEnvOrSystemVariableValue;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
@@ -79,6 +80,9 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+
+	private static final String EXPRESSION_LANGUAGE_ENABLED_ENV = "ORG_HIBERNATE_VALIDATOR_EXPRESSION_LANGUAGE_ENABLED";
+	private static final String EXPRESSION_LANGUAGE_ENABLED_SYSTEM = "org.hibernate.validator.expressionLanguageEnabled";
 
 	/**
 	 * Context containing all {@link ValidatorFactory} level helpers and configuration properties.
@@ -192,6 +196,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				getScriptEvaluatorFactory( configurationState, properties, externalClassLoader ),
 				getFailFast( hibernateSpecificConfig, properties ),
 				getTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
+				getExpressionLanguageEnabled(),
 				getConstraintValidatorPayload( hibernateSpecificConfig )
 		);
 
@@ -476,6 +481,15 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		);
 	}
 
+	private static boolean getExpressionLanguageEnabled() {
+		String enable = run( GetEnvOrSystemVariableValue.action( EXPRESSION_LANGUAGE_ENABLED_ENV, EXPRESSION_LANGUAGE_ENABLED_SYSTEM ) );
+		if ( enable == null ) {
+			LOG.expressionLanguageFeaturesNoExplicitSetting( EXPRESSION_LANGUAGE_ENABLED_ENV, EXPRESSION_LANGUAGE_ENABLED_SYSTEM );
+			enable = "false";
+		}
+		return "true".equalsIgnoreCase( enable );
+	}
+
 	private static boolean getFailFast(ConfigurationImpl configuration, Map<String, String> properties) {
 		// check whether fail fast is programmatically enabled
 		boolean tmpFailFast = configuration != null ? configuration.getFailFast() : false;
@@ -717,6 +731,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		private final boolean traversableResolverResultCacheEnabled;
 
 		/**
+		 * Hibernate Validator specific flag to enable Expression Language message interpolation.
+		 */
+		private final boolean expressionLanguageEnabled;
+
+		/**
 		 * The constraint validator payload.
 		 */
 		private final Object constraintValidatorPayload;
@@ -734,9 +753,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				ScriptEvaluatorFactory scriptEvaluatorFactory,
 				boolean failFast,
 				boolean traversableResolverResultCacheEnabled,
+				boolean expressionLanguageEnabled,
 				Object constraintValidatorPayload) {
 			this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
-					traversableResolverResultCacheEnabled, constraintValidatorPayload,
+					traversableResolverResultCacheEnabled, expressionLanguageEnabled, constraintValidatorPayload,
 					new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
 							temporalValidationTolerance ) );
 		}
@@ -749,6 +769,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				ScriptEvaluatorFactory scriptEvaluatorFactory,
 				boolean failFast,
 				boolean traversableResolverResultCacheEnabled,
+				boolean expressionLanguageEnabled,
 				Object constraintValidatorPayload,
 				HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext) {
 			this.messageInterpolator = messageInterpolator;
@@ -759,6 +780,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 			this.failFast = failFast;
 			this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
+			this.expressionLanguageEnabled = expressionLanguageEnabled;
 			this.constraintValidatorPayload = constraintValidatorPayload;
 			this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
 		}
@@ -793,6 +815,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		public boolean isTraversableResolverResultCacheEnabled() {
 			return this.traversableResolverResultCacheEnabled;
+		}
+
+		public boolean isExpressionLanguageEnabled() {
+			return expressionLanguageEnabled;
 		}
 
 		public Object getConstraintValidatorPayload() {
@@ -914,6 +940,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						scriptEvaluatorFactory,
 						failFast,
 						traversableResolverResultCacheEnabled,
+						defaultContext.expressionLanguageEnabled,
 						constraintValidatorPayload,
 						HibernateConstraintValidatorInitializationContextImpl.of(
 								constraintValidatorInitializationContext,

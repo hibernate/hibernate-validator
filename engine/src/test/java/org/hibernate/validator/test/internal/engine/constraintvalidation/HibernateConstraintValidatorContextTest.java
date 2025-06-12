@@ -32,6 +32,8 @@ import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
@@ -47,6 +49,16 @@ public class HibernateConstraintValidatorContextTest {
 	private static final String QUESTION_4 = "What keywords are not allowed?";
 
 	private static final List<String> INVALID_KEYWORDS = Lists.newArrayList( "foo", "bar", "baz" );
+
+	@BeforeTest
+	public void before() {
+		System.setProperty( "org.hibernate.validator.expressionLanguageEnabled", "true" );
+	}
+
+	@AfterTest
+	public void after() {
+		System.clearProperty( "org.hibernate.validator.expressionLanguageEnabled" );
+	}
 
 	// Message parameters
 

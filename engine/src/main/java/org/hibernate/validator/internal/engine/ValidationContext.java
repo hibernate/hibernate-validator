@@ -318,6 +318,7 @@ public class ValidationContext<T> {
 		String messageTemplate = constraintViolationCreationContext.getMessage();
 		String interpolatedMessage = interpolate(
 				messageTemplate,
+				constraintViolationCreationContext.isExpressionLanguageEnabled(),
 				localContext.getCurrentValidatedValue(),
 				descriptor,
 				constraintViolationCreationContext.getPath(),
@@ -407,6 +408,10 @@ public class ValidationContext<T> {
 		this.validatedProperty = validatedProperty;
 	}
 
+	public boolean isExpressionLanguageEnabled() {
+		return validatorScopedContext.isExpressionLanguageEnabled();
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
@@ -450,6 +455,7 @@ public class ValidationContext<T> {
 	}
 
 	private String interpolate(String messageTemplate,
+			boolean expressionLanguageEnabled,
 			Object validatedValue,
 			ConstraintDescriptor<?> descriptor,
 			Path path,
@@ -461,7 +467,8 @@ public class ValidationContext<T> {
 				getRootBeanClass(),
 				path,
 				messageParameters,
-				expressionVariables
+				expressionVariables,
+				expressionLanguageEnabled
 		);
 
 		try {
@@ -787,6 +794,11 @@ public class ValidationContext<T> {
 		private final boolean traversableResolverResultCacheEnabled;
 
 		/**
+		 * Hibernate Validator specific flag to enable Expression Language message interpolation.
+		 */
+		private final boolean expressionLanguageEnabled;
+
+		/**
 		 * Hibernate Validator specific payload passed to the constraint validators.
 		 */
 		private final Object constraintValidatorPayload;
@@ -799,6 +811,7 @@ public class ValidationContext<T> {
 			this.scriptEvaluatorFactory = validatorFactoryScopedContext.getScriptEvaluatorFactory();
 			this.failFast = validatorFactoryScopedContext.isFailFast();
 			this.traversableResolverResultCacheEnabled = validatorFactoryScopedContext.isTraversableResolverResultCacheEnabled();
+			this.expressionLanguageEnabled = validatorFactoryScopedContext.isExpressionLanguageEnabled();
 			this.constraintValidatorPayload = validatorFactoryScopedContext.getConstraintValidatorPayload();
 		}
 
@@ -828,6 +841,10 @@ public class ValidationContext<T> {
 
 		public boolean isTraversableResolverResultCacheEnabled() {
 			return this.traversableResolverResultCacheEnabled;
+		}
+
+		public boolean isExpressionLanguageEnabled() {
+			return expressionLanguageEnabled;
 		}
 
 		public Object getConstraintValidatorPayload() {

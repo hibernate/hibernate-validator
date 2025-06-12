@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,6 +44,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
+	private final boolean expressionLanguageEnabled;
 	private Map<String, Object> messageParameters;
 	private Map<String, Object> expressionVariables;
 	private final List<String> methodParameterNames;
@@ -55,7 +57,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private final Object constraintValidatorPayload;
 
 	public ConstraintValidatorContextImpl(List<String> methodParameterNames, ClockProvider clockProvider,
-			PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor, Object constraintValidatorPayload) {
+			PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor, Object constraintValidatorPayload, boolean expressionLanguageEnabled) {
+		this.expressionLanguageEnabled = expressionLanguageEnabled;
 		this.methodParameterNames = methodParameterNames;
 		this.clockProvider = clockProvider;
 		this.basePath = propertyPath;
@@ -164,6 +167,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private ConstraintViolationCreationContext getDefaultConstraintViolationCreationContext() {
 		return new ConstraintViolationCreationContext(
 				getDefaultConstraintMessageTemplate(),
+				true, // EL is enabled for the default constraint violation
 				basePath,
 				messageParameters != null ? new HashMap<>( messageParameters ) : Collections.emptyMap(),
 				expressionVariables != null ? new HashMap<>( expressionVariables ) : Collections.emptyMap(),
@@ -179,19 +183,26 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		protected final String messageTemplate;
 		protected PathImpl propertyPath;
+		protected final boolean expressionLanguageEnabled;
 
-		protected NodeBuilderBase(String template, PathImpl path) {
+		protected NodeBuilderBase(String template, PathImpl path, boolean expressionLanguageEnabled) {
 			this.messageTemplate = template;
 			this.propertyPath = path;
+			this.expressionLanguageEnabled = expressionLanguageEnabled;
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
 			if ( constraintViolationCreationContexts == null ) {
 				constraintViolationCreationContexts = CollectionHelper.newArrayList( 3 );
 			}
+			if ( !(expressionVariables == null || expressionVariables.isEmpty()) && !expressionLanguageEnabled ) {
+				LOG.expressionVariablesDefinedWithExpressionLanguageNotEnabled(
+						constraintDescriptor.getAnnotation() != null ? constraintDescriptor.getAnnotation().annotationType() : Annotation.class );
+			}
 			constraintViolationCreationContexts.add(
 					new ConstraintViolationCreationContext(
 							messageTemplate,
+							expressionLanguageEnabled,
 							propertyPath,
 							messageParameters != null ? new HashMap<>( messageParameters ) : Collections.emptyMap(),
 							expressionVariables != null ? new HashMap<>( expressionVariables ) : Collections.emptyMap(),
@@ -202,12 +213,12 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		}
 	}
 
-	private class ConstraintViolationBuilderImpl extends NodeBuilderBase implements ConstraintViolationBuilder {
+	protected class ConstraintViolationBuilderImpl extends NodeBuilderBase implements ConstraintViolationBuilder {
 
 		private final List<String> methodParameterNames;
 
 		private ConstraintViolationBuilderImpl(List<String> methodParameterNames, String template, PathImpl path) {
-			super( template, path );
+			super( template, path, ConstraintValidatorContextImpl.this.expressionLanguageEnabled );
 			this.methodParameterNames = methodParameterNames;
 		}
 
@@ -216,19 +227,19 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 			dropLeafNodeIfRequired();
 			propertyPath.addPropertyNode( name );
 
-			return new NodeBuilder( messageTemplate, propertyPath );
+			return new NodeBuilder( messageTemplate, propertyPath, expressionLanguageEnabled );
 		}
 
 		@Override
 		public NodeBuilderCustomizableContext addPropertyNode(String name) {
 			dropLeafNodeIfRequired();
 
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, name, ElementKind.PROPERTY );
+			return new DeferredNodeBuilder( messageTemplate, expressionLanguageEnabled, propertyPath, name, ElementKind.PROPERTY );
 		}
 
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, null, ElementKind.BEAN );
+			return new DeferredNodeBuilder( messageTemplate, expressionLanguageEnabled, propertyPath, null, ElementKind.BEAN );
 		}
 
 		@Override
@@ -240,14 +251,14 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 			dropLeafNodeIfRequired();
 			propertyPath.addParameterNode( methodParameterNames.get( index ), index );
 
-			return new NodeBuilder( messageTemplate, propertyPath );
+			return new NodeBuilder( messageTemplate, propertyPath, expressionLanguageEnabled );
 		}
 
 		@Override
 		public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
 			dropLeafNodeIfRequired();
 
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, name, containerType, typeArgumentIndex );
+			return new DeferredNodeBuilder( messageTemplate, expressionLanguageEnabled, propertyPath, name, containerType, typeArgumentIndex );
 		}
 
 		/**
@@ -266,8 +277,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private class NodeBuilder extends NodeBuilderBase
 			implements NodeBuilderDefinedContext, LeafNodeBuilderDefinedContext, ContainerElementNodeBuilderDefinedContext {
 
-		private NodeBuilder(String template, PathImpl path) {
-			super( template, path );
+		private NodeBuilder(String template, PathImpl path, boolean expressionLanguageEnabled) {
+			super( template, path, expressionLanguageEnabled );
 		}
 
 		@Override
@@ -278,17 +289,17 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		@Override
 		public NodeBuilderCustomizableContext addPropertyNode(String name) {
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, name, ElementKind.PROPERTY );
+			return new DeferredNodeBuilder( messageTemplate, expressionLanguageEnabled, propertyPath, name, ElementKind.PROPERTY );
 		}
 
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, null, ElementKind.BEAN );
+			return new DeferredNodeBuilder( messageTemplate, expressionLanguageEnabled, propertyPath, null, ElementKind.BEAN );
 		}
 
 		@Override
 		public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, name, containerType, typeArgumentIndex );
+			return new DeferredNodeBuilder( messageTemplate, expressionLanguageEnabled, propertyPath, name, containerType, typeArgumentIndex );
 		}
 	}
 
@@ -304,16 +315,21 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		private final Integer leafNodeTypeArgumentIndex;
 
-		private DeferredNodeBuilder(String template, PathImpl path, String nodeName, ElementKind leafNodeKind) {
-			super( template, path );
+		private DeferredNodeBuilder(String template, boolean expressionLanguageEnabled, PathImpl path, String nodeName, ElementKind leafNodeKind) {
+			super( template, path, expressionLanguageEnabled );
 			this.leafNodeName = nodeName;
 			this.leafNodeKind = leafNodeKind;
 			this.leafNodeContainerType = null;
 			this.leafNodeTypeArgumentIndex = null;
 		}
 
-		private DeferredNodeBuilder(String template, PathImpl path, String nodeName, Class<?> leafNodeContainerType, Integer leafNodeTypeArgumentIndex) {
-			super( template, path );
+		private DeferredNodeBuilder(String template,
+				boolean expressionLanguageEnabled,
+				PathImpl path,
+				String nodeName,
+				Class<?> leafNodeContainerType,
+				Integer leafNodeTypeArgumentIndex) {
+			super( template, path, expressionLanguageEnabled );
 			this.leafNodeName = nodeName;
 			this.leafNodeKind = ElementKind.CONTAINER_ELEMENT;
 			this.leafNodeContainerType = leafNodeContainerType;
@@ -336,14 +352,14 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		public NodeBuilder atKey(Object key) {
 			propertyPath.makeLeafNodeIterableAndSetMapKey( key );
 			addLeafNode();
-			return new NodeBuilder( messageTemplate, propertyPath );
+			return new NodeBuilder( messageTemplate, propertyPath, expressionLanguageEnabled );
 		}
 
 		@Override
 		public NodeBuilder atIndex(Integer index) {
 			propertyPath.makeLeafNodeIterableAndSetIndex( index );
 			addLeafNode();
-			return new NodeBuilder( messageTemplate, propertyPath );
+			return new NodeBuilder( messageTemplate, propertyPath, expressionLanguageEnabled );
 		}
 
 		@Override
@@ -355,19 +371,19 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		@Override
 		public NodeBuilderCustomizableContext addPropertyNode(String name) {
 			addLeafNode();
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, name, ElementKind.PROPERTY );
+			return new DeferredNodeBuilder( messageTemplate, expressionLanguageEnabled, propertyPath, name, ElementKind.PROPERTY );
 		}
 
 		@Override
 		public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
 			addLeafNode();
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, name, containerType, typeArgumentIndex );
+			return new DeferredNodeBuilder( messageTemplate, expressionLanguageEnabled, propertyPath, name, containerType, typeArgumentIndex );
 		}
 
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
 			addLeafNode();
-			return new DeferredNodeBuilder( messageTemplate, propertyPath, null, ElementKind.BEAN );
+			return new DeferredNodeBuilder( messageTemplate, expressionLanguageEnabled, propertyPath, null, ElementKind.BEAN );
 		}
 
 		@Override

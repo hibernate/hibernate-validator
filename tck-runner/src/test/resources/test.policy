@@ -29,7 +29,8 @@ grant codeBase "file:${localRepository}/org/hibernate/validator/hibernate-valida
     permission java.lang.RuntimePermission "setContextClassLoader";
 
     permission org.hibernate.validator.HibernateValidatorPermission "accessPrivateMembers";
-
+    permission java.lang.RuntimePermission "getenv.ORG_HIBERNATE_VALIDATOR_EXPRESSION_LANGUAGE_ENABLED";
+	permission java.util.PropertyPermission "org.hibernate.validator.expressionLanguageEnabled", "read";
 };
 
 // Used during aggregator builds also building "engine", e.g. mvn clean install -pl tck-runner -am
@@ -40,7 +41,8 @@ grant codeBase "file:${basedir}/../engine/target/hibernate-validator-${project.v
     permission java.lang.RuntimePermission "setContextClassLoader";
 
     permission org.hibernate.validator.HibernateValidatorPermission "accessPrivateMembers";
-
+    permission java.lang.RuntimePermission "getenv.ORG_HIBERNATE_VALIDATOR_EXPRESSION_LANGUAGE_ENABLED";
+    permission java.util.PropertyPermission "org.hibernate.validator.expressionLanguageEnabled", "read";
 };
 
 grant codeBase "file:${localRepository}/com/fasterxml/classmate/-" {
