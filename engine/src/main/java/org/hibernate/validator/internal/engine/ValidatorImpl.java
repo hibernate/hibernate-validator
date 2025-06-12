@@ -144,6 +144,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private final boolean failFast;
 
 	/**
+	 * Hibernate Validator specific flag to enable Expression Language message interpolation.
+	 */
+	private final boolean expressionLanguageEnabled;
+
+	/**
 	 * Used for resolving generic type information.
 	 */
 	private final TypeResolutionHelper typeResolutionHelper;
@@ -167,7 +172,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			TypeResolutionHelper typeResolutionHelper,
 			List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
 			ConstraintValidatorManager constraintValidatorManager,
-			boolean failFast) {
+			boolean failFast,
+			boolean expressionLanguageEnabled) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
@@ -178,6 +184,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.validatedValueHandlers = validatedValueHandlers;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
+		this.expressionLanguageEnabled = expressionLanguageEnabled;
 
 		validationOrderGenerator = new ValidationOrderGenerator();
 
@@ -353,7 +360,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				timeProvider,
 				validatedValueHandlers,
 				typeResolutionHelper,
-				failFast
+				failFast,
+				expressionLanguageEnabled
 		);
 	}
 
@@ -1565,8 +1573,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			PathImpl propertyPath,
 			List<MetaConstraint<?>> metaConstraints,
 			List<MetaConstraint<?>> typeArgumentConstraints) {
-		Class<?> clazz = validationContext.getRootBeanClass();
 		PropertyMetaData propertyMetaData = null;
+		Class<?> clazz = validationContext.getRootBeanClass();
 
 		Iterator<Path.Node> propertyPathIter = propertyPath.iterator();
 

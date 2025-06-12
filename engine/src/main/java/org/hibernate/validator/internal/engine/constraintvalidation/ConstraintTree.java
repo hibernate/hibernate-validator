@@ -120,7 +120,8 @@ public class ConstraintTree<A extends Annotation> {
 					validationContext.getParameterNames(),
 					validationContext.getTimeProvider(),
 					valueContext.getPropertyPath(),
-					descriptor
+					descriptor,
+					validationContext.isExpressionLanguageEnabled()
 			);
 
 			// validate

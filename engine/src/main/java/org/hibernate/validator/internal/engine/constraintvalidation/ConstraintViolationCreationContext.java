@@ -18,16 +18,18 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
  */
 public class ConstraintViolationCreationContext {
 	private final String message;
+	private final boolean expressionLanguageEnabled;
 	private final PathImpl propertyPath;
 	private final Map<String, Object> expressionVariables;
 	private final Object dynamicPayload;
 
 	public ConstraintViolationCreationContext(String message, PathImpl property) {
-		this( message, property, Collections.<String, Object>emptyMap(), null );
+		this( message, true, property, Collections.<String, Object>emptyMap(), null );
 	}
 
-	public ConstraintViolationCreationContext(String message, PathImpl property, Map<String, Object> expressionVariables, Object dynamicPayload) {
+	public ConstraintViolationCreationContext(String message, boolean expressionLanguageEnabled, PathImpl property, Map<String, Object> expressionVariables, Object dynamicPayload) {
 		this.message = message;
+		this.expressionLanguageEnabled = expressionLanguageEnabled;
 		this.propertyPath = property;
 		this.expressionVariables = expressionVariables;
 		this.dynamicPayload = dynamicPayload;
@@ -35,6 +37,10 @@ public class ConstraintViolationCreationContext {
 
 	public final String getMessage() {
 		return message;
+	}
+
+	public boolean isExpressionLanguageEnabled() {
+		return expressionLanguageEnabled;
 	}
 
 	public final PathImpl getPath() {
@@ -53,6 +59,7 @@ public class ConstraintViolationCreationContext {
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "ConstraintViolationCreationContext{" );
 		sb.append( "message='" ).append( message ).append( '\'' );
+		sb.append( ", expressionLanguageEnabled=" ).append( expressionLanguageEnabled );
 		sb.append( ", propertyPath=" ).append( propertyPath );
 		sb.append( ", messageParameters=" ).append( expressionVariables );
 		sb.append( ", dynamicPayload=" ).append( dynamicPayload );

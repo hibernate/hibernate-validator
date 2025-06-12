@@ -149,6 +149,8 @@ public class ValidationContext<T> {
 
 	private final TimeProvider timeProvider;
 
+	private final boolean expressionLanguageEnabled;
+
 	private ValidationContext(ConstraintValidatorManager constraintValidatorManager,
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
@@ -158,6 +160,7 @@ public class ValidationContext<T> {
 			List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers,
 			TypeResolutionHelper typeResolutionHelper,
 			boolean failFast,
+			boolean expressionLanguageEnabled,
 			T rootBean,
 			Class<T> rootBeanClass,
 			ExecutableElement executable,
@@ -172,6 +175,7 @@ public class ValidationContext<T> {
 		this.validatedValueUnwrappers = validatedValueUnwrappers;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.failFast = failFast;
+		this.expressionLanguageEnabled = expressionLanguageEnabled;
 
 		this.rootBean = rootBean;
 		this.rootBeanClass = rootBeanClass;
@@ -193,8 +197,9 @@ public class ValidationContext<T> {
 			TimeProvider timeProvider,
 			List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers,
 			TypeResolutionHelper typeResolutionHelper,
-			boolean failFast) {
-
+			boolean failFast,
+			boolean expressionLanguageEnabled
+	) {
 		return new ValidationContextBuilder(
 				constraintValidatorManager,
 				messageInterpolator,
@@ -203,7 +208,8 @@ public class ValidationContext<T> {
 				timeProvider,
 				validatedValueUnwrappers,
 				typeResolutionHelper,
-				failFast
+				failFast,
+				expressionLanguageEnabled
 		);
 	}
 
@@ -299,6 +305,7 @@ public class ValidationContext<T> {
 		String messageTemplate = constraintViolationCreationContext.getMessage();
 		String interpolatedMessage = interpolate(
 				messageTemplate,
+				constraintViolationCreationContext.isExpressionLanguageEnabled(),
 				localContext.getCurrentValidatedValue(),
 				descriptor,
 				constraintViolationCreationContext.getExpressionVariables()
@@ -402,6 +409,10 @@ public class ValidationContext<T> {
 		return null;
 	}
 
+	public boolean isExpressionLanguageEnabled() {
+		return expressionLanguageEnabled;
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
@@ -412,6 +423,7 @@ public class ValidationContext<T> {
 	}
 
 	private String interpolate(String messageTemplate,
+			boolean expressionLanguageEnabled,
 			Object validatedValue,
 			ConstraintDescriptor<?> descriptor,
 			Map<String, Object> messageParameters) {
@@ -419,7 +431,8 @@ public class ValidationContext<T> {
 				descriptor,
 				validatedValue,
 				getRootBeanClass(),
-				messageParameters
+				messageParameters,
+				expressionLanguageEnabled
 		);
 
 		try {
@@ -511,6 +524,7 @@ public class ValidationContext<T> {
 		private final List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers;
 		private final TypeResolutionHelper typeResolutionHelper;
 		private final boolean failFast;
+		private final boolean expressionLanguageEnabled;
 
 		private ValidationContextBuilder(
 				ConstraintValidatorManager constraintValidatorManager,
@@ -520,7 +534,8 @@ public class ValidationContext<T> {
 				TimeProvider timeProvider,
 				List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers,
 				TypeResolutionHelper typeResolutionHelper,
-				boolean failFast) {
+				boolean failFast,
+				boolean expressionLanguageEnabled) {
 			this.constraintValidatorManager = constraintValidatorManager;
 			this.messageInterpolator = messageInterpolator;
 			this.constraintValidatorFactory = constraintValidatorFactory;
@@ -529,6 +544,7 @@ public class ValidationContext<T> {
 			this.validatedValueUnwrappers = validatedValueUnwrappers;
 			this.typeResolutionHelper = typeResolutionHelper;
 			this.failFast = failFast;
+			this.expressionLanguageEnabled = expressionLanguageEnabled;
 		}
 
 		public <T> ValidationContext<T> forValidate(T rootBean) {
@@ -544,6 +560,7 @@ public class ValidationContext<T> {
 					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,
+					expressionLanguageEnabled,
 					rootBean,
 					rootBeanClass,
 					null, //executable
@@ -565,6 +582,7 @@ public class ValidationContext<T> {
 					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,
+					expressionLanguageEnabled,
 					rootBean,
 					rootBeanClass,
 					null, //executable
@@ -584,6 +602,7 @@ public class ValidationContext<T> {
 					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,
+					expressionLanguageEnabled,
 					null, //root bean
 					rootBeanClass,
 					null, //executable
@@ -610,6 +629,7 @@ public class ValidationContext<T> {
 					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,
+					expressionLanguageEnabled,
 					rootBean,
 					rootBeanClass,
 					executable,
@@ -635,6 +655,7 @@ public class ValidationContext<T> {
 					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,
+					expressionLanguageEnabled,
 					rootBean,
 					rootBeanClass,
 					executable,

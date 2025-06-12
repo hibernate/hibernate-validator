@@ -35,6 +35,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private ParameterNameProvider parameterNameProvider;
 	private boolean failFast;
+	private final boolean expressionLanguageEnabled;
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 	private TimeProvider timeProvider;
 	private final MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
@@ -47,6 +48,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
 		this.parameterNameProvider = validatorFactory.getParameterNameProvider();
 		this.failFast = validatorFactory.isFailFast();
+		this.expressionLanguageEnabled = validatorFactory.isExpressionLanguageEnabled();
 		this.validatedValueHandlers = new ArrayList<ValidatedValueUnwrapper<?>>(
 				validatorFactory.getValidatedValueHandlers()
 		);
@@ -146,6 +148,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				traversableResolver,
 				parameterNameProvider,
 				failFast,
+				expressionLanguageEnabled,
 				validatedValueHandlers,
 				timeProvider,
 				methodValidationConfiguration
