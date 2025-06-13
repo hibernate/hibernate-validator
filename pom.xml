@@ -277,10 +277,10 @@
         <!-- We always publish to a local directory, JReleaser is supposed to take care of publishing to Nexus: -->
         <local.staging.releases.repo.id>staging-deploy</local.staging.releases.repo.id>
         <local.staging.releases.repo.url>file:${maven.multiModuleProjectDirectory}/target/staging-deploy/maven</local.staging.releases.repo.url>
-        <ossrh.releases.repo.id>ossrh</ossrh.releases.repo.id>
-        <ossrh.releases.repo.url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</ossrh.releases.repo.url>
-        <ossrh.snapshots.repo.id>ossrh</ossrh.snapshots.repo.id>
-        <ossrh.snapshots.repo.url>https://oss.sonatype.org/content/repositories/snapshots</ossrh.snapshots.repo.url>
+        <central.releases.repo.id>central-releases</central.releases.repo.id>
+        <central.releases.repo.url>https://central.sonatype.com/api/v1/publisher/</central.releases.repo.url>
+        <central.snapshots.repo.id>central-snapshots</central.snapshots.repo.id>
+        <central.snapshots.repo.url>https://central.sonatype.com/repository/maven-snapshots/</central.snapshots.repo.url>
 
         <!--
             We don't want to publish or sign any modules by default.
@@ -1618,14 +1618,14 @@
 
     <distributionManagement>
         <repository>
-            <id>${ossrh.releases.repo.id}</id>
-            <name>OSSRH Releases Repository</name>
-            <url>${ossrh.releases.repo.url}</url>
+            <id>${central.releases.repo.id}</id>
+            <name>Maven Central Releases Repository</name>
+            <url>${central.releases.repo.url}</url>
         </repository>
         <snapshotRepository>
-            <id>${ossrh.snapshots.repo.id}</id>
-            <name>OSSRH Snapshots Repository</name>
-            <url>${ossrh.snapshots.repo.url}</url>
+            <id>${central.snapshots.repo.id}</id>
+            <name>Maven Central Snapshots Repository</name>
+            <url>${central.snapshots.repo.url}</url>
         </snapshotRepository>
     </distributionManagement>
 
