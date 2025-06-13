@@ -11,6 +11,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -40,60 +41,49 @@ public class NIPValidatorTest extends AbstractConstrainedTest {
 				);
 	}
 
-	@Test
-	public void testCorrectNipNumber() {
-		assertNoViolations( validator.validate( new Person( "5931423811" ) ) );
-		assertNoViolations( validator.validate( new Person( "2596048500" ) ) );
-		assertNoViolations( validator.validate( new Person( "4163450312" ) ) );
-		assertNoViolations( validator.validate( new Person( "1786052059" ) ) );
-		assertNoViolations( validator.validate( new Person( "6660057854" ) ) );
-		assertNoViolations( validator.validate( new Person( "4219220786" ) ) );
-		assertNoViolations( validator.validate( new Person( "3497264632" ) ) );
-
+	@Test(dataProvider = "validNips")
+	public void testCorrectNipNumber(String nip) {
+		assertNoViolations( validator.validate( new Person( nip ) ) );
 	}
 
-	@Test
-	public void testIncorrectNipNumber() {
-		assertThat( validator.validate( new Person( "123-456-78-14" ) ) )
+	@Test(dataProvider = "invalidNips")
+	public void testIncorrectNipNumber(String nip) {
+		assertThat( validator.validate( new Person( nip ) ) )
 				.containsOnlyViolations(
 						violationOf( NIP.class ).withProperty( "nip" )
 				);
-		assertThat( validator.validate( new Person( "123-45-67-812" ) ) )
-				.containsOnlyViolations(
-						violationOf( NIP.class ).withProperty( "nip" )
-				);
-		assertThat( validator.validate( new Person( "123-456-32-12" ) ) )
-				.containsOnlyViolations(
-						violationOf( NIP.class ).withProperty( "nip" )
-				);
-		assertThat( validator.validate( new Person( "5931423812" ) ) )
-				.containsOnlyViolations(
-						violationOf( NIP.class ).withProperty( "nip" )
-				);
-		assertThat( validator.validate( new Person( "2596048505" ) ) )
-				.containsOnlyViolations(
-						violationOf( NIP.class ).withProperty( "nip" )
-				);
-		assertThat( validator.validate( new Person( "4163450311" ) ) )
-				.containsOnlyViolations(
-						violationOf( NIP.class ).withProperty( "nip" )
-				);
-		assertThat( validator.validate( new Person( "1786052053" ) ) )
-				.containsOnlyViolations(
-						violationOf( NIP.class ).withProperty( "nip" )
-				);
-		assertThat( validator.validate( new Person( "6660057852" ) ) )
-				.containsOnlyViolations(
-						violationOf( NIP.class ).withProperty( "nip" )
-				);
-		assertThat( validator.validate( new Person( "4219220785" ) ) )
-				.containsOnlyViolations(
-						violationOf( NIP.class ).withProperty( "nip" )
-				);
-		assertThat( validator.validate( new Person( "3497264639" ) ) )
-				.containsOnlyViolations(
-						violationOf( NIP.class ).withProperty( "nip" )
-				);
+	}
+
+	@DataProvider(name = "validNips")
+	private static Object[][] validNips() {
+		return new Object[][] {
+				{ "5931423811" },
+				{ "2596048500" },
+				{ "4163450312" },
+				{ "1786052059" },
+				{ "6660057854" },
+				{ "4219220786" },
+				{ "3497264632" }
+		};
+	}
+
+	@DataProvider(name = "invalidNips")
+	private static Object[][] invalidNips() {
+		return new Object[][] {
+				{ "123-456-78-14" },
+				{ "123-45-67-812" },
+				{ "123-456-32-12" },
+				{ "5931423812" },
+				{ "2596048505" },
+				{ "4163450311" },
+				{ "1786052053" },
+				{ "6660057852" },
+				{ "4219220785" },
+				{ "3497264639" },
+				{ "4062321040" },
+				{ "7985097620" },
+				{ "8808817210" }
+		};
 	}
 
 	public static class Person {
