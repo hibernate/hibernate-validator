@@ -31,6 +31,7 @@ import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
+import org.hibernate.validator.spi.tracking.ProcessedBeansTrackingVoter;
 
 /**
  * Base interface for Hibernate Validator specific configurations.
@@ -486,4 +487,7 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	S failFastOnPropertyViolation(boolean failFastOnPropertyViolation);
+
+	@Incubating
+	S processedBeansTrackingVoter(ProcessedBeansTrackingVoter processedBeanTrackingVoter);
 }
