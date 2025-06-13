@@ -1,6 +1,22 @@
 Hibernate Validator Changelog
 =============================
 
+9.0.1.Final (2025-06-13)
+-------------------------
+
+** Bug
+    * HV-2117 NIP validation incorrectly accepts values ending in 0
+
+** Improvement
+    * HV-2116 Do not recreate PersistenceUtil in the built-in JPATraversableResolver
+    * HV-2114 Add support for Korean foreigner resident registration number (RRN) validation
+    * HV-2113 Adding Date Validation Condition in KorRRNValidator
+    * HV-2112 Use the Hibernate theme for rendered javadocs
+    * HV-2109 Bump Expressly version to 6.0.0
+
+** Task
+    * HV-1271 Move JavaDoc stylesheet.css to separate repo and fetch it from there
+
 9.0.0.Final (2025-05-20)
 -------------------------
 
