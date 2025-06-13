@@ -59,6 +59,7 @@ public class REGONValidatorTest extends AbstractConstrainedTest {
 		assertNoViolations( validator.validate( new Company( "737024234" ) ) );
 		assertNoViolations( validator.validate( new Company( "074635672" ) ) );
 		assertNoViolations( validator.validate( new Company( "593908869" ) ) );
+		assertNoViolations( validator.validate( new Company( "501827370" ) ) );
 	}
 
 	@Test
