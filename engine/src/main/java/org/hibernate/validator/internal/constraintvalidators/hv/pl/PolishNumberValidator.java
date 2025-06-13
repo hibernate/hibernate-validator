@@ -14,7 +14,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckBase;
 import org.hibernate.validator.internal.util.ModUtil;
 
 /**
- * A base class validator for different Polish identification numbers. They differs in the lengths and weights used to calculate the mod sum.
+ * A base class validator for different Polish identification numbers. They differ in the lengths and weights used to calculate the mod sum.
  * In order to implement one you need to provide a method that gives an array of weights
  * and {@link ConstraintValidator#initialize(Annotation)} methods.
  *
@@ -38,10 +38,14 @@ public abstract class PolishNumberValidator<T extends Annotation> extends ModChe
 		switch ( modResult ) {
 			case 10:
 			case 11:
-				return checkDigit == '0';
+				return checkTwoDigitModuloResult( checkDigit );
 			default:
 				return Character.isDigit( checkDigit ) && modResult == extractDigit( checkDigit );
 		}
+	}
+
+	protected boolean checkTwoDigitModuloResult(char checkDigit) {
+		return checkDigit == '0';
 	}
 
 	protected abstract int[] getWeights(List<Integer> digits);
