@@ -1,6 +1,12 @@
 Hibernate Validator Changelog
 =============================
 
+5.3.6.SP1 (2025-06-13)
+-------------------------
+
+** Improvement
+    * HV-1816 Disable Expression Language by default for custom constraint violations (Partial backport of internal changes only)
+
 5.3.6.Final (19-10-2017)
 -------------------------
 
