@@ -1331,7 +1331,7 @@
                     <plugin>
                         <artifactId>maven-deploy-plugin</artifactId>
                         <configuration>
-                            <altReleaseDeploymentRepository>${local.staging.releases.repo.id}::${local.staging.releases.repo.url}</altReleaseDeploymentRepository>
+                            <altReleaseDeploymentRepository>${local.staging.releases.repo.id}::default::${local.staging.releases.repo.url}</altReleaseDeploymentRepository>
                         </configuration>
                     </plugin>
                     <plugin>
