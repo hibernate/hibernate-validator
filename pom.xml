@@ -1808,6 +1808,22 @@
             </properties>
         </profile>
         <profile>
+            <id>testWithJdk26</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>26</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- ForbiddenAPIs doesn't work with JDK25+ yet -->
+                <forbiddenapis.skip>true</forbiddenapis.skip>
+                <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK25+ -->
+                <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
+                <arquillian.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</arquillian.jvm.args.java-version>
+            </properties>
+        </profile>
+        <profile>
             <!--
                 This profile set some properties to make running reproducibility check build easier.
                 Instead of
