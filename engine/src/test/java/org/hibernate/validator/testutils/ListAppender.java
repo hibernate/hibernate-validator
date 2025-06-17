@@ -20,17 +20,14 @@ import org.apache.logging.log4j.core.impl.MutableLogEvent;
  */
 public class ListAppender extends AbstractAppender {
 	final List<LogEvent> events = Collections.synchronizedList( new ArrayList<>() );
-	private final List<String> messages = Collections.synchronizedList( new ArrayList() );
-	final List<byte[]> data = Collections.synchronizedList( new ArrayList() );
 
 	public ListAppender(final String name) {
 		super( name, null, null, true, Property.EMPTY_ARRAY );
 	}
 
-
 	public void append(final LogEvent event) {
-		if ( event instanceof MutableLogEvent ) {
-			this.events.add( ( (MutableLogEvent) event ).createMemento() );
+		if ( event instanceof MutableLogEvent e ) {
+			this.events.add( e.toImmutable() );
 		}
 		else {
 			this.events.add( event );
