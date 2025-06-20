@@ -387,7 +387,7 @@
                                         *;
                                     </requires>
                                     <exports>
-                                        org.hibernate.validator.*.logging to org.jboss.logging, org.hibernate.validator.cdi;
+                                        org.hibernate.validator.*.logging to org.hibernate.validator.cdi;
                                         org.hibernate.validator.internal to org.hibernate.validator.cdi;
                                         org.hibernate.validator.internal.* to org.hibernate.validator.cdi;
                                         org.hibernate.validator.*.internal.* to org.hibernate.validator.cdi;
