@@ -12,6 +12,7 @@ import static org.jboss.logging.Logger.Level.WARN;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
@@ -946,4 +947,8 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = DEBUG)
 	@Message(id = 269, value = "Unable to enable secure XML feature processing when loading %1$s: %2$s")
 	void unableToEnableSecureFeatureProcessingSchemaXml(String fileName, String message);
+
+	@LogMessage(level = WARN)
+	@Message(id = 270, value = "For a given container, the `@Valid` annotation should either be put on the container itself or on the type argument(s) of the container, but not both: %s")
+	void validAppliedTwice(AnnotatedParameterizedType annotatedParameterizedType);
 }
