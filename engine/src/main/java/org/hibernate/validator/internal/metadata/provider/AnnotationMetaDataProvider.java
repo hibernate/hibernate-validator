@@ -682,9 +682,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			Map<TypeVariable<?>, CascadingMetaDataBuilder> nestedTypeParametersCascadingMetadata = getTypeParametersCascadingMetaDataForAnnotatedType(
 					annotatedTypeArgument );
 
+			boolean annotatedWithValid = annotatedTypeArgument.isAnnotationPresent( Valid.class );
+			if ( annotatedWithValid && annotatedParameterizedType.isAnnotationPresent( Valid.class ) ) {
+				LOG.validAppliedTwice( annotatedParameterizedType );
+			}
 			typeParametersCascadingMetadata.put( typeParameters[i], new CascadingMetaDataBuilder( annotatedParameterizedType.getType(), typeParameters[i],
-					annotatedTypeArgument.isAnnotationPresent( Valid.class ), nestedTypeParametersCascadingMetadata,
-					getGroupConversions( annotatedTypeArgument ) ) );
+					annotatedWithValid, nestedTypeParametersCascadingMetadata, getGroupConversions( annotatedTypeArgument ) ) );
 			i++;
 		}
 
