@@ -46,8 +46,10 @@ import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.PredefinedScopeHibernateValidatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
+import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.PredefinedScopeConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
+import org.hibernate.validator.internal.engine.tracking.DefaultProcessedBeansTrackingVoter;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.PredefinedScopeBeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -118,6 +120,14 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 						determineAllowParallelMethodsDefineParameterConstraints( hibernateSpecificConfig, properties )
 				).build();
 
+		ExecutableParameterNameProvider parameterNameProvider = new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() );
+		ScriptEvaluatorFactory scriptEvaluatorFactory = determineScriptEvaluatorFactory( configurationState, properties, externalClassLoader );
+		Duration temporalValidationTolerance = determineTemporalValidationTolerance( configurationState, properties );
+
+		HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl(
+				scriptEvaluatorFactory, configurationState.getClockProvider(), temporalValidationTolerance );
+
+
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
 				configurationState.getMessageInterpolator(),
 				configurationState.getTraversableResolver(),
@@ -128,15 +138,16 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				determineFailFast( hibernateSpecificConfig, properties ),
 				determineFailFastOnPropertyViolation( hibernateSpecificConfig, properties ),
 				determineTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
+				determineShowValidatedValuesInTraceLogs( hibernateSpecificConfig, properties ),
 				determineConstraintValidatorPayload( hibernateSpecificConfig ),
 				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
 				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
-				determineShowValidatedValuesInTraceLogs( hibernateSpecificConfig, properties )
+				constraintValidatorInitializationContext
 		);
 
 		this.constraintValidatorManager = new PredefinedScopeConstraintValidatorManagerImpl(
 				configurationState.getConstraintValidatorFactory(),
-				this.validatorFactoryScopedContext.getConstraintValidatorInitializationContext()
+				constraintValidatorInitializationContext
 		);
 
 		this.validationOrderGenerator = new ValidationOrderGenerator();
@@ -147,11 +158,14 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
 		ConstraintHelper constraintHelper = ConstraintHelper.forBuiltinConstraints(
 				hibernateSpecificConfig.getBuiltinConstraints(),
-				hibernateSpecificConfig.isIncludeBeansAndConstraintsDefinedOnlyInXml() );
+				hibernateSpecificConfig.isIncludeBeansAndConstraintsDefinedOnlyInXml()
+		);
 		TypeResolutionHelper typeResolutionHelper = new TypeResolutionHelper();
 
-		ConstraintCreationContext constraintCreationContext = new ConstraintCreationContext( constraintHelper,
-				constraintValidatorManager, typeResolutionHelper, valueExtractorManager );
+		ConstraintCreationContext constraintCreationContext = new ConstraintCreationContext(
+				constraintHelper,
+				constraintValidatorManager, typeResolutionHelper, valueExtractorManager
+		);
 
 		ExecutableHelper executableHelper = new ExecutableHelper( typeResolutionHelper );
 		JavaBeanHelper javaBeanHelper = new JavaBeanHelper( getterPropertySelectionStrategy, propertyNodeNameProvider );
@@ -164,15 +178,18 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 						javaBeanHelper,
 						externalClassLoader
 				),
-				constraintHelper );
+				constraintHelper
+		);
 
 		// we parse all XML mappings but only register constraint validators and delay constraint mappings building till
 		// we collect all the constraint validators.
 		// HV-302; don't load XmlMappingParser if not necessary
 		MappingXmlParser mappingParser = null;
 		if ( !configurationState.getMappingStreams().isEmpty() ) {
-			mappingParser = new MappingXmlParser( constraintCreationContext,
-					javaBeanHelper, externalClassLoader );
+			mappingParser = new MappingXmlParser(
+					constraintCreationContext,
+					javaBeanHelper, externalClassLoader
+			);
 			mappingParser.parse( configurationState.getMappingStreams() );
 		}
 
@@ -202,15 +219,32 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 			xmlMetaDataProvider = null;
 		}
 
+		// collect all metadata, I don't think we need this work to be in BeanMetaDataManager contract, it can be a specific class (or private method if simple enough)
+		// it's basically the content of PredefinedScopeBeanMetaDataManager constructor
+		// the metadata wouldn't be complete because we want to inject the tracking information
+
+		// then you build the tracking information from these incomplete metadata
+
+		// finally you create a PredefinedScopeBeanMetaDataManager with the augmented metadata pushed to it
+		// you will need to augment both BeanMetaData and ExecutableMetaData
+		// I would prototype BeanMetaData first then discuss it before going further
+
+		// Note: we want classes to be immutable
+		// Might be a good idea to push a default method to BeanMetaData as enabling tracking is the default behavior we want
+		// Maybe first try composition and benchmark it and if good enough, we keep it
+
 		this.beanMetaDataManager = new PredefinedScopeBeanMetaDataManager(
 				constraintCreationContext,
 				executableHelper,
-				validatorFactoryScopedContext.getParameterNameProvider(),
+				parameterNameProvider,
 				javaBeanHelper,
 				validationOrderGenerator,
 				buildMetaDataProviders( constraintCreationContext, xmlMetaDataProvider, constraintMappings ),
 				methodValidationConfiguration,
 				determineBeanMetaDataClassNormalizer( hibernateSpecificConfig ),
+				( hibernateSpecificConfig.getProcessedBeansTrackingVoter() != null )
+						? hibernateSpecificConfig.getProcessedBeansTrackingVoter()
+						: new DefaultProcessedBeansTrackingVoter(),
 				beanClassesToInitialize
 		);
 
@@ -281,6 +315,10 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		return validatorFactoryScopedContext.isTraversableResolverResultCacheEnabled();
 	}
 
+	public PredefinedScopeBeanMetaDataManager getBeanMetaDataManager() {
+		return beanMetaDataManager;
+	}
+
 	@Override
 	public <T> T unwrap(Class<T> type) {
 		// allow unwrapping into public super types
@@ -322,7 +360,8 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 	private static List<MetaDataProvider> buildMetaDataProviders(
 			ConstraintCreationContext constraintCreationContext,
 			XmlMetaDataProvider xmlMetaDataProvider,
-			Set<DefaultConstraintMapping> constraintMappings) {
+			Set<DefaultConstraintMapping> constraintMappings
+	) {
 		List<MetaDataProvider> metaDataProviders = newArrayList();
 		if ( xmlMetaDataProvider != null ) {
 			metaDataProviders.add( xmlMetaDataProvider );
