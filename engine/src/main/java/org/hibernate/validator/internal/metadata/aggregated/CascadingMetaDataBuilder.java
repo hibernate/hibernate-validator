@@ -224,6 +224,9 @@ public class CascadingMetaDataBuilder {
 		Set<ValueExtractorDescriptor> containerDetectionValueExtractorCandidates = valueExtractorManager.getResolver()
 				.getValueExtractorCandidatesForContainerDetectionOfGlobalCascadedValidation( enclosingType );
 		if ( !containerDetectionValueExtractorCandidates.isEmpty() ) {
+			// Using @Valid on a container is deprecated at the moment. You are supposed to apply the annotation on the type argument(s).
+			LOG.deprecatedUseOfValidOnContainer( ReflectionHelper.getClassFromType( enclosingType ), context );
+
 			if ( containerDetectionValueExtractorCandidates.size() > 1 ) {
 				throw LOG.getUnableToGetMostSpecificValueExtractorDueToSeveralMaximallySpecificValueExtractorsDeclaredException(
 						ReflectionHelper.getClassFromType( enclosingType ),
