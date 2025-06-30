@@ -946,4 +946,8 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = DEBUG)
 	@Message(id = 269, value = "Unable to enable secure XML feature processing when loading %1$s: %2$s")
 	void unableToEnableSecureFeatureProcessingSchemaXml(String fileName, String message);
+
+	@LogMessage(level = WARN)
+	@Message(id = 270, value = "Using `@Valid` on a container (%1$s) is deprecated. You should apply the annotation on the type argument(s). Field name: %2$s")
+	void deprecatedUseOfValidOnContainer(@FormatWith(ClassObjectFormatter.class) Class<?> valueType, Object context);
 }
