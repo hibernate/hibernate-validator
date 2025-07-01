@@ -10,8 +10,8 @@ import static org.testng.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -57,7 +57,7 @@ public class CompilerTestHelper {
 
 		private final String name;
 
-		private Library(String name) {
+		Library(String name) {
 			this.name = name;
 		}
 
@@ -82,7 +82,7 @@ public class CompilerTestHelper {
 		PROCESSOR_OUT_DIR = new File( TARGET_DIR, "processor-generated-test-classes" );
 		if ( !PROCESSOR_OUT_DIR.exists() ) {
 			if ( !PROCESSOR_OUT_DIR.mkdirs() ) {
-				fail( "Unable to create test output directory " + PROCESSOR_OUT_DIR.toString() );
+				fail( "Unable to create test output directory " + PROCESSOR_OUT_DIR );
 			}
 		}
 	}
@@ -163,7 +163,23 @@ public class CompilerTestHelper {
 			EnumSet<Library> dependencies, File... sourceFiles) {
 		StandardJavaFileManager fileManager = compiler.getStandardFileManager( null, null, null );
 		Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjects( sourceFiles );
-		List<String> options = new ArrayList<String>();
+		try {
+			fileManager.setLocation( StandardLocation.CLASS_PATH, getDependenciesAsFiles( dependencies ) );
+			fileManager.setLocation( StandardLocation.CLASS_OUTPUT, Collections.singletonList( PROCESSOR_OUT_DIR ) );
+		}
+		catch (IOException e) {
+			throw new RuntimeException( e );
+		}
+
+		final List<String> options = extractOptions( diagnosticKind, verbose, allowMethodConstraints );
+		CompilationTask task = compiler.getTask( null, fileManager, diagnostics, options, null, compilationUnits );
+		task.setProcessors( Collections.singletonList( annotationProcessor ) );
+
+		return task.call();
+	}
+
+	private static List<String> extractOptions(Kind diagnosticKind, Boolean verbose, Boolean allowMethodConstraints) {
+		final List<String> options = new ArrayList<>();
 
 		if ( diagnosticKind != null ) {
 			options.add( StringHelper.format( "-A%s=%s", Configuration.DIAGNOSTIC_KIND_PROCESSOR_OPTION, diagnosticKind ) );
@@ -174,27 +190,9 @@ public class CompilerTestHelper {
 		}
 
 		if ( allowMethodConstraints != null ) {
-			options.add(
-					StringHelper.format(
-							"-A%s=%b",
-							Configuration.METHOD_CONSTRAINTS_SUPPORTED_PROCESSOR_OPTION,
-							allowMethodConstraints
-					)
-			);
+			options.add( StringHelper.format( "-A%s=%b", Configuration.METHOD_CONSTRAINTS_SUPPORTED_PROCESSOR_OPTION, allowMethodConstraints ) );
 		}
-
-		try {
-			fileManager.setLocation( StandardLocation.CLASS_PATH, getDependenciesAsFiles( dependencies ) );
-			fileManager.setLocation( StandardLocation.CLASS_OUTPUT, Arrays.asList( PROCESSOR_OUT_DIR ) );
-		}
-		catch (IOException e) {
-			throw new RuntimeException( e );
-		}
-
-		CompilationTask task = compiler.getTask( null, fileManager, diagnostics, options, null, compilationUnits );
-		task.setProcessors( Arrays.asList( annotationProcessor ) );
-
-		return task.call();
+		return options;
 	}
 
 	/**
@@ -226,7 +224,7 @@ public class CompilerTestHelper {
 	}
 
 	private Set<File> getDependenciesAsFiles(EnumSet<Library> dependencies) {
-		Set<File> files = new HashSet<File>();
+		Set<File> files = new HashSet<>();
 
 		for ( Library oneDependency : dependencies ) {
 			files.add( new File( testLibraryDir + File.separator + oneDependency.getName() ) );
