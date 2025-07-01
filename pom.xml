@@ -188,7 +188,7 @@
         <version.org.openjfx>17.0.15</version.org.openjfx>
 
         <!-- Test dependencies -->
-        <version.org.jboss.arquillian>1.9.5.Final</version.org.jboss.arquillian>
+        <version.org.jboss.arquillian>1.10.0.Final</version.org.jboss.arquillian>
         <version.shrinkwrap.core>1.2.6</version.shrinkwrap.core>
         <version.shrinkwrap.resolvers>3.3.4</version.shrinkwrap.resolvers>
         <version.shrinkwrap.descriptors>2.0.0</version.shrinkwrap.descriptors>
@@ -219,7 +219,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>10.25.1</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>10.26.1</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
