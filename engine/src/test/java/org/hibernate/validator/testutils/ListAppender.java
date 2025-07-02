@@ -4,14 +4,19 @@
  */
 package org.hibernate.validator.testutils;
 
+import static java.util.Collections.unmodifiableList;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.impl.MutableLogEvent;
+import org.apache.logging.log4j.message.Message;
 
 /**
  * A simple log appender for tests.
@@ -39,6 +44,25 @@ public class ListAppender extends AbstractAppender {
 	}
 
 	public List<LogEvent> getEvents() {
-		return Collections.unmodifiableList( this.events );
+		return unmodifiableList( this.events );
+	}
+
+	/**
+	 * Returns all logged messages
+	 */
+	public List<String> getMessages() {
+		return getMessages( logEvent -> true );
+	}
+
+	/**
+	 * Returns logged messages matching the specified {@link Level}
+	 */
+	public List<String> getMessages(Level level) {
+		return getMessages( logEvent -> logEvent.getLevel().equals( level ) );
+	}
+
+	private List<String> getMessages(Predicate<LogEvent> filter) {
+		return events.stream().filter( filter ).map( LogEvent::getMessage )
+				.map( Message::getFormattedMessage ).toList();
 	}
 }
