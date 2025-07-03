@@ -711,6 +711,10 @@ With one exception also these constraints apply to the field/property level, onl
         Supported data types::: `CharSequence`
         Hibernate metadata impact::: None
 
+`@OneOf`:: Checks that the annotated character sequence or object is one of the allowed values. The allowed values are defined using `allowedValues`, `allowedIntegers`, `allowedLongs`, `allowedFloats`, `allowedDoubles` or by specifying an `enumClass`. The validation occurs after converting the annotated object to a `String`.
+		Supported data types::: `CharSequence`, `Integer`, `Long`, `Float`, `Double`, `Enum`
+		Hibernate metadata impact::: None
+
 `@Range(min=, max=)`:: Checks whether the annotated value lies between (inclusive) the specified minimum and maximum
 	Supported data types::: `BigDecimal`, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types
 	Hibernate metadata impact::: None
