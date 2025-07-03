@@ -21,6 +21,7 @@ import jakarta.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
+import org.hibernate.validator.internal.engine.tracking.ProcessedBeansTrackingStrategy;
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
@@ -34,6 +35,8 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
+import org.hibernate.validator.spi.tracking.ProcessedBeansTrackingVoter;
+import org.hibernate.validator.spi.tracking.ProcessedBeansTrackingVoter.Vote;
 
 /**
  * An aggregated view of the constraint related meta data for a given method or
@@ -53,6 +56,8 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Gunnar Morling
  */
 public class ExecutableMetaData extends AbstractConstraintMetaData {
+
+	private final Class<?> beanClass;
 
 	private final Class<?>[] parameterTypes;
 
@@ -76,7 +81,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	private final ReturnValueMetaData returnValueMetaData;
 	private final ElementKind kind;
 
+	private final boolean trackingEnabledForParameters;
+	private final boolean trackingEnabledForReturnValue;
+
 	private ExecutableMetaData(
+			Class<?> beanClass,
 			String name,
 			Type returnType,
 			Class<?>[] parameterTypes,
@@ -88,7 +97,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			CascadingMetaData cascadingMetaData,
 			boolean isConstrained,
-			boolean isGetter) {
+			boolean isGetter,
+			ProcessedBeansTrackingVoter processedBeansTrackingVoter) {
 		super(
 				name,
 				returnType,
@@ -98,6 +108,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				isConstrained
 		);
 
+		this.beanClass = beanClass;
 		this.parameterTypes = parameterTypes;
 		this.parameterMetaDataList = CollectionHelper.toImmutableList( parameterMetaDataList );
 		this.validatableParametersMetaData = new ValidatableParametersMetaData( parameterMetaDataList );
@@ -111,6 +122,90 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		);
 		this.isGetter = isGetter;
 		this.kind = kind;
+
+		Vote processedBeansTrackingVoteForParameters = processedBeansTrackingVoter.isEnabledForParameters( beanClass, name, parameterTypes,
+				validatableParametersMetaData.hasCascadables() );
+		switch ( processedBeansTrackingVoteForParameters ) {
+			case NON_TRACKING:
+				this.trackingEnabledForParameters = false;
+				break;
+			case TRACKING:
+				this.trackingEnabledForParameters = true;
+				break;
+			default:
+				this.trackingEnabledForParameters = validatableParametersMetaData.hasCascadables();
+				break;
+		}
+
+		Vote processedBeansTrackingVoteForReturnValue = processedBeansTrackingVoter.isEnabledForReturnValue( beanClass, name, parameterTypes,
+				returnValueMetaData.hasCascadables() );
+		switch ( processedBeansTrackingVoteForReturnValue ) {
+			case NON_TRACKING:
+				this.trackingEnabledForReturnValue = false;
+				break;
+			case TRACKING:
+				this.trackingEnabledForReturnValue = true;
+				break;
+			default:
+				this.trackingEnabledForReturnValue = returnValueMetaData.hasCascadables();
+				break;
+		}
+	}
+
+	public ExecutableMetaData(ExecutableMetaData originalExecutableMetaData,
+			ProcessedBeansTrackingStrategy processedBeansTrackingStrategy,
+			ProcessedBeansTrackingVoter processedBeansTrackingVoter) {
+		super( originalExecutableMetaData );
+
+		this.beanClass = originalExecutableMetaData.beanClass;
+		this.parameterTypes = originalExecutableMetaData.parameterTypes;
+		this.parameterMetaDataList = originalExecutableMetaData.parameterMetaDataList;
+		this.validatableParametersMetaData = originalExecutableMetaData.validatableParametersMetaData;
+		this.crossParameterConstraints = originalExecutableMetaData.crossParameterConstraints;
+		this.signatures = originalExecutableMetaData.signatures;
+		this.returnValueMetaData = originalExecutableMetaData.returnValueMetaData;
+		this.isGetter = originalExecutableMetaData.isGetter;
+		this.kind = originalExecutableMetaData.kind;
+
+		Vote processedBeansTrackingVoteForParameters = processedBeansTrackingVoter.isEnabledForParameters( originalExecutableMetaData.beanClass,
+				originalExecutableMetaData.getName(), parameterTypes, originalExecutableMetaData.getValidatableParametersMetaData().hasCascadables() );
+		switch ( processedBeansTrackingVoteForParameters ) {
+			case NON_TRACKING:
+				this.trackingEnabledForParameters = false;
+				break;
+			case TRACKING:
+				this.trackingEnabledForParameters = true;
+				break;
+			default:
+				boolean trackingEnabledForParameters = false;
+				for ( Signature signature : originalExecutableMetaData.getSignatures() ) {
+					trackingEnabledForParameters = trackingEnabledForParameters
+							|| processedBeansTrackingStrategy.isEnabledForParameters( signature,
+									originalExecutableMetaData.getValidatableParametersMetaData().hasCascadables() );
+				}
+				this.trackingEnabledForParameters = trackingEnabledForParameters;
+				break;
+		}
+
+		Vote processedBeansTrackingVoteForReturnValue = processedBeansTrackingVoter.isEnabledForReturnValue( originalExecutableMetaData.beanClass,
+				originalExecutableMetaData.getName(), parameterTypes, originalExecutableMetaData.getReturnValueMetaData().hasCascadables() );
+		switch ( processedBeansTrackingVoteForReturnValue ) {
+			case NON_TRACKING:
+				this.trackingEnabledForReturnValue = false;
+				break;
+			case TRACKING:
+				this.trackingEnabledForReturnValue = true;
+				break;
+			default:
+				boolean trackingEnabledForReturnValue = false;
+				for ( Signature signature : originalExecutableMetaData.getSignatures() ) {
+					trackingEnabledForReturnValue = trackingEnabledForReturnValue
+							|| processedBeansTrackingStrategy.isEnabledForReturnValue( signature,
+									originalExecutableMetaData.getReturnValueMetaData().hasCascadables() );
+				}
+				this.trackingEnabledForReturnValue = trackingEnabledForReturnValue;
+				break;
+		}
 	}
 
 	/**
@@ -197,6 +292,15 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		return kind;
 	}
 
+
+	public boolean isTrackingEnabledForParameters() {
+		return trackingEnabledForParameters;
+	}
+
+	public boolean isTrackingEnabledForReturnValue() {
+		return trackingEnabledForReturnValue;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder parameterBuilder = new StringBuilder();
@@ -258,6 +362,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private final Set<MethodConfigurationRule> rules;
 		private boolean isConstrained = false;
 		private CascadingMetaDataBuilder cascadingMetaDataBuilder;
+		private ProcessedBeansTrackingVoter processedBeansTrackingVoter;
 
 		/**
 		 * Holds a merged representation of the configurations for one method
@@ -277,11 +382,13 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				ConstraintCreationContext constraintCreationContext,
 				ExecutableHelper executableHelper,
 				ExecutableParameterNameProvider parameterNameProvider,
-				MethodValidationConfiguration methodValidationConfiguration) {
+				MethodValidationConfiguration methodValidationConfiguration,
+				ProcessedBeansTrackingVoter processedBeansTrackingVoter) {
 			super( beanClass, constraintCreationContext );
 
 			this.executableHelper = executableHelper;
 			this.parameterNameProvider = parameterNameProvider;
+			this.processedBeansTrackingVoter = processedBeansTrackingVoter;
 			this.kind = constrainedExecutable.getKind();
 			this.callable = constrainedExecutable.getCallable();
 			this.rules = methodValidationConfiguration.getConfiguredRuleSet();
@@ -373,6 +480,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			assertCorrectnessOfConfiguration();
 
 			return new ExecutableMetaData(
+					callable.getDeclaringClass(),
 					callable.getName(),
 					callable.getType(),
 					callable.getParameterTypes(),
@@ -384,7 +492,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
 					cascadingMetaDataBuilder.build( constraintCreationContext.getValueExtractorManager(), callable ),
 					isConstrained,
-					kind == ConstrainedElementKind.GETTER
+					kind == ConstrainedElementKind.GETTER,
+					processedBeansTrackingVoter
 			);
 		}
 
