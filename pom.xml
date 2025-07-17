@@ -412,7 +412,7 @@
                 - update README
                 - run mvn wrapper:wrapper to re-generate the maven wrapper
             -->
-        <maven.min.version>3.9.10</maven.min.version>
+        <maven.min.version>3.9.11</maven.min.version>
 
         <!-- Formatting -->
         <format.skip>false</format.skip>
