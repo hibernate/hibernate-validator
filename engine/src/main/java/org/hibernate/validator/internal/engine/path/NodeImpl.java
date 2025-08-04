@@ -59,7 +59,7 @@ public class NodeImpl
 	private final NodeImpl parent;
 	private final NodeImpl root;
 	private final int size;
-	private final boolean isIterable;
+	private boolean isIterable;
 	private final Integer index;
 	private final Object key;
 	private final ElementKind kind;
@@ -67,7 +67,8 @@ public class NodeImpl
 	//type-specific attributes
 	private final Class<?>[] parameterTypes;
 	private final Integer parameterIndex;
-	private final Object value;
+	private Object value;
+	private boolean valueSet;
 	private final Class<?> containerClass;
 	private final Integer typeArgumentIndex;
 
@@ -76,7 +77,7 @@ public class NodeImpl
 
 	private NodeImpl(
 			String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
-			Integer parameterIndex, Object value, Class<?> containerClass, Integer typeArgumentIndex
+			Integer parameterIndex, Object value, boolean valueSet, Class<?> containerClass, Integer typeArgumentIndex
 	) {
 		this.name = name;
 		this.parent = parent;
@@ -85,6 +86,7 @@ public class NodeImpl
 		this.index = index;
 		this.key = key;
 		this.value = value;
+		this.valueSet = valueSet;
 		this.isIterable = isIterable;
 		this.kind = kind;
 		this.parameterTypes = parameterTypes;
@@ -105,6 +107,7 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
+				false,
 				null,
 				null
 		);
@@ -121,6 +124,7 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
+				false,
 				null,
 				null
 		);
@@ -137,6 +141,7 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				parameterIndex,
 				null,
+				false,
 				null,
 				null
 		);
@@ -153,17 +158,18 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
+				false,
 				null,
 				null
 		);
 	}
 
 	public static NodeImpl createMethodNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null, null, null );
+		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null, false, null, null );
 	}
 
 	public static NodeImpl createConstructorNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null, null, null );
+		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null, false, null, null );
 	}
 
 	public static NodeImpl createBeanNode(NodeImpl parent) {
@@ -177,6 +183,7 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
+				false,
 				null,
 				null
 		);
@@ -193,6 +200,7 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
+				false,
 				null,
 				null
 		);
@@ -209,6 +217,7 @@ public class NodeImpl
 				node.parameterTypes,
 				node.parameterIndex,
 				node.value,
+				node.valueSet,
 				node.containerClass,
 				node.typeArgumentIndex
 		);
@@ -225,6 +234,7 @@ public class NodeImpl
 				node.parameterTypes,
 				node.parameterIndex,
 				node.value,
+				node.valueSet,
 				node.containerClass,
 				node.typeArgumentIndex
 		);
@@ -241,25 +251,32 @@ public class NodeImpl
 				node.parameterTypes,
 				node.parameterIndex,
 				node.value,
+				node.valueSet,
 				node.containerClass,
 				node.typeArgumentIndex
 		);
 	}
 
 	public static NodeImpl setPropertyValue(NodeImpl node, Object value) {
-		return new NodeImpl(
-				node.name,
-				node.parent,
-				node.isIterable,
-				node.index,
-				node.key,
-				node.kind,
-				node.parameterTypes,
-				node.parameterIndex,
-				value,
-				node.containerClass,
-				node.typeArgumentIndex
-		);
+		if ( node.valueSet && node.value != value ) {
+			return new NodeImpl(
+					node.name,
+					node.parent,
+					node.isIterable,
+					node.index,
+					node.key,
+					node.kind,
+					node.parameterTypes,
+					node.parameterIndex,
+					value,
+					true,
+					node.containerClass,
+					node.typeArgumentIndex
+			);
+		}
+		node.value = value;
+		node.valueSet = true;
+		return node;
 	}
 
 	public static NodeImpl setTypeParameter(NodeImpl node, Class<?> containerClass, Integer typeArgumentIndex) {
@@ -273,6 +290,7 @@ public class NodeImpl
 				node.parameterTypes,
 				node.parameterIndex,
 				node.value,
+				node.valueSet,
 				containerClass,
 				typeArgumentIndex
 		);
@@ -370,7 +388,7 @@ public class NodeImpl
 				kind == ElementKind.PARAMETER,
 				"getParameterIndex() may only be invoked for nodes of type ElementKind.PARAMETER."
 		);
-		return parameterIndex.intValue();
+		return parameterIndex;
 	}
 
 	@Override
@@ -541,6 +559,7 @@ public class NodeImpl
 
 	@Override
 	public Iterator<Path.Node> iterator() {
+		// TODO: keep the initialized list so next iterator calls can reuse it?
 		if ( parent == null ) {
 			return List.of( (Path.Node) this ).iterator();
 		}
