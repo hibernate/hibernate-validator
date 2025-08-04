@@ -7,6 +7,8 @@ package org.hibernate.validator.internal.engine.path;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +37,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class NodeImpl
 		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Path.ContainerElementNode,
-		org.hibernate.validator.path.PropertyNode, org.hibernate.validator.path.ContainerElementNode, Serializable {
+		org.hibernate.validator.path.PropertyNode, org.hibernate.validator.path.ContainerElementNode, Serializable, Iterable<Path.Node> {
 	private static final long serialVersionUID = 2075466571633860499L;
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[] { };
 
@@ -55,6 +57,8 @@ public class NodeImpl
 
 	private final String name;
 	private final NodeImpl parent;
+	private final NodeImpl root;
+	private final int size;
 	private final boolean isIterable;
 	private final Integer index;
 	private final Object key;
@@ -70,10 +74,14 @@ public class NodeImpl
 	private int hashCode = -1;
 	private String asString;
 
-	private NodeImpl(String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
-			Integer parameterIndex, Object value, Class<?> containerClass, Integer typeArgumentIndex) {
+	private NodeImpl(
+			String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
+			Integer parameterIndex, Object value, Class<?> containerClass, Integer typeArgumentIndex
+	) {
 		this.name = name;
 		this.parent = parent;
+		this.root = parent == null ? this : parent.root;
+		this.size = ( parent == null ? 0 : parent.size ) + 1;
 		this.index = index;
 		this.key = key;
 		this.value = value;
@@ -524,5 +532,93 @@ public class NodeImpl
 			return false;
 		}
 		return true;
+	}
+
+	boolean isRootPath() {
+		// .size() == 1 && nodeList.get( 0 ).getName() == null
+		return parent == null && name == null;
+	}
+
+	@Override
+	public Iterator<Path.Node> iterator() {
+		if ( parent == null ) {
+			return List.of( (Path.Node) this ).iterator();
+		}
+		List<Path.Node> result = new LinkedList<>();
+		NodeImpl curr = this;
+		while ( !curr.isRootPath() ) {
+			result.add( 0, curr );
+			curr = curr.parent;
+		}
+		return result.iterator();
+	}
+
+	boolean isSubPathOf(NodeImpl other) {
+		if ( this.size > other.size ) {
+			return false;
+		}
+		NodeImpl curr = this;
+		NodeImpl otherCurr = other;
+		while ( otherCurr != null && !otherCurr.equals( this ) ) {
+			otherCurr = otherCurr.parent;
+		}
+		if ( otherCurr == null ) {
+			return false;
+		}
+		while ( !curr.isRootPath() && !otherCurr.isRootPath() ) {
+			if ( !curr.equals( otherCurr ) ) {
+				return false;
+			}
+			curr = curr.parent;
+			otherCurr = otherCurr.parent;
+		}
+
+		return curr.isRootPath();
+	}
+
+	boolean isSubPathOrContains(NodeImpl other) {
+		NodeImpl curr;
+		NodeImpl otherCurr;
+		if ( this.size > other.size ) {
+			curr = other;
+			otherCurr = this;
+		}
+		else {
+			curr = this;
+			otherCurr = other;
+		}
+
+		while ( otherCurr != null && !otherCurr.equals( curr ) ) {
+			otherCurr = otherCurr.parent;
+		}
+		if ( otherCurr == null ) {
+			return false;
+		}
+		while ( !curr.isRootPath() && !otherCurr.isRootPath() ) {
+			if ( !curr.equals( otherCurr ) ) {
+				return false;
+			}
+			curr = curr.parent;
+			otherCurr = otherCurr.parent;
+		}
+
+		return curr.isRootPath() && otherCurr.isRootPath();
+	}
+
+	boolean samePath(NodeImpl other) {
+		if ( this.size != other.size ) {
+			return false;
+		}
+		NodeImpl curr = this;
+		NodeImpl otherCurr = other;
+		while ( curr != null && otherCurr != null ) {
+			if ( !curr.equals( otherCurr ) ) {
+				return false;
+			}
+			otherCurr = otherCurr.parent;
+			curr = curr.parent;
+		}
+
+		return curr == null && otherCurr == null;
 	}
 }

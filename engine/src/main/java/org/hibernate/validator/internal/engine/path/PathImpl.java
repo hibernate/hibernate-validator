@@ -8,10 +8,8 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,8 +49,6 @@ public final class PathImpl implements Path, Serializable {
 	private static final int INDEX_GROUP = 3;
 	private static final int REMAINING_STRING_GROUP = 5;
 
-	private List<Node> nodeList;
-	private boolean nodeListRequiresCopy;
 	private NodeImpl currentLeafNode;
 	private int hashCode;
 
@@ -104,30 +100,23 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public static PathImpl createCopyWithoutLeafNode(PathImpl path) {
-		return new PathImpl( path.nodeList.subList( 0, path.nodeList.size() - 1 ) );
+		return new PathImpl( path.currentLeafNode.getParent() );
 	}
 
-
 	public boolean isRootPath() {
-		return nodeList.size() == 1 && nodeList.get( 0 ).getName() == null;
+		return currentLeafNode.isRootPath();
 	}
 
 	public NodeImpl addPropertyNode(String nodeName) {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createPropertyNode( nodeName, parent );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public NodeImpl addContainerElementNode(String nodeName) {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createContainerElementNode( nodeName, parent );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
@@ -144,91 +133,64 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public NodeImpl addParameterNode(String nodeName, int index) {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createParameterNode( nodeName, parent, index );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public NodeImpl addCrossParameterNode() {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createCrossParameterNode( parent );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public NodeImpl addBeanNode() {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createBeanNode( parent );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public NodeImpl addReturnValueNode() {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createReturnValue( parent );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	private NodeImpl addConstructorNode(String name, Class<?>[] parameterTypes) {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createConstructorNode( name, parent, parameterTypes );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	private NodeImpl addMethodNode(String name, Class<?>[] parameterTypes) {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createMethodNode( name, parent, parameterTypes );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public NodeImpl makeLeafNodeIterable() {
-		requiresWriteableNodeList();
-
 		currentLeafNode = NodeImpl.makeIterable( currentLeafNode );
 
-		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public NodeImpl makeLeafNodeIterableAndSetIndex(Integer index) {
-		requiresWriteableNodeList();
-
 		currentLeafNode = NodeImpl.makeIterableAndSetIndex( currentLeafNode, index );
 
-		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public NodeImpl makeLeafNodeIterableAndSetMapKey(Object key) {
-		requiresWriteableNodeList();
-
 		currentLeafNode = NodeImpl.makeIterableAndSetMapKey( currentLeafNode, key );
 
-		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
@@ -236,11 +198,7 @@ public final class PathImpl implements Path, Serializable {
 	public NodeImpl setLeafNodeValueIfRequired(Object value) {
 		// The value is only exposed for property and container element nodes
 		if ( currentLeafNode.getKind() == ElementKind.PROPERTY || currentLeafNode.getKind() == ElementKind.CONTAINER_ELEMENT ) {
-			requiresWriteableNodeList();
-
 			currentLeafNode = NodeImpl.setPropertyValue( currentLeafNode, value );
-
-			nodeList.set( nodeList.size() - 1, currentLeafNode );
 
 			// the property value is not part of the NodeImpl hashCode so we don't need to reset the PathImpl hashCode
 		}
@@ -248,21 +206,15 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public NodeImpl setLeafNodeTypeParameter(Class<?> containerClass, Integer typeArgumentIndex) {
-		requiresWriteableNodeList();
-
 		currentLeafNode = NodeImpl.setTypeParameter( currentLeafNode, containerClass, typeArgumentIndex );
 
-		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public void removeLeafNode() {
-		if ( !nodeList.isEmpty() ) {
-			requiresWriteableNodeList();
-
-			nodeList.remove( nodeList.size() - 1 );
-			currentLeafNode = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		if ( currentLeafNode != null ) {
+			currentLeafNode = currentLeafNode.getParent();
 			resetHashCode();
 		}
 	}
@@ -273,47 +225,33 @@ public final class PathImpl implements Path, Serializable {
 
 	@Override
 	public Iterator<Path.Node> iterator() {
-		if ( nodeList.size() == 0 ) {
-			return Collections.<Path.Node>emptyList().iterator();
+		if ( currentLeafNode == null ) {
+			return Collections.emptyIterator();
 		}
-		if ( nodeList.size() == 1 ) {
-			return nodeList.iterator();
-		}
-		return nodeList.subList( 1, nodeList.size() ).iterator();
+		return currentLeafNode.iterator();
 	}
 
 	public String asString() {
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
-		for ( int i = 1; i < nodeList.size(); i++ ) {
-			NodeImpl nodeImpl = (NodeImpl) nodeList.get( i );
-			String name = nodeImpl.asString();
+		NodeImpl current = currentLeafNode;
+		while ( !current.isRootPath() ) {
+			String name = current.asString();
 			if ( name.isEmpty() ) {
+				current = current.getParent();
 				// skip the node if it does not contribute to the string representation of the path, eg class level constraints
 				continue;
 			}
 
 			if ( !first ) {
-				builder.append( PROPERTY_PATH_SEPARATOR );
+				builder.insert( 0, PROPERTY_PATH_SEPARATOR );
 			}
 
-			builder.append( nodeImpl.asString() );
-
+			builder.insert( 0, current.asString() );
 			first = false;
+			current = current.getParent();
 		}
 		return builder.toString();
-	}
-
-	private void requiresWriteableNodeList() {
-		if ( !nodeListRequiresCopy ) {
-			return;
-		}
-
-		// Usually, the write operation is about adding one more node, so let's make the list one element larger.
-		List<Node> newNodeList = new ArrayList<>( nodeList.size() + 1 );
-		newNodeList.addAll( nodeList );
-		nodeList = newNodeList;
-		nodeListRequiresCopy = false;
 	}
 
 	@Override
@@ -333,12 +271,12 @@ public final class PathImpl implements Path, Serializable {
 			return false;
 		}
 		PathImpl other = (PathImpl) obj;
-		if ( nodeList == null ) {
-			if ( other.nodeList != null ) {
+		if ( currentLeafNode == null ) {
+			if ( other.currentLeafNode != null ) {
 				return false;
 			}
 		}
-		else if ( !nodeList.equals( other.nodeList ) ) {
+		else if ( !currentLeafNode.samePath( other.currentLeafNode ) ) {
 			return false;
 		}
 		return true;
@@ -358,7 +296,7 @@ public final class PathImpl implements Path, Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ( ( nodeList == null ) ? 0 : nodeList.hashCode() );
+				+ ( ( currentLeafNode == null ) ? 0 : currentLeafNode.hashCode() );
 		return result;
 	}
 
@@ -368,23 +306,17 @@ public final class PathImpl implements Path, Serializable {
 	 * @param path the path to make a copy of.
 	 */
 	private PathImpl(PathImpl path) {
-		nodeList = path.nodeList;
 		currentLeafNode = path.currentLeafNode;
 		hashCode = path.hashCode;
-		nodeListRequiresCopy = true;
 	}
 
 	private PathImpl() {
-		nodeList = new ArrayList<>( 1 );
 		hashCode = -1;
-		nodeListRequiresCopy = false;
 	}
 
-	private PathImpl(List<Node> nodeList) {
-		this.nodeList = nodeList;
-		currentLeafNode = (NodeImpl) nodeList.get( nodeList.size() - 1 );
+	private PathImpl(NodeImpl currentLeafNode) {
+		this.currentLeafNode = currentLeafNode;
 		hashCode = -1;
-		nodeListRequiresCopy = true;
 	}
 
 	private void resetHashCode() {
@@ -469,33 +401,16 @@ public final class PathImpl implements Path, Serializable {
 	 * @return true, if this path is a subpath
 	 */
 	public boolean isSubPathOf(PathImpl other) {
-		if ( nodeList.size() > other.nodeList.size() ) {
-			// cannot be a subpath as it is already longer then the other path
-			return false;
+		if ( currentLeafNode == null ) {
+			return other.currentLeafNode == null;
 		}
-
-		for ( int i = 0; i < nodeList.size(); i++ ) {
-			if ( !nodeList.get( i ).equals( other.nodeList.get( i ) ) ) {
-				return false;
-			}
-		}
-		return true;
+		return currentLeafNode.isSubPathOf( other.currentLeafNode );
 	}
 
 	public boolean isSubPathOrContains(PathImpl other) {
-
-		// prefetch contant return values
-		int oSize = other.nodeList.size();
-		// calling Math.min will reduce speed significantly
-		int mySize = nodeList.size() < oSize
-				? nodeList.size()
-				: oSize;
-
-		for ( int i = 0; i < mySize; i++ ) {
-			if ( !nodeList.get( i ).equals( other.nodeList.get( i ) ) ) {
-				return false;
-			}
+		if ( currentLeafNode == null ) {
+			return other.currentLeafNode == null;
 		}
-		return true;
+		return currentLeafNode.isSubPathOrContains( other.currentLeafNode );
 	}
 }
