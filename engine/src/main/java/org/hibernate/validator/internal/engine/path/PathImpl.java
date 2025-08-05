@@ -67,7 +67,7 @@ public final class PathImpl implements Path, Serializable {
 	public static PathImpl createPathFromString(String propertyPath) {
 		Contracts.assertNotNull( propertyPath, MESSAGES.propertyPathCannotBeNull() );
 
-		if ( propertyPath.length() == 0 ) {
+		if ( propertyPath.isEmpty() ) {
 			return createRootPath();
 		}
 
@@ -90,9 +90,7 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public static PathImpl createRootPath() {
-		PathImpl path = new PathImpl();
-		path.addBeanNode();
-		return path;
+		return new PathImpl( NodeImpl.ROOT_NODE );
 	}
 
 	public static PathImpl createCopy(PathImpl path) {
