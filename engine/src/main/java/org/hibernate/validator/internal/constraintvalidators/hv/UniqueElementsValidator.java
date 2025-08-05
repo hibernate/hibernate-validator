@@ -7,6 +7,7 @@ package org.hibernate.validator.internal.constraintvalidators.hv;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,7 +54,10 @@ public class UniqueElementsValidator implements ConstraintValidator<UniqueElemen
 		if ( constraintValidatorContext instanceof HibernateConstraintValidatorContext ) {
 			constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class )
 					.addMessageParameter( "duplicates", duplicates.stream().map( String::valueOf ).collect( Collectors.joining( ", " ) ) )
-					.withDynamicPayload( CollectionHelper.toImmutableList( duplicates ) );
+					// We cannot leverage the CollectionHelper.toImmutableList here as it does not allow `null` values.
+					//  User collections may have `null`s in it and those could as well be duplicates
+					//  so let's rely on the Collections.unmodifiableList here which accepts `null` values as long as the underlying collection allows it:
+					.withDynamicPayload( Collections.unmodifiableList( duplicates ) );
 		}
 
 		return false;
