@@ -7,14 +7,12 @@ package org.hibernate.validator.internal.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -95,38 +93,47 @@ public final class CollectionHelper {
 		return new HashSet<>( Arrays.asList( ts ) );
 	}
 
+	/**
+	 * Converts the provided list to an {@code java.util.ImmutableCollections}.
+	 * <p>
+	 * <b>NOTE:</b> the resulting list does not allow {@code null} values.
+	 * Attempt to convert a list with {@code null}s will result in an exception!
+	 *
+	 * @param list the list to convert.
+	 * @return the converted list.
+	 * @param <T> the type of the list elements.
+	 */
 	public static <T> List<T> toImmutableList(List<? extends T> list) {
-		switch ( list.size() ) {
-			case 0:
-				return Collections.emptyList();
-			case 1:
-				return Collections.singletonList( list.get( 0 ) );
-			default:
-				return Collections.unmodifiableList( list );
-		}
+		return List.copyOf( list );
 	}
 
+	/**
+	 * Converts the provided set to an {@code java.util.ImmutableCollections}.
+	 * <p>
+	 * <b>NOTE:</b> the resulting set does not allow {@code null} values.
+	 * Attempt to convert a set with {@code null}s will result in an exception!
+	 *
+	 * @param set the set to convert.
+	 * @return the converted set.
+	 * @param <T> the type of the set elements.
+	 */
 	public static <T> Set<T> toImmutableSet(Set<? extends T> set) {
-		switch ( set.size() ) {
-			case 0:
-				return Collections.emptySet();
-			case 1:
-				return Collections.singleton( set.iterator().next() );
-			default:
-				return Collections.unmodifiableSet( set );
-		}
+		return Set.copyOf( set );
 	}
 
+	/**
+	 * Converts the provided map to an {@code java.util.ImmutableCollections}.
+	 * <p>
+	 * <b>NOTE:</b> the resulting map does not allow {@code null} keys and values .
+	 * Attempt to convert a map with {@code null}s (either as key or a value) will result in an exception!
+	 *
+	 * @param map the map to convert.
+	 * @param <K> the type of the map keys.
+	 * @param <V> the type of the map values.
+	 * @return the converted map.
+	 */
 	public static <K, V> Map<K, V> toImmutableMap(Map<K, V> map) {
-		switch ( map.size() ) {
-			case 0:
-				return Collections.emptyMap();
-			case 1:
-				Entry<K, V> entry = map.entrySet().iterator().next();
-				return Collections.singletonMap( entry.getKey(), entry.getValue() );
-			default:
-				return Collections.unmodifiableMap( map );
-		}
+		return Map.copyOf( map );
 	}
 
 	/**
