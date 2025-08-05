@@ -287,6 +287,9 @@ public class NodeImpl
 	}
 
 	public static NodeImpl setTypeParameter(NodeImpl node, Class<?> containerClass, Integer typeArgumentIndex) {
+		if ( node.typeArgumentIndex != null && node.typeArgumentIndex.equals( typeArgumentIndex ) && node.containerClass == containerClass ) {
+			return node;
+		}
 		return new NodeImpl(
 				node.name,
 				node.parent,
