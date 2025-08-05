@@ -43,6 +43,13 @@ public class NodeImpl
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
+	static final NodeImpl ROOT_NODE;
+	static {
+		ROOT_NODE = NodeImpl.createBeanNode( null );
+		ROOT_NODE.valueSet = true;
+		ROOT_NODE.hashCode();
+	}
+
 	private static final String INDEX_OPEN = "[";
 	private static final String INDEX_CLOSE = "]";
 	private static final String TYPE_PARAMETER_OPEN = "<";
@@ -553,7 +560,6 @@ public class NodeImpl
 	}
 
 	boolean isRootPath() {
-		// .size() == 1 && nodeList.get( 0 ).getName() == null
 		return parent == null && name == null;
 	}
 
