@@ -1,6 +1,23 @@
 Hibernate Validator Changelog
 =============================
 
+8.0.3.Final (2025-08-06)
+-------------------------
+
+** Bug
+    * HV-1978 Expression Language not propagated to iterable node
+    * HV-1971 CNPJ with all digits the same
+    * HV-1965 Typo in CrossParameterConstraintValidatorContextImpl, wrong element kind assertion fail message.
+    * HV-1917 MinDuration/MaxDuration validation message (english) broken for zero duration.
+
+** Improvement
+    * HV-2121 Backport "New Alphanumeric CNPJ" (HV-1999) to 8.x series
+    * HV-1999 New Alphanumeric CNPJ
+
+** Task
+    * HV-2070 Use `maven-assembly-plugin` instead of `copy-maven-plugin` to rename the pdf documents
+    * HV-2023 Add a step to build pdf documentation to the nightly CI job
+
 8.0.2.Final (2024-12-13)
 -------------------------
 
