@@ -8,9 +8,9 @@ import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import jakarta.validation.ElementKind;
 import jakarta.validation.Path;
@@ -44,9 +44,11 @@ public class NodeImpl
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	static final NodeImpl ROOT_NODE;
+
 	static {
 		ROOT_NODE = NodeImpl.createBeanNode( null );
 		ROOT_NODE.valueSet = true;
+		ROOT_NODE.nodes = new NodeImpl[] { ROOT_NODE };
 		ROOT_NODE.hashCode();
 	}
 
@@ -81,6 +83,7 @@ public class NodeImpl
 
 	private int hashCode = -1;
 	private String asString;
+	private NodeImpl[] nodes;
 
 	private NodeImpl(
 			String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
@@ -568,17 +571,16 @@ public class NodeImpl
 
 	@Override
 	public Iterator<Path.Node> iterator() {
-		// TODO: keep the initialized list so next iterator calls can reuse it?
-		if ( parent == null ) {
-			return List.of( (Path.Node) this ).iterator();
+		if ( nodes == null ) {
+			nodes = new NodeImpl[size - 1];
+			NodeImpl curr = this;
+			while ( curr.parent != null ) {
+				nodes[curr.size - 2] = curr;
+				curr = curr.parent;
+			}
 		}
-		List<Path.Node> result = new LinkedList<>();
-		NodeImpl curr = this;
-		while ( !curr.isRootPath() ) {
-			result.add( 0, curr );
-			curr = curr.parent;
-		}
-		return result.iterator();
+
+		return new NodeIterator( nodes );
 	}
 
 	boolean isSubPathOf(NodeImpl other) {
@@ -648,5 +650,27 @@ public class NodeImpl
 		}
 
 		return curr == null && otherCurr == null;
+	}
+
+	private static class NodeIterator implements Iterator<Path.Node> {
+		private final NodeImpl[] array;
+		private int index;
+
+		public NodeIterator(NodeImpl[] array) {
+			this.array = array;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return index < array.length;
+		}
+
+		@Override
+		public Path.Node next() {
+			if ( index < array.length ) {
+				return array[index++];
+			}
+			throw new NoSuchElementException();
+		}
 	}
 }
