@@ -11,7 +11,7 @@ import jakarta.validation.TraversableResolver;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 
 /**
@@ -54,7 +54,7 @@ public class ValidationContextBuilder {
 		);
 	}
 
-	public <T> BaseBeanValidationContext<T> forValidateProperty(Class<T> rootBeanClass, BeanMetaData<T> rootBeanMetaData, T rootBean, PathImpl propertyPath) {
+	public <T> BaseBeanValidationContext<T> forValidateProperty(Class<T> rootBeanClass, BeanMetaData<T> rootBeanMetaData, T rootBean, ModifiablePath propertyPath) {
 		return new PropertyValidationContext<>(
 				constraintValidatorManager,
 				constraintValidatorFactory,
@@ -68,7 +68,7 @@ public class ValidationContextBuilder {
 		);
 	}
 
-	public <T> BaseBeanValidationContext<T> forValidateValue(Class<T> rootBeanClass, BeanMetaData<T> rootBeanMetaData, PathImpl propertyPath) {
+	public <T> BaseBeanValidationContext<T> forValidateValue(Class<T> rootBeanClass, BeanMetaData<T> rootBeanMetaData, ModifiablePath propertyPath) {
 		return new PropertyValidationContext<>(
 				constraintValidatorManager,
 				constraintValidatorFactory,

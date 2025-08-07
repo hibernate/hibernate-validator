@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.internal.engine.valuecontext;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -25,7 +25,7 @@ public final class ValueContexts {
 			ExecutableParameterNameProvider parameterNameProvider,
 			T value,
 			Validatable validatable,
-			PathImpl propertyPath) {
+			ModifiablePath propertyPath) {
 		return new ValueContext<>( parameterNameProvider, value, validatable, propertyPath );
 	}
 
@@ -34,7 +34,7 @@ public final class ValueContexts {
 			ExecutableParameterNameProvider parameterNameProvider,
 			T value,
 			BeanMetaData<?> currentBeanMetaData,
-			PathImpl propertyPath) {
+			ModifiablePath propertyPath) {
 		return new BeanValueContext<>( parameterNameProvider, value, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
 	}
 
@@ -42,7 +42,7 @@ public final class ValueContexts {
 	public static <T, V> BeanValueContext<T, V> getLocalExecutionContextForValueValidation(
 			ExecutableParameterNameProvider parameterNameProvider,
 			BeanMetaData<?> currentBeanMetaData,
-			PathImpl propertyPath) {
+			ModifiablePath propertyPath) {
 		return new BeanValueContext<>( parameterNameProvider, null, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
 	}
 }

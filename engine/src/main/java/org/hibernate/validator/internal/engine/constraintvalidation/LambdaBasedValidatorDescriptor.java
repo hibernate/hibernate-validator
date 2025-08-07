@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
+import java.io.Serial;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.EnumSet;
@@ -22,6 +23,7 @@ import org.hibernate.validator.cfg.context.ConstraintDefinitionContext.Validatio
  */
 class LambdaBasedValidatorDescriptor<A extends Annotation> implements ConstraintValidatorDescriptor<A> {
 
+	@Serial
 	private static final long serialVersionUID = 5129757824081595723L;
 
 	private final Type validatedType;

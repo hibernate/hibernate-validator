@@ -8,7 +8,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Callable;
 import org.hibernate.validator.internal.properties.Constrainable;
@@ -88,7 +88,7 @@ public interface ConstraintLocation {
 	/**
 	 * Appends a node representing this location to the given property path.
 	 */
-	void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path);
+	void appendTo(ExecutableParameterNameProvider parameterNameProvider, ModifiablePath path);
 
 	/**
 	 * Obtains the value of this location from the parent. The type of the passed parent depends on the location type,

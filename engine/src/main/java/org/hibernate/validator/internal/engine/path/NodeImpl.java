@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.internal.engine.path;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
@@ -37,7 +38,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class NodeImpl
 		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Path.ContainerElementNode,
-		org.hibernate.validator.path.PropertyNode, org.hibernate.validator.path.ContainerElementNode, Serializable, Iterable<Path.Node> {
+		org.hibernate.validator.path.PropertyNode, org.hibernate.validator.path.ContainerElementNode, Serializable {
+	@Serial
 	private static final long serialVersionUID = 2075466571633860499L;
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[] { };
 
@@ -500,6 +502,9 @@ public class NodeImpl
 			return false;
 		}
 		NodeImpl other = (NodeImpl) obj;
+		if ( hashCode != -1 && other.hashCode != -1 && hashCode != other.hashCode ) {
+			return false;
+		}
 		if ( index == null ) {
 			if ( other.index != null ) {
 				return false;
@@ -569,18 +574,15 @@ public class NodeImpl
 		return parent == null && name == null;
 	}
 
-	@Override
-	public Iterator<Path.Node> iterator() {
-		if ( nodes == null ) {
-			nodes = new NodeImpl[size - 1];
-			NodeImpl curr = this;
-			while ( curr.parent != null ) {
-				nodes[curr.size - 2] = curr;
-				curr = curr.parent;
-			}
+	static NodeImpl[] constructPath(NodeImpl leaf) {
+		leaf.nodes = new NodeImpl[leaf.size - 1];
+		NodeImpl curr = leaf;
+		while ( curr.parent != null ) {
+			leaf.nodes[curr.size - 2] = curr;
+			curr = curr.parent;
 		}
 
-		return new NodeIterator( nodes );
+		return leaf.nodes;
 	}
 
 	boolean isSubPathOf(NodeImpl other) {
@@ -652,7 +654,7 @@ public class NodeImpl
 		return curr == null && otherCurr == null;
 	}
 
-	private static class NodeIterator implements Iterator<Path.Node> {
+	protected static class NodeIterator implements Iterator<Path.Node> {
 		private final NodeImpl[] array;
 		private int index;
 

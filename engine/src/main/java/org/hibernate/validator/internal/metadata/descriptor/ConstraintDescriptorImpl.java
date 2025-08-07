@@ -8,6 +8,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
@@ -66,6 +67,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  */
 public class ConstraintDescriptorImpl<T extends Annotation> implements ConstraintDescriptor<T>, Serializable {
 
+	@Serial
 	private static final long serialVersionUID = -2563102960314069246L;
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;

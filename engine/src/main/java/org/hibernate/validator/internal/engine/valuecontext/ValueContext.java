@@ -7,7 +7,7 @@ package org.hibernate.validator.internal.engine.valuecontext;
 import java.lang.reflect.TypeVariable;
 
 import org.hibernate.validator.internal.engine.groups.Group;
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
@@ -37,7 +37,7 @@ public class ValueContext<T, V> {
 	/**
 	 * The current property path we are validating.
 	 */
-	private PathImpl propertyPath;
+	private ModifiablePath propertyPath;
 
 	/**
 	 * The current group we are validating.
@@ -56,14 +56,14 @@ public class ValueContext<T, V> {
 	 */
 	private ConstraintLocationKind constraintLocationKind;
 
-	ValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, Validatable validatable, PathImpl propertyPath) {
+	ValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, Validatable validatable, ModifiablePath propertyPath) {
 		this.parameterNameProvider = parameterNameProvider;
 		this.currentBean = currentBean;
 		this.currentValidatable = validatable;
 		this.propertyPath = propertyPath;
 	}
 
-	public final PathImpl getPropertyPath() {
+	public final ModifiablePath getPropertyPath() {
 		return propertyPath;
 	}
 
@@ -87,20 +87,20 @@ public class ValueContext<T, V> {
 	}
 
 	public final void appendNode(Cascadable node) {
-		PathImpl newPath = PathImpl.createCopy( propertyPath );
+		ModifiablePath newPath = ModifiablePath.createCopy( propertyPath );
 		node.appendTo( newPath );
 		propertyPath = newPath;
 	}
 
 	public final void appendNode(ConstraintLocation location) {
-		PathImpl newPath = PathImpl.createCopy( propertyPath );
+		ModifiablePath newPath = ModifiablePath.createCopy( propertyPath );
 		location.appendTo( parameterNameProvider, newPath );
 		propertyPath = newPath;
 	}
 
 	public final void appendTypeParameterNode(String nodeName) {
 		if ( propertyPath.needToAddContainerElementNode( nodeName ) ) {
-			PathImpl newPath = PathImpl.createCopy( propertyPath );
+			ModifiablePath newPath = ModifiablePath.createCopy( propertyPath );
 			newPath.addContainerElementNode( nodeName );
 			propertyPath = newPath;
 		}
@@ -187,16 +187,16 @@ public class ValueContext<T, V> {
 
 	public static class ValueState<V> {
 
-		private final PathImpl propertyPath;
+		private final ModifiablePath propertyPath;
 
 		private final V currentValue;
 
-		ValueState(PathImpl propertyPath, V currentValue) {
+		ValueState(ModifiablePath propertyPath, V currentValue) {
 			this.propertyPath = propertyPath;
 			this.currentValue = currentValue;
 		}
 
-		public PathImpl getPropertyPath() {
+		public ModifiablePath getPropertyPath() {
 			return propertyPath;
 		}
 

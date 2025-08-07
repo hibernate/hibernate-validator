@@ -6,7 +6,7 @@ package org.hibernate.validator.internal.metadata.facets;
 
 import java.lang.reflect.Type;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
@@ -44,7 +44,7 @@ public interface Cascadable {
 	/**
 	 * Appends this cascadable element to the given path.
 	 */
-	void appendTo(PathImpl path);
+	void appendTo(ModifiablePath path);
 
 	/**
 	 * Returns cascading metadata of this cascadable element. Also contains the cascading metadata of the potential
