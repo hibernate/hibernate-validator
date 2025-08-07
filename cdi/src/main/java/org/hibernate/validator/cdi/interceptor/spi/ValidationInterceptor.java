@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.cdi.interceptor.spi;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.Member;
 import java.util.Arrays;
@@ -37,6 +38,7 @@ import org.hibernate.validator.cdi.interceptor.internal.MethodValidated;
 @Priority(Interceptor.Priority.PLATFORM_AFTER + 800)
 public class ValidationInterceptor implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 604440259030722151L;
 
 	/**

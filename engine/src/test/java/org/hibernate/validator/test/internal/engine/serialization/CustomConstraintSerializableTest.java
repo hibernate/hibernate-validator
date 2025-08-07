@@ -6,6 +6,7 @@ package org.hibernate.validator.test.internal.engine.serialization;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -57,6 +58,7 @@ public class CustomConstraintSerializableTest {
 	}
 
 	static class CustomEmail implements Serializable {
+		@Serial
 		private static final long serialVersionUID = -9095271389455131159L;
 
 		@Email

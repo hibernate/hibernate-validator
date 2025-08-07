@@ -27,7 +27,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B> {
+final class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -36,16 +36,43 @@ class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 	}
 
 	@Override
-	protected void validateConstraints(ValidationContext<?> validationContext,
-			ValueContext<?, ?> valueContext,
-			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts) {
+	public boolean validateConstraints(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext) {
+		ConstraintValidatorContextImpl constraintValidatorContext = doValidateConstraints( validationContext, valueContext );
+		if ( constraintValidatorContext != null ) {
+			for ( ConstraintViolationCreationContext constraintViolationCreationContext : constraintValidatorContext.getConstraintViolationCreationContexts() ) {
+				validationContext.addConstraintFailure(
+						valueContext, constraintViolationCreationContext, constraintValidatorContext.getConstraintDescriptor()
+				);
+			}
+			return false;
+		}
+		return true;
+	}
 
+	@Override
+	protected void validateConstraints(
+			ValidationContext<?> validationContext,
+			ValueContext<?, ?> valueContext,
+			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts
+	) {
+		ConstraintValidatorContextImpl constraintValidatorContext = doValidateConstraints( validationContext, valueContext );
+
+		if ( constraintValidatorContext != null ) {
+			violatedConstraintValidatorContexts.add( constraintValidatorContext );
+		}
+	}
+
+	private ConstraintValidatorContextImpl doValidateConstraints(
+			ValidationContext<?> validationContext,
+			ValueContext<?, ?> valueContext
+	) {
 		if ( LOG.isTraceEnabled() ) {
 			if ( validationContext.isShowValidatedValuesInTraceLogs() ) {
 				LOG.tracef(
 						"Validating value %s against constraint defined by %s.",
 						valueContext.getCurrentValidatedValue(),
-						descriptor );
+						descriptor
+				);
 			}
 			else {
 				LOG.tracef( "Validating against constraint defined by %s.", descriptor );
@@ -61,8 +88,6 @@ class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 		);
 
 		// validate
-		if ( validateSingleConstraint( valueContext, constraintValidatorContext, validator ).isPresent() ) {
-			violatedConstraintValidatorContexts.add( constraintValidatorContext );
-		}
+		return validateSingleConstraint( valueContext, constraintValidatorContext, validator );
 	}
 }

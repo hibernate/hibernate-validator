@@ -6,9 +6,9 @@ package org.hibernate.validator.internal.engine.path;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +30,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-public final class PathImpl implements Path, Serializable {
+public final class ModifiablePath implements Path, Serializable {
+	@Serial
 	private static final long serialVersionUID = 7564511574909882392L;
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -51,8 +52,6 @@ public final class PathImpl implements Path, Serializable {
 	private static final int INDEX_GROUP = 3;
 	private static final int REMAINING_STRING_GROUP = 5;
 
-	private List<Node> nodeList;
-	private boolean nodeListRequiresCopy;
 	private NodeImpl currentLeafNode;
 	private int hashCode;
 
@@ -68,20 +67,20 @@ public final class PathImpl implements Path, Serializable {
 	 * @throws IllegalArgumentException in case {@code property == null} or
 	 * {@code property} cannot be parsed.
 	 */
-	public static PathImpl createPathFromString(String propertyPath) {
+	public static ModifiablePath createPathFromString(String propertyPath) {
 		Contracts.assertNotNull( propertyPath, MESSAGES.propertyPathCannotBeNull() );
 
-		if ( propertyPath.length() == 0 ) {
+		if ( propertyPath.isEmpty() ) {
 			return createRootPath();
 		}
 
 		return parseProperty( propertyPath );
 	}
 
-	public static PathImpl createPathForExecutable(ExecutableMetaData executable) {
+	public static ModifiablePath createPathForExecutable(ExecutableMetaData executable) {
 		Contracts.assertNotNull( executable, "A method is required to create a method return value path." );
 
-		PathImpl path = createRootPath();
+		ModifiablePath path = createRootPath();
 
 		if ( executable.getKind() == ElementKind.CONSTRUCTOR ) {
 			path.addConstructorNode( executable.getName(), executable.getParameterTypes() );
@@ -93,41 +92,36 @@ public final class PathImpl implements Path, Serializable {
 		return path;
 	}
 
-	public static PathImpl createRootPath() {
-		PathImpl path = new PathImpl();
-		path.addBeanNode();
-		return path;
+	public static ModifiablePath createRootPath() {
+		return new ModifiablePath( NodeImpl.ROOT_NODE );
 	}
 
-	public static PathImpl createCopy(PathImpl path) {
-		return new PathImpl( path );
+	public static ModifiablePath createCopy(ModifiablePath path) {
+		return new ModifiablePath( path );
 	}
 
-	public static PathImpl createCopyWithoutLeafNode(PathImpl path) {
-		return new PathImpl( path.nodeList.subList( 0, path.nodeList.size() - 1 ) );
+	public static Path createPublicCopy(ModifiablePath path) {
+		return new PublicPath( path );
 	}
 
+	public static ModifiablePath createCopyWithoutLeafNode(ModifiablePath path) {
+		return new ModifiablePath( path.currentLeafNode.getParent() );
+	}
 
 	public boolean isRootPath() {
-		return nodeList.size() == 1 && nodeList.get( 0 ).getName() == null;
+		return currentLeafNode.isRootPath();
 	}
 
 	public NodeImpl addPropertyNode(String nodeName) {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createPropertyNode( nodeName, parent );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public NodeImpl addContainerElementNode(String nodeName) {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createContainerElementNode( nodeName, parent );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
@@ -144,91 +138,64 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public NodeImpl addParameterNode(String nodeName, int index) {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createParameterNode( nodeName, parent, index );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public NodeImpl addCrossParameterNode() {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createCrossParameterNode( parent );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public NodeImpl addBeanNode() {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createBeanNode( parent );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public NodeImpl addReturnValueNode() {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createReturnValue( parent );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	private NodeImpl addConstructorNode(String name, Class<?>[] parameterTypes) {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createConstructorNode( name, parent, parameterTypes );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	private NodeImpl addMethodNode(String name, Class<?>[] parameterTypes) {
-		requiresWriteableNodeList();
-
 		NodeImpl parent = currentLeafNode;
 		currentLeafNode = NodeImpl.createMethodNode( name, parent, parameterTypes );
-		nodeList.add( currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public NodeImpl makeLeafNodeIterable() {
-		requiresWriteableNodeList();
-
 		currentLeafNode = NodeImpl.makeIterable( currentLeafNode );
 
-		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public NodeImpl makeLeafNodeIterableAndSetIndex(Integer index) {
-		requiresWriteableNodeList();
-
 		currentLeafNode = NodeImpl.makeIterableAndSetIndex( currentLeafNode, index );
 
-		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public NodeImpl makeLeafNodeIterableAndSetMapKey(Object key) {
-		requiresWriteableNodeList();
-
 		currentLeafNode = NodeImpl.makeIterableAndSetMapKey( currentLeafNode, key );
 
-		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
@@ -236,11 +203,7 @@ public final class PathImpl implements Path, Serializable {
 	public NodeImpl setLeafNodeValueIfRequired(Object value) {
 		// The value is only exposed for property and container element nodes
 		if ( currentLeafNode.getKind() == ElementKind.PROPERTY || currentLeafNode.getKind() == ElementKind.CONTAINER_ELEMENT ) {
-			requiresWriteableNodeList();
-
 			currentLeafNode = NodeImpl.setPropertyValue( currentLeafNode, value );
-
-			nodeList.set( nodeList.size() - 1, currentLeafNode );
 
 			// the property value is not part of the NodeImpl hashCode so we don't need to reset the PathImpl hashCode
 		}
@@ -248,21 +211,15 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public NodeImpl setLeafNodeTypeParameter(Class<?> containerClass, Integer typeArgumentIndex) {
-		requiresWriteableNodeList();
-
 		currentLeafNode = NodeImpl.setTypeParameter( currentLeafNode, containerClass, typeArgumentIndex );
 
-		nodeList.set( nodeList.size() - 1, currentLeafNode );
 		resetHashCode();
 		return currentLeafNode;
 	}
 
 	public void removeLeafNode() {
-		if ( !nodeList.isEmpty() ) {
-			requiresWriteableNodeList();
-
-			nodeList.remove( nodeList.size() - 1 );
-			currentLeafNode = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		if ( currentLeafNode != null ) {
+			currentLeafNode = currentLeafNode.getParent();
 			resetHashCode();
 		}
 	}
@@ -273,47 +230,40 @@ public final class PathImpl implements Path, Serializable {
 
 	@Override
 	public Iterator<Path.Node> iterator() {
-		if ( nodeList.size() == 0 ) {
-			return Collections.<Path.Node>emptyList().iterator();
+		if ( currentLeafNode == null ) {
+			return Collections.emptyIterator();
 		}
-		if ( nodeList.size() == 1 ) {
-			return nodeList.iterator();
+		if ( currentLeafNode.isRootPath() ) {
+			return List.of( (Path.Node) currentLeafNode ).iterator();
 		}
-		return nodeList.subList( 1, nodeList.size() ).iterator();
+		return new NodeImpl.NodeIterator( NodeImpl.constructPath( currentLeafNode ) );
 	}
 
 	public String asString() {
+		return asString( currentLeafNode );
+	}
+
+	static String asString(NodeImpl currentLeafNode) {
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
-		for ( int i = 1; i < nodeList.size(); i++ ) {
-			NodeImpl nodeImpl = (NodeImpl) nodeList.get( i );
-			String name = nodeImpl.asString();
+		NodeImpl current = currentLeafNode;
+		while ( !current.isRootPath() ) {
+			String name = current.asString();
 			if ( name.isEmpty() ) {
+				current = current.getParent();
 				// skip the node if it does not contribute to the string representation of the path, eg class level constraints
 				continue;
 			}
 
 			if ( !first ) {
-				builder.append( PROPERTY_PATH_SEPARATOR );
+				builder.insert( 0, PROPERTY_PATH_SEPARATOR );
 			}
 
-			builder.append( nodeImpl.asString() );
-
+			builder.insert( 0, current.asString() );
 			first = false;
+			current = current.getParent();
 		}
 		return builder.toString();
-	}
-
-	private void requiresWriteableNodeList() {
-		if ( !nodeListRequiresCopy ) {
-			return;
-		}
-
-		// Usually, the write operation is about adding one more node, so let's make the list one element larger.
-		List<Node> newNodeList = new ArrayList<>( nodeList.size() + 1 );
-		newNodeList.addAll( nodeList );
-		nodeList = newNodeList;
-		nodeListRequiresCopy = false;
 	}
 
 	@Override
@@ -332,13 +282,13 @@ public final class PathImpl implements Path, Serializable {
 		if ( getClass() != obj.getClass() ) {
 			return false;
 		}
-		PathImpl other = (PathImpl) obj;
-		if ( nodeList == null ) {
-			if ( other.nodeList != null ) {
+		ModifiablePath other = (ModifiablePath) obj;
+		if ( currentLeafNode == null ) {
+			if ( other.currentLeafNode != null ) {
 				return false;
 			}
 		}
-		else if ( !nodeList.equals( other.nodeList ) ) {
+		else if ( !currentLeafNode.samePath( other.currentLeafNode ) ) {
 			return false;
 		}
 		return true;
@@ -358,7 +308,7 @@ public final class PathImpl implements Path, Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ( ( nodeList == null ) ? 0 : nodeList.hashCode() );
+				+ ( ( currentLeafNode == null ) ? 0 : currentLeafNode.hashCode() );
 		return result;
 	}
 
@@ -367,32 +317,26 @@ public final class PathImpl implements Path, Serializable {
 	 *
 	 * @param path the path to make a copy of.
 	 */
-	private PathImpl(PathImpl path) {
-		nodeList = path.nodeList;
+	private ModifiablePath(ModifiablePath path) {
 		currentLeafNode = path.currentLeafNode;
 		hashCode = path.hashCode;
-		nodeListRequiresCopy = true;
 	}
 
-	private PathImpl() {
-		nodeList = new ArrayList<>( 1 );
+	private ModifiablePath() {
 		hashCode = -1;
-		nodeListRequiresCopy = false;
 	}
 
-	private PathImpl(List<Node> nodeList) {
-		this.nodeList = nodeList;
-		currentLeafNode = (NodeImpl) nodeList.get( nodeList.size() - 1 );
+	private ModifiablePath(NodeImpl currentLeafNode) {
+		this.currentLeafNode = currentLeafNode;
 		hashCode = -1;
-		nodeListRequiresCopy = true;
 	}
 
 	private void resetHashCode() {
 		hashCode = -1;
 	}
 
-	private static PathImpl parseProperty(String propertyName) {
-		PathImpl path = createRootPath();
+	private static ModifiablePath parseProperty(String propertyName) {
+		ModifiablePath path = createRootPath();
 		String tmp = propertyName;
 		do {
 			Matcher matcher = PATH_PATTERN.matcher( tmp );
@@ -443,9 +387,7 @@ public final class PathImpl implements Path, Serializable {
 	 * <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.8">chapter 3.8</a>
 	 *
 	 * @param identifier string identifier to validate
-	 *
 	 * @return true if the given identifier is a valid Java Identifier
-	 *
 	 * @throws IllegalArgumentException if the given identifier is {@code null}
 	 */
 	private static boolean isValidJavaIdentifier(String identifier) {
@@ -465,37 +407,21 @@ public final class PathImpl implements Path, Serializable {
 
 	/**
 	 * checks if this PathImpl is a subpath of <code>other</code>.
+	 *
 	 * @param other the path to compare with
 	 * @return true, if this path is a subpath
 	 */
-	public boolean isSubPathOf(PathImpl other) {
-		if ( nodeList.size() > other.nodeList.size() ) {
-			// cannot be a subpath as it is already longer then the other path
-			return false;
+	public boolean isSubPathOf(ModifiablePath other) {
+		if ( currentLeafNode == null ) {
+			return other.currentLeafNode == null;
 		}
-
-		for ( int i = 0; i < nodeList.size(); i++ ) {
-			if ( !nodeList.get( i ).equals( other.nodeList.get( i ) ) ) {
-				return false;
-			}
-		}
-		return true;
+		return currentLeafNode.isSubPathOf( other.currentLeafNode );
 	}
 
-	public boolean isSubPathOrContains(PathImpl other) {
-
-		// prefetch contant return values
-		int oSize = other.nodeList.size();
-		// calling Math.min will reduce speed significantly
-		int mySize = nodeList.size() < oSize
-				? nodeList.size()
-				: oSize;
-
-		for ( int i = 0; i < mySize; i++ ) {
-			if ( !nodeList.get( i ).equals( other.nodeList.get( i ) ) ) {
-				return false;
-			}
+	public boolean isSubPathOrContains(ModifiablePath other) {
+		if ( currentLeafNode == null ) {
+			return other.currentLeafNode == null;
 		}
-		return true;
+		return currentLeafNode.isSubPathOrContains( other.currentLeafNode );
 	}
 }

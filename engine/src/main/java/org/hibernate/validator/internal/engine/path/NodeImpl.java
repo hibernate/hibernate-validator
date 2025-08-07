@@ -4,11 +4,14 @@
  */
 package org.hibernate.validator.internal.engine.path;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import jakarta.validation.ElementKind;
 import jakarta.validation.Path;
@@ -36,10 +39,20 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class NodeImpl
 		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Path.ContainerElementNode,
 		org.hibernate.validator.path.PropertyNode, org.hibernate.validator.path.ContainerElementNode, Serializable {
+	@Serial
 	private static final long serialVersionUID = 2075466571633860499L;
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[] { };
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+
+	static final NodeImpl ROOT_NODE;
+
+	static {
+		ROOT_NODE = NodeImpl.createBeanNode( null );
+		ROOT_NODE.valueSet = true;
+		ROOT_NODE.nodes = new NodeImpl[] { ROOT_NODE };
+		ROOT_NODE.hashCode();
+	}
 
 	private static final String INDEX_OPEN = "[";
 	private static final String INDEX_CLOSE = "]";
@@ -55,7 +68,9 @@ public class NodeImpl
 
 	private final String name;
 	private final NodeImpl parent;
-	private final boolean isIterable;
+	private final NodeImpl root;
+	private final int size;
+	private boolean isIterable;
 	private final Integer index;
 	private final Object key;
 	private final ElementKind kind;
@@ -63,20 +78,27 @@ public class NodeImpl
 	//type-specific attributes
 	private final Class<?>[] parameterTypes;
 	private final Integer parameterIndex;
-	private final Object value;
+	private Object value;
+	private boolean valueSet;
 	private final Class<?> containerClass;
 	private final Integer typeArgumentIndex;
 
 	private int hashCode = -1;
 	private String asString;
+	private NodeImpl[] nodes;
 
-	private NodeImpl(String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
-			Integer parameterIndex, Object value, Class<?> containerClass, Integer typeArgumentIndex) {
+	private NodeImpl(
+			String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
+			Integer parameterIndex, Object value, boolean valueSet, Class<?> containerClass, Integer typeArgumentIndex
+	) {
 		this.name = name;
 		this.parent = parent;
+		this.root = parent == null ? this : parent.root;
+		this.size = ( parent == null ? 0 : parent.size ) + 1;
 		this.index = index;
 		this.key = key;
 		this.value = value;
+		this.valueSet = valueSet;
 		this.isIterable = isIterable;
 		this.kind = kind;
 		this.parameterTypes = parameterTypes;
@@ -97,6 +119,7 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
+				false,
 				null,
 				null
 		);
@@ -113,6 +136,7 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
+				false,
 				null,
 				null
 		);
@@ -129,6 +153,7 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				parameterIndex,
 				null,
+				false,
 				null,
 				null
 		);
@@ -145,17 +170,18 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
+				false,
 				null,
 				null
 		);
 	}
 
 	public static NodeImpl createMethodNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null, null, null );
+		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null, false, null, null );
 	}
 
 	public static NodeImpl createConstructorNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null, null, null );
+		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null, false, null, null );
 	}
 
 	public static NodeImpl createBeanNode(NodeImpl parent) {
@@ -169,6 +195,7 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
+				false,
 				null,
 				null
 		);
@@ -185,6 +212,7 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
+				false,
 				null,
 				null
 		);
@@ -201,6 +229,7 @@ public class NodeImpl
 				node.parameterTypes,
 				node.parameterIndex,
 				node.value,
+				node.valueSet,
 				node.containerClass,
 				node.typeArgumentIndex
 		);
@@ -217,6 +246,7 @@ public class NodeImpl
 				node.parameterTypes,
 				node.parameterIndex,
 				node.value,
+				node.valueSet,
 				node.containerClass,
 				node.typeArgumentIndex
 		);
@@ -233,28 +263,38 @@ public class NodeImpl
 				node.parameterTypes,
 				node.parameterIndex,
 				node.value,
+				node.valueSet,
 				node.containerClass,
 				node.typeArgumentIndex
 		);
 	}
 
 	public static NodeImpl setPropertyValue(NodeImpl node, Object value) {
-		return new NodeImpl(
-				node.name,
-				node.parent,
-				node.isIterable,
-				node.index,
-				node.key,
-				node.kind,
-				node.parameterTypes,
-				node.parameterIndex,
-				value,
-				node.containerClass,
-				node.typeArgumentIndex
-		);
+		if ( node.valueSet && node.value != value ) {
+			return new NodeImpl(
+					node.name,
+					node.parent,
+					node.isIterable,
+					node.index,
+					node.key,
+					node.kind,
+					node.parameterTypes,
+					node.parameterIndex,
+					value,
+					true,
+					node.containerClass,
+					node.typeArgumentIndex
+			);
+		}
+		node.value = value;
+		node.valueSet = true;
+		return node;
 	}
 
 	public static NodeImpl setTypeParameter(NodeImpl node, Class<?> containerClass, Integer typeArgumentIndex) {
+		if ( node.typeArgumentIndex == typeArgumentIndex && node.containerClass == containerClass ) {
+			return node;
+		}
 		return new NodeImpl(
 				node.name,
 				node.parent,
@@ -265,6 +305,7 @@ public class NodeImpl
 				node.parameterTypes,
 				node.parameterIndex,
 				node.value,
+				node.valueSet,
 				containerClass,
 				typeArgumentIndex
 		);
@@ -362,7 +403,7 @@ public class NodeImpl
 				kind == ElementKind.PARAMETER,
 				"getParameterIndex() may only be invoked for nodes of type ElementKind.PARAMETER."
 		);
-		return parameterIndex.intValue();
+		return parameterIndex;
 	}
 
 	@Override
@@ -461,6 +502,9 @@ public class NodeImpl
 			return false;
 		}
 		NodeImpl other = (NodeImpl) obj;
+		if ( hashCode != -1 && other.hashCode != -1 && hashCode != other.hashCode ) {
+			return false;
+		}
 		if ( index == null ) {
 			if ( other.index != null ) {
 				return false;
@@ -524,5 +568,111 @@ public class NodeImpl
 			return false;
 		}
 		return true;
+	}
+
+	boolean isRootPath() {
+		return parent == null && name == null;
+	}
+
+	static NodeImpl[] constructPath(NodeImpl leaf) {
+		leaf.nodes = new NodeImpl[leaf.size - 1];
+		NodeImpl curr = leaf;
+		while ( curr.parent != null ) {
+			leaf.nodes[curr.size - 2] = curr;
+			curr = curr.parent;
+		}
+
+		return leaf.nodes;
+	}
+
+	boolean isSubPathOf(NodeImpl other) {
+		if ( this.size > other.size ) {
+			return false;
+		}
+		NodeImpl curr = this;
+		NodeImpl otherCurr = other;
+		while ( otherCurr != null && !otherCurr.equals( this ) ) {
+			otherCurr = otherCurr.parent;
+		}
+		if ( otherCurr == null ) {
+			return false;
+		}
+		while ( !curr.isRootPath() && !otherCurr.isRootPath() ) {
+			if ( !curr.equals( otherCurr ) ) {
+				return false;
+			}
+			curr = curr.parent;
+			otherCurr = otherCurr.parent;
+		}
+
+		return curr.isRootPath();
+	}
+
+	boolean isSubPathOrContains(NodeImpl other) {
+		NodeImpl curr;
+		NodeImpl otherCurr;
+		if ( this.size > other.size ) {
+			curr = other;
+			otherCurr = this;
+		}
+		else {
+			curr = this;
+			otherCurr = other;
+		}
+
+		while ( otherCurr != null && !otherCurr.equals( curr ) ) {
+			otherCurr = otherCurr.parent;
+		}
+		if ( otherCurr == null ) {
+			return false;
+		}
+		while ( !curr.isRootPath() && !otherCurr.isRootPath() ) {
+			if ( !curr.equals( otherCurr ) ) {
+				return false;
+			}
+			curr = curr.parent;
+			otherCurr = otherCurr.parent;
+		}
+
+		return curr.isRootPath() && otherCurr.isRootPath();
+	}
+
+	boolean samePath(NodeImpl other) {
+		if ( this.size != other.size ) {
+			return false;
+		}
+		NodeImpl curr = this;
+		NodeImpl otherCurr = other;
+		while ( curr != null && otherCurr != null ) {
+			if ( !curr.equals( otherCurr ) ) {
+				return false;
+			}
+			otherCurr = otherCurr.parent;
+			curr = curr.parent;
+		}
+
+		return curr == null && otherCurr == null;
+	}
+
+	protected static class NodeIterator implements Iterator<Path.Node> {
+		private final NodeImpl[] array;
+		private int index;
+
+		public NodeIterator(NodeImpl[] array) {
+			this.array = array;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return index < array.length;
+		}
+
+		@Override
+		public Path.Node next() {
+			if ( index < array.length ) {
+				return array[index++];
+			}
+			throw new NoSuchElementException();
+		}
 	}
 }
