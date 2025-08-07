@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.internal.util.annotation;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
@@ -36,6 +37,7 @@ import org.hibernate.validator.internal.util.actions.GetAnnotationAttributes;
  */
 class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 6907601010599429454L;
 
 	private final AnnotationDescriptor<? extends Annotation> descriptor;

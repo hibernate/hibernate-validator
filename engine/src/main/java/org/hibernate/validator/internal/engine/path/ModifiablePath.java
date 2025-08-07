@@ -6,6 +6,7 @@ package org.hibernate.validator.internal.engine.path;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
@@ -28,7 +29,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-public final class PathImpl implements Path, Serializable {
+public final class ModifiablePath implements Path, Serializable {
+	@Serial
 	private static final long serialVersionUID = 7564511574909882392L;
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -57,14 +59,12 @@ public final class PathImpl implements Path, Serializable {
 	 * given string. To create a root node the empty string should be passed.
 	 *
 	 * @param propertyPath the path as string representation.
-	 *
 	 * @return a {@code Path} instance representing the path described by the
-	 *         given string.
-	 *
+	 * given string.
 	 * @throws IllegalArgumentException in case {@code property == null} or
 	 * {@code property} cannot be parsed.
 	 */
-	public static PathImpl createPathFromString(String propertyPath) {
+	public static ModifiablePath createPathFromString(String propertyPath) {
 		Contracts.assertNotNull( propertyPath, MESSAGES.propertyPathCannotBeNull() );
 
 		if ( propertyPath.isEmpty() ) {
@@ -74,10 +74,10 @@ public final class PathImpl implements Path, Serializable {
 		return parseProperty( propertyPath );
 	}
 
-	public static PathImpl createPathForExecutable(ExecutableMetaData executable) {
+	public static ModifiablePath createPathForExecutable(ExecutableMetaData executable) {
 		Contracts.assertNotNull( executable, "A method is required to create a method return value path." );
 
-		PathImpl path = createRootPath();
+		ModifiablePath path = createRootPath();
 
 		if ( executable.getKind() == ElementKind.CONSTRUCTOR ) {
 			path.addConstructorNode( executable.getName(), executable.getParameterTypes() );
@@ -89,16 +89,16 @@ public final class PathImpl implements Path, Serializable {
 		return path;
 	}
 
-	public static PathImpl createRootPath() {
-		return new PathImpl( NodeImpl.ROOT_NODE );
+	public static ModifiablePath createRootPath() {
+		return new ModifiablePath( NodeImpl.ROOT_NODE );
 	}
 
-	public static PathImpl createCopy(PathImpl path) {
-		return new PathImpl( path );
+	public static ModifiablePath createCopy(ModifiablePath path) {
+		return new ModifiablePath( path );
 	}
 
-	public static PathImpl createCopyWithoutLeafNode(PathImpl path) {
-		return new PathImpl( path.currentLeafNode.getParent() );
+	public static ModifiablePath createCopyWithoutLeafNode(ModifiablePath path) {
+		return new ModifiablePath( path.currentLeafNode.getParent() );
 	}
 
 	public boolean isRootPath() {
@@ -226,10 +226,18 @@ public final class PathImpl implements Path, Serializable {
 		if ( currentLeafNode == null ) {
 			return Collections.emptyIterator();
 		}
-		return currentLeafNode.iterator();
+		return new NodeImpl.NodeIterator( NodeImpl.constructPath( currentLeafNode ) );
+	}
+
+	public Path materialize() {
+		return new MaterializedPath( this );
 	}
 
 	public String asString() {
+		return asString( currentLeafNode );
+	}
+
+	static String asString(NodeImpl currentLeafNode) {
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
 		NodeImpl current = currentLeafNode;
@@ -268,7 +276,7 @@ public final class PathImpl implements Path, Serializable {
 		if ( getClass() != obj.getClass() ) {
 			return false;
 		}
-		PathImpl other = (PathImpl) obj;
+		ModifiablePath other = (ModifiablePath) obj;
 		if ( currentLeafNode == null ) {
 			if ( other.currentLeafNode != null ) {
 				return false;
@@ -303,16 +311,16 @@ public final class PathImpl implements Path, Serializable {
 	 *
 	 * @param path the path to make a copy of.
 	 */
-	private PathImpl(PathImpl path) {
+	private ModifiablePath(ModifiablePath path) {
 		currentLeafNode = path.currentLeafNode;
 		hashCode = path.hashCode;
 	}
 
-	private PathImpl() {
+	private ModifiablePath() {
 		hashCode = -1;
 	}
 
-	private PathImpl(NodeImpl currentLeafNode) {
+	private ModifiablePath(NodeImpl currentLeafNode) {
 		this.currentLeafNode = currentLeafNode;
 		hashCode = -1;
 	}
@@ -321,8 +329,8 @@ public final class PathImpl implements Path, Serializable {
 		hashCode = -1;
 	}
 
-	private static PathImpl parseProperty(String propertyName) {
-		PathImpl path = createRootPath();
+	private static ModifiablePath parseProperty(String propertyName) {
+		ModifiablePath path = createRootPath();
 		String tmp = propertyName;
 		do {
 			Matcher matcher = PATH_PATTERN.matcher( tmp );
@@ -373,9 +381,7 @@ public final class PathImpl implements Path, Serializable {
 	 * <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.8">chapter 3.8</a>
 	 *
 	 * @param identifier string identifier to validate
-	 *
 	 * @return true if the given identifier is a valid Java Identifier
-	 *
 	 * @throws IllegalArgumentException if the given identifier is {@code null}
 	 */
 	private static boolean isValidJavaIdentifier(String identifier) {
@@ -395,17 +401,18 @@ public final class PathImpl implements Path, Serializable {
 
 	/**
 	 * checks if this PathImpl is a subpath of <code>other</code>.
+	 *
 	 * @param other the path to compare with
 	 * @return true, if this path is a subpath
 	 */
-	public boolean isSubPathOf(PathImpl other) {
+	public boolean isSubPathOf(ModifiablePath other) {
 		if ( currentLeafNode == null ) {
 			return other.currentLeafNode == null;
 		}
 		return currentLeafNode.isSubPathOf( other.currentLeafNode );
 	}
 
-	public boolean isSubPathOrContains(PathImpl other) {
+	public boolean isSubPathOrContains(ModifiablePath other) {
 		if ( currentLeafNode == null ) {
 			return other.currentLeafNode == null;
 		}

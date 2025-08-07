@@ -12,7 +12,7 @@ import jakarta.validation.ElementKind;
 import jakarta.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ParameterDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
@@ -85,7 +85,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	}
 
 	@Override
-	public void appendTo(PathImpl path) {
+	public void appendTo(ModifiablePath path) {
 		path.addParameterNode( getName(), getIndex() );
 	}
 

@@ -6,7 +6,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.reflect.Type;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.properties.Field;
@@ -45,7 +45,7 @@ public abstract class AbstractPropertyCascadable<T extends Property> implements 
 	}
 
 	@Override
-	public void appendTo(PathImpl path) {
+	public void appendTo(ModifiablePath path) {
 		path.addPropertyNode( property.getResolvedPropertyName() );
 	}
 

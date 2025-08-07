@@ -28,7 +28,7 @@ import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintViolationBuilder;
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -49,7 +49,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private final ClockProvider clockProvider;
 	private final ExpressionLanguageFeatureLevel defaultConstraintExpressionLanguageFeatureLevel;
 	private final ExpressionLanguageFeatureLevel defaultCustomViolationExpressionLanguageFeatureLevel;
-	private final PathImpl basePath;
+	private final ModifiablePath basePath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private List<ConstraintViolationCreationContext> constraintViolationCreationContexts;
 	private boolean defaultDisabled;
@@ -58,7 +58,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 	public ConstraintValidatorContextImpl(
 			ClockProvider clockProvider,
-			PathImpl propertyPath,
+			ModifiablePath propertyPath,
 			ConstraintDescriptor<?> constraintDescriptor,
 			Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel defaultConstraintExpressionLanguageFeatureLevel,
@@ -168,8 +168,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		return CollectionHelper.toImmutableList( returnedConstraintViolationCreationContexts );
 	}
 
-	protected final PathImpl getCopyOfBasePath() {
-		return PathImpl.createCopy( basePath );
+	protected final ModifiablePath getCopyOfBasePath() {
+		return ModifiablePath.createCopy( basePath );
 	}
 
 	private ConstraintViolationCreationContext getDefaultConstraintViolationCreationContext() {
@@ -188,13 +188,13 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		protected final String messageTemplate;
 		protected ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel;
-		protected PathImpl propertyPath;
+		protected ModifiablePath propertyPath;
 
-		protected NodeBuilderBase(String template, PathImpl path) {
+		protected NodeBuilderBase(String template, ModifiablePath path) {
 			this( template, defaultCustomViolationExpressionLanguageFeatureLevel, path );
 		}
 
-		protected NodeBuilderBase(String template, ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel, PathImpl path) {
+		protected NodeBuilderBase(String template, ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel, ModifiablePath path) {
 			this.messageTemplate = template;
 			this.expressionLanguageFeatureLevel = expressionLanguageFeatureLevel;
 			this.propertyPath = path;
@@ -225,7 +225,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 	protected class ConstraintViolationBuilderImpl extends NodeBuilderBase implements HibernateConstraintViolationBuilder {
 
-		protected ConstraintViolationBuilderImpl(String template, PathImpl path) {
+		protected ConstraintViolationBuilderImpl(String template, ModifiablePath path) {
 			super( template, path );
 		}
 
@@ -274,7 +274,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		 */
 		private void dropLeafNodeIfRequired() {
 			if ( propertyPath.getLeafNode().getKind() == ElementKind.BEAN ) {
-				propertyPath = PathImpl.createCopyWithoutLeafNode( propertyPath );
+				propertyPath = ModifiablePath.createCopyWithoutLeafNode( propertyPath );
 			}
 		}
 	}
@@ -282,7 +282,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	protected class NodeBuilder extends NodeBuilderBase
 			implements NodeBuilderDefinedContext, LeafNodeBuilderDefinedContext, ContainerElementNodeBuilderDefinedContext {
 
-		protected NodeBuilder(String template, ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel, PathImpl path) {
+		protected NodeBuilder(String template, ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel, ModifiablePath path) {
 			super( template, expressionLanguageFeatureLevel, path );
 		}
 
@@ -322,7 +322,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		private DeferredNodeBuilder(String template,
 				ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel,
-				PathImpl path,
+				ModifiablePath path,
 				String nodeName,
 				ElementKind leafNodeKind) {
 			super( template, expressionLanguageFeatureLevel, path );
@@ -334,7 +334,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		private DeferredNodeBuilder(String template,
 				ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel,
-				PathImpl path,
+				ModifiablePath path,
 				String nodeName,
 				Class<?> leafNodeContainerType,
 				Integer leafNodeTypeArgumentIndex) {

@@ -38,8 +38,8 @@ import org.hibernate.validator.internal.engine.groups.GroupWithInheritance;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
-import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 import org.hibernate.validator.internal.engine.validationcontext.BaseBeanValidationContext;
 import org.hibernate.validator.internal.engine.validationcontext.ExecutableValidationContext;
@@ -164,7 +164,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				validatorScopedContext.getParameterNameProvider(),
 				object,
 				validationContext.getRootBeanMetaData(),
-				PathImpl.createRootPath()
+				ModifiablePath.createRootPath()
 		);
 
 		return validateInContext( validationContext, valueContext, validationOrder );
@@ -184,7 +184,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			return Collections.emptySet();
 		}
 
-		PathImpl propertyPath = PathImpl.createPathFromString( propertyName );
+		ModifiablePath propertyPath = ModifiablePath.createPathFromString( propertyName );
 		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidateProperty( rootBeanClass, rootBeanMetaData, object,
 				propertyPath );
 
@@ -211,7 +211,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			return Collections.emptySet();
 		}
 
-		PathImpl propertyPath = PathImpl.createPathFromString( propertyName );
+		ModifiablePath propertyPath = ModifiablePath.createPathFromString( propertyName );
 		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidateValue( beanType, rootBeanMetaData, propertyPath );
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
@@ -813,7 +813,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return newValueContext;
 	}
 
-	private <T> Set<ConstraintViolation<T>> validateValueInContext(BaseBeanValidationContext<T> validationContext, Object value, PathImpl propertyPath,
+	private <T> Set<ConstraintViolation<T>> validateValueInContext(BaseBeanValidationContext<T> validationContext, Object value, ModifiablePath propertyPath,
 			ValidationOrder validationOrder) {
 		BeanValueContext<?, Object> valueContext = getValueContextForValueValidation( validationContext.getRootBeanClass(), propertyPath );
 		valueContext.setCurrentValidatedValue( value );
@@ -902,7 +902,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				validatorScopedContext.getParameterNameProvider(),
 				parameterValues,
 				executableMetaData.getValidatableParametersMetaData(),
-				PathImpl.createPathForExecutable( executableMetaData )
+				ModifiablePath.createPathForExecutable( executableMetaData )
 		);
 
 		groupIterator = validationOrder.getGroupIterator();
@@ -1035,7 +1035,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				validatorScopedContext.getParameterNameProvider(),
 				object,
 				validatable,
-				PathImpl.createPathForExecutable( executableMetaData )
+				ModifiablePath.createPathForExecutable( executableMetaData )
 		);
 
 		valueContext.setCurrentGroup( group );
@@ -1078,7 +1078,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					validatorScopedContext.getParameterNameProvider(),
 					value,
 					executableMetaData.getReturnValueMetaData(),
-					PathImpl.createPathForExecutable( executableMetaData )
+					ModifiablePath.createPathForExecutable( executableMetaData )
 			);
 
 			groupIterator = validationOrder.getGroupIterator();
@@ -1184,7 +1184,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to
 	 * the given property path.
 	 */
-	private <V> BeanValueContext<?, V> getValueContextForPropertyValidation(BaseBeanValidationContext<?> validationContext, PathImpl propertyPath) {
+	private <V> BeanValueContext<?, V> getValueContextForPropertyValidation(BaseBeanValidationContext<?> validationContext, ModifiablePath propertyPath) {
 		Class<?> clazz = validationContext.getRootBeanClass();
 		BeanMetaData<?> beanMetaData = validationContext.getRootBeanMetaData();
 		Object value = validationContext.getRootBean();
@@ -1262,7 +1262,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * the given property path.
 	 */
 	private <V> BeanValueContext<?, V> getValueContextForValueValidation(Class<?> rootBeanClass,
-			PathImpl propertyPath) {
+			ModifiablePath propertyPath) {
 		Class<?> clazz = rootBeanClass;
 		BeanMetaData<?> beanMetaData = null;
 		PropertyMetaData propertyMetaData = null;
@@ -1330,13 +1330,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		);
 	}
 
-	private boolean isReachable(BaseBeanValidationContext<?> validationContext, Object traversableObject, PathImpl path,
+	private boolean isReachable(BaseBeanValidationContext<?> validationContext, Object traversableObject, ModifiablePath path,
 			ConstraintLocationKind constraintLocationKind) {
 		if ( needToCallTraversableResolver( path, constraintLocationKind ) ) {
 			return true;
 		}
 
-		Path pathToObject = PathImpl.createCopyWithoutLeafNode( path );
+		Path pathToObject = ModifiablePath.createCopyWithoutLeafNode( path );
 		try {
 			return validationContext.getTraversableResolver().isReachable(
 					traversableObject,
@@ -1351,7 +1351,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private boolean needToCallTraversableResolver(PathImpl path, ConstraintLocationKind constraintLocationKind) {
+	private boolean needToCallTraversableResolver(ModifiablePath path, ConstraintLocationKind constraintLocationKind) {
 		// as the TraversableResolver interface is designed right now it does not make sense to call it when
 		// there is no traversable object hosting the property to be accessed. For this reason we don't call the resolver
 		// for class level constraints (ElementType.TYPE) or top level method parameters or return values.
@@ -1362,7 +1362,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				|| isReturnValueValidation( path );
 	}
 
-	private boolean isCascadeRequired(BaseBeanValidationContext<?> validationContext, Object traversableObject, PathImpl path,
+	private boolean isCascadeRequired(BaseBeanValidationContext<?> validationContext, Object traversableObject, ModifiablePath path,
 			ConstraintLocationKind constraintLocationKind) {
 		if ( needToCallTraversableResolver( path, constraintLocationKind ) ) {
 			return true;
@@ -1373,7 +1373,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			return false;
 		}
 
-		Path pathToObject = PathImpl.createCopyWithoutLeafNode( path );
+		Path pathToObject = ModifiablePath.createCopyWithoutLeafNode( path );
 		try {
 			return validationContext.getTraversableResolver().isCascadable(
 					traversableObject,
@@ -1392,15 +1392,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return ConstraintLocationKind.TYPE.equals( constraintLocationKind );
 	}
 
-	private boolean isCrossParameterValidation(PathImpl path) {
+	private boolean isCrossParameterValidation(ModifiablePath path) {
 		return path.getLeafNode().getKind() == ElementKind.CROSS_PARAMETER;
 	}
 
-	private boolean isParameterValidation(PathImpl path) {
+	private boolean isParameterValidation(ModifiablePath path) {
 		return path.getLeafNode().getKind() == ElementKind.PARAMETER;
 	}
 
-	private boolean isReturnValueValidation(PathImpl path) {
+	private boolean isReturnValueValidation(ModifiablePath path) {
 		return path.getLeafNode().getKind() == ElementKind.RETURN_VALUE;
 	}
 

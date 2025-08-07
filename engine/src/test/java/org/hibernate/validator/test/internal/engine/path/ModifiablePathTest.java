@@ -11,6 +11,7 @@ import static org.hibernate.validator.testutils.ConstraintValidatorInitializatio
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import java.lang.reflect.Method;
@@ -30,7 +31,7 @@ import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManagerImpl;
 import org.hibernate.validator.internal.metadata.DefaultBeanMetaDataClassNormalizer;
@@ -50,12 +51,12 @@ import org.testng.annotations.Test;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-public class PathImplTest {
+public class ModifiablePathTest {
 
 	@Test
 	public void testParsing() {
 		String property = "orders[3].deliveryAddress.addressline[1]";
-		Path path = PathImpl.createPathFromString( property );
+		Path path = ModifiablePath.createPathFromString( property );
 		Iterator<Path.Node> propIter = path.iterator();
 
 		assertTrue( propIter.hasNext() );
@@ -76,7 +77,7 @@ public class PathImplTest {
 
 		assertTrue( propIter.hasNext() );
 		elem = propIter.next();
-		assertEquals( elem.getName(), null );
+		assertNull( elem.getName() );
 		assertTrue( elem.isInIterable() );
 		assertEquals( elem.getIndex(), Integer.valueOf( 1 ) );
 
@@ -87,7 +88,7 @@ public class PathImplTest {
 
 	@Test
 	public void testParsingPropertyWithCurrencySymbol() {
-		PathImpl path = PathImpl.createPathFromString( "€Amount" );
+		ModifiablePath path = ModifiablePath.createPathFromString( "€Amount" );
 		Iterator<Path.Node> it = path.iterator();
 
 		assertEquals( it.next().getName(), "€Amount" );
@@ -95,7 +96,7 @@ public class PathImplTest {
 
 	@Test
 	public void testParsingPropertyWithGermanCharacter() {
-		PathImpl path = PathImpl.createPathFromString( "höchstBetrag" );
+		ModifiablePath path = ModifiablePath.createPathFromString( "höchstBetrag" );
 		Iterator<Path.Node> it = path.iterator();
 
 		assertEquals( it.next().getName(), "höchstBetrag" );
@@ -103,7 +104,7 @@ public class PathImplTest {
 
 	@Test
 	public void testParsingPropertyWithUnicodeCharacter() {
-		PathImpl path = PathImpl.createPathFromString( "höchst\u00f6Betrag" );
+		ModifiablePath path = ModifiablePath.createPathFromString( "höchst\u00f6Betrag" );
 		Iterator<Path.Node> it = path.iterator();
 
 		assertEquals( it.next().getName(), "höchst\u00f6Betrag" );
@@ -111,68 +112,68 @@ public class PathImplTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testParsingInvalidJavaProperty() {
-		PathImpl.createPathFromString( "1invalid" );
+		ModifiablePath.createPathFromString( "1invalid" );
 	}
 
 	@Test
 	public void testParseMapBasedProperty() {
 		String property = "order[foo].deliveryAddress";
-		Path path = PathImpl.createPathFromString( property );
+		Path path = ModifiablePath.createPathFromString( property );
 		Iterator<Path.Node> propIter = path.iterator();
 
 		assertTrue( propIter.hasNext() );
 		Path.Node elem = propIter.next();
-		assertEquals( "order", elem.getName() );
+		assertEquals( elem.getName(), "order" );
 		assertFalse( elem.isInIterable() );
 
 		assertTrue( propIter.hasNext() );
 		elem = propIter.next();
-		assertEquals( "deliveryAddress", elem.getName() );
+		assertEquals( elem.getName(), "deliveryAddress" );
 		assertTrue( elem.isInIterable() );
-		assertEquals( "foo", elem.getKey() );
+		assertEquals( elem.getKey(), "foo" );
 
 		assertFalse( propIter.hasNext() );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNull() {
-		PathImpl.createPathFromString( null );
+		ModifiablePath.createPathFromString( null );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testUnbalancedBraces() {
-		PathImpl.createPathFromString( "foo[.bar" );
+		ModifiablePath.createPathFromString( "foo[.bar" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testIndexInMiddleOfProperty() {
-		PathImpl.createPathFromString( "f[1]oo.bar" );
+		ModifiablePath.createPathFromString( "f[1]oo.bar" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testTrailingPathSeparator() {
-		PathImpl.createPathFromString( "foo.bar." );
+		ModifiablePath.createPathFromString( "foo.bar." );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testLeadingPathSeparator() {
-		PathImpl.createPathFromString( ".foo.bar" );
+		ModifiablePath.createPathFromString( ".foo.bar" );
 	}
 
 	@Test
 	public void testEmptyString() {
-		Path path = PathImpl.createPathFromString( "" );
+		Path path = ModifiablePath.createPathFromString( "" );
 		assertTrue( path.iterator().hasNext() );
 	}
 
 	@Test
 	public void testIsSubPathOf() {
-		PathImpl subPath = PathImpl.createPathFromString( "annotation" );
-		PathImpl middlePath = PathImpl.createPathFromString( "annotation.property" );
-		PathImpl middlePath2 = PathImpl.createPathFromString( "annotation.property[2]" );
-		PathImpl middlePath3 = PathImpl.createPathFromString( "annotation.property[3]" );
-		PathImpl fullPath3 = PathImpl.createPathFromString( "annotation.property[3].element" );
-		PathImpl fullPath4 = PathImpl.createPathFromString( "annotation.property[4].element" );
+		ModifiablePath subPath = ModifiablePath.createPathFromString( "annotation" );
+		ModifiablePath middlePath = ModifiablePath.createPathFromString( "annotation.property" );
+		ModifiablePath middlePath2 = ModifiablePath.createPathFromString( "annotation.property[2]" );
+		ModifiablePath middlePath3 = ModifiablePath.createPathFromString( "annotation.property[3]" );
+		ModifiablePath fullPath3 = ModifiablePath.createPathFromString( "annotation.property[3].element" );
+		ModifiablePath fullPath4 = ModifiablePath.createPathFromString( "annotation.property[4].element" );
 
 		assertTrue( subPath.isSubPathOf( middlePath ), "bean is subpath of its properties" );
 		assertFalse( middlePath.isSubPathOf( subPath ), "a property is not a subPath of its bean" );
@@ -186,13 +187,13 @@ public class PathImplTest {
 
 	@Test
 	public void testIsSubPathOrContains() {
-		PathImpl rootPath = PathImpl.createPathFromString( "" );
-		PathImpl subPath = PathImpl.createPathFromString( "annotation" );
-		PathImpl middlePath = PathImpl.createPathFromString( "annotation.property" );
-		PathImpl middlePath2 = PathImpl.createPathFromString( "annotation.property[2]" );
-		PathImpl middlePath3 = PathImpl.createPathFromString( "annotation.property[3]" );
-		PathImpl fullPath3 = PathImpl.createPathFromString( "annotation.property[3].element" );
-		PathImpl fullPath4 = PathImpl.createPathFromString( "annotation.property[4].element" );
+		ModifiablePath rootPath = ModifiablePath.createPathFromString( "" );
+		ModifiablePath subPath = ModifiablePath.createPathFromString( "annotation" );
+		ModifiablePath middlePath = ModifiablePath.createPathFromString( "annotation.property" );
+		ModifiablePath middlePath2 = ModifiablePath.createPathFromString( "annotation.property[2]" );
+		ModifiablePath middlePath3 = ModifiablePath.createPathFromString( "annotation.property[3]" );
+		ModifiablePath fullPath3 = ModifiablePath.createPathFromString( "annotation.property[3].element" );
+		ModifiablePath fullPath4 = ModifiablePath.createPathFromString( "annotation.property[4].element" );
 
 		assertTrue( rootPath.isSubPathOrContains( middlePath ), "root path is in every path" );
 		assertTrue( middlePath.isSubPathOrContains( rootPath ), "every path contains the root path" );
@@ -248,14 +249,14 @@ public class PathImplTest {
 		ExecutableMetaData executableMetaData = beanMetaDataManager.getBeanMetaData( Container.class )
 				.getMetaDataFor( executable ).get();
 
-		PathImpl methodParameterPath = PathImpl.createPathForExecutable( executableMetaData );
+		ModifiablePath methodParameterPath = ModifiablePath.createPathForExecutable( executableMetaData );
 
 		assertEquals( methodParameterPath.toString(), "addItem" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testCreationOfExecutablePathFailsDueToMissingExecutable() throws Exception {
-		PathImpl.createPathForExecutable( null );
+	public void testCreationOfExecutablePathFailsDueToMissingExecutable() {
+		ModifiablePath.createPathForExecutable( null );
 	}
 
 	class Container {

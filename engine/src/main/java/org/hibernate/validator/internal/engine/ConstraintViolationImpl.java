@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<T>, Serializable {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+	@Serial
 	private static final long serialVersionUID = -4970067626703103139L;
 
 	private final String interpolatedMessage;
