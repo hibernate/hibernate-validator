@@ -14,7 +14,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import jakarta.validation.ConstraintValidator;
@@ -38,7 +37,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
+final class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -62,6 +61,23 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 	}
 
 	@Override
+	public boolean validateConstraints(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext) {
+		List<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts = new ArrayList<>( 5 );
+		validateConstraints( validationContext, valueContext, violatedConstraintValidatorContexts );
+		if ( !violatedConstraintValidatorContexts.isEmpty() ) {
+			for ( ConstraintValidatorContextImpl constraintValidatorContext : violatedConstraintValidatorContexts ) {
+				for ( ConstraintViolationCreationContext constraintViolationCreationContext : constraintValidatorContext.getConstraintViolationCreationContexts() ) {
+					validationContext.addConstraintFailure(
+							valueContext, constraintViolationCreationContext, constraintValidatorContext.getConstraintDescriptor()
+					);
+				}
+			}
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	protected void validateConstraints(ValidationContext<?> validationContext,
 			ValueContext<?, ?> valueContext,
 			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts) {
@@ -69,7 +85,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 				validationContext, valueContext, violatedConstraintValidatorContexts
 		);
 
-		Optional<ConstraintValidatorContextImpl> violatedLocalConstraintValidatorContext;
+		ConstraintValidatorContextImpl violatedLocalConstraintValidatorContext;
 
 		// After all children are validated the actual ConstraintValidator of the constraint itself is executed
 		if ( mainConstraintNeedsEvaluation( validationContext, violatedConstraintValidatorContexts ) ) {
@@ -103,7 +119,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 
 			// We re-evaluate the boolean composition by taking into consideration also the violations
 			// from the local constraintValidator
-			if ( !violatedLocalConstraintValidatorContext.isPresent() ) {
+			if ( violatedLocalConstraintValidatorContext == null ) {
 				compositionResult.setAtLeastOneTrue( true );
 			}
 			else {
@@ -111,7 +127,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 			}
 		}
 		else {
-			violatedLocalConstraintValidatorContext = Optional.empty();
+			violatedLocalConstraintValidatorContext = null;
 		}
 
 		if ( !passesCompositionTypeRequirement( violatedConstraintValidatorContexts, compositionResult ) ) {
@@ -157,7 +173,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 	private void prepareFinalConstraintViolations(ValidationContext<?> validationContext,
 			ValueContext<?, ?> valueContext,
 			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts,
-			Optional<ConstraintValidatorContextImpl> localConstraintValidatorContext) {
+			ConstraintValidatorContextImpl localConstraintValidatorContext) {
 		if ( reportAsSingleViolation() ) {
 			// We clear the current violations list anyway
 			violatedConstraintValidatorContexts.clear();
@@ -166,7 +182,7 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 			// violations or not (or if there is no local ConstraintValidator at all).
 			// If not we create a violation
 			// using the error message in the annotation declaration at top level.
-			if ( !localConstraintValidatorContext.isPresent() ) {
+			if ( localConstraintValidatorContext == null ) {
 				violatedConstraintValidatorContexts.add(
 						validationContext.createConstraintValidatorContextFor(
 								descriptor, valueContext.getPropertyPath()
@@ -183,8 +199,8 @@ class ComposingConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 		// as checked in test CustomErrorMessage.java
 		// If no violations have been reported from the local ConstraintValidator, or no such validator exists,
 		// then we just add an empty list.
-		if ( localConstraintValidatorContext.isPresent() ) {
-			violatedConstraintValidatorContexts.add( localConstraintValidatorContext.get() );
+		if ( localConstraintValidatorContext != null ) {
+			violatedConstraintValidatorContexts.add( localConstraintValidatorContext );
 		}
 	}
 

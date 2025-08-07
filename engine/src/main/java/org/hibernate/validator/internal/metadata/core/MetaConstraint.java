@@ -128,9 +128,8 @@ public class MetaConstraint<A extends Annotation> {
 
 	private boolean doValidateConstraint(ValidationContext<?> executionContext, ValueContext<?, ?> valueContext) {
 		valueContext.setConstraintLocationKind( getConstraintLocationKind() );
-		boolean validationResult = constraintTree.validateConstraints( executionContext, valueContext );
 
-		return validationResult;
+		return constraintTree.validateConstraints( executionContext, valueContext );
 	}
 
 	public ConstraintLocation getLocation() {
