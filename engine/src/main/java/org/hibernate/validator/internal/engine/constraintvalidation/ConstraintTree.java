@@ -7,9 +7,7 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 import jakarta.validation.ConstraintDeclarationException;
@@ -33,7 +31,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Guillaume Smet
  * @author Marko Bekhta
  */
-public abstract class ConstraintTree<A extends Annotation> {
+public abstract sealed class ConstraintTree<A extends Annotation> permits SimpleConstraintTree, ComposingConstraintTree {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -68,21 +66,7 @@ public abstract class ConstraintTree<A extends Annotation> {
 		}
 	}
 
-	public final boolean validateConstraints(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext) {
-		List<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts = new ArrayList<>( 5 );
-		validateConstraints( validationContext, valueContext, violatedConstraintValidatorContexts );
-		if ( !violatedConstraintValidatorContexts.isEmpty() ) {
-			for ( ConstraintValidatorContextImpl constraintValidatorContext : violatedConstraintValidatorContexts ) {
-				for ( ConstraintViolationCreationContext constraintViolationCreationContext : constraintValidatorContext.getConstraintViolationCreationContexts() ) {
-					validationContext.addConstraintFailure(
-							valueContext, constraintViolationCreationContext, constraintValidatorContext.getConstraintDescriptor()
-					);
-				}
-			}
-			return false;
-		}
-		return true;
-	}
+	public abstract boolean validateConstraints(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext);
 
 	protected abstract void validateConstraints(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext,
 			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts);
@@ -168,7 +152,7 @@ public abstract class ConstraintTree<A extends Annotation> {
 	 * @return an {@link Optional#empty()} if there is no violation or a corresponding {@link ConstraintValidatorContextImpl}
 	 * 		otherwise.
 	 */
-	protected final <V> Optional<ConstraintValidatorContextImpl> validateSingleConstraint(
+	protected final <V> ConstraintValidatorContextImpl validateSingleConstraint(
 			ValueContext<?, ?> valueContext,
 			ConstraintValidatorContextImpl constraintValidatorContext,
 			ConstraintValidator<A, V> validator) {
@@ -187,9 +171,9 @@ public abstract class ConstraintTree<A extends Annotation> {
 		if ( !isValid ) {
 			//We do not add these violations yet, since we don't know how they are
 			//going to influence the final boolean evaluation
-			return Optional.of( constraintValidatorContext );
+			return constraintValidatorContext;
 		}
-		return Optional.empty();
+		return null;
 	}
 
 	@Override
