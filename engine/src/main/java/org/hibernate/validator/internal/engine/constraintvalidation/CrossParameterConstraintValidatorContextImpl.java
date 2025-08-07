@@ -12,7 +12,7 @@ import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintViolationBuilder;
 import org.hibernate.validator.constraintvalidation.HibernateCrossParameterConstraintValidatorContext;
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 
@@ -25,7 +25,7 @@ public class CrossParameterConstraintValidatorContextImpl extends ConstraintVali
 
 	public CrossParameterConstraintValidatorContextImpl(List<String> methodParameterNames,
 			ClockProvider clockProvider,
-			PathImpl propertyPath,
+			ModifiablePath propertyPath,
 			ConstraintDescriptor<?> constraintDescriptor,
 			Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
@@ -63,7 +63,7 @@ public class CrossParameterConstraintValidatorContextImpl extends ConstraintVali
 
 		private final List<String> methodParameterNames;
 
-		private CrossParameterConstraintViolationBuilderImpl(List<String> methodParameterNames, String template, PathImpl path) {
+		private CrossParameterConstraintViolationBuilderImpl(List<String> methodParameterNames, String template, ModifiablePath path) {
 			super( template, path );
 			this.methodParameterNames = methodParameterNames;
 		}
@@ -77,7 +77,7 @@ public class CrossParameterConstraintValidatorContextImpl extends ConstraintVali
 		}
 
 		private void dropLeafNode() {
-			propertyPath = PathImpl.createCopyWithoutLeafNode( propertyPath );
+			propertyPath = ModifiablePath.createCopyWithoutLeafNode( propertyPath );
 		}
 	}
 }

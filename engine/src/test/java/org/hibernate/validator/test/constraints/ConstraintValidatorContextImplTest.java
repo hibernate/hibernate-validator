@@ -18,7 +18,7 @@ import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.testutil.ConstraintViolationAssert.PathExpectation;
 
@@ -223,7 +223,7 @@ public class ConstraintValidatorContextImplTest {
 	}
 
 	private ConstraintValidatorContextImpl createEmptyConstraintValidatorContextImpl() {
-		PathImpl path = PathImpl.createRootPath();
+		ModifiablePath path = ModifiablePath.createRootPath();
 		path.addBeanNode();
 
 		ConstraintValidatorContextImpl context = new ConstraintValidatorContextImpl( null, path, null, null, ExpressionLanguageFeatureLevel.BEAN_PROPERTIES,

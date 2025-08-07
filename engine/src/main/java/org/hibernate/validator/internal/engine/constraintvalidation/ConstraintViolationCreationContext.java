@@ -8,7 +8,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.toImmutable
 
 import java.util.Map;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 
@@ -23,7 +23,7 @@ public class ConstraintViolationCreationContext {
 	private final String message;
 	private final ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel;
 	private final boolean customViolation;
-	private final PathImpl propertyPath;
+	private final ModifiablePath propertyPath;
 	@Immutable
 	private final Map<String, Object> messageParameters;
 	@Immutable
@@ -33,7 +33,7 @@ public class ConstraintViolationCreationContext {
 	public ConstraintViolationCreationContext(String message,
 			ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel,
 			boolean customViolation,
-			PathImpl property,
+			ModifiablePath property,
 			Map<String, Object> messageParameters,
 			Map<String, Object> expressionVariables,
 			Object dynamicPayload) {
@@ -58,7 +58,7 @@ public class ConstraintViolationCreationContext {
 		return customViolation;
 	}
 
-	public final PathImpl getPath() {
+	public final ModifiablePath getPath() {
 		return propertyPath;
 	}
 

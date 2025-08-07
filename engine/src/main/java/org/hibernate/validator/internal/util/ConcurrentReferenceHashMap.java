@@ -12,6 +12,7 @@
 package org.hibernate.validator.internal.util;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -132,6 +133,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 final public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V>
 		implements java.util.concurrent.ConcurrentMap<K, V>, Serializable {
+	@Serial
 	private static final long serialVersionUID = 7249069246763182397L;
 
 	/*
@@ -476,7 +478,7 @@ final public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V>
 				 * As a guide, all critical volatile reads and writes to the
 				 * count field are marked in code comments.
 				 */
-
+		@Serial
 		private static final long serialVersionUID = 2249069246763182397L;
 
 		/**
@@ -1544,6 +1546,7 @@ final public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V>
 	static class SimpleEntry<K, V>
 			implements Entry<K, V>,
 			java.io.Serializable {
+		@Serial
 		private static final long serialVersionUID = -8499721149061103585L;
 
 		private final K key;
@@ -1605,6 +1608,7 @@ final public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V>
 	 * changes to the underlying map.
 	 */
 	final class WriteThroughEntry extends SimpleEntry<K, V> {
+		@Serial
 		private static final long serialVersionUID = -7900634345345313646L;
 
 		WriteThroughEntry(K k, V v) {

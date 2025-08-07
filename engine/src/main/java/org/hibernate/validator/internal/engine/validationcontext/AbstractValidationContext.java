@@ -24,7 +24,7 @@ import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.engine.valuecontext.ValueContext;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -112,7 +112,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	 * Maps an object to a list of paths in which it has been validated. The objects are the bean instances.
 	 */
 	@Lazy
-	private Map<Object, Set<PathImpl>> processedPathsPerBean;
+	private Map<Object, Set<ModifiablePath>> processedPathsPerBean;
 
 	/**
 	 * Contains all failing constraints so far.
@@ -195,7 +195,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	}
 
 	@Override
-	public boolean isBeanAlreadyValidated(Object value, Class<?> group, PathImpl path) {
+	public boolean isBeanAlreadyValidated(Object value, Class<?> group, ModifiablePath path) {
 		if ( disableAlreadyValidatedBeanTracking ) {
 			return false;
 		}
@@ -247,7 +247,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 				constraintViolationCreationContext.getExpressionVariables()
 		);
 		// at this point we make a copy of the path to avoid side effects
-		Path path = PathImpl.createCopy( constraintViolationCreationContext.getPath() );
+		Path path = constraintViolationCreationContext.getPath().materialize();
 
 		getInitializedFailingConstraintViolations().add(
 				createConstraintViolation(
@@ -292,7 +292,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	}
 
 	@Override
-	public ConstraintValidatorContextImpl createConstraintValidatorContextFor(ConstraintDescriptorImpl<?> constraintDescriptor, PathImpl path) {
+	public ConstraintValidatorContextImpl createConstraintValidatorContextFor(ConstraintDescriptorImpl<?> constraintDescriptor, ModifiablePath path) {
 		return new ConstraintValidatorContextImpl(
 				validatorScopedContext.getClockProvider(),
 				path,
@@ -340,8 +340,8 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		}
 	}
 
-	private boolean isAlreadyValidatedForPath(Object value, PathImpl path) {
-		Set<PathImpl> pathSet = getInitializedProcessedPathsPerBean().get( value );
+	private boolean isAlreadyValidatedForPath(Object value, ModifiablePath path) {
+		Set<ModifiablePath> pathSet = getInitializedProcessedPathsPerBean().get( value );
 		if ( pathSet == null ) {
 			return false;
 		}
@@ -354,7 +354,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		// it means that the new path we are testing cannot be a root path; also since we are cascading into inner
 		// objects, i.e. going further from the object tree root, it means that the new path cannot be shorter than
 		// the ones we've already encountered.
-		for ( PathImpl p : pathSet ) {
+		for ( ModifiablePath p : pathSet ) {
 			if ( p.isSubPathOrContains( path ) ) {
 				return true;
 			}
@@ -366,17 +366,17 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		return getInitializedProcessedGroupUnits().contains( new BeanGroupProcessedUnit( value, group ) );
 	}
 
-	private void markCurrentBeanAsProcessedForCurrentPath(Object bean, PathImpl path) {
+	private void markCurrentBeanAsProcessedForCurrentPath(Object bean, ModifiablePath path) {
 		// HV-1031 The path object is mutated as we traverse the object tree, hence copy it before saving it
-		Map<Object, Set<PathImpl>> processedPathsPerBean = getInitializedProcessedPathsPerBean();
+		Map<Object, Set<ModifiablePath>> processedPathsPerBean = getInitializedProcessedPathsPerBean();
 
-		Set<PathImpl> processedPaths = processedPathsPerBean.get( bean );
+		Set<ModifiablePath> processedPaths = processedPathsPerBean.get( bean );
 		if ( processedPaths == null ) {
 			processedPaths = new HashSet<>();
 			processedPathsPerBean.put( bean, processedPaths );
 		}
 
-		processedPaths.add( PathImpl.createCopy( path ) );
+		processedPaths.add( ModifiablePath.createCopy( path ) );
 	}
 
 	private void markCurrentBeanAsProcessedForCurrentGroup(Object bean, Class<?> group) {
@@ -397,7 +397,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		return processedGroupUnits;
 	}
 
-	private Map<Object, Set<PathImpl>> getInitializedProcessedPathsPerBean() {
+	private Map<Object, Set<ModifiablePath>> getInitializedProcessedPathsPerBean() {
 		if ( processedPathsPerBean == null ) {
 			processedPathsPerBean = new IdentityHashMap<>();
 		}

@@ -12,7 +12,7 @@ import java.util.Set;
 import jakarta.validation.ElementKind;
 import jakarta.validation.metadata.ReturnValueDescriptor;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
@@ -90,7 +90,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	}
 
 	@Override
-	public void appendTo(PathImpl path) {
+	public void appendTo(ModifiablePath path) {
 		path.addReturnValueNode();
 	}
 
