@@ -502,6 +502,16 @@ public class NodeImpl
 			return false;
 		}
 		NodeImpl other = (NodeImpl) obj;
+		return samePath( other );
+	}
+
+	boolean sameNode(NodeImpl other) {
+		if ( this == other ) {
+			return true;
+		}
+		if ( other == null ) {
+			return false;
+		}
 		if ( hashCode != -1 && other.hashCode != -1 && hashCode != other.hashCode ) {
 			return false;
 		}
@@ -570,7 +580,24 @@ public class NodeImpl
 		return true;
 	}
 
-	boolean isRootPath() {
+	boolean samePath(NodeImpl other) {
+		if ( this.size != other.size ) {
+			return false;
+		}
+		NodeImpl curr = this;
+		NodeImpl otherCurr = other;
+		while ( curr != null && otherCurr != null ) {
+			if ( !curr.sameNode( otherCurr ) ) {
+				return false;
+			}
+			otherCurr = otherCurr.parent;
+			curr = curr.parent;
+		}
+
+		return curr == null && otherCurr == null;
+	}
+
+	public boolean isRootPath() {
 		return parent == null && name == null;
 	}
 
@@ -615,7 +642,7 @@ public class NodeImpl
 		return curr.isRootPath();
 	}
 
-	boolean isSubPathOrContains(NodeImpl other) {
+	public boolean isSubPathOrContains(NodeImpl other) {
 		NodeImpl curr;
 		NodeImpl otherCurr;
 		if ( this.size > other.size ) {
@@ -642,23 +669,6 @@ public class NodeImpl
 		}
 
 		return curr.isRootPath() && otherCurr.isRootPath();
-	}
-
-	boolean samePath(NodeImpl other) {
-		if ( this.size != other.size ) {
-			return false;
-		}
-		NodeImpl curr = this;
-		NodeImpl otherCurr = other;
-		while ( curr != null && otherCurr != null ) {
-			if ( !curr.equals( otherCurr ) ) {
-				return false;
-			}
-			otherCurr = otherCurr.parent;
-			curr = curr.parent;
-		}
-
-		return curr == null && otherCurr == null;
 	}
 
 	protected static class NodeIterator implements Iterator<Path.Node> {

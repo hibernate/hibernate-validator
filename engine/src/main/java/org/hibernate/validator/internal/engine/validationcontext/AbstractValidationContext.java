@@ -25,6 +25,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.ModifiablePath;
+import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.engine.valuecontext.ValueContext;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -109,10 +110,10 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	private Set<BeanGroupProcessedUnit> processedGroupUnits;
 
 	/**
-	 * Maps an object to a list of paths in which it has been validated. The objects are the bean instances.
+	 * Maps an object to a list of paths (represented by leaf nodes) in which it has been validated. The objects are the bean instances.
 	 */
 	@Lazy
-	private Map<Object, Set<ModifiablePath>> processedPathsPerBean;
+	private Map<Object, Set<NodeImpl>> processedPathsPerBean;
 
 	/**
 	 * Contains all failing constraints so far.
@@ -200,11 +201,10 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			return false;
 		}
 
-		boolean alreadyValidated;
-		alreadyValidated = isAlreadyValidatedForCurrentGroup( value, group );
+		boolean alreadyValidated = isAlreadyValidatedForCurrentGroup( value, group );
 
 		if ( alreadyValidated ) {
-			alreadyValidated = isAlreadyValidatedForPath( value, path );
+			alreadyValidated = isAlreadyValidatedForPath( value, path.getLeafNode() );
 		}
 
 		return alreadyValidated;
@@ -270,7 +270,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			ConstraintViolationCreationContext constraintViolationCreationContext);
 
 	@Override
-	public boolean hasMetaConstraintBeenProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint) {
+	public boolean hasMetaConstraintBeenProcessed(Object bean, ModifiablePath path, MetaConstraint<?> metaConstraint) {
 		// this is only useful if the constraint is defined for more than 1 group as in the case it's only
 		// defined for one group, there is no chance it's going to be called twice.
 		if ( metaConstraint.isDefinedForOneGroupOnly() ) {
@@ -281,7 +281,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	}
 
 	@Override
-	public void markConstraintProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint) {
+	public void markConstraintProcessed(Object bean, ModifiablePath path, MetaConstraint<?> metaConstraint) {
 		// this is only useful if the constraint is defined for more than 1 group as in the case it's only
 		// defined for one group, there is no chance it's going to be called twice.
 		if ( metaConstraint.isDefinedForOneGroupOnly() ) {
@@ -340,8 +340,8 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		}
 	}
 
-	private boolean isAlreadyValidatedForPath(Object value, ModifiablePath path) {
-		Set<ModifiablePath> pathSet = getInitializedProcessedPathsPerBean().get( value );
+	private boolean isAlreadyValidatedForPath(Object value, NodeImpl path) {
+		Set<NodeImpl> pathSet = getInitializedProcessedPathsPerBean().get( value );
 		if ( pathSet == null ) {
 			return false;
 		}
@@ -354,7 +354,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		// it means that the new path we are testing cannot be a root path; also since we are cascading into inner
 		// objects, i.e. going further from the object tree root, it means that the new path cannot be shorter than
 		// the ones we've already encountered.
-		for ( ModifiablePath p : pathSet ) {
+		for ( NodeImpl p : pathSet ) {
 			if ( p.isSubPathOrContains( path ) ) {
 				return true;
 			}
@@ -367,16 +367,16 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	}
 
 	private void markCurrentBeanAsProcessedForCurrentPath(Object bean, ModifiablePath path) {
-		// HV-1031 The path object is mutated as we traverse the object tree, hence copy it before saving it
-		Map<Object, Set<ModifiablePath>> processedPathsPerBean = getInitializedProcessedPathsPerBean();
+		Map<Object, Set<NodeImpl>> processedPathsPerBean = getInitializedProcessedPathsPerBean();
 
-		Set<ModifiablePath> processedPaths = processedPathsPerBean.get( bean );
+		Set<NodeImpl> processedPaths = processedPathsPerBean.get( bean );
 		if ( processedPaths == null ) {
 			processedPaths = new HashSet<>();
 			processedPathsPerBean.put( bean, processedPaths );
 		}
 
-		processedPaths.add( ModifiablePath.createCopy( path ) );
+		// HV-1031 The path object is mutated as we traverse the object tree, hence we use the node which is not (for the most part):
+		processedPaths.add( path.getLeafNode() );
 	}
 
 	private void markCurrentBeanAsProcessedForCurrentGroup(Object bean, Class<?> group) {
@@ -397,7 +397,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		return processedGroupUnits;
 	}
 
-	private Map<Object, Set<ModifiablePath>> getInitializedProcessedPathsPerBean() {
+	private Map<Object, Set<NodeImpl>> getInitializedProcessedPathsPerBean() {
 		if ( processedPathsPerBean == null ) {
 			processedPathsPerBean = new IdentityHashMap<>();
 		}
@@ -415,13 +415,13 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 		// these fields are final but we don't mark them as final as an optimization
 		private Object bean;
-		private Path path;
+		private NodeImpl pathLeaf;
 		private MetaConstraint<?> metaConstraint;
 		private int hashCode;
 
-		BeanPathMetaConstraintProcessedUnit(Object bean, Path path, MetaConstraint<?> metaConstraint) {
+		BeanPathMetaConstraintProcessedUnit(Object bean, ModifiablePath path, MetaConstraint<?> metaConstraint) {
 			this.bean = bean;
-			this.path = path;
+			this.pathLeaf = path.getLeafNode(); // because the leaf represent the entire path.
 			this.metaConstraint = metaConstraint;
 			this.hashCode = createHashCode();
 		}
@@ -442,7 +442,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			if ( metaConstraint != that.metaConstraint ) {
 				return false;
 			}
-			if ( !path.equals( that.path ) ) {
+			if ( !pathLeaf.equals( that.pathLeaf ) ) {
 				return false;
 			}
 
@@ -456,7 +456,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 		private int createHashCode() {
 			int result = System.identityHashCode( bean );
-			result = 31 * result + path.hashCode();
+			result = 31 * result + pathLeaf.hashCode();
 			result = 31 * result + System.identityHashCode( metaConstraint );
 			return result;
 		}
