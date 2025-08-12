@@ -19,18 +19,9 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * This is not a real test, just an illustration.
- * <p>
- * This one is a bit more tricky: during the validation, when cascading, we take into account the runtime type to get
- * the metadata, not the declared type.
- * <p>
- * So even if you couldn't have a cycle with the declared type, when trying to find the cycles, we need to take into
- * consideration all the subclasses too. The good news is that we are in a closed world so we have them all passed
- * to our PredefinedScopedValidatorFactoryImpl!
- *
- * @author Guillaume Smet
+ * In this case we have cascading validation on generics.
  */
-public class ProcessedBeansTrackingCycles5Test {
+public class ProcessedBeansTrackingCycles6Test {
 
 	@DataProvider(name = "validators")
 	public Object[][] createValidators() {
@@ -42,34 +33,44 @@ public class ProcessedBeansTrackingCycles5Test {
 
 	@Test(dataProvider = "validators")
 	public void testCycle(Validator validator) {
-		assertThat( validator.validate( new Parent() ) ).isNotEmpty();
+		Parent<ChildWithNoCycles, ChildWithNoCycles> parent = new Parent<>();
+		parent.children = List.of( new ChildWithNoCycles(), new Child( parent ) );
+		parent.children2 = List.of( new ChildWithNoCycles(), new Child( parent ) );
+		parent.children3 = List.of( new ChildWithNoCycles(), new Child( parent ) );
+
+		assertThat( validator.validate( parent ) ).isNotEmpty();
+
+		Parent<String, ChildWithNoCycles> parent2 = new Parent<>();
+		parent2.children = List.of( "foo", "bar" );
+		parent2.children2 = List.of( new ChildWithNoCycles(), new Child( parent ) );
+		parent2.children3 = List.of( new ChildWithNoCycles(), new Child( parent ) );
+
+		assertThat( validator.validate( parent2 ) ).isNotEmpty();
 	}
 
-	private static class Parent {
+	private static class Parent<T, V extends ChildWithNoCycles> {
 
 		@NotNull
-		private String property;
+		String property;
 
-		private List<@Valid ChildWithNoCycles> children;
+		List<@Valid T> children;
+		List<@Valid V> children2;
+		List<@Valid ChildWithNoCycles> children3;
 
-		public Parent() {
-			this.property = null;
-			this.children = List.of( new ChildWithNoCycles(), new Child( this ) );
-		}
 	}
 
 	private static class ChildWithNoCycles {
 
 		@NotNull
-		private String property;
+		String property;
 	}
 
 	private static class Child extends ChildWithNoCycles {
 
 		@Valid
-		private Parent parent;
+		Parent<?, ?> parent;
 
-		public Child(Parent parent) {
+		Child(Parent<?, ?> parent) {
 			this.parent = parent;
 		}
 	}
