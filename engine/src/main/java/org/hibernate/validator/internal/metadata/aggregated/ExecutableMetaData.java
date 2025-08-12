@@ -125,31 +125,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 		Vote processedBeansTrackingVoteForParameters = processedBeansTrackingVoter.isEnabledForParameters( beanClass, name, parameterTypes,
 				validatableParametersMetaData.hasCascadables() );
-		switch ( processedBeansTrackingVoteForParameters ) {
-			case NON_TRACKING:
-				this.trackingEnabledForParameters = false;
-				break;
-			case TRACKING:
-				this.trackingEnabledForParameters = true;
-				break;
-			default:
-				this.trackingEnabledForParameters = validatableParametersMetaData.hasCascadables();
-				break;
-		}
+		this.trackingEnabledForParameters = Vote.voteToTracking( processedBeansTrackingVoteForParameters, validatableParametersMetaData::hasCascadables );
 
 		Vote processedBeansTrackingVoteForReturnValue = processedBeansTrackingVoter.isEnabledForReturnValue( beanClass, name, parameterTypes,
 				returnValueMetaData.hasCascadables() );
-		switch ( processedBeansTrackingVoteForReturnValue ) {
-			case NON_TRACKING:
-				this.trackingEnabledForReturnValue = false;
-				break;
-			case TRACKING:
-				this.trackingEnabledForReturnValue = true;
-				break;
-			default:
-				this.trackingEnabledForReturnValue = returnValueMetaData.hasCascadables();
-				break;
-		}
+		this.trackingEnabledForReturnValue = Vote.voteToTracking( processedBeansTrackingVoteForReturnValue, returnValueMetaData::hasCascadables );
 	}
 
 	public ExecutableMetaData(ExecutableMetaData originalExecutableMetaData,
@@ -169,43 +149,31 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 		Vote processedBeansTrackingVoteForParameters = processedBeansTrackingVoter.isEnabledForParameters( originalExecutableMetaData.beanClass,
 				originalExecutableMetaData.getName(), parameterTypes, originalExecutableMetaData.getValidatableParametersMetaData().hasCascadables() );
-		switch ( processedBeansTrackingVoteForParameters ) {
-			case NON_TRACKING:
-				this.trackingEnabledForParameters = false;
-				break;
-			case TRACKING:
-				this.trackingEnabledForParameters = true;
-				break;
-			default:
-				boolean trackingEnabledForParameters = false;
-				for ( Signature signature : originalExecutableMetaData.getSignatures() ) {
-					trackingEnabledForParameters = trackingEnabledForParameters
-							|| processedBeansTrackingStrategy.isEnabledForParameters( signature,
-									originalExecutableMetaData.getValidatableParametersMetaData().hasCascadables() );
-				}
-				this.trackingEnabledForParameters = trackingEnabledForParameters;
-				break;
-		}
+		this.trackingEnabledForParameters =
+				Vote.voteToTracking( processedBeansTrackingVoteForParameters, () -> originalExecutableMetaData.trackingEnabledForParameters( processedBeansTrackingStrategy ) );
 
 		Vote processedBeansTrackingVoteForReturnValue = processedBeansTrackingVoter.isEnabledForReturnValue( originalExecutableMetaData.beanClass,
 				originalExecutableMetaData.getName(), parameterTypes, originalExecutableMetaData.getReturnValueMetaData().hasCascadables() );
-		switch ( processedBeansTrackingVoteForReturnValue ) {
-			case NON_TRACKING:
-				this.trackingEnabledForReturnValue = false;
-				break;
-			case TRACKING:
-				this.trackingEnabledForReturnValue = true;
-				break;
-			default:
-				boolean trackingEnabledForReturnValue = false;
-				for ( Signature signature : originalExecutableMetaData.getSignatures() ) {
-					trackingEnabledForReturnValue = trackingEnabledForReturnValue
-							|| processedBeansTrackingStrategy.isEnabledForReturnValue( signature,
-									originalExecutableMetaData.getReturnValueMetaData().hasCascadables() );
-				}
-				this.trackingEnabledForReturnValue = trackingEnabledForReturnValue;
-				break;
+		this.trackingEnabledForReturnValue =
+				Vote.voteToTracking( processedBeansTrackingVoteForReturnValue, () -> originalExecutableMetaData.trackingEnabledForReturnValue( processedBeansTrackingStrategy ) );
+	}
+
+	private boolean trackingEnabledForParameters(ProcessedBeansTrackingStrategy processedBeansTrackingStrategy) {
+		boolean trackingEnabledForParameters = false;
+		for ( Signature signature : getSignatures() ) {
+			trackingEnabledForParameters = trackingEnabledForParameters
+					|| processedBeansTrackingStrategy.isEnabledForParameters( signature, getValidatableParametersMetaData().hasCascadables() );
 		}
+		return trackingEnabledForParameters;
+	}
+
+	private boolean trackingEnabledForReturnValue(ProcessedBeansTrackingStrategy processedBeansTrackingStrategy) {
+		boolean trackingEnabledForReturnValue = false;
+		for ( Signature signature : getSignatures() ) {
+			trackingEnabledForReturnValue = trackingEnabledForReturnValue
+					|| processedBeansTrackingStrategy.isEnabledForReturnValue( signature, getReturnValueMetaData().hasCascadables() );
+		}
+		return trackingEnabledForReturnValue;
 	}
 
 	/**
