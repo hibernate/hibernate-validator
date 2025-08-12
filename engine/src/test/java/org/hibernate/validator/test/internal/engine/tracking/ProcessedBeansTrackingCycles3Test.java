@@ -4,8 +4,11 @@
  */
 package org.hibernate.validator.test.internal.engine.tracking;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
@@ -13,6 +16,7 @@ import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -24,11 +28,23 @@ import org.testng.annotations.Test;
  */
 public class ProcessedBeansTrackingCycles3Test {
 
-	@Test
-	public void testSerializeHibernateEmail() throws Exception {
-		Validator validator = ValidatorUtil.getValidator();
+	@DataProvider(name = "validators")
+	public Object[][] createValidators() {
+		return new Object[][] {
+				{ ValidatorUtil.getValidator() },
+				{ ValidatorUtil.getPredefinedValidator( Set.of( Parent.class, Child.class ) ) }
+		};
+	}
 
-		validator.validate( new Parent() );
+	@Test(dataProvider = "validators")
+	public void testCycle(Validator validator) throws Exception {
+		Parent parent = new Parent();
+		parent.property = "";
+		Child child = new Child();
+		child.property = "";
+		child.parent = parent;
+		parent.children = Map.of( "1", List.of( child ) );
+		assertThat( validator.validate( parent ) ).isEmpty();
 	}
 
 	private static class Parent {

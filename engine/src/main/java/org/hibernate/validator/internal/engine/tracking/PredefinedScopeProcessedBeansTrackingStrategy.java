@@ -6,15 +6,18 @@ package org.hibernate.validator.internal.engine.tracking;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Collections;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ContainerCascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.PotentiallyContainerCascadingMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.properties.Signature;
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -29,11 +32,11 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 
 	public PredefinedScopeProcessedBeansTrackingStrategy(Map<Class<?>, BeanMetaData<?>> rawBeanMetaDataMap) {
 		// TODO: build the maps from the information inside the beanMetaDataManager
-		// There is a good chance we will need a structure with the whole hierarchy of constraint classes.
-		// That's something we could add to PredefinedScopeBeanMetaDataManager, as we are already doing similar things
-		// there (see the ClassHierarchyHelper.getHierarchy call).
-		// In the predefined scope case, we will have the whole hierarchy of constrained classes passed to
-		// PredefinedScopeBeanMetaDataManager.
+		//  There is a good chance we will need a structure with the whole hierarchy of constraint classes.
+		//  That's something we could add to PredefinedScopeBeanMetaDataManager, as we are already doing similar things
+		//  there (see the ClassHierarchyHelper.getHierarchy call).
+		//  In the predefined scope case, we will have the whole hierarchy of constrained classes passed to
+		//  PredefinedScopeBeanMetaDataManager.
 
 		this.trackingEnabledForBeans = CollectionHelper.toImmutableMap(
 				new TrackingEnabledStrategyBuilder( rawBeanMetaDataMap ).build()
@@ -45,10 +48,21 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 	private static class TrackingEnabledStrategyBuilder {
 		private final Map<Class<?>, BeanMetaData<?>> rawBeanMetaDataMap;
 		private final Map<Class<?>, Boolean> classToBeanTrackingEnabled;
+		// Map values are a set of subtypes for the key class, including "self" i.e. the "key":
+		private final Map<Class<?>, Set<Class<?>>> subtypesMap;
 
 		TrackingEnabledStrategyBuilder(Map<Class<?>, BeanMetaData<?>> rawBeanMetaDataMap) {
 			this.rawBeanMetaDataMap = rawBeanMetaDataMap;
 			this.classToBeanTrackingEnabled = CollectionHelper.newHashMap( rawBeanMetaDataMap.size() );
+			this.subtypesMap = CollectionHelper.newHashMap( rawBeanMetaDataMap.size() );
+			for ( Class<?> beanClass : rawBeanMetaDataMap.keySet() ) {
+				for ( Class<?> otherBeanClass : rawBeanMetaDataMap.keySet() ) {
+					if ( beanClass.isAssignableFrom( otherBeanClass ) ) {
+						subtypesMap.computeIfAbsent( beanClass, k -> new HashSet<>() )
+								.add( otherBeanClass );
+					}
+				}
+			}
 		}
 
 		public Map<Class<?>, Boolean> build() {
@@ -95,8 +109,16 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 		//          -----
 		//    A, B, C have cycles; D does not have a cycle.
 		//
+		//
+		// We also need to account for the case when the subtype is used at runtime that may change the cycles:
+		//  4) A -> B -> C -> D
+		//     And C1 extends C where C1 -> A
+		//     Hence, at runtime we "may" get:
+		//     A -> B -> C1 -> D
+		//     ^          |
+		//     |          |
+		//     -----------
 		private boolean determineTrackingRequired(Class<?> beanClass, Set<Class<?>> beanClassesInPath) {
-
 			final Boolean isBeanTrackingEnabled = classToBeanTrackingEnabled.get( beanClass );
 			if ( isBeanTrackingEnabled != null ) {
 				// It was already determined for beanClass.
@@ -157,38 +179,104 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 
 		// TODO: is there a more concise way to do this?
 		private <T> Set<Class<?>> getDirectCascadedBeanClasses(Class<T> beanClass) {
-			final BeanMetaData<?> beanMetaData = rawBeanMetaDataMap.get( beanClass );
-
-			if ( beanMetaData == null || !beanMetaData.hasCascadables() ) {
-				return Collections.emptySet();
-			}
-
 			final Set<Class<?>> directCascadedBeanClasses = new HashSet<>();
-			for ( Cascadable cascadable : beanMetaData.getCascadables() ) {
-				final CascadingMetaData cascadingMetaData = cascadable.getCascadingMetaData();
-				if ( cascadingMetaData.isContainer() ) {
-					final ContainerCascadingMetaData containerCascadingMetaData = (ContainerCascadingMetaData) cascadingMetaData;
-					if ( containerCascadingMetaData.getEnclosingType() instanceof ParameterizedType ) {
-						ParameterizedType parameterizedType = (ParameterizedType) containerCascadingMetaData.getEnclosingType();
-						for ( Type typeArgument : parameterizedType.getActualTypeArguments() ) {
-							if ( typeArgument instanceof Class ) {
-								directCascadedBeanClasses.add( (Class<?>) typeArgument );
-							}
-							else {
-								throw new UnsupportedOperationException( "Only ParameterizedType values of type Class are supported" );
-							}
-						}
+			// At runtime, if we are not looking at the root bean the actual value of a cascadable
+			//  can be either the same `beanClass` or one of its subtypes... since subtypes can potentially add
+			//  more constraints we want to iterate through the subclasses (for which there is some metadata defined)
+			//  and include the info from them too.
+			Set<Class<?>> classes = subtypesMap.get( beanClass );
+			if ( classes == null ) {
+				// It may be that some bean property without any constraints is marked for cascading validation,
+				//  In that case the metadata entry will be missing from the map:
+				return Set.of();
+			}
+			for ( Class<?> otherBeanClass : classes ) {
+				final BeanMetaData<?> beanMetaData = rawBeanMetaDataMap.get( otherBeanClass );
+
+				if ( beanMetaData == null || !beanMetaData.hasCascadables() ) {
+					continue;
+				}
+
+				for ( Cascadable cascadable : beanMetaData.getCascadables() ) {
+					final CascadingMetaData cascadingMetaData = cascadable.getCascadingMetaData();
+					if ( cascadingMetaData.isContainer() ) {
+						final ContainerCascadingMetaData containerCascadingMetaData = cascadingMetaData.as( ContainerCascadingMetaData.class );
+						processContainerCascadingMetaData( containerCascadingMetaData, directCascadedBeanClasses );
+					}
+					else if ( cascadingMetaData instanceof PotentiallyContainerCascadingMetaData potentiallyContainerCascadingMetaData ) {
+						// if it's a potentially container cascading one, we are "in trouble" as thing can be "almost anything".
+						// TODO: would it be enough to just take the type as defined ?
+						//  directCascadedBeanClasses.add( (Class<?>) cascadable.getCascadableType() );
+						//
+						// TODO: or be much more cautious and just assume that it can be "anything":
+						directCascadedBeanClasses.add( Object.class );
 					}
 					else {
-						throw new UnsupportedOperationException( "Non-parameterized containers are not supported yet." );
+						// TODO: For now, assume non-container Cascadables are always beans. Truee???
+						directCascadedBeanClasses.add( typeToClassToProcess( cascadable.getCascadableType() ) );
 					}
-				}
-				else {
-					// TODO: For now, assume non-container Cascadables are always beans. Truee???
-					directCascadedBeanClasses.add( (Class<?>) cascadable.getCascadableType() );
 				}
 			}
 			return directCascadedBeanClasses;
+		}
+
+		private static void processContainerCascadingMetaData(ContainerCascadingMetaData metaData, Set<Class<?>> directCascadedBeanClasses) {
+			if ( metaData.isCascading() ) {
+				if ( metaData.getDeclaredTypeParameterIndex() != null ) {
+					if ( metaData.getEnclosingType() instanceof ParameterizedType parameterizedType ) {
+						Type typeArgument = parameterizedType.getActualTypeArguments()[metaData.getDeclaredTypeParameterIndex()];
+						if ( typeArgument instanceof Class<?> typeArgumentClass ) {
+							directCascadedBeanClasses.add( typeArgumentClass );
+						}
+						else if ( typeArgument instanceof TypeVariable<?> typeVariable ) {
+							for ( Type bound : typeVariable.getBounds() ) {
+								directCascadedBeanClasses.add( typeToClassToProcess( bound ) );
+							}
+						}
+						else if ( typeArgument instanceof WildcardType wildcard ) {
+							for ( Type bound : wildcard.getUpperBounds() ) {
+								directCascadedBeanClasses.add( typeToClassToProcess( bound ) );
+							}
+							if ( wildcard.getLowerBounds().length != 0 ) {
+								// if it's a lower bound ? super smth ... it doesn't matter anymore since it can contain anything so go with object ?
+								directCascadedBeanClasses.add( Object.class );
+							}
+						}
+						else {
+							// TODO: instead of failing, add an Object.class and assume it can be anything ?
+							throw new UnsupportedOperationException( typeArgument.getClass().getSimpleName() + " type argument values are not supported." );
+						}
+					}
+				}
+				else {
+					// If we do not have the type arguments then we can go though the value extractors,
+					//  as they are required to define the `@ExtractedValue(type = ???)` ...
+					//  this way we should get the type we want:
+					for ( ValueExtractorDescriptor valueExtractorCandidate : metaData.getValueExtractorCandidates() ) {
+						valueExtractorCandidate.getExtractedType().ifPresent( directCascadedBeanClasses::add );
+					}
+				}
+			}
+
+			if ( metaData.getEnclosingType() instanceof ParameterizedType parameterizedType ) {
+				for ( ContainerCascadingMetaData sub : metaData.getContainerElementTypesCascadingMetaData() ) {
+					processContainerCascadingMetaData( sub, directCascadedBeanClasses );
+				}
+			}
+		}
+
+		private static Class<?> typeToClassToProcess(Type type) {
+			if ( type instanceof Class<?> cascadableClass ) {
+				return cascadableClass;
+			}
+			else if ( type instanceof ParameterizedType parameterizedType ) {
+				return typeToClassToProcess( parameterizedType.getRawType() );
+			}
+			else {
+				// TODO: instead of failing, add an Object.class and assume it can be anything ?
+				//  return Object.class;
+				throw new UnsupportedOperationException( type.getClass().getSimpleName() + " type values are not supported." );
+			}
 		}
 
 		private boolean register(Class<?> beanClass, boolean isBeanTrackingEnabled) {

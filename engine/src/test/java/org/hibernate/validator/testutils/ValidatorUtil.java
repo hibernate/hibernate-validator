@@ -9,6 +9,7 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.Locale;
+import java.util.Set;
 
 import jakarta.validation.Configuration;
 import jakarta.validation.Validation;
@@ -23,10 +24,12 @@ import jakarta.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.DefaultClockProvider;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.path.ModifiablePath;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.testutil.DummyTraversableResolver;
 import org.hibernate.validator.testutil.ValidationInvocationHandler;
@@ -57,6 +60,20 @@ public final class ValidatorUtil {
 		configuration.traversableResolver( new DummyTraversableResolver() );
 
 		return configuration.buildValidatorFactory().getValidator();
+	}
+
+	public static Validator getPredefinedValidator(Set<Class<?>> beans) {
+		return getPredefinedValidator( beans, ConstraintHelper.getBuiltinConstraints() );
+	}
+
+	public static Validator getPredefinedValidator(Set<Class<?>> beans, Set<String> constraints) {
+		return Validation.byProvider( PredefinedScopeHibernateValidator.class )
+				.configure()
+				.traversableResolver( new DummyTraversableResolver() )
+				.builtinConstraints( constraints )
+				.initializeBeanMetaData( beans )
+				.buildValidatorFactory()
+				.getValidator();
 	}
 
 	/**
