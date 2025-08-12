@@ -219,7 +219,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>10.26.1</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>11.0.0</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
