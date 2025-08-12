@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.spi.tracking;
 
+import java.util.function.BooleanSupplier;
+
 import org.hibernate.validator.Incubating;
 
 @Incubating
@@ -18,5 +20,13 @@ public interface ProcessedBeansTrackingVoter {
 	enum Vote {
 
 		DEFAULT, NON_TRACKING, TRACKING;
+
+		public static boolean voteToTracking(Vote vote, BooleanSupplier processedByDefault) {
+			return switch ( vote ) {
+				case NON_TRACKING -> false;
+				case TRACKING -> true;
+				default -> processedByDefault.getAsBoolean();
+			};
+		}
 	}
 }

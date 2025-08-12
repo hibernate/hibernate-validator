@@ -281,17 +281,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.resolvedDefaultGroupSequence = getDefaultGroupSequence( null );
 
 		Vote processedBeansTrackingVote = processedBeansTrackingVoter.isEnabledForBean( beanClass, hasCascadables() );
-		switch ( processedBeansTrackingVote ) {
-			case NON_TRACKING:
-				this.trackingEnabled = false;
-				break;
-			case TRACKING:
-				this.trackingEnabled = true;
-				break;
-			default:
-				this.trackingEnabled = hasCascadables();
-				break;
-		}
+		this.trackingEnabled = Vote.voteToTracking( processedBeansTrackingVote, this::hasCascadables );
 	}
 
 	public BeanMetaDataImpl(BeanMetaDataImpl<T> originalBeanMetaData, ProcessedBeansTrackingStrategy processedBeansTrackingStrategy,
@@ -322,17 +312,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.resolvedDefaultGroupSequence = originalBeanMetaData.resolvedDefaultGroupSequence;
 
 		Vote processedBeansTrackingVote = processedBeansTrackingVoter.isEnabledForBean( beanClass, hasCascadables() );
-		switch ( processedBeansTrackingVote ) {
-			case NON_TRACKING:
-				this.trackingEnabled = false;
-				break;
-			case TRACKING:
-				this.trackingEnabled = true;
-				break;
-			default:
-				this.trackingEnabled = processedBeansTrackingStrategy.isEnabledForBean( this.beanClass, hasCascadables() );
-				break;
-		}
+		this.trackingEnabled = Vote.voteToTracking( processedBeansTrackingVote, () -> processedBeansTrackingStrategy.isEnabledForBean( this.beanClass, hasCascadables() ) );
 	}
 
 	@Override
