@@ -186,17 +186,17 @@
             </dependencies>
         </profile>
         <profile>
-            <id>hv-8.0</id>
+            <id>hv-9.0</id>
             <activation>
                 <property>
                     <name>validator</name>
-                    <value>hv-8.0</value>
+                    <value>hv-9.0</value>
                 </property>
             </activation>
             <properties>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <validation-api.version>3.0.0.Final</validation-api.version>
-                <beanvalidation-impl.version>8.0.1.Final</beanvalidation-impl.version>
+                <validation-api.version>3.1.1.Final</validation-api.version>
+                <beanvalidation-impl.version>9.0.0.Final</beanvalidation-impl.version>
                 <sources.to.add.main>${project.basedir}/src/main/jakarta</sources.to.add.main>
             </properties>
             <dependencies>
@@ -212,6 +212,77 @@
                 <dependency>
                     <groupId>org.glassfish.expressly</groupId>
                     <artifactId>expressly</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>hv-8.0</id>
+            <activation>
+                <property>
+                    <name>validator</name>
+                    <value>hv-8.0</value>
+                </property>
+            </activation>
+            <properties>
+                <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
+                <validation-api.version>3.0.0.Final</validation-api.version>
+                <beanvalidation-impl.version>8.0.3.Final</beanvalidation-impl.version>
+                <sources.to.add.main>${project.basedir}/src/main/jakarta</sources.to.add.main>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>jakarta.validation</groupId>
+                    <artifactId>jakarta.validation-api</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${beanvalidation-impl.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.expressly</groupId>
+                    <artifactId>expressly</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>hv-6.2</id>
+            <activation>
+                <property>
+                    <name>validator</name>
+                    <value>hv-6.2</value>
+                </property>
+            </activation>
+            <properties>
+                <validation-api.version>2.0.1.Final</validation-api.version>
+                <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
+                <beanvalidation-impl.version>6.2.5.Final</beanvalidation-impl.version>
+                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
+                <sources.to.add.additional>${project.basedir}/src/main/javax-bv2</sources.to.add.additional>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${beanvalidation-impl.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.el</artifactId>
+                    <version>3.0.1-b12</version>
                 </dependency>
                 <dependency>
                     <groupId>org.apache.logging.log4j</groupId>
