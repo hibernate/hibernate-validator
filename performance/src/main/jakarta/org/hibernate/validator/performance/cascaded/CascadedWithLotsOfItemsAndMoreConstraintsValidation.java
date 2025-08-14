@@ -84,8 +84,7 @@ public class CascadedWithLotsOfItemsAndMoreConstraintsValidation {
 		private String name;
 
 		@NotNull
-		@Valid
-		private List<Article> articles = new ArrayList<>();
+		private List<@Valid @NotNull Article> articles = new ArrayList<>();
 
 		public Shop(Integer id, String name) {
 			this.id = id;

@@ -80,8 +80,7 @@ public class CascadedWithLotsOfItemsValidation {
 		private Integer id;
 
 		@NotNull
-		@Valid
-		private List<Article> articles = new ArrayList<>();
+		private List<@Valid @NotNull Article> articles = new ArrayList<>();
 
 		public Shop(Integer id) {
 			this.id = id;

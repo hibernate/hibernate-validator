@@ -30,24 +30,24 @@ import org.testng.annotations.Test;
 public class ProcessedBeansTrackingCycles1Test {
 
 	@Test
-	public void testValidNull() throws Exception {
+	public void testValidNull() {
 		final Parent parent = new Parent( "parent property" );
 		Set<ConstraintViolation<Parent>> violations = getValidator().validate( parent );
 		assertTrue( violations.isEmpty() );
 	}
 
 	@Test
-	public void testValidNotNull() throws Exception {
+	public void testValidNotNull() {
 		final Parent parent = new Parent( "parent property" );
 		parent.child = new Child( "child property" );
 
 		Set<ConstraintViolation<Parent>> violations = getValidator().validate( parent );
-		//Set<ConstraintViolation<Parent>> violations = ValidatorUtil.getValidator().validate( parent );
+
 		assertTrue( violations.isEmpty() );
 	}
 
 	@Test
-	public void testValidNotNullNonCyclic() throws Exception {
+	public void testValidNotNullNonCyclic() {
 		final Parent parent = new Parent( "parent property" );
 		parent.child = new Child( "child property" );
 		parent.child.parent = new Parent( "other parent property" );
@@ -57,7 +57,7 @@ public class ProcessedBeansTrackingCycles1Test {
 	}
 
 	@Test
-	public void testValidNotNullCyclic() throws Exception {
+	public void testValidNotNullCyclic() {
 		final Parent parent = new Parent( "parent property" );
 		parent.child = new Child( "child property" );
 		parent.child.parent = parent;

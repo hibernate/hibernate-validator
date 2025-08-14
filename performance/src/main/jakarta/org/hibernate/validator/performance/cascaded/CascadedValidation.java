@@ -74,8 +74,7 @@ public class CascadedValidation {
 		@NotNull
 		String name;
 
-		@Valid
-		Set<Person> friends = new HashSet<>();
+		Set<@Valid Person> friends = new HashSet<>();
 
 		public Person(String name) {
 			this.name = name;
