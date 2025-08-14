@@ -66,7 +66,7 @@ public class ParameterExecutableValidationContext<T> extends AbstractValidationC
 	) {
 		super( constraintValidatorManager, constraintValidatorFactory, validatorScopedContext, traversableResolver,
 				constraintValidatorInitializationContext, rootBean, rootBeanClass, rootBeanMetaData,
-				buildDisableAlreadyValidatedBeanTracking( executableMetaData )
+				isProcessedBeansTrackingEnabled( executableMetaData )
 		);
 		this.executable = executable;
 		this.executableMetaData = executableMetaData;
@@ -83,13 +83,13 @@ public class ParameterExecutableValidationContext<T> extends AbstractValidationC
 		return executableMetaData;
 	}
 
-	private static boolean buildDisableAlreadyValidatedBeanTracking(Optional<ExecutableMetaData> executableMetaData) {
+	private static boolean isProcessedBeansTrackingEnabled(Optional<ExecutableMetaData> executableMetaData) {
 		if ( !executableMetaData.isPresent() ) {
 			// the method is unconstrained so there's no need to worry about the tracking
 			return false;
 		}
 
-		return !executableMetaData.get().getValidatableParametersMetaData().hasCascadables();
+		return executableMetaData.get().isTrackingEnabledForParameters();
 	}
 
 	@Override
