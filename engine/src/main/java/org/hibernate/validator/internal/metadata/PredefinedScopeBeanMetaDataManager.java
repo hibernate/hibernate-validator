@@ -234,7 +234,7 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 			ProcessedBeansTrackingStrategy processedBeansTrackingStrategy,
 			ProcessedBeansTrackingVoter processedBeansTrackingVoter
 	) {
-		return new BeanMetaDataImpl<T>( (BeanMetaDataImpl<T>) rawBeanMetaData, processedBeansTrackingStrategy, processedBeansTrackingVoter );
+		return new BeanMetaDataImpl<>( (BeanMetaDataImpl<T>) rawBeanMetaData, processedBeansTrackingStrategy, processedBeansTrackingVoter );
 	}
 
 	private static class UninitializedBeanMetaData<T> implements BeanMetaData<T> {

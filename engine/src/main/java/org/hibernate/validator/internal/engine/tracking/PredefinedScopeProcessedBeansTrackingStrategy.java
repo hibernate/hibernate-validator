@@ -8,7 +8,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -21,33 +20,17 @@ import org.hibernate.validator.internal.metadata.aggregated.PotentiallyContainer
 import org.hibernate.validator.internal.metadata.aggregated.ReturnValueMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ValidatableParametersMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
-import org.hibernate.validator.internal.properties.Signature;
+import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.util.CollectionHelper;
 
 public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedBeansTrackingStrategy {
 
 	private final Map<Class<?>, Boolean> trackingEnabledForBeans;
 
-	// TODO: signature is just name and parameters so that can clash between different beans.
-	//  with that.. do we even need to track it per signature or since
-	//  we already built the `trackingEnabledForBeans` we can just "inspect" the cascadable as we go
-	//  and check against this `trackingEnabledForBeans` to see if tracking is required ?
-	private final Map<Signature, Boolean> trackingEnabledForReturnValues;
-	private final Map<Signature, Boolean> trackingEnabledForParameters;
-
 	public PredefinedScopeProcessedBeansTrackingStrategy(Map<Class<?>, BeanMetaData<?>> rawBeanMetaDataMap) {
-		// TODO: build the maps from the information inside the beanMetaDataManager
-		//  There is a good chance we will need a structure with the whole hierarchy of constraint classes.
-		//  That's something we could add to PredefinedScopeBeanMetaDataManager, as we are already doing similar things
-		//  there (see the ClassHierarchyHelper.getHierarchy call).
-		//  In the predefined scope case, we will have the whole hierarchy of constrained classes passed to
-		//  PredefinedScopeBeanMetaDataManager.
-
 		this.trackingEnabledForBeans = CollectionHelper.toImmutableMap(
 				new TrackingEnabledStrategyBuilder( rawBeanMetaDataMap ).build()
 		);
-		this.trackingEnabledForReturnValues = CollectionHelper.toImmutableMap( new HashMap<>() );
-		this.trackingEnabledForParameters = CollectionHelper.toImmutableMap( new HashMap<>() );
 	}
 
 	private static class TrackingEnabledStrategyBuilder {
@@ -223,16 +206,13 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 			final ContainerCascadingMetaData containerCascadingMetaData = cascadingMetaData.as( ContainerCascadingMetaData.class );
 			processContainerCascadingMetaData( containerCascadingMetaData, directCascadedBeanClasses );
 		}
-		else if ( cascadingMetaData instanceof PotentiallyContainerCascadingMetaData potentiallyContainerCascadingMetaData ) {
-			// if it's a potentially container cascading one, we are "in trouble" as thing can be "almost anything".
-			// TODO: would it be enough to just take the type as defined ?
-			//  directCascadedBeanClasses.add( (Class<?>) cascadable.getCascadableType() );
-			//
-			// TODO: or be much more cautious and just assume that it can be "anything":
+		else if ( cascadingMetaData instanceof PotentiallyContainerCascadingMetaData ) {
+			// If it's a potentially container cascading one, we are "in trouble" as thing can be "almost anything".
+			//  Let's be much more cautious and just assume that it can be "anything":
 			directCascadedBeanClasses.add( Object.class );
 		}
 		else {
-			// TODO: For now, assume non-container Cascadables are always beans. Truee???
+			// TODO: For now, assume non-container Cascadables are always beans. True???
 			directCascadedBeanClasses.add( typeToClassToProcess( cascadable.getCascadableType() ) );
 		}
 	}
@@ -260,8 +240,8 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 						}
 					}
 					else {
-						// TODO: instead of failing, add an Object.class and assume it can be anything ?
-						throw new UnsupportedOperationException( typeArgument.getClass().getSimpleName() + " type argument values are not supported." );
+						// In any unexpected case treat things as if they require tracking just to be on the safe side:
+						directCascadedBeanClasses.add( Object.class );
 					}
 				}
 			}
@@ -288,9 +268,7 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 			return typeToClassToProcess( parameterizedType.getRawType() );
 		}
 		else {
-			// TODO: instead of failing, add an Object.class and assume it can be anything ?
-			//  return Object.class;
-			throw new UnsupportedOperationException( type.getClass().getSimpleName() + " type values are not supported." );
+			return Object.class;
 		}
 	}
 
@@ -304,54 +282,26 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 	}
 
 	@Override
-	public boolean isEnabledForReturnValue(Signature signature, boolean hasCascadables) {
-		if ( !hasCascadables ) {
-			return false;
-		}
-
-		return trackingEnabledForReturnValues.getOrDefault( signature, true );
-	}
-
-	@Override
 	public boolean isEnabledForReturnValue(ReturnValueMetaData returnValueMetaData) {
-		if ( !returnValueMetaData.isCascading() ) {
-			return false;
-		}
-
-		Set<Class<?>> directCascadedBeanClasses = new HashSet<>();
-		for ( Cascadable cascadable : returnValueMetaData.getCascadables() ) {
-			processSingleCascadable( cascadable, directCascadedBeanClasses );
-		}
-		for ( Class<?> directCascadedBeanClass : directCascadedBeanClasses ) {
-			if ( trackingEnabledForBeans.get( directCascadedBeanClass ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean isEnabledForParameters(Signature signature, boolean hasCascadables) {
-		if ( !hasCascadables ) {
-			return false;
-		}
-
-		return trackingEnabledForParameters.getOrDefault( signature, true );
+		return isEnabledForExecutableValidatable( returnValueMetaData );
 	}
 
 	@Override
 	public boolean isEnabledForParameters(ValidatableParametersMetaData parametersMetaData) {
-		if ( !parametersMetaData.hasCascadables() ) {
+		return isEnabledForExecutableValidatable( parametersMetaData );
+	}
+
+	private boolean isEnabledForExecutableValidatable(Validatable validatable) {
+		if ( !validatable.hasCascadables() ) {
 			return false;
 		}
 
 		Set<Class<?>> directCascadedBeanClasses = new HashSet<>();
-		for ( Cascadable cascadable : parametersMetaData.getCascadables() ) {
+		for ( Cascadable cascadable : validatable.getCascadables() ) {
 			processSingleCascadable( cascadable, directCascadedBeanClasses );
 		}
 		for ( Class<?> directCascadedBeanClass : directCascadedBeanClasses ) {
-			if ( trackingEnabledForBeans.get( directCascadedBeanClass ) ) {
+			if ( Boolean.TRUE.equals( trackingEnabledForBeans.get( directCascadedBeanClass ) ) ) {
 				return true;
 			}
 		}
@@ -362,7 +312,5 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 	@Override
 	public void clear() {
 		trackingEnabledForBeans.clear();
-		trackingEnabledForReturnValues.clear();
-		trackingEnabledForParameters.clear();
 	}
 }

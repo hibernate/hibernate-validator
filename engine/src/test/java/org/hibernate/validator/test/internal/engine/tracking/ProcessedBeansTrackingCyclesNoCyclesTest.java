@@ -4,14 +4,13 @@
  */
 package org.hibernate.validator.test.internal.engine.tracking;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
 
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -109,13 +108,13 @@ public class ProcessedBeansTrackingCyclesNoCyclesTest {
 		f.g = g;
 
 		final Validator validator = getValidator();
-		final Set<ConstraintViolation<A>> violationsA = validator.validate( a );
-		final Set<ConstraintViolation<B>> violationsB = validator.validate( b );
-		final Set<ConstraintViolation<C>> violationsC = validator.validate( c );
-		final Set<ConstraintViolation<D>> violationsD = validator.validate( d );
-		final Set<ConstraintViolation<E>> violationsE = validator.validate( e );
-		final Set<ConstraintViolation<F>> violationsF = validator.validate( f );
-		final Set<ConstraintViolation<G>> violationsG = validator.validate( g );
+		assertThat( validator.validate( a ) ).isEmpty();
+		assertThat( validator.validate( b ) ).isEmpty();
+		assertThat( validator.validate( c ) ).isEmpty();
+		assertThat( validator.validate( d ) ).isEmpty();
+		assertThat( validator.validate( e ) ).isEmpty();
+		assertThat( validator.validate( f ) ).isEmpty();
+		assertThat( validator.validate( g ) ).isEmpty();
 	}
 
 	private Validator getValidator() {
