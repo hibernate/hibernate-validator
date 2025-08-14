@@ -149,7 +149,12 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 		if ( !localesToInitialize.isEmpty() ) {
 			Map<Locale, ResourceBundle> tmpPreloadedResourceBundles = CollectionHelper.newHashMap( localesToInitialize.size() );
 			for ( Locale localeToPreload : localesToInitialize ) {
-				tmpPreloadedResourceBundles.put( localeToPreload, doGetResourceBundle( localeToPreload ) );
+				ResourceBundle bundle = doGetResourceBundle( localeToPreload );
+				if ( bundle == null ) {
+					LOG.resourceBundleNotPreLoaded( localeToPreload );
+					continue;
+				}
+				tmpPreloadedResourceBundles.put( localeToPreload, bundle );
 			}
 			this.preloadedResourceBundles = CollectionHelper.toImmutableMap( tmpPreloadedResourceBundles );
 		}
