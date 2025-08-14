@@ -18,6 +18,8 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ContainerCascadingMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.PotentiallyContainerCascadingMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ReturnValueMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ValidatableParametersMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.properties.Signature;
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -26,8 +28,11 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 
 	private final Map<Class<?>, Boolean> trackingEnabledForBeans;
 
+	// TODO: signature is just name and parameters so that can clash between different beans.
+	//  with that.. do we even need to track it per signature or since
+	//  we already built the `trackingEnabledForBeans` we can just "inspect" the cascadable as we go
+	//  and check against this `trackingEnabledForBeans` to see if tracking is required ?
 	private final Map<Signature, Boolean> trackingEnabledForReturnValues;
-
 	private final Map<Signature, Boolean> trackingEnabledForParameters;
 
 	public PredefinedScopeProcessedBeansTrackingStrategy(Map<Class<?>, BeanMetaData<?>> rawBeanMetaDataMap) {
@@ -198,85 +203,10 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 				}
 
 				for ( Cascadable cascadable : beanMetaData.getCascadables() ) {
-					final CascadingMetaData cascadingMetaData = cascadable.getCascadingMetaData();
-					if ( cascadingMetaData.isContainer() ) {
-						final ContainerCascadingMetaData containerCascadingMetaData = cascadingMetaData.as( ContainerCascadingMetaData.class );
-						processContainerCascadingMetaData( containerCascadingMetaData, directCascadedBeanClasses );
-					}
-					else if ( cascadingMetaData instanceof PotentiallyContainerCascadingMetaData potentiallyContainerCascadingMetaData ) {
-						// if it's a potentially container cascading one, we are "in trouble" as thing can be "almost anything".
-						// TODO: would it be enough to just take the type as defined ?
-						//  directCascadedBeanClasses.add( (Class<?>) cascadable.getCascadableType() );
-						//
-						// TODO: or be much more cautious and just assume that it can be "anything":
-						directCascadedBeanClasses.add( Object.class );
-					}
-					else {
-						// TODO: For now, assume non-container Cascadables are always beans. Truee???
-						directCascadedBeanClasses.add( typeToClassToProcess( cascadable.getCascadableType() ) );
-					}
+					processSingleCascadable( cascadable, directCascadedBeanClasses );
 				}
 			}
 			return directCascadedBeanClasses;
-		}
-
-		private static void processContainerCascadingMetaData(ContainerCascadingMetaData metaData, Set<Class<?>> directCascadedBeanClasses) {
-			if ( metaData.isCascading() ) {
-				if ( metaData.getDeclaredTypeParameterIndex() != null ) {
-					if ( metaData.getEnclosingType() instanceof ParameterizedType parameterizedType ) {
-						Type typeArgument = parameterizedType.getActualTypeArguments()[metaData.getDeclaredTypeParameterIndex()];
-						if ( typeArgument instanceof Class<?> typeArgumentClass ) {
-							directCascadedBeanClasses.add( typeArgumentClass );
-						}
-						else if ( typeArgument instanceof TypeVariable<?> typeVariable ) {
-							for ( Type bound : typeVariable.getBounds() ) {
-								directCascadedBeanClasses.add( typeToClassToProcess( bound ) );
-							}
-						}
-						else if ( typeArgument instanceof WildcardType wildcard ) {
-							for ( Type bound : wildcard.getUpperBounds() ) {
-								directCascadedBeanClasses.add( typeToClassToProcess( bound ) );
-							}
-							if ( wildcard.getLowerBounds().length != 0 ) {
-								// if it's a lower bound ? super smth ... it doesn't matter anymore since it can contain anything so go with object ?
-								directCascadedBeanClasses.add( Object.class );
-							}
-						}
-						else {
-							// TODO: instead of failing, add an Object.class and assume it can be anything ?
-							throw new UnsupportedOperationException( typeArgument.getClass().getSimpleName() + " type argument values are not supported." );
-						}
-					}
-				}
-				else {
-					// If we do not have the type arguments then we can go though the value extractors,
-					//  as they are required to define the `@ExtractedValue(type = ???)` ...
-					//  this way we should get the type we want:
-					for ( ValueExtractorDescriptor valueExtractorCandidate : metaData.getValueExtractorCandidates() ) {
-						valueExtractorCandidate.getExtractedType().ifPresent( directCascadedBeanClasses::add );
-					}
-				}
-			}
-
-			if ( metaData.getEnclosingType() instanceof ParameterizedType parameterizedType ) {
-				for ( ContainerCascadingMetaData sub : metaData.getContainerElementTypesCascadingMetaData() ) {
-					processContainerCascadingMetaData( sub, directCascadedBeanClasses );
-				}
-			}
-		}
-
-		private static Class<?> typeToClassToProcess(Type type) {
-			if ( type instanceof Class<?> cascadableClass ) {
-				return cascadableClass;
-			}
-			else if ( type instanceof ParameterizedType parameterizedType ) {
-				return typeToClassToProcess( parameterizedType.getRawType() );
-			}
-			else {
-				// TODO: instead of failing, add an Object.class and assume it can be anything ?
-				//  return Object.class;
-				throw new UnsupportedOperationException( type.getClass().getSimpleName() + " type values are not supported." );
-			}
 		}
 
 		private boolean register(Class<?> beanClass, boolean isBeanTrackingEnabled) {
@@ -284,6 +214,83 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 				throw new IllegalStateException( beanClass.getName() + " registered more than once." );
 			}
 			return isBeanTrackingEnabled;
+		}
+	}
+
+	private static void processSingleCascadable(Cascadable cascadable, Set<Class<?>> directCascadedBeanClasses) {
+		CascadingMetaData cascadingMetaData = cascadable.getCascadingMetaData();
+		if ( cascadingMetaData.isContainer() ) {
+			final ContainerCascadingMetaData containerCascadingMetaData = cascadingMetaData.as( ContainerCascadingMetaData.class );
+			processContainerCascadingMetaData( containerCascadingMetaData, directCascadedBeanClasses );
+		}
+		else if ( cascadingMetaData instanceof PotentiallyContainerCascadingMetaData potentiallyContainerCascadingMetaData ) {
+			// if it's a potentially container cascading one, we are "in trouble" as thing can be "almost anything".
+			// TODO: would it be enough to just take the type as defined ?
+			//  directCascadedBeanClasses.add( (Class<?>) cascadable.getCascadableType() );
+			//
+			// TODO: or be much more cautious and just assume that it can be "anything":
+			directCascadedBeanClasses.add( Object.class );
+		}
+		else {
+			// TODO: For now, assume non-container Cascadables are always beans. Truee???
+			directCascadedBeanClasses.add( typeToClassToProcess( cascadable.getCascadableType() ) );
+		}
+	}
+
+	private static void processContainerCascadingMetaData(ContainerCascadingMetaData metaData, Set<Class<?>> directCascadedBeanClasses) {
+		if ( metaData.isCascading() ) {
+			if ( metaData.getDeclaredTypeParameterIndex() != null ) {
+				if ( metaData.getEnclosingType() instanceof ParameterizedType parameterizedType ) {
+					Type typeArgument = parameterizedType.getActualTypeArguments()[metaData.getDeclaredTypeParameterIndex()];
+					if ( typeArgument instanceof Class<?> typeArgumentClass ) {
+						directCascadedBeanClasses.add( typeArgumentClass );
+					}
+					else if ( typeArgument instanceof TypeVariable<?> typeVariable ) {
+						for ( Type bound : typeVariable.getBounds() ) {
+							directCascadedBeanClasses.add( typeToClassToProcess( bound ) );
+						}
+					}
+					else if ( typeArgument instanceof WildcardType wildcard ) {
+						for ( Type bound : wildcard.getUpperBounds() ) {
+							directCascadedBeanClasses.add( typeToClassToProcess( bound ) );
+						}
+						if ( wildcard.getLowerBounds().length != 0 ) {
+							// if it's a lower bound ? super smth ... it doesn't matter anymore since it can contain anything so go with object ?
+							directCascadedBeanClasses.add( Object.class );
+						}
+					}
+					else {
+						// TODO: instead of failing, add an Object.class and assume it can be anything ?
+						throw new UnsupportedOperationException( typeArgument.getClass().getSimpleName() + " type argument values are not supported." );
+					}
+				}
+			}
+			else {
+				// If we do not have the type arguments then we can go though the value extractors,
+				//  as they are required to define the `@ExtractedValue(type = ???)` ...
+				//  this way we should get the type we want:
+				for ( ValueExtractorDescriptor valueExtractorCandidate : metaData.getValueExtractorCandidates() ) {
+					valueExtractorCandidate.getExtractedType().ifPresent( directCascadedBeanClasses::add );
+				}
+			}
+		}
+
+		for ( ContainerCascadingMetaData sub : metaData.getContainerElementTypesCascadingMetaData() ) {
+			processContainerCascadingMetaData( sub, directCascadedBeanClasses );
+		}
+	}
+
+	private static Class<?> typeToClassToProcess(Type type) {
+		if ( type instanceof Class<?> cascadableClass ) {
+			return cascadableClass;
+		}
+		else if ( type instanceof ParameterizedType parameterizedType ) {
+			return typeToClassToProcess( parameterizedType.getRawType() );
+		}
+		else {
+			// TODO: instead of failing, add an Object.class and assume it can be anything ?
+			//  return Object.class;
+			throw new UnsupportedOperationException( type.getClass().getSimpleName() + " type values are not supported." );
 		}
 	}
 
@@ -306,12 +313,50 @@ public class PredefinedScopeProcessedBeansTrackingStrategy implements ProcessedB
 	}
 
 	@Override
+	public boolean isEnabledForReturnValue(ReturnValueMetaData returnValueMetaData) {
+		if ( !returnValueMetaData.isCascading() ) {
+			return false;
+		}
+
+		Set<Class<?>> directCascadedBeanClasses = new HashSet<>();
+		for ( Cascadable cascadable : returnValueMetaData.getCascadables() ) {
+			processSingleCascadable( cascadable, directCascadedBeanClasses );
+		}
+		for ( Class<?> directCascadedBeanClass : directCascadedBeanClasses ) {
+			if ( trackingEnabledForBeans.get( directCascadedBeanClass ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
 	public boolean isEnabledForParameters(Signature signature, boolean hasCascadables) {
 		if ( !hasCascadables ) {
 			return false;
 		}
 
 		return trackingEnabledForParameters.getOrDefault( signature, true );
+	}
+
+	@Override
+	public boolean isEnabledForParameters(ValidatableParametersMetaData parametersMetaData) {
+		if ( !parametersMetaData.hasCascadables() ) {
+			return false;
+		}
+
+		Set<Class<?>> directCascadedBeanClasses = new HashSet<>();
+		for ( Cascadable cascadable : parametersMetaData.getCascadables() ) {
+			processSingleCascadable( cascadable, directCascadedBeanClasses );
+		}
+		for ( Class<?> directCascadedBeanClass : directCascadedBeanClasses ) {
+			if ( trackingEnabledForBeans.get( directCascadedBeanClass ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override
