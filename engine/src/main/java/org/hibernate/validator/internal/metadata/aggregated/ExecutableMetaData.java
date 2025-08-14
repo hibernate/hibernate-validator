@@ -159,21 +159,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	}
 
 	private boolean trackingEnabledForParameters(ProcessedBeansTrackingStrategy processedBeansTrackingStrategy) {
-		boolean trackingEnabledForParameters = false;
-		for ( Signature signature : getSignatures() ) {
-			trackingEnabledForParameters = trackingEnabledForParameters
-					|| processedBeansTrackingStrategy.isEnabledForParameters( signature, getValidatableParametersMetaData().hasCascadables() );
-		}
-		return trackingEnabledForParameters;
+		return processedBeansTrackingStrategy.isEnabledForParameters( getValidatableParametersMetaData() );
 	}
 
 	private boolean trackingEnabledForReturnValue(ProcessedBeansTrackingStrategy processedBeansTrackingStrategy) {
-		boolean trackingEnabledForReturnValue = false;
-		for ( Signature signature : getSignatures() ) {
-			trackingEnabledForReturnValue = trackingEnabledForReturnValue
-					|| processedBeansTrackingStrategy.isEnabledForReturnValue( signature, getReturnValueMetaData().hasCascadables() );
-		}
-		return trackingEnabledForReturnValue;
+		return processedBeansTrackingStrategy.isEnabledForReturnValue( getReturnValueMetaData() );
 	}
 
 	/**
