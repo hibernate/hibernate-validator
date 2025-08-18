@@ -51,6 +51,9 @@ env:
   MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end -Pci-build --no-transfer-progress"
   TESTCONTAINERS_REUSE_ENABLE: true
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: ${{matrix.os.name}}
