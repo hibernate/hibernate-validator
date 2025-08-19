@@ -8,7 +8,6 @@ import jakarta.validation.TraversableResolver;
 import jakarta.validation.Validator;
 
 import org.hibernate.validator.internal.engine.ValidatorImpl;
-import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.engine.valuecontext.ValueContext;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -38,9 +37,9 @@ public interface BaseBeanValidationContext<T> extends ValidationContext<T> {
 
 	void markCurrentBeanAsProcessed(ValueContext<?, ?> valueContext);
 
-	boolean hasMetaConstraintBeenProcessed(Object bean, ModifiablePath path, MetaConstraint<?> metaConstraint);
+	boolean hasMetaConstraintBeenProcessed(ValueContext<?, ?> valueContext, MetaConstraint<?> metaConstraint);
 
-	void markConstraintProcessed(Object bean, ModifiablePath path, MetaConstraint<?> metaConstraint);
+	void markConstraintProcessed(ValueContext<?, ?> valueContext, MetaConstraint<?> metaConstraint);
 
 	/**
 	 * @return {@code true} if current validation context can and should process passed meta constraint. Is used in

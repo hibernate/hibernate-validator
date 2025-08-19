@@ -24,7 +24,6 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.ModifiablePath;
-import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.engine.valuecontext.ValueContext;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -95,12 +94,6 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	 * Indicates if the tracking of already validated bean should be disabled.
 	 */
 	private final boolean processedBeanTrackingEnabled;
-
-	/**
-	 * The set of already processed meta constraints per bean - path ({@link BeanPathMetaConstraintProcessedUnit}).
-	 */
-	@Lazy
-	private Set<BeanPathMetaConstraintProcessedUnit> processedPathUnits;
 
 	/**
 	 * Contains all failing constraints so far.
@@ -248,25 +241,25 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 			ConstraintViolationCreationContext constraintViolationCreationContext);
 
 	@Override
-	public boolean hasMetaConstraintBeenProcessed(Object bean, ModifiablePath path, MetaConstraint<?> metaConstraint) {
+	public boolean hasMetaConstraintBeenProcessed(ValueContext<?, ?> valueContext, MetaConstraint<?> metaConstraint) {
 		// this is only useful if the constraint is defined for more than 1 group as in the case it's only
 		// defined for one group, there is no chance it's going to be called twice.
 		if ( metaConstraint.isDefinedForOneGroupOnly() ) {
 			return false;
 		}
 
-		return getInitializedProcessedPathUnits().contains( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
+		return valueContext.hasMetaConstraintBeenProcessed( metaConstraint );
 	}
 
 	@Override
-	public void markConstraintProcessed(Object bean, ModifiablePath path, MetaConstraint<?> metaConstraint) {
+	public void markConstraintProcessed(ValueContext<?, ?> valueContext, MetaConstraint<?> metaConstraint) {
 		// this is only useful if the constraint is defined for more than 1 group as in the case it's only
 		// defined for one group, there is no chance it's going to be called twice.
 		if ( metaConstraint.isDefinedForOneGroupOnly() ) {
 			return;
 		}
 
-		getInitializedProcessedPathUnits().add( new BeanPathMetaConstraintProcessedUnit( bean, path, metaConstraint ) );
+		valueContext.markConstraintProcessed( metaConstraint );
 	}
 
 	@Override
@@ -318,69 +311,11 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		}
 	}
 
-	private Set<BeanPathMetaConstraintProcessedUnit> getInitializedProcessedPathUnits() {
-		if ( processedPathUnits == null ) {
-			processedPathUnits = new HashSet<>();
-		}
-		return processedPathUnits;
-	}
-
 	private Set<ConstraintViolation<T>> getInitializedFailingConstraintViolations() {
 		if ( failingConstraintViolations == null ) {
 			failingConstraintViolations = new HashSet<>();
 		}
 		return failingConstraintViolations;
-	}
-
-	private static final class BeanPathMetaConstraintProcessedUnit {
-
-		// these fields are final but we don't mark them as final as an optimization
-		private Object bean;
-		private NodeImpl pathLeaf;
-		private MetaConstraint<?> metaConstraint;
-		private int hashCode;
-
-		BeanPathMetaConstraintProcessedUnit(Object bean, ModifiablePath path, MetaConstraint<?> metaConstraint) {
-			this.bean = bean;
-			this.pathLeaf = path.getLeafNode(); // because the leaf represent the entire path.
-			this.metaConstraint = metaConstraint;
-			this.hashCode = createHashCode();
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			// null check intentionally left out
-			if ( this == o ) {
-				return true;
-			}
-
-			// No need to check if the class matches because of how this class is used in the set.
-			BeanPathMetaConstraintProcessedUnit that = (BeanPathMetaConstraintProcessedUnit) o;
-
-			if ( bean != that.bean ) { // instance equality
-				return false;
-			}
-			if ( metaConstraint != that.metaConstraint ) {
-				return false;
-			}
-			if ( !pathLeaf.equals( that.pathLeaf ) ) {
-				return false;
-			}
-
-			return true;
-		}
-
-		@Override
-		public int hashCode() {
-			return hashCode;
-		}
-
-		private int createHashCode() {
-			int result = System.identityHashCode( bean );
-			result = 31 * result + pathLeaf.hashCode();
-			result = 31 * result + System.identityHashCode( metaConstraint );
-			return result;
-		}
 	}
 
 }

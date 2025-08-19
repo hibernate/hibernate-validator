@@ -10,6 +10,7 @@ import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -153,6 +154,10 @@ public abstract sealed class ValueContext<T, V> permits BeanValueContext, Execut
 	public abstract void markCurrentGroupAsProcessed();
 
 	protected abstract boolean isProcessedForGroup(Class<?> group);
+
+	public abstract void markConstraintProcessed(MetaConstraint<?> metaConstraint);
+
+	public abstract boolean hasMetaConstraintBeenProcessed(MetaConstraint<?> metaConstraint);
 
 	public final void setCurrentValidatedValue(V currentValue) {
 		propertyPath.setLeafNodeValueIfRequired( currentValue );
