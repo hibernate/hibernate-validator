@@ -4,26 +4,67 @@
  */
 package org.hibernate.validator.internal.engine.valuecontext;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 
 /**
  * @author Marko Bekhta
  */
-public class BeanValueContext<T, V> extends ValueContext<T, V> {
+public final class BeanValueContext<T, V> extends ValueContext<T, V> {
 
 	/**
 	 * The metadata of the current bean.
 	 */
 	private final BeanMetaData<T> currentBeanMetaData;
 
-	BeanValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, BeanMetaData<T> currentBeanMetaData, ModifiablePath propertyPath) {
-		super( parameterNameProvider, currentBean, currentBeanMetaData, propertyPath );
+	/**
+	 * When we check whether the bean was validated we need to check that it was validated for the requested group.
+	 * This set tracks the groups we've already processed this bean for.
+	 */
+	@Lazy
+	private Set<Class<?>> alreadyProcessedGroups;
+
+	BeanValueContext(ValueContext<?, ?> parentContext, ExecutableParameterNameProvider parameterNameProvider, T currentBean, BeanMetaData<T> currentBeanMetaData, ModifiablePath propertyPath) {
+		super( parentContext, parameterNameProvider, currentBean, currentBeanMetaData, propertyPath );
 		this.currentBeanMetaData = currentBeanMetaData;
+		this.alreadyProcessedGroups = new HashSet<>();
 	}
 
-	public final BeanMetaData<T> getCurrentBeanMetaData() {
+	public BeanMetaData<T> getCurrentBeanMetaData() {
 		return currentBeanMetaData;
+	}
+
+	@Override
+	public boolean isBeanAlreadyValidated(Object value, Class<?> group) {
+		ValueContext<?, ?> curr = this;
+		while ( curr != null ) {
+			if ( curr.currentBean == value ) {
+				return curr.isProcessedForGroup( group );
+			}
+			curr = curr.parentContext;
+		}
+		return false;
+	}
+
+	@Override
+	public void markCurrentGroupAsProcessed() {
+		// if we just validate the default/single group it doesn't make sense to track it beyond the "current group" value
+		if ( this.previousGroup != null && this.previousGroup != this.currentGroup ) {
+			if ( this.alreadyProcessedGroups == null ) {
+				this.alreadyProcessedGroups = new HashSet<>();
+				this.alreadyProcessedGroups.add( this.previousGroup );
+			}
+			this.alreadyProcessedGroups.add( this.currentGroup );
+		}
+	}
+
+	@Override
+	protected boolean isProcessedForGroup(Class<?> group) {
+		return group == this.currentGroup || ( this.alreadyProcessedGroups != null && alreadyProcessedGroups.contains( group ) );
 	}
 }
