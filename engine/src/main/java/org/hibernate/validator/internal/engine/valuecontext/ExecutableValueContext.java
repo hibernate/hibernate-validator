@@ -5,6 +5,7 @@
 package org.hibernate.validator.internal.engine.valuecontext;
 
 import org.hibernate.validator.internal.engine.path.ModifiablePath;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
@@ -31,6 +32,16 @@ public final class ExecutableValueContext<T, V> extends ValueContext<T, V> {
 
 	@Override
 	protected boolean isProcessedForGroup(Class<?> group) {
+		return false;
+	}
+
+	@Override
+	public void markConstraintProcessed(MetaConstraint<?> metaConstraint) {
+		// do nothing as usual
+	}
+
+	@Override
+	public boolean hasMetaConstraintBeenProcessed(MetaConstraint<?> metaConstraint) {
 		return false;
 	}
 }

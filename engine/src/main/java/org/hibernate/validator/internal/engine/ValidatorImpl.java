@@ -588,7 +588,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			success = metaConstraint.validateConstraint( validationContext, valueContext );
 
-			validationContext.markConstraintProcessed( valueContext.getCurrentBean(), valueContext.getPropertyPath(), metaConstraint );
+			validationContext.markConstraintProcessed( valueContext, metaConstraint );
 		}
 
 		// reset the value context to the state before this call
@@ -1313,8 +1313,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			return false;
 		}
 		if ( validationContext.hasMetaConstraintBeenProcessed(
-				valueContext.getCurrentBean(),
-				valueContext.getPropertyPath(),
+				valueContext,
 				metaConstraint
 		) ) {
 			return false;

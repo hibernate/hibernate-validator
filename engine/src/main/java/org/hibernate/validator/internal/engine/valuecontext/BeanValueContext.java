@@ -5,10 +5,13 @@
 package org.hibernate.validator.internal.engine.valuecontext;
 
 import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.engine.path.ModifiablePath;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
 
@@ -28,6 +31,12 @@ public final class BeanValueContext<T, V> extends ValueContext<T, V> {
 	 */
 	@Lazy
 	private Set<Class<?>> alreadyProcessedGroups;
+
+	/**
+	 * To track when the constraint is in multiple groups, and it was already processed for some other group.
+	 */
+	@Lazy
+	private Map<MetaConstraint<?>, Boolean> alreadyProcessedMetaConstraints;
 
 	BeanValueContext(ValueContext<?, ?> parentContext, ExecutableParameterNameProvider parameterNameProvider, T currentBean, BeanMetaData<T> currentBeanMetaData, ModifiablePath propertyPath) {
 		super( parentContext, parameterNameProvider, currentBean, currentBeanMetaData, propertyPath );
@@ -66,5 +75,18 @@ public final class BeanValueContext<T, V> extends ValueContext<T, V> {
 	@Override
 	protected boolean isProcessedForGroup(Class<?> group) {
 		return group == this.currentGroup || ( this.alreadyProcessedGroups != null && alreadyProcessedGroups.contains( group ) );
+	}
+
+	@Override
+	public void markConstraintProcessed(MetaConstraint<?> metaConstraint) {
+		if ( alreadyProcessedMetaConstraints == null ) {
+			alreadyProcessedMetaConstraints = new IdentityHashMap<>();
+		}
+		alreadyProcessedMetaConstraints.put( metaConstraint, Boolean.TRUE );
+	}
+
+	@Override
+	public boolean hasMetaConstraintBeenProcessed(MetaConstraint<?> metaConstraint) {
+		return alreadyProcessedMetaConstraints != null && alreadyProcessedMetaConstraints.containsKey( metaConstraint );
 	}
 }
