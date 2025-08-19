@@ -36,7 +36,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  * @author Guillaume Smet
  */
-public class NodeImpl
+public class MutableNode
 		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Path.ContainerElementNode,
 		org.hibernate.validator.path.PropertyNode, org.hibernate.validator.path.ContainerElementNode, Serializable {
 	@Serial
@@ -45,12 +45,12 @@ public class NodeImpl
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
-	static final NodeImpl ROOT_NODE;
+	static final MutableNode ROOT_NODE;
 
 	static {
-		ROOT_NODE = NodeImpl.createBeanNode( null );
+		ROOT_NODE = MutableNode.createBeanNode( null );
 		ROOT_NODE.valueSet = true;
-		ROOT_NODE.nodes = new NodeImpl[] { ROOT_NODE };
+		ROOT_NODE.nodes = new MutableNode[] { ROOT_NODE };
 		ROOT_NODE.hashCode();
 	}
 
@@ -67,33 +67,31 @@ public class NodeImpl
 	public static final String MAP_VALUE_NODE_NAME = "<map value>";
 
 	private final String name;
-	private final NodeImpl parent;
-	private final NodeImpl root;
+	private final MutableNode parent;
+	private final ElementKind kind;
 	private final int size;
 	private boolean isIterable;
-	private final Integer index;
-	private final Object key;
-	private final ElementKind kind;
+	private Integer index;
+	private Object key;
 
 	//type-specific attributes
 	private final Class<?>[] parameterTypes;
 	private final Integer parameterIndex;
 	private Object value;
 	private boolean valueSet;
-	private final Class<?> containerClass;
-	private final Integer typeArgumentIndex;
+	private Class<?> containerClass;
+	private Integer typeArgumentIndex;
 
 	private int hashCode = -1;
 	private String asString;
-	private NodeImpl[] nodes;
+	private MutableNode[] nodes;
 
-	private NodeImpl(
-			String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
+	private MutableNode(
+			String name, MutableNode parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
 			Integer parameterIndex, Object value, boolean valueSet, Class<?> containerClass, Integer typeArgumentIndex
 	) {
 		this.name = name;
 		this.parent = parent;
-		this.root = parent == null ? this : parent.root;
 		this.size = ( parent == null ? 0 : parent.size ) + 1;
 		this.index = index;
 		this.key = key;
@@ -108,8 +106,8 @@ public class NodeImpl
 	}
 
 	//TODO It would be nicer if we could return PropertyNode
-	public static NodeImpl createPropertyNode(String name, NodeImpl parent) {
-		return new NodeImpl(
+	public static MutableNode createPropertyNode(String name, MutableNode parent) {
+		return new MutableNode(
 				name,
 				parent,
 				false,
@@ -125,8 +123,8 @@ public class NodeImpl
 		);
 	}
 
-	public static NodeImpl createContainerElementNode(String name, NodeImpl parent) {
-		return new NodeImpl(
+	public static MutableNode createContainerElementNode(String name, MutableNode parent) {
+		return new MutableNode(
 				name,
 				parent,
 				false,
@@ -142,8 +140,8 @@ public class NodeImpl
 		);
 	}
 
-	public static NodeImpl createParameterNode(String name, NodeImpl parent, int parameterIndex) {
-		return new NodeImpl(
+	public static MutableNode createParameterNode(String name, MutableNode parent, int parameterIndex) {
+		return new MutableNode(
 				name,
 				parent,
 				false,
@@ -159,8 +157,8 @@ public class NodeImpl
 		);
 	}
 
-	public static NodeImpl createCrossParameterNode(NodeImpl parent) {
-		return new NodeImpl(
+	public static MutableNode createCrossParameterNode(MutableNode parent) {
+		return new MutableNode(
 				CROSS_PARAMETER_NODE_NAME,
 				parent,
 				false,
@@ -176,16 +174,16 @@ public class NodeImpl
 		);
 	}
 
-	public static NodeImpl createMethodNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null, false, null, null );
+	public static MutableNode createMethodNode(String name, MutableNode parent, Class<?>[] parameterTypes) {
+		return new MutableNode( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null, false, null, null );
 	}
 
-	public static NodeImpl createConstructorNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null, false, null, null );
+	public static MutableNode createConstructorNode(String name, MutableNode parent, Class<?>[] parameterTypes) {
+		return new MutableNode( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null, false, null, null );
 	}
 
-	public static NodeImpl createBeanNode(NodeImpl parent) {
-		return new NodeImpl(
+	public static MutableNode createBeanNode(MutableNode parent) {
+		return new MutableNode(
 				null,
 				parent,
 				false,
@@ -201,8 +199,8 @@ public class NodeImpl
 		);
 	}
 
-	public static NodeImpl createReturnValue(NodeImpl parent) {
-		return new NodeImpl(
+	public static MutableNode createReturnValue(MutableNode parent) {
+		return new MutableNode(
 				RETURN_VALUE_NODE_NAME,
 				parent,
 				false,
@@ -218,97 +216,39 @@ public class NodeImpl
 		);
 	}
 
-	public static NodeImpl makeIterable(NodeImpl node) {
-		return new NodeImpl(
-				node.name,
-				node.parent,
-				true,
-				null,
-				null,
-				node.kind,
-				node.parameterTypes,
-				node.parameterIndex,
-				node.value,
-				node.valueSet,
-				node.containerClass,
-				node.typeArgumentIndex
-		);
+	public void makeIterable() {
+		this.isIterable = true;
+		this.index = null;
+		this.key = null;
 	}
 
-	public static NodeImpl makeIterableAndSetIndex(NodeImpl node, Integer index) {
-		return new NodeImpl(
-				node.name,
-				node.parent,
-				true,
-				index,
-				null,
-				node.kind,
-				node.parameterTypes,
-				node.parameterIndex,
-				node.value,
-				node.valueSet,
-				node.containerClass,
-				node.typeArgumentIndex
-		);
+	public void makeIterableAndSetIndex(Integer index) {
+		this.isIterable = true;
+		this.index = index;
+		this.key = null;
 	}
 
-	public static NodeImpl makeIterableAndSetMapKey(NodeImpl node, Object key) {
-		return new NodeImpl(
-				node.name,
-				node.parent,
-				true,
-				null,
-				key,
-				node.kind,
-				node.parameterTypes,
-				node.parameterIndex,
-				node.value,
-				node.valueSet,
-				node.containerClass,
-				node.typeArgumentIndex
-		);
+	public void makeIterableAndSetMapKey(Object key) {
+		this.isIterable = true;
+		this.index = null;
+		this.key = key;
 	}
 
-	public static NodeImpl setPropertyValue(NodeImpl node, Object value) {
-		if ( node.valueSet && node.value != value ) {
-			return new NodeImpl(
-					node.name,
-					node.parent,
-					node.isIterable,
-					node.index,
-					node.key,
-					node.kind,
-					node.parameterTypes,
-					node.parameterIndex,
-					value,
-					true,
-					node.containerClass,
-					node.typeArgumentIndex
-			);
-		}
-		node.value = value;
-		node.valueSet = true;
-		return node;
+	public void setPropertyValue(Object value) {
+		this.value = value;
 	}
 
-	public static NodeImpl setTypeParameter(NodeImpl node, Class<?> containerClass, Integer typeArgumentIndex) {
-		if ( node.typeArgumentIndex != null && node.typeArgumentIndex.equals( typeArgumentIndex ) && node.containerClass == containerClass ) {
-			return node;
-		}
-		return new NodeImpl(
-				node.name,
-				node.parent,
-				node.isIterable,
-				node.index,
-				node.key,
-				node.kind,
-				node.parameterTypes,
-				node.parameterIndex,
-				node.value,
-				node.valueSet,
-				containerClass,
-				typeArgumentIndex
-		);
+	public void setTypeParameter(Class<?> containerClass, Integer typeArgumentIndex) {
+		this.typeArgumentIndex = typeArgumentIndex;
+		this.containerClass = containerClass;
+	}
+
+	public void reset() {
+		isIterable = false;
+		index = null;
+		key = null;
+		typeArgumentIndex = null;
+		containerClass = null;
 	}
 
 	@Override
@@ -369,7 +309,7 @@ public class NodeImpl
 		return parent.typeArgumentIndex;
 	}
 
-	public final NodeImpl getParent() {
+	public final MutableNode getParent() {
 		return parent;
 	}
 
@@ -501,11 +441,11 @@ public class NodeImpl
 		if ( getClass() != obj.getClass() ) {
 			return false;
 		}
-		NodeImpl other = (NodeImpl) obj;
+		MutableNode other = (MutableNode) obj;
 		return samePath( other );
 	}
 
-	boolean sameNode(NodeImpl other) {
+	boolean sameNode(MutableNode other) {
 		if ( this == other ) {
 			return true;
 		}
@@ -580,12 +520,12 @@ public class NodeImpl
 		return true;
 	}
 
-	boolean samePath(NodeImpl other) {
+	boolean samePath(MutableNode other) {
 		if ( this.size != other.size ) {
 			return false;
 		}
-		NodeImpl curr = this;
-		NodeImpl otherCurr = other;
+		MutableNode curr = this;
+		MutableNode otherCurr = other;
 		while ( curr != null && otherCurr != null ) {
 			if ( !curr.sameNode( otherCurr ) ) {
 				return false;
@@ -601,15 +541,15 @@ public class NodeImpl
 		return parent == null && name == null;
 	}
 
-	static NodeImpl[] constructPath(NodeImpl leaf) {
+	static MutableNode[] constructPath(MutableNode leaf) {
 		if ( leaf.parent == null ) {
 			if ( leaf.nodes == null ) {
-				leaf.nodes = new NodeImpl[] { leaf };
+				leaf.nodes = new MutableNode[] { leaf };
 			}
 		}
 		else {
-			leaf.nodes = new NodeImpl[leaf.size - 1];
-			NodeImpl curr = leaf;
+			leaf.nodes = new MutableNode[leaf.size - 1];
+			MutableNode curr = leaf;
 			while ( curr.parent != null ) {
 				leaf.nodes[curr.size - 2] = curr;
 				curr = curr.parent;
@@ -619,12 +559,29 @@ public class NodeImpl
 		return leaf.nodes;
 	}
 
-	boolean isSubPathOf(NodeImpl other) {
+	MaterializedNode[] partiallyInitializedMaterializedNodes() {
+		MaterializedNode[] nodes = new MaterializedNode[size - 1];
+		MutableNode curr = this;
+		while ( curr.parent != null ) {
+			nodes[curr.size - 2] = curr.materialize();
+			curr = curr.parent;
+		}
+		return nodes;
+	}
+
+	MaterializedNode materialize() {
+		return new MaterializedNode(
+				name, size, isIterable, index, key, kind, parameterTypes,
+				parameterIndex, value, containerClass, typeArgumentIndex
+		);
+	}
+
+	boolean isSubPathOf(MutableNode other) {
 		if ( this.size > other.size ) {
 			return false;
 		}
-		NodeImpl curr = this;
-		NodeImpl otherCurr = other;
+		MutableNode curr = this;
+		MutableNode otherCurr = other;
 		while ( otherCurr != null && !otherCurr.equals( this ) ) {
 			otherCurr = otherCurr.parent;
 		}
@@ -642,9 +599,9 @@ public class NodeImpl
 		return curr.isRootPath();
 	}
 
-	public boolean isSubPathOrContains(NodeImpl other) {
-		NodeImpl curr;
-		NodeImpl otherCurr;
+	public boolean isSubPathOrContains(MutableNode other) {
+		MutableNode curr;
+		MutableNode otherCurr;
 		if ( this.size > other.size ) {
 			curr = other;
 			otherCurr = this;
@@ -672,10 +629,10 @@ public class NodeImpl
 	}
 
 	protected static class NodeIterator implements Iterator<Path.Node> {
-		private final NodeImpl[] array;
+		private final MutableNode[] array;
 		private int index;
 
-		public NodeIterator(NodeImpl[] array) {
+		public NodeIterator(MutableNode[] array) {
 			this.array = array;
 		}
 

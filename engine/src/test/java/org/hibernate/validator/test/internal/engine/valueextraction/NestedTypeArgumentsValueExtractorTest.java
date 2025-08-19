@@ -24,7 +24,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.valueextraction.Unwrapping;
 
-import org.hibernate.validator.internal.engine.path.NodeImpl;
+import org.hibernate.validator.internal.engine.path.MutableNode;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
 
@@ -56,7 +56,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
 								.property( "map" )
-								.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, "k", null, Map.class, 0 )
+								.containerElement( MutableNode.MAP_KEY_NODE_NAME, true, "k", null, Map.class, 0 )
 						)
 		);
 
@@ -65,7 +65,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
 								.property( "map" )
-								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+								.containerElement( MutableNode.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
 						)
 		);
 
@@ -74,14 +74,14 @@ public class NestedTypeArgumentsValueExtractorTest {
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
 								.property( "map" )
-								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
-								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+								.containerElement( MutableNode.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+								.containerElement( MutableNode.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
 						),
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
 								.property( "map" )
-								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
-								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+								.containerElement( MutableNode.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+								.containerElement( MutableNode.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
 						)
 		);
 
@@ -90,18 +90,18 @@ public class NestedTypeArgumentsValueExtractorTest {
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
 								.property( "map" )
-								.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, "k", null, Map.class, 0 )
+								.containerElement( MutableNode.MAP_KEY_NODE_NAME, true, "k", null, Map.class, 0 )
 						),
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
 								.property( "map" )
-								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "k", null, Map.class, 1 )
+								.containerElement( MutableNode.MAP_VALUE_NODE_NAME, true, "k", null, Map.class, 1 )
 						),
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
 								.property( "map" )
-								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "k", null, Map.class, 1 )
-								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+								.containerElement( MutableNode.MAP_VALUE_NODE_NAME, true, "k", null, Map.class, 1 )
+								.containerElement( MutableNode.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
 						)
 		);
 	}
@@ -116,8 +116,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
 								.property( "map" )
-								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key", null, Map.class, 1 )
-								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+								.containerElement( MutableNode.MAP_VALUE_NODE_NAME, true, "key", null, Map.class, 1 )
+								.containerElement( MutableNode.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
 						)
 		);
 
@@ -126,8 +126,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.property( "map" )
-								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key", null, Map.class, 1 )
-								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+								.containerElement( MutableNode.MAP_VALUE_NODE_NAME, true, "key", null, Map.class, 1 )
+								.containerElement( MutableNode.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
 						)
 		);
 	}
@@ -143,12 +143,12 @@ public class NestedTypeArgumentsValueExtractorTest {
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.property( "array" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
 						),
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
 								.property( "array" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
 						)
 		);
 	}
@@ -160,14 +160,14 @@ public class NestedTypeArgumentsValueExtractorTest {
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
 								.property( "map" )
-								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
-								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+								.containerElement( MutableNode.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+								.containerElement( MutableNode.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
 						),
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
 								.property( "map" )
-								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
-								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
+								.containerElement( MutableNode.MAP_VALUE_NODE_NAME, true, "key1", null, Map.class, 1 )
+								.containerElement( MutableNode.LIST_ELEMENT_NODE_NAME, true, null, 1, List.class, 0 )
 						)
 		);
 	}
@@ -183,7 +183,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 				violationOf( Size.class )
 						.withPropertyPath( pathWith()
 								.property( "array" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
 						)
 		);
 
@@ -192,8 +192,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 				violationOf( Email.class )
 						.withPropertyPath( pathWith()
 								.property( "array" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
 						)
 		);
 	}

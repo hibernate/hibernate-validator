@@ -11,7 +11,7 @@ import jakarta.validation.valueextraction.ExtractedValue;
 import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
-import org.hibernate.validator.internal.engine.path.NodeImpl;
+import org.hibernate.validator.internal.engine.path.MutableNode;
 
 import javafx.beans.property.MapProperty;
 import javafx.beans.value.ObservableValue;
@@ -37,7 +37,7 @@ class MapPropertyValueExtractor implements ValueExtractor<MapProperty<?, @Extrac
 	@Override
 	public void extractValues(MapProperty<?, ?> originalValue, ValueExtractor.ValueReceiver receiver) {
 		for ( Map.Entry<?, ?> entry : originalValue.entrySet() ) {
-			receiver.keyedValue( NodeImpl.MAP_VALUE_NODE_NAME, entry.getKey(), entry.getValue() );
+			receiver.keyedValue( MutableNode.MAP_VALUE_NODE_NAME, entry.getKey(), entry.getValue() );
 		}
 	}
 }

@@ -23,7 +23,7 @@ import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
-import org.hibernate.validator.internal.engine.path.ModifiablePath;
+import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.engine.valuecontext.ValueContext;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -217,8 +217,8 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 				constraintViolationCreationContext.getMessageParameters(),
 				constraintViolationCreationContext.getExpressionVariables()
 		);
-		// at this point we make a copy of the path to avoid side effects
-		Path path = constraintViolationCreationContext.getPath().materialize();
+
+		Path path = constraintViolationCreationContext.getPath();
 
 		getInitializedFailingConstraintViolations().add(
 				createConstraintViolation(
@@ -263,7 +263,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	}
 
 	@Override
-	public ConstraintValidatorContextImpl createConstraintValidatorContextFor(ConstraintDescriptorImpl<?> constraintDescriptor, ModifiablePath path) {
+	public ConstraintValidatorContextImpl createConstraintValidatorContextFor(ConstraintDescriptorImpl<?> constraintDescriptor, MutablePath path) {
 		return new ConstraintValidatorContextImpl(
 				validatorScopedContext.getClockProvider(),
 				path,

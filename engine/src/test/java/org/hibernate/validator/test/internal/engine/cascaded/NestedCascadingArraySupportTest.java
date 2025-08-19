@@ -20,7 +20,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.internal.engine.path.NodeImpl;
+import org.hibernate.validator.internal.engine.path.MutableNode;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.annotations.Test;
@@ -47,13 +47,13 @@ public class NestedCascadingArraySupportTest {
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.property( "array" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
-								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+								.containerElement( MutableNode.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
 						),
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.property( "array" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
 								.property( "visitor", true, null, 1, List.class, 0 )
 								.property( "name", Reference.class, 0 )
 						)

@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.internal.engine.valuecontext;
 
-import org.hibernate.validator.internal.engine.path.ModifiablePath;
+import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -14,7 +14,7 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
  */
 public final class ExecutableValueContext<T, V> extends ValueContext<T, V> {
 
-	ExecutableValueContext(ValueContext<?, ?> parentContext, ExecutableParameterNameProvider parameterNameProvider, T currentBean, Validatable validatable, ModifiablePath propertyPath) {
+	ExecutableValueContext(ValueContext<?, ?> parentContext, ExecutableParameterNameProvider parameterNameProvider, T currentBean, Validatable validatable, MutablePath propertyPath) {
 		super( parentContext, parameterNameProvider, currentBean, validatable, propertyPath );
 	}
 

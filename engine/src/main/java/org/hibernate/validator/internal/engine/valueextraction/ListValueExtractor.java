@@ -10,7 +10,7 @@ import java.util.Optional;
 import jakarta.validation.valueextraction.ExtractedValue;
 import jakarta.validation.valueextraction.ValueExtractor;
 
-import org.hibernate.validator.internal.engine.path.NodeImpl;
+import org.hibernate.validator.internal.engine.path.MutableNode;
 
 class ListValueExtractor implements ValueExtractor<List<@ExtractedValue ?>> {
 
@@ -23,7 +23,7 @@ class ListValueExtractor implements ValueExtractor<List<@ExtractedValue ?>> {
 	@Override
 	public void extractValues(List<?> originalValue, ValueReceiver receiver) {
 		for ( int i = 0; i < originalValue.size(); i++ ) {
-			receiver.indexedValue( NodeImpl.LIST_ELEMENT_NODE_NAME, i, originalValue.get( i ) );
+			receiver.indexedValue( MutableNode.LIST_ELEMENT_NODE_NAME, i, originalValue.get( i ) );
 		}
 	}
 }

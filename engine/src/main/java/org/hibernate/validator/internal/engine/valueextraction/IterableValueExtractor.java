@@ -9,7 +9,7 @@ import java.util.Optional;
 import jakarta.validation.valueextraction.ExtractedValue;
 import jakarta.validation.valueextraction.ValueExtractor;
 
-import org.hibernate.validator.internal.engine.path.NodeImpl;
+import org.hibernate.validator.internal.engine.path.MutableNode;
 
 class IterableValueExtractor implements ValueExtractor<Iterable<@ExtractedValue ?>> {
 
@@ -22,7 +22,7 @@ class IterableValueExtractor implements ValueExtractor<Iterable<@ExtractedValue 
 	@Override
 	public void extractValues(Iterable<?> originalValue, ValueReceiver receiver) {
 		for ( Object object : originalValue ) {
-			receiver.iterableValue( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, object );
+			receiver.iterableValue( MutableNode.ITERABLE_ELEMENT_NODE_NAME, object );
 		}
 	}
 }
