@@ -7,7 +7,6 @@ package org.hibernate.validator.internal.engine.validationcontext;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -104,18 +103,6 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	private Set<BeanPathMetaConstraintProcessedUnit> processedPathUnits;
 
 	/**
-	 * The set of already processed groups per bean ({@link BeanGroupProcessedUnit}).
-	 */
-	@Lazy
-	private Set<BeanGroupProcessedUnit> processedGroupUnits;
-
-	/**
-	 * Maps an object to a list of paths (represented by leaf nodes) in which it has been validated. The objects are the bean instances.
-	 */
-	@Lazy
-	private Map<Object, Set<NodeImpl>> processedPathsPerBean;
-
-	/**
 	 * Contains all failing constraints so far.
 	 */
 	@Lazy
@@ -196,18 +183,11 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	}
 
 	@Override
-	public boolean isBeanAlreadyValidated(Object value, Class<?> group, ModifiablePath path) {
+	public boolean isBeanAlreadyValidated(Object value, Class<?> group, ValueContext<?, ?> valueContext) {
 		if ( !processedBeanTrackingEnabled ) {
 			return false;
 		}
-
-		boolean alreadyValidated = isAlreadyValidatedForCurrentGroup( value, group );
-
-		if ( alreadyValidated ) {
-			alreadyValidated = isAlreadyValidatedForPath( value, path.getLeafNode() );
-		}
-
-		return alreadyValidated;
+		return valueContext.isBeanAlreadyValidated( value, group );
 	}
 
 	@Override
@@ -215,9 +195,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		if ( !processedBeanTrackingEnabled ) {
 			return;
 		}
-
-		markCurrentBeanAsProcessedForCurrentGroup( valueContext.getCurrentBean(), valueContext.getCurrentGroup() );
-		markCurrentBeanAsProcessedForCurrentPath( valueContext.getCurrentBean(), valueContext.getPropertyPath() );
+		valueContext.markCurrentGroupAsProcessed();
 	}
 
 	@Override
@@ -340,68 +318,11 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		}
 	}
 
-	private boolean isAlreadyValidatedForPath(Object value, NodeImpl path) {
-		Set<NodeImpl> pathSet = getInitializedProcessedPathsPerBean().get( value );
-		if ( pathSet == null ) {
-			return false;
-		}
-
-		if ( path.isRootPath() ) {
-			return true;
-		}
-
-		// Since this isAlreadyValidatedForPath(..) is only applicable for an object that is about to be cascaded into,
-		// it means that the new path we are testing cannot be a root path; also since we are cascading into inner
-		// objects, i.e. going further from the object tree root, it means that the new path cannot be shorter than
-		// the ones we've already encountered.
-		for ( NodeImpl p : pathSet ) {
-			if ( p.isSubPathOrContains( path ) ) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean isAlreadyValidatedForCurrentGroup(Object value, Class<?> group) {
-		return getInitializedProcessedGroupUnits().contains( new BeanGroupProcessedUnit( value, group ) );
-	}
-
-	private void markCurrentBeanAsProcessedForCurrentPath(Object bean, ModifiablePath path) {
-		Map<Object, Set<NodeImpl>> processedPathsPerBean = getInitializedProcessedPathsPerBean();
-
-		Set<NodeImpl> processedPaths = processedPathsPerBean.get( bean );
-		if ( processedPaths == null ) {
-			processedPaths = new HashSet<>();
-			processedPathsPerBean.put( bean, processedPaths );
-		}
-
-		// HV-1031 The path object is mutated as we traverse the object tree, hence we use the node which is not (for the most part):
-		processedPaths.add( path.getLeafNode() );
-	}
-
-	private void markCurrentBeanAsProcessedForCurrentGroup(Object bean, Class<?> group) {
-		getInitializedProcessedGroupUnits().add( new BeanGroupProcessedUnit( bean, group ) );
-	}
-
 	private Set<BeanPathMetaConstraintProcessedUnit> getInitializedProcessedPathUnits() {
 		if ( processedPathUnits == null ) {
 			processedPathUnits = new HashSet<>();
 		}
 		return processedPathUnits;
-	}
-
-	private Set<BeanGroupProcessedUnit> getInitializedProcessedGroupUnits() {
-		if ( processedGroupUnits == null ) {
-			processedGroupUnits = new HashSet<>();
-		}
-		return processedGroupUnits;
-	}
-
-	private Map<Object, Set<NodeImpl>> getInitializedProcessedPathsPerBean() {
-		if ( processedPathsPerBean == null ) {
-			processedPathsPerBean = new IdentityHashMap<>();
-		}
-		return processedPathsPerBean;
 	}
 
 	private Set<ConstraintViolation<T>> getInitializedFailingConstraintViolations() {
@@ -462,48 +383,4 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		}
 	}
 
-	private static final class BeanGroupProcessedUnit {
-
-		// these fields are final but we don't mark them as final as an optimization
-		private Object bean;
-		private Class<?> group;
-		private int hashCode;
-
-		BeanGroupProcessedUnit(Object bean, Class<?> group) {
-			this.bean = bean;
-			this.group = group;
-			this.hashCode = createHashCode();
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			// null check intentionally left out
-			if ( this == o ) {
-				return true;
-			}
-
-			// No need to check if the class matches because of how this class is used in the set.
-			BeanGroupProcessedUnit that = (BeanGroupProcessedUnit) o;
-
-			if ( bean != that.bean ) { // instance equality
-				return false;
-			}
-			if ( !group.equals( that.group ) ) {
-				return false;
-			}
-
-			return true;
-		}
-
-		@Override
-		public int hashCode() {
-			return hashCode;
-		}
-
-		private int createHashCode() {
-			int result = System.identityHashCode( bean );
-			result = 31 * result + group.hashCode();
-			return result;
-		}
-	}
 }

@@ -34,7 +34,7 @@ public interface BaseBeanValidationContext<T> extends ValidationContext<T> {
 
 	TraversableResolver getTraversableResolver();
 
-	boolean isBeanAlreadyValidated(Object value, Class<?> group, ModifiablePath path);
+	boolean isBeanAlreadyValidated(Object value, Class<?> group, ValueContext<?, ?> valueContext);
 
 	void markCurrentBeanAsProcessed(ValueContext<?, ?> valueContext);
 

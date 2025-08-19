@@ -42,7 +42,7 @@ public class NonContainerCascadingMetaData implements CascadingMetaData {
 	/**
 	 * The group conversions defined for this type parameter.
 	 */
-	private GroupConversionHelper groupConversionHelper;
+	private final GroupConversionHelper groupConversionHelper;
 
 	public static NonContainerCascadingMetaData of(CascadingMetaDataBuilder cascadingMetaDataBuilder, Object context) {
 		if ( !cascadingMetaDataBuilder.isCascading() ) {

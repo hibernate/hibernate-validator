@@ -25,14 +25,16 @@ import org.hibernate.validator.internal.util.TypeVariables;
  * @author Gunnar Morling
  * @author Guillaume Smet
  */
-public class ValueContext<T, V> {
+public abstract sealed class ValueContext<T, V> permits BeanValueContext, ExecutableValueContext {
+
+	protected final ValueContext<?, ?> parentContext;
 
 	private final ExecutableParameterNameProvider parameterNameProvider;
 
 	/**
 	 * The current bean which gets validated. This is the bean hosting the constraints which get validated.
 	 */
-	private final T currentBean;
+	protected final T currentBean;
 
 	/**
 	 * The current property path we are validating.
@@ -42,7 +44,12 @@ public class ValueContext<T, V> {
 	/**
 	 * The current group we are validating.
 	 */
-	private Class<?> currentGroup;
+	protected Class<?> currentGroup;
+
+	/**
+	 * The previous group we were validating.
+	 */
+	protected Class<?> previousGroup;
 
 	/**
 	 * The value which gets currently evaluated.
@@ -56,7 +63,8 @@ public class ValueContext<T, V> {
 	 */
 	private ConstraintLocationKind constraintLocationKind;
 
-	ValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, Validatable validatable, ModifiablePath propertyPath) {
+	ValueContext(ValueContext<?, ?> parentContext, ExecutableParameterNameProvider parameterNameProvider, T currentBean, Validatable validatable, ModifiablePath propertyPath) {
+		this.parentContext = parentContext;
 		this.parameterNameProvider = parameterNameProvider;
 		this.currentBean = currentBean;
 		this.currentValidatable = validatable;
@@ -138,8 +146,13 @@ public class ValueContext<T, V> {
 	}
 
 	public final void setCurrentGroup(Class<?> currentGroup) {
+		this.previousGroup = this.currentGroup;
 		this.currentGroup = currentGroup;
 	}
+
+	public abstract void markCurrentGroupAsProcessed();
+
+	protected abstract boolean isProcessedForGroup(Class<?> group);
 
 	public final void setCurrentValidatedValue(V currentValue) {
 		propertyPath.setLeafNodeValueIfRequired( currentValue );
@@ -184,6 +197,8 @@ public class ValueContext<T, V> {
 		// TODO: For BVAL-214 we'd get the value from a map or another alternative structure instead
 		return location.getValue( parent );
 	}
+
+	public abstract boolean isBeanAlreadyValidated(Object value, Class<?> group);
 
 	public static class ValueState<V> {
 

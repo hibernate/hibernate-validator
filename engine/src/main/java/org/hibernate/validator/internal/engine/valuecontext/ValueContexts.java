@@ -26,16 +26,26 @@ public final class ValueContexts {
 			T value,
 			Validatable validatable,
 			ModifiablePath propertyPath) {
-		return new ValueContext<>( parameterNameProvider, value, validatable, propertyPath );
+		return new ExecutableValueContext<>( null, parameterNameProvider, value, validatable, propertyPath );
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T, V> BeanValueContext<T, V> getLocalExecutionContextForBean(
+	public static <T, V> BeanValueContext<T, V> getLocalExecutionContextForRootBean(
 			ExecutableParameterNameProvider parameterNameProvider,
 			T value,
 			BeanMetaData<?> currentBeanMetaData,
 			ModifiablePath propertyPath) {
-		return new BeanValueContext<>( parameterNameProvider, value, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
+		return new BeanValueContext<>( null, parameterNameProvider, value, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T, V> BeanValueContext<T, V> getLocalExecutionContextForBean(
+			ValueContext<?, ?> parentContext,
+			ExecutableParameterNameProvider parameterNameProvider,
+			T value,
+			BeanMetaData<?> currentBeanMetaData,
+			ModifiablePath propertyPath) {
+		return new BeanValueContext<>( parentContext, parameterNameProvider, value, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -43,6 +53,6 @@ public final class ValueContexts {
 			ExecutableParameterNameProvider parameterNameProvider,
 			BeanMetaData<?> currentBeanMetaData,
 			ModifiablePath propertyPath) {
-		return new BeanValueContext<>( parameterNameProvider, null, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
+		return new BeanValueContext<>( null, parameterNameProvider, null, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
 	}
 }

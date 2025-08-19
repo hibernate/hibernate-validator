@@ -160,7 +160,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidate( rootBeanClass, rootBeanMetaData, object );
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
-		BeanValueContext<?, Object> valueContext = ValueContexts.getLocalExecutionContextForBean(
+		BeanValueContext<?, Object> valueContext = ValueContexts.getLocalExecutionContextForRootBean(
 				validatorScopedContext.getParameterNameProvider(),
 				object,
 				validationContext.getRootBeanMetaData(),
@@ -648,7 +648,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Class<?> originalGroup = valueContext.getCurrentGroup();
 		Class<?> currentGroup = cascadingMetaData.convertGroup( originalGroup );
 
-		if ( validationContext.isBeanAlreadyValidated( value, currentGroup, valueContext.getPropertyPath() )
+		if ( validationContext.isBeanAlreadyValidated( value, currentGroup, valueContext )
 				|| shouldFailFast( validationContext ) ) {
 			return;
 		}
@@ -728,7 +728,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			Class<?> currentGroup = cascadingMetaData.convertGroup( originalGroup );
 
 			if ( value == null
-					|| validationContext.isBeanAlreadyValidated( value, currentGroup, valueContext.getPropertyPath() )
+					|| validationContext.isBeanAlreadyValidated( value, currentGroup, valueContext )
 					|| shouldFailFast( validationContext ) ) {
 				return;
 			}
@@ -803,6 +803,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Contracts.assertNotNull( value, "value cannot be null" );
 		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( value.getClass() );
 		newValueContext = ValueContexts.getLocalExecutionContextForBean(
+				valueContext,
 				validatorScopedContext.getParameterNameProvider(),
 				value,
 				beanMetaData,
@@ -1246,7 +1247,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		propertyPath.removeLeafNode();
 
-		return ValueContexts.getLocalExecutionContextForBean( validatorScopedContext.getParameterNameProvider(), value, beanMetaData, propertyPath );
+		return ValueContexts.getLocalExecutionContextForRootBean( validatorScopedContext.getParameterNameProvider(), value, beanMetaData, propertyPath );
 	}
 
 	/**
