@@ -21,7 +21,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import org.hibernate.validator.internal.engine.path.NodeImpl;
+import org.hibernate.validator.internal.engine.path.MutableNode;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.annotations.BeforeClass;
@@ -58,17 +58,17 @@ public class ContainerElementConstraintsArraySupportTest {
 				violationOf( NotBlank.class )
 						.withPropertyPath( pathWith()
 								.property( "names" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
 						),
 				violationOf( NotBlank.class )
 						.withPropertyPath( pathWith()
 								.property( "names" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
 						),
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.property( "names" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
 						)
 		);
 	}
@@ -84,7 +84,7 @@ public class ContainerElementConstraintsArraySupportTest {
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.property( "bars" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
 						),
 				violationOf( Min.class )
 						.withPropertyPath( pathWith()
@@ -105,12 +105,12 @@ public class ContainerElementConstraintsArraySupportTest {
 				violationOf( NotBlank.class )
 						.withPropertyPath( pathWith()
 								.property( "names" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
 						),
 				violationOf( NotBlank.class )
 						.withPropertyPath( pathWith()
 								.property( "names" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
 						)
 		);
 
@@ -135,17 +135,17 @@ public class ContainerElementConstraintsArraySupportTest {
 				violationOf( NotBlank.class )
 						.withPropertyPath( pathWith()
 								.property( "strings" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
 						),
 				violationOf( NotBlank.class )
 						.withPropertyPath( pathWith()
 								.property( "strings" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
 						),
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.property( "strings" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
 						)
 		);
 	}
@@ -165,19 +165,19 @@ public class ContainerElementConstraintsArraySupportTest {
 						.withPropertyPath( pathWith()
 								.method( "returnStrings" )
 								.returnValue()
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, Object[].class, null )
 						),
 				violationOf( NotBlank.class )
 						.withPropertyPath( pathWith()
 								.method( "returnStrings" )
 								.returnValue()
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
 						),
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.method( "returnStrings" )
 								.returnValue()
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
 						)
 		);
 	}
@@ -195,7 +195,7 @@ public class ContainerElementConstraintsArraySupportTest {
 				violationOf( NotBlank.class )
 						.withPropertyPath( pathWith()
 								.property( "names" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
 						)
 		);
 	}
@@ -217,19 +217,19 @@ public class ContainerElementConstraintsArraySupportTest {
 						.withPropertyPath( pathWith()
 								.method( "setValues" )
 								.parameter( "arrayParameter", 0 )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
 						),
 				violationOf( NotBlank.class )
 						.withPropertyPath( pathWith()
 								.method( "setValues" )
 								.parameter( "arrayParameter", 0 )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
 						),
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.method( "setValues" )
 								.parameter( "arrayParameter", 0 )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
 						)
 		);
 	}
@@ -251,19 +251,19 @@ public class ContainerElementConstraintsArraySupportTest {
 						.withPropertyPath( pathWith()
 								.constructor( TypeWithArray8.class )
 								.parameter( "arrayParameter", 0 )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
 						),
 				violationOf( NotBlank.class )
 						.withPropertyPath( pathWith()
 								.constructor( TypeWithArray8.class )
 								.parameter( "arrayParameter", 0 )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
 						),
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.constructor( TypeWithArray8.class )
 								.parameter( "arrayParameter", 0 )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 2, Object[].class, null )
 						)
 		);
 	}
@@ -283,7 +283,7 @@ public class ContainerElementConstraintsArraySupportTest {
 				violationOf( Min.class )
 						.withPropertyPath( pathWith()
 								.property( "ints" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
 						)
 		);
 	}
@@ -301,7 +301,7 @@ public class ContainerElementConstraintsArraySupportTest {
 				violationOf( Min.class )
 						.withPropertyPath( pathWith()
 								.property( "ints" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
 						)
 		);
 
@@ -326,7 +326,7 @@ public class ContainerElementConstraintsArraySupportTest {
 				violationOf( Min.class )
 						.withPropertyPath( pathWith()
 								.property( "ints" )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
 						)
 		);
 	}
@@ -347,7 +347,7 @@ public class ContainerElementConstraintsArraySupportTest {
 						.withPropertyPath( pathWith()
 								.method( "returnInts" )
 								.returnValue()
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
 						)
 		);
 	}
@@ -364,7 +364,7 @@ public class ContainerElementConstraintsArraySupportTest {
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( Min.class ).withPropertyPath( pathWith()
 						.property( "ints" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, int[].class, null )
+						.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, int[].class, null )
 				)
 		);
 	}
@@ -387,7 +387,7 @@ public class ContainerElementConstraintsArraySupportTest {
 						.withPropertyPath( pathWith()
 								.method( "setValues" )
 								.parameter( "arrayParameter", 0 )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
 						)
 		);
 	}
@@ -409,7 +409,7 @@ public class ContainerElementConstraintsArraySupportTest {
 						.withPropertyPath( pathWith()
 								.constructor( TypeWithArrayOfPrimitives8.class )
 								.parameter( "arrayParameter", 0 )
-								.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
+								.containerElement( MutableNode.ITERABLE_ELEMENT_NODE_NAME, true, null, 1, int[].class, null )
 						)
 		);
 	}

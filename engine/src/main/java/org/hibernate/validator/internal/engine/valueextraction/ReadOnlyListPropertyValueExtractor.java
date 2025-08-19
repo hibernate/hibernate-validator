@@ -11,7 +11,7 @@ import jakarta.validation.valueextraction.ExtractedValue;
 import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
-import org.hibernate.validator.internal.engine.path.NodeImpl;
+import org.hibernate.validator.internal.engine.path.MutableNode;
 
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.value.ObservableValue;
@@ -37,7 +37,7 @@ class ReadOnlyListPropertyValueExtractor implements ValueExtractor<ReadOnlyListP
 	@Override
 	public void extractValues(ReadOnlyListProperty<?> originalValue, ValueExtractor.ValueReceiver receiver) {
 		for ( int i = 0; i < originalValue.size(); i++ ) {
-			receiver.indexedValue( NodeImpl.LIST_ELEMENT_NODE_NAME, i, originalValue.get( i ) );
+			receiver.indexedValue( MutableNode.LIST_ELEMENT_NODE_NAME, i, originalValue.get( i ) );
 		}
 	}
 }

@@ -10,7 +10,7 @@ import java.util.Optional;
 import jakarta.validation.valueextraction.ExtractedValue;
 import jakarta.validation.valueextraction.ValueExtractor;
 
-import org.hibernate.validator.internal.engine.path.NodeImpl;
+import org.hibernate.validator.internal.engine.path.MutableNode;
 
 class MapValueExtractor implements ValueExtractor<Map<?, @ExtractedValue ?>> {
 
@@ -23,7 +23,7 @@ class MapValueExtractor implements ValueExtractor<Map<?, @ExtractedValue ?>> {
 	@Override
 	public void extractValues(Map<?, ?> originalValue, ValueReceiver receiver) {
 		for ( Map.Entry<?, ?> entry : originalValue.entrySet() ) {
-			receiver.keyedValue( NodeImpl.MAP_VALUE_NODE_NAME, entry.getKey(), entry.getValue() );
+			receiver.keyedValue( MutableNode.MAP_VALUE_NODE_NAME, entry.getKey(), entry.getValue() );
 		}
 	}
 }

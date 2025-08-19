@@ -1,0 +1,433 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright Red Hat Inc. and Hibernate Authors
+ */
+package org.hibernate.validator.internal.engine.path;
+
+import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
+import jakarta.validation.ElementKind;
+import jakarta.validation.Path;
+import jakarta.validation.Path.BeanNode;
+import jakarta.validation.Path.ConstructorNode;
+import jakarta.validation.Path.ContainerElementNode;
+import jakarta.validation.Path.CrossParameterNode;
+import jakarta.validation.Path.MethodNode;
+import jakarta.validation.Path.ParameterNode;
+import jakarta.validation.Path.PropertyNode;
+import jakarta.validation.Path.ReturnValueNode;
+
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.TypeVariables;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+public class MaterializedNode
+		implements PropertyNode, MethodNode, ConstructorNode, BeanNode, ParameterNode, ReturnValueNode, CrossParameterNode, ContainerElementNode,
+		org.hibernate.validator.path.PropertyNode, org.hibernate.validator.path.ContainerElementNode, Serializable {
+	//	@Serial
+	//	private static final long serialVersionUID = 2075466571633860499L;
+	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[] { };
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+
+	static final MaterializedNode ROOT_NODE;
+
+	private static final String INDEX_OPEN = "[";
+	private static final String INDEX_CLOSE = "]";
+	private static final String TYPE_PARAMETER_OPEN = "<";
+	private static final String TYPE_PARAMETER_CLOSE = ">";
+
+	public static final String ITERABLE_ELEMENT_NODE_NAME = "<iterable element>";
+
+	static {
+		ROOT_NODE = new MaterializedNode(
+				null,
+				0,
+				false,
+				null,
+				null,
+				ElementKind.BEAN,
+				EMPTY_CLASS_ARRAY,
+				null,
+				null,
+				null,
+				null
+		);
+		ROOT_NODE.nodes = new MaterializedNode[] { ROOT_NODE };
+		ROOT_NODE.hashCode();
+	}
+
+
+	// NOTE: parent here is not final on purpose,
+	//  this way we don't need to use recursive calls or construct a temp array of mutable nodes
+	//  when building the materialized path (see #constructMaterializedPath())
+	private MaterializedNode parent;
+	private final String name;
+	private final int size;
+	private final boolean isIterable;
+	private final Integer index;
+	private final Object key;
+	private final ElementKind kind;
+
+	//type-specific attributes
+	private final Class<?>[] parameterTypes;
+	private final Integer parameterIndex;
+	private final Object value;
+	private final Class<?> containerClass;
+	private final Integer typeArgumentIndex;
+
+	private int hashCode = -1;
+	private String asString;
+	private MaterializedNode[] nodes;
+
+	MaterializedNode(
+			String name, int size, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
+			Integer parameterIndex, Object value, Class<?> containerClass, Integer typeArgumentIndex
+	) {
+		this.name = name;
+		this.size = size;
+		this.index = index;
+		this.key = key;
+		this.value = value;
+		this.isIterable = isIterable;
+		this.kind = kind;
+		this.parameterTypes = parameterTypes;
+		this.parameterIndex = parameterIndex;
+		this.containerClass = containerClass;
+		this.typeArgumentIndex = typeArgumentIndex;
+	}
+
+	static MaterializedNode[] constructMaterializedPath(MutableNode leaf) {
+		if ( leaf.getParent() == null ) {
+			// root ?
+			return ROOT_NODE.nodes;
+		}
+		else {
+			MaterializedNode[] materializedNodes = leaf.partiallyInitializedMaterializedNodes();
+			for ( int i = materializedNodes.length - 1; i > 0; i-- ) {
+				materializedNodes[i].parent = materializedNodes[i - 1];
+			}
+			materializedNodes[0].parent = ROOT_NODE;
+			return materializedNodes;
+		}
+	}
+
+	@Override
+	public final String getName() {
+		return name;
+	}
+
+	@Override
+	public final boolean isInIterable() {
+		return parent != null && parent.isIterable();
+	}
+
+	public final boolean isIterable() {
+		return isIterable;
+	}
+
+	@Override
+	public final Integer getIndex() {
+		if ( parent == null ) {
+			return null;
+		}
+		else {
+			return parent.index;
+		}
+	}
+
+	@Override
+	public final Object getKey() {
+		if ( parent == null ) {
+			return null;
+		}
+		else {
+			return parent.key;
+		}
+	}
+
+	@Override
+	public Class<?> getContainerClass() {
+		Contracts.assertTrue(
+				kind == ElementKind.BEAN || kind == ElementKind.PROPERTY || kind == ElementKind.CONTAINER_ELEMENT,
+				"getContainerClass() may only be invoked for nodes of type ElementKind.BEAN, ElementKind.PROPERTY or ElementKind.CONTAINER_ELEMENT."
+		);
+		if ( parent == null ) {
+			return null;
+		}
+		return parent.containerClass;
+	}
+
+	@Override
+	public Integer getTypeArgumentIndex() {
+		Contracts.assertTrue(
+				kind == ElementKind.BEAN || kind == ElementKind.PROPERTY || kind == ElementKind.CONTAINER_ELEMENT,
+				"getTypeArgumentIndex() may only be invoked for nodes of type ElementKind.BEAN, ElementKind.PROPERTY or ElementKind.CONTAINER_ELEMENT."
+		);
+		if ( parent == null ) {
+			return null;
+		}
+		return parent.typeArgumentIndex;
+	}
+
+	public final MaterializedNode getParent() {
+		return parent;
+	}
+
+	@Override
+	public ElementKind getKind() {
+		return kind;
+	}
+
+	@Override
+	public <T extends Path.Node> T as(Class<T> nodeType) {
+		if ( ( kind == ElementKind.BEAN && nodeType == BeanNode.class )
+				|| ( kind == ElementKind.CONSTRUCTOR && nodeType == ConstructorNode.class ) || ( kind == ElementKind.CROSS_PARAMETER && nodeType == CrossParameterNode.class )
+				|| ( kind == ElementKind.METHOD && nodeType == MethodNode.class ) || ( kind == ElementKind.PARAMETER && nodeType == ParameterNode.class )
+				|| ( kind == ElementKind.PROPERTY && ( nodeType == PropertyNode.class || nodeType == org.hibernate.validator.path.PropertyNode.class ) )
+				|| ( kind == ElementKind.RETURN_VALUE && nodeType == ReturnValueNode.class )
+				|| ( kind == ElementKind.CONTAINER_ELEMENT && ( nodeType == ContainerElementNode.class || nodeType == org.hibernate.validator.path.ContainerElementNode.class ) ) ) {
+			return nodeType.cast( this );
+		}
+
+		throw LOG.getUnableToNarrowNodeTypeException( this.getClass(), kind, nodeType );
+	}
+
+	@Override
+	public List<Class<?>> getParameterTypes() {
+		return Arrays.asList( parameterTypes );
+	}
+
+	@Override
+	public int getParameterIndex() {
+		Contracts.assertTrue(
+				kind == ElementKind.PARAMETER,
+				"getParameterIndex() may only be invoked for nodes of type ElementKind.PARAMETER."
+		);
+		return parameterIndex;
+	}
+
+	@Override
+	public Object getValue() {
+		return value;
+	}
+
+	@Override
+	public String toString() {
+		return asString();
+	}
+
+	public final String asString() {
+		if ( asString == null ) {
+			asString = buildToString();
+		}
+		return asString;
+	}
+
+	private String buildToString() {
+		StringBuilder builder = new StringBuilder();
+
+		if ( getName() != null ) {
+			builder.append( getName() );
+		}
+
+		if ( includeTypeParameterInformation( containerClass, typeArgumentIndex ) ) {
+			builder.append( TYPE_PARAMETER_OPEN );
+			builder.append( TypeVariables.getTypeParameterName( containerClass, typeArgumentIndex ) );
+			builder.append( TYPE_PARAMETER_CLOSE );
+		}
+
+		if ( isIterable() ) {
+			builder.append( INDEX_OPEN );
+			if ( index != null ) {
+				builder.append( index );
+			}
+			else if ( key != null ) {
+				builder.append( key );
+			}
+			builder.append( INDEX_CLOSE );
+		}
+
+		return builder.toString();
+	}
+
+	// TODO: this is used to reduce the number of differences until we agree on the string representation
+	//  it introduces some inconsistent behavior e.g. you get '<V>' for a Multimap but not for a Map
+	private static boolean includeTypeParameterInformation(Class<?> containerClass, Integer typeArgumentIndex) {
+		if ( containerClass == null || typeArgumentIndex == null ) {
+			return false;
+		}
+
+		if ( containerClass.getTypeParameters().length < 2 ) {
+			return false;
+		}
+		if ( Map.class.isAssignableFrom( containerClass ) && typeArgumentIndex == 1 ) {
+			return false;
+		}
+		return true;
+	}
+
+	public final int buildHashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ( ( index == null ) ? 0 : index.hashCode() );
+		result = prime * result + ( isIterable ? 1231 : 1237 );
+		result = prime * result + ( ( key == null ) ? 0 : key.hashCode() );
+		result = prime * result + ( ( kind == null ) ? 0 : kind.hashCode() );
+		result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
+		result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
+		result = prime * result + ( ( parameterTypes == null ) ? 0 : Arrays.hashCode( parameterTypes ) );
+		result = prime * result + ( ( containerClass == null ) ? 0 : containerClass.hashCode() );
+		result = prime * result + ( ( typeArgumentIndex == null ) ? 0 : typeArgumentIndex.hashCode() );
+		return result;
+	}
+
+	@Override
+	public int hashCode() {
+		if ( hashCode == -1 ) {
+			hashCode = buildHashCode();
+		}
+
+		return hashCode;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( obj == null ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		MaterializedNode other = (MaterializedNode) obj;
+		return samePath( other );
+	}
+
+	boolean sameNode(MaterializedNode other) {
+		if ( this == other ) {
+			return true;
+		}
+		if ( other == null ) {
+			return false;
+		}
+		if ( hashCode != -1 && other.hashCode != -1 && hashCode != other.hashCode ) {
+			return false;
+		}
+		if ( index == null ) {
+			if ( other.index != null ) {
+				return false;
+			}
+		}
+		else if ( !index.equals( other.index ) ) {
+			return false;
+		}
+		if ( isIterable != other.isIterable ) {
+			return false;
+		}
+		if ( key == null ) {
+			if ( other.key != null ) {
+				return false;
+			}
+		}
+		else if ( !key.equals( other.key ) ) {
+			return false;
+		}
+		if ( containerClass == null ) {
+			if ( other.containerClass != null ) {
+				return false;
+			}
+		}
+		else if ( !containerClass.equals( other.containerClass ) ) {
+			return false;
+		}
+		if ( typeArgumentIndex == null ) {
+			if ( other.typeArgumentIndex != null ) {
+				return false;
+			}
+		}
+		else if ( !typeArgumentIndex.equals( other.typeArgumentIndex ) ) {
+			return false;
+		}
+		if ( kind != other.kind ) {
+			return false;
+		}
+		if ( name == null ) {
+			if ( other.name != null ) {
+				return false;
+			}
+		}
+		else if ( !name.equals( other.name ) ) {
+			return false;
+		}
+		if ( parameterIndex == null ) {
+			if ( other.parameterIndex != null ) {
+				return false;
+			}
+		}
+		else if ( !parameterIndex.equals( other.parameterIndex ) ) {
+			return false;
+		}
+		if ( parameterTypes == null ) {
+			if ( other.parameterTypes != null ) {
+				return false;
+			}
+		}
+		else if ( !Arrays.equals( parameterTypes, other.parameterTypes ) ) {
+			return false;
+		}
+		return true;
+	}
+
+	boolean samePath(MaterializedNode other) {
+		if ( this.size != other.size ) {
+			return false;
+		}
+		MaterializedNode curr = this;
+		MaterializedNode otherCurr = other;
+		while ( curr != null && otherCurr != null ) {
+			if ( !curr.sameNode( otherCurr ) ) {
+				return false;
+			}
+			otherCurr = otherCurr.parent;
+			curr = curr.parent;
+		}
+
+		return curr == null && otherCurr == null;
+	}
+
+	public boolean isRootPath() {
+		return parent == null && name == null;
+	}
+
+	protected static class NodeIterator implements Iterator<Path.Node> {
+		private final MaterializedNode[] array;
+		private int index;
+
+		public NodeIterator(MaterializedNode[] array) {
+			this.array = array;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return index < array.length;
+		}
+
+		@Override
+		public Path.Node next() {
+			if ( index < array.length ) {
+				return array[index++];
+			}
+			throw new NoSuchElementException();
+		}
+	}
+}

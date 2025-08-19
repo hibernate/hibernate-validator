@@ -11,7 +11,7 @@ import jakarta.validation.valueextraction.ExtractedValue;
 import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
-import org.hibernate.validator.internal.engine.path.NodeImpl;
+import org.hibernate.validator.internal.engine.path.MutableNode;
 
 import javafx.beans.property.SetProperty;
 import javafx.beans.value.ObservableValue;
@@ -37,7 +37,7 @@ class SetPropertyValueExtractor implements ValueExtractor<SetProperty<@Extracted
 	@Override
 	public void extractValues(SetProperty<?> originalValue, ValueExtractor.ValueReceiver receiver) {
 		for ( Object object : originalValue ) {
-			receiver.iterableValue( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, object );
+			receiver.iterableValue( MutableNode.ITERABLE_ELEMENT_NODE_NAME, object );
 		}
 	}
 }

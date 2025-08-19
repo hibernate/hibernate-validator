@@ -31,7 +31,7 @@ import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
-import org.hibernate.validator.internal.engine.path.ModifiablePath;
+import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.engine.tracking.DefaultProcessedBeansTrackingVoter;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManagerImpl;
@@ -52,12 +52,13 @@ import org.testng.annotations.Test;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-public class ModifiablePathTest {
+@SuppressWarnings("removal")
+public class MutablePathTest {
 
 	@Test
 	public void testParsing() {
 		String property = "orders[3].deliveryAddress.addressline[1]";
-		Path path = ModifiablePath.createPathFromString( property );
+		Path path = MutablePath.createPathFromString( property );
 		Iterator<Path.Node> propIter = path.iterator();
 
 		assertTrue( propIter.hasNext() );
@@ -89,7 +90,7 @@ public class ModifiablePathTest {
 
 	@Test
 	public void testParsingPropertyWithCurrencySymbol() {
-		ModifiablePath path = ModifiablePath.createPathFromString( "€Amount" );
+		MutablePath path = MutablePath.createPathFromString( "€Amount" );
 		Iterator<Path.Node> it = path.iterator();
 
 		assertEquals( it.next().getName(), "€Amount" );
@@ -97,7 +98,7 @@ public class ModifiablePathTest {
 
 	@Test
 	public void testParsingPropertyWithGermanCharacter() {
-		ModifiablePath path = ModifiablePath.createPathFromString( "höchstBetrag" );
+		MutablePath path = MutablePath.createPathFromString( "höchstBetrag" );
 		Iterator<Path.Node> it = path.iterator();
 
 		assertEquals( it.next().getName(), "höchstBetrag" );
@@ -105,7 +106,7 @@ public class ModifiablePathTest {
 
 	@Test
 	public void testParsingPropertyWithUnicodeCharacter() {
-		ModifiablePath path = ModifiablePath.createPathFromString( "höchst\u00f6Betrag" );
+		MutablePath path = MutablePath.createPathFromString( "höchst\u00f6Betrag" );
 		Iterator<Path.Node> it = path.iterator();
 
 		assertEquals( it.next().getName(), "höchst\u00f6Betrag" );
@@ -113,13 +114,13 @@ public class ModifiablePathTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testParsingInvalidJavaProperty() {
-		ModifiablePath.createPathFromString( "1invalid" );
+		MutablePath.createPathFromString( "1invalid" );
 	}
 
 	@Test
 	public void testParseMapBasedProperty() {
 		String property = "order[foo].deliveryAddress";
-		Path path = ModifiablePath.createPathFromString( property );
+		Path path = MutablePath.createPathFromString( property );
 		Iterator<Path.Node> propIter = path.iterator();
 
 		assertTrue( propIter.hasNext() );
@@ -138,43 +139,43 @@ public class ModifiablePathTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNull() {
-		ModifiablePath.createPathFromString( null );
+		MutablePath.createPathFromString( null );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testUnbalancedBraces() {
-		ModifiablePath.createPathFromString( "foo[.bar" );
+		MutablePath.createPathFromString( "foo[.bar" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testIndexInMiddleOfProperty() {
-		ModifiablePath.createPathFromString( "f[1]oo.bar" );
+		MutablePath.createPathFromString( "f[1]oo.bar" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testTrailingPathSeparator() {
-		ModifiablePath.createPathFromString( "foo.bar." );
+		MutablePath.createPathFromString( "foo.bar." );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testLeadingPathSeparator() {
-		ModifiablePath.createPathFromString( ".foo.bar" );
+		MutablePath.createPathFromString( ".foo.bar" );
 	}
 
 	@Test
 	public void testEmptyString() {
-		Path path = ModifiablePath.createPathFromString( "" );
+		Path path = MutablePath.createPathFromString( "" );
 		assertTrue( path.iterator().hasNext() );
 	}
 
 	@Test
 	public void testIsSubPathOf() {
-		ModifiablePath subPath = ModifiablePath.createPathFromString( "annotation" );
-		ModifiablePath middlePath = ModifiablePath.createPathFromString( "annotation.property" );
-		ModifiablePath middlePath2 = ModifiablePath.createPathFromString( "annotation.property[2]" );
-		ModifiablePath middlePath3 = ModifiablePath.createPathFromString( "annotation.property[3]" );
-		ModifiablePath fullPath3 = ModifiablePath.createPathFromString( "annotation.property[3].element" );
-		ModifiablePath fullPath4 = ModifiablePath.createPathFromString( "annotation.property[4].element" );
+		MutablePath subPath = MutablePath.createPathFromString( "annotation" );
+		MutablePath middlePath = MutablePath.createPathFromString( "annotation.property" );
+		MutablePath middlePath2 = MutablePath.createPathFromString( "annotation.property[2]" );
+		MutablePath middlePath3 = MutablePath.createPathFromString( "annotation.property[3]" );
+		MutablePath fullPath3 = MutablePath.createPathFromString( "annotation.property[3].element" );
+		MutablePath fullPath4 = MutablePath.createPathFromString( "annotation.property[4].element" );
 
 		assertTrue( subPath.isSubPathOf( middlePath ), "bean is subpath of its properties" );
 		assertFalse( middlePath.isSubPathOf( subPath ), "a property is not a subPath of its bean" );
@@ -188,13 +189,13 @@ public class ModifiablePathTest {
 
 	@Test
 	public void testIsSubPathOrContains() {
-		ModifiablePath rootPath = ModifiablePath.createPathFromString( "" );
-		ModifiablePath subPath = ModifiablePath.createPathFromString( "annotation" );
-		ModifiablePath middlePath = ModifiablePath.createPathFromString( "annotation.property" );
-		ModifiablePath middlePath2 = ModifiablePath.createPathFromString( "annotation.property[2]" );
-		ModifiablePath middlePath3 = ModifiablePath.createPathFromString( "annotation.property[3]" );
-		ModifiablePath fullPath3 = ModifiablePath.createPathFromString( "annotation.property[3].element" );
-		ModifiablePath fullPath4 = ModifiablePath.createPathFromString( "annotation.property[4].element" );
+		MutablePath rootPath = MutablePath.createPathFromString( "" );
+		MutablePath subPath = MutablePath.createPathFromString( "annotation" );
+		MutablePath middlePath = MutablePath.createPathFromString( "annotation.property" );
+		MutablePath middlePath2 = MutablePath.createPathFromString( "annotation.property[2]" );
+		MutablePath middlePath3 = MutablePath.createPathFromString( "annotation.property[3]" );
+		MutablePath fullPath3 = MutablePath.createPathFromString( "annotation.property[3].element" );
+		MutablePath fullPath4 = MutablePath.createPathFromString( "annotation.property[4].element" );
 
 		assertTrue( rootPath.isSubPathOrContains( middlePath ), "root path is in every path" );
 		assertTrue( middlePath.isSubPathOrContains( rootPath ), "every path contains the root path" );
@@ -251,14 +252,14 @@ public class ModifiablePathTest {
 		ExecutableMetaData executableMetaData = beanMetaDataManager.getBeanMetaData( Container.class )
 				.getMetaDataFor( executable ).get();
 
-		ModifiablePath methodParameterPath = ModifiablePath.createPathForExecutable( executableMetaData );
+		MutablePath methodParameterPath = MutablePath.createPathForExecutable( executableMetaData );
 
 		assertEquals( methodParameterPath.toString(), "addItem" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testCreationOfExecutablePathFailsDueToMissingExecutable() {
-		ModifiablePath.createPathForExecutable( null );
+		MutablePath.createPathForExecutable( null );
 	}
 
 	class Container {

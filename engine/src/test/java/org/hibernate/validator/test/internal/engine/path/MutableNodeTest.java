@@ -55,7 +55,7 @@ import org.testng.annotations.Test;
  * @author Hardy Ferentschik
  * @author Guillaume Smet
  */
-public class NodeImplTest {
+public class MutableNodeTest {
 	private Validator validator;
 
 	@BeforeClass

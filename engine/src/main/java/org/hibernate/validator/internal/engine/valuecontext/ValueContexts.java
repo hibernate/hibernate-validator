@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.internal.engine.valuecontext;
 
-import org.hibernate.validator.internal.engine.path.ModifiablePath;
+import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -25,7 +25,7 @@ public final class ValueContexts {
 			ExecutableParameterNameProvider parameterNameProvider,
 			T value,
 			Validatable validatable,
-			ModifiablePath propertyPath) {
+			MutablePath propertyPath) {
 		return new ExecutableValueContext<>( null, parameterNameProvider, value, validatable, propertyPath );
 	}
 
@@ -34,7 +34,7 @@ public final class ValueContexts {
 			ExecutableParameterNameProvider parameterNameProvider,
 			T value,
 			BeanMetaData<?> currentBeanMetaData,
-			ModifiablePath propertyPath) {
+			MutablePath propertyPath) {
 		return new BeanValueContext<>( null, parameterNameProvider, value, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
 	}
 
@@ -44,7 +44,7 @@ public final class ValueContexts {
 			ExecutableParameterNameProvider parameterNameProvider,
 			T value,
 			BeanMetaData<?> currentBeanMetaData,
-			ModifiablePath propertyPath) {
+			MutablePath propertyPath) {
 		return new BeanValueContext<>( parentContext, parameterNameProvider, value, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
 	}
 
@@ -52,7 +52,7 @@ public final class ValueContexts {
 	public static <T, V> BeanValueContext<T, V> getLocalExecutionContextForValueValidation(
 			ExecutableParameterNameProvider parameterNameProvider,
 			BeanMetaData<?> currentBeanMetaData,
-			ModifiablePath propertyPath) {
+			MutablePath propertyPath) {
 		return new BeanValueContext<>( null, parameterNameProvider, null, (BeanMetaData<T>) currentBeanMetaData, propertyPath );
 	}
 }

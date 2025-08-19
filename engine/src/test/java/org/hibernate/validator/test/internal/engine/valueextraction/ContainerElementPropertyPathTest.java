@@ -31,7 +31,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import org.hibernate.validator.internal.engine.path.NodeImpl;
+import org.hibernate.validator.internal.engine.path.MutableNode;
 import org.hibernate.validator.testutils.CandidateForTck;
 
 import org.testng.annotations.BeforeClass;
@@ -58,7 +58,7 @@ public class ContainerElementPropertyPathTest {
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.property( "inhabitantsPerAddress" )
-								.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, null, null, Map.class, 0 )
+								.containerElement( MutableNode.MAP_KEY_NODE_NAME, true, null, null, Map.class, 0 )
 						)
 		);
 	}
@@ -124,7 +124,7 @@ public class ContainerElementPropertyPathTest {
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.property( "addressesPerCity" )
-								.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, city, null, Map.class, 1 )
+								.containerElement( MutableNode.MAP_VALUE_NODE_NAME, true, city, null, Map.class, 1 )
 						)
 		);
 	}
@@ -191,7 +191,7 @@ public class ContainerElementPropertyPathTest {
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith()
 								.property( "addresses" )
-								.containerElement( NodeImpl.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+								.containerElement( MutableNode.LIST_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
 						)
 		);
 	}

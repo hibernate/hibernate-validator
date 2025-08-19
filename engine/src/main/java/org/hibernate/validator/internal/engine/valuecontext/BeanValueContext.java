@@ -9,7 +9,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.engine.path.ModifiablePath;
+import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -38,7 +38,7 @@ public final class BeanValueContext<T, V> extends ValueContext<T, V> {
 	@Lazy
 	private Map<MetaConstraint<?>, Boolean> alreadyProcessedMetaConstraints;
 
-	BeanValueContext(ValueContext<?, ?> parentContext, ExecutableParameterNameProvider parameterNameProvider, T currentBean, BeanMetaData<T> currentBeanMetaData, ModifiablePath propertyPath) {
+	BeanValueContext(ValueContext<?, ?> parentContext, ExecutableParameterNameProvider parameterNameProvider, T currentBean, BeanMetaData<T> currentBeanMetaData, MutablePath propertyPath) {
 		super( parentContext, parameterNameProvider, currentBean, currentBeanMetaData, propertyPath );
 		this.currentBeanMetaData = currentBeanMetaData;
 		this.alreadyProcessedGroups = new HashSet<>();

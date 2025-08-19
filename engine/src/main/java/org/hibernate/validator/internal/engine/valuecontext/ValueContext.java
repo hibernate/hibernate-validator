@@ -7,7 +7,7 @@ package org.hibernate.validator.internal.engine.valuecontext;
 import java.lang.reflect.TypeVariable;
 
 import org.hibernate.validator.internal.engine.groups.Group;
-import org.hibernate.validator.internal.engine.path.ModifiablePath;
+import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.engine.valueextraction.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valueextraction.ArrayElement;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -40,7 +40,7 @@ public abstract sealed class ValueContext<T, V> permits BeanValueContext, Execut
 	/**
 	 * The current property path we are validating.
 	 */
-	private ModifiablePath propertyPath;
+	private MutablePath propertyPath;
 
 	/**
 	 * The current group we are validating.
@@ -64,7 +64,7 @@ public abstract sealed class ValueContext<T, V> permits BeanValueContext, Execut
 	 */
 	private ConstraintLocationKind constraintLocationKind;
 
-	ValueContext(ValueContext<?, ?> parentContext, ExecutableParameterNameProvider parameterNameProvider, T currentBean, Validatable validatable, ModifiablePath propertyPath) {
+	ValueContext(ValueContext<?, ?> parentContext, ExecutableParameterNameProvider parameterNameProvider, T currentBean, Validatable validatable, MutablePath propertyPath) {
 		this.parentContext = parentContext;
 		this.parameterNameProvider = parameterNameProvider;
 		this.currentBean = currentBean;
@@ -72,7 +72,7 @@ public abstract sealed class ValueContext<T, V> permits BeanValueContext, Execut
 		this.propertyPath = propertyPath;
 	}
 
-	public final ModifiablePath getPropertyPath() {
+	public final MutablePath getPropertyPath() {
 		return propertyPath;
 	}
 
@@ -96,20 +96,20 @@ public abstract sealed class ValueContext<T, V> permits BeanValueContext, Execut
 	}
 
 	public final void appendNode(Cascadable node) {
-		ModifiablePath newPath = ModifiablePath.createCopy( propertyPath );
+		MutablePath newPath = MutablePath.createCopy( propertyPath );
 		node.appendTo( newPath );
 		propertyPath = newPath;
 	}
 
 	public final void appendNode(ConstraintLocation location) {
-		ModifiablePath newPath = ModifiablePath.createCopy( propertyPath );
+		MutablePath newPath = MutablePath.createCopy( propertyPath );
 		location.appendTo( parameterNameProvider, newPath );
 		propertyPath = newPath;
 	}
 
 	public final void appendTypeParameterNode(String nodeName) {
 		if ( propertyPath.needToAddContainerElementNode( nodeName ) ) {
-			ModifiablePath newPath = ModifiablePath.createCopy( propertyPath );
+			MutablePath newPath = MutablePath.createCopy( propertyPath );
 			newPath.addContainerElementNode( nodeName );
 			propertyPath = newPath;
 		}
@@ -207,16 +207,16 @@ public abstract sealed class ValueContext<T, V> permits BeanValueContext, Execut
 
 	public static class ValueState<V> {
 
-		private final ModifiablePath propertyPath;
+		private final MutablePath propertyPath;
 
 		private final V currentValue;
 
-		ValueState(ModifiablePath propertyPath, V currentValue) {
+		ValueState(MutablePath propertyPath, V currentValue) {
 			this.propertyPath = propertyPath;
 			this.currentValue = currentValue;
 		}
 
-		public ModifiablePath getPropertyPath() {
+		public MutablePath getPropertyPath() {
 			return propertyPath;
 		}
 
