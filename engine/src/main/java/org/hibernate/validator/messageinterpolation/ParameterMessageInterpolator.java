@@ -11,8 +11,8 @@ import java.util.Set;
 
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
-import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.internal.engine.messageinterpolation.ParameterTermResolver;
+import org.hibernate.validator.internal.engine.messageinterpolation.TermInterpolator;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
@@ -51,13 +51,12 @@ public class ParameterMessageInterpolator extends AbstractMessageInterpolator {
 
 	@Override
 	protected String interpolate(Context context, Locale locale, String term) {
-		if ( InterpolationTerm.isElExpression( term ) ) {
+		if ( TermInterpolator.isElExpression( term ) ) {
 			LOG.warnElIsUnsupported( term );
 			return term;
 		}
 		else {
-			ParameterTermResolver parameterTermResolver = new ParameterTermResolver();
-			return parameterTermResolver.interpolate( context, term );
+			return ParameterTermResolver.INSTANCE.interpolate( context, locale, term );
 		}
 	}
 }

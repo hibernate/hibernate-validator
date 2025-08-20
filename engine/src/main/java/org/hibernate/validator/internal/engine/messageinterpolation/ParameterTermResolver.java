@@ -5,6 +5,7 @@
 package org.hibernate.validator.internal.engine.messageinterpolation;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import jakarta.validation.MessageInterpolator.Context;
 
@@ -18,10 +19,15 @@ import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolator
  * @author Guillaume Smet
  * @author Alexander Gatsenko
  */
-public class ParameterTermResolver implements TermResolver {
+public final class ParameterTermResolver implements TermResolver {
+
+	public static final ParameterTermResolver INSTANCE = new ParameterTermResolver();
+
+	private ParameterTermResolver() {
+	}
 
 	@Override
-	public String interpolate(Context context, String expression) {
+	public String interpolate(Context context, Locale locale, String expression) {
 		String resolvedExpression;
 		Object variable = getVariable( context, removeCurlyBraces( expression ) );
 		if ( variable != null ) {
@@ -34,8 +40,8 @@ public class ParameterTermResolver implements TermResolver {
 	}
 
 	private Object getVariable(Context context, String parameter) {
-		if ( context instanceof HibernateMessageInterpolatorContext ) {
-			Object variable = ( (HibernateMessageInterpolatorContext) context ).getMessageParameters().get( parameter );
+		if ( context instanceof HibernateMessageInterpolatorContext hibernateMessageInterpolatorContext ) {
+			Object variable = hibernateMessageInterpolatorContext.getMessageParameters().get( parameter );
 			if ( variable != null ) {
 				return variable;
 			}

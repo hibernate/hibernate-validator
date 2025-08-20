@@ -8,6 +8,7 @@ import static org.testng.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import jakarta.validation.MessageInterpolator;
@@ -28,7 +29,7 @@ import org.testng.annotations.Test;
  */
 public class ParameterTermResolverTest {
 
-	private final ParameterTermResolver resolver = new ParameterTermResolver();
+	private final ParameterTermResolver resolver = ParameterTermResolver.INSTANCE;
 
 	@DataProvider(name = "interpolateByNotArrayValueArgs")
 	public static Object[][] interpolateByNotArrayValueArgs() {
@@ -75,7 +76,7 @@ public class ParameterTermResolverTest {
 		);
 		final String srcExpression = createVariableExpression( variableName );
 
-		final String actualResolvedExpression = resolver.interpolate( context, srcExpression );
+		final String actualResolvedExpression = resolver.interpolate( context, Locale.ROOT, srcExpression );
 		assertEquals( actualResolvedExpression, expectedResolvedExpression );
 	}
 
@@ -91,7 +92,7 @@ public class ParameterTermResolverTest {
 		);
 		final String srcExpression = createVariableExpression( variableName );
 
-		final String actualResolvedExpression = resolver.interpolate( context, srcExpression );
+		final String actualResolvedExpression = resolver.interpolate( context, Locale.ROOT, srcExpression );
 		assertEquals( actualResolvedExpression, expectedResolvedExpression );
 	}
 
@@ -106,7 +107,7 @@ public class ParameterTermResolverTest {
 		);
 		final String srcExpression = createVariableExpression( variableName );
 
-		final String actualResolvedExpression = resolver.interpolate( context, srcExpression );
+		final String actualResolvedExpression = resolver.interpolate( context, Locale.ROOT, srcExpression );
 		assertEquals( actualResolvedExpression, expectedResolvedExpression );
 	}
 

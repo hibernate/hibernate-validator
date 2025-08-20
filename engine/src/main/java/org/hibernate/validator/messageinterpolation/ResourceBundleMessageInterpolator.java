@@ -16,7 +16,7 @@ import jakarta.el.ExpressionFactory;
 
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
-import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
+import org.hibernate.validator.internal.engine.messageinterpolation.TermInterpolator;
 import org.hibernate.validator.internal.util.actions.GetClassLoader;
 import org.hibernate.validator.internal.util.actions.SetContextClassLoader;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -38,7 +38,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
-	private final ExpressionFactory expressionFactory;
+	private final TermInterpolator termInterpolator;
 
 	public ResourceBundleMessageInterpolator() {
 		this( Collections.emptySet(), Locale.getDefault(), new DefaultLocaleResolver(), false );
@@ -76,7 +76,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	@Incubating
 	public ResourceBundleMessageInterpolator(Set<Locale> locales, Locale defaultLocale, LocaleResolver localeResolver, boolean preloadResourceBundles) {
 		super( locales, defaultLocale, localeResolver, preloadResourceBundles );
-		this.expressionFactory = buildExpressionFactory();
+		this.termInterpolator = new TermInterpolator( buildExpressionFactory() );
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 			LocaleResolver localeResolver,
 			boolean preloadResourceBundles) {
 		super( userResourceBundleLocator, locales, defaultLocale, localeResolver, preloadResourceBundles );
-		this.expressionFactory = buildExpressionFactory();
+		this.termInterpolator = new TermInterpolator( buildExpressionFactory() );
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 			LocaleResolver localeResolver,
 			boolean preloadResourceBundles) {
 		super( userResourceBundleLocator, contributorResourceBundleLocator, locales, defaultLocale, localeResolver, preloadResourceBundles );
-		this.expressionFactory = buildExpressionFactory();
+		this.termInterpolator = new TermInterpolator( buildExpressionFactory() );
 	}
 
 	/**
@@ -119,7 +119,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 			boolean cachingEnabled) {
 		super( userResourceBundleLocator, contributorResourceBundleLocator, locales, defaultLocale, localeResolver, preloadResourceBundles,
 				cachingEnabled );
-		this.expressionFactory = buildExpressionFactory();
+		this.termInterpolator = new TermInterpolator( buildExpressionFactory() );
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 			boolean preloadResourceBundles,
 			boolean cachingEnabled) {
 		super( userResourceBundleLocator, null, locales, defaultLocale, localeResolver, preloadResourceBundles, cachingEnabled );
-		this.expressionFactory = buildExpressionFactory();
+		this.termInterpolator = new TermInterpolator( buildExpressionFactory() );
 	}
 
 	/**
@@ -148,13 +148,12 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 			boolean cachingEnabled,
 			ExpressionFactory expressionFactory) {
 		super( userResourceBundleLocator, null, locales, defaultLocale, localeResolver, preloadResourceBundles, cachingEnabled );
-		this.expressionFactory = expressionFactory;
+		this.termInterpolator = new TermInterpolator( expressionFactory );
 	}
 
 	@Override
 	protected String interpolate(Context context, Locale locale, String term) {
-		InterpolationTerm expression = new InterpolationTerm( term, locale, expressionFactory );
-		return expression.interpolate( context );
+		return termInterpolator.interpolate( context, term, locale );
 	}
 
 	/**
