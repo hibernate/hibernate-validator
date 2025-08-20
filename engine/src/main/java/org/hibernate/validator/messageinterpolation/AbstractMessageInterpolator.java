@@ -404,7 +404,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		if ( resolvedMessage.indexOf( '{' ) > -1 ) {
 			// resolve parameter expressions (step 2)
 			resolvedMessage = interpolateExpression(
-					new TokenIterator( getParameterTokens( resolvedMessage, tokenizedParameterMessages, InterpolationTermType.PARAMETER ) ),
+					new TokenIterator( resolvedMessage, getParameterTokens( resolvedMessage, tokenizedParameterMessages, InterpolationTermType.PARAMETER ) ),
 					context,
 					locale
 			);
@@ -416,7 +416,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			if ( !( context instanceof HibernateMessageInterpolatorContext )
 					|| ( (HibernateMessageInterpolatorContext) context ).getExpressionLanguageFeatureLevel() != ExpressionLanguageFeatureLevel.NONE ) {
 				resolvedMessage = interpolateExpression(
-						new TokenIterator( getParameterTokens( resolvedMessage, tokenizedELMessages, InterpolationTermType.EL ) ),
+						new TokenIterator( resolvedMessage, getParameterTokens( resolvedMessage, tokenizedELMessages, InterpolationTermType.EL ) ),
 						context,
 						locale );
 			}
@@ -503,7 +503,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	private String interpolateBundleMessage(String message, ResourceBundle bundle, Locale locale, boolean recursive)
 			throws MessageDescriptorFormatException {
 		TokenCollector tokenCollector = new TokenCollector( message, InterpolationTermType.PARAMETER );
-		TokenIterator tokenIterator = new TokenIterator( tokenCollector.getTokenList() );
+		TokenIterator tokenIterator = new TokenIterator( message, tokenCollector.getTokenList() );
 		while ( tokenIterator.hasMoreInterpolationTerms() ) {
 			String term = tokenIterator.nextInterpolationTerm();
 			String resolvedParameterValue = resolveParameter(

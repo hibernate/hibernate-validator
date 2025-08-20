@@ -4,8 +4,9 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 
 /**
  * Allows to iterate over a list of message tokens and replace parameters.
@@ -14,14 +15,18 @@ import java.util.List;
  */
 public class TokenIterator {
 	private final List<Token> tokenList;
+	private final String originalMessage;
+	@Lazy
+	private StringBuilder messageBuilder;
 
 	private int currentPosition;
 	private Token currentToken;
 	private boolean allInterpolationTermsProcessed;
 	private boolean currentTokenAvailable;
 
-	public TokenIterator(List<Token> tokens) {
-		this.tokenList = new ArrayList<Token>( tokens );
+	public TokenIterator(String originalMessage, List<Token> tokens) {
+		this.tokenList = tokens;
+		this.originalMessage = originalMessage;
 	}
 
 	/**
@@ -30,7 +35,6 @@ public class TokenIterator {
 	 * can be called.
 	 *
 	 * @return Returns {@code true} in case there are more message parameters, {@code false} otherwise.
-	 *
 	 * @throws MessageDescriptorFormatException in case the message descriptor is invalid
 	 */
 	public boolean hasMoreInterpolationTerms() throws MessageDescriptorFormatException {
@@ -40,6 +44,9 @@ public class TokenIterator {
 			if ( currentToken.isParameter() ) {
 				currentTokenAvailable = true;
 				return true;
+			}
+			if ( messageBuilder != null ) {
+				messageBuilder.append( currentToken.getTokenValue() );
 			}
 		}
 		allInterpolationTermsProcessed = true;
@@ -65,20 +72,24 @@ public class TokenIterator {
 	 * @param replacement The string to replace the current term with.
 	 */
 	public void replaceCurrentInterpolationTerm(String replacement) {
-		Token token = new Token( replacement );
-		token.terminate();
-		tokenList.set( currentPosition - 1, token );
+		if ( !currentToken.getTokenValue().equals( replacement ) ) {
+			if ( messageBuilder == null ) {
+				messageBuilder = new StringBuilder();
+				for ( int i = 0; i < currentPosition - 1; i++ ) {
+					messageBuilder.append( tokenList.get( i ).getTokenValue() );
+				}
+			}
+		}
+		if ( messageBuilder != null ) {
+			messageBuilder.append( replacement );
+		}
 	}
 
 	public String getInterpolatedMessage() {
 		if ( !allInterpolationTermsProcessed ) {
 			throw new IllegalStateException( "Not all interpolation terms have been processed yet." );
 		}
-		StringBuilder messageBuilder = new StringBuilder();
-		for ( Token token : tokenList ) {
-			messageBuilder.append( token.getTokenValue() );
-		}
 
-		return messageBuilder.toString();
+		return messageBuilder != null ? messageBuilder.toString() : originalMessage;
 	}
 }

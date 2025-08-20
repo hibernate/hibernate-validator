@@ -10,7 +10,6 @@ import static org.hibernate.validator.internal.engine.messageinterpolation.util.
 import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.ESCAPE_CHARACTER;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
@@ -114,7 +113,7 @@ public class TokenCollector {
 	}
 
 	public List<Token> getTokenList() {
-		return Collections.unmodifiableList( tokenList );
+		return tokenList;
 	}
 
 	public String getOriginalMessageDescriptor() {
