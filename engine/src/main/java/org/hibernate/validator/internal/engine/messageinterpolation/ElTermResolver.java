@@ -32,7 +32,7 @@ import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolator
  * @author Adam Stawicki
  * @author Guillaume Smet
  */
-public class ElTermResolver implements TermResolver {
+public final class ElTermResolver implements TermResolver {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -42,11 +42,6 @@ public class ElTermResolver implements TermResolver {
 	private static final String VALIDATED_VALUE_NAME = "validatedValue";
 
 	/**
-	 * The locale for which to interpolate the expression.
-	 */
-	private final Locale locale;
-
-	/**
 	 * Factory for creating EL expressions
 	 */
 	private final ExpressionFactory expressionFactory;
@@ -54,22 +49,20 @@ public class ElTermResolver implements TermResolver {
 	/**
 	 * Construct the resolver. The expression factory has to be passed in to ensure that it is
 	 * set up early and to allow for application control.
-	 * @param locale the locale.
 	 * @param expressionFactory the expression factory.
 	 */
-	public ElTermResolver(Locale locale, ExpressionFactory expressionFactory) {
-		this.locale = locale;
+	public ElTermResolver(ExpressionFactory expressionFactory) {
 		this.expressionFactory = expressionFactory;
 	}
 
 	@Override
-	public String interpolate(MessageInterpolator.Context context, String expression) {
+	public String interpolate(MessageInterpolator.Context context, Locale locale, String expression) {
 		String resolvedExpression = expression;
 
 		ELContext elContext = getElContext( context );
 
 		try {
-			ValueExpression valueExpression = bindContextValues( expression, context, elContext );
+			ValueExpression valueExpression = bindContextValues( expression, context, locale, elContext );
 			resolvedExpression = (String) valueExpression.getValue( elContext );
 		}
 		catch (DisabledFeatureELException dfee) {
@@ -110,7 +103,7 @@ public class ElTermResolver implements TermResolver {
 		}
 	}
 
-	private ValueExpression bindContextValues(String messageTemplate, MessageInterpolator.Context messageInterpolatorContext, ELContext elContext) {
+	private ValueExpression bindContextValues(String messageTemplate, MessageInterpolator.Context messageInterpolatorContext, Locale locale, ELContext elContext) {
 		// bind the validated value
 		ValueExpression valueExpression = expressionFactory.createValueExpression(
 				messageInterpolatorContext.getValidatedValue(),

@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation;
 
+import java.util.Locale;
+
 import jakarta.validation.MessageInterpolator;
 
 /**
@@ -16,10 +18,10 @@ public interface TermResolver {
 	/**
 	 * Interpolates given term based on the constraint validation context.
 	 *
-	 * @param term the message to interpolate
 	 * @param context contextual information related to the interpolation
-	 *
+	 * @param locale the locale for which to interpolate the expression
+	 * @param term the message to interpolate
 	 * @return interpolated message
 	 */
-	String interpolate(MessageInterpolator.Context context, String term);
+	String interpolate(MessageInterpolator.Context context, Locale locale, String term);
 }
