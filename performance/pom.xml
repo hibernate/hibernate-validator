@@ -696,5 +696,35 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>bval-3.0</id>
+            <activation>
+                <property>
+                    <name>validator</name>
+                    <value>bval-3.0</value>
+                </property>
+            </activation>
+            <properties>
+                <validation-api.version>3.1.1.Final</validation-api.version>
+                <beanvalidation-impl.name>Apache BVal</beanvalidation-impl.name>
+                <beanvalidation-impl.version>3.0.2</beanvalidation-impl.version>
+                <sources.to.add.main>${project.basedir}/src/main/jakarta</sources.to.add.main>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>jakarta.validation</groupId>
+                    <artifactId>jakarta.validation-api</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.expressly</groupId>
+                    <artifactId>expressly</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.bval</groupId>
+                    <artifactId>bval-jsr</artifactId>
+                    <version>${beanvalidation-impl.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
     </profiles>
 </project>
