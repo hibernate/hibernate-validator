@@ -288,7 +288,7 @@
                 <dependency>
                     <groupId>org.glassfish</groupId>
                     <artifactId>jakarta.el</artifactId>
-                    <version>3.0.3</version>
+                    <version>3.0.4</version>
                 </dependency>
                 <dependency>
                     <groupId>org.apache.logging.log4j</groupId>
@@ -344,7 +344,7 @@
             <properties>
                 <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>6.0.22.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>6.0.23.Final</beanvalidation-impl.version>
                 <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
                 <sources.to.add.additional>${project.basedir}/src/main/javax-bv2</sources.to.add.additional>
             </properties>
@@ -459,7 +459,7 @@
             <properties>
                 <validation-api.version>1.1.0.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>5.2.4.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>5.2.5.Final</beanvalidation-impl.version>
                 <javax-el.version>2.2.4</javax-el.version>
                 <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
             </properties>
@@ -543,7 +543,7 @@
             <properties>
                 <validation-api.version>1.1.0.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>5.0.1.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>5.0.3.Final</beanvalidation-impl.version>
                 <javax-el.version>2.2.4</javax-el.version>
                 <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
             </properties>
@@ -585,7 +585,7 @@
             <properties>
                 <validation-api.version>1.0.0.GA</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-                <beanvalidation-impl.version>4.3.0.Final</beanvalidation-impl.version>
+                <beanvalidation-impl.version>4.3.2.Final</beanvalidation-impl.version>
                 <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
             </properties>
             <dependencies>
