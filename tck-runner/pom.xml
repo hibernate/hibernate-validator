@@ -322,7 +322,7 @@
             <id>sigtest</id>
             <properties>
                 <sigtest.java-version>${java-version.main.release}</sigtest.java-version>
-                <sigtest.signature-file>${project.build.directory}/validation-api-java${sigtest.java-version}.sig</sigtest.signature-file>
+                <sigtest.signature-file>${project.build.directory}/validation-tck/validation-tck-dist-${version.jakarta.validation-api}/artifacts/validation-tck-tests-${version.jakarta.validation-api}-sigtest-jdk${sigtest.java-version}.sig</sigtest.signature-file>
             </properties>
             <build>
                 <plugins>
@@ -340,12 +340,12 @@
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>jakarta.validation</groupId>
-                                            <artifactId>jakarta.validation-api</artifactId>
+                                            <artifactId>validation-tck-distribution</artifactId>
                                             <version>${version.jakarta.validation-api}</version>
-                                            <type>jar</type>
+                                            <type>zip</type>
                                             <overWrite>false</overWrite>
-                                            <outputDirectory>${project.build.directory}/validation-api</outputDirectory>
-                                            <includes>**/*.class,**/*.xml</includes>
+                                            <outputDirectory>${project.build.directory}/validation-tck</outputDirectory>
+                                            <includes>**/*.sig</includes>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
@@ -356,16 +356,6 @@
                         <groupId>jakarta.tck</groupId>
                         <artifactId>sigtest-maven-plugin</artifactId>
                         <executions>
-                            <execution>
-                                <id>sigtest-generate</id>
-                                <goals>
-                                    <goal>generate</goal>
-                                </goals>
-                                <configuration>
-                                    <classes>${project.build.directory}/validation-api</classes>
-                                    <attach>false</attach>
-                                </configuration>
-                            </execution>
                             <execution>
                                 <id>sigtest-check</id>
                                 <goals>
