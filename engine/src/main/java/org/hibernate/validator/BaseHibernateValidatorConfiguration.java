@@ -365,6 +365,18 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	S constraintValidatorPayload(Object constraintValidatorPayload);
 
 	/**
+	 * Allows adding a payload which will be  available during the constraint validators initialization.
+	 * If the method is called multiple times passing different instances of the same class,
+	 * only the payload passed last will be available for that type.
+	 *
+	 * @param constraintValidatorInitializationPayload the payload to retrieve from the constraint validator initializers
+	 * @return {@code this} following the chaining method pattern
+	 * @since 9.1.0
+	 */
+	@Incubating
+	S addConstraintValidatorInitializationPayload(Object constraintValidatorInitializationPayload);
+
+	/**
 	 * Allows to set a getter property selection strategy defining the rules determining if a method is a getter
 	 * or not.
 	 *
