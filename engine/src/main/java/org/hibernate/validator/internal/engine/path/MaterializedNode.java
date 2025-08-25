@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.internal.engine.path;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
@@ -31,8 +32,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class MaterializedNode
 		implements PropertyNode, MethodNode, ConstructorNode, BeanNode, ParameterNode, ReturnValueNode, CrossParameterNode, ContainerElementNode,
 		org.hibernate.validator.path.PropertyNode, org.hibernate.validator.path.ContainerElementNode, Serializable {
-	//	@Serial
-	//	private static final long serialVersionUID = 2075466571633860499L;
+	@Serial
+	private static final long serialVersionUID = -7629728442122634981L;
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[] { };
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );

@@ -19,6 +19,7 @@ import jakarta.validation.Validator;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.path.PropertyNode;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -60,6 +61,13 @@ public class PropertyPathTest {
 		assertEquals( node.getName(), "name" );
 		assertEquals( node.as( PropertyNode.class ).getValue(), "Bob" );
 		//end::include[]
+		if ( path instanceof org.hibernate.validator.path.Path hvPath ) {
+			assertEquals( hvPath.getLeafNode().getName(), "name" );
+			assertEquals( hvPath.getLeafNode().as( PropertyNode.class ).getValue(), "Bob" );
+		}
+		else {
+			Assert.fail( "Unexpected path node type: " + path.getClass().getName() );
+		}
 
 		assertFalse( nodeIterator.hasNext() );
 	}

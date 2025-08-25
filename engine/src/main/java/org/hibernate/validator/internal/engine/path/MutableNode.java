@@ -40,7 +40,7 @@ public class MutableNode
 		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Path.ContainerElementNode,
 		org.hibernate.validator.path.PropertyNode, org.hibernate.validator.path.ContainerElementNode, Serializable {
 	@Serial
-	private static final long serialVersionUID = 2075466571633860499L;
+	private static final long serialVersionUID = 3259464108481054555L;
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[] { };
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
