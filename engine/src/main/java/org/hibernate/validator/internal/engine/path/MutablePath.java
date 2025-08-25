@@ -15,12 +15,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jakarta.validation.ElementKind;
-import jakarta.validation.Path;
 
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.path.Path;
 
 /**
  * Internal, mutable implementation of {@code jakarta.validation.Path}.
@@ -31,7 +31,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public final class MutablePath implements Path, Serializable {
 	@Serial
-	private static final long serialVersionUID = 7564511574909882392L;
+	private static final long serialVersionUID = 2464836778339203598L;
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String PROPERTY_PATH_SEPARATOR = ".";
@@ -182,6 +182,7 @@ public final class MutablePath implements Path, Serializable {
 		}
 	}
 
+	@Override
 	public MutableNode getLeafNode() {
 		return currentLeafNode;
 	}

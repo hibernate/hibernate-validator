@@ -8,12 +8,13 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Iterator;
 
-import jakarta.validation.Path;
+import org.hibernate.validator.path.Path;
+
 
 final class MaterializedPath implements Path, Serializable {
 
 	@Serial
-	private static final long serialVersionUID = -8906501301223202169L;
+	private static final long serialVersionUID = 1264131890253015968L;
 
 	private static final String PROPERTY_PATH_SEPARATOR = ".";
 
@@ -70,5 +71,10 @@ final class MaterializedPath implements Path, Serializable {
 			current = current.getParent();
 		}
 		return builder.toString();
+	}
+
+	@Override
+	public Node getLeafNode() {
+		return leafNode;
 	}
 }
