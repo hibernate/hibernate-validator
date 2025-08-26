@@ -1,0 +1,176 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright Red Hat Inc. and Hibernate Authors
+
+name: "GH Actions TCK report"
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+*'
+
+concurrency:
+  group: "workflow = ${{ github.workflow }}, ref = ${{ github.event.ref }}, pr = ${{ github.event.pull_request.id }}"
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end -Pci-build --no-transfer-progress -Dscan=false -Dno-build-cache -Denforcer.skip=true"
+  REPORT_FILE: "Hibernate-Validator-${{github.ref_name}}-${{matrix.java-version}}-Jakarta-Validation-TCK-Results.asciidoc"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: JDK ${{ matrix.java-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest ]
+        java-version: [ '17', '21' ]
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Java ${{ matrix.java-version }}
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # 4.7.1
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: temurin
+
+      - name: Start building the asciidoc report
+        id: init-report
+        run: |
+          echo "== Hibernate Validator ${{github.ref_name}} Jakarta Validation 3.1 TCK Results" > ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+          echo "The following sections contain the test results and environment information for this TCK run." >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+          echo "=== The build system information" >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+          
+          echo ".Operating system details" >> ${{ env.REPORT_FILE }}
+          echo "[source,bash]" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          uname -a >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+
+          echo ".JDK information" >> ${{ env.REPORT_FILE }}
+          echo "[source,bash]" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "$(java -version 2>&1)" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+
+          echo ".Maven information" >> ${{ env.REPORT_FILE }}
+          echo "[source,bash]" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          mvn -v >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+          
+          echo "=== Test results" >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}  
+
+      - name: TCK in standalone mode
+        id: tck-standalone
+        run: |
+          ./mvnw $MAVEN_ARGS clean verify -pl :hibernate-validator-tck-runner
+
+          echo ".TCK tests in the standalone mode" >> ${{ env.REPORT_FILE }}
+          echo "[source,bash]" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "$(cat tck-runner/target/surefire-reports/TestSuite-default.txt)" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+          echo "Test results available for the download are link:tck-standalone-report-${{github.ref_name}}-${{matrix.java-version}}.html[here]." >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+
+      - name: Upload TCK Report as an Artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # 4.6.2
+        with:
+          name: tck-standalone-report-html-${{matrix.java-version}}
+          path: tck-runner/target/surefire-reports/emailable-report.html
+
+      - name: TCK in container mode
+        id: tck-container
+        run: |
+          ./mvnw $MAVEN_ARGS clean verify -pl :hibernate-validator-tck-runner -Dincontainer -Dincontainer-prepared
+
+          echo ".TCK tests in the container mode" >> ${{ env.REPORT_FILE }}
+          echo "[source,bash]" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "$(cat tck-runner/target/surefire-reports/TestSuite-default.txt)" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+          echo "Test results available for the download are link:tck-container-report-${{github.ref_name}}-${{matrix.java-version}}.html[here]." >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+          
+      - name: Upload TCK Report as an Artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # 4.6.2
+        with:
+          name: tck-container-report-html-${{matrix.java-version}}
+          path: tck-runner/target/surefire-reports/emailable-report.html
+
+      - name: Signature test
+        id: tck-sigtest
+        run: |
+          ./mvnw $MAVEN_ARGS clean verify -pl :hibernate-validator-tck-runner -Psigtest
+
+          echo ".Signature test results" >> ${{ env.REPORT_FILE }}
+          echo "[source,bash]" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "$(cat tck-runner/target/surefire-reports/sigtest/report.xml)" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+          echo "Test results available for the download are link:tck-signature-report-${{github.ref_name}}-${{matrix.java-version}}.xml[here]." >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+
+      - name: Upload TCK Report as an Artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # 4.6.2
+        with:
+          name: tck-signature-report-xml-${{matrix.java-version}}
+          path: tck-runner/target/surefire-reports/sigtest/report.xml
+
+      - name: Finish asciidoc report
+        id: final-report
+        run: |
+          echo "=== File signatures" >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+          
+          echo ".SHA256 validation-tck-distribution.zip" >> ${{ env.REPORT_FILE }}
+          echo "[source,bash]" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "$(sha256sum tck-runner/target/tck-dependencies/validation-tck-distribution.zip)" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+          
+          echo ".SHA256 validation-tck-tests.jar" >> ${{ env.REPORT_FILE }}
+          echo "[source,bash]" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "$(sha256sum tck-runner/target/tck-dependencies/validation-tck-tests.jar)" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+          
+          echo ".SHA256 jakarta.validation-api.jar" >> ${{ env.REPORT_FILE }}
+          echo "[source,bash]" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "$(sha256sum tck-runner/target/tck-dependencies/jakarta.validation-api.jar)" >> ${{ env.REPORT_FILE }}
+          echo "----" >> ${{ env.REPORT_FILE }}
+          echo "" >> ${{ env.REPORT_FILE }}
+          
+          echo "Report output:"
+          cat ${{ env.REPORT_FILE }}
+
+      - name: Upload Final Report as an Artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # 4.6.2
+        with:
+          name: final-report-${{matrix.java-version}}
+          path: ${{ env.REPORT_FILE }}
+

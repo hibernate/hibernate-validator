@@ -107,27 +107,6 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-tck-bv-api-signature-file</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>jakarta.validation</groupId>
-                                    <artifactId>validation-tck-tests</artifactId>
-                                    <version>${version.jakarta.validation.validation-tck}</version>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                            </artifactItems>
-                            <!-- We just need the signature file and nothing else -->
-                            <includes>**/*.sig</includes>
-                            <outputDirectory>${project.build.directory}/api-signature</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>copy-tck-test-suite-file</id>
                         <phase>generate-test-sources</phase>
                         <goals>
@@ -144,6 +123,38 @@
                                     <overWrite>false</overWrite>
                                 </artifactItem>
                             </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-tck-dependencies</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/tck-dependencies</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>jakarta.validation</groupId>
+                                    <artifactId>jakarta.validation-api</artifactId>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>jakarta.validation</groupId>
+                                    <artifactId>validation-tck-distribution</artifactId>
+                                    <version>${version.jakarta.validation.validation-tck}</version>
+                                    <type>zip</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>jakarta.validation</groupId>
+                                    <artifactId>validation-tck-tests</artifactId>
+                                    <version>${version.jakarta.validation.validation-tck}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>jakarta.validation</groupId>
+                                    <artifactId>jakarta.validation-api</artifactId>
+                                </artifactItem>
+                            </artifactItems>
+                            <stripVersion>true</stripVersion>
                         </configuration>
                     </execution>
                 </executions>
@@ -379,6 +390,7 @@
                                 jakarta.validation.valueextraction
                             </packages>
                             <sigfile>${sigtest.signature-file}</sigfile>
+                            <report>${project.build.directory}/surefire-reports/sigtest/report.xml</report>
                         </configuration>
                     </plugin>
                 </plugins>
