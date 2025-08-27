@@ -23,6 +23,12 @@ by sending a pull request to the project's GitHub repository,
 listing at least one relevant contribution in the pull request description.
 Note: one-liner or repetitive patches may not be sufficient to claim copyright.
 
+### Compliance with Laws and Regulations
+
+All contributions must comply with applicable laws and regulations, including U.S. export control and sanctions restrictions.
+For background, see the Linux Foundation’s guidance:
+[Navigating Global Regulations and Open Source: US OFAC Sanctions](https://www.linuxfoundation.org/blog/navigating-global-regulations-and-open-source-us-ofac-sanctions).
+
 ## Finding something to contribute
 
 Our [JIRA instance](https://hibernate.atlassian.net/browse/HV) is where all tasks are reported and tracked.
