@@ -1,6 +1,40 @@
 Hibernate Validator Changelog
 =============================
 
+9.1.0.Alpha1 (2025-08-28)
+-------------------------
+
+** Bug
+    * HV-2117 NIP validation incorrectly accepts values ending in 0
+    * HV-1987 When complex objects are verified, processedPathsPerBean always occupies a large amount of memory, causing OOM.
+
+** Improvement
+    * HV-2133 Bump Apache Groovy to 5.0.0
+    * HV-2128 Consider creating Hibernate Validator extension to the Path with more convinience methods
+    * HV-2127 Make Path implementaion not relying on Lists (or other collections)
+    * HV-2125 Update Hibernate asciidoc theme to 5.1.2.Final
+    * HV-2124 Bump Apache Groovy to 4.0.28
+    * HV-2122 Update to OpenJFX to 17.0.16
+    * HV-2116 Do not recreate PersistenceUtil in the built-in JPATraversableResolver
+    * HV-2114 Add support for Korean foreigner resident registration number (RRN) validation
+    * HV-2113 Adding Date Validation Condition in KorRRNValidator
+    * HV-2112 Use the Hibernate theme for rendered javadocs
+    * HV-2111 Bump Apache Groovy to 4.0.27
+    * HV-2110 Update to OpenJFX to 17.0.15
+    * HV-2109 Bump Expressly version to 6.0.0
+    * HV-1831 Optimize cascading validation for large lists
+    * HV-1591 Log a warning when @Valid is defined both globally and on a type parameter of a container
+
+** Task
+    * HV-2131 Use a sig file from the TCK dist zip (instead of generating one on-the-fly)
+    * HV-2129 Test against wildfly-preview 37.0.0.Final
+    * HV-2123 Use Maven 3.9.11 as a required minimum version for the build
+    * HV-2120 Stop exporting logging/reporting.impl packages to org.jboss.logging
+    * HV-2119 Test against JDK 26
+    * HV-2118 Switch to Maven Central publishing
+    * HV-2115 Use Maven 3.9.10 as a required minimum version for the build
+    * HV-1271 Move JavaDoc stylesheet.css to separate repo and fetch it from there
+
 9.0.0.Final (2025-05-20)
 -------------------------
 
