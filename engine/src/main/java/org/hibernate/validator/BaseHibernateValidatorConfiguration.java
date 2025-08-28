@@ -488,6 +488,14 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	@Incubating
 	S failFastOnPropertyViolation(boolean failFastOnPropertyViolation);
 
+	/**
+	 * Allows providing a custom bean tracking voter that helps to identify whether
+	 * the processed beans have to be tracked when cascaded into.
+	 *
+	 * @param processedBeanTrackingVoter the {@link ProcessedBeansTrackingVoter bean tracking voter} to apply.
+	 * @return {@code this} following the chaining method pattern
+	 * @since 9.1
+	 */
 	@Incubating
 	S processedBeansTrackingVoter(ProcessedBeansTrackingVoter processedBeanTrackingVoter);
 }
