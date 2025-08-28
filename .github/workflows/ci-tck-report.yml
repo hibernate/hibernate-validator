@@ -18,7 +18,7 @@ defaults:
 
 env:
   MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end -Pci-build --no-transfer-progress -Dscan=false -Dno-build-cache -Denforcer.skip=true"
-  REPORT_FILE: "Hibernate-Validator-${{github.ref_name}}-${{matrix.java-version}}-Jakarta-Validation-TCK-Results.asciidoc"
+  REPORT_FILE: "Hibernate-Validator-${{github.ref_name}}-Jakarta-Validation-TCK-Results.asciidoc"
 
 permissions:
   contents: read
