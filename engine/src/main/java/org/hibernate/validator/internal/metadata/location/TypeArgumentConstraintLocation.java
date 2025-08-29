@@ -73,6 +73,11 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
+	public void applyTo(ExecutableParameterNameProvider parameterNameProvider, MutablePath path) {
+		delegate.applyTo( parameterNameProvider, path );
+	}
+
+	@Override
 	public Object getValue(Object parent) {
 		return delegate.getValue( parent );
 	}

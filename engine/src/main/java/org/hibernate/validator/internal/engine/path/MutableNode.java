@@ -49,7 +49,6 @@ public class MutableNode
 
 	static {
 		ROOT_NODE = MutableNode.createBeanNode( null );
-		ROOT_NODE.valueSet = true;
 		ROOT_NODE.nodes = new MutableNode[] { ROOT_NODE };
 		ROOT_NODE.hashCode();
 	}
@@ -66,19 +65,18 @@ public class MutableNode
 	public static final String MAP_KEY_NODE_NAME = "<map key>";
 	public static final String MAP_VALUE_NODE_NAME = "<map value>";
 
-	private final String name;
 	private final MutableNode parent;
-	private final ElementKind kind;
 	private final int size;
+	private String name;
+	private ElementKind kind;
 	private boolean isIterable;
 	private Integer index;
 	private Object key;
 
 	//type-specific attributes
 	private final Class<?>[] parameterTypes;
-	private final Integer parameterIndex;
+	private Integer parameterIndex;
 	private Object value;
-	private boolean valueSet;
 	private Class<?> containerClass;
 	private Integer typeArgumentIndex;
 
@@ -88,7 +86,7 @@ public class MutableNode
 
 	private MutableNode(
 			String name, MutableNode parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
-			Integer parameterIndex, Object value, boolean valueSet, Class<?> containerClass, Integer typeArgumentIndex
+			Integer parameterIndex, Object value, Class<?> containerClass, Integer typeArgumentIndex
 	) {
 		this.name = name;
 		this.parent = parent;
@@ -96,13 +94,28 @@ public class MutableNode
 		this.index = index;
 		this.key = key;
 		this.value = value;
-		this.valueSet = valueSet;
 		this.isIterable = isIterable;
 		this.kind = kind;
 		this.parameterTypes = parameterTypes;
 		this.parameterIndex = parameterIndex;
 		this.containerClass = containerClass;
 		this.typeArgumentIndex = typeArgumentIndex;
+	}
+
+	public static MutableNode createNode(MutableNode parent) {
+		return new MutableNode(
+				null,
+				parent,
+				false,
+				null,
+				null,
+				null,
+				EMPTY_CLASS_ARRAY,
+				null,
+				null,
+				null,
+				null
+		);
 	}
 
 	//TODO It would be nicer if we could return PropertyNode
@@ -117,7 +130,6 @@ public class MutableNode
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
-				false,
 				null,
 				null
 		);
@@ -134,7 +146,6 @@ public class MutableNode
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
-				false,
 				null,
 				null
 		);
@@ -151,7 +162,6 @@ public class MutableNode
 				EMPTY_CLASS_ARRAY,
 				parameterIndex,
 				null,
-				false,
 				null,
 				null
 		);
@@ -168,18 +178,17 @@ public class MutableNode
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
-				false,
 				null,
 				null
 		);
 	}
 
 	public static MutableNode createMethodNode(String name, MutableNode parent, Class<?>[] parameterTypes) {
-		return new MutableNode( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null, false, null, null );
+		return new MutableNode( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null, null, null );
 	}
 
 	public static MutableNode createConstructorNode(String name, MutableNode parent, Class<?>[] parameterTypes) {
-		return new MutableNode( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null, false, null, null );
+		return new MutableNode( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null, null, null );
 	}
 
 	public static MutableNode createBeanNode(MutableNode parent) {
@@ -193,7 +202,6 @@ public class MutableNode
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
-				false,
 				null,
 				null
 		);
@@ -210,7 +218,6 @@ public class MutableNode
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
-				false,
 				null,
 				null
 		);
@@ -246,9 +253,11 @@ public class MutableNode
 	public void reset() {
 		isIterable = false;
 		index = null;
+		parameterIndex = null;
 		key = null;
 		typeArgumentIndex = null;
 		containerClass = null;
+		value = null;
 	}
 
 	@Override
@@ -626,6 +635,37 @@ public class MutableNode
 		}
 
 		return curr.isRootPath() && otherCurr.isRootPath();
+	}
+
+	public void resetAsProperty(String resolvedPropertyName) {
+		reset();
+		this.name = resolvedPropertyName;
+		this.kind = ElementKind.PROPERTY;
+	}
+
+	public void resetAsBeanNode() {
+		reset();
+		this.kind = ElementKind.BEAN;
+		this.name = null;
+	}
+
+	public void resetAsParameter(String parameterName, int index) {
+		reset();
+		this.kind = ElementKind.PARAMETER;
+		this.name = parameterName;
+		this.parameterIndex = index;
+	}
+
+	public void resetAsReturnValue() {
+		reset();
+		this.name = RETURN_VALUE_NODE_NAME;
+		this.kind = ElementKind.RETURN_VALUE;
+	}
+
+	public void resetAsCrossParameter() {
+		reset();
+		this.name = CROSS_PARAMETER_NODE_NAME;
+		this.kind = ElementKind.CROSS_PARAMETER;
 	}
 
 	protected static class NodeIterator implements Iterator<Path.Node> {

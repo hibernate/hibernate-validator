@@ -151,6 +151,11 @@ public final class MutablePath implements Path, Serializable {
 		currentLeafNode = MutableNode.createMethodNode( name, parent, parameterTypes );
 	}
 
+	public void addEmptyNode() {
+		MutableNode parent = currentLeafNode;
+		currentLeafNode = MutableNode.createNode( parent );
+	}
+
 	public void makeLeafNodeIterable() {
 		currentLeafNode.makeIterable();
 	}

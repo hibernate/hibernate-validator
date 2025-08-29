@@ -51,6 +51,11 @@ class ReturnValueConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
+	public void applyTo(ExecutableParameterNameProvider parameterNameProvider, MutablePath path) {
+		path.getLeafNode().resetAsReturnValue();
+	}
+
+	@Override
 	public Object getValue(Object parent) {
 		return parent;
 	}

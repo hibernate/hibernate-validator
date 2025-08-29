@@ -50,6 +50,11 @@ class CrossParameterConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
+	public void applyTo(ExecutableParameterNameProvider parameterNameProvider, MutablePath path) {
+		path.getLeafNode().resetAsCrossParameter();
+	}
+
+	@Override
 	public Object getValue(Object parent) {
 		return parent;
 	}

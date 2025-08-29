@@ -528,6 +528,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		valueContext.setCurrentGroup( defaultSequenceMember.getDefiningClass() );
 
+		BeanValueContext.ValueState<Object> originalValueState = valueContext.getCurrentValueState();
+		valueContext.appendEmptyNode();
+
 		for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
 			// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
 			// time. An interface can define more than one constraint, we have to check the class we are validating.
@@ -547,6 +550,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			validationSuccessful = validationSuccessful && tmp;
 		}
+
+		// reset the value context to the state before this call
+		valueContext.resetValueState( originalValueState );
+
 		return validationSuccessful;
 	}
 
@@ -566,18 +573,24 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private boolean validateMetaConstraints(BaseBeanValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent,
 			Iterable<MetaConstraint<?>> constraints) {
 		boolean validationSuccessful = true;
+		BeanValueContext.ValueState<Object> originalValueState = valueContext.getCurrentValueState();
+		valueContext.appendEmptyNode();
+
 		for ( MetaConstraint<?> metaConstraint : constraints ) {
 			validationSuccessful = validateMetaConstraint( validationContext, valueContext, parent, metaConstraint ) && validationSuccessful;
 			if ( shouldFailFast( validationContext ) ) {
 				break;
 			}
 		}
+
+		// reset the value context to the state before this call
+		valueContext.resetValueState( originalValueState );
+
 		return validationSuccessful;
 	}
 
 	private boolean validateMetaConstraint(BaseBeanValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, MetaConstraint<?> metaConstraint) {
-		BeanValueContext.ValueState<Object> originalValueState = valueContext.getCurrentValueState();
-		valueContext.appendNode( metaConstraint.getLocation() );
+		valueContext.updateNode( metaConstraint.getLocation() );
 		boolean success = true;
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
@@ -590,9 +603,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			validationContext.markConstraintProcessed( valueContext, metaConstraint );
 		}
-
-		// reset the value context to the state before this call
-		valueContext.resetValueState( originalValueState );
 
 		return success;
 	}
@@ -691,11 +701,31 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		private final BaseBeanValidationContext<?> validationContext;
 		private final ValueContext<?, ?> valueContext;
 		private final ContainerCascadingMetaData cascadingMetaData;
+		private final BeanValueContext<?, Object> cascadedValueContext;
 
 		public CascadingValueReceiver(BaseBeanValidationContext<?> validationContext, ValueContext<?, ?> valueContext, ContainerCascadingMetaData cascadingMetaData) {
 			this.validationContext = validationContext;
 			this.valueContext = valueContext;
 			this.cascadingMetaData = cascadingMetaData;
+			this.cascadedValueContext = ValueContexts.getLocalExecutionContextForBean(
+					valueContext,
+					validatorScopedContext.getParameterNameProvider(),
+					null,
+					null,
+					valueContext.getPropertyPath()
+			);
+		}
+
+		private BeanValueContext<?, Object> resetCascadedValueContext(Object value) {
+			Contracts.assertNotNull( value, "value cannot be null" );
+
+			BeanMetaData<?> currentBeanMetaData = cascadedValueContext.getCurrentBeanMetaData();
+			if ( currentBeanMetaData == null || currentBeanMetaData.getBeanClass() != value.getClass() ) {
+				currentBeanMetaData = beanMetaDataManager.getBeanMetaData( value.getClass() );
+			}
+			cascadedValueContext.reset( value, valueContext.getPropertyPath(), currentBeanMetaData );
+			cascadedValueContext.setCurrentValidatedValue( value );
+			return cascadedValueContext;
 		}
 
 		@Override
@@ -738,7 +768,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			// already and need only to pass the current element
 			ValidationOrder validationOrder = validationOrderGenerator.getValidationOrder( currentGroup, currentGroup != originalGroup );
 
-			BeanValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
+			BeanValueContext<?, Object> cascadedValueContext = resetCascadedValueContext( value );
 
 			if ( cascadingMetaData.getDeclaredContainerClass() != null ) {
 				cascadedValueContext.setTypeParameter( cascadingMetaData.getDeclaredContainerClass(), cascadingMetaData.getDeclaredTypeParameterIndex() );
