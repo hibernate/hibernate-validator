@@ -41,7 +41,6 @@ public final class BeanValueContext<T, V> extends ValueContext<T, V> {
 	BeanValueContext(ValueContext<?, ?> parentContext, ExecutableParameterNameProvider parameterNameProvider, T currentBean, BeanMetaData<T> currentBeanMetaData, MutablePath propertyPath) {
 		super( parentContext, parameterNameProvider, currentBean, currentBeanMetaData, propertyPath );
 		this.currentBeanMetaData = currentBeanMetaData;
-		this.alreadyProcessedGroups = new HashSet<>();
 	}
 
 	public BeanMetaData<T> getCurrentBeanMetaData() {

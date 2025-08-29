@@ -147,7 +147,9 @@ public abstract sealed class ValueContext<T, V> permits BeanValueContext, Execut
 	}
 
 	public final void setCurrentGroup(Class<?> currentGroup) {
-		this.previousGroup = this.currentGroup;
+		if ( this.previousGroup != this.currentGroup ) {
+			this.previousGroup = this.currentGroup;
+		}
 		this.currentGroup = currentGroup;
 	}
 
