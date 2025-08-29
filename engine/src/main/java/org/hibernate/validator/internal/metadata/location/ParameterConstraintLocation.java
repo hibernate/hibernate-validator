@@ -58,6 +58,11 @@ public class ParameterConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
+	public void applyTo(ExecutableParameterNameProvider parameterNameProvider, MutablePath path) {
+		path.getLeafNode().resetAsParameter( callable.getParameterName( parameterNameProvider, index ), index );
+	}
+
+	@Override
 	public Object getValue(Object parent) {
 		return ( (Object[]) parent )[index];
 	}

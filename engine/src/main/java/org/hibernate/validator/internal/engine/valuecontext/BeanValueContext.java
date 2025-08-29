@@ -23,7 +23,7 @@ public final class BeanValueContext<T, V> extends ValueContext<T, V> {
 	/**
 	 * The metadata of the current bean.
 	 */
-	private final BeanMetaData<T> currentBeanMetaData;
+	private BeanMetaData<?> currentBeanMetaData;
 
 	/**
 	 * When we check whether the bean was validated we need to check that it was validated for the requested group.
@@ -43,8 +43,20 @@ public final class BeanValueContext<T, V> extends ValueContext<T, V> {
 		this.currentBeanMetaData = currentBeanMetaData;
 	}
 
+	@SuppressWarnings("unchecked")
 	public BeanMetaData<T> getCurrentBeanMetaData() {
-		return currentBeanMetaData;
+		return (BeanMetaData<T>) currentBeanMetaData;
+	}
+
+	public void reset(Object currentBean, MutablePath propertyPath, BeanMetaData<?> currentBeanMetaData) {
+		this.currentBeanMetaData = currentBeanMetaData;
+		this.currentValidatable = currentBeanMetaData;
+		this.currentBean = currentBean;
+		this.propertyPath = propertyPath;
+		this.alreadyProcessedGroups = null;
+		this.alreadyProcessedMetaConstraints = null;
+		this.currentGroup = null;
+		this.previousGroup = null;
 	}
 
 	@Override

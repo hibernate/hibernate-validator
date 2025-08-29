@@ -35,12 +35,12 @@ public abstract sealed class ValueContext<T, V> permits BeanValueContext, Execut
 	/**
 	 * The current bean which gets validated. This is the bean hosting the constraints which get validated.
 	 */
-	protected final T currentBean;
+	protected Object currentBean;
 
 	/**
 	 * The current property path we are validating.
 	 */
-	private MutablePath propertyPath;
+	protected MutablePath propertyPath;
 
 	/**
 	 * The current group we are validating.
@@ -57,7 +57,7 @@ public abstract sealed class ValueContext<T, V> permits BeanValueContext, Execut
 	 */
 	private V currentValue;
 
-	private final Validatable currentValidatable;
+	protected Validatable currentValidatable;
 
 	/**
 	 * The {@code ConstraintLocationKind} the constraint was defined on
@@ -80,8 +80,9 @@ public abstract sealed class ValueContext<T, V> permits BeanValueContext, Execut
 		return currentGroup;
 	}
 
+	@SuppressWarnings("unchecked")
 	public final T getCurrentBean() {
-		return currentBean;
+		return (T) currentBean;
 	}
 
 	public Validatable getCurrentValidatable() {
@@ -113,6 +114,16 @@ public abstract sealed class ValueContext<T, V> permits BeanValueContext, Execut
 			newPath.addContainerElementNode( nodeName );
 			propertyPath = newPath;
 		}
+	}
+
+	public void appendEmptyNode() {
+		MutablePath newPath = MutablePath.createCopy( propertyPath );
+		newPath.addEmptyNode();
+		propertyPath = newPath;
+	}
+
+	public final void updateNode(ConstraintLocation location) {
+		location.applyTo( parameterNameProvider, propertyPath );
 	}
 
 	public final void markCurrentPropertyAsIterable() {

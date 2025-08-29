@@ -59,6 +59,11 @@ class BeanConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
+	public void applyTo(ExecutableParameterNameProvider parameterNameProvider, MutablePath path) {
+		path.getLeafNode().resetAsBeanNode();
+	}
+
+	@Override
 	public Object getValue(Object parent) {
 		return parent;
 	}

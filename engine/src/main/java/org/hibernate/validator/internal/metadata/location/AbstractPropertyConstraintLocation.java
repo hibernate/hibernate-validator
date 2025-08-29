@@ -56,6 +56,11 @@ public abstract class AbstractPropertyConstraintLocation<T extends Property> imp
 	}
 
 	@Override
+	public void applyTo(ExecutableParameterNameProvider parameterNameProvider, MutablePath path) {
+		path.getLeafNode().resetAsProperty( property.getResolvedPropertyName() );
+	}
+
+	@Override
 	public Object getValue(Object parent) {
 		return propertyAccessor.getValueFrom( parent );
 	}

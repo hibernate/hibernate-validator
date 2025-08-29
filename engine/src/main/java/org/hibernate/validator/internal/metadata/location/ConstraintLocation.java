@@ -90,6 +90,8 @@ public interface ConstraintLocation {
 	 */
 	void appendTo(ExecutableParameterNameProvider parameterNameProvider, MutablePath path);
 
+	void applyTo(ExecutableParameterNameProvider parameterNameProvider, MutablePath path);
+
 	/**
 	 * Obtains the value of this location from the parent. The type of the passed parent depends on the location type,
 	 * e.g. a bean would be passed for a {@link AbstractPropertyConstraintLocation} but an
