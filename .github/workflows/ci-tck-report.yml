@@ -81,7 +81,7 @@ jobs:
       - name: TCK in standalone mode
         id: tck-standalone
         run: |
-          ./mvnw $MAVEN_ARGS clean verify -pl :hibernate-validator-tck-runner
+          ./mvnw $MAVEN_ARGS clean verify -pl :hibernate-validator-build-enforcer,:hibernate-validator-build-config,:hibernate-validator-tck-runner
 
           echo ".TCK tests in the standalone mode" >> ${{ env.REPORT_FILE }}
           echo "[source,bash]" >> ${{ env.REPORT_FILE }}
@@ -101,7 +101,7 @@ jobs:
       - name: TCK in container mode
         id: tck-container
         run: |
-          ./mvnw $MAVEN_ARGS clean verify -pl :hibernate-validator-tck-runner -Dincontainer -Dincontainer-prepared
+          ./mvnw $MAVEN_ARGS clean verify -pl :hibernate-validator-build-enforcer,:hibernate-validator-build-config,:hibernate-validator-tck-runner -Dincontainer -Dincontainer-prepared
 
           echo ".TCK tests in the container mode" >> ${{ env.REPORT_FILE }}
           echo "[source,bash]" >> ${{ env.REPORT_FILE }}
@@ -121,7 +121,7 @@ jobs:
       - name: Signature test
         id: tck-sigtest
         run: |
-          ./mvnw $MAVEN_ARGS clean verify -pl :hibernate-validator-tck-runner -Psigtest
+          ./mvnw $MAVEN_ARGS clean verify -pl :hibernate-validator-build-enforcer,:hibernate-validator-build-config,:hibernate-validator-tck-runner -Psigtest
 
           echo ".Signature test results" >> ${{ env.REPORT_FILE }}
           echo "[source,bash]" >> ${{ env.REPORT_FILE }}
