@@ -49,7 +49,7 @@ jobs:
           fi
       # Checkout target branch which has trusted code
       - name: Check out target branch
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # 5.0.0
         with:
           persist-credentials: false
           # By default, a workflow that is triggered with on workflow_run would run on the main (default) branch.
@@ -57,13 +57,13 @@ jobs:
           #  that we publish with the one that we built the scan with in the first place.
           ref: ${{ steps.determine_branch_ref.outputs.original_branch_ref }}
       - name: Set up Java 21
-        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # 4.7.1
+        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # 5.0.0
         with:
           java-version: 21
           distribution: temurin
       # https://github.com/actions/cache/blob/main/examples.md#java---maven
       - name: Cache local Maven repository
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # 4.2.3
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
         with:
           path: ~/.m2/repository
           # use a different key than workflows running untrusted code
@@ -74,7 +74,7 @@ jobs:
         run: ./mvnw -v
       - name: Download GitHub Actions artifacts for the Develocity build scans
         id: downloadBuildScan
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # 4.3.0
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # 5.0.0
         with:
           pattern: build-scan-data-*
           github-token: ${{ github.token }}
