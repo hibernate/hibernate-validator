@@ -4,8 +4,6 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.toImmutableMap;
-
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
@@ -47,8 +45,8 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 		this.validatedValue = validatedValue;
 		this.rootBeanType = rootBeanType;
 		this.propertyPath = propertyPath;
-		this.messageParameters = toImmutableMap( messageParameters );
-		this.expressionVariables = toImmutableMap( expressionVariables );
+		this.messageParameters = messageParameters;
+		this.expressionVariables = expressionVariables;
 		this.expressionLanguageFeatureLevel = expressionLanguageFeatureLevel;
 		this.customViolation = customViolation;
 	}

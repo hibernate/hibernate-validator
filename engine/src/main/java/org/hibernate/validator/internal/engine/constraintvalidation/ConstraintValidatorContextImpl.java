@@ -153,7 +153,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 				throw LOG.getAtLeastOneCustomMessageMustBeCreatedException();
 			}
 
-			return CollectionHelper.toImmutableList( constraintViolationCreationContexts );
+			return constraintViolationCreationContexts;
 		}
 
 		if ( constraintViolationCreationContexts == null || constraintViolationCreationContexts.size() == 0 ) {
@@ -165,7 +165,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		returnedConstraintViolationCreationContexts.addAll( constraintViolationCreationContexts );
 		returnedConstraintViolationCreationContexts.add( getDefaultConstraintViolationCreationContext() );
 
-		return CollectionHelper.toImmutableList( returnedConstraintViolationCreationContexts );
+		return returnedConstraintViolationCreationContexts;
 	}
 
 	protected final MutablePath getCopyOfBasePath() {
@@ -178,8 +178,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 				defaultConstraintExpressionLanguageFeatureLevel,
 				false,
 				basePath,
-				messageParameters != null ? new HashMap<>( messageParameters ) : Collections.emptyMap(),
-				expressionVariables != null ? new HashMap<>( expressionVariables ) : Collections.emptyMap(),
+				messageParameters != null ? Map.copyOf( messageParameters ) : Collections.emptyMap(),
+				expressionVariables != null ? Map.copyOf( expressionVariables ) : Collections.emptyMap(),
 				dynamicPayload
 		);
 	}
@@ -214,8 +214,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 							expressionLanguageFeatureLevel,
 							true,
 							propertyPath,
-							messageParameters != null ? new HashMap<>( messageParameters ) : Collections.emptyMap(),
-							expressionVariables != null ? new HashMap<>( expressionVariables ) : Collections.emptyMap(),
+							messageParameters != null ? Map.copyOf( messageParameters ) : Collections.emptyMap(),
+							expressionVariables != null ? Map.copyOf( expressionVariables ) : Collections.emptyMap(),
 							dynamicPayload
 					)
 			);

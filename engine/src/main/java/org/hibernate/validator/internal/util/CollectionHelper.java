@@ -98,6 +98,8 @@ public final class CollectionHelper {
 	 * <p>
 	 * <b>NOTE:</b> the resulting list does not allow {@code null} values.
 	 * Attempt to convert a list with {@code null}s will result in an exception!
+	 * <b>NOTE:</b> do <b>NOT</b> use this util method at "runtime" as results
+	 * in creating unnecessary copies of arrays!
 	 *
 	 * @param list the list to convert.
 	 * @return the converted list.
@@ -112,6 +114,8 @@ public final class CollectionHelper {
 	 * <p>
 	 * <b>NOTE:</b> the resulting set does not allow {@code null} values.
 	 * Attempt to convert a set with {@code null}s will result in an exception!
+	 * <b>NOTE:</b> do <b>NOT</b> use this util method at "runtime" as results
+	 * in creating unnecessary copies of arrays!
 	 *
 	 * @param set the set to convert.
 	 * @return the converted set.
@@ -126,6 +130,8 @@ public final class CollectionHelper {
 	 * <p>
 	 * <b>NOTE:</b> the resulting map does not allow {@code null} keys and values .
 	 * Attempt to convert a map with {@code null}s (either as key or a value) will result in an exception!
+	 * <b>NOTE:</b> do <b>NOT</b> use this util method at "runtime" as results
+	 * in creating unnecessary copies of arrays!
 	 *
 	 * @param map the map to convert.
 	 * @param <K> the type of the map keys.
