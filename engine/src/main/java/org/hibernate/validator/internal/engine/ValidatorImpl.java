@@ -781,14 +781,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			// Cascade validation to container elements if we are dealing with a container element
 			if ( cascadingMetaData.hasContainerElementsMarkedForCascading() ) {
-				ValueContext<?, Object> cascadedTypeArgumentValueContext = buildNewLocalExecutionContext( valueContext, value );
 				if ( cascadingMetaData.getTypeParameter() != null ) {
 					cascadedValueContext.setTypeParameter( cascadingMetaData.getDeclaredContainerClass(), cascadingMetaData.getDeclaredTypeParameterIndex() );
 				}
 
-				cascadedTypeArgumentValueContext.appendTypeParameterNode( nodeName );
+				cascadedValueContext.appendTypeParameterNode( nodeName );
 
-				validateCascadedContainerElementsInContext( value, validationContext, cascadedTypeArgumentValueContext, cascadingMetaData, validationOrder );
+				validateCascadedContainerElementsInContext( value, validationContext, cascadedValueContext, cascadingMetaData, validationOrder );
 			}
 		}
 	}
