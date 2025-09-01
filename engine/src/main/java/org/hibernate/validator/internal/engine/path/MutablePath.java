@@ -172,8 +172,6 @@ public final class MutablePath implements Path, Serializable {
 		// The value is only exposed for property and container element nodes
 		if ( currentLeafNode.getKind() == ElementKind.PROPERTY || currentLeafNode.getKind() == ElementKind.CONTAINER_ELEMENT ) {
 			currentLeafNode.setPropertyValue( value );
-
-			// the property value is not part of the NodeImpl hashCode so we don't need to reset the PathImpl hashCode
 		}
 	}
 
