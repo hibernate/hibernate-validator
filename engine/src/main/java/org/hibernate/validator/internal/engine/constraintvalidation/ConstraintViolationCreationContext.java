@@ -4,8 +4,6 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.toImmutableMap;
-
 import java.util.Map;
 
 import jakarta.validation.Path;
@@ -44,8 +42,8 @@ public class ConstraintViolationCreationContext {
 		this.customViolation = customViolation;
 		// at this point we make a copy of the path to avoid side effects
 		this.propertyPath = property.materialize();
-		this.messageParameters = toImmutableMap( messageParameters );
-		this.expressionVariables = toImmutableMap( expressionVariables );
+		this.messageParameters = messageParameters;
+		this.expressionVariables = expressionVariables;
 		this.dynamicPayload = dynamicPayload;
 	}
 

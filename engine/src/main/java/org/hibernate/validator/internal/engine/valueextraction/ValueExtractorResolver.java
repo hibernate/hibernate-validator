@@ -304,10 +304,12 @@ public class ValueExtractorResolver {
 			return valueExtractorDescriptors;
 		}
 
-		Set<ValueExtractorDescriptor> possibleValueExtractors = potentialValueExtractorDescriptors
-				.stream()
-				.filter( e -> TypeHelper.isAssignable( e.getContainerType(), runtimeType ) )
-				.collect( Collectors.toSet() );
+		Set<ValueExtractorDescriptor> possibleValueExtractors = CollectionHelper.newHashSet( potentialValueExtractorDescriptors.size() );
+		for ( ValueExtractorDescriptor descriptor : potentialValueExtractorDescriptors ) {
+			if ( TypeHelper.isAssignable( descriptor.getContainerType(), runtimeType ) ) {
+				possibleValueExtractors.add( descriptor );
+			}
+		}
 
 		valueExtractorDescriptors = getMaximallySpecificValueExtractors( possibleValueExtractors );
 
