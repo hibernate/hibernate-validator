@@ -23,6 +23,7 @@ import jakarta.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraintvalidation.HibernateValidatorFactoryObserver;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
@@ -40,7 +41,6 @@ import org.hibernate.validator.spi.tracking.ProcessedBeansTrackingVoter;
  * {@link PredefinedScopeHibernateValidatorConfiguration}.
  *
  * @param <S> The actual type of the configuration.
- *
  * @author Emmanuel Bernard
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
@@ -178,6 +178,15 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	String FAIL_FAST_ON_PROPERTY_VIOLATION = "hibernate.validator.fail_fast_on_property_violation";
+
+	/**
+	 * Property for configuring the validator factory observers.
+	 * A comma separated list of fully qualified names of classes implementing {@link HibernateValidatorFactoryObserver} is expected as a value.
+	 *
+	 * @since 9.1
+	 */
+	@Incubating
+	String HIBERNATE_VALIDATOR_FACTORY_OBSERVER = "hibernate.validator.factory_observer";
 
 	/**
 	 * <p>
@@ -365,6 +374,32 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	S constraintValidatorPayload(Object constraintValidatorPayload);
 
 	/**
+	 * Allows adding a payload which will be  available during the constraint validators initialization.
+	 * If the method is called multiple times passing different instances of the same class,
+	 * only the payload passed last will be available for that type.
+	 *
+	 * @param constraintValidatorInitializationSharedService the payload to retrieve from the constraint validator initializers
+	 * @return {@code this} following the chaining method pattern
+	 * @since 9.1.0
+	 */
+	@Incubating
+	S addConstraintValidatorInitializationSharedService(Object constraintValidatorInitializationSharedService);
+
+	/**
+	 * Allows adding a payload which will be  available during the constraint validators initialization.
+	 * If the method is called multiple times passing different instances of the same class,
+	 * only the payload passed last will be available for that type.
+	 * <p>
+	 * If the added service also implements {@link HibernateValidatorFactoryObserver} such service will be registered as an observer automatically.
+	 *
+	 * @param constraintValidatorInitializationSharedService the payload to retrieve from the constraint validator initializers
+	 * @return {@code this} following the chaining method pattern
+	 * @since 9.1.0
+	 */
+	@Incubating
+	<T, V extends T> S addConstraintValidatorInitializationSharedService(Class<T> serviceClass, V constraintValidatorInitializationSharedService);
+
+	/**
 	 * Allows to set a getter property selection strategy defining the rules determining if a method is a getter
 	 * or not.
 	 *
@@ -498,4 +533,15 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	S processedBeansTrackingVoter(ProcessedBeansTrackingVoter processedBeanTrackingVoter);
+
+	/**
+	 * Allows adding validator factory observers tracking basic lifecycle factory events.
+	 *
+	 * @param observer An observer to register.
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 9.1
+	 */
+	@Incubating
+	S addHibernateValidatorFactoryObserver(HibernateValidatorFactoryObserver observer);
 }

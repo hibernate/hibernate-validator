@@ -45,6 +45,7 @@ import jakarta.validation.valueextraction.ValueExtractor;
 import jakarta.validation.valueextraction.ValueExtractorDeclarationException;
 import jakarta.validation.valueextraction.ValueExtractorDefinitionException;
 
+import org.hibernate.validator.constraintvalidation.HibernateValidatorFactoryObserver;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -959,4 +960,11 @@ public interface Log extends BasicLogger {
 	@Message(id = 272,
 			value = "Using `@Valid` on a container is deprecated. You should apply the annotation on the type argument(s). (%1$s) can potentially be a container at runtime. Affected element: %2$s")
 	void potentiallyDeprecatedUseOfValidOnContainer(@FormatWith(ClassObjectFormatter.class) Class<?> valueType, Object context);
+
+	@Message(id = 273, value = "Unable to instantiate the Hibernate Validator factory observer class %s.")
+	ValidationException getUnableToInstantiateFactoryObserverClassException(String observerFQCN, @Cause Exception e);
+
+	@LogMessage(level = WARN)
+	@Message(id = 274, value = "Unexpected exception occurred for the Hibernate Validator observer %s: %s")
+	void unexpectedObserverException(HibernateValidatorFactoryObserver observer, Exception e);
 }

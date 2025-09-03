@@ -4,17 +4,22 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.OBSERVE_FACTORY_CLOSED;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.OBSERVE_FACTORY_CLOSING;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.OBSERVE_FACTORY_CREATED;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowMultipleCascadedValidationOnReturnValues;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowOverridingMethodAlterParameterConstraint;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowParallelMethodsDefineParameterConstraints;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineBeanMetaDataClassNormalizer;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintExpressionLanguageFeatureLevel;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintMappings;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintValidatorInitializationSharedServices;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintValidatorPayload;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineCustomViolationExpressionLanguageFeatureLevel;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineExternalClassLoader;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFast;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFastOnPropertyViolation;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineHibernateValidatorFactoryObservers;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineScriptEvaluatorFactory;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineServiceLoadedConstraintMappings;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineShowValidatedValuesInTraceLogs;
@@ -22,6 +27,7 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTraversableResolverResultCacheEnabled;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.logValidatorFactoryScopedConfiguration;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.registerCustomConstraintValidators;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.safeObserve;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 import java.lang.invoke.MethodHandles;
@@ -44,9 +50,11 @@ import jakarta.validation.spi.ConfigurationState;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.PredefinedScopeHibernateValidatorFactory;
+import org.hibernate.validator.constraintvalidation.HibernateValidatorFactoryObserver;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
+import org.hibernate.validator.internal.engine.constraintvalidation.PatternConstraintInitializer;
 import org.hibernate.validator.internal.engine.constraintvalidation.PredefinedScopeConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.tracking.DefaultProcessedBeansTrackingVoter;
@@ -102,6 +110,8 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 
 	private final ValidationOrderGenerator validationOrderGenerator;
 
+	private final List<HibernateValidatorFactoryObserver> hibernateValidatorFactoryObservers;
+
 	public PredefinedScopeValidatorFactoryImpl(ConfigurationState configurationState) {
 		Contracts.assertTrue( configurationState instanceof PredefinedScopeConfigurationImpl, "Only PredefinedScopeConfigurationImpl is supported." );
 
@@ -124,9 +134,10 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		ScriptEvaluatorFactory scriptEvaluatorFactory = determineScriptEvaluatorFactory( configurationState, properties, externalClassLoader );
 		Duration temporalValidationTolerance = determineTemporalValidationTolerance( configurationState, properties );
 
+		List<HibernateValidatorFactoryObserver> sharedServicesObservers = newArrayList();
 		HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl(
-				scriptEvaluatorFactory, configurationState.getClockProvider(), temporalValidationTolerance );
-
+				scriptEvaluatorFactory, configurationState.getClockProvider(), temporalValidationTolerance,
+				determineConstraintValidatorInitializationSharedServices( hibernateSpecificConfig, PatternConstraintInitializer.predefined(), sharedServicesObservers ) );
 
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
 				configurationState.getMessageInterpolator(),
@@ -248,9 +259,13 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				beanClassesToInitialize
 		);
 
+		this.hibernateValidatorFactoryObservers = determineHibernateValidatorFactoryObservers( sharedServicesObservers, configurationState, properties, externalClassLoader );
+		safeObserve( hibernateValidatorFactoryObservers, this, OBSERVE_FACTORY_CREATED );
+
 		if ( LOG.isDebugEnabled() ) {
 			logValidatorFactoryScopedConfiguration( validatorFactoryScopedContext );
 		}
+
 	}
 
 	@Override
@@ -336,10 +351,14 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 
 	@Override
 	public void close() {
+		safeObserve( hibernateValidatorFactoryObservers, this, OBSERVE_FACTORY_CLOSING );
+
 		constraintValidatorManager.clear();
 		beanMetaDataManager.clear();
 		validatorFactoryScopedContext.getScriptEvaluatorFactory().clear();
 		valueExtractorManager.clear();
+
+		safeObserve( hibernateValidatorFactoryObservers, this, OBSERVE_FACTORY_CLOSED );
 	}
 
 	public ValidatorFactoryScopedContext getValidatorFactoryScopedContext() {

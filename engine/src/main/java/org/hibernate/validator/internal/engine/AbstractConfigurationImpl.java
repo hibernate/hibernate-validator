@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +36,10 @@ import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.BaseHibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraintvalidation.HibernateValidatorFactoryObserver;
 import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationSharedServiceManager;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
@@ -114,11 +117,12 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = new HashMap<>();
 
 	// HV-specific options
+	private final HibernateConstraintValidatorInitializationSharedServiceManager constraintValidatorInitializationSharedServiceManager;
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
+	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 	private boolean failFast;
 	private boolean failFastOnPropertyViolation;
 	private ClassLoader externalClassLoader;
-	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 	private boolean traversableResolverResultCacheEnabled = true;
 	private ScriptEvaluatorFactory scriptEvaluatorFactory;
 	private Duration temporalValidationTolerance;
@@ -132,6 +136,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 	private ProcessedBeansTrackingVoter processedBeansTrackingVoter;
 	private boolean showValidatedValuesInTraceLogs;
+	private List<HibernateValidatorFactoryObserver> hibernateValidatorFactoryObservers;
 
 	protected AbstractConfigurationImpl(BootstrapState state) {
 		this();
@@ -159,6 +164,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
 		this.defaultPropertyNodeNameProvider = new DefaultPropertyNodeNameProvider();
+		this.constraintValidatorInitializationSharedServiceManager = new HibernateConstraintValidatorInitializationSharedServiceManager();
 	}
 
 	@Override
@@ -349,6 +355,23 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		Contracts.assertNotNull( constraintValidatorPayload, MESSAGES.parameterMustNotBeNull( "constraintValidatorPayload" ) );
 
 		this.constraintValidatorPayload = constraintValidatorPayload;
+		return thisAsT();
+	}
+
+	@Override
+	public T addConstraintValidatorInitializationSharedService(Object constraintValidatorInitializationSharedService) {
+		Contracts.assertNotNull( constraintValidatorInitializationSharedService, MESSAGES.parameterMustNotBeNull( "constraintValidatorInitializationSharedService" ) );
+
+		this.constraintValidatorInitializationSharedServiceManager.register( constraintValidatorInitializationSharedService );
+		return thisAsT();
+	}
+
+	@Override
+	public <V, S extends V> T addConstraintValidatorInitializationSharedService(Class<V> serviceClass, S constraintValidatorInitializationSharedService) {
+		Contracts.assertNotNull( constraintValidatorInitializationSharedService, MESSAGES.parameterMustNotBeNull( "serviceClass" ) );
+		Contracts.assertNotNull( constraintValidatorInitializationSharedService, MESSAGES.parameterMustNotBeNull( "constraintValidatorInitializationSharedService" ) );
+		this.constraintValidatorInitializationSharedServiceManager.register( serviceClass, constraintValidatorInitializationSharedService );
+
 		return thisAsT();
 	}
 
@@ -548,6 +571,10 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		return constraintValidatorPayload;
 	}
 
+	public HibernateConstraintValidatorInitializationSharedServiceManager getConstraintValidatorInitializationSharedServiceManager() {
+		return constraintValidatorInitializationSharedServiceManager;
+	}
+
 	public GetterPropertySelectionStrategy getGetterPropertySelectionStrategy() {
 		return getterPropertySelectionStrategy;
 	}
@@ -687,12 +714,26 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		return thisAsT();
 	}
 
-	public ProcessedBeansTrackingVoter getProcessedBeansTrackingVoter() {
+	@Override
+	public T addHibernateValidatorFactoryObserver(HibernateValidatorFactoryObserver observer) {
+		Contracts.assertNotNull( observer, MESSAGES.parameterMustNotBeNull( "observer" ) );
+		if ( hibernateValidatorFactoryObservers == null ) {
+			hibernateValidatorFactoryObservers = new ArrayList<>();
+		}
+		hibernateValidatorFactoryObservers.add( observer );
+		return thisAsT();
+	}
+
+	public final ProcessedBeansTrackingVoter getProcessedBeansTrackingVoter() {
 		return processedBeansTrackingVoter;
 	}
 
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {
 		return programmaticMappings;
+	}
+
+	public final List<HibernateValidatorFactoryObserver> getHibernateValidatorFactoryObservers() {
+		return hibernateValidatorFactoryObservers == null ? List.of() : hibernateValidatorFactoryObservers;
 	}
 
 	private boolean isSpecificProvider() {

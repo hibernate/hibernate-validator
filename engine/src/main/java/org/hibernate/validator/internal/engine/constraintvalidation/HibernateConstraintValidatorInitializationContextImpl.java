@@ -23,25 +23,30 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 
 	private final Duration temporalValidationTolerance;
 
+	private final HibernateConstraintValidatorInitializationSharedServiceManager constraintValidatorInitializationSharedServiceManager;
+
 	private final int hashCode;
 
 	public HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider,
-			Duration temporalValidationTolerance) {
+			Duration temporalValidationTolerance, HibernateConstraintValidatorInitializationSharedServiceManager constraintValidatorInitializationSharedServiceManager
+	) {
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.clockProvider = clockProvider;
 		this.temporalValidationTolerance = temporalValidationTolerance;
+		this.constraintValidatorInitializationSharedServiceManager = constraintValidatorInitializationSharedServiceManager;
 		this.hashCode = createHashCode();
 	}
 
 	public static HibernateConstraintValidatorInitializationContextImpl of(HibernateConstraintValidatorInitializationContextImpl defaultContext,
-			ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider, Duration temporalValidationTolerance) {
+			ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider, Duration temporalValidationTolerance,
+			HibernateConstraintValidatorInitializationSharedServiceManager constraintValidatorInitializationSharedServiceManager) {
 		if ( scriptEvaluatorFactory == defaultContext.scriptEvaluatorFactory
 				&& clockProvider == defaultContext.clockProvider
 				&& temporalValidationTolerance.equals( defaultContext.temporalValidationTolerance ) ) {
 			return defaultContext;
 		}
 
-		return new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider, temporalValidationTolerance );
+		return new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider, temporalValidationTolerance, constraintValidatorInitializationSharedServiceManager );
 	}
 
 	@Override
@@ -57,6 +62,15 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 	@Override
 	public Duration getTemporalValidationTolerance() {
 		return temporalValidationTolerance;
+	}
+
+	@Override
+	public <C> C getConstraintValidatorInitializationSharedService(Class<C> type) {
+		return constraintValidatorInitializationSharedServiceManager.retrieve( type );
+	}
+
+	public HibernateConstraintValidatorInitializationSharedServiceManager getConstraintValidatorInitializationSharedServiceManager() {
+		return constraintValidatorInitializationSharedServiceManager;
 	}
 
 	@Override
