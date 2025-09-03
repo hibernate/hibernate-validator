@@ -201,8 +201,8 @@
         <version.com.google.guava>33.4.8-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>6.2.10</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
-        <version.com.fasterxml.jackson.core.jackson-databind>2.19.2</version.com.fasterxml.jackson.core.jackson-databind>
-        <version.com.fasterxml.jackson.core.jackson-annotations>2.19.2</version.com.fasterxml.jackson.core.jackson-annotations>
+        <version.com.fasterxml.jackson.core.jackson-databind>2.20.0</version.com.fasterxml.jackson.core.jackson-databind>
+        <version.com.fasterxml.jackson.core.jackson-annotations>2.20</version.com.fasterxml.jackson.core.jackson-annotations>
         <version.net.bytebuddy.byte-buddy>1.17.7</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
@@ -219,7 +219,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>11.0.0</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>11.0.1</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
@@ -263,10 +263,10 @@
         <version.moditect.plugin>1.3.0.Final</version.moditect.plugin>
         <version.sisu-maven-plugin>0.9.0.M4</version.sisu-maven-plugin>
         <version.versions.plugin>2.18.0</version.versions.plugin>
-        <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
+        <version.maven-wrapper-plugin>3.3.3</version.maven-wrapper-plugin>
         <version.spotless-maven-plugin>2.46.1</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.13</version.jacoco.plugin>
-        <version.sonar.plugin>5.1.0.4751</version.sonar.plugin>
+        <version.sonar.plugin>5.2.0.4988</version.sonar.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
 
         <!-- Forbidden API related properties -->
