@@ -166,6 +166,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						determineAllowParallelMethodsDefineParameterConstraints( hibernateSpecificConfig, properties )
 				).build();
 
+		List<HibernateValidatorFactoryObserver> sharedServicesObservers = newArrayList();
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
 				configurationState.getMessageInterpolator(),
 				configurationState.getTraversableResolver(),
@@ -178,7 +179,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				determineTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
 				determineShowValidatedValuesInTraceLogs( hibernateSpecificConfig, properties ),
 				determineConstraintValidatorPayload( hibernateSpecificConfig ),
-				determineConstraintValidatorInitializationSharedServices( hibernateSpecificConfig, new PatternConstraintInitializer.SimplePatternConstraintInitializer() ),
+				determineConstraintValidatorInitializationSharedServices( hibernateSpecificConfig, PatternConstraintInitializer.simple(), sharedServicesObservers ),
 				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
 				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties )
 		);
@@ -245,7 +246,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				? hibernateSpecificConfig.getProcessedBeansTrackingVoter()
 				: new DefaultProcessedBeansTrackingVoter();
 
-		this.hibernateValidatorFactoryObservers = determineHibernateValidatorFactoryObservers( configurationState, properties, externalClassLoader );
+		this.hibernateValidatorFactoryObservers = determineHibernateValidatorFactoryObservers( sharedServicesObservers, configurationState, properties, externalClassLoader );
 		safeObserve( hibernateValidatorFactoryObservers, this, OBSERVE_FACTORY_CREATED );
 
 		if ( LOG.isDebugEnabled() ) {

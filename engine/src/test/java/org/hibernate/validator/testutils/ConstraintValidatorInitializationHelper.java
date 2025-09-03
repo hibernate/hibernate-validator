@@ -101,7 +101,7 @@ public class ConstraintValidatorInitializationHelper {
 			@Override
 			public <C> C getConstraintValidatorInitializationSharedService(Class<C> type) {
 				if ( PatternConstraintInitializer.class.equals( type ) ) {
-					return (C) new PatternConstraintInitializer.SimplePatternConstraintInitializer();
+					return (C) PatternConstraintInitializer.simple();
 				}
 				return null;
 			}

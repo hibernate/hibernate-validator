@@ -134,10 +134,10 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		ScriptEvaluatorFactory scriptEvaluatorFactory = determineScriptEvaluatorFactory( configurationState, properties, externalClassLoader );
 		Duration temporalValidationTolerance = determineTemporalValidationTolerance( configurationState, properties );
 
-		PatternConstraintInitializer.CachingPatternConstraintInitializer patternConstraintInitializer = new PatternConstraintInitializer.CachingPatternConstraintInitializer();
+		List<HibernateValidatorFactoryObserver> sharedServicesObservers = newArrayList();
 		HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl(
 				scriptEvaluatorFactory, configurationState.getClockProvider(), temporalValidationTolerance,
-				determineConstraintValidatorInitializationSharedServices( hibernateSpecificConfig, patternConstraintInitializer ) );
+				determineConstraintValidatorInitializationSharedServices( hibernateSpecificConfig, PatternConstraintInitializer.predefined(), sharedServicesObservers ) );
 
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
 				configurationState.getMessageInterpolator(),
@@ -259,10 +259,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				beanClassesToInitialize
 		);
 
-		// at this point all constraints had to be initialized, so we can clear up the pattern cache:
-		patternConstraintInitializer.close();
-
-		this.hibernateValidatorFactoryObservers = determineHibernateValidatorFactoryObservers( configurationState, properties, externalClassLoader );
+		this.hibernateValidatorFactoryObservers = determineHibernateValidatorFactoryObservers( sharedServicesObservers, configurationState, properties, externalClassLoader );
 		safeObserve( hibernateValidatorFactoryObservers, this, OBSERVE_FACTORY_CREATED );
 
 		if ( LOG.isDebugEnabled() ) {

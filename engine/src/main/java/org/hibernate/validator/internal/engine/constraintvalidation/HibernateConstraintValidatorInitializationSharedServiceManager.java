@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,5 +48,9 @@ public class HibernateConstraintValidatorInitializationSharedServiceManager {
 		return new HibernateConstraintValidatorInitializationSharedServiceManager(
 				Map.copyOf( services )
 		);
+	}
+
+	public Collection<Object> registeredServices() {
+		return Collections.unmodifiableCollection( services.values() );
 	}
 }

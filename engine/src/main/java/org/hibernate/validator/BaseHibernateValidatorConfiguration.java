@@ -389,6 +389,8 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 * Allows adding a payload which will be  available during the constraint validators initialization.
 	 * If the method is called multiple times passing different instances of the same class,
 	 * only the payload passed last will be available for that type.
+	 * <p>
+	 * If the added service also implements {@link HibernateValidatorFactoryObserver} such service will be registered as an observer automatically.
 	 *
 	 * @param constraintValidatorInitializationSharedService the payload to retrieve from the constraint validator initializers
 	 * @return {@code this} following the chaining method pattern

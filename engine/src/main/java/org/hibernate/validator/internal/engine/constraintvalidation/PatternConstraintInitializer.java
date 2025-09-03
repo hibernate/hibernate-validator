@@ -8,37 +8,43 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
-public interface PatternConstraintInitializer extends AutoCloseable {
+import org.hibernate.validator.HibernateValidatorFactory;
+import org.hibernate.validator.constraintvalidation.HibernateValidatorFactoryObserver;
 
-	Pattern of(String pattern, int flags);
+public abstract sealed class PatternConstraintInitializer implements HibernateValidatorFactoryObserver
+		permits PatternConstraintInitializer.SimplePatternConstraintInitializer, PatternConstraintInitializer.PredefinedPatternConstraintInitializer {
+	private final Map<PatternKey, Pattern> cache = new ConcurrentHashMap<>();
 
-	@Override
-	default void close() {
+	public static PatternConstraintInitializer predefined() {
+		return new PredefinedPatternConstraintInitializer();
 	}
 
-	class SimplePatternConstraintInitializer implements PatternConstraintInitializer {
-
-		@Override
-		public Pattern of(String pattern, int flags) {
-			return Pattern.compile( pattern, flags );
-		}
+	public static PatternConstraintInitializer simple() {
+		return new SimplePatternConstraintInitializer();
 	}
 
-	class CachingPatternConstraintInitializer implements PatternConstraintInitializer {
-		private final Map<PatternKey, Pattern> cache = new ConcurrentHashMap<>();
+	public final Pattern of(String pattern, int flags) {
+		return cache.computeIfAbsent( new PatternKey( pattern, flags ), key -> Pattern.compile( pattern, flags ) );
+	}
 
+	protected void clearCache() {
+		cache.clear();
+	}
+
+	static final class SimplePatternConstraintInitializer extends PatternConstraintInitializer {
 		@Override
-		public Pattern of(String pattern, int flags) {
-			return cache.computeIfAbsent( new PatternKey( pattern, flags ), key -> Pattern.compile( pattern, flags ) );
-		}
-
-		@Override
-		public void close() {
-			cache.clear();
-		}
-
-		private record PatternKey(String pattern, int flags) {
+		public void factoryClosing(HibernateValidatorFactory factory) {
+			clearCache();
 		}
 	}
 
+	static final class PredefinedPatternConstraintInitializer extends PatternConstraintInitializer {
+		@Override
+		public void factoryCreated(HibernateValidatorFactory factory) {
+			clearCache();
+		}
+	}
+
+	private record PatternKey(String pattern, int flags) {
+	}
 }

@@ -268,7 +268,7 @@ final class ValidatorFactoryConfigurationHelper {
 	}
 
 	static HibernateConstraintValidatorInitializationSharedServiceManager determineConstraintValidatorInitializationSharedServices(ConfigurationState configurationState,
-			PatternConstraintInitializer patternConstraintInitializer) {
+			PatternConstraintInitializer patternConstraintInitializer, List<HibernateValidatorFactoryObserver> sharedServicesObservers) {
 		HibernateConstraintValidatorInitializationSharedServiceManager configured = null;
 		if ( configurationState instanceof AbstractConfigurationImpl<?> hibernateSpecificConfig ) {
 			if ( hibernateSpecificConfig.getConstraintValidatorPayload() != null ) {
@@ -279,9 +279,15 @@ final class ValidatorFactoryConfigurationHelper {
 			configured = new HibernateConstraintValidatorInitializationSharedServiceManager();
 		}
 
-		return configured.immutableWithDefaultServices(
+		HibernateConstraintValidatorInitializationSharedServiceManager sharedServiceManager = configured.immutableWithDefaultServices(
 				Map.of( PatternConstraintInitializer.class, patternConstraintInitializer )
 		);
+		for ( Object service : sharedServiceManager.registeredServices() ) {
+			if ( service instanceof HibernateValidatorFactoryObserver observer ) {
+				sharedServicesObservers.add( observer );
+			}
+		}
+		return sharedServiceManager;
 	}
 
 	static ExpressionLanguageFeatureLevel determineConstraintExpressionLanguageFeatureLevel(AbstractConfigurationImpl<?> hibernateSpecificConfig,
@@ -456,8 +462,9 @@ final class ValidatorFactoryConfigurationHelper {
 		return tmpShowValidatedValuesInTraceLogging;
 	}
 
-	static List<HibernateValidatorFactoryObserver> determineHibernateValidatorFactoryObservers(ConfigurationState configurationState, Map<String, String> properties, ClassLoader externalClassLoader) {
-		List<HibernateValidatorFactoryObserver> observers = newArrayList();
+	static List<HibernateValidatorFactoryObserver> determineHibernateValidatorFactoryObservers(List<HibernateValidatorFactoryObserver> sharedServicesObservers,
+			ConfigurationState configurationState, Map<String, String> properties, ClassLoader externalClassLoader) {
+		List<HibernateValidatorFactoryObserver> observers = newArrayList( sharedServicesObservers );
 		if ( configurationState instanceof AbstractConfigurationImpl<?> hibernateSpecificConfig ) {
 			observers.addAll( hibernateSpecificConfig.getHibernateValidatorFactoryObservers() );
 		}
