@@ -14,11 +14,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import jakarta.validation.spi.ConfigurationState;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraintvalidation.HibernateValidatorFactoryObserver;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationSharedServiceManager;
@@ -48,6 +51,10 @@ final class ValidatorFactoryConfigurationHelper {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
+	static final BiConsumer<HibernateValidatorFactoryObserver, HibernateValidatorFactory> OBSERVE_FACTORY_CLOSING = HibernateValidatorFactoryObserver::factoryClosing;
+	static final BiConsumer<HibernateValidatorFactoryObserver, HibernateValidatorFactory> OBSERVE_FACTORY_CLOSED = HibernateValidatorFactoryObserver::factoryClosed;
+	static final BiConsumer<HibernateValidatorFactoryObserver, HibernateValidatorFactory> OBSERVE_FACTORY_CREATED = HibernateValidatorFactoryObserver::factoryCreated;
+
 	private ValidatorFactoryConfigurationHelper() {
 	}
 
@@ -61,9 +68,7 @@ final class ValidatorFactoryConfigurationHelper {
 			ConfigurationState configurationState, JavaBeanHelper javaBeanHelper, ClassLoader externalClassLoader) {
 		Set<DefaultConstraintMapping> constraintMappings = newHashSet();
 
-		if ( configurationState instanceof AbstractConfigurationImpl ) {
-			AbstractConfigurationImpl<?> hibernateConfiguration = (AbstractConfigurationImpl<?>) configurationState;
-
+		if ( configurationState instanceof AbstractConfigurationImpl<?> hibernateConfiguration ) {
 			// programmatic config
 			/* We add these first so that constraint mapping created through DefaultConstraintMappingBuilder will take
 			 * these programmatically defined mappings into account when checking for constraint definition uniqueness
@@ -204,8 +209,7 @@ final class ValidatorFactoryConfigurationHelper {
 
 	static ScriptEvaluatorFactory determineScriptEvaluatorFactory(ConfigurationState configurationState, Map<String, String> properties,
 			ClassLoader externalClassLoader) {
-		if ( configurationState instanceof AbstractConfigurationImpl ) {
-			AbstractConfigurationImpl<?> hibernateSpecificConfig = (AbstractConfigurationImpl<?>) configurationState;
+		if ( configurationState instanceof AbstractConfigurationImpl<?> hibernateSpecificConfig ) {
 			if ( hibernateSpecificConfig.getScriptEvaluatorFactory() != null ) {
 				LOG.usingScriptEvaluatorFactory( hibernateSpecificConfig.getScriptEvaluatorFactory().getClass() );
 				return hibernateSpecificConfig.getScriptEvaluatorFactory();
@@ -231,8 +235,7 @@ final class ValidatorFactoryConfigurationHelper {
 	}
 
 	static Duration determineTemporalValidationTolerance(ConfigurationState configurationState, Map<String, String> properties) {
-		if ( configurationState instanceof AbstractConfigurationImpl ) {
-			AbstractConfigurationImpl<?> hibernateSpecificConfig = (AbstractConfigurationImpl<?>) configurationState;
+		if ( configurationState instanceof AbstractConfigurationImpl<?> hibernateSpecificConfig ) {
 			if ( hibernateSpecificConfig.getTemporalValidationTolerance() != null ) {
 				LOG.logTemporalValidationTolerance( hibernateSpecificConfig.getTemporalValidationTolerance() );
 				return hibernateSpecificConfig.getTemporalValidationTolerance();
@@ -451,6 +454,42 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 
 		return tmpShowValidatedValuesInTraceLogging;
+	}
+
+	static List<HibernateValidatorFactoryObserver> determineHibernateValidatorFactoryObservers(ConfigurationState configurationState, Map<String, String> properties, ClassLoader externalClassLoader) {
+		List<HibernateValidatorFactoryObserver> observers = newArrayList();
+		if ( configurationState instanceof AbstractConfigurationImpl<?> hibernateSpecificConfig ) {
+			observers.addAll( hibernateSpecificConfig.getHibernateValidatorFactoryObservers() );
+		}
+
+		String[] observerFqcn = properties.getOrDefault( HibernateValidatorConfiguration.HIBERNATE_VALIDATOR_FACTORY_OBSERVER, "" ).split( "," );
+		for ( String fqcn : observerFqcn ) {
+			if ( fqcn == null || fqcn.isBlank() ) {
+				continue;
+			}
+			try {
+				@SuppressWarnings("unchecked")
+				Class<? extends HibernateValidatorFactoryObserver> clazz = (Class<? extends HibernateValidatorFactoryObserver>) LoadClass.action( fqcn, externalClassLoader );
+				HibernateValidatorFactoryObserver observer = NewInstance.action( clazz, "Hibernate Validator factory observer class" );
+				observers.add( observer );
+			}
+			catch (Exception e) {
+				throw LOG.getUnableToInstantiateFactoryObserverClassException( fqcn, e );
+			}
+		}
+		return observers;
+	}
+
+	static void safeObserve(List<HibernateValidatorFactoryObserver> hibernateValidatorFactoryObservers, HibernateValidatorFactory factory,
+			BiConsumer<HibernateValidatorFactoryObserver, HibernateValidatorFactory> action) {
+		for ( HibernateValidatorFactoryObserver observer : hibernateValidatorFactoryObservers ) {
+			try {
+				action.accept( observer, factory );
+			}
+			catch (Exception e) {
+				LOG.unexpectedObserverException( observer, e );
+			}
+		}
 	}
 
 	static void logValidatorFactoryScopedConfiguration(ValidatorFactoryScopedContext context) {

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ import jakarta.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.BaseHibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraintvalidation.HibernateValidatorFactoryObserver;
 import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationSharedServiceManager;
@@ -134,6 +136,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 	private ProcessedBeansTrackingVoter processedBeansTrackingVoter;
 	private boolean showValidatedValuesInTraceLogs;
+	private List<HibernateValidatorFactoryObserver> hibernateValidatorFactoryObservers;
 
 	protected AbstractConfigurationImpl(BootstrapState state) {
 		this();
@@ -711,12 +714,26 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		return thisAsT();
 	}
 
-	public ProcessedBeansTrackingVoter getProcessedBeansTrackingVoter() {
+	@Override
+	public T addHibernateValidatorFactoryObserver(HibernateValidatorFactoryObserver observer) {
+		Contracts.assertNotNull( observer, MESSAGES.parameterMustNotBeNull( "observer" ) );
+		if ( hibernateValidatorFactoryObservers == null ) {
+			hibernateValidatorFactoryObservers = new ArrayList<>();
+		}
+		hibernateValidatorFactoryObservers.add( observer );
+		return thisAsT();
+	}
+
+	public final ProcessedBeansTrackingVoter getProcessedBeansTrackingVoter() {
 		return processedBeansTrackingVoter;
 	}
 
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {
 		return programmaticMappings;
+	}
+
+	public final List<HibernateValidatorFactoryObserver> getHibernateValidatorFactoryObservers() {
+		return hibernateValidatorFactoryObservers == null ? List.of() : hibernateValidatorFactoryObservers;
 	}
 
 	private boolean isSpecificProvider() {

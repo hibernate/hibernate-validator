@@ -4,6 +4,9 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.OBSERVE_FACTORY_CLOSED;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.OBSERVE_FACTORY_CLOSING;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.OBSERVE_FACTORY_CREATED;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowMultipleCascadedValidationOnReturnValues;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowOverridingMethodAlterParameterConstraint;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowParallelMethodsDefineParameterConstraints;
@@ -16,6 +19,7 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineExternalClassLoader;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFast;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFastOnPropertyViolation;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineHibernateValidatorFactoryObservers;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineScriptEvaluatorFactory;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineServiceLoadedConstraintMappings;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineShowValidatedValuesInTraceLogs;
@@ -23,6 +27,7 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTraversableResolverResultCacheEnabled;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.logValidatorFactoryScopedConfiguration;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.registerCustomConstraintValidators;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.safeObserve;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 import java.lang.invoke.MethodHandles;
@@ -45,6 +50,7 @@ import jakarta.validation.spi.ConfigurationState;
 
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
+import org.hibernate.validator.constraintvalidation.HibernateValidatorFactoryObserver;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
@@ -138,6 +144,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final ValidationOrderGenerator validationOrderGenerator;
 
 	private final ProcessedBeansTrackingVoter processedBeansTrackingVoter;
+
+	private final List<HibernateValidatorFactoryObserver> hibernateValidatorFactoryObservers;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		ClassLoader externalClassLoader = determineExternalClassLoader( configurationState );
@@ -237,6 +245,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				? hibernateSpecificConfig.getProcessedBeansTrackingVoter()
 				: new DefaultProcessedBeansTrackingVoter();
 
+		this.hibernateValidatorFactoryObservers = determineHibernateValidatorFactoryObservers( configurationState, properties, externalClassLoader );
+		safeObserve( hibernateValidatorFactoryObservers, this, OBSERVE_FACTORY_CREATED );
+
 		if ( LOG.isDebugEnabled() ) {
 			logValidatorFactoryScopedConfiguration( validatorFactoryScopedContext );
 		}
@@ -333,6 +344,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	@Override
 	public void close() {
+		safeObserve( hibernateValidatorFactoryObservers, this, OBSERVE_FACTORY_CLOSING );
+
 		constraintCreationContext.getConstraintValidatorManager().clear();
 		constraintCreationContext.getConstraintHelper().clear();
 		for ( BeanMetaDataManager beanMetaDataManager : beanMetaDataManagers.values() ) {
@@ -340,6 +353,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 		validatorFactoryScopedContext.getScriptEvaluatorFactory().clear();
 		constraintCreationContext.getValueExtractorManager().clear();
+
+		safeObserve( hibernateValidatorFactoryObservers, this, OBSERVE_FACTORY_CLOSED );
 	}
 
 	public ValidatorFactoryScopedContext getValidatorFactoryScopedContext() {
