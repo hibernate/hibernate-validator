@@ -262,7 +262,7 @@
         <version.flatten-maven-plugin>1.7.2</version.flatten-maven-plugin>
         <version.moditect.plugin>1.3.0.Final</version.moditect.plugin>
         <version.sisu-maven-plugin>0.9.0.M4</version.sisu-maven-plugin>
-        <version.versions.plugin>2.18.0</version.versions.plugin>
+        <version.versions.plugin>2.19.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.3</version.maven-wrapper-plugin>
         <version.spotless-maven-plugin>2.46.1</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.13</version.jacoco.plugin>
