@@ -197,7 +197,16 @@
         <defaultGoal>test</defaultGoal>
         <resources>
             <resource>
-                <directory>src/main/resources</directory>
+                <!-- The default resource dir: -->
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+            <resource>
+                <!-- Extra dir to include the license file: -->
+                <directory>${rootProject.directory}</directory>
+                <includes>
+                    <include>license.txt</include>
+                </includes>
+                <targetPath>META-INF</targetPath>
             </resource>
             <resource>
                 <directory>src/main/xsd</directory>
