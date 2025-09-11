@@ -574,6 +574,20 @@
     </dependencyManagement>
 
     <build>
+        <resources>
+            <resource>
+                <!-- The default resource dir: -->
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+            <resource>
+                <!-- Extra dir to include the license file: -->
+                <directory>${rootProject.directory}</directory>
+                <includes>
+                    <include>license.txt</include>
+                </includes>
+                <targetPath>META-INF</targetPath>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>

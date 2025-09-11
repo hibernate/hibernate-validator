@@ -137,11 +137,6 @@
 
     <build>
         <defaultGoal>test</defaultGoal>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
         <testResources>
             <testResource>
                 <filtering>true</filtering>
