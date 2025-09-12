@@ -13,6 +13,7 @@ import jakarta.validation.TraversableResolver;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
+import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationSharedDataManager;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
@@ -103,13 +104,15 @@ public class ValidatorFactoryScopedContext {
 			boolean traversableResolverResultCacheEnabled,
 			boolean showValidatedValuesInTraceLogs,
 			Object constraintValidatorPayload,
+			HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
 			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel) {
 		this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
 				failFastOnPropertyViolation, traversableResolverResultCacheEnabled, showValidatedValuesInTraceLogs, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
 				customViolationExpressionLanguageFeatureLevel,
 				new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
-						temporalValidationTolerance ) );
+						temporalValidationTolerance, constraintValidatorInitializationSharedServiceManager
+				) );
 	}
 
 	ValidatorFactoryScopedContext(MessageInterpolator messageInterpolator,
@@ -214,7 +217,7 @@ public class ValidatorFactoryScopedContext {
 		private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
 		private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 		private boolean showValidatedValuesInTraceLogs;
-		private HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
+		private final HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
 
 		Builder(ValidatorFactoryScopedContext defaultContext) {
 			Contracts.assertNotNull( defaultContext, "Default context cannot be null." );
@@ -348,7 +351,8 @@ public class ValidatorFactoryScopedContext {
 							constraintValidatorInitializationContext,
 							scriptEvaluatorFactory,
 							clockProvider,
-							temporalValidationTolerance
+							temporalValidationTolerance,
+							constraintValidatorInitializationContext.getConstraintValidatorInitializationSharedServiceManager()
 					)
 			);
 		}

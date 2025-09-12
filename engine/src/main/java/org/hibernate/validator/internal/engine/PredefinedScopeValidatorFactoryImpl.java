@@ -20,6 +20,7 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineShowValidatedValuesInTraceLogs;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTemporalValidationTolerance;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTraversableResolverResultCacheEnabled;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.initializeConstraintValidatorInitializationShareDataManager;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.logValidatorFactoryScopedConfiguration;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.registerCustomConstraintValidators;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -125,8 +126,8 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		Duration temporalValidationTolerance = determineTemporalValidationTolerance( configurationState, properties );
 
 		HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl(
-				scriptEvaluatorFactory, configurationState.getClockProvider(), temporalValidationTolerance );
-
+				scriptEvaluatorFactory, configurationState.getClockProvider(), temporalValidationTolerance,
+				initializeConstraintValidatorInitializationShareDataManager( hibernateSpecificConfig ) );
 
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
 				configurationState.getMessageInterpolator(),

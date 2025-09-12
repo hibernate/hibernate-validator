@@ -5,6 +5,7 @@
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import java.time.Duration;
+import java.util.function.Supplier;
 
 import jakarta.validation.ClockProvider;
 
@@ -23,25 +24,30 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 
 	private final Duration temporalValidationTolerance;
 
+	private final HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager;
+
 	private final int hashCode;
 
 	public HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider,
-			Duration temporalValidationTolerance) {
+			Duration temporalValidationTolerance, HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager
+	) {
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.clockProvider = clockProvider;
 		this.temporalValidationTolerance = temporalValidationTolerance;
+		this.constraintValidatorInitializationSharedServiceManager = constraintValidatorInitializationSharedServiceManager;
 		this.hashCode = createHashCode();
 	}
 
 	public static HibernateConstraintValidatorInitializationContextImpl of(HibernateConstraintValidatorInitializationContextImpl defaultContext,
-			ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider, Duration temporalValidationTolerance) {
+			ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider, Duration temporalValidationTolerance,
+			HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager) {
 		if ( scriptEvaluatorFactory == defaultContext.scriptEvaluatorFactory
 				&& clockProvider == defaultContext.clockProvider
 				&& temporalValidationTolerance.equals( defaultContext.temporalValidationTolerance ) ) {
 			return defaultContext;
 		}
 
-		return new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider, temporalValidationTolerance );
+		return new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider, temporalValidationTolerance, constraintValidatorInitializationSharedServiceManager );
 	}
 
 	@Override
@@ -60,6 +66,20 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 	}
 
 	@Override
+	public <C> C getSharedData(Class<C> type) {
+		return constraintValidatorInitializationSharedServiceManager.retrieve( type );
+	}
+
+	@Override
+	public <C, V extends C> C getSharedData(Class<C> type, Supplier<V> createIfNotPresent) {
+		return constraintValidatorInitializationSharedServiceManager.retrieve( type, createIfNotPresent );
+	}
+
+	public HibernateConstraintValidatorInitializationSharedDataManager getConstraintValidatorInitializationSharedServiceManager() {
+		return constraintValidatorInitializationSharedServiceManager;
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
@@ -71,6 +91,9 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		HibernateConstraintValidatorInitializationContextImpl hibernateConstraintValidatorInitializationContextImpl = (HibernateConstraintValidatorInitializationContextImpl) o;
 
 		if ( scriptEvaluatorFactory != hibernateConstraintValidatorInitializationContextImpl.scriptEvaluatorFactory ) {
+			return false;
+		}
+		if ( constraintValidatorInitializationSharedServiceManager != hibernateConstraintValidatorInitializationContextImpl.constraintValidatorInitializationSharedServiceManager ) {
 			return false;
 		}
 		if ( clockProvider != hibernateConstraintValidatorInitializationContextImpl.clockProvider ) {
@@ -91,6 +114,7 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		int result = System.identityHashCode( scriptEvaluatorFactory );
 		result = 31 * result + System.identityHashCode( clockProvider );
 		result = 31 * result + temporalValidationTolerance.hashCode();
+		result = 31 * result + System.identityHashCode( constraintValidatorInitializationSharedServiceManager );
 		return result;
 	}
 }
