@@ -6,15 +6,20 @@ package org.hibernate.validator.internal.engine.path;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.util.Iterator;
 
-import org.hibernate.validator.path.Path;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.path.RandomAccessPath;
 
 
-final class MaterializedPath implements Path, Serializable {
+final class MaterializedPath implements RandomAccessPath, Serializable {
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	@Serial
-	private static final long serialVersionUID = 1264131890253015968L;
+	private static final long serialVersionUID = -329465327521818082L;
 
 	private static final String PROPERTY_PATH_SEPARATOR = ".";
 
@@ -24,6 +29,29 @@ final class MaterializedPath implements Path, Serializable {
 	MaterializedPath(MutablePath path) {
 		this.nodes = MaterializedNode.constructMaterializedPath( path.getLeafNode() );
 		this.leafNode = nodes[nodes.length - 1];
+	}
+
+	@Override
+	public Node getLeafNode() {
+		return leafNode;
+	}
+
+	@Override
+	public Node getRootNode() {
+		return nodes[0];
+	}
+
+	@Override
+	public Node getNode(int index) {
+		if ( index < 0 || index >= nodes.length ) {
+			throw LOG.pathIndexOutOfBounds( index, nodes.length );
+		}
+		return nodes[index];
+	}
+
+	@Override
+	public int length() {
+		return nodes.length;
 	}
 
 	@Override
@@ -71,10 +99,5 @@ final class MaterializedPath implements Path, Serializable {
 			current = current.getParent();
 		}
 		return builder.toString();
-	}
-
-	@Override
-	public Node getLeafNode() {
-		return leafNode;
 	}
 }
