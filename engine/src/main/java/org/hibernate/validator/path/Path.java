@@ -8,6 +8,8 @@ import org.hibernate.validator.Incubating;
 
 /**
  * An extended representation of the validation path, provides Hibernate Validator specific functionality.
+ *
+ * @since 9.1
  */
 @Incubating
 public interface Path extends jakarta.validation.Path {
