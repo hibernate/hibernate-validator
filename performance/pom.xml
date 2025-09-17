@@ -270,8 +270,7 @@
                 <validation-api.version>2.0.2.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>6.2.5.Final</beanvalidation-impl.version>
-                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
-                <sources.to.add.additional>${project.basedir}/src/main/javax-bv2</sources.to.add.additional>
+                <sources.to.add.main>${project.basedir}/src/main/javax-bv2</sources.to.add.main>
                 <sources.to.add.additional.predefined>${project.basedir}/src/main/javax-predefined-scope</sources.to.add.additional.predefined>
             </properties>
             <dependencies>
@@ -308,8 +307,7 @@
                 <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>6.1.7.Final</beanvalidation-impl.version>
-                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
-                <sources.to.add.additional>${project.basedir}/src/main/javax-bv2</sources.to.add.additional>
+                <sources.to.add.main>${project.basedir}/src/main/javax-bv2</sources.to.add.main>
             </properties>
             <dependencies>
                 <dependency>
@@ -345,8 +343,7 @@
                 <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>6.0.23.Final</beanvalidation-impl.version>
-                <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
-                <sources.to.add.additional>${project.basedir}/src/main/javax-bv2</sources.to.add.additional>
+                <sources.to.add.main>${project.basedir}/src/main/javax-bv2</sources.to.add.main>
             </properties>
             <dependencies>
                 <dependency>
