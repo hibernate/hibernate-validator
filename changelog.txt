@@ -1,6 +1,21 @@
 Hibernate Validator Changelog
 =============================
 
+9.1.0.Alpha2 (2025-09-19)
+-------------------------
+
+** Improvement
+    * HV-2140 Bump Apache Groovy to 5.0.1
+    * HV-2139 Introduce a RandomAccessPath as an extension of the org.hibernate.validator.path.Path
+    * HV-2138 Include license file in the META-INF of published artifacts
+    * HV-2135 Do not initialize the alreadyProcessedGroups unless necessary in BeanValueContext
+    * HV-2004 add constant pool for @Pattern
+
+** Task
+    * HV-2136 Test against wildfly-preview 37.0.1.Final
+    * HV-2134 Update beanvalidation-benchmark to run with jakarta versions
+    * HV-2130 Add a GitHub workflow to publish TCK results (for certification)
+
 9.1.0.Alpha1 (2025-08-28)
 -------------------------
 
