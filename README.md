@@ -22,7 +22,7 @@ The documentation for this release is included in the _docs_ directory of the di
 
 ## Release Notes
 
-The full list of changes for this release can be found in changelog.txt.
+The full list of changes for this release can be found in [changelog.txt](changelog.txt).
 
 ## System Requirements
 
@@ -37,32 +37,32 @@ provided by the JDK) as implementation. Just add a supported logging library to 
 Logging will delegate any log requests to that provider.
 
 * Add the following artifact to your Maven/Ivy/Gradle dependency list:
-
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>9.1.0.Alpha2</version>
-        </dependency>
-
+    ```xml
+    <dependency>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator</artifactId>
+        <version>9.1.0.Alpha2</version>
+    </dependency>
+    ```
   You also need an API and implementation of the Unified Expression Language. These dependencies must be explicitly added in an SE environment.
   In a Jakarta EE environment, they are often already provided.
-
-        <dependency>
-           <groupId>org.glassfish.expressly</groupId>
-           <artifactId>expressly</artifactId>
-           <version>6.0.0</version>
-        </dependency>
-
+    ```xml
+    <dependency>
+       <groupId>org.glassfish.expressly</groupId>
+       <artifactId>expressly</artifactId>
+       <version>6.0.0</version>
+    </dependency>
+    ```
 * Jakarta Validation defines integration points with [CDI](http://jcp.org/en/jsr/detail?id=346). If your application runs
 in an environment which does not provide this integration out of the box, you may use the Hibernate Validator CDI portable
 extension by adding the following dependency:
-
-        <dependency>
-           <groupId>org.hibernate.validator</groupId>
-           <artifactId>hibernate-validator-cdi</artifactId>
-           <version>9.1.0.Alpha2</version>
-        </dependency>
-
+    ```xml
+    <dependency>
+       <groupId>org.hibernate.validator</groupId>
+       <artifactId>hibernate-validator-cdi</artifactId>
+       <version>9.1.0.Alpha2</version>
+    </dependency>
+    ```
 * _hibernate-validator-annotation-processor-&lt;version&gt;.jar_ is an optional jar which can be integrated with your build
 environment respectively IDE to verify that constraint annotations are correctly used. Refer to the [online
 documentation](https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#validator-annotation-processor) for more information.
@@ -70,7 +70,7 @@ documentation](https://docs.jboss.org/hibernate/stable/validator/reference/en-US
 ## Licensing
 
 Hibernate Validator itself as well as the Jakarta Validation API and TCK are all provided and distributed under
-the Apache Software License 2.0. Refer to license.txt for more information.
+the Apache Software License 2.0. Refer to [license.txt](license.txt) for more information.
 
 ## Build from Source
 
