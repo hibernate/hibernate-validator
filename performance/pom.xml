@@ -25,6 +25,12 @@
         <enforcer.skip>true</enforcer.skip>
         <deploy.skip>true</deploy.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
+        <!--
+            The build-helper-maven-plugin is used to add Bean Validation 2.0 source folder to the BV implementations
+            that are 2.0+. Since we are also using this plugin to parse versions in the root pom we want to control
+            when the sources are added with this property:
+        -->
+        <add.bv2.sources.skip>true</add.bv2.sources.skip>
 
         <!--
         Need to specify something, since the plugin cannot handle empty options. Using something which does not have
@@ -81,6 +87,7 @@
                                 <goal>add-source</goal>
                             </goals>
                             <configuration>
+                                <skipAddSource>${add.bv2.sources.skip}</skipAddSource>
                                 <sources>
                                     <source>${project.basedir}/src/main/java-bv2</source>
                                 </sources>
@@ -163,6 +170,7 @@
             <properties>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>${project.version}</beanvalidation-impl.version>
+                <add.bv2.sources.skip>false</add.bv2.sources.skip>
             </properties>
             <dependencies>
                 <dependency>
@@ -183,15 +191,6 @@
                     <artifactId>log4j</artifactId>
                 </dependency>
             </dependencies>
-            <!-- adding sources for BV 2.0 tests -->
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
         <profile>
             <id>hv-6.1</id>
@@ -205,6 +204,7 @@
                 <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>6.1.2.Final</beanvalidation-impl.version>
+                <add.bv2.sources.skip>false</add.bv2.sources.skip>
             </properties>
             <dependencies>
                 <dependency>
@@ -227,15 +227,6 @@
                     <artifactId>log4j</artifactId>
                 </dependency>
             </dependencies>
-            <!-- adding sources for BV 2.0 tests -->
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
         <profile>
             <id>hv-6.0</id>
@@ -249,6 +240,7 @@
                 <validation-api.version>2.0.1.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>6.0.19.Final</beanvalidation-impl.version>
+                <add.bv2.sources.skip>false</add.bv2.sources.skip>
             </properties>
             <dependencies>
                 <dependency>
@@ -271,15 +263,6 @@
                     <artifactId>log4j</artifactId>
                 </dependency>
             </dependencies>
-            <!-- adding sources for BV 2.0 tests -->
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
         <profile>
             <id>hv-5.4</id>
