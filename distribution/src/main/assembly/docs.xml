@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+	SPDX-License-Identifier: Apache-2.0
+	Copyright Red Hat Inc. and Hibernate Authors
+-->
+
+<assembly>
+	<id>docs</id>
+	<formats>
+		<format>dir</format>
+	</formats>
+
+	<baseDirectory>.</baseDirectory>
+
+	<fileSets>
+		<!-- Include documentation -->
+		<fileSet>
+			<directory>target/site/javadocs/apidocs</directory>
+			<outputDirectory>api</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>../documentation/target/dist</directory>
+			<outputDirectory>reference</outputDirectory>
+		</fileSet>
+
+	</fileSets>
+
+</assembly>
