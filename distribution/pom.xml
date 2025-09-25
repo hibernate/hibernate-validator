@@ -215,5 +215,37 @@
                 <javadoc.additional.options>-html5 -source 8</javadoc.additional.options>
             </properties>
         </profile>
+        <profile>
+            <id>release</id>
+            <properties>
+                <documentation.staging.dir>${rootProject.directory}/target/staging-deploy/</documentation.staging.dir>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${basedir}/src/main/assembly/docs.xml</descriptor>
+                            </descriptors>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>documentation</finalName>
+                            <tarLongFileMode>posix</tarLongFileMode>
+                            <outputDirectory>${documentation.staging.dir}</outputDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>stage-documentation</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>
