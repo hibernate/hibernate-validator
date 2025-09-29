@@ -227,7 +227,7 @@
                                 <stylesdir>css</stylesdir>
                                 <iconfont-remote>false</iconfont-remote>
                                 <iconfont-name>font-awesome/css/font-awesome.min</iconfont-name>
-                                <source-highlighter>prettify</source-highlighter>
+                                <source-highlighter>rouge</source-highlighter>
                             </attributes>
                         </configuration>
                     </execution>
@@ -252,6 +252,7 @@
                         <engine-sourcedir>${asciidoctor.engine-source-dir}</engine-sourcedir>
 
                         <hvVersion>${project.version}</hvVersion>
+                        <hvVersionShort>${parsed-version.org.hibernate.validator.majorVersion}.${parsed-version.org.hibernate.validator.minorVersion}</hvVersionShort>
                         <bvVersion>${version.jakarta.validation-api}</bvVersion>
                         <jbossLoggingVersion>${version.org.jboss.logging.jboss-logging}</jbossLoggingVersion>
                         <classmateVersion>${version.com.fasterxml.classmate}</classmateVersion>
@@ -329,7 +330,7 @@
                                         <pagenums/>
                                         <idprefix/>
                                         <idseparator>-</idseparator>
-                                        <source-highlighter>coderay</source-highlighter>
+                                        <source-highlighter>rouge</source-highlighter>
                                     </attributes>
                                 </configuration>
                             </execution>

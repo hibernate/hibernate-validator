@@ -34,7 +34,7 @@ API. It is even possible to ignore the XML configuration completely via
 [[example-validation-xml]]
 .`validation.xml`
 ====
-[source, XML, indent=0]
+[source, xml, indent=0]
 ----
 include::{resourcesdir}/org/hibernate/validator/referenceguide/chapter08/validation.xml[]
 ----
@@ -89,7 +89,7 @@ image::validation-mapping-2.0.png[validation-mapping-2.0.xsd]
 [[example-constraints-car]]
 .Bean constraints configured via XML
 ====
-[source, XML, indent=0]
+[source, xml, indent=0]
 ----
 include::{resourcesdir}/org/hibernate/validator/referenceguide/chapter08/rental-car-mapping.xml[]
 ----
@@ -102,7 +102,7 @@ and <<example-specifying-constraint-target>> can be expressed in XML.
 [[example-rental-station-xml]]
 .Method constraints configured via XML
 ====
-[source, XML, indent=0]
+[source, xml, indent=0]
 ----
 include::{resourcesdir}/org/hibernate/validator/referenceguide/chapter08/rental-station-mapping.xml[]
 ----
@@ -167,7 +167,7 @@ However, there is also a purely regular expression based version available which
 XML:
 
 .Using XML to register a regular expression based constraint definition for `@URL`
-[source, XML]
+[source, xml]
 ----
 <constraint-definition annotation="org.hibernate.validator.constraints.URL">
   <validated-by include-existing-validators="false">

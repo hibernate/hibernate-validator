@@ -36,7 +36,7 @@ level configuration example:
 [[example-field-level]]
 .Field-level constraints
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/fieldlevel/Car.java[tags=include]
 ----
@@ -66,7 +66,7 @@ constraints are used.
 [[example-property-level]]
 .Property-level constraints
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/propertylevel/Car.java[tags=include]
 ----
@@ -129,12 +129,12 @@ element. <<example-container-element-constraints-iterable>> shows an example of 
 [[example-container-element-constraints-iterable]]
 .Container element constraint on `Set`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/set/Car.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/set/CarTest.java[tags=validateSetContainerElementConstraint]
 ----
@@ -151,12 +151,12 @@ element. <<example-container-element-constraints-list>> shows an example of a
 [[example-container-element-constraints-list]]
 .Container element constraint on `List`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/list/Car.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/list/CarTest.java[tags=validateListContainerElementConstraint]
 ----
@@ -173,17 +173,17 @@ and a constraint on the value.
 [[example-container-element-constraints-map]]
 .Container element constraint on map keys and values
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/map/Car.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/map/CarTest.java[tags=validateMapValueContainerElementConstraint]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/map/CarTest.java[tags=validateMapKeyContainerElementConstraint]
 ----
@@ -204,12 +204,12 @@ an example of an `Optional` with a container element constraint.
 [[example-container-element-constraints-optional]]
 .Container element constraint on Optional
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/optional/Car.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/optional/CarTest.java[tags=validateOptionalContainerElementConstraint]
 ----
@@ -232,27 +232,27 @@ parameterized type with a type argument constraint.
 [[example-container-element-constraints-custom-container-type]]
 .Container element constraint on custom container type
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/custom/Car.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/custom/GearBox.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/custom/Gear.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/custom/GearBoxValueExtractor.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/custom/CarTest.java[tags=validateCustomContainerElementConstraint]
 ----
@@ -268,7 +268,7 @@ constraints on `Part` and `Manufacturer` will be enforced.
 [[example-container-element-nested]]
 .Constraints on nested container elements
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/containerelement/nested/Car.java[tags=include]
 ----
@@ -293,7 +293,7 @@ constraint.
 [[example-class-level]]
 .Class-level constraint
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/classlevel/Car.java[tags=include]
 ----
@@ -308,12 +308,12 @@ things clearer let's have a look at the following example:
 
 .Constraint inheritance
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/inheritance/Car.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/inheritance/RentalCar.java[tags=include]
 ----
@@ -339,12 +339,12 @@ reference to another object with `@Valid` as demonstrated in <<example-cascaded-
 [[example-cascaded-validation]]
 .Cascaded validation
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/objectgraph/Car.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/objectgraph/Person.java[tags=include]
 ----
@@ -373,17 +373,17 @@ Cascaded validation is also supported for nested container elements.
 [[example-cascaded-validation-list]]
 .Cascaded validation of containers
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/objectgraph/containerelement/Car.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/objectgraph/containerelement/Part.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/objectgraph/containerelement/Manufacturer.java[tags=include]
 ----
@@ -423,7 +423,7 @@ use the static method `Validation#buildDefaultValidatorFactory()`:
 
 .`Validation#buildDefaultValidatorFactory()`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/validation/ValidationTest.java[tags=setUpValidator]
 ----
@@ -456,7 +456,7 @@ property. The validation call therefore returns one `ConstraintViolation` object
 [[example-validator-validate]]
 .Using `Validator#validate()`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/validation/ValidationTest.java[tags=validate]
 ----
@@ -470,7 +470,7 @@ property name is the JavaBeans property name.
 
 .Using `Validator#validateProperty()`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/validation/ValidationTest.java[tags=validateProperty]
 ----
@@ -484,7 +484,7 @@ validated successfully, if the property had the specified value:
 
 .Using `Validator#validateValue()`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/validation/ValidationTest.java[tags=validateValue]
 ----

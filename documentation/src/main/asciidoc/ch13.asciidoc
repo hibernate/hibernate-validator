@@ -82,7 +82,7 @@ For using the Hibernate Validator annotation processor with Maven, set it up via
 
 .Using the HV Annotation Processor with Maven
 ====
-[source, XML]
+[source, xml]
 [subs="verbatim,attributes"]
 ----
 <project>
@@ -143,7 +143,7 @@ for http://ant.apache.org/[Apache Ant]:
 
 .Using the annotation processor with Ant
 ====
-[source, XML]
+[source, xml]
 [subs="verbatim,attributes"]
 ----
 <javac srcdir="src/main"

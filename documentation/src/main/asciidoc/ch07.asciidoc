@@ -48,7 +48,7 @@ as we can shape its value extractor after the `java.util.Optional` one:
 [[example-valueextraction-guava-optional-valueextractor]]
 .A `ValueExtractor` for Guava's `Optional`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/valueextractor/OptionalValueExtractor.java[tags=include]
 ----
@@ -72,7 +72,7 @@ is required:
 [[example-valueextraction-guava-multimap-value-valueextractor]]
 .A `ValueExtractor` for `Multimap` values
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/valueextractor/MultimapValueValueExtractor.java[tags=include]
 ----
@@ -82,7 +82,7 @@ It allows to validate constraints for the values of the `Multimap`:
 
 .Constraints on the values of a `Multimap`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=multimapValues]
 ----
@@ -94,7 +94,7 @@ of a `Multimap`:
 [[example-valueextraction-guava-multimap-key-valueextractor]]
 .A `ValueExtractor` for `Multimap` keys
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/valueextractor/MultimapKeyValueExtractor.java[tags=include]
 ----
@@ -105,7 +105,7 @@ keys and values of a `Multimap`:
 
 .Constraints on the keys and values of a `Multimap`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=multimapKeysAndValues]
 ----
@@ -158,7 +158,7 @@ A first attempt at a value extractor for `OptionalInt` would look like:
 [[example-valueextraction-optionalint-valueextractor]]
 .A `ValueExtractor` for `OptionalInt`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/nongeneric/OptionalIntValueExtractor.java[tags=include]
 ----
@@ -183,7 +183,7 @@ Jakarta Validation provides the `Unwrapping.Unwrap` payload for this situation:
 [[example-valueextraction-optionalint-unwrapping]]
 .Using `Unwrapping.Unwrap` payload
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=optionalIntUnwrap]
 ----
@@ -198,7 +198,7 @@ This is exactly what the `@UnwrapByDefault` annotation is for:
 [[example-valueextraction-optionalint-unwrapbydefault-valueextractor]]
 .A `ValueExtractor` for `OptionalInt` marked with `@UnwrapByDefault`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/nongeneric/UnwrapByDefaultOptionalIntValueExtractor.java[tags=include]
 ----
@@ -210,7 +210,7 @@ by default be applied to the wrapped value:
 [[example-valueextraction-optionalint-implicitunwrapping]]
 .Implicit unwrapping thanks to `@UnwrapByDefault`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=optionalInt]
 ----
@@ -222,7 +222,7 @@ the `Unwrapping.Skip` payload:
 [[example-valueextraction-optionalint-avoid-implicitunwrapping]]
 .Avoid implicit unwrapping with `Unwrapping.Skip`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=optionalIntSkip]
 ----
@@ -252,7 +252,7 @@ Thus, you can constrain a `StringProperty` as below:
 
 .Constraining a `StringProperty`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=stringProperty]
 ----
@@ -262,7 +262,7 @@ Or a `LongProperty`:
 
 .Constraining a `LongProperty`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=longProperty]
 ----
@@ -277,7 +277,7 @@ A `ReadOnlyListProperty` would naturally be constrained as a `List`:
 
 .Constraining a `ReadOnlyListProperty`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter07/Container.java[tags=listProperty]
 ----

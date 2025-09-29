@@ -12,27 +12,27 @@ The examples presented in this chapter are based on the classes and constraint d
 [[metadata-example-car]]
 .Example classes
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/Person.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/Vehicle.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/Car.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/Library.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/Book.java[tags=include]
 ----
@@ -58,7 +58,7 @@ If a constraint declaration hosted by the requested class is invalid, a `Validat
 [[metadata-example-using-beandescriptor]]
 .Using `BeanDescriptor`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/CarTest.java[tags=testBeanDescriptor]
 ----
@@ -102,7 +102,7 @@ how to use the `PropertyDescriptor` interface.
 [[metadata-example-using-propertydescriptor]]
 .Using `PropertyDescriptor`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/CarTest.java[tags=testPropertyDescriptor]
 ----
@@ -125,7 +125,7 @@ descriptors.
 [[metadata-example-using-methodandconstructordescriptor]]
 .Using `MethodDescriptor` and `ConstructorDescriptor`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/CarTest.java[tags=testMethodAndConstructorDescriptor]
 ----
@@ -186,7 +186,7 @@ respectively,
 [[metadata-example-using-elementdescriptor]]
 .Using `ElementDescriptor methods`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/CarTest.java[tags=testElementDescriptor]
 ----
@@ -199,7 +199,7 @@ constraint metadata in a fine grained way. <<example-constraint-finder>> shows h
 [[example-constraint-finder]]
 .Usage of `ConstraintFinder`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/CarTest.java[tags=testConstraintFinderApi]
 ----
@@ -242,7 +242,7 @@ to retrieve the set of `ContainerElementTypeDescriptor`.
 [[metadata-example-using-containerelementtypedescriptor]]
 .Using `ContainerElementTypeDescriptor`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/LibraryTest.java[tags=testContainerElementTypeDescriptor]
 ----
@@ -262,7 +262,7 @@ shows an example.
 [[metadata-example-using-groupconversiondescriptor]]
 .Using `GroupConversionDescriptor`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/CarTest.java[tags=testGroupConversionDescriptor]
 ----
@@ -285,7 +285,7 @@ constraint's annotation type and its validators from a `ConstraintDescriptor`.
 [[metadata-example-using-constraintdescriptor]]
 .Using `ConstraintDescriptor`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/CarTest.java[tags=testConstraintDescriptor]
 ----

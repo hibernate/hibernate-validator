@@ -728,6 +728,16 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>parse-project-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.hibernate.validator</propertyPrefix>
+                            <versionString>${project.version}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>parse-jakarta-validation-spec-version</id>
                         <goals>
                             <goal>parse-version</goal>

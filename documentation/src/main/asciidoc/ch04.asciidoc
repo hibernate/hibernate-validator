@@ -16,7 +16,7 @@ descriptor can be overridden with a specific value as shown in <<example-overrid
 [[example-overriding-message]]
 .Specifying a message descriptor using the message attribute
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter04/Car.java[tags=include]
 ----
@@ -114,7 +114,7 @@ message descriptors.
 [[example-message-descriptors]]
 .Specifying message descriptors
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter04/complete/Car.java[tags=include]
 ----
@@ -152,7 +152,7 @@ form `${attributeName}` must be used.
 [[example-expected-error-messages]]
 .Expected error messages
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter04/complete/CarTest.java[tags=messageDescriptors]
 ----
@@ -190,7 +190,7 @@ passing an instance of `PlatformResourceBundleLocator` with the bundle name when
 [[example-using-specific-resource-bundle-locator]]
 .Using a specific resource bundle
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter04/resourcebundlelocator/ResourceBundleLocatorTest.java[tags=messagesRetrievedFromSpecificBundle]
 ----
@@ -210,7 +210,7 @@ multi-module application where you want to have one message bundle per module.
 [[example-using-aggregate-resource-bundle-locator]]
 .Using `AggregateResourceBundleLocator`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter04/resourcebundlelocator/ResourceBundleLocatorTest.java[tags=usingAggregateResourceBundleLocator]
 ----

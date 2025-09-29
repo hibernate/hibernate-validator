@@ -82,12 +82,12 @@ all.
 [[example-using-fail-fast]]
 .Using the fail fast validation mode
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/failfast/Car.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/failfast/FailFastTest.java[tags=include]
 ----
@@ -128,7 +128,7 @@ _hibernate.validator.allow_parallel_method_parameter_constraint_ in _validation.
 [[example-relaxing-method-validation-xml]]
 .Configuring method validation behaviour in class hierarchies via properties
 ====
-[source, XML]
+[source, xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
 <validation-config
@@ -150,7 +150,7 @@ Alternatively these settings can be applied during programmatic bootstrapping.
 [[example-relaxing-method-validation]]
 .Configuring method validation behaviour in class hierarchies
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/relaxation/RelaxationTest.java[tags=testRelaxation]
 ----
@@ -188,7 +188,7 @@ manner as shown in <<example-constraint-mapping>>.
 [[example-constraint-mapping]]
 .Programmatic constraint declaration
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/constraintapi/ConstraintApiTest.java[tags=constraintMapping]
 ----
@@ -221,7 +221,7 @@ you can use `GenericConstraintDef` as seen in <<example-generic-constraint-mappi
 [[example-generic-constraint-mapping]]
 .Programmatic declaration of a custom constraint
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/constraintapi/ConstraintApiTest.java[tags=genericConstraintDef]
 ----
@@ -235,7 +235,7 @@ nested container elements.
 [[example-nested-container-element-constraints]]
 .Programmatic declaration of a nested container element constraint
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/constraintapi/ConstraintApiTest.java[tags=nestedContainerElementConstraint]
 ----
@@ -252,7 +252,7 @@ it with `@Valid`. Configure any group conversions to be applied during cascaded 
 [[example-cascading-constraints]]
 .Marking a property for cascaded validation
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/constraintapi/ConstraintApiTest.java[tags=cascaded]
 ----
@@ -269,7 +269,7 @@ As shown in the example, `valid()` can be also invoked on a container element ty
 [[example-method-constraint-mapping]]
 .Programmatic declaration of method and constructor constraints
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/constraintapi/ConstraintApiTest.java[tags=executableConfiguration]
 ----
@@ -281,7 +281,7 @@ provider of a type as shown in the following example.
 [[example-sequences]]
 .Configuration of default group sequence and default group sequence provider
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/constraintapi/ConstraintApiTest.java[tags=defaultGroupSequence]
 ----
@@ -299,7 +299,7 @@ To do so, implement the `ConstraintMappingContributor` contract:
 [[example-constraint-mapping-contributor]]
 .Custom `ConstraintMappingContributor` implementation
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/constraintapi/MyConstraintMappingContributor.java[tags=include]
 ----
@@ -327,7 +327,7 @@ given on a method declaration.
 [[example-purely-composed-constraint-validation-target]]
 .Specifying the validation target of a purely composed constraint
 ====
-[source, JAVA]
+[source, java]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/purelycomposed/ValidInvoiceAmount.java[tags=include]
 ----
@@ -351,7 +351,7 @@ Either the validated string is all lower-cased or it is between two and three ch
 [[example-boolean-constraint-composition]]
 .OR composition of constraints
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/booleancomposition/PatternOrSize.java[tags=include]
 ----
@@ -376,7 +376,7 @@ shown in the following example:
 [[example-property-node-get-value]]
 .Getting the value from property nodes
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/propertypath/PropertyPathTest.java[tags=include]
 ----
@@ -401,7 +401,7 @@ This is shown in example <<example-constraint-validator-setting-dynamic-payload>
 [[example-constraint-validator-setting-dynamic-payload]]
 .`ConstraintValidator` implementation setting a dynamic payload
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/dynamicpayload/ValidPassengerCountValidator.java[tags=include]
 ----
@@ -413,7 +413,7 @@ unwrapped to `HibernateConstraintViolation` in order to retrieve the dynamic pay
 [[example-retrieving-dynamic-payload]]
 .Retrieval of a ``ConstraintViolation``'s dynamic payload
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/dynamicpayload/DynamicPayLoadTest.java[tags=include]
 ----
@@ -442,14 +442,14 @@ Hibernate Validator provides ways to override these defaults when boostrapping t
 
 To change the Expression Language feature level for constraints, use the following:
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/el/ElFeaturesTest.java[tags=constraints]
 ----
 
 To change the Expression Language feature level for custom violations, use the following:
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/el/ElFeaturesTest.java[tags=customViolations]
 ----
@@ -514,7 +514,7 @@ The following example shows how to set the Hibernate Validator default locale to
 [[example-configure-default-locale]]
 .Configure the default locale
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/localization/LocalizationTest.java[tags=default-locale]
 ----
@@ -533,7 +533,7 @@ you could extract the header from the `ResteasyContext`.
 [[example-locale-resolver]]
 .Fine tune the locale used to interpolate the messages via a `LocaleResolver`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/localization/LocalizationTest.java[tags=locale-resolver]
 ----
@@ -567,7 +567,7 @@ or `HibernateConstraintValidatorContext#addMessageParameter(String, Object)`.
 [[example-custom-expression-variable]]
 .Custom `@Future` validator injecting an expression variable
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/context/MyFutureValidator.java[tags=include]
 ----
@@ -576,7 +576,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/context/My
 [[example-custom-message-parameter]]
 .Custom `@Future` validator injecting a message parameter
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/context/MyFutureValidatorMessageParameter.java[tags=include]
 ----
@@ -605,7 +605,7 @@ this to avoid arbitrary code execution or sensitive data leak if message templat
 
 It is possible to enable Expression Language for a given custom violation by using `enableExpressionLanguage()` as shown in the example below:
 
-[source]
+[source, java]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/elinjection/SafeValidator.java[tags=include]
 ----
@@ -634,7 +634,7 @@ if the user input contains valid expressions, they will be executed by the Expre
 
 Here is an example of something you should **ABSOLUTELY NOT** do:
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/elinjection/UnsafeValidator.java[tags=include]
 ----
@@ -655,7 +655,7 @@ bundle. If you have any other use cases, let us know.
 [[example-custom-message-interpolator-context]]
 .`HibernateMessageInterpolatorContext`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{engine-sourcedir}/org/hibernate/validator/messageinterpolation/HibernateMessageInterpolatorContext.java[lines=22..58]
 ----
@@ -719,7 +719,7 @@ for an example.
 [[example-using-service-file-for-constraint-definitions]]
 ._META-INF/services/jakarta.validation.ConstraintValidator_
 ====
-[source]
+[source, properties]
 ----
 # Assuming a custom constraint annotation @org.mycompany.CheckCase
 org.mycompany.CheckCaseValidator
@@ -752,7 +752,7 @@ definitions. You can use the programmatic constraint declaration API - see
 [[example-using-constraint-definition-api]]
 .Adding constraint definitions through the programmatic API
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/constraintapi/ConstraintApiTest.java[tags=constraintDefinition]
 ----
@@ -764,7 +764,7 @@ and `ConstraintValidatorContext` is not used), you also can use this alternative
 [[example-using-constraint-definition-api-lambda]]
 .Adding constraint definition with a Lambda expression
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/constraintapi/ConstraintApiTest.java[tags=constraintDefinitionUsingLambda]
 ----
@@ -784,7 +784,7 @@ However, there is also a purely regular expression based version available, whic
 the programmatic constraint declaration API:
 
 .Using the programmatic constraint declaration API to register a regular expression based constraint definition for `@URL`
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/constraintapi/ConstraintApiTest.java[tags=urlValidationOverride]
 ----
@@ -811,7 +811,7 @@ you may provide a specific class loader for loading these resources when bootstr
 [[example-using-external-class-loader]]
 .Providing a class loader for loading external resources and classes
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/classloading/ClassLoadingTest.java[tags=setupValidator]
 ----
@@ -852,7 +852,7 @@ as illustrated in <<example-using-fluent-api-pattern>>.
 [[example-using-fluent-api-pattern]]
 .A class that uses non-standard getters
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/getterselectionstrategy/User.java[tags=include]
 ----
@@ -863,7 +863,7 @@ by the standard strategy.
 
 .Validating a class with non-standard getters using the default getter property selection strategy
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/getterselectionstrategy/GetterPropertySelectionStrategyTest.java[tags=no-strategy]
 ----
@@ -875,7 +875,7 @@ In this particular case, a possible implementation of the strategy would be:
 
 .Custom `GetterPropertySelectionStrategy` implementation
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/getterselectionstrategy/FluentGetterPropertySelectionStrategy.java[tags=include]
 ----
@@ -889,7 +889,7 @@ programmatically (see <<custom-getter-strategy-programmatically>>) or by using t
 [[custom-getter-strategy-programmatically]]
 .Configuring a custom `GetterPropertySelectionStrategy` programmatically
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/getterselectionstrategy/GetterPropertySelectionStrategyTest.java[tags=custom-strategy]
 ----
@@ -898,7 +898,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/gettersele
 [[custom-getter-strategy-xml]]
 .Configuring a custom `GetterPropertySelectionStrategy` using an XML property
 ====
-[source, XML, indent=0]
+[source, xml, indent=0]
 ----
 include::{resourcesdir}/org/hibernate/validator/referenceguide/chapter12/getter-property-selection-strategy-validation.xml[]
 ----
@@ -919,7 +919,7 @@ Imagine that we have a simple data class that has `@NotNull` constraints on some
 [[example-person-class]]
 .Person data class
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/nodenameprovider/Person.java[tags=include]
 ----
@@ -929,7 +929,7 @@ This class can be serialized to JSON by using the https://github.com/FasterXML/j
 [[example-person-object-to-json]]
 .Serializing Person object to JSON
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/nodenameprovider/PersonSerializationTest.java[tags=include]
 ----
@@ -939,7 +939,7 @@ As we can see, the object is serialized to:
 [[example-person-json]]
 .Person as json
 ====
-[source, indent=0]
+[source, json, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/nodenameprovider/clarkKent.json[]
 ----
@@ -961,7 +961,7 @@ One example of how to do this is to leverage the Jackson API:
 [[example-jackson-property-node-name-provider]]
 .JacksonPropertyNodeNameProvider implementation
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/nodenameprovider/JacksonPropertyNodeNameProvider.java[tags=include]
 ----
@@ -971,7 +971,7 @@ And when doing the validation:
 [[example-jackson-property-node-name-provider-field]]
 .JacksonPropertyNodeNameProvider usage
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/nodenameprovider/JacksonPropertyNodeNameProviderTest.java[tags=field]
 ----
@@ -983,7 +983,7 @@ Note that this also works when the annotations are on a getter:
 [[example-jackson-property-node-name-provider-getter]]
 .Annotation on a getter
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/nodenameprovider/JacksonPropertyNodeNameProviderTest.java[tags=getter]
 ----
@@ -1022,12 +1022,12 @@ It can be done either programmatically (<<example-programmatic-fail-fast-on-prop
 [[example-programmatic-fail-fast-on-property-violation]]
 .Using the fail fast on property violation validation mode
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/failfastonpropertyviolation/Book.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/failfastonpropertyviolation/FailFastOnPropertyViolationTest.java[tags=include]
 ----
@@ -1043,7 +1043,7 @@ It is important to mention that only simple property constraints will be checked
 
 .Implementation of `NonSelfPublishing` class level constrain validator
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/failfastonpropertyviolation/NonSelfPublishing.java[tags=include]
 ----
@@ -1052,7 +1052,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter12/failfaston
 [[example-property-fail-fast-on-property-violation]]
 .Setting the fail fast on property violation validation mode using an XML property
 ====
-[source, XML, indent=0]
+[source, xml, indent=0]
 ----
 include::{resourcesdir}/org/hibernate/validator/referenceguide/chapter12/fail-fast-on-property-violation-validation.xml[]
 ----

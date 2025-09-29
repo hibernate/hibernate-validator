@@ -68,7 +68,7 @@ configuration in _hibernate.cfg.xml_:
 [[example-beanvalidationeventlistener-config]]
 .Manual configuration of `BeanValidationEvenListener`
 ====
-[source, XML]
+[source, xml]
 ----
 <hibernate-configuration>
     <session-factory>
@@ -120,7 +120,7 @@ specification.
 [[example-jsf2]]
 .Usage of Jakarta Validation within JSF2
 ====
-[source, XML]
+[source, xml]
 ----
 <h:form>
 
@@ -186,7 +186,7 @@ instances and use them in your managed beans. Just annotate instance fields of y
 [[example-dependency-injection]]
 .Retrieving validator factory and validator via `@Inject`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/cdi/validator/RentalStation.java[tags=include]
 ----
@@ -203,7 +203,7 @@ validator from Hibernate Validator are injected by annotating the injection poin
 [[example-dependency-injection-using-hv]]
 .Using the `@HibernateValidator` qualifier annotation
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/cdi/validator/qualifier/RentalStation.java[tags=include]
 ----
@@ -230,7 +230,7 @@ logic.
 [[example-constraint-validator-injected-bean]]
 .Constraint validator with injected bean
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/cdi/injection/ValidLicensePlateValidator.java[tags=include]
 ----
@@ -260,12 +260,12 @@ You can see an example in <<example-cdi-method-validation>>.
 [[example-cdi-method-validation]]
 .CDI managed beans with method-level constraints
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/cdi/methodvalidation/RentalStation.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/cdi/methodvalidation/RentCarRequest.java[tags=include]
 ----
@@ -307,7 +307,7 @@ INF/validation.xml__.
 [[example-using-validateonexecution]]
 .Using `@ValidateOnExecution`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/cdi/methodvalidation/configuration/RentalStation.java[tags=include]
 ----
@@ -342,12 +342,12 @@ and the validation interceptor kicks in when the methods on `ExpressRentalStatio
 [[example-using-executabletype-implicit]]
 .Using `ExecutableType.IMPLICIT`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/cdi/methodvalidation/implicit/RentalStation.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/cdi/methodvalidation/implicit/ExpressRentalStation.java[tags=include]
 ----
@@ -363,7 +363,7 @@ managed objects such as EJBs etc., as shown in <<example-validator-resource-inje
 [[example-validator-resource-injection]]
 .Retrieving `Validator` and `ValidatorFactory` via `@Resource` injection
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/javaee/RentalStationBean.java[tags=include]
 ----
