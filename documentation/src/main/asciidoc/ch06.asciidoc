@@ -27,7 +27,7 @@ a better approach is using an enum for that purpose:
 
 .Enum `CaseMode` to express upper vs. lower case
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CaseMode.java[]
 ----
@@ -39,7 +39,7 @@ before, this may look a bit scary, but actually it's not that hard:
 [[example-defining-custom-constraint]]
 .Defining the `@CheckCase` constraint annotation
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CheckCase.java[tags=include]
 ----
@@ -60,12 +60,12 @@ payload objects to a constraint. This attribute is not used by the API itself. A
 custom payload could be the definition of a severity:
 +
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/payload/Severity.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/payload/ContactDetails.java[tags=include]
 ----
@@ -122,7 +122,7 @@ as shown below:
 [[example-constraint-validator]]
 .Implementing a constraint validator for the constraint `@CheckCase`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CheckCaseValidator.java[tags=include]
 ----
@@ -156,7 +156,7 @@ demonstrated with an example:
 [[example-constraint-validator-context]]
 .Using `ConstraintValidatorContext` to define custom error messages
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintvalidatorcontext/CheckCaseValidator.java[tags=include]
 ----
@@ -206,7 +206,7 @@ The example below shows how to base your validators on `HibernateConstraintValid
 [[example-constraint-validator-hibernateconstraintvalidator]]
 .Using the `HibernateConstraintValidator` contract
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/MyFutureValidator.java[tags=include]
 ----
@@ -237,7 +237,7 @@ constraint validator payload value set.
 [[example-constraint-validator-payload-definition-validatorfactory]]
 .Defining a constraint validator payload during the `ValidatorFactory` initialization
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintvalidatorpayload/ConstraintValidatorPayloadTest.java[tags=setConstraintValidatorPayloadDuringValidatorFactoryInitialization]
 ----
@@ -248,7 +248,7 @@ Another option is to set the constraint validator payload per `Validator` using 
 [[example-constraint-validator-payload-definition-validatorcontext]]
 .Defining a constraint validator payload using a `Validator` context
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintvalidatorpayload/ConstraintValidatorPayloadTest.java[tags=setConstraintValidatorPayloadInValidatorContext]
 ----
@@ -259,7 +259,7 @@ Once you have set the constraint validator payload, it can be used in your const
 [[example-constraint-validator-payload-usage]]
 .Using the constraint validator payload in a constraint validator
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintvalidatorpayload/ZipCodeValidator.java[tags=include]
 ----
@@ -295,7 +295,7 @@ provided during the Hibernate Validator factory configuration.
 [[example-constraint-validator-shared-data-definition-validatorfactory]]
 .Defining a constraint validator initialization shared data during the `ValidatorFactory` initialization
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintvalidatorshareddata/ConstraintValidatorPayloadTest.java[tags=setSharedData]
 ----
@@ -306,7 +306,7 @@ Once you have set the constraint validator initialization shared data, it can be
 [[example-constraint-validator-shared-data-usage]]
 .Accessing the constraint validator initialization shared data in a constraint validator
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintvalidatorshareddata/ZipCodeValidator.java[tags=include]
 ----
@@ -322,7 +322,7 @@ and is not defined at the time of configuring the validator factory.
 [[example-constraint-validator-shared-data-usage-alternative]]
 .Accessing the constraint validator lazy initialization shared data in a constraint validator
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintvalidatorshareddata/ParsableDateTimeFormatValidator.java[tags=include]
 ----
@@ -362,7 +362,7 @@ specify that the `licensePlate` field should only contain upper-case strings:
 [[example-car-with-checkcase]]
 .Applying the `@CheckCase` constraint
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/Car.java[tags=include]
 ----
@@ -374,7 +374,7 @@ license plate causes the `@CheckCase` constraint to be violated.
 [[example-using-checkcase]]
 .Validating objects with the `@CheckCase` constraint
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CarTest.java[tags=testCheckCaseConstraint]
 ----
@@ -391,12 +391,12 @@ entire object. Class-level constraints are defined in the same way as are proper
 [[example-implementing-classlevel-constraint]]
 .Implementing a class-level constraint
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/classlevel/ValidPassengerCount.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/classlevel/ValidPassengerCountValidator.java[tags=include]
 ----
@@ -425,7 +425,7 @@ could add several property nodes, pointing to a sub-entity of the validated bean
 [[example-custom-error]]
 .Adding a new `ConstraintViolation` with custom property path
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/custompath/ValidPassengerCountValidator.java[tags=include]
 ----
@@ -451,7 +451,7 @@ check that two `Date` parameters of a method are in the correct order:
 
 .Cross-parameter constraint
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/crossparameter/ConsistentDateParameters.java[tags=include]
 ----
@@ -476,7 +476,7 @@ constraint target apparent.
 [[example-cross-parameter-validator]]
 .Generic and cross-parameter constraint
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/crossparameter/ConsistentDateParametersValidator.java[tags=include]
 ----
@@ -512,7 +512,7 @@ to specify the constraint's target as shown in <<example-dual-cross-parameter-co
 [[example-dual-cross-parameter-constraint]]
 .Generic and cross-parameter constraint
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/crossparameter/ScriptAssert.java[tags=include]
 ----
@@ -529,7 +529,7 @@ If the target can not be determined implicitly, it must be set by the user to ei
 [[example-dual-cross-parameter-constraint-usage]]
 .Specifying the target for a generic and cross-parameter constraint
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/crossparameter/ScriptAssertTest.java[tags=buildCar]
 ----
@@ -551,7 +551,7 @@ comprises the constraints `@NotNull`, `@Size` and `@CheckCase`:
 [[example-composed-constraint]]
 .Creating a composing constraint `@ValidLicensePlate`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintcomposition/ValidLicensePlate.java[tags=include]
 ----
@@ -567,7 +567,7 @@ version, where the three constraints were declared directly at the field itself:
 
 .Application of composing constraint `ValidLicensePlate`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintcomposition/Car.java[]
 ----
@@ -580,7 +580,7 @@ single `ConstraintViolation` in case any of the composing constraints is violate
 
 .Using @ReportAsSingleViolation
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintcomposition/reportassingle/ValidLicensePlate.java[tags=include]
 ----

@@ -15,7 +15,7 @@ your __pom.xml__:
 
 .Hibernate Validator Maven dependency
 ====
-[source, XML]
+[source, xml]
 [subs="verbatim,attributes"]
 ----
 <dependency>
@@ -42,7 +42,7 @@ implementation]:
 
 .Maven dependencies for Unified EL reference implementation
 ====
-[source, XML]
+[source, xml]
 [subs="verbatim,attributes"]
 ----
 <dependency>
@@ -71,7 +71,7 @@ Validator CDI portable extension by adding the following Maven dependency to you
 
 .Hibernate Validator CDI portable extension Maven dependency
 ====
-[source, XML]
+[source, xml]
 [subs="verbatim,attributes"]
 ----
 <dependency>
@@ -115,7 +115,7 @@ Let's dive directly into an example to see how to apply constraints.
 [[example-class-car]]
 .Class Car annotated with constraints
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter01/Car.java[]
 ----
@@ -144,7 +144,7 @@ unit test for `Car`:
 
 .Class CarTest showing validation examples
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter01/CarTest.java[]
 ----

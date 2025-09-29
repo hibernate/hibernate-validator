@@ -17,7 +17,7 @@ validator factory:
 [[example-build-default-validator-factory]]
 .Bootstrapping default `ValidatorFactory` and `Validator`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=buildDefaultValidatorFactory]
 ----
@@ -40,7 +40,7 @@ provider's `ValidationProvider` class as shown in <<example-using-specific-provi
 [[example-using-specific-provider]]
 .Bootstrapping `ValidatorFactory` and `Validator` using a specific provider
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=byProvider]
 ----
@@ -56,7 +56,7 @@ Similarly you can retrieve the default validator factory for configuration which
 [[example-configuring-default-provider]]
 .Retrieving the default `ValidatorFactory` for configuration
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=byDefaultProvider]
 ----
@@ -90,12 +90,12 @@ To use a custom provider resolver, pass it via `providerResolver()` as shown in
 [[example-using-custom-validation-provider-resolver]]
 .Using a custom `ValidationProviderResolver`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CustomValidationProviderResolver.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=providerResolver]
 ----
@@ -135,12 +135,12 @@ interface via `Configuration#messageInterpolator()` as shown in
 [[example-using-custom-message-interpolator]]
 .Using a custom `MessageInterpolator`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/MyMessageInterpolator.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=messageInterpolator]
 ----
@@ -161,12 +161,12 @@ custom traversable resolver implementation.
 [[example-using-custom-traversable-resolver]]
 .Using a custom `TraversableResolver`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/MyTraversableResolver.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=traversableResolver]
 ----
@@ -187,7 +187,7 @@ You can disable the cache either via the XML configuration:
 [[example-disabling-traversable-resolver-result-cache-xml-configuration]]
 .Disabling the `TraversableResolver` result cache via the XML configuration
 ====
-[source, XML, indent=0]
+[source, xml, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/validation-DisableTraversableResolverResultCache.xml[]
 ----
@@ -198,7 +198,7 @@ or via the programmatic API:
 [[example-disabling-traversable-resolver-result-cache-programmatic-api]]
 .Disabling the `TraversableResolver` result cache via the programmatic API
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=traversableResolverDisableCache]
 ----
@@ -220,12 +220,12 @@ To configure a custom constraint validator factory call `Configuration#constrain
 [[example-using-custom-constraint-validator-factory]]
 .Using a custom `ConstraintValidatorFactory`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/MyConstraintValidatorFactory.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=constraintValidatorFactory]
 ----
@@ -265,12 +265,12 @@ the `<parameter-name-provider>` element in the _META-INF/validation.xml_ file
 [[example-using-custom-parameter-name-provider]]
 .Using a custom `ParameterNameProvider`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/MyParameterNameProvider.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=parameterNameProvider]
 ----
@@ -299,12 +299,12 @@ provide a `java.time.Clock` defining `now` for time related validators.
 [[example-using-custom-clock-provider]]
 .Using a custom `ClockProvider`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/FixedClockProvider.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=clockProvider]
 ----
@@ -333,7 +333,7 @@ You can set a temporal validation tolerance by bootstrapping your `ValidatorFact
 [[example-using-temporal-validation-tolerance]]
 .Using temporal validation tolerance
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=temporalValidationTolerance]
 ----
@@ -367,7 +367,7 @@ to extract the keys and the values of Guava's `Multimap`.
 [[example-registering-value-extractor]]
 .Registering additional value extractors
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=valueExtractor]
 ----
@@ -386,7 +386,7 @@ stream(s) must adhere to the XML schema for constraint mappings presented in
 [[example-adding-mapping-streams]]
 .Adding constraint mapping streams
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=addMapping]
 ----
@@ -407,7 +407,7 @@ more programmatic constraint mappings as demonstrated in
 [[example-hibernate-validator-specific-options]]
 .Setting Hibernate Validator specific options
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=providerSpecificOptions]
 ----
@@ -419,7 +419,7 @@ Validator supports enabling the fail fast mode that way, too:
 [[example-hibernate-validator-specific-option-via-addproperty]]
 .Enabling a Hibernate Validator specific option via `addProperty()`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=providerSpecificOptionViaAddProperty]
 ----
@@ -448,7 +448,7 @@ property.
 [[example-script-evaluator-factory-xml]]
 .Defining the `ScriptEvaluatorFactory` via XML
 ====
-[source, XML, indent=0]
+[source, xml, indent=0]
 ----
 include::{resourcesdir}/org/hibernate/validator/referenceguide/chapter09/script-evaluator-factory-validation.xml[]
 ----
@@ -465,7 +465,7 @@ shows how this can be done.
 [[example-script-evaluator-factory-programmatically]]
 .Defining the `ScriptEvaluatorFactory` programmatically
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=scriptEvaluatorFactoryProgrammatically]
 ----
@@ -484,7 +484,7 @@ Thus the script engine wouldn't be found using the default strategy.
 To solve this issue, the `MultiClassLoaderScriptEvaluatorFactory` class below can be introduced:
 
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/MultiClassLoaderScriptEvaluatorFactory.java[]
 ----
@@ -493,7 +493,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/MultiClass
 and then declared with:
 
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=scriptEvaluatorFactoryMultiClassLoaderScriptEvaluatorFactory]
 ----
@@ -507,7 +507,7 @@ For instance, to use the https://docs.spring.io/spring/docs/current/spring-frame
 you can define a `SpringELScriptEvaluatorFactory` as:
 
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/SpringELScriptEvaluatorFactory.java[tags=include]
 ----
@@ -517,7 +517,7 @@ This factory allows to use Spring Expression Language in `ScriptAssert` and `Par
 constraints:
 
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CustomScriptEvaluatorFactoryForSpringELTest.java[tags=include]
 ----
@@ -533,7 +533,7 @@ can be configured to print these values as well. As usual, there are a few ways 
 
 .Programmatic configuration
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/LoggingConfigurationTest.java[tags=programmatic]
 ----
@@ -541,7 +541,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/LoggingCon
 
 .Programmatic configuration via property
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/LoggingConfigurationTest.java[tags=programmaticProperty]
 ----
@@ -549,7 +549,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/LoggingCon
 
 .XML configuration via property
 ====
-[source, XML, indent=0]
+[source, xml, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/validation-ShowValidatedValueInLogs.xml[]
 ----
@@ -571,7 +571,7 @@ be achieved by calling `ValidatorFactory#usingContext()`.
 [[example-using-context]]
 .Configuring a `Validator` instance via `usingContext()`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/BootstrappingTest.java[tags=usingContext]
 ----

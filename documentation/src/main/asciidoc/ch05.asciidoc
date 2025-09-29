@@ -26,7 +26,7 @@ assumed.
 [[example-person]]
 .Example class `Person`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/Person.java[tags=include]
 ----
@@ -46,12 +46,12 @@ that groups can inherit from each other via class inheritance. See <<section-gro
 [[example-driver]]
 .Driver
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/Driver.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/DriverChecks.java[]
 ----
@@ -64,12 +64,12 @@ whether a car passed the road worthy tests.
 [[example-car]]
 .Car
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/Car.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/CarChecks.java[]
 ----
@@ -88,7 +88,7 @@ method results in different validation results.
 [[example-drive-away]]
 .Using validation groups
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/GroupTest.java[tags=driveAway]
 ----
@@ -121,12 +121,12 @@ A `SuperCar` must have safety belts to be allowed to run in races.
 [[example-supercar]]
 .SuperCar
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupinheritance/SuperCar.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupinheritance/RaceCarChecks.java[]
 ----
@@ -138,7 +138,7 @@ and if it is a valid race-car.
 [[example-group-inheritance]]
 .Using group inheritance
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/GroupTest.java[tags=testGroupInheritance]
 ----
@@ -169,7 +169,7 @@ constraints of the following groups in the sequence get validated.
 [[example-defining-group-sequence]]
 .Defining a group sequence
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/OrderedChecks.java[]
 ----
@@ -188,7 +188,7 @@ You then can use the new sequence as shown in in <<example-group-sequence>>.
 [[example-group-sequence]]
 .Using a group sequence
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/GroupTest.java[tags=testOrderedChecks]
 ----
@@ -208,12 +208,12 @@ the sequence of groups which substitute `Default` for this class within the anno
 [[example-rental-car]]
 .Class `RentalCar` with redefined default group
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/RentalCar.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/RentalChecks.java[]
 ----
@@ -225,7 +225,7 @@ With this definition you can evaluate the constraints belonging to `RentalChecks
 [[example-testCarIsRented]]
 .Validating an object with redefined default group
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/GroupTest.java[tags=carIsRented]
 ----
@@ -260,12 +260,12 @@ scenario, you could for instance dynamically add the `CarChecks` as seen in
 [[example-implementing-using-default-group-sequence-provider]]
 .Implementing and using a default group sequence provider
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupsequenceprovider/RentalCarGroupSequenceProvider.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupsequenceprovider/RentalCar.java[tags=include]
 ----
@@ -288,12 +288,12 @@ cascaded validation of the driver association.
 [[example-group-conversion-dedault-to-driver-checks]]
 .`@ConvertGroup` usage
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupconversion/Driver.java[tags=include]
 ----
 
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupconversion/Car.java[tags=include]
 ----
@@ -306,7 +306,7 @@ the `validate()` call.
 [[example-group-conversion-test]]
 .Test case for `@ConvertGroup`
 ====
-[source, JAVA, indent=0]
+[source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupconversion/GroupConversionTest.java[tags=validateDriverChecksTogetherWithCarChecks]
 ----
