@@ -219,7 +219,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>11.0.1</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>11.1.0</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
@@ -264,7 +264,7 @@
         <version.sisu-maven-plugin>0.9.0.M4</version.sisu-maven-plugin>
         <version.versions.plugin>2.19.1</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.4</version.maven-wrapper-plugin>
-        <version.spotless-maven-plugin>2.46.1</version.spotless-maven-plugin>
+        <version.spotless-maven-plugin>3.0.0</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.13</version.jacoco.plugin>
         <version.sonar.plugin>5.2.0.4988</version.sonar.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
