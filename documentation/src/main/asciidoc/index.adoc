@@ -17,33 +17,33 @@ Hardy Ferentschik; Gunnar Morling; Guillaume Smet
 :html-meta-version-family: {hvVersionShort}
 :version-selector-enabled: true
 
-include::pr01.asciidoc[]
+include::_pr01.adoc[]
 
 :numbered:
-include::ch01.asciidoc[]
+include::_ch01.adoc[]
 
-include::ch02.asciidoc[]
+include::_ch02.adoc[]
 
-include::ch03.asciidoc[]
+include::_ch03.adoc[]
 
-include::ch04.asciidoc[]
+include::_ch04.adoc[]
 
-include::ch05.asciidoc[]
+include::_ch05.adoc[]
 
-include::ch06.asciidoc[]
+include::_ch06.adoc[]
 
-include::ch07.asciidoc[]
+include::_ch07.adoc[]
 
-include::ch08.asciidoc[]
+include::_ch08.adoc[]
 
-include::ch09.asciidoc[]
+include::_ch09.adoc[]
 
-include::ch10.asciidoc[]
+include::_ch10.adoc[]
 
-include::ch11.asciidoc[]
+include::_ch11.adoc[]
 
-include::ch12.asciidoc[]
+include::_ch12.adoc[]
 
-include::ch13.asciidoc[]
+include::_ch13.adoc[]
 
-include::ch14.asciidoc[]
+include::_ch14.adoc[]
