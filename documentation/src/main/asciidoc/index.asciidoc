@@ -15,6 +15,7 @@ Hardy Ferentschik; Gunnar Morling; Guillaume Smet
 :html-meta-keywords: hibernate, validator, hibernate validator, validation, jakarta bean validation, jakarta validation, bean validation
 :html-meta-canonical-link: https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/
 :html-meta-version-family: {hvVersionShort}
+:version-selector-enabled: true
 
 include::pr01.asciidoc[]
 
