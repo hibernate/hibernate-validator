@@ -244,7 +244,7 @@
                             <className>org.hibernate.infra.asciidoctor.extensions.sourcecodelanguage.SourcecodeLanguagePreprocessor</className>
                         </extension>
                     </extensions>
-                    <sourceDocumentName>index.asciidoc</sourceDocumentName>
+                    <sourceDocumentName>index.adoc</sourceDocumentName>
                     <attributes>
                         <docinfodir>${asciidoctor.aggregated-resources-dir}/docinfo/hibernate</docinfodir>
                         <icons>font</icons>
