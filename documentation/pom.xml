@@ -28,7 +28,7 @@
         <asciidoctor.engine-source-dir>${basedir}/../engine/src/main/java</asciidoctor.engine-source-dir>
 
         <html.meta.project-key>validator</html.meta.project-key>
-        <html.outdated-content.project-key>${html.meta.project-key}</html.outdated-content.project-key>
+        <html-outdated-content-project-key>${html.meta.project-key}</html-outdated-content-project-key>
 
         <surefire.jvm.args.additional>-Duser.language=en -Duser.country=US</surefire.jvm.args.additional>
 
@@ -240,10 +240,13 @@
                         <extension>
                             <className>org.hibernate.infra.asciidoctor.extensions.copytoclipboard.CopyToClipboardProcessor</className>
                         </extension>
+                        <extension>
+                            <className>org.hibernate.infra.asciidoctor.extensions.sourcecodelanguage.SourcecodeLanguagePreprocessor</className>
+                        </extension>
                     </extensions>
                     <sourceDocumentName>index.asciidoc</sourceDocumentName>
                     <attributes>
-                        <docinfodir>${asciidoctor.aggregated-resources-dir}/docinfo/noorm-documentation</docinfodir>
+                        <docinfodir>${asciidoctor.aggregated-resources-dir}/docinfo/hibernate</docinfodir>
                         <icons>font</icons>
                         <tabsize>4</tabsize>
 
@@ -322,6 +325,7 @@
                                 <configuration>
                                     <backend>pdf</backend>
                                     <outputDirectory>${asciidoctor.base-output-dir}/pdf</outputDirectory>
+                                    <requires>${asciidoctor.aggregated-resources-dir}/theme/hibernate.rb</requires>
                                     <attributes>
                                         <imagesdir>${asciidoctor.aggregated-resources-dir}/images/</imagesdir>
                                         <pdf-themesdir>${asciidoctor.aggregated-resources-dir}/theme</pdf-themesdir>
@@ -331,6 +335,7 @@
                                         <idprefix/>
                                         <idseparator>-</idseparator>
                                         <source-highlighter>rouge</source-highlighter>
+                                        <rouge-style>hibernate</rouge-style>
                                     </attributes>
                                 </configuration>
                             </execution>
