@@ -49,7 +49,7 @@ Just fork this repository, build your test case and attach it as an archive to a
 
 ### <a id="setup-build-tools"></a> Build tools
 
-You will need JDK 21 or above for the build.
+You will need JDK 25 or above for the build.
 
 A maven wrapper script is provided at the root of the repository (`./mvnw`),
 so you can use that and don't need to care about the required version of Maven
@@ -97,7 +97,7 @@ If you already did that, close IntelliJ IDEA, run `./mvnw clean`, and open Intel
 You will need to change some settings:
 
 * `Build, Execution, Deployment > Build Tools > Maven`: set `Maven home path` to `Use Maven wrapper`
-* In `Project structure`, make sure the project JDK is JDK 21.
+* In `Project structure`, make sure the project JDK is JDK 25.
 * Set up [formatting rules and code style](#setup-ide-formatting).
 
 Then a few steps will initialize your workspace:
@@ -349,19 +349,19 @@ than [the one required for the build](#setup-build-tools),
 you will need to have both JDKs installed,
 and then you will need to pass additional properties to Maven.
 
-To test Hibernate Validator against the JDK 17:
+To test Hibernate Validator against the JDK 25:
 
 ```bash
 ./mvnw clean install
 ```
 
-To test Hibernate Validator against JDKs other than 17:
+To test Hibernate Validator against JDKs other than 25:
 
 ```bash
 ./mvnw clean install -Djava-version.test.release=21 -Djava-version.test.compiler.java_home=/path/to/jdk21
 ```
 
-Or more simply, if the JDK you want to test against is newer than 21 and is your default JDK:
+Or more simply, if the JDK you want to test against is newer than 25 and is your default JDK:
 
 ```bash
 ./mvnw clean install -Djava-version.test.release=18
