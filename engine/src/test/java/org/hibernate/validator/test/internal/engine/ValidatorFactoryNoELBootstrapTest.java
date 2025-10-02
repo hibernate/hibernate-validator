@@ -23,7 +23,6 @@ import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.Min;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.util.actions.GetClassLoader;
 import org.hibernate.validator.internal.util.actions.SetContextClassLoader;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
@@ -141,7 +140,6 @@ public class ValidatorFactoryNoELBootstrapTest {
 		}
 
 		@Override
-		@IgnoreForbiddenApisErrors(reason = "getPackage() is deprecated but getDefinedPackage() is only available from JDK 9.")
 		public Class<?> loadClass(String className) throws ClassNotFoundException {
 			// This is what we in the end want to achieve. Throw ClassNotFoundException for jakarta.el classes
 			if ( className.startsWith( packageMissing ) ) {
