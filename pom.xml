@@ -405,7 +405,7 @@
 
         <!-- JDK version required for the build -->
         <!-- Remember to update README/CONTRIBUTING when changing the version here. -->
-        <jdk.min.version>21</jdk.min.version>
+        <jdk.min.version>25</jdk.min.version>
         <!-- Maven version required for the build -->
         <!--
             When changing the version here, remember to:
