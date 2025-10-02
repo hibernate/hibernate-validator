@@ -10,7 +10,6 @@ import java.util.Set;
 import jakarta.validation.valueextraction.ExtractedValue;
 import jakarta.validation.valueextraction.ValueExtractor;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.path.MutableNode;
 
 import javafx.beans.property.ReadOnlySetProperty;
@@ -24,8 +23,6 @@ import javafx.beans.value.ObservableValue;
  *
  * @author Guillaume Smet
  */
-@SuppressWarnings("restriction")
-@IgnoreForbiddenApisErrors(reason = "Usage of JavaFX classes")
 class ReadOnlySetPropertyValueExtractor implements ValueExtractor<ReadOnlySetProperty<@ExtractedValue ?>> {
 
 	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new ReadOnlySetPropertyValueExtractor(), ReadOnlySetProperty.class,
