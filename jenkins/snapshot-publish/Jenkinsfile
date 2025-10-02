@@ -18,7 +18,7 @@ pipeline {
 	}
 	tools {
 		maven 'Apache Maven 3.9'
-		jdk 'OpenJDK 21 Latest'
+		jdk 'OpenJDK 25 Latest'
 	}
 	options {
 		// Wait for 1h before publishing snapshots, in case there's more commits.

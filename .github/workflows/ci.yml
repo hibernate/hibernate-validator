@@ -63,20 +63,20 @@ jobs:
       matrix:
         os:
           - {
-            name: "Linux JDK 21",
+            name: "Linux JDK 25",
             runs-on: 'ubuntu-latest',
             java: {
-              version: 21
+              version: 25
             },
             maven: {
               args: ''
             }
           }
           - {
-            name: "Windows JDK 21",
+            name: "Windows JDK 25",
             runs-on: 'windows-latest',
             java: {
-              version: 21
+              version: 25
             },
             maven: {
               args: ''

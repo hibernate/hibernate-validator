@@ -75,7 +75,7 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *
  */
 
-@Field final String DEFAULT_JDK_TOOL = 'OpenJDK 21 Latest'
+@Field final String DEFAULT_JDK_TOOL = 'OpenJDK 25 Latest'
 @Field final String MAVEN_TOOL = 'Apache Maven 3.9'
 
 // Default node pattern, to be used for resource-intensive stages.
@@ -115,31 +115,25 @@ stage('Configure') {
 					new JdkBuildEnvironment(testJavaVersion: '17', testCompilerTool: 'OpenJDK 17 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(testJavaVersion: '21', testCompilerTool: 'OpenJDK 21 Latest',
-							condition: TestCondition.BEFORE_MERGE,
-							isDefault: true),
+							condition: TestCondition.AFTER_MERGE),
 
 					// We want to enable preview features when testing newer builds of OpenJDK:
 					// even if we don't use these features, just enabling them can cause side effects
 					// and it's useful to test that.
-					new JdkBuildEnvironment(testJavaVersion: '23', testCompilerTool: 'OpenJDK 23 Latest',
-							testLauncherArgs: '--enable-preview',
-							condition: TestCondition.AFTER_MERGE),
-					new JdkBuildEnvironment(testJavaVersion: '24', testCompilerTool: 'OpenJDK 24 Latest',
-							testLauncherArgs: '--enable-preview',
-							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(testJavaVersion: '25', testCompilerTool: 'OpenJDK 25 Latest',
 							testLauncherArgs: '--enable-preview',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.BEFORE_MERGE,
+							isDefault: true),
 					new JdkBuildEnvironment(testJavaVersion: '26', testCompilerTool: 'OpenJDK 26 Latest',
 							testLauncherArgs: '--enable-preview',
 							condition: TestCondition.AFTER_MERGE)
 			],
 			wildflyTck: [
-					new WildFlyTckBuildEnvironment(testJavaVersion: '21', testCompilerTool: 'OpenJDK 21 Latest',
+					new WildFlyTckBuildEnvironment(testJavaVersion: '25', testCompilerTool: 'OpenJDK 25 Latest',
 							condition: TestCondition.ON_DEMAND)
 			],
 			sigtest: [
-					new SigTestBuildEnvironment(testJavaVersion: '21', jdkTool: 'OpenJDK 21 Latest',
+					new SigTestBuildEnvironment(testJavaVersion: '25', jdkTool: 'OpenJDK 25 Latest',
 							condition: TestCondition.BEFORE_MERGE)
 			]
 	])
