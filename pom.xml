@@ -1196,7 +1196,7 @@
                             <!-- Java 17+ adds a warning for every single class/method/etc. without a javadoc comment, and we have lots of those.-->
                             <additionalOption>-Xdoclint:all,-missing</additionalOption>
                         </additionalOptions>
-<!--                        <stylesheetfile>${project.build.directory}/hibernate-asciidoctor-theme/javadoc/jdk21/stylesheet.css</stylesheetfile>-->
+                        <stylesheetfile>${project.build.directory}/hibernate-asciidoctor-theme/javadoc/jdk${jdk.min.version}/stylesheet.css</stylesheetfile>
                     </configuration>
                 </plugin>
                 <plugin>
