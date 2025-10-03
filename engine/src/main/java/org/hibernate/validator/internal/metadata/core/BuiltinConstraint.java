@@ -53,6 +53,7 @@ enum BuiltinConstraint {
 	// Hibernate Validator specific constraints
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CODE_POINT_LENGTH( "org.hibernate.validator.constraints.CodePointLength" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CURRENCY( "org.hibernate.validator.constraints.Currency" ),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IP_ADDRESS( "org.hibernate.validator.constraints.IpAddress" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ISBN( "org.hibernate.validator.constraints.ISBN" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LENGTH( "org.hibernate.validator.constraints.Length" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LUHN_CHECK( "org.hibernate.validator.constraints.LuhnCheck" ),
