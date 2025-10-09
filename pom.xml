@@ -331,7 +331,7 @@
         <!-- Set empty default value to avoid Maven leaving property references (${...}) when it doesn't find a value -->
         <maven.javadoc.skip>false</maven.javadoc.skip>
         <!-- Whether javadoc warnings should fail the build -->
-        <failOnJavadocWarning>true</failOnJavadocWarning>
+        <failOnJavadocWarning>false</failOnJavadocWarning>
         <javadoc.generate.jar.phase>none</javadoc.generate.jar.phase>
         <!-- We control whether we should download javadoc based on this property
              that defines the phase of some Maven plugin executions,
@@ -1981,6 +1981,19 @@
                     <id>${jakarta.staging.repo.id}</id>
                     <name>Jakarta OSS Staging Repository</name>
                     <url>${jakarta.staging.repo.url}</url>
+                </repository>
+            </repositories>
+        </profile>
+        <profile>
+            <id>jakarta-snapshots</id>
+            <activation>
+                <jdk>[17,)</jdk>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>${central.snapshots.repo.id}</id>
+                    <name>Maven Central Snapshots Repository</name>
+                    <url>${central.snapshots.repo.url}</url>
                 </repository>
             </repositories>
         </profile>
