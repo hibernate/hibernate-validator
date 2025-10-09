@@ -62,7 +62,8 @@ public class MappingXmlParser {
 			"1.1", "META-INF/validation-mapping-1.1.xsd",
 			"2.0", "META-INF/validation-mapping-2.0.xsd",
 			"3.0", "META-INF/validation-mapping-3.0.xsd",
-			"3.1", "META-INF/validation-mapping-3.1.xsd"
+			"3.1", "META-INF/validation-mapping-3.1.xsd",
+			"4.0", "META-INF/validation-mapping-4.0.xsd"
 	);
 
 	public MappingXmlParser(ConstraintCreationContext constraintCreationContext, JavaBeanHelper javaBeanHelper, ClassLoader externalClassLoader) {
