@@ -42,7 +42,8 @@ public class ValidationXmlParser {
 			"1.1", "META-INF/validation-configuration-1.1.xsd",
 			"2.0", "META-INF/validation-configuration-2.0.xsd",
 			"3.0", "META-INF/validation-configuration-3.0.xsd",
-			"3.1", "META-INF/validation-configuration-3.1.xsd"
+			"3.1", "META-INF/validation-configuration-3.1.xsd",
+			"4.0", "META-INF/validation-configuration-4.0.xsd"
 	);
 
 	private final ClassLoader externalClassLoader;
