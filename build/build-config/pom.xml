@@ -48,12 +48,13 @@
                                         <!--
                                             We want to make sure that the value we store in the property matches
                                             the version that is imported from the Jakarta EE BOM
-                                         -->
+
                                         <item>
                                             <property>${version.jakarta.validation-api}</property>
                                             <artifact>jakarta.validation:jakarta.validation-api</artifact>
                                             <failOnNotFound>true</failOnNotFound>
                                         </item>
+                                        -->
                                         <!--
                                             We want to make sure that the value we store in the property matches
                                             the version that is imported from the Jakarta EE BOM
