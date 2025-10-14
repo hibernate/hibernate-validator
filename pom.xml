@@ -472,6 +472,12 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- Override the version of Jakarta Validation: -->
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+                <version>${version.jakarta.validation-api}</version>
+            </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>

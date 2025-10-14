@@ -334,6 +334,7 @@
             <properties>
                 <sigtest.java-version>${java-version.main.release}</sigtest.java-version>
                 <sigtest.signature-file>${project.build.directory}/validation-tck/validation-tck-dist-${version.jakarta.validation-api}/artifacts/validation-tck-tests-${version.jakarta.validation-api}-sigtest-jdk${sigtest.java-version}.sig</sigtest.signature-file>
+                <sigtest.signature-file-21>${project.build.directory}/validation-tck/validation-tck-dist-${version.jakarta.validation-api}/artifacts/validation-tck-tests-${version.jakarta.validation-api}-sigtest-jdk21.sig</sigtest.signature-file-21>
             </properties>
             <build>
                 <plugins>
@@ -373,11 +374,24 @@
                                     <goal>check</goal>
                                 </goals>
                                 <configuration>
-                                    <action>strictcheck</action>
+                                    <release>17</release>
+                                    <sigfile>${sigtest.signature-file}</sigfile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>sigtest-check-21</id>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                                <configuration>
+                                    <release>21</release>
+                                    <sigfile>${sigtest.signature-file-21}</sigfile>
                                 </configuration>
                             </execution>
                         </executions>
                         <configuration>
+                            <action>strictcheck</action>
+                            <ignoreJDKClasses/>
                             <packages>
                                 jakarta.validation,
                                 jakarta.validation.bootstrap,
@@ -389,7 +403,6 @@
                                 jakarta.validation.spi,
                                 jakarta.validation.valueextraction
                             </packages>
-                            <sigfile>${sigtest.signature-file}</sigfile>
                             <report>${project.build.directory}/surefire-reports/sigtest/report.xml</report>
                         </configuration>
                     </plugin>

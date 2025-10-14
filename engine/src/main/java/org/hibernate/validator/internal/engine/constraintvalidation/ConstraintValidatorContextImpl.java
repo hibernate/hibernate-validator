@@ -235,8 +235,9 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 			return this;
 		}
 
+		@SuppressWarnings("removal")
+		@Deprecated(forRemoval = true, since = "10.0")
 		@Override
-		@Deprecated
 		public NodeBuilderDefinedContext addNode(String name) {
 			dropLeafNodeIfRequired();
 			propertyPath.addPropertyNode( name );
@@ -290,8 +291,9 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 			super( template, expressionLanguageFeatureLevel, path );
 		}
 
+		@SuppressWarnings("removal")
+		@Deprecated(forRemoval = true, since = "10.0")
 		@Override
-		@Deprecated
 		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
 			return addPropertyNode( name );
 		}
@@ -375,8 +377,9 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 			return new NodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath );
 		}
 
+		@SuppressWarnings("removal")
+		@Deprecated(forRemoval = true, since = "10.0")
 		@Override
-		@Deprecated
 		public NodeBuilderCustomizableContext addNode(String name) {
 			return addPropertyNode( name );
 		}
