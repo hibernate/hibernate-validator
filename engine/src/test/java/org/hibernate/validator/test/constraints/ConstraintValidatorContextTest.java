@@ -308,7 +308,7 @@ public class ConstraintValidatorContextTest {
 
 		class Validator implements ConstraintValidator<MyClassLevelValidation, MyObject> {
 
-			@SuppressWarnings("deprecation")
+			@SuppressWarnings({ "deprecation", "removal" })
 			@Override
 			public boolean isValid(MyObject value, ConstraintValidatorContext context) {
 				context.disableDefaultConstraintViolation();
