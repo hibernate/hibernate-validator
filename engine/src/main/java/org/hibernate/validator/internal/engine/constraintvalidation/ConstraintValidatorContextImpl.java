@@ -275,8 +275,9 @@ public class ConstraintValidatorContextImpl implements HibernateCrossParameterCo
 			return this;
 		}
 
+		@SuppressWarnings("removal")
+		@Deprecated(forRemoval = true, since = "10.0")
 		@Override
-		@Deprecated
 		public NodeBuilderDefinedContext addNode(String name) {
 			dropLeafNodeIfRequired();
 			propertyPath.addPropertyNode( name );
@@ -341,8 +342,9 @@ public class ConstraintValidatorContextImpl implements HibernateCrossParameterCo
 			super( template, expressionLanguageFeatureLevel, path );
 		}
 
+		@SuppressWarnings("removal")
+		@Deprecated(forRemoval = true, since = "10.0")
 		@Override
-		@Deprecated
 		public NodeBuilderCustomizableContext addNode(String name) {
 			return addPropertyNode( name );
 		}
@@ -427,8 +429,9 @@ public class ConstraintValidatorContextImpl implements HibernateCrossParameterCo
 			return new NodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath );
 		}
 
+		@SuppressWarnings("removal")
+		@Deprecated(forRemoval = true, since = "10.0")
 		@Override
-		@Deprecated
 		public NodeBuilderCustomizableContext addNode(String name) {
 			return addPropertyNode( name );
 		}
