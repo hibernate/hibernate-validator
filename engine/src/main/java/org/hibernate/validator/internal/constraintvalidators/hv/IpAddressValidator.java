@@ -5,9 +5,6 @@
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
 
-import java.util.Arrays;
-import java.util.List;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -37,125 +34,126 @@ public class IpAddressValidator implements ConstraintValidator<IpAddress, CharSe
 		return ipAddressValidationAlgorithm.isValid( charSequence );
 	}
 
-	private interface IpAddressValidationAlgorithm {
-		boolean isValid(CharSequence charSequence);
-
-		static IpAddressValidationAlgorithm from(IpAddress.Type type) {
-			Contracts.assertNotNull( type );
-
-			return switch ( type ) {
-				case IPv4 -> IpAddressValidationAlgorithmImpl.IPv4;
-				case IPv6 -> IpAddressValidationAlgorithmImpl.IPv6;
-				case ANY -> IpAddressValidationAlgorithmImpl.ANY;
-			};
-		}
-	}
-
-	private enum IpAddressValidationAlgorithmImpl implements IpAddressValidationAlgorithm {
+	private enum IpAddressValidationAlgorithm {
 		IPv4 {
 			@Override
-			public boolean isValid(CharSequence charSequence) {
-				String ipAddress = charSequence.toString();
-
-				String[] parts = ipAddress.split( "\\." );
-
-				if ( parts.length != 4 ) {
-					return false;
-				}
-
-				for ( String part : parts ) {
-					if ( part.isBlank() || ( part.length() > 1 && part.startsWith( "0" ) ) ) {
-						return false;
-					}
-
-					int num;
-					try {
-						num = Integer.parseInt( part );
-					}
-					catch (NumberFormatException e) {
-						return false;
-					}
-					if ( num < 0 || 255 < num ) {
-						return false;
-					}
-
-				}
-
-				return true;
+			public boolean isValid(CharSequence ipAddress) {
+				return isValidIpV4( ipAddress, 0, ipAddress.length() );
 			}
 		},
 		IPv6 {
+			private static final int IPv4_SEGMENTS = 2;
+			private static final int IPv6_SEGMENTS_MAX_TOTAL = 8;
+
 			@Override
 			public boolean isValid(CharSequence charSequence) {
+				if ( charSequence.length() < 2 ) {
+					// we at least need to have a ::
+					return false;
+				}
+
+				// implementation is highly inspired by sun.net.util.IPAddressUtil
 				String ipAddress = charSequence.toString();
-
-				int compressionIndex = ipAddress.indexOf( "::" );
-				if ( compressionIndex != -1 && ipAddress.lastIndexOf( "::" ) != compressionIndex ) {
-					return false;
+				// We ignore the scoped literal, so we look for % which defines it (scoped literal) if it's there:
+				int length = ipAddress.indexOf( '%' );
+				if ( length < 0 ) {
+					length = ipAddress.length();
 				}
 
-				boolean startsWithCompression = ipAddress.startsWith( "::" );
-				boolean endsWithCompression = ipAddress.endsWith( "::" );
-				if ( ( ipAddress.startsWith( ":" ) && !startsWithCompression ) || ( ipAddress.endsWith( ":" ) && !endsWithCompression ) ) {
-					return false;
-				}
-
-				String[] parts = ipAddress.split( ":" );
-				boolean hasCompression = compressionIndex != -1;
-
-				if ( hasCompression ) {
-					List<String> partsList = Arrays.asList( parts );
-					if ( endsWithCompression ) {
-						partsList.add( "" );
+				int i = 0;
+				int numberOfConsumedSegments = 0;
+				// Leading :: requires some special handling.
+				if ( ipAddress.charAt( i ) == ':' ) {
+					if ( ipAddress.charAt( ++i ) != ':' ) {
+						return false;
 					}
-					else if ( startsWithCompression && !partsList.isEmpty() ) {
-						partsList.remove( 0 );
-					}
-					parts = partsList.toArray( new String[0] );
 				}
+				char currentCharacter;
+				boolean hasSuppression = false;
+				boolean previousConsumedTokenIsDigit = false;
+				int segmentLength = 0;
+				int val = 0;
+				int curtok = i;
 
-				if ( parts.length > 8 ) {
-					return false;
-				}
+				while ( i < length ) {
+					currentCharacter = ipAddress.charAt( i++ );
 
-				int partsCount = 0;
-				for ( int i = 0; i < parts.length; i++ ) {
-					String part = parts[i];
-
-					if ( part.isBlank() ) {
-						if ( i > 0 && parts[i - 1].isBlank() ) {
+					if ( currentCharacter == ':' ) {
+						curtok = i;
+						if ( !previousConsumedTokenIsDigit ) {
+							if ( hasSuppression ) {
+								return false;
+							}
+							hasSuppression = true;
+							continue;
+						}
+						else if ( i == length ) {
 							return false;
 						}
-					}
-					else if ( i == parts.length - 1 && part.contains( "." ) ) {
-						if ( !IPv4.isValid( part ) ) {
+						numberOfConsumedSegments++;
+
+						if ( numberOfConsumedSegments > IPv6_SEGMENTS_MAX_TOTAL ) {
 							return false;
 						}
-						partsCount += 2;
+
+						previousConsumedTokenIsDigit = false;
+						val = 0;
+						segmentLength = 0;
+						continue;
+					}
+					// if we have a dot we assume it's an ipv4 segment.
+					// if that's so it can only be the last 32 bits of the IPv6
+					// so we check we are looking at the last 2 segments (note we may have had some suppression
+					// and if that's so the number of consumed segments so far may be less than 6
+					if ( currentCharacter == '.' ) {
+						if ( ( ( numberOfConsumedSegments + IPv4_SEGMENTS ) <= IPv6_SEGMENTS_MAX_TOTAL ) ) {
+							if ( !isValidIpV4( ipAddress, curtok, length ) ) {
+								return false;
+							}
+						}
+						else {
+							return false;
+						}
+						previousConsumedTokenIsDigit = false;
+						break;
+					}
+					int chval;
+
+					char lowerCh = Character.toLowerCase( currentCharacter );
+					if ( lowerCh >= 'a' && lowerCh <= 'f' ) {
+						chval = lowerCh - 'a' + 10;
 					}
 					else {
-						if ( part.length() > 4 ) {
-							return false;
-						}
-						int num;
-						try {
-							num = Integer.parseInt( part, 16 );
-						}
-						catch (NumberFormatException e) {
-							return false;
-						}
-						if ( num < 0 || num > 0xFFFF ) {
-							return false;
-						}
-						partsCount++;
-					}
-				}
+						chval = currentCharacter - '0';
 
-				if ( partsCount > 8 || ( partsCount < 8 && !hasCompression ) ) {
+					}
+
+					if ( chval > -1 && chval < 17 ) {
+						val <<= 4;
+						val |= chval;
+						if ( val > 0xffff ) {
+							return false;
+						}
+						previousConsumedTokenIsDigit = true;
+						segmentLength++;
+						if ( segmentLength == 5 ) {
+							return false;
+						}
+						continue;
+					}
 					return false;
 				}
+				if ( previousConsumedTokenIsDigit ) {
+					if ( numberOfConsumedSegments + 1 > IPv6_SEGMENTS_MAX_TOTAL ) {
+						return false;
+					}
+					numberOfConsumedSegments++;
+				}
 
-				return true;
+				if ( hasSuppression ) {
+					return numberOfConsumedSegments < IPv6_SEGMENTS_MAX_TOTAL;
+				}
+				return numberOfConsumedSegments == IPv6_SEGMENTS_MAX_TOTAL;
 			}
 		},
 		ANY {
@@ -163,6 +161,60 @@ public class IpAddressValidator implements ConstraintValidator<IpAddress, CharSe
 			public boolean isValid(CharSequence charSequence) {
 				return IPv4.isValid( charSequence ) || IPv6.isValid( charSequence );
 			}
+		};
+
+		abstract boolean isValid(CharSequence charSequence);
+
+		static IpAddressValidationAlgorithm from(IpAddress.Type type) {
+			Contracts.assertNotNull( type );
+
+			return switch ( type ) {
+				case IPv4 -> IpAddressValidationAlgorithm.IPv4;
+				case IPv6 -> IpAddressValidationAlgorithm.IPv6;
+				case ANY -> IpAddressValidationAlgorithm.ANY;
+			};
+		}
+
+		static boolean isValidIpV4(CharSequence string, int start, int end) {
+			int length = end - start;
+			if ( length < 7 || length > 15 ) {
+				return false;
+			}
+
+			// implementation inspired by sun.net.util.IPAddressUtil
+			int segmentValue = 0;
+			int segments = 1;
+			boolean newSegment = true;
+
+			for ( int i = start; i < end; i++ ) {
+				char c = string.charAt( i );
+				if ( c == '.' ) {
+					if ( newSegment || segmentValue < 0 || segmentValue > 255 || segments == 4 ) {
+						return false;
+					}
+					segments++;
+					segmentValue = 0;
+					newSegment = true;
+				}
+				else {
+					int digit = c - '0';
+					if ( digit < 0 || digit > 9 ) {
+						return false;
+					}
+					segmentValue *= 10;
+					segmentValue += digit;
+					// to prevet any leading 0 in the segment
+					if ( !newSegment && segmentValue < 10 ) {
+						return false;
+					}
+					newSegment = false;
+				}
+			}
+			if ( newSegment || segmentValue < 0 || segmentValue > 255 || segments != 4 ) {
+				return false;
+			}
+
+			return true;
 		}
 	}
 }
