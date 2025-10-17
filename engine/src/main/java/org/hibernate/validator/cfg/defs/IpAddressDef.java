@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.cfg.defs;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.IpAddress;
 
@@ -13,14 +14,15 @@ import org.hibernate.validator.constraints.IpAddress;
  * @author Ivan Malutin
  * @since 9.1
  */
+@Incubating
 public class IpAddressDef extends ConstraintDef<IpAddressDef, IpAddress> {
 
-    public IpAddressDef() {
-        super(IpAddress.class);
-    }
+	public IpAddressDef() {
+		super( IpAddress.class );
+	}
 
-    public IpAddressDef type(IpAddress.Type type) {
-        addParameter("type", type);
-        return this;
-    }
+	public IpAddressDef type(IpAddress.Type type) {
+		addParameter( "type", type );
+		return this;
+	}
 }

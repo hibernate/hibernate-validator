@@ -19,6 +19,8 @@ import java.lang.annotation.Target;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
+import org.hibernate.validator.Incubating;
+
 /**
  * Checks that the annotated character sequence is a valid
  * <a href="https://en.wikipedia.org/wiki/IP_address">IP address</a>.
@@ -27,6 +29,7 @@ import jakarta.validation.Payload;
  * @author Ivan Malutin
  * @since 9.1
  */
+@Incubating
 @Documented
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
@@ -39,7 +42,7 @@ public @interface IpAddress {
 
 	Class<? extends Payload>[] payload() default { };
 
-	Type type() default Type.IPv4;
+	Type type() default Type.ANY;
 
 	/**
 	 * Defines the IP address version.

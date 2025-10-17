@@ -683,7 +683,8 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
-`@IpAddress`:: Checks that the annotated character sequence is a valid https://en.wikipedia.org/wiki/IP_address[IP address]. `type` determines the version of IP address. The default is IPv4.
+`@IpAddress`:: Checks that the annotated character sequence is a valid https://en.wikipedia.org/wiki/IP_address[IP address]. `type` determines the version of IP address.
+The default is `ANY`, which means both IPv4 and IPv6 addresses are considered valid.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
