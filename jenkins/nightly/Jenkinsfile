@@ -66,7 +66,7 @@ pipeline {
 					}
 					steps {
 						script {
-							jdkVersion = 'OpenJDK 23 Latest'
+							jdkVersion = 'OpenJDK 25 Latest'
 						}
 						// The timeout cannot be in stage options, because that would
 						// include the time needed to provision a node.
