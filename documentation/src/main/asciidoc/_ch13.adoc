@@ -195,7 +195,7 @@ hibernate-validator-annotation-processor-{hvVersion}.jar
 You now should see any annotation problems as regular error markers within the editor and in the
 "Problem" view:
 
-image::annotation_processor_eclipse.png[]
+image::annotation_processor_eclipse.png[align="center"]
 
 [[validator-annotationprocessor-idea]]
 ===== IntelliJ IDEA
@@ -213,7 +213,7 @@ to the "Annotation Processors" list
 
 Rebuilding your project then should show any erroneous constraint annotations:
 
-image::annotation_processor_intellij.png[]
+image::annotation_processor_intellij.png[align="center"]
 
 [[validator-annotationprocessor-netbeans]]
 ===== NetBeans
@@ -229,7 +229,7 @@ org.hibernate.validator.ap.ConstraintValidationProcessor
 
 Any constraint annotation problems will then be marked directly within the editor:
 
-image::annotation_processor_netbeans.png[]
+image::annotation_processor_netbeans.png[align="center"]
 
 [[validator-annotationprocessor-known-issues]]
 === Known issues
