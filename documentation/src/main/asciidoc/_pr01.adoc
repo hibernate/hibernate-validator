@@ -9,7 +9,7 @@ which is time consuming and error-prone. To avoid duplication of these validatio
 bundle validation logic directly into the domain model, cluttering domain classes with validation
 code which is really metadata about the class itself.
 
-image::application-layers.png[]
+image::application-layers.png[align="center"]
 
 Jakarta Validation {bvVersion} defines a metadata model and API for entity and method validation.
 The default metadata source are annotations, with the ability to override and extend the meta-data
@@ -17,7 +17,7 @@ through the use of XML. The API is not tied to a specific application tier nor p
 is specifically not tied to either web or persistence tier, and is available for both server-side
 application programming, as well as rich client Swing application developers.
 
-image::application-layers2.png[]
+image::application-layers2.png[align="center"]
 
 Hibernate Validator is the reference implementation of Jakarta Validation. The implementation itself as
 well as the Jakarta Validation API and TCK are all provided and distributed under the

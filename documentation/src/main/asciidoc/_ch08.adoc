@@ -22,7 +22,7 @@ _validation.xml_ has to adhere.
 
 [[image-validation-configuration]]
 .Validation configuration schema
-image::validation-configuration-2.0.png[validation-configuration-2.0.xsd]
+image::validation-configuration-2.0.png[validation-configuration-2.0.xsd,align="center"]
 
 <<example-validation-xml>>
 shows the several configuration options of _validation.xml_. All settings are optional and the same
@@ -81,7 +81,7 @@ constraint-mapping in _validation.xml_.
 
 [[image-mapping-configuration]]
 .Validation mapping schema
-image::validation-mapping-2.0.png[validation-mapping-2.0.xsd]
+image::validation-mapping-2.0.png[validation-mapping-2.0.xsd,align="center"]
 
 <<example-constraints-car>> shows how the classes +Car+ and +RentalCar+ from <<example-car>> resp.
 <<example-rental-car>> could be mapped in XML.
