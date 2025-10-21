@@ -197,9 +197,9 @@
         <version.junit>4.13.2</version.junit>
         <version.org.easymock>5.6.0</version.org.easymock>
         <version.io.rest-assured>5.5.6</version.io.rest-assured>
-        <version.org.apache.groovy>5.0.1</version.org.apache.groovy>
+        <version.org.apache.groovy>5.0.2</version.org.apache.groovy>
         <version.com.google.guava>33.5.0-jre</version.com.google.guava>
-        <version.org.springframework.spring-expression>6.2.11</version.org.springframework.spring-expression>
+        <version.org.springframework.spring-expression>6.2.12</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.20.0</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.20</version.com.fasterxml.jackson.core.jackson-annotations>
@@ -219,7 +219,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>12.0.1</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>12.1.0</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
@@ -227,11 +227,11 @@
         <version.org.hibernate.infra.hibernate-asciidoctor-theme>6.0.2.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
         <version.org.hibernate.infra.hibernate-asciidoctor-extensions>3.2.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
         <version.org.asciidoctor.asciidoctorj>3.0.0</version.org.asciidoctor.asciidoctorj>
-        <version.org.asciidoctor.asciidoctorj-pdf>2.3.20</version.org.asciidoctor.asciidoctorj-pdf>
+        <version.org.asciidoctor.asciidoctorj-pdf>2.3.21</version.org.asciidoctor.asciidoctorj-pdf>
 
         <!-- Maven plugins versions -->
 
-        <version.antrun.plugin>3.1.0</version.antrun.plugin>
+        <version.antrun.plugin>3.2.0</version.antrun.plugin>
         <version.assembly.plugin>3.7.1</version.assembly.plugin>
         <version.buildhelper.plugin>3.6.1</version.buildhelper.plugin>
         <version.bundle.plugin>6.0.0</version.bundle.plugin>
