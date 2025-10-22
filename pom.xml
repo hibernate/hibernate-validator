@@ -224,7 +224,7 @@
         <!-- Asciidoctor -->
 
         <version.asciidoctor.plugin>3.2.0</version.asciidoctor.plugin>
-        <version.org.hibernate.infra.hibernate-asciidoctor-theme>6.0.4.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
+        <version.org.hibernate.infra.hibernate-asciidoctor-theme>6.1.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
         <version.org.hibernate.infra.hibernate-asciidoctor-extensions>3.2.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
         <version.org.asciidoctor.asciidoctorj>3.0.0</version.org.asciidoctor.asciidoctorj>
         <version.org.asciidoctor.asciidoctorj-pdf>2.3.20</version.org.asciidoctor.asciidoctorj-pdf>
@@ -1195,8 +1195,17 @@
                             <additionalOption>-html5</additionalOption>
                             <!-- Java 17+ adds a warning for every single class/method/etc. without a javadoc comment, and we have lots of those.-->
                             <additionalOption>-Xdoclint:all,-missing</additionalOption>
+                            <additionalOption>--allow-script-in-comments</additionalOption>
                         </additionalOptions>
+                        <docfilessubdirs>true</docfilessubdirs>
+                        <javadocDirectory>${project.build.directory}/hibernate-asciidoctor-theme/javadoc/jdk${jdk.min.version}/</javadocDirectory>
                         <stylesheetfile>${project.build.directory}/hibernate-asciidoctor-theme/javadoc/jdk${jdk.min.version}/stylesheet.css</stylesheetfile>
+                        <header>
+                            <![CDATA[
+                                <div id="toggleContainer"></div>
+                                <script>let scr = document.querySelector('script[src$="script-files/script.js"]');if (scr) {let newScript = document.createElement('script');newScript.src = scr.attributes.src.nodeValue.replace('script-files/script.js', 'resources/theme-switch.js');scr.append(newScript);}</script>
+                                ]]>
+                        </header>
                     </configuration>
                 </plugin>
                 <plugin>
