@@ -296,6 +296,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return annotationDescriptor.getAttributes();
 	}
 
+	@Override
+	public <V> V getAttribute(String name, Class<V> type) {
+		Object value = annotationDescriptor.getAttributes().get( name );
+		return value == null ? null : type.cast( value );
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public Set<ConstraintDescriptor<?>> getComposingConstraints() {
