@@ -1,6 +1,21 @@
 Hibernate Validator Changelog
 =============================
 
+9.1.0.Beta1 (2025-10-22)
+-------------------------
+
+** Improvement
+    * HV-2147 Bump Apache Groovy to 5.0.2
+    * HV-2145 Require JDK 25 for the build
+    * HV-2144 Update to com.fasterxml:classmate 1.7.1
+    * HV-2143 Apply the unified Hibernate Documentation theme
+
+** New Feature
+    * HV-2137 Add IpAddress constraint
+
+** Task
+    * HV-2142 Stage documentation and javadocs to projectroot/target/staging-deploy/documentation
+
 9.1.0.Alpha2 (2025-09-19)
 -------------------------
 
