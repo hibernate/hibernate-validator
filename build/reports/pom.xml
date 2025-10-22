@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator-internal-parent</artifactId>
-        <version>9.1.0-SNAPSHOT</version>
+        <version>9.1.0.Beta1</version>
         <relativePath>../../parents/internal</relativePath>
     </parent>
     <artifactId>hibernate-validator-reports</artifactId>
