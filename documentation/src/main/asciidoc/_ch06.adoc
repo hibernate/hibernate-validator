@@ -380,6 +380,61 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CarTest.ja
 ----
 ====
 
+[[validator-dependency-testing]]
+==== Testing constraint validator with dependencies
+
+Some DI frameworks (e.g. Spring) are capable of injecting dependencies into constraint validator instance:
+
+[[example-person-with-checkcase]]
+.Hibernate Validator test utilities Maven dependency
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+<dependency>
+    <groupId>org.hibernate.validator</groupId>
+    <artifactId>hibernate-validator-test-utils</artifactId>
+    <version>{hvVersion}</version>
+    <scope>test</scope>
+</dependency>
+----
+====
+
+.Defining the `@ZipCode` constraint annotation
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/customvalidatorwithdependency/ZipCode.java[tags=include]
+----
+====
+
+.Applying the `@ZipCode` constraint
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/customvalidatorwithdependency/Person.java[tags=include]
+----
+====
+
+.Using injected dependency in a constraint validator
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/customvalidatorwithdependency/ZipCodeValidator.java[tags=include]
+----
+====
+
+Finally, <<example-using-validator-dependency>> demonstrates how validating a `Person` instance which calls custom mocked validator.
+
+[[example-using-validator-dependency]]
+.Validating objects with the `@ZipCode` constraint
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/customvalidatorwithdependency/CustomValidatorWithDependencyTest.java[tags=field]
+----
+====
+
 [[section-class-level-constraints]]
 === Class-level constraints
 
