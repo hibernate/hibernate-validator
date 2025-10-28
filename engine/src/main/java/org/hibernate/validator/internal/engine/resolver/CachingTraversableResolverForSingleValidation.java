@@ -30,7 +30,7 @@ class CachingTraversableResolverForSingleValidation implements TraversableResolv
 
 	@Override
 	public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
-		TraversableHolder currentLH = new TraversableHolder( traversableObject, traversableProperty );
+		TraversableHolder currentLH = new TraversableHolder( traversableObject, traversableProperty, elementType );
 		TraversableHolder cachedLH = traversables.get( currentLH );
 		if ( cachedLH == null ) {
 			currentLH.isReachable = delegate.isReachable(
@@ -57,7 +57,7 @@ class CachingTraversableResolverForSingleValidation implements TraversableResolv
 
 	@Override
 	public boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
-		TraversableHolder currentLH = new TraversableHolder( traversableObject, traversableProperty );
+		TraversableHolder currentLH = new TraversableHolder( traversableObject, traversableProperty, elementType );
 
 		TraversableHolder cachedLH = traversables.get( currentLH );
 		if ( cachedLH == null ) {
@@ -83,12 +83,52 @@ class CachingTraversableResolverForSingleValidation implements TraversableResolv
 		return cachedLH.isCascadable;
 	}
 
-	private static final class TraversableHolder extends AbstractTraversableHolder {
+	private static final class TraversableHolder {
+		private final Object traversableObject;
+		private final String traversableProperty;
+		private final ElementType elementType;
+		private final int hashCode;
+
 		private Boolean isReachable;
 		private Boolean isCascadable;
 
-		private TraversableHolder(Object traversableObject, Path.Node traversableProperty) {
-			super( traversableObject, traversableProperty );
+		private TraversableHolder(Object traversableObject, Path.Node traversableProperty, ElementType elementType) {
+			this.traversableObject = traversableObject;
+			// nodes and paths are mutable, do not use them for caching:
+			this.traversableProperty = traversableProperty.getName();
+			this.elementType = elementType;
+			this.hashCode = buildHashCode();
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || !( o instanceof TraversableHolder that ) ) {
+				return false;
+			}
+			if ( traversableObject != null ? ( traversableObject != that.traversableObject ) : that.traversableObject != null ) {
+				return false;
+			}
+			if ( !traversableProperty.equals( that.traversableProperty ) ) {
+				return false;
+			}
+			return elementType == that.elementType;
+		}
+
+		@Override
+		public int hashCode() {
+			return hashCode;
+		}
+
+		private int buildHashCode() {
+			// HV-1013 Using identity hash code in order to avoid calling hashCode() of objects which may
+			// be handling null properties not correctly
+			int result = traversableObject != null ? System.identityHashCode( traversableObject ) : 0;
+			result = 31 * result + traversableProperty.hashCode();
+			result = 31 * result + elementType.hashCode();
+			return result;
 		}
 	}
 }
