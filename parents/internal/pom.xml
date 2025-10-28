@@ -137,6 +137,15 @@
                                     <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/org/jboss/logging/main</outputDirectory>
                                     <destFileName>jboss-logging-${version.org.jboss.logging.jboss-logging}.jar</destFileName>
                                 </artifactItem>
+                                <!-- And Byte Buddy -->
+                                <artifactItem>
+                                    <groupId>net.bytebuddy</groupId>
+                                    <artifactId>byte-buddy</artifactId>
+                                    <version>${version.net.bytebuddy.byte-buddy}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/net/bytebuddy/main</outputDirectory>
+                                    <destFileName>byte-buddy-${version.net.bytebuddy.byte-buddy}.jar</destFileName>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>

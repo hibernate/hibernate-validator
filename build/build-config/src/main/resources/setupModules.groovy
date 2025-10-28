@@ -63,9 +63,19 @@ jbossLoggingModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layer
 def jbossArtifactName = 'jboss-logging-' + jbossLoggingVersion + '.jar';
 println "[INFO] Using JBoss Logging version " + jbossArtifactName;
 processFileInplace( jbossLoggingModuleXml ) { text ->
-    text.replaceAll( /jboss-logging.*jar/, jbossArtifactName )
+	text.replaceAll( /jboss-logging.*jar/, jbossArtifactName )
 }
 
 deleteFiles( new FileNameByRegexFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/org/jboss/logging/main', 'jboss-logging-.*\\.jar' ) )
+
+// Byte Buddy
+byteBuddyModuleXml = new File( wildflyPatchedTargetDir, '/modules/system/layers/base/net/bytebuddy/main/module.xml' )
+def byteBuddyArtifactName = 'byte-buddy-' + byteBuddyVersion + '.jar';
+println "[INFO] Using Byte Buddy version " + byteBuddyArtifactName;
+processFileInplace( byteBuddyModuleXml ) { text ->
+	text.replaceAll( /byte-buddy.*jar/, byteBuddyArtifactName )
+}
+
+deleteFiles( new FileNameByRegexFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/net/bytebuddy/main', 'byte-buddy-.*\\.jar' ) )
 
 println "[INFO] ------------------------------------------------------------------------";

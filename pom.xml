@@ -1284,6 +1284,7 @@
                                 <properties>
                                     <wildflyPatchedTargetDir>${wildfly.actual.target-dir}</wildflyPatchedTargetDir>
                                     <jbossLoggingVersion>${version.org.jboss.logging.jboss-logging}</jbossLoggingVersion>
+                                    <byteBuddyVersion>${version.net.bytebuddy.byte-buddy}</byteBuddyVersion>
                                 </properties>
                             </configuration>
                         </execution>
