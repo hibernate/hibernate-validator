@@ -947,7 +947,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 269, value = "Unable to enable secure XML feature processing when loading %1$s: %2$s")
 	void unableToEnableSecureFeatureProcessingSchemaXml(String fileName, String message);
 
-	@LogMessage(level = WARN)
+	@LogMessage(level = DEBUG)
 	@Message(id = 270, value = "Message resource bundle for the %1$s locale is not available and was not pre-loaded.")
 	void resourceBundleNotPreLoaded(Locale localeToPreload);
 
