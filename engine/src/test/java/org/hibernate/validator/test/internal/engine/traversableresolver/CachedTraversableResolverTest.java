@@ -215,11 +215,11 @@ public class CachedTraversableResolverTest {
 		public static class Holder {
 			Object NULL = new Object();
 			Object to;
-			Path.Node tp;
+			String tp;
 
 			public Holder(Object traversableObject, Path.Node traversableProperty) {
 				to = traversableObject == null ? NULL : traversableObject;
-				tp = traversableProperty;
+				tp = traversableProperty.getName();
 			}
 
 			@Override

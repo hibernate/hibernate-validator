@@ -38,7 +38,7 @@ class CachingJPATraversableResolverForSingleValidation implements TraversableRes
 			return true;
 		}
 
-		return traversables.computeIfAbsent( new TraversableHolder( traversableObject, traversableProperty ), th -> delegate.isReachable(
+		return traversables.computeIfAbsent( new TraversableHolder( traversableObject, traversableProperty, elementType ), th -> delegate.isReachable(
 				traversableObject,
 				traversableProperty,
 				rootBeanType,
@@ -54,10 +54,50 @@ class CachingJPATraversableResolverForSingleValidation implements TraversableRes
 		return true;
 	}
 
-	private static class TraversableHolder extends AbstractTraversableHolder {
+	private static class TraversableHolder {
 
-		private TraversableHolder(Object traversableObject, Path.Node traversableProperty) {
-			super( traversableObject, traversableProperty );
+		private final Object traversableObject;
+		private final String traversableProperty;
+		private final ElementType elementType;
+		private final int hashCode;
+
+		private TraversableHolder(Object traversableObject, Path.Node traversableProperty, ElementType elementType) {
+			this.traversableObject = traversableObject;
+			// nodes and paths are mutable, do not use them for caching:
+			this.traversableProperty = traversableProperty.getName();
+			this.elementType = elementType;
+			this.hashCode = buildHashCode();
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || !( o instanceof TraversableHolder that ) ) {
+				return false;
+			}
+			if ( traversableObject != null ? ( traversableObject != that.traversableObject ) : that.traversableObject != null ) {
+				return false;
+			}
+			if ( !traversableProperty.equals( that.traversableProperty ) ) {
+				return false;
+			}
+			return elementType == that.elementType;
+		}
+
+		@Override
+		public int hashCode() {
+			return hashCode;
+		}
+
+		private int buildHashCode() {
+			// HV-1013 Using identity hash code in order to avoid calling hashCode() of objects which may
+			// be handling null properties not correctly
+			int result = traversableObject != null ? System.identityHashCode( traversableObject ) : 0;
+			result = 31 * result + traversableProperty.hashCode();
+			result = 31 * result + elementType.hashCode();
+			return result;
 		}
 	}
 }

@@ -258,6 +258,7 @@ public class MutableNode
 		typeArgumentIndex = null;
 		containerClass = null;
 		value = null;
+		asString = null;
 	}
 
 	@Override
