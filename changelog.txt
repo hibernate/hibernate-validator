@@ -1,6 +1,19 @@
 Hibernate Validator Changelog
 =============================
 
+9.1.0.CR1 (2025-10-29)
+-------------------------
+
+** Bug
+    * HV-2151 CachingTraversableResolverForSingleValidation won't work
+
+** Improvement
+    * HV-2148 Update Hibernate asciidoc theme to 6.1.1.Final
+
+** Task
+    * HV-2150 Test against wildfly-preview 38.0.0.Final
+    * HV-2149 Lower the log level for some resource bundle messages
+
 9.1.0.Beta1 (2025-10-22)
 -------------------------
 
