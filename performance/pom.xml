@@ -20,6 +20,7 @@
     <properties>
         <!-- Disable enforcer as we are using banned dependencies for old versions -->
         <enforcer.skip>true</enforcer.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
         <!--
             The build-helper-maven-plugin is used to add Bean Validation 2.0 source folder to the BV implementations
             that are 2.0+. Since we are also using this plugin to parse versions in the root pom we want to control
