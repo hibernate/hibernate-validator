@@ -1014,6 +1014,10 @@ public class ConstraintHelper {
 
 		AnnotationValue validatedBy = annotationApiHelper.getAnnotationValue( constraintMetaAnnotation, "validatedBy" );
 
+		if ( validatedBy == null ) {
+			return List.of();
+		}
+
 		return validatedBy.accept(
 				new SimpleAnnotationValueVisitor8<List<? extends AnnotationValue>, Void>() {
 
