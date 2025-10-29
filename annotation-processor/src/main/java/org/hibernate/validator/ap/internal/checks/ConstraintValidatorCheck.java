@@ -5,9 +5,11 @@
 package org.hibernate.validator.ap.internal.checks;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.TypeElement;
 
 import org.hibernate.validator.ap.internal.util.AnnotationApiHelper;
@@ -39,9 +41,10 @@ public class ConstraintValidatorCheck extends AbstractConstraintCheck {
 		AnnotationMirror constraintMirror = annotationApiHelper.getMirror(
 				element.getAnnotationMirrors(), BeanValidationTypes.CONSTRAINT
 		);
-		boolean atLeastOneValidatorGiven = !annotationApiHelper.getAnnotationArrayValue(
+		List<? extends AnnotationValue> validatedBy = annotationApiHelper.getAnnotationArrayValue(
 				constraintMirror, "validatedBy"
-		).isEmpty();
+		);
+		boolean atLeastOneValidatorGiven = validatedBy != null && !validatedBy.isEmpty();
 
 		if ( !( atLeastOneValidatorGiven || constraintHelper.isComposedConstraint( element ) ) ) {
 
