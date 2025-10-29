@@ -1122,6 +1122,7 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${version.javadoc.plugin}</version>
                     <configuration>
+                        <skip>${maven.javadoc.skip}</skip>
                         <!-- Fail on error alternative -->
                         <quiet>true</quiet>
                         <verbose>false</verbose>
