@@ -51,9 +51,9 @@ included in the distribution package.
 ### Performing the release
 
 Once you trigger the CI job, it automatically pushes artifacts to the
-[OSSRH repository manager](https://oss.sonatype.org/#stagingRepositories),
+[Maven Central](https://central.sonatype.com/),
 the distribution to [SourceForge](https://sourceforge.net/projects/hibernate/files/hibernate-validator/)
-and the documentation to [docs.jboss.org](https://docs.jboss.org/hibernate/validator/).
+and the documentation to [docs.hibernate.org](https://docs.hibernate.org/validator/).
 
 * Transfer the released issues in JIRA to the "Closed state":
   * Go to [the list of releases](https://hibernate.atlassian.net/projects/HV?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page)
@@ -72,14 +72,10 @@ and the documentation to [docs.jboss.org](https://docs.jboss.org/hibernate/valid
   * **Be careful** when filling the form with the build parameters.
   * Note that for new branches where the job has never run, the first run will not ask for parameters and thus will fail:
     that's expected, just run it again.
-* Release the artifacts on the [OSSRH repository manager](https://oss.sonatype.org/#stagingRepositories).
-  * Log into Nexus. The credentials can be found on Bitwarden; ask a teammate if you don't have access.
-  * Click "staging repositories" to the left.
-  * Examine your staging repository: check that all expected artifacts are there.
-  * If necessary (that's very rare), test the release in the staging repository.
-    You can drop the staging repo if there is a problem,
-    but you'll need to revert the commits pushed during the release.
-  * If everything is ok, select the staging repository and click the "Release" button.
+* If the release option `RELEASE_PUBLISH_AUTOMATICALLY` was selected as `false`-- release the artifacts on the [Maven Central portal](https://central.sonatype.com/).
+    * Log into Maven Central. The credentials can be found on Bitwarden; ask a teammate if you don't have access.
+    * Click on the profile circle at the top right and pick "View Deployments".
+    * Find your deployment on the left and click "Publish".
 
 ### Announcing the release
 
