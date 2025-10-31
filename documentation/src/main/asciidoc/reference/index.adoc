@@ -1,5 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 = Hibernate Validator {hvVersion} - Jakarta Validation Reference Implementation: Reference Guide
-Hardy Ferentschik; Gunnar Morling; Guillaume Smet
+Hardy Ferentschik; Gunnar Morling; Guillaume Smet; Marko Bekhta
 :doctype: book
 :revdate: {docdate}
 :sectanchors:

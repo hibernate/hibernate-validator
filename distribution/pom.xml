@@ -156,14 +156,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>${basedir}/src/main/assembly/dist.xml</descriptor>
-                    </descriptors>
-                    <finalName>hibernate-validator-${project.version}</finalName>
-                    <tarLongFileMode>posix</tarLongFileMode>
-                    <outputDirectory>${project.build.directory}/dist/</outputDirectory>
-                </configuration>
                 <executions>
                     <execution>
                         <id>make-assembly</id>
@@ -171,6 +163,14 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${basedir}/src/main/assembly/dist.xml</descriptor>
+                            </descriptors>
+                            <finalName>hibernate-validator-${project.version}</finalName>
+                            <tarLongFileMode>posix</tarLongFileMode>
+                            <outputDirectory>${project.build.directory}/dist/</outputDirectory>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -188,15 +188,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>${basedir}/src/main/assembly/docs.xml</descriptor>
-                            </descriptors>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <finalName>documentation</finalName>
-                            <tarLongFileMode>posix</tarLongFileMode>
-                            <outputDirectory>${documentation.staging.dir}</outputDirectory>
-                        </configuration>
                         <executions>
                             <execution>
                                 <id>stage-documentation</id>
@@ -204,6 +195,15 @@
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>${basedir}/src/main/assembly/docs.xml</descriptor>
+                                    </descriptors>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                    <finalName>documentation</finalName>
+                                    <tarLongFileMode>posix</tarLongFileMode>
+                                    <outputDirectory>${documentation.staging.dir}</outputDirectory>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
