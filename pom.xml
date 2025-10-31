@@ -738,6 +738,16 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>parse-project-previous-stable-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.hibernate.validator.previous-stable</propertyPrefix>
+                            <versionString>${previous.stable}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>parse-jakarta-validation-spec-version</id>
                         <goals>
                             <goal>parse-version</goal>

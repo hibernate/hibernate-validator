@@ -14,9 +14,19 @@
 	<!-- PDFs: -->
 	<files>
 		<file>
-			<source>${asciidoctor.base-output-dir}/pdf/index.pdf</source>
-			<outputDirectory>en-US/pdf/</outputDirectory>
+			<source>${asciidoctor.base-output-dir}/pdf/reference/index.pdf</source>
+			<outputDirectory>reference/en-US/pdf/</outputDirectory>
 			<destName>hibernate_validator_reference.pdf</destName>
+		</file>
+		<file>
+			<source>${asciidoctor.base-output-dir}/pdf/migration/index.pdf</source>
+			<outputDirectory>migration/en-US/pdf/</outputDirectory>
+			<destName>hibernate_validator_migration_guide.pdf</destName>
+		</file>
+		<file>
+			<source>${asciidoctor.base-output-dir}/pdf/whats-new/index.pdf</source>
+			<outputDirectory>whats-new/en-US/pdf/</outputDirectory>
+			<destName>hibernate_validator_whats_new.pdf</destName>
 		</file>
 	</files>
 </assembly>

@@ -115,6 +115,7 @@
 				<exclude>jenkins/**</exclude>
 				<exclude>.mvn/.develocity/**</exclude>
 				<exclude>.github/**</exclude>
+				<exclude>*.log</exclude>
 			</excludes>
 		</fileSet>
 
@@ -125,7 +126,7 @@
 		</fileSet>
 		<fileSet>
 			<directory>../documentation/target/dist</directory>
-			<outputDirectory>docs/reference</outputDirectory>
+			<outputDirectory>docs/</outputDirectory>
 		</fileSet>
 
 	</fileSets>
