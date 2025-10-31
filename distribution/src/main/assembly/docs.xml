@@ -20,7 +20,7 @@
 		</fileSet>
 		<fileSet>
 			<directory>../documentation/target/dist</directory>
-			<outputDirectory>reference</outputDirectory>
+			<outputDirectory>.</outputDirectory>
 		</fileSet>
 
 	</fileSets>

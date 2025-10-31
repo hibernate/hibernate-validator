@@ -109,7 +109,7 @@
 
         <!-- Version to be used as baseline for API/SPI change reports -->
 
-        <previous.stable>6.0.10.Final</previous.stable>
+        <previous.stable>9.0.1.Final</previous.stable>
 
         <!-- URLs used in javadoc and documentation generation -->
 
@@ -735,6 +735,16 @@
                         <configuration>
                             <propertyPrefix>parsed-version.org.hibernate.validator</propertyPrefix>
                             <versionString>${project.version}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-project-previous-stable-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.hibernate.validator.previous-stable</propertyPrefix>
+                            <versionString>${previous.stable}</versionString>
                         </configuration>
                     </execution>
                     <execution>

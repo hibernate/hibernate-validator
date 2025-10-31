@@ -14,8 +14,58 @@
 	<fileSets>
 		<!-- Reference documentation -->
 		<fileSet>
-			<directory>${asciidoctor.base-output-dir}/html_single/</directory>
-			<outputDirectory>en-US/html_single/</outputDirectory>
+			<directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
+			<outputDirectory>reference/en-US/html_single/css/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
+			<outputDirectory>reference/en-US/html_single/script/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
+			<outputDirectory>reference/en-US/html_single/images/</outputDirectory>
+		</fileSet>
+		<!-- What's new -->
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
+			<outputDirectory>whats-new/en-US/html_single/css/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
+			<outputDirectory>whats-new/en-US/html_single/script/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
+			<outputDirectory>whats-new/en-US/html_single/images/</outputDirectory>
+		</fileSet>
+		<!-- Migration guide -->
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
+			<outputDirectory>migration/en-US/html_single/css/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
+			<outputDirectory>migration/en-US/html_single/script/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
+			<outputDirectory>migration/en-US/html_single/images/</outputDirectory>
 		</fileSet>
 	</fileSets>
+
+	<files>
+		<!-- HTMLs: -->
+		<file>
+			<source>${asciidoctor.base-output-dir}/html_single/reference/index.html</source>
+			<outputDirectory>reference/en-US/html_single/</outputDirectory>
+		</file>
+		<file>
+			<source>${asciidoctor.base-output-dir}/html_single/migration/index.html</source>
+			<outputDirectory>migration/en-US/html_single/</outputDirectory>
+		</file>
+		<file>
+			<source>${asciidoctor.base-output-dir}/html_single/whats-new/index.html</source>
+			<outputDirectory>whats-new/en-US/html_single/</outputDirectory>
+		</file>
+	</files>
 </assembly>

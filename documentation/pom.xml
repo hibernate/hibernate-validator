@@ -214,14 +214,16 @@
                 <artifactId>asciidoctor-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>output-html</id>
+                        <id>output-html-reference</id>
                         <phase>process-resources</phase>
                         <goals>
                             <goal>process-asciidoc</goal>
                         </goals>
                         <configuration>
                             <backend>html5</backend>
+                            <sourceDirectory>src/main/asciidoc</sourceDirectory>
                             <outputDirectory>${asciidoctor.base-output-dir}/html_single</outputDirectory>
+                            <preserveDirectories>true</preserveDirectories>
                             <attributes>
                                 <imagesdir>images/</imagesdir>
                                 <stylesdir>css</stylesdir>
@@ -244,7 +246,7 @@
                             <className>org.hibernate.infra.asciidoctor.extensions.sourcecodelanguage.SourcecodeLanguagePreprocessor</className>
                         </extension>
                     </extensions>
-                    <sourceDocumentName>index.adoc</sourceDocumentName>
+                    <relativeBaseDir>true</relativeBaseDir>
                     <attributes>
                         <docinfodir>${asciidoctor.aggregated-resources-dir}/docinfo/hibernate</docinfodir>
                         <icons>font</icons>
@@ -256,6 +258,7 @@
 
                         <hvVersion>${project.version}</hvVersion>
                         <hvVersionShort>${parsed-version.org.hibernate.validator.majorVersion}.${parsed-version.org.hibernate.validator.minorVersion}</hvVersionShort>
+                        <hvVersionPreviousShort>${parsed-version.org.hibernate.validator.previous-stable.majorVersion}.${parsed-version.org.hibernate.validator.previous-stable.minorVersion}</hvVersionPreviousShort>
                         <bvVersion>${version.jakarta.validation-api}</bvVersion>
                         <jbossLoggingVersion>${version.org.jboss.logging.jboss-logging}</jbossLoggingVersion>
                         <classmateVersion>${version.com.fasterxml.classmate}</classmateVersion>
@@ -324,7 +327,10 @@
                                 </goals>
                                 <configuration>
                                     <backend>pdf</backend>
+                                    <sourceDirectory>src/main/asciidoc</sourceDirectory>
                                     <outputDirectory>${asciidoctor.base-output-dir}/pdf</outputDirectory>
+                                    <preserveDirectories>true</preserveDirectories>
+                                    <relativeBaseDir>true</relativeBaseDir>
                                     <requires>${asciidoctor.aggregated-resources-dir}/theme/hibernate.rb</requires>
                                     <attributes>
                                         <imagesdir>${asciidoctor.aggregated-resources-dir}/images/</imagesdir>

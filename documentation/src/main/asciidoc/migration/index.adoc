@@ -1,0 +1,79 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
+= Hibernate Validator {hvVersion} - Jakarta Validation Reference Implementation: Migration Guide from {hvVersionPreviousShort}
+:doctype: book
+:revdate: {docdate}
+:sectanchors:
+:xrefstyle: full
+:anchor:
+:toc: left
+:toclevels: 4
+:sectnumlevels: 5
+:docinfodir: {docinfodir}
+:docinfo: shared,private
+:title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
+:html-meta-description: Hibernate Validator, Annotation based constraints for your domain model - Migration Documentation
+:html-meta-keywords: hibernate, validator, hibernate validator, validation, jakarta bean validation, jakarta validation, bean validation
+:html-meta-canonical-link: https://docs.jboss.org/hibernate/stable/validator/migration/en-US/html_single/
+:html-meta-version-family: {hvVersionShort}
+:version-selector-enabled: true
+
+[[introduction]]
+== [[_introduction]] Introduction
+
+The aim of this guide is to assist you migrating an existing application using any version `{hvVersionPreviousShort}.x`
+of Hibernate Validator to the latest of the `{hvVersionShort}.x` series.
+
+NOTE: If you think something is missing or something does not work, please link:https://hibernate.org/community[contact us].
+
+If you're looking to migrate from an earlier version, you should migrate step-by-step, from one minor version to the next,
+following the migration guide of link:https://hibernate.org/validator/documentation/migrate/[each version].
+
+[WARNING]
+====
+As this release includes significant changes to the processed bean tracking, path implementation and related areas,
+we encourage users to give it a try and report any findings, especially if there are non-trivial validation scenarios.
+====
+
+[[requirements]]
+== Requirements
+
+The requirements of Hibernate Validator {hvVersionShort}
+are the same as those of Hibernate Validator {hvVersionPreviousShort}.
+
+[[artifact-changes]]
+== Artifacts
+
+The coordinates of Maven artifacts in Hibernate Validator {hvVersionShort}
+are the same as in Hibernate Validator {hvVersionPreviousShort}.
+
+[[configuration]]
+== Configuration
+
+The configuration properties in Hibernate Validator {hvVersionShort},
+in general, are backward-compatible with Hibernate Validator {hvVersionPreviousShort}.
+
+[[api]]
+== API
+
+The https://hibernate.org/community/compatibility-policy/#code-categorization[API]
+in Hibernate Validator {hvVersionShort}
+is, in general, backward-compatible with Hibernate Validator {hvVersionPreviousShort}.
+
+[[spi]]
+== SPI
+
+The https://hibernate.org/community/compatibility-policy/#code-categorization[SPI]
+in Hibernate Validator {hvVersionShort}
+is, in general, backward-compatible with Hibernate Validator {hvVersionPreviousShort}.
+
+[[behavior]]
+== Behavior
+
+The behavior of Hibernate Validator {hvVersionShort}
+is, in general, backward-compatible with Hibernate Validator {hvVersionPreviousShort}.
+
+Keep in mind that the internal representation of the `Path` and `Node` became mutable during validation process,
+so do not rely on these being immutable in your traversable resolvers.
+The `Path` and `Node` representations within the `ConstraintViolation` remains immutable.
+
