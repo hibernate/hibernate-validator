@@ -74,7 +74,7 @@ jobs:
         run: ./mvnw -v
       - name: Download GitHub Actions artifacts for the Develocity build scans
         id: downloadBuildScan
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # 5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # 6.0.0
         with:
           pattern: build-scan-data-*
           github-token: ${{ github.token }}
