@@ -93,7 +93,7 @@ jobs:
           echo "" >> ${{ env.REPORT_FILE }}
 
       - name: Upload TCK Report as an Artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # 4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # 5.0.0
         with:
           name: tck-standalone-report-html-${{matrix.java-version}}
           path: tck-runner/target/surefire-reports/emailable-report.html
@@ -113,7 +113,7 @@ jobs:
           echo "" >> ${{ env.REPORT_FILE }}
           
       - name: Upload TCK Report as an Artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # 4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # 5.0.0
         with:
           name: tck-container-report-html-${{matrix.java-version}}
           path: tck-runner/target/surefire-reports/emailable-report.html
@@ -133,7 +133,7 @@ jobs:
           echo "" >> ${{ env.REPORT_FILE }}
 
       - name: Upload TCK Report as an Artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # 4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # 5.0.0
         with:
           name: tck-signature-report-xml-${{matrix.java-version}}
           path: tck-runner/target/surefire-reports/sigtest/report.xml
@@ -169,7 +169,7 @@ jobs:
           cat ${{ env.REPORT_FILE }}
 
       - name: Upload Final Report as an Artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # 4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # 5.0.0
         with:
           name: final-report-${{matrix.java-version}}
           path: ${{ env.REPORT_FILE }}
