@@ -1,6 +1,17 @@
 Hibernate Validator Changelog
 =============================
 
+9.1.0.Final (2025-11-07)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HV/versions/35947
+
+
+** Improvement
+    * HV-2154 Include hibernate-validator-test-utils in the dist bundle
+    * HV-2153 Create migration guide as part of the project sources
+    * HV-2152 Add a "What's New" document for series
+
 9.1.0.CR1 (2025-10-29)
 -------------------------
 
