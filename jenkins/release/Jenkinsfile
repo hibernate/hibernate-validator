@@ -77,8 +77,10 @@ pipeline {
 									dir('.release/scripts') {
 										sh 'git clone --branch test/github-releases https://github.com/hibernate/hibernate-release-scripts.git .'
 									}
+									def ghReleaseNote = sh('realpath -e github_release_notes.md 2>/dev/null', returnStdout: true).trim()
 									sh """
 										bash -xe .release/scripts/release.sh -j ${params.RELEASE_DRY_RUN ? '-d' : ''} \
+												${ghReleaseNote != '' ? '--notes=' + ghReleaseNote : ''} \
 												validator ${releaseVersion.toString()} ${developmentVersion.toString()}
 									"""
 								}
