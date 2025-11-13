@@ -75,7 +75,7 @@ pipeline {
 								sshagent(['ed25519.Hibernate-CI.github.com', 'jenkins.in.relation.to', 'hibernate-ci.frs.sourceforge.net']) {
 									sh 'cat $HOME/.ssh/config'
 									dir('.release/scripts') {
-										sh 'git clone --branch test/github-releases https://github.com/hibernate/hibernate-release-scripts.git .'
+										sh 'git clone https://github.com/hibernate/hibernate-release-scripts.git .'
 									}
 									def ghReleaseNote = sh('realpath -e github_release_notes.md 2>/dev/null', returnStdout: true).trim()
 									sh """
