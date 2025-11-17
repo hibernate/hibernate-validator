@@ -117,11 +117,11 @@
                                     <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/el-api</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.javamoney</groupId>
-                                    <artifactId>moneta</artifactId>
+                                    <groupId>javax.money</groupId>
+                                    <artifactId>money-api</artifactId>
                                     <classifier>javadoc</classifier>
                                     <type>jar</type>
-                                    <version>${version.org.javamoney.moneta}</version>
+                                    <version>${version.javax.money}</version>
                                     <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/javamoney-api</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
