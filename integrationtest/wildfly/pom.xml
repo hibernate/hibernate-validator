@@ -68,8 +68,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.javamoney</groupId>
-            <artifactId>moneta</artifactId>
+            <groupId>org.javamoney.moneta</groupId>
+            <artifactId>moneta-core</artifactId>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -206,8 +206,8 @@
                                     <outputDirectory>${wildfly.modules-dir}/javax/money/api/main/</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.javamoney</groupId>
-                                    <artifactId>moneta</artifactId>
+                                    <groupId>org.javamoney.moneta</groupId>
+                                    <artifactId>moneta-core</artifactId>
                                     <version>${version.org.javamoney.moneta}</version>
                                     <outputDirectory>${wildfly.modules-dir}/org/javamoney/moneta/main/</outputDirectory>
                                 </artifactItem>

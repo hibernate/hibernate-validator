@@ -178,7 +178,7 @@
 
         <!-- JavaMoney dependencies -->
         <version.javax.money>1.1</version.javax.money>
-        <version.org.javamoney.moneta>1.1</version.org.javamoney.moneta>
+        <version.org.javamoney.moneta>1.4.5</version.org.javamoney.moneta>
         <version.javax.annotation-api>1.3.2</version.javax.annotation-api>
 
         <!-- Used in the Karaf features file: it is a dependency of Moneta, and for the documentation -->
@@ -509,8 +509,8 @@
                 <version>${version.javax.money}</version>
             </dependency>
             <dependency>
-                <groupId>org.javamoney</groupId>
-                <artifactId>moneta</artifactId>
+                <groupId>org.javamoney.moneta</groupId>
+                <artifactId>moneta-core</artifactId>
                 <version>${version.org.javamoney.moneta}</version>
             </dependency>
             <dependency>
