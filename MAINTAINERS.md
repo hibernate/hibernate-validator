@@ -53,7 +53,7 @@ included in the distribution package.
 Once you trigger the CI job, it automatically pushes artifacts to the
 [OSSRH repository manager](https://oss.sonatype.org/#stagingRepositories),
 the distribution to [SourceForge](https://sourceforge.net/projects/hibernate/files/hibernate-validator/)
-and the documentation to [docs.jboss.org](https://docs.jboss.org/hibernate/validator/).
+and the documentation to [docs.hibernate.org](https://docs.hibernate.org/validator/).
 
 * Transfer the released issues in JIRA to the "Closed state":
   * Go to [the list of releases](https://hibernate.atlassian.net/projects/HV?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page)
