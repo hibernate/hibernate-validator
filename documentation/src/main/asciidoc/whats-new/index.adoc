@@ -14,7 +14,7 @@
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 :html-meta-description: Hibernate Validator, Annotation based constraints for your domain model - What's new in {hvVersionShort}
 :html-meta-keywords: hibernate, validator, hibernate validator, validation, jakarta bean validation, jakarta validation, bean validation
-:html-meta-canonical-link: https://docs.jboss.org/hibernate/stable/validator/migration/en-US/html_single/
+:html-meta-canonical-link: https://docs.hibernate.org/stable/validator/migration/en-US/html_single/
 :html-meta-version-family: {hvVersionShort}
 :version-selector-enabled: true
 
