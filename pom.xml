@@ -106,7 +106,7 @@
         <java.technotes.base-url>https://docs.oracle.com/javase/8/docs/technotes</java.technotes.base-url>
         <javaee.api-docs.base-url>https://docs.oracle.com/javaee/7/api</javaee.api-docs.base-url>
         <javafx.docs.url>https://docs.oracle.com/javase/8/javase-clienttechnologies.htm</javafx.docs.url>
-        <bv.api-docs.base-url>https://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api</bv.api-docs.base-url>
+        <bv.api-docs.base-url>https://docs.hibernate.org/beanvalidation/spec/2.0/api</bv.api-docs.base-url>
         <javamoney.api-docs.base-url>https://javamoney.github.io/apidocs</javamoney.api-docs.base-url>
 
         <!-- Module names used for Java 9 modules and OSGi bundles -->
