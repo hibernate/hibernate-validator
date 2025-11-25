@@ -224,7 +224,7 @@
         <!-- Asciidoctor -->
 
         <version.asciidoctor.plugin>3.2.0</version.asciidoctor.plugin>
-        <version.org.hibernate.infra.hibernate-asciidoctor-theme>6.1.1.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
+        <version.org.hibernate.infra.hibernate-asciidoctor-theme>6.1.2.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
         <version.org.hibernate.infra.hibernate-asciidoctor-extensions>3.2.0.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
         <version.org.asciidoctor.asciidoctorj>3.0.1</version.org.asciidoctor.asciidoctorj>
         <version.org.asciidoctor.asciidoctorj-pdf>2.3.23</version.org.asciidoctor.asciidoctorj-pdf>
