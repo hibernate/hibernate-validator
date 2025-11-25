@@ -244,7 +244,7 @@ correctly.
 
 * https://hibernate.atlassian.net/browse/HV-308[HV-308]: Additional validators
 registered for a constraint
-http://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#chapter-xml-configuration[using XML] are
+http://docs.hibernate.org/stable/validator/reference/en-US/html_single/#chapter-xml-configuration[using XML] are
 not evaluated by the annotation processor.
 
 * Sometimes custom constraints can't be
