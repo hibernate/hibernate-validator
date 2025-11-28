@@ -161,7 +161,9 @@ stage('Configure') {
 			pipelineTriggers(
 					// HSEARCH-3417: do not add snapshotDependencies() here, this was known to cause problems.
 					[
-							issueCommentTrigger('.*test this please.*')
+							issueCommentTrigger('.*test this please.*'),
+							// Run every week @ 01:00 on Saturday
+							cron('0 1 * * 6')
 					]
 							+ helper.generateUpstreamTriggers()
 			),
@@ -184,7 +186,7 @@ while other options will trigger multiple Maven executions in different environm
 							trim: true,
 							description: """A regex filter to apply to the environments that must be checked.
 If this parameter is non-empty, ENVIRONMENT_SET will be ignored and environments whose tag matches the given regex will be checked.
-Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse'.
+Some useful filters: 'default', 'jdk', 'jdk-10'.
 """
 					)
 			])
