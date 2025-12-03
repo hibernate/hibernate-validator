@@ -38,6 +38,14 @@ on:
       # we'll reject such dependant PRs and send a PR ourselves.
       - '!dependabot/**'
       - 'dependabot/maven/build-dependencies-**'
+  # Allow calling this workflow from the scheduler
+  workflow_call:
+    inputs:
+      branch:
+        required: true
+        type: string
+  # Allow running this workflow manually
+  workflow_dispatch:
 
 concurrency:
   group: "workflow = ${{ github.workflow }}, ref = ${{ github.event.ref }}, pr = ${{ github.event.pull_request.id }}"
@@ -86,8 +94,10 @@ jobs:
       - name: Support longpaths on Windows
         if: "startsWith(matrix.os.runs-on, 'windows')"
         run: git config --global core.longpaths true
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # 6.0.0
+      - name: Checkout ${{ inputs.branch }}
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # 6.0.0
         with:
+          ref: ${{ inputs.branch }}
           persist-credentials: false
       - name: Set up Java ${{ matrix.os.java.version }}
         uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # 5.0.0
@@ -139,6 +149,18 @@ jobs:
         with:
           name: build-scan-data-incontainer-${{ matrix.os.name }}
           path: ~/.m2/.develocity/build-scan-data
+
+      - name: Notify the build failure
+        if: ${{ failure() && github.repository == 'hibernate/hibernate-validator'}}
+        uses: zulip/github-actions-zulip/send-message@e4c8f27c732ba9bd98ac6be0583096dea82feea5 # v1.0.2
+        with:
+          api-key: ${{ secrets.ZULIP_GITHUB_WORKFLOW_NOTIFICATION_API_KEY }}
+          email: ${{ secrets.ZULIP_GITHUB_WORKFLOW_NOTIFICATION_EMAIL }}
+          organization-url: "https://hibernate.zulipchat.com"
+          type: "stream"
+          to: "hibernate-validator-dev"
+          topic: "GitHub workflow failures"
+          content: "The GitHub [build #${{github.run_id}}](https://github.com/hibernate/hibernate-validator/actions/runs/${{github.run_id}}) failed and requires your attention :warning:"
 
       - name: Omit produced artifacts from build cache
         run: rm -r ~/.m2/repository/org/hibernate/validator
