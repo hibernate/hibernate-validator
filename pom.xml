@@ -251,7 +251,7 @@
         <version.jar.plugin>3.5.0</version.jar.plugin>
         <version.jqassistant.plugin>2.8.0</version.jqassistant.plugin>
         <version.javadoc.plugin>3.12.0</version.javadoc.plugin>
-        <version.release.plugin>3.2.0</version.release.plugin>
+        <version.release.plugin>3.3.0</version.release.plugin>
         <version.resources.plugin>3.4.0</version.resources.plugin>
         <version.shade.plugin>3.6.1</version.shade.plugin>
         <version.sigtest.plugin>2.6</version.sigtest.plugin>
@@ -266,7 +266,7 @@
         <version.maven-wrapper-plugin>3.3.4</version.maven-wrapper-plugin>
         <version.spotless-maven-plugin>3.1.0</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.14</version.jacoco.plugin>
-        <version.sonar.plugin>5.4.0.6343</version.sonar.plugin>
+        <version.sonar.plugin>5.5.0.6356</version.sonar.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
 
         <!-- Forbidden API related properties -->
