@@ -8,15 +8,15 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 //tag::include[]
 public class PersonSerializationTest {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Test
-	public void personIsSerialized() throws JsonProcessingException {
+	public void personIsSerialized() throws JacksonException {
 		Person person = new Person( "Clark", "Kent" );
 
 		String serializedPerson = objectMapper.writeValueAsString( person );
