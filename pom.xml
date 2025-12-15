@@ -201,8 +201,7 @@
         <version.com.google.guava>33.5.0-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>7.0.2</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
-        <version.com.fasterxml.jackson.core.jackson-databind>2.20.1</version.com.fasterxml.jackson.core.jackson-databind>
-        <version.com.fasterxml.jackson.core.jackson-annotations>2.20</version.com.fasterxml.jackson.core.jackson-annotations>
+        <version.tools.jackson.core.jackson-bom>3.0.3</version.tools.jackson.core.jackson-bom>
         <version.net.bytebuddy.byte-buddy>1.18.3</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
@@ -644,16 +643,11 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>${version.com.fasterxml.jackson.core.jackson-databind}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>${version.com.fasterxml.jackson.core.jackson-annotations}</version>
-                <scope>test</scope>
+                <groupId>tools.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <type>pom</type>
+                <scope>import</scope>
+                <version>${version.tools.jackson.core.jackson-bom}</version>
             </dependency>
             <dependency>
                 <groupId>javax.inject</groupId>
