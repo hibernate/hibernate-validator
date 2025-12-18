@@ -20,4 +20,11 @@ public interface JavaBeanProperty extends Property {
 	 * @return {@link Class} owning class of the property
 	 */
 	Class<?> getDeclaringClass();
+
+	/**
+	 * @return the name of the underlying class member representing this property.
+	 * @since 9.1.1
+	 */
+	@Incubating
+	String getMemberName();
 }
