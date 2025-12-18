@@ -4,42 +4,75 @@
  */
 package org.hibernate.validator.referenceguide.chapter12.nodenameprovider;
 
-//tag::include[]
 import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
 import org.hibernate.validator.spi.nodenameprovider.Property;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.BeanProperty;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
+import tools.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
+
+//tag::include[]
 
 public class JacksonPropertyNodeNameProvider implements PropertyNodeNameProvider {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
 	public String getName(Property property) {
-		if ( property instanceof JavaBeanProperty ) {
-			return getJavaBeanPropertyName( (JavaBeanProperty) property );
+		if (property instanceof JavaBeanProperty javaBeanProperty) {
+			var visitor = new JsonPropertyNameGetter(javaBeanProperty.getMemberName());
+			try {
+				objectMapper.acceptJsonFormatVisitor(
+						javaBeanProperty.getDeclaringClass(),
+						visitor
+				);
+				var attributeName = visitor.getAttributeName();
+				return attributeName != null ? attributeName : property.getName();
+			} catch (JacksonException ignored) {}
 		}
-
-		return getDefaultName( property );
-	}
-
-	private String getJavaBeanPropertyName(JavaBeanProperty property) {
-		JavaType type = objectMapper.constructType( property.getDeclaringClass() );
-		BeanDescription desc = objectMapper.getSerializationConfig().introspect( type );
-
-		return desc.findProperties()
-				.stream()
-				.filter( prop -> prop.getInternalName().equals( property.getName() ) )
-				.map( BeanPropertyDefinition::getName )
-				.findFirst()
-				.orElse( property.getName() );
-	}
-
-	private String getDefaultName(Property property) {
 		return property.getName();
 	}
+
+	// Visitor wrapper
+	private static class JsonPropertyNameGetter extends JsonFormatVisitorWrapper.Base {
+
+		private final JsonObjectFormatVisitor visitor;
+		private String attributeName = null;
+
+		JsonPropertyNameGetter(String memberName) {
+			this.visitor = new JsonObjectFormatVisitor.Base() {
+
+				@Override
+				public void property(BeanProperty prop) {
+					setAttributeName(prop);
+				}
+
+				@Override
+				public void optionalProperty(BeanProperty prop) {
+					setAttributeName(prop);
+				}
+
+				private void setAttributeName(BeanProperty writer) {
+					if (memberName.equalsIgnoreCase(writer.getMember().getName())) {
+						attributeName = writer.getName();
+					}
+				}
+			};
+		}
+
+		public String getAttributeName() {
+			return attributeName;
+		}
+
+		@Override
+		public JsonObjectFormatVisitor expectObjectFormat(JavaType type) {
+			return visitor;
+		}
+
+	}
+
 }
 //end::include[]
