@@ -77,7 +77,7 @@ public class JavaBeanHelper {
 		}
 		else {
 			return Optional.of( new JavaBeanGetter( declaringClass, getter, property, propertyNodeNameProvider.getName(
-					new JavaBeanPropertyImpl( declaringClass, property ) ) ) );
+					new JavaBeanPropertyImpl( declaringClass, property, getter.getName() ) ) ) );
 		}
 	}
 
@@ -119,14 +119,14 @@ public class JavaBeanHelper {
 		Optional<String> correspondingProperty = getterPropertySelectionStrategy.getProperty( executable );
 		if ( correspondingProperty.isPresent() ) {
 			return new JavaBeanGetter( declaringClass, method, correspondingProperty.get(), propertyNodeNameProvider.getName(
-					new JavaBeanPropertyImpl( declaringClass, correspondingProperty.get() ) ) );
+					new JavaBeanPropertyImpl( declaringClass, correspondingProperty.get(), method.getName() ) ) );
 		}
 
 		return new JavaBeanMethod( method );
 	}
 
 	public JavaBeanField field(Field field) {
-		return new JavaBeanField( field, propertyNodeNameProvider.getName( new JavaBeanPropertyImpl( field.getDeclaringClass(), field.getName() ) ) );
+		return new JavaBeanField( field, propertyNodeNameProvider.getName( new JavaBeanPropertyImpl( field.getDeclaringClass(), field.getName(), field.getName() ) ) );
 	}
 
 	private static class JavaBeanConstrainableExecutable implements ConstrainableExecutable {
@@ -156,15 +156,22 @@ public class JavaBeanHelper {
 	private static class JavaBeanPropertyImpl implements JavaBeanProperty {
 		private final Class<?> declaringClass;
 		private final String name;
+		private final String memberName;
 
-		private JavaBeanPropertyImpl(Class<?> declaringClass, String name) {
+		private JavaBeanPropertyImpl(Class<?> declaringClass, String name, String memberName) {
 			this.declaringClass = declaringClass;
 			this.name = name;
+			this.memberName = memberName;
 		}
 
 		@Override
 		public Class<?> getDeclaringClass() {
 			return declaringClass;
+		}
+
+		@Override
+		public String getMemberName() {
+			return memberName;
 		}
 
 		@Override
