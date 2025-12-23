@@ -1,0 +1,19 @@
+name: Scheduled Hibernate Validator Builds
+
+on:
+  schedule:
+    - cron: '0 0 * * 6'
+
+permissions:
+  contents: read
+
+jobs:
+  build-maintenance-branches:
+    name: Limited support branches build
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: [ '9.0', '8.0', '6.2' ]
+    uses: ./.github/workflows/ci.yml
+    with:
+      branch: ${{ matrix.branch }}
