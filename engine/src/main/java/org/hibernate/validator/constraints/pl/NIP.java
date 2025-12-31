@@ -24,7 +24,7 @@ import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 
 /**
- * Validates that a {@code CharSequence} is a NIP number (9-digit Polish VAT identification number).
+ * Validates that a {@code CharSequence} is a NIP number (10-digit Polish VAT identification number).
  *
  * @author Marko Bekhta
  * @see <a href="https://pl.wikipedia.org/wiki/NIP">NIP</a>
