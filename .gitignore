@@ -52,10 +52,6 @@ maven-eclipse.xml
 .clover
 .DS_Store
 
-# Maven wrapper files
-.mvn/wrapper
-mvnw*
-
 # Cache folders for formatting plugins:
 .cache
 

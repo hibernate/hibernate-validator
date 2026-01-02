@@ -238,6 +238,7 @@
         <version.org.wildfly.core>14.0.0.Final</version.org.wildfly.core>
         <version.wildfly-patch-gen.plugin>2.1.0.Final</version.wildfly-patch-gen.plugin>
         <version.wildfly-patch-gen.plugin.woodstox>5.0.3</version.wildfly-patch-gen.plugin.woodstox>
+        <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
@@ -333,7 +334,13 @@
 
         <!-- JDK version required for the build -->
         <jdk.min.version>17</jdk.min.version>
-        <maven.min.version>3.3.1</maven.min.version>
+        <!-- Maven version required for the build -->
+        <!--
+            When changing the version here, remember to:
+                - update README
+                - run mvn wrapper:wrapper to re-generate the maven wrapper
+            -->
+        <maven.min.version>3.9.12</maven.min.version>
     </properties>
 
     <dependencyManagement>
@@ -1228,6 +1235,15 @@
                                 </pluginExecution>
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-wrapper-plugin</artifactId>
+                    <version>${version.maven-wrapper-plugin}</version>
+                    <configuration>
+                        <mavenVersion>${maven.min.version}</mavenVersion>
+                        <distributionType>bin</distributionType>
                     </configuration>
                 </plugin>
             </plugins>

@@ -17,7 +17,7 @@ pipeline {
 		label 'Release'
 	}
 	tools {
-		maven 'Apache Maven 3.6'
+		maven 'Apache Maven 3.9'
 		jdk 'OpenJDK 17 Latest'
 	}
 	options {
