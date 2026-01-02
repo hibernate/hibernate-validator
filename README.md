@@ -69,7 +69,7 @@ the Apache Software License 2.0. Refer to license.txt for more information.
 ## Build from Source
 
 You can build Hibernate Validator from source by cloning the git repository `git://github.com/hibernate/hibernate-validator.git`.
-You will also need a JDK 8+ and Maven 3 (>= 3.3.1). With these prerequisites in place you can compile the source via:
+You will also need a JDK 8+ and Maven 3 (>= 3.9). With these prerequisites in place you can compile the source via:
 
     mvn clean install
 
