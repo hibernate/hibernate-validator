@@ -840,26 +840,10 @@
                             <artifactId>hibernate-validator-build-config</artifactId>
                             <version>${project.version}</version>
                         </dependency>
-                        <!--
-                             force SLF4J dependency to align
-                             Maven internals and CheckStyle's
-                             see https://github.com/jcgay/maven-color/wiki/Problems
-                             If that causes problem, that can be removed
-                             but maven-color won't work -->
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
                             <version>${puppycrawl.checkstyle.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>jcl-over-slf4j</artifactId>
-                            <version>${version.org.slf4j}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-jdk14</artifactId>
-                            <version>${version.org.slf4j}</version>
                         </dependency>
                     </dependencies>
                     <configuration>
@@ -1806,64 +1790,6 @@
                     </plugins>
                 </pluginManagement>
             </build>
-        </profile>
-        <profile>
-            <id>testWithJdk21</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>21</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- ForbiddenAPIs doesn't work with JDK20+ yet -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>testWithJdk23</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>23</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- ForbiddenAPIs doesn't work with JDK23+ yet -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>testWithJdk24</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>24</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- ForbiddenAPIs doesn't work with JDK24+ yet -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
-                <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK24+ -->
-                <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
-                <arquillian.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</arquillian.jvm.args.java-version>
-            </properties>
-        </profile>
-        <profile>
-            <id>testWithJdk25</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>25</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- ForbiddenAPIs doesn't work with JDK25+ yet -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
-                <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK25+ -->
-                <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
-                <arquillian.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</arquillian.jvm.args.java-version>
-            </properties>
         </profile>
         <profile>
             <id>testWithJdk26</id>
