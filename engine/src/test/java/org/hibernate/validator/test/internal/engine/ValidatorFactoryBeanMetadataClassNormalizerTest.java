@@ -34,7 +34,7 @@ import org.testng.annotations.Test;
 public class ValidatorFactoryBeanMetadataClassNormalizerTest {
 
 	@Test(expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = ".*No suitable value extractor found for type interface java.util.List.*")
+			expectedExceptionsMessageRegExp = ".*No validator could be found for constraint 'jakarta.validation.constraints.Email' validating type 'java.lang.Object'.*")
 	public void testBeanMetaDataClassNormalizerNoNormalizer() throws NoSuchMethodException {
 		ValidatorFactory validatorFactory = Validation.byDefaultProvider()
 				.configure()
@@ -110,6 +110,8 @@ public class ValidatorFactoryBeanMetadataClassNormalizerTest {
 	private static class BeanProxy extends Bean implements MyProxyInterface {
 		// The proxy dropped the generics, but kept constraint annotations,
 		// which will cause trouble unless its metadata is ignored.
+		// We won't be able to find a suitable constraint validator for email
+		// since we will be looking for an impl for the `Object`.
 		@Override
 		@SuppressWarnings("unchecked")
 		public void setEmails(@Email(payload = Unwrapping.Unwrap.class) List emails) {

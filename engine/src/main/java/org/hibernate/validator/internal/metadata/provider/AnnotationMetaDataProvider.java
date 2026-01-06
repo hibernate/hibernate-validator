@@ -666,9 +666,25 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		else if ( annotatedType instanceof AnnotatedParameterizedType ) {
 			return getTypeParametersCascadingMetaDataForParameterizedType( (AnnotatedParameterizedType) annotatedType, typeParameters );
 		}
+		else if ( typeParameters.length > 0 ) {
+			return getTypeParametersCascadingMetaDataForParameterizedType( annotatedType, typeParameters );
+		}
 		else {
 			return Collections.emptyMap();
 		}
+	}
+
+	private Map<TypeVariable<?>, CascadingMetaDataBuilder> getTypeParametersCascadingMetaDataForParameterizedType(AnnotatedType annotatedType, TypeVariable<?>[] typeParameters) {
+		// We did not get the parameterized (annotated) type but a raw one instead. (because we have the type variables)
+		// There won't be any cascading on the type variables since ... it's a raw type so we just create a placeholder instead:
+		Map<TypeVariable<?>, CascadingMetaDataBuilder> typeParametersCascadingMetadata = CollectionHelper.newHashMap( typeParameters.length );
+
+		for ( TypeVariable<?> typeParameter : typeParameters ) {
+			typeParametersCascadingMetadata.put( typeParameter, new CascadingMetaDataBuilder( annotatedType.getType(), typeParameter,
+					false, Map.of(), Map.of() ) );
+		}
+
+		return typeParametersCascadingMetadata;
 	}
 
 	private Map<TypeVariable<?>, CascadingMetaDataBuilder> getTypeParametersCascadingMetaDataForParameterizedType(
