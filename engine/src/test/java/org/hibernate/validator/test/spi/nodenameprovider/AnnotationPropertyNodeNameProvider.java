@@ -18,6 +18,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
 import org.hibernate.validator.spi.nodenameprovider.Property;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProviderContext;
 
 /**
  * An example of how a name can be resolved from an annotation
@@ -41,9 +42,9 @@ class AnnotationPropertyNodeNameProvider implements PropertyNodeNameProvider, Se
 	}
 
 	@Override
-	public String getName(Property property) {
-		if ( property instanceof JavaBeanProperty ) {
-			return getJavaBeanPropertyName( (JavaBeanProperty) property );
+	public String getName(Property property, PropertyNodeNameProviderContext context) {
+		if ( property instanceof JavaBeanProperty javaBeanProperty ) {
+			return getJavaBeanPropertyName( javaBeanProperty );
 		}
 
 		return getDefaultName( property );

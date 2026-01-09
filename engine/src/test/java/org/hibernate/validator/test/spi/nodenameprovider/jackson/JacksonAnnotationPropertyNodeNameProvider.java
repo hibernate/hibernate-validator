@@ -7,6 +7,7 @@ package org.hibernate.validator.test.spi.nodenameprovider.jackson;
 import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
 import org.hibernate.validator.spi.nodenameprovider.Property;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProviderContext;
 
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
@@ -22,7 +23,7 @@ public class JacksonAnnotationPropertyNodeNameProvider implements PropertyNodeNa
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
-	public String getName(Property property) {
+	public String getName(Property property, PropertyNodeNameProviderContext context) {
 		if ( property instanceof JavaBeanProperty ) {
 			return getJavaBeanPropertyName( (JavaBeanProperty) property );
 		}
