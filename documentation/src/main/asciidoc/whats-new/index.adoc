@@ -17,3 +17,15 @@
 :html-meta-canonical-link: https://docs.hibernate.org/stable/validator/migration/en-US/html_single/
 :html-meta-version-family: {hvVersionShort}
 :version-selector-enabled: true
+
+== `PropertyNodeNameProvider` improvements
+
+We've identified that in some scenarios, e.g., with the recent Jackson 3 changes,
+it might be useful to have access to additional information when trying to
+construct the property node name. For these reasons, `PropertyNodeNameProvider` now
+comes with the `getName(Property property, PropertyNodeNameProviderContext context)`.
+`PropertyNodeNameProviderContext` opens up access to the current getter name strategy.
+
+At the same time `org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty` introduced
+an extra `getMemberName()` method. As `JavaBeanProperty` is backed by a field/getter
+this method returns the name of such class member.
