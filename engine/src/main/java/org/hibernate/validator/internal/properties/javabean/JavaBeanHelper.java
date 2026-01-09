@@ -20,6 +20,7 @@ import org.hibernate.validator.internal.util.actions.GetDeclaredMethod;
 import org.hibernate.validator.internal.util.actions.GetMethodFromGetterNameCandidates;
 import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
+import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProviderContext;
 import org.hibernate.validator.spi.properties.ConstrainableExecutable;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 
@@ -29,7 +30,7 @@ import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
  *
  * @author Marko Bekhta
  */
-public class JavaBeanHelper {
+public class JavaBeanHelper implements PropertyNodeNameProviderContext {
 
 	private final GetterPropertySelectionStrategy getterPropertySelectionStrategy;
 	private final PropertyNodeNameProvider propertyNodeNameProvider;
@@ -39,6 +40,7 @@ public class JavaBeanHelper {
 		this.propertyNodeNameProvider = propertyNodeNameProvider;
 	}
 
+	@Override
 	public GetterPropertySelectionStrategy getGetterPropertySelectionStrategy() {
 		return getterPropertySelectionStrategy;
 	}
@@ -77,7 +79,7 @@ public class JavaBeanHelper {
 		}
 		else {
 			return Optional.of( new JavaBeanGetter( declaringClass, getter, property, propertyNodeNameProvider.getName(
-					new JavaBeanPropertyImpl( declaringClass, property, getter.getName() ) ) ) );
+					new JavaBeanPropertyImpl( declaringClass, property, getter.getName() ), this ) ) );
 		}
 	}
 
@@ -119,14 +121,14 @@ public class JavaBeanHelper {
 		Optional<String> correspondingProperty = getterPropertySelectionStrategy.getProperty( executable );
 		if ( correspondingProperty.isPresent() ) {
 			return new JavaBeanGetter( declaringClass, method, correspondingProperty.get(), propertyNodeNameProvider.getName(
-					new JavaBeanPropertyImpl( declaringClass, correspondingProperty.get(), method.getName() ) ) );
+					new JavaBeanPropertyImpl( declaringClass, correspondingProperty.get(), method.getName() ), this ) );
 		}
 
 		return new JavaBeanMethod( method );
 	}
 
 	public JavaBeanField field(Field field) {
-		return new JavaBeanField( field, propertyNodeNameProvider.getName( new JavaBeanPropertyImpl( field.getDeclaringClass(), field.getName(), field.getName() ) ) );
+		return new JavaBeanField( field, propertyNodeNameProvider.getName( new JavaBeanPropertyImpl( field.getDeclaringClass(), field.getName(), field.getName() ), this ) );
 	}
 
 	private static class JavaBeanConstrainableExecutable implements ConstrainableExecutable {
