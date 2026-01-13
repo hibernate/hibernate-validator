@@ -4,15 +4,19 @@
  */
 package org.hibernate.validator.test.spi.nodenameprovider.jackson;
 
+import java.util.List;
+
 import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
 import org.hibernate.validator.spi.nodenameprovider.Property;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProviderContext;
 
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.BeanProperty;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
+import tools.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
 
 /**
  * An example of how a name can be resolved from a Jackson annotation.
@@ -24,26 +28,60 @@ public class JacksonAnnotationPropertyNodeNameProvider implements PropertyNodeNa
 
 	@Override
 	public String getName(Property property, PropertyNodeNameProviderContext context) {
-		if ( property instanceof JavaBeanProperty ) {
-			return getJavaBeanPropertyName( (JavaBeanProperty) property );
+		if ( property instanceof JavaBeanProperty javaBeanProperty ) {
+			var visitor = new JsonPropertyNameGetter( javaBeanProperty, context );
+			try {
+				objectMapper.acceptJsonFormatVisitor(
+						javaBeanProperty.getDeclaringClass(),
+						visitor
+				);
+				var attributeName = visitor.getAttributeName();
+				return attributeName != null ? attributeName : property.getName();
+			}
+			catch (JacksonException ignored) {
+			}
+		}
+		return property.getName();
+	}
+
+	private static class JsonPropertyNameGetter extends JsonFormatVisitorWrapper.Base {
+
+		private final JsonObjectFormatVisitor visitor;
+		private String attributeName = null;
+
+		JsonPropertyNameGetter(JavaBeanProperty property, PropertyNodeNameProviderContext context) {
+			String memberName = property.getMemberName();
+			String name = property.getName();
+			List<String> nameCandidates = context.getGetterPropertySelectionStrategy().getGetterMethodNameCandidates( name );
+			this.visitor = new JsonObjectFormatVisitor.Base() {
+
+				@Override
+				public void property(BeanProperty prop) {
+					setAttributeName( prop );
+				}
+
+				@Override
+				public void optionalProperty(BeanProperty prop) {
+					setAttributeName( prop );
+				}
+
+				private void setAttributeName(BeanProperty writer) {
+					if ( memberName.equalsIgnoreCase( writer.getMember().getName() )
+							|| name.equalsIgnoreCase( writer.getMember().getName() )
+							|| nameCandidates.contains( writer.getMember().getName() ) ) {
+						attributeName = writer.getName();
+					}
+				}
+			};
 		}
 
-		return getDefaultName( property );
-	}
+		public String getAttributeName() {
+			return attributeName;
+		}
 
-	private String getJavaBeanPropertyName(JavaBeanProperty property) {
-		JavaType type = objectMapper.constructType( property.getDeclaringClass() );
-		BeanDescription desc = objectMapper.getSerializationConfig().introspect( type );
-
-		return desc.findProperties()
-				.stream()
-				.filter( prop -> prop.getInternalName().equals( property.getName() ) )
-				.map( BeanPropertyDefinition::getName )
-				.findFirst()
-				.orElse( property.getName() );
-	}
-
-	private String getDefaultName(Property property) {
-		return property.getName();
+		@Override
+		public JsonObjectFormatVisitor expectObjectFormat(JavaType type) {
+			return visitor;
+		}
 	}
 }
