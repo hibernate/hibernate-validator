@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.referenceguide.chapter12.nodenameprovider;
 
+import java.util.List;
+
 import org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty;
 import org.hibernate.validator.spi.nodenameprovider.Property;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
@@ -17,14 +19,13 @@ import tools.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
 import tools.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
 
 //tag::include[]
-
 public class JacksonPropertyNodeNameProvider implements PropertyNodeNameProvider {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
 	public String getName(Property property, PropertyNodeNameProviderContext context) {
-		if (property instanceof JavaBeanProperty javaBeanProperty) {
-			var visitor = new JsonPropertyNameGetter(javaBeanProperty.getMemberName());
+		if ( property instanceof JavaBeanProperty javaBeanProperty ) {
+			var visitor = new JsonPropertyNameGetter( javaBeanProperty, context );
 			try {
 				objectMapper.acceptJsonFormatVisitor(
 						javaBeanProperty.getDeclaringClass(),
@@ -32,32 +33,38 @@ public class JacksonPropertyNodeNameProvider implements PropertyNodeNameProvider
 				);
 				var attributeName = visitor.getAttributeName();
 				return attributeName != null ? attributeName : property.getName();
-			} catch (JacksonException ignored) {}
+			}
+			catch (JacksonException ignored) {
+			}
 		}
 		return property.getName();
 	}
 
-	// Visitor wrapper
 	private static class JsonPropertyNameGetter extends JsonFormatVisitorWrapper.Base {
 
 		private final JsonObjectFormatVisitor visitor;
 		private String attributeName = null;
 
-		JsonPropertyNameGetter(String memberName) {
+		JsonPropertyNameGetter(JavaBeanProperty property, PropertyNodeNameProviderContext context) {
+			String memberName = property.getMemberName();
+			String name = property.getName();
+			List<String> nameCandidates = context.getGetterPropertySelectionStrategy().getGetterMethodNameCandidates( name );
 			this.visitor = new JsonObjectFormatVisitor.Base() {
 
 				@Override
 				public void property(BeanProperty prop) {
-					setAttributeName(prop);
+					setAttributeName( prop );
 				}
 
 				@Override
 				public void optionalProperty(BeanProperty prop) {
-					setAttributeName(prop);
+					setAttributeName( prop );
 				}
 
 				private void setAttributeName(BeanProperty writer) {
-					if (memberName.equalsIgnoreCase(writer.getMember().getName())) {
+					if ( memberName.equalsIgnoreCase( writer.getMember().getName() )
+							|| name.equalsIgnoreCase( writer.getMember().getName() )
+							|| nameCandidates.contains( writer.getMember().getName() ) ) {
 						attributeName = writer.getName();
 					}
 				}
@@ -72,8 +79,6 @@ public class JacksonPropertyNodeNameProvider implements PropertyNodeNameProvider
 		public JsonObjectFormatVisitor expectObjectFormat(JavaType type) {
 			return visitor;
 		}
-
 	}
-
 }
 //end::include[]
