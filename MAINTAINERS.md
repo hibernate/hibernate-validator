@@ -51,9 +51,7 @@ included in the distribution package.
 ### Performing the release
 
 Once you trigger the CI job, it automatically pushes artifacts to the
-[Maven Central](https://central.sonatype.com/),
-the distribution to [SourceForge](https://sourceforge.net/projects/hibernate/files/hibernate-validator/)
-and the documentation to [docs.hibernate.org](https://docs.hibernate.org/validator/).
+[Maven Central](https://central.sonatype.com/) and the documentation to [docs.hibernate.org](https://docs.hibernate.org/validator/).
 
 * Transfer the released issues in JIRA to the "Closed state":
   * Go to [the list of releases](https://hibernate.atlassian.net/projects/HV?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page)
