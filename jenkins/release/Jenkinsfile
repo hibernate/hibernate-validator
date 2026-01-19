@@ -74,7 +74,7 @@ pipeline {
 											 string(credentialsId: 'release.gpg.passphrase', variable: 'JRELEASER_GPG_PASSPHRASE'),
 											 usernamePassword(credentialsId: 'central.sonatype.com', passwordVariable: 'JRELEASER_MAVENCENTRAL_TOKEN', usernameVariable: 'JRELEASER_MAVENCENTRAL_USERNAME'),
 											 string(credentialsId: 'Hibernate-CI.github.com', variable: 'JRELEASER_GITHUB_TOKEN')]) {
-								sshagent(['ed25519.Hibernate-CI.github.com', 'hibernate.filemgmt.jboss.org', 'jenkins.in.relation.to', 'hibernate-ci.frs.sourceforge.net']) {
+								sshagent(['ed25519.Hibernate-CI.github.com', 'jenkins.in.relation.to']) {
 									sh 'cat $HOME/.ssh/config'
 									dir('.release/scripts') {
 										sh 'git clone https://github.com/hibernate/hibernate-release-scripts.git .'
