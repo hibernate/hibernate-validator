@@ -99,10 +99,27 @@ public class CPFValidatorTest extends AbstractConstrainedTest {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HV-979")
-	public void correct_cpf_with_dash_only_separator_validates() {
+	@TestForIssue(jiraKey = "HV-1923")
+	public void incorrect_cpf_with_dash_only_separator_is_invalid() {
 		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "134241313-00" ) );
-		assertNoViolations( violations );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CPF.class ).withProperty( "cpf" )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1923")
+	public void incorrect_cpf_with_partial_dots_is_invalid() {
+		// Test various incorrect formats with partial dots
+		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "134.241313-00" ) );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CPF.class ).withProperty( "cpf" )
+		);
+
+		violations = validator.validate( new Person( "134241.313-00" ) );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( CPF.class ).withProperty( "cpf" )
+		);
 	}
 
 	@Test
