@@ -6,6 +6,7 @@ package org.hibernate.validator.internal.util.logging;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
+import java.util.Locale;
 
 import org.jboss.logging.Logger;
 
@@ -18,7 +19,7 @@ public final class LoggerFactory {
 
 	public static Log make(final Lookup creationContext) {
 		final String className = creationContext.lookupClass().getName();
-		return Logger.getMessageLogger( MethodHandles.lookup(), Log.class, className );
+		return Logger.getMessageLogger( MethodHandles.lookup(), Log.class, className, Locale.ROOT );
 	}
 
 	// private constructor to avoid instantiation
