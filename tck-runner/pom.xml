@@ -24,7 +24,7 @@
             to override the one we are using for the main build.
             The version here must be the exact same version as the one used in the Bean Validation TCK
         -->
-        <version.org.assertj.assertj-core>3.8.0</version.org.assertj.assertj-core>
+        <version.org.assertj.assertj-core>3.27.7</version.org.assertj.assertj-core>
 
         <tck.suite.file>${project.build.directory}/dependency/validation-tck-tests-suite.xml</tck.suite.file>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
