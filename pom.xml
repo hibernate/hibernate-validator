@@ -119,7 +119,7 @@
         <version.jakarta.validation-api>2.0.2</version.jakarta.validation-api>
         <version.org.hibernate.beanvalidation.tck>2.0.6</version.org.hibernate.beanvalidation.tck>
 
-        <version.com.thoughtworks.paranamer>2.8</version.com.thoughtworks.paranamer>
+        <version.com.thoughtworks.paranamer>2.8.3</version.com.thoughtworks.paranamer>
         <version.org.glassfish.jakarta.el>3.0.3</version.org.glassfish.jakarta.el>
         <version.org.jboss.logging.jboss-logging>3.4.1.Final</version.org.jboss.logging.jboss-logging>
         <version.org.jboss.logging.jboss-logging-tools>2.2.1.Final</version.org.jboss.logging.jboss-logging-tools>
