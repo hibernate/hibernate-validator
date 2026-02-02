@@ -416,7 +416,7 @@
                 <validation-api.version>1.1.0.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>5.3.6.Final</beanvalidation-impl.version>
-                <javax-el.version>2.2.4</javax-el.version>
+                <javax-el.version>2.2.5</javax-el.version>
                 <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
             </properties>
             <dependencies>
@@ -458,7 +458,7 @@
                 <validation-api.version>1.1.0.Final</validation-api.version>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.version>5.2.5.Final</beanvalidation-impl.version>
-                <javax-el.version>2.2.4</javax-el.version>
+                <javax-el.version>2.2.5</javax-el.version>
                 <sources.to.add.main>${project.basedir}/src/main/javax</sources.to.add.main>
             </properties>
             <dependencies>
