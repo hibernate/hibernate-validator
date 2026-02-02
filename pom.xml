@@ -172,7 +172,7 @@
         <version.junit>4.13.1</version.junit>
         <version.org.easymock>3.4</version.org.easymock>
         <version.io.rest-assured>4.1.2</version.io.rest-assured>
-        <version.org.codehaus.groovy>2.4.12</version.org.codehaus.groovy>
+        <version.org.codehaus.groovy>2.4.21</version.org.codehaus.groovy>
         <version.com.google.guava>30.1.1-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>5.3.22</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-se-embedded-1.1>1.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-se-embedded-1.1>
