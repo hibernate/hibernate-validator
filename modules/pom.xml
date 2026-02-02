@@ -285,7 +285,7 @@
                     <dependency>
                         <groupId>org.jboss.modules</groupId>
                         <artifactId>jboss-modules</artifactId>
-                        <version>1.9.0.Final</version>
+                        <version>1.9.2.Final</version>
                     </dependency>
                 </dependencies>
                 <executions>
