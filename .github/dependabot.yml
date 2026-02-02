@@ -92,6 +92,8 @@ updates:
       day: "tuesday"
     assignees: [ "marko-bekhta" ]
     open-pull-requests-limit: 20
+    commit-message:
+      prefix: "[9.1] "
     groups:
       # This group combines all build-only dependencies. Published artifacts do not depend on them.
       # Grouping such dependencies will make Dependabot create PRs with a branch name
@@ -150,6 +152,8 @@ updates:
   - package-ecosystem: "maven"
     directory: "/" # Location of package manifests
     target-branch: "9.0"
+    commit-message:
+      prefix: "[9.0] "
     schedule:
       interval: "weekly"
       day: "tuesday"
@@ -213,6 +217,8 @@ updates:
   - package-ecosystem: "maven"
     directory: "/" # Location of package manifests
     target-branch: "8.0"
+    commit-message:
+      prefix: "[8.0] "
     schedule:
       interval: "weekly"
       day: "tuesday"
@@ -276,6 +282,8 @@ updates:
   - package-ecosystem: "maven"
     directory: "/" # Location of package manifests
     target-branch: "6.2"
+    commit-message:
+      prefix: "[6.2] "
     schedule:
       interval: "weekly"
       day: "tuesday"
@@ -331,6 +339,12 @@ updates:
       - dependency-name: "jakarta.persistence:jakarta.persistence-api"
       - dependency-name: "jakarta.el:jakarta.el-api"
       - dependency-name: "org.assertj:*"
+        # money-api/paranamer cannot be updated as any patch version
+        #  above current ones need a JDK 9 and OSGI tests won't work.
+      - dependency-name: "com.thoughtworks.paranamer:paranamer"
+      - dependency-name: "javax.money:money-api"
+      - dependency-name: "org.apache.karaf:*"
+      - dependency-name: "org.apache.karaf.features:*"
         # We have a fixed major version of OpenJFX to work with the min JDK we require
       - dependency-name: "*"
         update-types:
