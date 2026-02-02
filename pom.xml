@@ -155,7 +155,7 @@
         <version.jakarta.ws.rs-api>2.1.6</version.jakarta.ws.rs-api>
 
         <!-- JavaMoney dependencies -->
-        <version.javax.money>1.0.1</version.javax.money>
+        <version.javax.money>1.0.3</version.javax.money>
         <version.org.javamoney.moneta>1.1</version.org.javamoney.moneta>
 
         <!-- Used in the Karaf features file: it is a dependency of Moneta, and for the documentation -->
