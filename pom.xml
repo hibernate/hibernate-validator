@@ -242,7 +242,7 @@
         <version.surefire.plugin.java-version.asm>9.2</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.wildfly.plugin>1.2.1.Final</version.wildfly.plugin>
-        <version.org.wildfly.core>14.0.0.Final</version.org.wildfly.core>
+        <version.org.wildfly.core>14.0.1.Final</version.org.wildfly.core>
         <version.wildfly-patch-gen.plugin>2.1.0.Final</version.wildfly-patch-gen.plugin>
         <version.wildfly-patch-gen.plugin.woodstox>5.0.3</version.wildfly-patch-gen.plugin.woodstox>
         <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
