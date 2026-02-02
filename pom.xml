@@ -200,7 +200,7 @@
         <version.asciidoctor.plugin>1.5.8</version.asciidoctor.plugin>
         <version.org.hibernate.infra.hibernate-asciidoctor-theme>5.0.7.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
         <version.org.hibernate.infra.hibernate-asciidoctor-extensions>1.0.3.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
-        <version.org.jruby>9.1.15.0</version.org.jruby>
+        <version.org.jruby>9.1.17.0</version.org.jruby>
         <version.org.asciidoctor.asciidoctorj>1.6.2</version.org.asciidoctor.asciidoctorj>
         <version.org.asciidoctor.asciidoctorj-pdf>1.5.4</version.org.asciidoctor.asciidoctorj-pdf>
 
