@@ -188,7 +188,7 @@
         <version.org.openjfx>17.0.14</version.org.openjfx>
 
         <!-- Test dependencies -->
-        <version.org.jboss.arquillian>1.9.4.Final</version.org.jboss.arquillian>
+        <version.org.jboss.arquillian>1.9.5.Final</version.org.jboss.arquillian>
         <version.shrinkwrap.core>1.2.6</version.shrinkwrap.core>
         <version.shrinkwrap.resolvers>3.3.4</version.shrinkwrap.resolvers>
         <version.shrinkwrap.descriptors>2.0.0</version.shrinkwrap.descriptors>
@@ -196,14 +196,14 @@
         <version.org.assertj.assertj-core>3.26.3</version.org.assertj.assertj-core>
         <version.junit>4.13.2</version.junit>
         <version.org.easymock>5.6.0</version.org.easymock>
-        <version.io.rest-assured>5.5.2</version.io.rest-assured>
+        <version.io.rest-assured>5.5.7</version.io.rest-assured>
         <version.org.apache.groovy>4.0.26</version.org.apache.groovy>
         <version.com.google.guava>33.4.8-jre</version.com.google.guava>
-        <version.org.springframework.spring-expression>6.2.7</version.org.springframework.spring-expression>
+        <version.org.springframework.spring-expression>6.2.15</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
-        <version.com.fasterxml.jackson.core.jackson-databind>2.19.0</version.com.fasterxml.jackson.core.jackson-databind>
-        <version.com.fasterxml.jackson.core.jackson-annotations>2.19.0</version.com.fasterxml.jackson.core.jackson-annotations>
-        <version.net.bytebuddy.byte-buddy>1.17.5</version.net.bytebuddy.byte-buddy>
+        <version.com.fasterxml.jackson.core.jackson-databind>2.19.4</version.com.fasterxml.jackson.core.jackson-databind>
+        <version.com.fasterxml.jackson.core.jackson-annotations>2.19.4</version.com.fasterxml.jackson.core.jackson-annotations>
+        <version.net.bytebuddy.byte-buddy>1.17.8</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
         <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
@@ -226,18 +226,18 @@
         <version.asciidoctor.plugin>3.2.0</version.asciidoctor.plugin>
         <version.org.hibernate.infra.hibernate-asciidoctor-theme>5.1.1.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
         <version.org.hibernate.infra.hibernate-asciidoctor-extensions>3.1.1.Final</version.org.hibernate.infra.hibernate-asciidoctor-extensions>
-        <version.org.asciidoctor.asciidoctorj>3.0.0</version.org.asciidoctor.asciidoctorj>
-        <version.org.asciidoctor.asciidoctorj-pdf>2.3.19</version.org.asciidoctor.asciidoctorj-pdf>
+        <version.org.asciidoctor.asciidoctorj>3.0.1</version.org.asciidoctor.asciidoctorj>
+        <version.org.asciidoctor.asciidoctorj-pdf>2.3.23</version.org.asciidoctor.asciidoctorj-pdf>
 
         <!-- Maven plugins versions -->
 
         <version.antrun.plugin>3.1.0</version.antrun.plugin>
         <version.assembly.plugin>3.7.1</version.assembly.plugin>
-        <version.buildhelper.plugin>3.6.0</version.buildhelper.plugin>
+        <version.buildhelper.plugin>3.6.1</version.buildhelper.plugin>
         <version.bundle.plugin>6.0.0</version.bundle.plugin>
         <version.checkstyle.plugin>3.6.0</version.checkstyle.plugin>
         <version.clean.plugin>3.4.1</version.clean.plugin>
-        <version.compiler.plugin>3.14.0</version.compiler.plugin>
+        <version.compiler.plugin>3.14.1</version.compiler.plugin>
         <version.copy.plugin>1.0.0</version.copy.plugin>
         <version.dependency.plugin>3.8.1</version.dependency.plugin>
         <version.depends.plugin>1.5.0</version.depends.plugin>
@@ -245,27 +245,27 @@
         <version.enforcer.plugin>3.5.0</version.enforcer.plugin>
         <!-- Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting. -->
         <version.forbiddenapis.plugin>3.9</version.forbiddenapis.plugin>
-        <version.gmavenplus.plugin>4.2.0</version.gmavenplus.plugin>
+        <version.gmavenplus.plugin>4.2.1</version.gmavenplus.plugin>
         <version.install.plugin>3.1.4</version.install.plugin>
         <version.japicmp.plugin>0.23.1</version.japicmp.plugin>
         <version.jar.plugin>3.4.2</version.jar.plugin>
-        <version.jqassistant.plugin>2.7.0</version.jqassistant.plugin>
-        <version.javadoc.plugin>3.11.2</version.javadoc.plugin>
+        <version.jqassistant.plugin>2.7.1</version.jqassistant.plugin>
+        <version.javadoc.plugin>3.11.3</version.javadoc.plugin>
         <version.release.plugin>3.1.1</version.release.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
-        <version.shade.plugin>3.6.0</version.shade.plugin>
+        <version.shade.plugin>3.6.1</version.shade.plugin>
         <version.sigtest.plugin>2.6</version.sigtest.plugin>
         <version.source.plugin>3.3.1</version.source.plugin>
-        <version.surefire.plugin>3.5.3</version.surefire.plugin>
+        <version.surefire.plugin>3.5.4</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.8</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
-        <version.flatten-maven-plugin>1.7.0</version.flatten-maven-plugin>
+        <version.flatten-maven-plugin>1.7.3</version.flatten-maven-plugin>
         <version.moditect.plugin>1.2.2.Final</version.moditect.plugin>
-        <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
+        <version.sisu-maven-plugin>0.9.0.M4</version.sisu-maven-plugin>
         <version.versions.plugin>2.18.0</version.versions.plugin>
-        <version.maven-wrapper-plugin>3.3.2</version.maven-wrapper-plugin>
-        <version.spotless-maven-plugin>2.44.4</version.spotless-maven-plugin>
-        <version.jacoco.plugin>0.8.13</version.jacoco.plugin>
+        <version.maven-wrapper-plugin>3.3.4</version.maven-wrapper-plugin>
+        <version.spotless-maven-plugin>2.44.5</version.spotless-maven-plugin>
+        <version.jacoco.plugin>0.8.14</version.jacoco.plugin>
         <version.sonar.plugin>5.1.0.4751</version.sonar.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
 
@@ -412,7 +412,7 @@
                 - update README
                 - run mvn wrapper:wrapper to re-generate the maven wrapper
             -->
-        <maven.min.version>3.9.9</maven.min.version>
+        <maven.min.version>3.9.12</maven.min.version>
 
         <!-- Formatting -->
         <format.skip>false</format.skip>
