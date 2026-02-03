@@ -144,6 +144,9 @@ updates:
       - dependency-name: "jakarta.persistence:jakarta.persistence-api"
       - dependency-name: "jakarta.el:jakarta.el-api"
       - dependency-name: "org.assertj:*"
+        # Classmate 1.7.2 brings breaking changes,
+        #  hence it is updated in Validator 9.2
+      - dependency-name: "com.fasterxml:classmate"
         # We have a fixed major version of OpenJFX to work with the min JDK we require
       - dependency-name: "*"
         update-types:
@@ -209,6 +212,9 @@ updates:
       - dependency-name: "jakarta.persistence:jakarta.persistence-api"
       - dependency-name: "jakarta.el:jakarta.el-api"
       - dependency-name: "org.assertj:*"
+        # Classmate 1.7.2 brings breaking changes,
+        #  hence it is updated in Validator 9.2
+      - dependency-name: "com.fasterxml:classmate"
         # We have a fixed major version of OpenJFX to work with the min JDK we require
       - dependency-name: "*"
         update-types:
@@ -274,6 +280,9 @@ updates:
       - dependency-name: "jakarta.persistence:jakarta.persistence-api"
       - dependency-name: "jakarta.el:jakarta.el-api"
       - dependency-name: "org.assertj:*"
+      # Classmate 1.7.2 brings breaking changes,
+      #  hence it is updated in Validator 9.2
+      - dependency-name: "com.fasterxml:classmate"
         # We have a fixed major version of OpenJFX to work with the min JDK we require
       - dependency-name: "*"
         update-types:
@@ -345,6 +354,9 @@ updates:
       - dependency-name: "javax.money:money-api"
       - dependency-name: "org.apache.karaf:*"
       - dependency-name: "org.apache.karaf.features:*"
+        # Classmate 1.7.2 brings breaking changes,
+        #  hence it is updated in Validator 9.2
+      - dependency-name: "com.fasterxml:classmate"
         # We have a fixed major version of OpenJFX to work with the min JDK we require
       - dependency-name: "*"
         update-types:
