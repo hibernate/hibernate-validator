@@ -236,7 +236,7 @@
         <version.bundle.plugin>6.0.0</version.bundle.plugin>
         <version.checkstyle.plugin>3.6.0</version.checkstyle.plugin>
         <version.clean.plugin>3.5.0</version.clean.plugin>
-        <version.compiler.plugin>3.14.1</version.compiler.plugin>
+        <version.compiler.plugin>3.15.0</version.compiler.plugin>
         <version.copy.plugin>1.0.0</version.copy.plugin>
         <version.dependency.plugin>3.8.1</version.dependency.plugin>
         <version.depends.plugin>1.5.0</version.depends.plugin>
