@@ -190,7 +190,7 @@
         <!-- Test dependencies -->
         <version.org.jboss.arquillian>1.10.0.Final</version.org.jboss.arquillian>
         <version.shrinkwrap.core>1.2.6</version.shrinkwrap.core>
-        <version.shrinkwrap.resolvers>3.3.4</version.shrinkwrap.resolvers>
+        <version.shrinkwrap.resolvers>3.3.5</version.shrinkwrap.resolvers>
         <version.shrinkwrap.descriptors>2.0.0</version.shrinkwrap.descriptors>
         <version.org.testng>7.12.0</version.org.testng>
         <version.org.assertj.assertj-core>3.27.7</version.org.assertj.assertj-core>
@@ -199,10 +199,10 @@
         <version.io.rest-assured>6.0.0</version.io.rest-assured>
         <version.org.apache.groovy>5.0.4</version.org.apache.groovy>
         <version.com.google.guava>33.5.0-jre</version.com.google.guava>
-        <version.org.springframework.spring-expression>7.0.3</version.org.springframework.spring-expression>
+        <version.org.springframework.spring-expression>7.0.4</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.tools.jackson.core.jackson-bom>3.0.4</version.tools.jackson.core.jackson-bom>
-        <version.net.bytebuddy.byte-buddy>1.18.4</version.net.bytebuddy.byte-buddy>
+        <version.net.bytebuddy.byte-buddy>1.18.5</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
         <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
@@ -244,11 +244,11 @@
         <version.enforcer.plugin>3.6.2</version.enforcer.plugin>
         <!-- Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting. -->
         <version.forbiddenapis.plugin>3.10</version.forbiddenapis.plugin>
-        <version.gmavenplus.plugin>4.3.0</version.gmavenplus.plugin>
+        <version.gmavenplus.plugin>4.3.1</version.gmavenplus.plugin>
         <version.install.plugin>3.1.4</version.install.plugin>
         <version.japicmp.plugin>0.25.4</version.japicmp.plugin>
         <version.jar.plugin>3.5.0</version.jar.plugin>
-        <version.jqassistant.plugin>2.9.0</version.jqassistant.plugin>
+        <version.jqassistant.plugin>2.9.1</version.jqassistant.plugin>
         <version.javadoc.plugin>3.12.0</version.javadoc.plugin>
         <version.release.plugin>3.3.1</version.release.plugin>
         <version.resources.plugin>3.4.0</version.resources.plugin>
