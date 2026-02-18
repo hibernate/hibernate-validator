@@ -7,7 +7,7 @@ jira:
       # Examples:
       # Bump some-dep-GAV from some-version to some-version in the build-dependencies group
       # Bump the build-dependencies group with 2 updates
-      titlePattern: "Bump.*the (build-dependencies|workflow-actions) group.*+"
+      titlePattern: ".*Bump.*the (build-dependencies|workflow-actions) group.*+"
   ignoreFiles:
     # Git
     - ".git*"
@@ -52,12 +52,8 @@ licenseAgreement:
   ignore:
     # We ignore all dependabot PRs for a license check:
     - user: dependabot[bot]
-      titlePattern: "Bump.*"
+      titlePattern: ".*Bump.*"
 branches:
   enabled: true
   titlePrefix: "[%s]"
   label: "%s"
-  ignore:
-    # We ignore all dependabot PRs for a license check:
-    - user: dependabot[bot]
-      titlePattern: "Bump.*"
