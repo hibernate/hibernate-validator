@@ -201,7 +201,7 @@
         <version.com.google.guava>33.5.0-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>7.0.4</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
-        <version.tools.jackson.core.jackson-bom>3.0.4</version.tools.jackson.core.jackson-bom>
+        <version.tools.jackson.core.jackson-bom>3.1.0</version.tools.jackson.core.jackson-bom>
         <version.net.bytebuddy.byte-buddy>1.18.5</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
