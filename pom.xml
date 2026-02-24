@@ -256,7 +256,7 @@
         <version.shade.plugin>3.6.1</version.shade.plugin>
         <version.sigtest.plugin>2.6</version.sigtest.plugin>
         <version.source.plugin>3.3.1</version.source.plugin>
-        <version.surefire.plugin>3.5.4</version.surefire.plugin>
+        <version.surefire.plugin>3.5.5</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.8</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.flatten-maven-plugin>1.7.3</version.flatten-maven-plugin>
