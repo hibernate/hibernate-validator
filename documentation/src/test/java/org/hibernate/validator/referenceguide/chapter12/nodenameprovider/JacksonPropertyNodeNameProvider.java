@@ -49,7 +49,7 @@ public class JacksonPropertyNodeNameProvider implements PropertyNodeNameProvider
 			String memberName = property.getMemberName();
 			String name = property.getName();
 			List<String> nameCandidates = context.getGetterPropertySelectionStrategy().getGetterMethodNameCandidates( name );
-			this.visitor = new JsonObjectFormatVisitor.Base() {
+			this.visitor = new JsonObjectFormatVisitor.Base( getContext() ) {
 
 				@Override
 				public void property(BeanProperty prop) {
