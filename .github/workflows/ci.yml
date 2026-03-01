@@ -117,7 +117,7 @@ jobs:
       # The actual publishing must be done in a separate job (see ci-report.yml).
       # We don't write to the remote cache as that would be unsafe.
       - name: Upload GitHub Actions artifact for the Develocity build scan
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # 6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # 7.0.0
         if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
         with:
           name: build-scan-data-standalone-${{ matrix.os.name }}
@@ -134,7 +134,7 @@ jobs:
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
 
       - name: Upload GitHub Actions artifact for the Develocity build scan
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # 6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # 7.0.0
         if: "${{ github.event_name == 'pull_request' && !cancelled() }}"
         with:
           name: build-scan-data-incontainer-${{ matrix.os.name }}
