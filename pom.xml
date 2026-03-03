@@ -202,7 +202,7 @@
         <version.org.springframework.spring-expression>7.0.5</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.tools.jackson.core.jackson-bom>3.1.0</version.tools.jackson.core.jackson-bom>
-        <version.net.bytebuddy.byte-buddy>1.18.5</version.net.bytebuddy.byte-buddy>
+        <version.net.bytebuddy.byte-buddy>1.18.7</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
         <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
@@ -218,7 +218,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>13.2.0</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>13.3.0</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
@@ -233,7 +233,7 @@
         <version.antrun.plugin>3.2.0</version.antrun.plugin>
         <version.assembly.plugin>3.8.0</version.assembly.plugin>
         <version.buildhelper.plugin>3.6.1</version.buildhelper.plugin>
-        <version.bundle.plugin>6.0.0</version.bundle.plugin>
+        <version.bundle.plugin>6.0.2</version.bundle.plugin>
         <version.checkstyle.plugin>3.6.0</version.checkstyle.plugin>
         <version.clean.plugin>3.5.0</version.clean.plugin>
         <version.compiler.plugin>3.15.0</version.compiler.plugin>
@@ -263,7 +263,7 @@
         <version.sisu-maven-plugin>1.0.0</version.sisu-maven-plugin>
         <version.versions.plugin>2.21.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.4</version.maven-wrapper-plugin>
-        <version.spotless-maven-plugin>3.2.1</version.spotless-maven-plugin>
+        <version.spotless-maven-plugin>3.3.0</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.14</version.jacoco.plugin>
         <version.sonar.plugin>5.5.0.6356</version.sonar.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
