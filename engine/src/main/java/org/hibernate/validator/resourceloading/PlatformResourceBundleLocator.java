@@ -9,7 +9,6 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +25,6 @@ import org.hibernate.validator.Incubating;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.actions.GetClassLoader;
-import org.hibernate.validator.internal.util.actions.GetMethod;
 import org.hibernate.validator.internal.util.actions.GetResources;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -270,18 +268,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 				return false;
 			}
 
-			Method getModule = GetMethod.action( Class.class, "getModule" );
-			// not on Java 9
-			if ( getModule == null ) {
-				return true;
-			}
-
-			// on Java 9, check whether HV is a named module
-			Object module = getModule.invoke( PlatformResourceBundleLocator.class );
-			Method isNamedMethod = GetMethod.action( module.getClass(), "isNamed" );
-			boolean isNamed = (Boolean) isNamedMethod.invoke( module );
-
-			return !isNamed;
+			return !PlatformResourceBundleLocator.class.getModule().isNamed();
 		}
 		catch (Throwable e) {
 			LOG.info( MESSAGES.unableToUseResourceBundleAggregation() );
