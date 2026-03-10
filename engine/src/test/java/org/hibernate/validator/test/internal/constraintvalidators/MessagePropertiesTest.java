@@ -55,6 +55,7 @@ import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Normalized;
+import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
@@ -156,6 +157,7 @@ public class MessagePropertiesTest {
 							violationOf( Mod10Check.class ),
 							violationOf( Mod11Check.class ),
 							violationOf( Normalized.class ),
+							violationOf( NullOrNotBlank.class ),
 							violationOf( Range.class ),
 							violationOf( UniqueElements.class ),
 							violationOf( URL.class ),
@@ -302,6 +304,9 @@ public class MessagePropertiesTest {
 
 		@Normalized(form = java.text.Normalizer.Form.NFKC)
 		private String normalized = "\uFE64script\uFE65";
+
+		@NullOrNotBlank
+		private String nullOrNotBlank = "   ";
 
 		@Range(min = 2, max = 4)
 		private int range = 6;
