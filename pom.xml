@@ -251,8 +251,8 @@
         <version.jqassistant.plugin>2.9.1</version.jqassistant.plugin>
         <version.javadoc.plugin>3.12.0</version.javadoc.plugin>
         <version.release.plugin>3.3.1</version.release.plugin>
-        <version.resources.plugin>3.4.0</version.resources.plugin>
-        <version.shade.plugin>3.6.1</version.shade.plugin>
+        <version.resources.plugin>3.5.0</version.resources.plugin>
+        <version.shade.plugin>3.6.2</version.shade.plugin>
         <version.sigtest.plugin>2.6</version.sigtest.plugin>
         <version.source.plugin>3.4.0</version.source.plugin>
         <version.surefire.plugin>3.5.5</version.surefire.plugin>
@@ -411,7 +411,7 @@
                 - update README
                 - run mvn wrapper:wrapper to re-generate the maven wrapper
             -->
-        <maven.min.version>3.9.12</maven.min.version>
+        <maven.min.version>3.9.13</maven.min.version>
 
         <!-- Formatting -->
         <format.skip>false</format.skip>
