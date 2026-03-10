@@ -54,6 +54,7 @@ import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Normalized;
+import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
@@ -115,6 +116,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( Mod10Check.class, new Mod10CheckBean() );
 		testConstraint( Mod11Check.class, new Mod11CheckBean() );
 		testConstraint( Normalized.class, new NormalizedBean() );
+		testConstraint( NullOrNotBlank.class, new NullOrNotBlankBean() );
 		testConstraint( Range.class, new RangeBean() );
 		testConstraint( UniqueElements.class, new UniqueElementsBean() );
 		testConstraint( URL.class, new URLBean() );
@@ -346,6 +348,13 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@Normalized(form = java.text.Normalizer.Form.NFKC)
 		private String normalized = "\uFE64script\uFE65";
+
+	}
+
+	private static class NullOrNotBlankBean {
+
+		@NullOrNotBlank
+		private String nullOrNotBlank = "   ";
 
 	}
 
