@@ -15,12 +15,14 @@ import jakarta.validation.ConstraintViolation;
 
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.annotations.Test;
 
 /**
  * @author Koen Aers
  */
+@TestForIssue(jiraKey = "HV-2193")
 public class NullOrNotBlankConstrainedTest extends AbstractConstrainedTest {
 
 	@Test
