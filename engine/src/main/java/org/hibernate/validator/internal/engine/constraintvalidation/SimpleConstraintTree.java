@@ -17,6 +17,8 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import org.jboss.logging.Logger;
+
 /**
  * A constraint tree for a simple constraint i.e. not a composing one.
  *
@@ -66,7 +68,7 @@ final class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B>
 			ValidationContext<?> validationContext,
 			ValueContext<?, ?> valueContext
 	) {
-		if ( LOG.isTraceEnabled() ) {
+		if ( LOG.isEnabled( Logger.Level.TRACE ) ) {
 			if ( validationContext.isShowValidatedValuesInTraceLogs() ) {
 				LOG.tracef(
 						"Validating value %s against constraint defined by %s.",

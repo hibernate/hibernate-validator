@@ -121,15 +121,12 @@ public class MetaConstraint<A extends Annotation> {
 		}
 		// regular constraint
 		else {
-			success = doValidateConstraint( validationContext, valueContext );
+			success = constraintTree.validateConstraints( validationContext, valueContext );
 		}
+
+		validationContext.markConstraintProcessed( valueContext, this );
+
 		return success;
-	}
-
-	private boolean doValidateConstraint(ValidationContext<?> executionContext, ValueContext<?, ?> valueContext) {
-		valueContext.setConstraintLocationKind( getConstraintLocationKind() );
-
-		return constraintTree.validateConstraints( executionContext, valueContext );
 	}
 
 	public ConstraintLocation getLocation() {
@@ -240,7 +237,7 @@ public class MetaConstraint<A extends Annotation> {
 				}
 			}
 			else {
-				success &= doValidateConstraint( validationContext, valueContext );
+				success &= constraintTree.validateConstraints( validationContext, valueContext );
 			}
 
 			// reset the value context to the state before this call

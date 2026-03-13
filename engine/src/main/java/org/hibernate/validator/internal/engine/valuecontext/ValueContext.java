@@ -14,7 +14,6 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeVariables;
 
@@ -58,11 +57,6 @@ public abstract sealed class ValueContext<T, V> permits BeanValueContext, Execut
 	private V currentValue;
 
 	protected Validatable currentValidatable;
-
-	/**
-	 * The {@code ConstraintLocationKind} the constraint was defined on
-	 */
-	private ConstraintLocationKind constraintLocationKind;
 
 	ValueContext(ValueContext<?, ?> parentContext, ExecutableParameterNameProvider parameterNameProvider, T currentBean, Validatable validatable, MutablePath propertyPath) {
 		this.parentContext = parentContext;
@@ -181,16 +175,8 @@ public abstract sealed class ValueContext<T, V> permits BeanValueContext, Execut
 		return getCurrentGroup() != null && Group.isDefaultGroup( getCurrentGroup() );
 	}
 
-	public final ConstraintLocationKind getConstraintLocationKind() {
-		return constraintLocationKind;
-	}
-
-	public final void setConstraintLocationKind(ConstraintLocationKind constraintLocationKind) {
-		this.constraintLocationKind = constraintLocationKind;
-	}
-
 	public final ValueState<V> getCurrentValueState() {
-		return new ValueState<V>( propertyPath, currentValue );
+		return new ValueState<>( propertyPath, currentValue );
 	}
 
 	public final void resetValueState(ValueState<V> valueState) {
@@ -206,7 +192,6 @@ public abstract sealed class ValueContext<T, V> permits BeanValueContext, Execut
 		sb.append( ", propertyPath=" ).append( propertyPath );
 		sb.append( ", currentGroup=" ).append( currentGroup );
 		sb.append( ", currentValue=" ).append( currentValue );
-		sb.append( ", constraintLocationKind=" ).append( constraintLocationKind );
 		sb.append( '}' );
 		return sb.toString();
 	}
